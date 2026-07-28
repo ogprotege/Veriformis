@@ -55,7 +55,7 @@ Expected: FAIL — `ModuleNotFoundError: No module named 'veriformis'`
 ```toml
 # pyproject.toml
 [build-system]
-require = ["setuptools>=77"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
