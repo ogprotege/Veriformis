@@ -57,7 +57,7 @@ class _LowercaseRule:
 RULES: dict[str, Callable[[], Rule]] = {
     "page-numbers": lambda: RegexRule(
         "page-numbers",
-        r"^\s*(?:\d{1,4}|(?:page|p\.?)\s*\d{1,4}(?:\s*of\s*\d{1,4})?)\s*\n?",
+        r"^[ \t]*(?:\d{1,4}|(?:page|p\.?)\s*\d{1,4}(?:\s*of\s*\d{1,4})?)[ \t]*(?:\n|$)",
         "",
     ),
     "headers-footers": lambda: _RepeatedLineRule(),
