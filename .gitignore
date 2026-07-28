@@ -1,0 +1,12 @@
+# .gitignore
+.venv/
+__pycache__/
+*.egg-info/
+*.pyc
+.coverage
+htmlcov/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.superpowers/
