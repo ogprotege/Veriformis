@@ -24,7 +24,7 @@ from veriformis.rules.library import RULES, custom_regex, default_rules
 from veriformis.serializers.chat import serialize_chat
 from veriformis.serializers.formats import serialize_completion, serialize_instruction
 from veriformis.sources import SourceRef
-from veriformis.validate.gates import run_gates
+from veriformis.validate.gates import RECORD_SCHEMAS, run_gates
 
 app = typer.Typer(help="Veriformis — local-first dataset compiler.")
 
@@ -186,6 +186,9 @@ def format_cmd(
 @app.command()
 def validate(workspace: Path, format: str = typer.Option(..., "--format")) -> None:
     """Run validation gates; exits 1 if any gate fails."""
+    if format not in RECORD_SCHEMAS:
+        typer.echo(f"unknown format: {format} (have: {sorted(RECORD_SCHEMAS)})", err=True)
+        raise typer.Exit(code=2)
     _, sources = _load_workspace(workspace)
     raw = json.loads((workspace / "chunks.json").read_text())
     chunks = [
@@ -245,8 +248,6 @@ def seal(workspace: Path, out: Path = typer.Option(..., "-o")) -> None:
 @app.command()
 def preview(path: Path, rules: str = typer.Option("", "--rules")) -> None:
     """Dry-run cleaning on one file; prints the log; writes nothing."""
-    from veriformis.ir import block_text
-
     result = _parse_one(path)
     if rules:
         unknown = [n for n in rules.split(",") if n not in RULES]
@@ -254,7 +255,7 @@ def preview(path: Path, rules: str = typer.Option("", "--rules")) -> None:
             typer.echo(f"unknown rule(s): {', '.join(unknown)} (have: {sorted(RULES)})", err=True)
             raise typer.Exit(code=2)
     selected = default_rules() if not rules else [RULES[n]() for n in rules.split(",")]
-    text = block_text(result.document.children[0]) if result.document.children else ""
+    text = result.source.extracted_text  # the whole file, not just the first block
     from veriformis.rules.engine import apply_rules
 
     cleaned, records, warnings = apply_rules(text, selected)

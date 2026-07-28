@@ -53,6 +53,21 @@ def test_preview_writes_nothing(tmp_path):
     assert list(tmp_path.iterdir()) == [src]
 
 
+def test_preview_covers_all_blocks(tmp_path):
+    src = tmp_path / "doc.txt"
+    src.write_text("line\n\n42\n\nmore")
+    result = runner.invoke(app, ["preview", str(src)])
+    assert result.exit_code == 0
+    after = result.output.split("--- after ---")[-1]
+    assert "42" not in after  # whole-file dry run, not just the first block
+
+
+def test_validate_rejects_unknown_format(tmp_path):
+    result = runner.invoke(app, ["validate", str(tmp_path), "--format", "bogus"])
+    assert result.exit_code == 2
+    assert "unknown format" in result.output.lower()
+
+
 def test_version():
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0 and "0.1.0" in result.output
