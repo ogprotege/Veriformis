@@ -1374,6 +1374,26 @@ def test_structure_chunks_attach_heading_path():
     assert chunks[0].heading_path == ["Intro"]
     assert chunks[-1].heading_path == ["Intro", "Scope"]
     assert any("body two" in c.text for c in chunks)
+
+
+def test_transformed_flag_marks_only_chunks_containing_edited_blocks():
+    blocks = _blocks(["aaa", "bbb", "ccc"])
+    chunks = chunk_paragraph(blocks, max_size=5, transformed=(1,))
+    assert [c.transformed for c in chunks] == [False, True, False]
+
+
+def test_stream_chunks_attribute_transformed_by_window_intersection():
+    blocks = _blocks(["x" * 40, "y" * 40])
+    chunks = chunk_fixed(blocks, size=30, overlap=10, transformed=(0,))
+    assert chunks[0].transformed is True
+    assert chunks[-1].transformed is False  # last window covers only block 1
+
+
+def test_sentence_chunks_accumulate_contributing_blocks_for_transformed():
+    blocks = _blocks(["Alpha one. Alpha two.", "Beta one."])
+    chunks = chunk_sentence(blocks, max_size=1000, transformed=(1,))
+    assert len(chunks) == 1
+    assert chunks[0].transformed is True  # edited block 1 contributes mid-buffer
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1497,11 +1517,27 @@ def chunk_paragraph(blocks, *, max_size=1000, source_id="", transformed=()) -> l
     return chunks
 
 
+def _block_ranges(blocks) -> list[tuple[int, int]]:
+    """[start, end) offset of each block's region (text plus its following
+    separator) within the flattened stream."""
+    ranges, pos = [], 0
+    for i, block in enumerate(blocks):
+        end = pos + len(block_text(block)) + (0 if i == len(blocks) - 1 else 2)
+        ranges.append((pos, end))
+        pos = end
+    return ranges
+
+
+def _blocks_intersecting(blocks, ranges, start, end) -> list[Block]:
+    return [b for b, (s, e) in zip(blocks, ranges, strict=True) if start < e and end > s]
+
+
 def _stream_chunks(blocks, size, overlap, *, source_id, transformed):
     """Shared engine for fixed/sliding: `fixed` is boundary splitting with optional
     overlap; `sliding` is the same engine with overlap as a first-class parameter.
     A document shorter than `size` always yields exactly one chunk."""
     tb, stream, chunks, seq = _norm(transformed), flatten(blocks), [], 0
+    ranges = _block_ranges(blocks)
     if len(stream) <= size:
         if stream:
             chunks.append(make_chunk(1, blocks, stream, source_id=source_id,
@@ -1514,7 +1550,8 @@ def _stream_chunks(blocks, size, overlap, *, source_id, transformed):
     while pos < len(stream):
         end = min(pos + size, len(stream))
         seq += 1
-        chunks.append(make_chunk(seq, blocks, stream[pos:end], source_id=source_id,
+        chunks.append(make_chunk(seq, _blocks_intersecting(blocks, ranges, pos, end),
+                                 stream[pos:end], source_id=source_id,
                                  heading_path=[], span=Span(pos, end), transformed_blocks=tb))
         if end == len(stream):
             break
@@ -1554,7 +1591,9 @@ def chunk_sentence(blocks, *, max_size=1000, source_id="", transformed=()) -> li
                                          span=None, transformed_blocks=tb))
                 buf, buf_blocks = sent, [block]
             else:
-                buf, buf_blocks = candidate, (buf_blocks or [block])
+                buf = candidate
+                if not any(b is block for b in buf_blocks):
+                    buf_blocks.append(block)
     if buf:
         seq += 1
         chunks.append(make_chunk(seq, buf_blocks, buf, source_id=source_id,
@@ -1591,10 +1630,12 @@ from veriformis.chunkers.strategies import (  # noqa: F401
 
 Note for the implementer: `chunk_sentence`'s span is intentionally `None` in v1 (sentence packing crosses block boundaries in a way the single-span model can't express honestly); `heading_path` is still attached. The provenance gate (Task 10) treats `span=None` as "linkage check only".
 
+Amendment (Task-8 review, 2026-07-28): the `transformed` flag now reflects the blocks each chunk actually contains, per the global constraint "any chunk containing one sets `transformed=True`" — `_stream_chunks` attributes each window to its intersecting blocks via `_block_ranges`/`_blocks_intersecting` (the original listing passed the whole document to every chunk, so one edited block marked every chunk), and `chunk_sentence` accumulates every contributing block in `buf_blocks` (the original kept only the buffer's first block). Three tests pin the corrected semantics. Stream-chunk `heading_path=[]` is retained deliberately: heading attribution for arbitrary byte windows is ill-defined in v1.
+
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest tests/chunkers/test_strategies.py -v`
-Expected: PASS (5 passed)
+Expected: PASS (8 passed)
 
 - [ ] **Step 5: Commit**
 
