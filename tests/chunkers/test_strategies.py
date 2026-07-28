@@ -54,3 +54,23 @@ def test_structure_chunks_attach_heading_path():
     assert chunks[0].heading_path == ["Intro"]
     assert chunks[-1].heading_path == ["Intro", "Scope"]
     assert any("body two" in c.text for c in chunks)
+
+
+def test_transformed_flag_marks_only_chunks_containing_edited_blocks():
+    blocks = _blocks(["aaa", "bbb", "ccc"])
+    chunks = chunk_paragraph(blocks, max_size=5, transformed=(1,))
+    assert [c.transformed for c in chunks] == [False, True, False]
+
+
+def test_stream_chunks_attribute_transformed_by_window_intersection():
+    blocks = _blocks(["x" * 40, "y" * 40])
+    chunks = chunk_fixed(blocks, size=30, overlap=10, transformed=(0,))
+    assert chunks[0].transformed is True
+    assert chunks[-1].transformed is False  # last window covers only block 1
+
+
+def test_sentence_chunks_accumulate_contributing_blocks_for_transformed():
+    blocks = _blocks(["Alpha one. Alpha two.", "Beta one."])
+    chunks = chunk_sentence(blocks, max_size=1000, transformed=(1,))
+    assert len(chunks) == 1
+    assert chunks[0].transformed is True  # edited block 1 contributes mid-buffer

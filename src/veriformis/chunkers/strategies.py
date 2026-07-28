@@ -50,11 +50,27 @@ def chunk_paragraph(blocks, *, max_size=1000, source_id="", transformed=()) -> l
     return chunks
 
 
+def _block_ranges(blocks) -> list[tuple[int, int]]:
+    """[start, end) offset of each block's region (text plus its following
+    separator) within the flattened stream."""
+    ranges, pos = [], 0
+    for i, block in enumerate(blocks):
+        end = pos + len(block_text(block)) + (0 if i == len(blocks) - 1 else 2)
+        ranges.append((pos, end))
+        pos = end
+    return ranges
+
+
+def _blocks_intersecting(blocks, ranges, start, end) -> list[Block]:
+    return [b for b, (s, e) in zip(blocks, ranges, strict=True) if start < e and end > s]
+
+
 def _stream_chunks(blocks, size, overlap, *, source_id, transformed):
     """Shared engine for fixed/sliding: `fixed` is boundary splitting with optional
     overlap; `sliding` is the same engine with overlap as a first-class parameter.
     A document shorter than `size` always yields exactly one chunk."""
     tb, stream, chunks, seq = _norm(transformed), flatten(blocks), [], 0
+    ranges = _block_ranges(blocks)
     if len(stream) <= size:
         if stream:
             chunks.append(make_chunk(1, blocks, stream, source_id=source_id,
@@ -67,7 +83,8 @@ def _stream_chunks(blocks, size, overlap, *, source_id, transformed):
     while pos < len(stream):
         end = min(pos + size, len(stream))
         seq += 1
-        chunks.append(make_chunk(seq, blocks, stream[pos:end], source_id=source_id,
+        chunks.append(make_chunk(seq, _blocks_intersecting(blocks, ranges, pos, end),
+                                 stream[pos:end], source_id=source_id,
                                  heading_path=[], span=Span(pos, end), transformed_blocks=tb))
         if end == len(stream):
             break
@@ -107,7 +124,9 @@ def chunk_sentence(blocks, *, max_size=1000, source_id="", transformed=()) -> li
                                          span=None, transformed_blocks=tb))
                 buf, buf_blocks = sent, [block]
             else:
-                buf, buf_blocks = candidate, (buf_blocks or [block])
+                buf = candidate
+                if not any(b is block for b in buf_blocks):
+                    buf_blocks.append(block)
     if buf:
         seq += 1
         chunks.append(make_chunk(seq, buf_blocks, buf, source_id=source_id,
