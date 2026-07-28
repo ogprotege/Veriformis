@@ -2446,6 +2446,21 @@ def test_preview_writes_nothing(tmp_path):
     assert list(tmp_path.iterdir()) == [src]
 
 
+def test_preview_covers_all_blocks(tmp_path):
+    src = tmp_path / "doc.txt"
+    src.write_text("line\n\n42\n\nmore")
+    result = runner.invoke(app, ["preview", str(src)])
+    assert result.exit_code == 0
+    after = result.output.split("--- after ---")[-1]
+    assert "42" not in after  # whole-file dry run, not just the first block
+
+
+def test_validate_rejects_unknown_format(tmp_path):
+    result = runner.invoke(app, ["validate", str(tmp_path), "--format", "bogus"])
+    assert result.exit_code == 2
+    assert "unknown format" in result.output.lower()
+
+
 def test_version():
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0 and "0.1.0" in result.output
@@ -2485,7 +2500,7 @@ from veriformis.rules.library import RULES, custom_regex, default_rules
 from veriformis.serializers.chat import serialize_chat
 from veriformis.serializers.formats import serialize_completion, serialize_instruction
 from veriformis.sources import SourceRef
-from veriformis.validate.gates import run_gates
+from veriformis.validate.gates import RECORD_SCHEMAS, run_gates
 
 app = typer.Typer(help="Veriformis — local-first dataset compiler.")
 
@@ -2647,6 +2662,9 @@ def format_cmd(
 @app.command()
 def validate(workspace: Path, format: str = typer.Option(..., "--format")) -> None:
     """Run validation gates; exits 1 if any gate fails."""
+    if format not in RECORD_SCHEMAS:
+        typer.echo(f"unknown format: {format} (have: {sorted(RECORD_SCHEMAS)})", err=True)
+        raise typer.Exit(code=2)
     _, sources = _load_workspace(workspace)
     raw = json.loads((workspace / "chunks.json").read_text())
     chunks = [
@@ -2706,8 +2724,6 @@ def seal(workspace: Path, out: Path = typer.Option(..., "-o")) -> None:
 @app.command()
 def preview(path: Path, rules: str = typer.Option("", "--rules")) -> None:
     """Dry-run cleaning on one file; prints the log; writes nothing."""
-    from veriformis.ir import block_text
-
     result = _parse_one(path)
     if rules:
         unknown = [n for n in rules.split(",") if n not in RULES]
@@ -2715,7 +2731,7 @@ def preview(path: Path, rules: str = typer.Option("", "--rules")) -> None:
             typer.echo(f"unknown rule(s): {', '.join(unknown)} (have: {sorted(RULES)})", err=True)
             raise typer.Exit(code=2)
     selected = default_rules() if not rules else [RULES[n]() for n in rules.split(",")]
-    text = block_text(result.document.children[0]) if result.document.children else ""
+    text = result.source.extracted_text  # the whole file, not just the first block
     from veriformis.rules.engine import apply_rules
 
     cleaned, records, warnings = apply_rules(text, selected)
@@ -2741,6 +2757,8 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
+
+Amendment (Task-12 review, 2026-07-28): two review findings fixed at plan level. (1) `preview` now cleans the whole extracted stream (`result.source.extracted_text`) — the original listing cleaned only `children[0]`, silently misrepresenting multi-paragraph files and contradicting this task's "dry-run cleaning on one file" interface. (2) `validate` rejects unknown `--format` values with a clean exit 2 (membership check against `RECORD_SCHEMAS`), matching the sibling commands' error convention; previously an unknown format crashed with a raw `KeyError`. Two tests pin the corrected behaviors.
 
 - [ ] **Step 4: Run full suite to verify everything passes**
 
