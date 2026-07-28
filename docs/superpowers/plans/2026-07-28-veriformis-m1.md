@@ -1158,6 +1158,14 @@ def test_page_numbers_line_anchored_only():
     assert "Page 12 of 98" not in out
 
 
+def test_page_numbers_conservative_on_inline_and_boundaries():
+    # Task-7 review amendment: leading inline numbers survive; paragraph
+    # boundaries are never merged by a removal.
+    text = "37 people attended the meeting.\n\npara one\n\n42\n\npara two\n"
+    out = _apply("page-numbers", text)
+    assert out == "37 people attended the meeting.\n\npara one\n\n\npara two\n"
+
+
 def test_headers_footers_strips_only_short_repeated_lines():
     lines = ["CONFIDENTIAL DRAFT"] + [f"Unique sentence number {i} here." for i in range(6)]
     text = "CONFIDENTIAL DRAFT\n" + "\n".join(lines[1:3]) + "\nCONFIDENTIAL DRAFT\n" + "\n".join(lines[3:]) + "\nCONFIDENTIAL DRAFT"
@@ -1254,7 +1262,7 @@ class _LowercaseRule:
 RULES: dict[str, Callable[[], Rule]] = {
     "page-numbers": lambda: RegexRule(
         "page-numbers",
-        r"^\s*(?:\d{1,4}|(?:page|p\.?)\s*\d{1,4}(?:\s*of\s*\d{1,4})?)\s*\n?",
+        r"^[ \t]*(?:\d{1,4}|(?:page|p\.?)\s*\d{1,4}(?:\s*of\s*\d{1,4})?)[ \t]*(?:\n|$)",
         "",
     ),
     "headers-footers": lambda: _RepeatedLineRule(),
@@ -1271,6 +1279,8 @@ def default_rules() -> list[Rule]:
 ```
 
 Note for the implementer: the `whitespace` rule collapses `[ \t]+` only — never newlines; paragraph boundaries are load-bearing downstream (chunkers depend on them).
+
+Amendment (Task-7 review, 2026-07-28): the `page-numbers` regex was re-anchored to `[ \t]*…[ \t]*(?:\n|$)` after review found the original `^\s*…\s*\n?` form deleted paragraph-leading inline numbers and merged paragraph boundaries — both violations of this task's conservative-design constraint. The added test `test_page_numbers_conservative_on_inline_and_boundaries` pins the corrected behavior (and makes the "6 passed" expectation exact).
 
 - [ ] **Step 4: Run test to verify it passes**
 
