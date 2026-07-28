@@ -30,6 +30,9 @@ def chunk_paragraph(blocks, *, max_size=1000, source_id="", transformed=()) -> l
 
     def flush() -> None:
         nonlocal seq
+        if not flatten(group):
+            return  # never emit empty chunks (e.g. a lone horizontal rule): the
+                    # gate rejects zero-length spans and empty records are noise
         seq += 1
         chunks.append(make_chunk(
             seq, group, flatten(group), source_id=source_id,
@@ -40,7 +43,7 @@ def chunk_paragraph(blocks, *, max_size=1000, source_id="", transformed=()) -> l
         ))
 
     for block in blocks:
-        if group and len(flatten(group + [block])) > max_size:
+        if group and block_text(block) and len(flatten(group + [block])) > max_size:
             flush()
             group = [block]
         else:
