@@ -593,6 +593,18 @@ def test_parse_text_code_language(tmp_path):
     assert result.document.children[0].language == "python"
 
 
+def test_parse_text_irregular_separators_use_canonical_stream(tmp_path):
+    # Final-review amendment: irregular raw separators must not break the
+    # stream contract — the registered stream is canonical, spans index it.
+    p = tmp_path / "irregular.txt"
+    p.write_text("First para.\n\n\nSecond para.\n \nThird para.", encoding="utf-8")
+    result = parse_text(p)
+    stream = result.source.extracted_text
+    assert stream == "First para.\n\nSecond para.\n\nThird para."
+    for block in result.document.children:
+        assert stream[block.span.start:block.span.end] == block_text_of(block)
+
+
 def block_text_of(block):
     from veriformis.ir import block_text
 
@@ -666,27 +678,30 @@ _BLANK = re.compile(r"\n\s*\n")
 def parse_text(path: str | Path, *, language: str | None = None) -> ParseResult:
     p = Path(path)
     text = p.read_text(encoding="utf-8")
-    source = register_source(p, "text", text)
     if language is not None:
+        source = register_source(p, "text", text)
         doc = Document(
             children=[CodeBlock(text=text, language=language, span=Span(0, len(text)), block_index=0)],
             source_id=source.id,
         )
         return ParseResult(document=doc, source=source)
-    blocks = []
-    pos = 0
+    blocks, parts, pos = [], [], 0
     for chunk in _BLANK.split(text):
         stripped = chunk.strip()
         if not stripped:
             continue
-        chunk_start = text.index(chunk, pos)
-        start = chunk_start + (len(chunk) - len(chunk.lstrip()))
-        pos = chunk_start + len(chunk)
-        # span covers the stripped range, so stream[start:end] == block_text(block)
+        # span indexes the canonical extracted stream (stripped blocks joined by
+        # "\n\n", built below) — NOT the raw file, whose separators may be
+        # irregular; fixed/sliding chunk windows would otherwise drift (final
+        # whole-branch review finding).
         blocks.append(
-            Paragraph(children=[Text(stripped)], span=Span(start, start + len(stripped)),
+            Paragraph(children=[Text(stripped)], span=Span(pos, pos + len(stripped)),
                       block_index=len(blocks))
         )
+        parts.append(stripped)
+        pos += len(stripped) + 2
+    stream = "\n\n".join(parts)
+    source = register_source(p, "text", stream)
     return ParseResult(document=Document(children=blocks, source_id=source.id), source=source)
 ```
 
@@ -695,10 +710,12 @@ def parse_text(path: str | Path, *, language: str | None = None) -> ParseResult:
 """Parsers: one module per input format, each returning sources.ParseResult."""
 ```
 
+Amendment (final whole-branch review, 2026-07-28): `parse_text` now registers the CANONICAL extracted stream (stripped paragraphs joined by `"\n\n"`) with spans indexing it — the original listing registered the raw file text, so any irregular separator (e.g. `\n\n\n`, whitespace-only lines) drifted fixed/sliding chunk windows against the gate's stream slices and made such files unsealable (probe-confirmed). The code-language path is unchanged (single whole-file CodeBlock; raw text already equals the canonical stream). Pinning test: `test_parse_text_irregular_separators_use_canonical_stream`.
+
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest tests/parsers/test_text.py -v`
-Expected: PASS (2 passed)
+Expected: PASS (3 passed)
 
 - [ ] **Step 5: Commit**
 
@@ -1322,7 +1339,7 @@ git commit -m "feat(rules): stock rule library with line-anchored page-number re
 from veriformis.chunkers.strategies import (
     chunk_fixed, chunk_paragraph, chunk_sentence, chunk_sliding, chunk_structure,
 )
-from veriformis.ir import Heading, Paragraph, Span, Text
+from veriformis.ir import Heading, HorizontalRule, Paragraph, Span, Text
 
 
 def _blocks(texts):
@@ -1394,6 +1411,33 @@ def test_sentence_chunks_accumulate_contributing_blocks_for_transformed():
     chunks = chunk_sentence(blocks, max_size=1000, transformed=(1,))
     assert len(chunks) == 1
     assert chunks[0].transformed is True  # edited block 1 contributes mid-buffer
+
+
+def test_fixed_chunks_gate_clean_on_irregular_text_separators(tmp_path):
+    # Final-review amendment: parse_text registers the canonical stream, so
+    # fixed windows and the provenance gate agree even on irregular input.
+    from veriformis.parsers.text import parse_text
+    from veriformis.validate.gates import gate_provenance
+
+    p = tmp_path / "irregular.txt"
+    p.write_text("alpha\n\n\nbeta\n \ngamma", encoding="utf-8")
+    result = parse_text(p)
+    chunks = chunk_fixed(result.document.children, size=10, overlap=2, source_id=result.source.id)
+    assert gate_provenance(chunks, {result.source.id: result.source}).passed
+
+
+def test_paragraph_chunks_never_empty_for_isolated_empty_blocks():
+    # Final-review amendment: an isolated empty-text block (e.g. `---` between
+    # two oversized paragraphs) must not become a zero-length chunk.
+    blocks = [
+        Paragraph(children=[Text("a" * 1500)], span=Span(0, 1500), block_index=0),
+        HorizontalRule(span=Span(1502, 1502), block_index=1),
+        Paragraph(children=[Text("b" * 1500)], span=Span(1504, 3004), block_index=2),
+    ]
+    chunks = chunk_paragraph(blocks, max_size=1000)
+    assert len(chunks) == 2
+    assert all(c.text for c in chunks)
+    assert chunks[0].span.start == 0 and chunks[0].span.end == 1502  # HR coalesced
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1497,6 +1541,9 @@ def chunk_paragraph(blocks, *, max_size=1000, source_id="", transformed=()) -> l
 
     def flush() -> None:
         nonlocal seq
+        if not flatten(group):
+            return  # never emit empty chunks (e.g. a lone horizontal rule): the
+                    # gate rejects zero-length spans and empty records are noise
         seq += 1
         chunks.append(make_chunk(
             seq, group, flatten(group), source_id=source_id,
@@ -1507,7 +1554,7 @@ def chunk_paragraph(blocks, *, max_size=1000, source_id="", transformed=()) -> l
         ))
 
     for block in blocks:
-        if group and len(flatten(group + [block])) > max_size:
+        if group and block_text(block) and len(flatten(group + [block])) > max_size:
             flush()
             group = [block]
         else:
@@ -1632,10 +1679,12 @@ Note for the implementer: `chunk_sentence`'s span is intentionally `None` in v1 
 
 Amendment (Task-8 review, 2026-07-28): the `transformed` flag now reflects the blocks each chunk actually contains, per the global constraint "any chunk containing one sets `transformed=True`" — `_stream_chunks` attributes each window to its intersecting blocks via `_block_ranges`/`_blocks_intersecting` (the original listing passed the whole document to every chunk, so one edited block marked every chunk), and `chunk_sentence` accumulates every contributing block in `buf_blocks` (the original kept only the buffer's first block). Three tests pin the corrected semantics. Stream-chunk `heading_path=[]` is retained deliberately: heading attribution for arbitrary byte windows is ill-defined in v1.
 
+Amendment (final whole-branch review, 2026-07-28): `chunk_paragraph` never emits empty chunks — empty-text blocks (e.g. an isolated `HorizontalRule`) coalesce into the current group and `flush()` skips empty groups. The original listing could emit a zero-length chunk (text="", span start==end) that `gate_provenance` rejects, making markdown with an `---` between two oversized paragraphs unsealable (probe-confirmed). Pinning tests: `test_paragraph_chunks_never_empty_for_isolated_empty_blocks` and `test_fixed_chunks_gate_clean_on_irregular_text_separators` (the latter also pins Task 3's canonical-stream amendment).
+
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest tests/chunkers/test_strategies.py -v`
-Expected: PASS (8 passed)
+Expected: PASS (10 passed)
 
 - [ ] **Step 5: Commit**
 
