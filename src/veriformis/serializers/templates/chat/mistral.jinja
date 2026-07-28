@@ -1,0 +1,3 @@
+<s>[INST] {% if messages[0].role == "system" %}{{ messages[0].content }}
+
+{% endif %}{{ messages | selectattr("role", "equalto", "user") | map(attribute="content") | first }} [/INST] {{ messages | selectattr("role", "equalto", "assistant") | map(attribute="content") | first }}</s>

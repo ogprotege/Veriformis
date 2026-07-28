@@ -1,0 +1,3 @@
+{% for m in messages %}<|im_start|>{{ m.role }}
+{{ m.content }}<|im_end|>{% if not loop.last %}
+{% endif %}{% endfor %}

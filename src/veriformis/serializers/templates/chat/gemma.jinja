@@ -1,0 +1,6 @@
+<bos><start_of_turn>user
+{% if messages[0].role == "system" %}{{ messages[0].content }}
+
+{% endif %}{{ messages | selectattr("role", "equalto", "user") | map(attribute="content") | first }}<end_of_turn>
+<start_of_turn>model
+{{ messages | selectattr("role", "equalto", "assistant") | map(attribute="content") | first }}<end_of_turn>
