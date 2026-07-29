@@ -1,7 +1,7 @@
 # Architecture
 
-This document describes Veriformis `0.1.0` after the Group 1 integrity work.
-The later dataset-construction architecture is labeled separately. See the
+This document describes Veriformis `0.1.0` after the Group 2 dataset-construction
+work. Later finished-dataset architecture is labeled separately. See the
 [build roadmap](plans/2026-07-29-veriformis-roadmap.md) for the ordered path to
 the complete product.
 
@@ -17,16 +17,17 @@ raw local files
    -> parse into canonical IR + diagnostics
    -> clean through a replayable plan
    -> chunk with reconstructible source evidence
-   -> format current M1 record projections
-   -> validate one immutable revision
-   -> seal the current M1 bundle shape
-   -> dataset.jsonl + manifest.json
+   +-> construct evidence-bearing accepted records
+   |
+   +-> format current M1 chunk projections
+       -> validate one immutable revision
+       -> seal the current M1 bundle shape
+       -> dataset.jsonl + manifest.json
 ```
 
-The first four transitions now rest on immutable workspace revisions,
-source-scoped identities, strict persisted schemas, and content-addressed
-artifacts. The later record, curation, split, exact-validation, and closed-seal
-contracts remain assigned to Groups 2 and 3.
+Construction and the legacy M1 projection path are separate after chunking.
+Group 3 will make serializers consume accepted records. Curation, split,
+product-row, exact-validation, and closed-seal contracts remain unimplemented.
 
 There is no shared pipeline service, YAML runner, MCP server, or macOS
 application in `0.1.0`.
@@ -35,7 +36,7 @@ application in `0.1.0`.
 
 | Module | Current responsibility |
 | --- | --- |
-| `src/veriformis/contracts.py` | Public product, Group 1, canonical-stream, source-kind, objective, schema, stage, and error-code constants |
+| `src/veriformis/contracts.py` | Public product, integrity, construction, canonical-stream, source-kind, objective, row-schema, stage, and error-code constants |
 | `src/veriformis/identity.py` | Exact-string durable JSON, NFC-normalized logical paths, digests, and domain-separated deterministic identities |
 | `src/veriformis/workspace.py` | Versioned revisions, content-addressed objects, stage dependencies, locking, atomic commits, and corruption checks |
 | `src/veriformis/diagnostics.py` | Located, typed parser diagnostics and mandatory parse reports |
@@ -44,6 +45,7 @@ application in `0.1.0`.
 | `src/veriformis/ir/` | Canonical document model and strict `veriformis.ir/v1` JSON serialization |
 | `src/veriformis/rules/` | Deterministic rules, replayable cleaning plans, and transform records |
 | `src/veriformis/chunkers/` | Paragraph, fixed, sliding, sentence, and structure chunking with source evidence |
+| `src/veriformis/construction/` | Strict objectives and recipes, text and IR field evidence, deterministic constructors, lifecycle models, execution, and replay validation |
 | `src/veriformis/serializers/` | Current completion, instruction, and rendered-chat projections |
 | `src/veriformis/validate/` | Schema, encoding, and evidence-based provenance gates |
 | `src/veriformis/bundle/` | Current bundle manifest, writer, and programmatic verification |
@@ -73,8 +75,9 @@ footnote and endnote references. Note bodies follow the body in the shared
 canonical stream, but `body`, `footnote:<id>`, and `endnote:<id>` remain
 distinct logical regions for chunking and source evidence. IR-only metadata,
 such as link targets and image sources or titles, remains in the strict IR.
-Field-level evidence for that metadata is a Group 2 prerequisite before the
-`structured_field` objective can be implemented truthfully.
+Group 2 `IRFieldEvidence` can bind one strict-IR scalar to its source, immutable
+artifact, RFC 6901 pointer, exact value and output digests, encoding, and
+construction context.
 
 Parser diagnostics use format-native locations. Text diagnostics can report
 lines and raw byte offsets. DOCX diagnostics can report an OOXML part and
@@ -100,6 +103,7 @@ Durable IDs use a domain-separated `kind-v1-<64 hex>` form.
 - A source ID binds the normalized logical path and raw SHA-256.
 - An artifact ID binds content, producer, version, configuration, and source scope.
 - Cleaning operations, plans, transforms, derivations, evidence, and chunks bind their semantic payloads.
+- Objectives, recipes, passes, IR evidence, candidates, reviews, decisions, accepted records, construction diagnostics, and results bind their complete semantic payloads.
 - A portable state digest binds current semantic workspace state.
 - A revision ID also binds its parent and commit time for audit history.
 - Duplicate durable identities or inconsistent persisted identities fail closed.
@@ -116,16 +120,18 @@ forms remain distinct. Those durable paths apply NFC normalization only to
 explicit locator fields, currently logical source paths, before identity
 derivation. Exact content digests still bind the persisted bytes.
 
-Roadmap Step 4 applies this model to the durable primitives that exist now:
-sources, artifacts, transforms, chunks, and workspace revisions. Steps 5 and 6
-also use domain-separated IDs for diagnostics, evidence, cleaning operations,
-and plans. Candidate, dataset-record, and split identities do not exist yet.
-Groups 2 and 3 must adopt the same identity substrate when those types are
-introduced.
+Roadmap Step 4 applies this model to sources, artifacts, transforms, chunks,
+and workspace revisions. Steps 5 and 6 also use domain-separated IDs for
+diagnostics, evidence, cleaning operations, and plans. Group 2 extends it to
+every construction object. Group 3 must add separate curation and split
+identities without mutating accepted record identity.
 
 ## Transactional workspace
 
-The workspace has this physical layout:
+The workspace physical layout remains schema 1. Newly created and explicitly
+migrated workspaces use revision schema 2. Verified unmigrated v1 workspaces
+remain on revision schema 1 for legacy-stage commits until migration. The layout
+is:
 
 ```text
 workspace/
@@ -159,8 +165,10 @@ after readers can already observe the revision.
 
 Each revision contains source descriptors, artifact descriptors, and a state
 for every stage. A stage state records its inputs, configuration, logical
-outputs, status, and invalidation evidence. Legacy flat workspaces require an
-explicit migration and are not silently trusted.
+outputs, status, and invalidation evidence. `upgrade-workspace` appends the
+only supported revision-schema-v1 to revision-schema-v2 migration. It preserves
+all v1 source, artifact, and stage facts and adds `construct` as absent.
+Pre-revision flat workspaces remain unsupported.
 
 The revision ID is an audit identity. Two otherwise equivalent runs may have
 different revision IDs because their parents or commit times differ. The
@@ -177,15 +185,25 @@ The revision manifest maps these exact keys to artifact IDs:
 | Parse | `registry`; `source/<source-id>/raw`; `source/<source-id>/canonical`; `source/<source-id>/document`; `source/<source-id>/diagnostics` |
 | Clean | `transforms`; `source/<source-id>/document`; `source/<source-id>/cleaning-plan`; `source/<source-id>/block-derivations` |
 | Chunk | `chunks` |
+| Construct | `recipe`; `result` |
 | Format | `records`; `records-meta` |
 | Validate | `validations` |
 | Seal | No workspace output yet. The current command writes an external bundle directory. |
 
-Rerunning a stage invalidates every dependent stage. Parse invalidates clean
-through seal. Clean invalidates chunk through seal. Chunk invalidates format
-through seal. Format invalidates validation and seal. Validation invalidates
-seal. Stale stages retain history in older revisions but expose no active
-outputs in the new revision.
+Rerunning a stage invalidates every dependent stage. Parse invalidates all
+later stages. Clean invalidates chunk, construct, format, validate, and seal.
+Chunk invalidates construct, format, validate, and seal. Construct has no
+downstream stage in Group 2, so it does not invalidate the legacy format path.
+Format invalidates validation and seal. Validation invalidates seal. Stale
+stages retain history in older revisions but expose no active outputs in the
+new revision.
+
+Construct commits use a strict stage configuration containing the construction
+schema ID, recipe ID, and exact selected source IDs. Before `HEAD` advances,
+the transaction reloads the recipe and result, requires canonical JSON and
+exact artifact scope, reconstructs the selected source, clean, chunk,
+transform, and cleaned-IR inputs, and compares the result with a fresh semantic
+replay. A self-consistent result ID is not enough if the result does not replay.
 
 ## Replayable cleaning
 
@@ -234,7 +252,42 @@ provenance gate reconstructs each chunk and compares the result with its text.
 Chunking operates within one body or note region at a time and records that
 region in both chunk identity context and source ranges.
 
-## Current record construction
+## Dataset construction
+
+Group 2 adds a pure construction subsystem after verified chunking. A strict
+`TrainingObjective` declares one of five semantic field shapes:
+
+- `full_text`: `text`;
+- `continuation`: `prompt`, `completion`;
+- `section_reconstruction`: `heading`, `section`;
+- `before_after_transformation`: `before`, `after`;
+- `structured_field`: `input`, `fields`.
+
+A `DatasetRecipe` binds its objective to an exact source set, clean
+configuration, segmentation policy, ordered constructor passes and versions,
+review policy, required construction gates, and future target row schema.
+Recipe curation and split policy values remain explicitly `deferred`. The row
+schema is declared but is not emitted in Group 2.
+
+Each constructor returns evidence-bearing drafts and deterministic diagnostics.
+Drafts become append-only candidates with recipe, objective, pass, source,
+chunk, and transform lineage. Every candidate receives one accepted, rejected,
+or pending-review decision. Accepted candidates become immutable dataset
+records with unchanged fields and lineage. Review-required recipes cannot
+promote a candidate without separate review evidence.
+
+Text fields resolve through Group 1 source evidence. Structured IR fields bind
+an immutable document artifact and RFC 6901 scalar pointer. Missing source
+chunks, missing section structure, unavailable IR, and other ineligible inputs
+produce typed construction diagnostics. `source-chunks-unavailable` records a
+selected source omitted by a pass without stopping valid sources. It is not a
+substitute for Group 3 coverage accounting.
+
+The cleaned corpus is an intermediate compiler state unless `full_text`
+explicitly selects retained source-grounded sequences as targets. There is no
+summary objective, remote generation, or LLM call in deterministic v1.
+
+## Legacy M1 formatting
 
 The current format stage still maps chunks directly into records:
 
@@ -248,9 +301,9 @@ as the assistant response. This is not a truthful summarization operation.
 Rendered chat text also removes the prompt and assistant boundary needed for
 completion-only masking in downstream trainers.
 
-Group 2 introduces declared objectives, recipes, construction passes, and
-record lifecycle states. Group 3 separates construction from serialization and
-adds structured training rows.
+These serializers do not consume Group 2 `DatasetRecord` values. Group 3 must
+separate accepted-record construction from target-schema lowering and add
+provenance-bearing product rows.
 
 ## Current validation
 
@@ -283,17 +336,16 @@ declared payload hashes, but it skips the manifest self-hash and accepts
 undeclared extra files. Original inputs are not copied into the bundle.
 
 Atomic closed-set sealing, an external digest or attestation, path-safe
-verification, and mutation tests belong to roadmap Step 16. Group 1 does not
-claim those defects are fixed.
+verification, and mutation tests belong to roadmap Step 16. Groups 1 and 2 do
+not claim those defects are fixed.
 
 ## Planned product architecture
 
-The implemented Group 1 foundation supports the remaining ordered work:
+The implemented Groups 1 and 2 foundation supports the remaining ordered work:
 
-1. Group 2 adds training objectives, recipes, construction passes, record states, and deterministic constructors.
-2. Group 3 adds curation, leakage-safe splitting, structured rows, exact validation, and atomic sealing.
-3. Group 4 adds `PipelineService`, a thin CLI, and dual-objective M1.1 acceptance.
-4. Later groups expand ingest and recipes, add MCP and Aptus contracts, and deliver the SwiftUI workbench.
+1. Group 3 adds curation, leakage-safe splitting, construction-aware serialization, product rows, exact validation, atomic sealing, and independent verification.
+2. Group 4 adds `PipelineService`, a thin CLI, and dual-objective M1.1 acceptance.
+3. Later groups expand ingest and recipes, add MCP and Aptus contracts, and deliver the SwiftUI workbench.
 
 The endpoint remains a finished, constructed, curated, split, validated, and
 sealed dataset. Canonical and cleaned text are accountable intermediate states,
@@ -303,6 +355,7 @@ not the product boundary.
 
 - [Product contract](product-contract.md)
 - [Integrity Contract v1](contracts/integrity-v1.md)
+- [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Current implementation status](current-status.md)
 - [CLI reference](cli.md)
 - [Development guide](development.md)

@@ -7,6 +7,7 @@ Veriformis is an alpha dataset compiler with strict source-fidelity and integrit
 Before changing code, read:
 
 - [Product contract](docs/product-contract.md)
+- [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
@@ -52,8 +53,11 @@ For integrity or provenance repairs:
 
 - Do not label copied source text as a summary or another transformation that did not occur.
 - Do not invent instructions or targets inside a serializer.
+- Keep recipe source selection exact. Do not silently widen or narrow it.
+- Bind every constructed field to replayable source-text or strict-IR evidence.
 - Keep structured prompt and target boundaries when downstream masking depends on them.
 - Treat human review as a recipe or policy state, not a universal prerequisite for dataset construction.
+- Preserve `curation_policy` and `split_policy` as deferred until Group 3 implements them.
 - Keep `0.1.0` deterministic and offline unless an approved roadmap step changes that boundary.
 
 ### Safety and compatibility
@@ -98,6 +102,11 @@ For integrity or provenance repairs:
 
 ## Current project boundary
 
-Version `0.1.0` provides the core Python package and stage-command CLI. Transactional workspace state, recipe-driven construction, full dataset validation, atomic sealing, additional ingest formats, MCP, downstream handoff, and the SwiftUI application are planned work.
+Version `0.1.0` provides the core Python package and stage-command CLI,
+transactional workspace revision schema 2, and recipe-driven deterministic
+construction. It does not yet connect accepted records to curation, splits,
+product-row serialization, exact whole-dataset validation, or final sealing.
+Additional ingest formats, MCP, downstream handoff, and the SwiftUI application
+also remain planned.
 
 Follow the numbered sequence and exit gates in the [build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md).

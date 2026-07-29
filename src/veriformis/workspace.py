@@ -23,7 +23,10 @@ from pydantic import (
     model_validator,
 )
 
-from veriformis.contracts import CANONICAL_STREAM_CONTRACT_VERSION
+from veriformis.contracts import (
+    CANONICAL_STREAM_CONTRACT_VERSION,
+    CONSTRUCTION_STAGE_SCHEMA_ID,
+)
 from veriformis.errors import (
     ArtifactDigestMismatchError,
     DuplicateIdentityError,
@@ -49,14 +52,33 @@ from veriformis.identity import (
     validate_sha256,
 )
 
-WORKSPACE_SCHEMA_VERSION = 1
-StageName = Literal["parse", "clean", "chunk", "format", "validate", "seal"]
+WORKSPACE_LAYOUT_SCHEMA_VERSION = 1
+LEGACY_REVISION_SCHEMA_VERSION = 1
+WORKSPACE_REVISION_SCHEMA_VERSION = 2
+CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION = CONSTRUCTION_STAGE_SCHEMA_ID
+
+# Compatibility alias for callers that used the original name for the
+# workspace.json layout contract. Revision manifests now carry their own,
+# independently versioned schema.
+WORKSPACE_SCHEMA_VERSION = WORKSPACE_LAYOUT_SCHEMA_VERSION
+
+StageName = Literal[
+    "parse", "clean", "chunk", "construct", "format", "validate", "seal"
+]
 StageStatus = Literal["complete", "failed", "stale", "absent"]
 CommitStage = Literal[
-    "init", "migration", "parse", "clean", "chunk", "format", "validate", "seal"
+    "init",
+    "migration",
+    "parse",
+    "clean",
+    "chunk",
+    "construct",
+    "format",
+    "validate",
+    "seal",
 ]
 
-STAGES: tuple[StageName, ...] = (
+LEGACY_STAGES: tuple[StageName, ...] = (
     "parse",
     "clean",
     "chunk",
@@ -64,7 +86,17 @@ STAGES: tuple[StageName, ...] = (
     "validate",
     "seal",
 )
-STAGE_DEPENDENCIES: dict[StageName, tuple[StageName, ...]] = {
+STAGES: tuple[StageName, ...] = (
+    "parse",
+    "clean",
+    "chunk",
+    "construct",
+    "format",
+    "validate",
+    "seal",
+)
+
+LEGACY_STAGE_DEPENDENCIES: dict[StageName, tuple[StageName, ...]] = {
     "parse": (),
     "clean": ("parse",),
     "chunk": ("clean",),
@@ -72,18 +104,48 @@ STAGE_DEPENDENCIES: dict[StageName, tuple[StageName, ...]] = {
     "validate": ("parse", "clean", "chunk", "format"),
     "seal": ("parse", "clean", "chunk", "format", "validate"),
 }
+STAGE_DEPENDENCIES: dict[StageName, tuple[StageName, ...]] = {
+    **LEGACY_STAGE_DEPENDENCIES,
+    "construct": ("parse", "clean", "chunk"),
+}
 
 
-def _descendants(stage: StageName) -> tuple[StageName, ...]:
+def _stages_for_revision(schema_version: int) -> tuple[StageName, ...]:
+    if schema_version == LEGACY_REVISION_SCHEMA_VERSION:
+        return LEGACY_STAGES
+    if schema_version == WORKSPACE_REVISION_SCHEMA_VERSION:
+        return STAGES
+    raise UnsupportedWorkspaceVersionError(
+        f"workspace revision schema {schema_version} is not supported"
+    )
+
+
+def _dependencies_for_revision(
+    schema_version: int,
+) -> dict[StageName, tuple[StageName, ...]]:
+    _stages_for_revision(schema_version)
+    return (
+        LEGACY_STAGE_DEPENDENCIES
+        if schema_version == LEGACY_REVISION_SCHEMA_VERSION
+        else STAGE_DEPENDENCIES
+    )
+
+
+def _descendants(
+    stage: StageName,
+    *,
+    stages: tuple[StageName, ...] = STAGES,
+    dependencies: Mapping[StageName, tuple[StageName, ...]] = STAGE_DEPENDENCIES,
+) -> tuple[StageName, ...]:
     found: set[StageName] = set()
     pending: list[StageName] = [stage]
     while pending:
         parent = pending.pop()
-        for candidate, dependencies in STAGE_DEPENDENCIES.items():
-            if parent in dependencies and candidate not in found:
+        for candidate, required in dependencies.items():
+            if parent in required and candidate not in found:
                 found.add(candidate)
                 pending.append(candidate)
-    return tuple(item for item in STAGES if item in found)
+    return tuple(item for item in stages if item in found)
 
 
 STAGE_DESCENDANTS: dict[StageName, tuple[StageName, ...]] = {
@@ -91,12 +153,21 @@ STAGE_DESCENDANTS: dict[StageName, tuple[StageName, ...]] = {
 }
 
 
+def _descendants_for_revision(
+    schema_version: int,
+    stage: StageName,
+) -> tuple[StageName, ...]:
+    stages = _stages_for_revision(schema_version)
+    dependencies = _dependencies_for_revision(schema_version)
+    return _descendants(stage, stages=stages, dependencies=dependencies)
+
+
 class _PersistedModel(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid", strict=True)
 
 
 class WorkspaceMetadata(_PersistedModel):
-    schema_version: int = WORKSPACE_SCHEMA_VERSION
+    schema_version: int = WORKSPACE_LAYOUT_SCHEMA_VERSION
     workspace_id: str
     created_at: str
 
@@ -448,6 +519,8 @@ _FIXED_STAGE_OUTPUT_KINDS: dict[tuple[StageName, str], str] = {
     ("parse", "registry"): "source-registry",
     ("clean", "transforms"): "transform-records",
     ("chunk", "chunks"): "chunks",
+    ("construct", "recipe"): "dataset-recipe",
+    ("construct", "result"): "construction-result",
     ("format", "records"): "formatted-records",
     ("format", "records-meta"): "records-metadata",
     ("validate", "validations"): "validation-report",
@@ -490,6 +563,49 @@ def _required_stage_output_kinds(
         for role, kind in role_kinds.items():
             expected[f"source/{source_id}/{role}"] = kind
     return expected
+
+
+def _construct_source_scope(
+    state: StageState,
+    sources: Mapping[str, SourceDescriptor],
+) -> tuple[str, ...]:
+    """Return the exact source set selected by a construction recipe."""
+    expected_keys = {"schema_version", "recipe_id", "selected_source_ids"}
+    if set(state.config) != expected_keys:
+        raise WorkspaceCorruptError(
+            "construct config keys do not match the v1 stage schema"
+        )
+    if state.config["schema_version"] != CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION:
+        raise WorkspaceCorruptError(
+            "construct config uses an unsupported stage schema"
+        )
+    try:
+        validate_id(state.config["recipe_id"], kind="rcp")
+    except (TypeError, ValueError) as exc:
+        raise WorkspaceCorruptError(
+            "construct config requires a valid recipe_id"
+        ) from exc
+    raw = state.config.get("selected_source_ids")
+    if not isinstance(raw, list) or not raw:
+        raise WorkspaceCorruptError(
+            "construct config requires a non-empty selected_source_ids list"
+        )
+    try:
+        selected = tuple(validate_id(item, kind="src") for item in raw)
+    except (TypeError, ValueError) as exc:
+        raise WorkspaceCorruptError(
+            "construct config contains an invalid selected source identity"
+        ) from exc
+    if selected != tuple(sorted(selected)) or len(selected) != len(set(selected)):
+        raise WorkspaceCorruptError(
+            "construct selected_source_ids must be sorted and unique"
+        )
+    missing = set(selected) - set(sources)
+    if missing:
+        raise WorkspaceCorruptError(
+            f"construct config selects unknown sources: {sorted(missing)}"
+        )
+    return selected
 
 
 def _validate_source_artifact_bindings(
@@ -597,6 +713,11 @@ def _validate_stage_output_bindings(
                 raise WorkspaceCorruptError(
                     "parse stage config does not match its source inventory"
                 )
+        construct_source_ids = (
+            _construct_source_scope(state, sources)
+            if state.stage == "construct" and state.status == "complete"
+            else None
+        )
         for output_name, artifact_id in state.outputs.items():
             artifact = artifacts[artifact_id]
             expected_kind = _FIXED_STAGE_OUTPUT_KINDS.get((state.stage, output_name))
@@ -606,7 +727,12 @@ def _validate_stage_output_bindings(
                         f"{stage_name} output {output_name!r} has kind {artifact.kind!r}; "
                         f"expected {expected_kind!r}"
                     )
-                if artifact.source_ids != all_source_ids:
+                expected_source_ids = (
+                    construct_source_ids
+                    if state.stage == "construct"
+                    else all_source_ids
+                )
+                if artifact.source_ids != expected_source_ids:
                     raise WorkspaceCorruptError(
                         f"{stage_name} output {output_name!r} has incorrect source scope"
                     )
@@ -627,6 +753,10 @@ def _validate_stage_output_bindings(
                             "chunk stage lacks a valid producer strategy"
                         )
                     producer_id = f"veriformis.chunker.{strategy}"
+                    producer_version = "1"
+                    expected_config_digest = state.config_digest
+                elif state.stage == "construct":
+                    producer_id = f"veriformis.construction.{output_name}"
                     producer_version = "1"
                     expected_config_digest = state.config_digest
                 elif state.stage == "format":
@@ -723,7 +853,9 @@ def _validate_stage_output_bindings(
 
 
 class WorkspaceRevision(_PersistedModel):
-    schema_version: int = WORKSPACE_SCHEMA_VERSION
+    # Preserve Group 1's programmatic/model-level default. The persisted loader
+    # separately rejects schema-less manifests unless their stage set is exact v1.
+    schema_version: int = LEGACY_REVISION_SCHEMA_VERSION
     revision_id: str
     state_digest: str
     parent_revision_id: str | None
@@ -750,11 +882,9 @@ class WorkspaceRevision(_PersistedModel):
 
     @model_validator(mode="after")
     def _consistent_revision(self) -> WorkspaceRevision:
-        if self.schema_version != WORKSPACE_SCHEMA_VERSION:
-            raise UnsupportedWorkspaceVersionError(
-                f"workspace schema {self.schema_version} is not supported"
-            )
-        if set(self.stages) != set(STAGES):
+        revision_stages = _stages_for_revision(self.schema_version)
+        dependencies = _dependencies_for_revision(self.schema_version)
+        if set(self.stages) != set(revision_stages):
             raise WorkspaceCorruptError("revision does not contain the exact stage set")
         for stage, state in self.stages.items():
             if stage != state.stage:
@@ -762,10 +892,15 @@ class WorkspaceRevision(_PersistedModel):
                     f"stage key {stage!r} does not match {state.stage!r}"
                 )
         if self.committed_stage == "migration":
-            raise UnsupportedWorkspaceVersionError(
-                "migration revisions require a versioned migration contract"
-            )
-        if self.committed_stage == "init":
+            if (
+                self.schema_version != WORKSPACE_REVISION_SCHEMA_VERSION
+                or self.parent_revision_id is None
+                or self.stages["construct"] != StageState.absent("construct")
+            ):
+                raise UnsupportedWorkspaceVersionError(
+                    "migration revision does not match the v1-to-v2 migration contract"
+                )
+        elif self.committed_stage == "init":
             if (
                 self.parent_revision_id is not None
                 or self.sources
@@ -776,6 +911,11 @@ class WorkspaceRevision(_PersistedModel):
                     "init revision must be an empty root with all stages absent"
                 )
         else:
+            if self.committed_stage not in revision_stages:
+                raise WorkspaceCorruptError(
+                    f"revision schema {self.schema_version} does not define "
+                    f"stage {self.committed_stage}"
+                )
             if self.parent_revision_id is None:
                 raise WorkspaceCorruptError(
                     f"{self.committed_stage} revision lacks a parent revision"
@@ -795,7 +935,10 @@ class WorkspaceRevision(_PersistedModel):
                 if state.status != "stale":
                     continue
                 if (
-                    state.stage not in STAGE_DESCENDANTS[self.committed_stage]
+                    state.stage
+                    not in _descendants_for_revision(
+                        self.schema_version, self.committed_stage
+                    )
                     or state.invalidated_by != self.committed_stage
                     or state.prior_revision_id != self.parent_revision_id
                 ):
@@ -806,7 +949,7 @@ class WorkspaceRevision(_PersistedModel):
         for stage, state in self.stages.items():
             if state.status in ("complete", "failed"):
                 expected_inputs: set[str] = set()
-                for dependency in STAGE_DEPENDENCIES[state.stage]:
+                for dependency in dependencies[state.stage]:
                     if self.stages[dependency].status != "complete":
                         raise WorkspaceCorruptError(
                             f"active stage {stage} requires complete dependency "
@@ -821,7 +964,9 @@ class WorkspaceRevision(_PersistedModel):
             if state.status == "absent":
                 present_descendants = [
                     descendant
-                    for descendant in STAGE_DESCENDANTS[state.stage]
+                    for descendant in _descendants_for_revision(
+                        self.schema_version, state.stage
+                    )
                     if self.stages[descendant].status != "absent"
                 ]
                 if present_descendants:
@@ -906,9 +1051,30 @@ def _validate_revision_transition(
     if child.parent_revision_id != parent.revision_id:
         raise WorkspaceCorruptError("workspace revision parent link is inconsistent")
     stage = child.committed_stage
-    if stage in {"init", "migration"}:
+    if stage == "migration":
+        expected_construct = StageState.absent("construct")
+        if (
+            parent.schema_version != LEGACY_REVISION_SCHEMA_VERSION
+            or child.schema_version != WORKSPACE_REVISION_SCHEMA_VERSION
+            or child.sources != parent.sources
+            or child.artifacts != parent.artifacts
+            or child.stages.get("construct") != expected_construct
+            or any(
+                child.stages.get(stage_name) != parent.stages.get(stage_name)
+                for stage_name in LEGACY_STAGES
+            )
+        ):
+            raise UnsupportedWorkspaceVersionError(
+                "migration revision does not match the v1-to-v2 migration contract"
+            )
+        return
+    if stage == "init":
         raise WorkspaceCorruptError(
             f"workspace history contains an invalid {stage} child revision"
+        )
+    if child.schema_version != parent.schema_version:
+        raise UnsupportedWorkspaceVersionError(
+            "workspace revision schema changes require the v1-to-v2 migration contract"
         )
     if stage != "parse" and child.sources != parent.sources:
         raise WorkspaceCorruptError(
@@ -923,8 +1089,13 @@ def _validate_revision_transition(
             "workspace history contains a fabricated no-op child revision"
         )
 
-    descendants = set(STAGE_DESCENDANTS[stage])
-    for stage_name in STAGES:
+    revision_stages = _stages_for_revision(child.schema_version)
+    if stage not in revision_stages:
+        raise WorkspaceCorruptError(
+            f"revision schema {child.schema_version} does not define stage {stage}"
+        )
+    descendants = set(_descendants_for_revision(child.schema_version, stage))
+    for stage_name in revision_stages:
         current = child.stages[stage_name]
         previous = parent.stages[stage_name]
         if stage_name == stage:
@@ -986,6 +1157,7 @@ def _derive_revision_id(
 
 def _new_revision(
     *,
+    schema_version: int,
     parent_revision_id: str | None,
     committed_stage: CommitStage,
     committed_at: str,
@@ -998,14 +1170,14 @@ def _new_revision(
     stage_copy = dict(stages)
     state_digest = canonical_digest(
         _semantic_payload(
-            schema_version=WORKSPACE_SCHEMA_VERSION,
+            schema_version=schema_version,
             sources=source_copy,
             artifacts=artifact_copy,
             stages=stage_copy,
         )
     )
     revision_id = _derive_revision_id(
-        schema_version=WORKSPACE_SCHEMA_VERSION,
+        schema_version=schema_version,
         state_digest=state_digest,
         parent_revision_id=parent_revision_id,
         committed_stage=committed_stage,
@@ -1015,7 +1187,7 @@ def _new_revision(
         stages=stage_copy,
     )
     return WorkspaceRevision(
-        schema_version=WORKSPACE_SCHEMA_VERSION,
+        schema_version=schema_version,
         revision_id=revision_id,
         state_digest=state_digest,
         parent_revision_id=parent_revision_id,
@@ -1047,6 +1219,21 @@ def _strict_json(data: str) -> Any:
         data,
         object_pairs_hook=_strict_object,
         parse_constant=_reject_json_constant,
+    )
+
+
+def _revision_json_with_dispatched_schema(data: str) -> str:
+    """Version-dispatch a persisted revision before strict JSON-mode validation."""
+    payload = _strict_json(data)
+    if not isinstance(payload, dict) or "schema_version" in payload:
+        return data
+    stages = payload.get("stages")
+    if isinstance(stages, Mapping) and set(stages) == set(LEGACY_STAGES):
+        payload["schema_version"] = LEGACY_REVISION_SCHEMA_VERSION
+        return lossless_json_bytes(payload).decode("utf-8")
+    raise UnsupportedWorkspaceVersionError(
+        "schema-less workspace revisions are supported only for the exact "
+        "legacy stage set"
     )
 
 
@@ -1101,6 +1288,30 @@ def _promote_commit_pointer(path: Path, data: bytes) -> bool:
         if not promoted:
             temp.unlink(missing_ok=True)
     return durability_confirmed
+
+
+def _install_revision_directory(
+    root: Path,
+    temp_dir: Path,
+    revision: WorkspaceRevision,
+) -> None:
+    """Install one immutable revision manifest before HEAD is promoted."""
+    staged_dir = temp_dir / "revision"
+    staged_dir.mkdir()
+    manifest = lossless_json_bytes(revision)
+    _write_fsync(staged_dir / "revision.json", manifest)
+    _fsync_dir(staged_dir)
+    target = root / "revisions" / revision.revision_id
+    if target.exists():
+        existing = target / "revision.json"
+        if not existing.exists() or existing.read_bytes() != manifest:
+            raise WorkspaceCorruptError(
+                f"revision identity collision: {revision.revision_id}"
+            )
+        shutil.rmtree(staged_dir)
+    else:
+        os.replace(staged_dir, target)
+        _fsync_dir(target.parent)
 
 
 class Workspace:
@@ -1160,6 +1371,7 @@ class Workspace:
         _atomic_write(root / "workspace.json", lossless_json_bytes(metadata))
         stages = {stage: StageState.absent(stage) for stage in STAGES}
         initial = _new_revision(
+            schema_version=WORKSPACE_REVISION_SCHEMA_VERSION,
             parent_revision_id=None,
             committed_stage="init",
             committed_at="1970-01-01T00:00:00+00:00",
@@ -1210,9 +1422,9 @@ class Workspace:
             ValidationError,
         ) as exc:
             raise WorkspaceCorruptError(f"invalid workspace metadata: {root}") from exc
-        if metadata.schema_version != WORKSPACE_SCHEMA_VERSION:
+        if metadata.schema_version != WORKSPACE_LAYOUT_SCHEMA_VERSION:
             raise UnsupportedWorkspaceVersionError(
-                f"workspace schema {metadata.schema_version} is not supported"
+                f"workspace layout schema {metadata.schema_version} is not supported"
             )
         workspace = cls(
             root,
@@ -1279,8 +1491,8 @@ class Workspace:
         path = self.root / "revisions" / revision_id / "revision.json"
         try:
             revision_text = path.read_text(encoding="utf-8")
-            _strict_json(revision_text)
-            revision = WorkspaceRevision.model_validate_json(revision_text)
+            dispatched_text = _revision_json_with_dispatched_schema(revision_text)
+            revision = WorkspaceRevision.model_validate_json(dispatched_text)
         except DuplicateIdentityError:
             raise
         except UnsupportedWorkspaceVersionError:
@@ -1318,8 +1530,84 @@ class Workspace:
         validate_id(expected, kind="rev")
         if expected != base.revision_id:
             raise WorkspaceRevisionConflict(expected, base.revision_id)
+        revision_stages = _stages_for_revision(base.schema_version)
+        if stage not in revision_stages:
+            if (
+                stage == "construct"
+                and base.schema_version == LEGACY_REVISION_SCHEMA_VERSION
+            ):
+                raise UnsupportedWorkspaceVersionError(
+                    "construct requires workspace revision schema 2; "
+                    "call migrate_to_current() first"
+                )
+            raise UnsupportedWorkspaceVersionError(
+                f"workspace revision schema {base.schema_version} does not define "
+                f"stage {stage}"
+            )
         self._required_artifacts(base, stage)
         return WorkspaceTransaction(self, stage, base)
+
+    def migrate_to_current(
+        self,
+        expected_revision_id: str | None = None,
+    ) -> WorkspaceRevision:
+        """Append the exact v1-to-v2 revision migration and atomically promote HEAD."""
+        base = self.head()
+        expected = expected_revision_id or base.revision_id
+        validate_id(expected, kind="rev")
+        if expected != base.revision_id:
+            raise WorkspaceRevisionConflict(expected, base.revision_id)
+
+        with self._exclusive_lock():
+            actual = self.head(verify_objects=False)
+            if actual.revision_id != expected:
+                raise WorkspaceRevisionConflict(expected, actual.revision_id)
+            if actual.schema_version == WORKSPACE_REVISION_SCHEMA_VERSION:
+                self.last_commit_durability_warning = None
+                return actual
+            if actual.schema_version != LEGACY_REVISION_SCHEMA_VERSION:
+                raise UnsupportedWorkspaceVersionError(
+                    f"workspace revision schema {actual.schema_version} cannot be "
+                    "migrated to the current schema"
+                )
+
+            stages = dict(actual.stages)
+            stages["construct"] = StageState.absent("construct")
+            candidate = _new_revision(
+                schema_version=WORKSPACE_REVISION_SCHEMA_VERSION,
+                parent_revision_id=actual.revision_id,
+                committed_stage="migration",
+                committed_at=datetime.now(UTC).isoformat(),
+                sources=actual.sources,
+                artifacts=actual.artifacts,
+                stages=stages,
+            )
+            _validate_revision_transition(candidate, actual)
+
+            temp_dir = Path(
+                tempfile.mkdtemp(prefix="migration-", dir=self.root / ".txn")
+            )
+            try:
+                self._inject_failure("before-revision")
+                _install_revision_directory(self.root, temp_dir, candidate)
+                self._inject_failure("after-revision")
+                self._inject_failure("before-head")
+                durability_confirmed = _promote_commit_pointer(
+                    self.root / "HEAD",
+                    (candidate.revision_id + "\n").encode("ascii"),
+                )
+                self.last_commit_durability_warning = (
+                    None
+                    if durability_confirmed
+                    else (
+                        "HEAD was committed, but the workspace directory sync failed; "
+                        "crash durability could not be confirmed"
+                    )
+                )
+                # HEAD is the commit point. Do no fallible work after promotion.
+                return candidate
+            finally:
+                shutil.rmtree(temp_dir, ignore_errors=True)
 
     def read_artifact(
         self,
@@ -1367,7 +1655,13 @@ class Workspace:
         self, revision: WorkspaceRevision, stage: StageName
     ) -> tuple[str, ...]:
         artifact_ids: set[str] = set()
-        for dependency in STAGE_DEPENDENCIES[stage]:
+        dependencies = _dependencies_for_revision(revision.schema_version)
+        if stage not in dependencies:
+            raise UnsupportedWorkspaceVersionError(
+                f"workspace revision schema {revision.schema_version} does not define "
+                f"stage {stage}"
+            )
+        for dependency in dependencies[stage]:
             state = revision.stages[dependency]
             if state.status == "stale":
                 raise StaleStageError(
@@ -1631,7 +1925,9 @@ class WorkspaceTransaction:
             )
             states[self.stage] = stage_state
             if not exact_noop:
-                for descendant in STAGE_DESCENDANTS[self.stage]:
+                for descendant in _descendants_for_revision(
+                    actual.schema_version, self.stage
+                ):
                     previous = states[descendant]
                     if previous.status != "absent":
                         states[descendant] = previous.as_stale(
@@ -1667,6 +1963,7 @@ class WorkspaceTransaction:
                 candidate = actual
             else:
                 candidate = _new_revision(
+                    schema_version=actual.schema_version,
                     parent_revision_id=actual.revision_id,
                     committed_stage=self.stage,
                     committed_at=datetime.now(UTC).isoformat(),
@@ -1727,7 +2024,7 @@ class WorkspaceTransaction:
 
     def _validate_stage_semantics(self, revision: WorkspaceRevision) -> None:
         """Validate cross-artifact meaning before the atomic commit point."""
-        if self.stage not in {"parse", "clean", "chunk"}:
+        if self.stage not in {"parse", "clean", "chunk", "construct"}:
             return
 
         def load_json(artifact_id: str) -> Any:
@@ -1742,6 +2039,187 @@ class WorkspaceTransaction:
                 raise WorkspaceCorruptError(
                     "candidate stage artifact is not valid UTF-8 JSON"
                 ) from exc
+
+        if self.stage == "construct":
+            from veriformis.chunkers.base import chunk_from_dict
+            from veriformis.construction import (
+                ConstructionInputs,
+                IRArtifactInput,
+                construction_result_from_dict,
+                construction_result_to_dict,
+                dataset_recipe_from_dict,
+                dataset_recipe_to_dict,
+                validate_construction_result,
+            )
+            from veriformis.rules.engine import transform_record_from_dict
+            from veriformis.sources import SourceRef
+
+            try:
+                construct_state = revision.stages["construct"]
+                selected_source_ids = _construct_source_scope(
+                    construct_state,
+                    revision.sources,
+                )
+                recipe_bytes = self._candidate_artifact_bytes(
+                    revision,
+                    construct_state.outputs["recipe"],
+                )
+                result_bytes = self._candidate_artifact_bytes(
+                    revision,
+                    construct_state.outputs["result"],
+                )
+                raw_recipe = load_json(construct_state.outputs["recipe"])
+                raw_result = load_json(construct_state.outputs["result"])
+                if not isinstance(raw_recipe, dict) or not isinstance(raw_result, dict):
+                    raise WorkspaceCorruptError(
+                        "construct artifacts must contain JSON objects"
+                    )
+                recipe = dataset_recipe_from_dict(raw_recipe)
+                result = construction_result_from_dict(raw_result)
+                if recipe_bytes != lossless_json_bytes(
+                    dataset_recipe_to_dict(recipe)
+                ):
+                    raise WorkspaceCorruptError(
+                        "dataset recipe artifact is not canonical JSON"
+                    )
+                if result_bytes != lossless_json_bytes(
+                    construction_result_to_dict(result)
+                ):
+                    raise WorkspaceCorruptError(
+                        "construction result artifact is not canonical JSON"
+                    )
+                if (
+                    recipe.recipe_id != construct_state.config["recipe_id"]
+                    or recipe.source_ids != selected_source_ids
+                    or result.recipe_id != recipe.recipe_id
+                ):
+                    raise WorkspaceCorruptError(
+                        "construct config, recipe, and result identities disagree"
+                    )
+
+                clean_state = revision.stages["clean"]
+                chunk_state = revision.stages["chunk"]
+                if recipe.cleaning_config_digest != clean_state.config_digest:
+                    raise WorkspaceCorruptError(
+                        "dataset recipe does not bind the active clean config"
+                    )
+                chunk_config = chunk_state.config
+                if set(chunk_config) != {"strategy", "size", "overlap"} or (
+                    recipe.segmentation.strategy != chunk_config["strategy"]
+                    or recipe.segmentation.size != chunk_config["size"]
+                    or recipe.segmentation.overlap != chunk_config["overlap"]
+                ):
+                    raise WorkspaceCorruptError(
+                        "dataset recipe does not bind the active segmentation"
+                    )
+
+                sources: list[SourceRef] = []
+                for source_id in selected_source_ids:
+                    descriptor = revision.sources[source_id]
+                    artifact_id = descriptor.extracted_artifact_id
+                    if artifact_id is None:
+                        raise WorkspaceCorruptError(
+                            f"source {source_id} has no canonical text artifact"
+                        )
+                    extracted = self._candidate_artifact_bytes(
+                        revision,
+                        artifact_id,
+                    ).decode("utf-8")
+                    sources.append(
+                        SourceRef(
+                            id=descriptor.id,
+                            path=(
+                                descriptor.original_path
+                                or descriptor.logical_path
+                            ),
+                            sha256=descriptor.sha256,
+                            size=descriptor.size,
+                            parser=descriptor.parser_id,
+                            extracted_text=extracted,
+                            logical_path=descriptor.logical_path,
+                            parser_version=descriptor.parser_version,
+                            canonical_stream_contract_version=(
+                                descriptor.canonical_stream_contract_version
+                            ),
+                            stream_sha256=sha256_digest(extracted),
+                            artifact_id=artifact_id,
+                        )
+                    )
+
+                raw_chunks = load_json(chunk_state.outputs["chunks"])
+                if not isinstance(raw_chunks, list):
+                    raise WorkspaceCorruptError(
+                        "chunk artifact must contain a JSON array"
+                    )
+                selected_set = set(selected_source_ids)
+                chunks = tuple(
+                    chunk
+                    for chunk in (chunk_from_dict(item) for item in raw_chunks)
+                    if chunk.source_id in selected_set
+                )
+
+                raw_transforms = load_json(clean_state.outputs["transforms"])
+                if not isinstance(raw_transforms, list):
+                    raise WorkspaceCorruptError(
+                        "transform artifact must contain a JSON array"
+                    )
+                transforms = tuple(
+                    record
+                    for record in (
+                        transform_record_from_dict(item)
+                        for item in raw_transforms
+                    )
+                    if record.source_id in selected_set
+                )
+
+                ir_artifacts: list[IRArtifactInput] = []
+                for source_id in selected_source_ids:
+                    document_artifact_id = clean_state.outputs[
+                        f"source/{source_id}/document"
+                    ]
+                    artifact = revision.artifacts[document_artifact_id]
+                    ir_artifacts.append(
+                        IRArtifactInput.create(
+                            source_id=source_id,
+                            artifact_id=document_artifact_id,
+                            artifact_kind="cleaned-document-ir",
+                            document_json=self._candidate_artifact_bytes(
+                                revision,
+                                document_artifact_id,
+                            ),
+                            producer_id=artifact.producer_id,
+                            producer_version=artifact.producer_version,
+                            config_digest=artifact.config_digest,
+                        )
+                    )
+
+                reviews = tuple(
+                    decision.review
+                    for decision in result.decisions
+                    if decision.review is not None
+                )
+                inputs = ConstructionInputs.create(
+                    cleaning_config_digest=clean_state.config_digest,
+                    sources=sources,
+                    chunks=chunks,
+                    transforms=transforms,
+                    ir_artifacts=ir_artifacts,
+                    reviews=reviews,
+                )
+                validate_construction_result(recipe, inputs, result)
+            except WorkspaceCorruptError:
+                raise
+            except (
+                VeriformisError,
+                KeyError,
+                UnicodeError,
+                ValueError,
+                TypeError,
+            ) as exc:
+                raise WorkspaceCorruptError(
+                    "construct artifacts do not match their declared inputs"
+                ) from exc
+            return
 
         if self.stage == "chunk":
             from veriformis.chunkers.base import chunk_from_dict
@@ -2283,23 +2761,11 @@ class WorkspaceTransaction:
             _fsync_dir(target.parent)
 
     def _install_revision(self, revision: WorkspaceRevision) -> None:
-        staged_dir = self._temp_dir / "revision"
-        staged_dir.mkdir()
-        _write_fsync(staged_dir / "revision.json", lossless_json_bytes(revision))
-        _fsync_dir(staged_dir)
-        target = self.workspace.root / "revisions" / revision.revision_id
-        if target.exists():
-            existing = target / "revision.json"
-            if not existing.exists() or existing.read_bytes() != lossless_json_bytes(
-                revision
-            ):
-                raise WorkspaceCorruptError(
-                    f"revision identity collision: {revision.revision_id}"
-                )
-            shutil.rmtree(staged_dir)
-        else:
-            os.replace(staged_dir, target)
-            _fsync_dir(target.parent)
+        _install_revision_directory(
+            self.workspace.root,
+            self._temp_dir,
+            revision,
+        )
 
     def _ensure_open(self) -> None:
         if self._closed:

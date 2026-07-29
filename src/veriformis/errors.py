@@ -35,6 +35,12 @@ class EvidenceError(VeriformisError):
     code = "source-evidence-invalid"
 
 
+class ConstructionError(VeriformisError):
+    """A recipe or construction result is invalid or cannot be replayed."""
+
+    code = "construction-invalid"
+
+
 class InvalidIRError(VeriformisError):
     """Persisted document IR violates the versioned schema or provenance rules."""
 
