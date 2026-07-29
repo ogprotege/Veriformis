@@ -1,8 +1,17 @@
 # tests/chunkers/test_strategies.py
+from dataclasses import replace
+
+import pytest
+
+from veriformis.chunkers.base import chunk_from_dict, chunk_to_dict, refresh_chunk_id
 from veriformis.chunkers.strategies import (
     chunk_fixed, chunk_paragraph, chunk_sentence, chunk_sliding, chunk_structure,
 )
+from veriformis.errors import EvidenceError
+from veriformis.evidence import resolve_evidence
+from veriformis.identity import canonical_digest
 from veriformis.ir import Heading, HorizontalRule, Paragraph, Span, Text
+from veriformis.parsers.markdown import parse_md_file
 
 
 def _blocks(texts):
@@ -18,7 +27,7 @@ def test_paragraph_chunks_preserve_coverage_and_provenance():
     chunks = chunk_paragraph(blocks, max_size=100, source_id="src-x")
     assert "\n\n".join(c.text for c in chunks) == "\n\n".join(["alpha", "beta", "gamma"])
     assert all(c.source_id == "src-x" for c in chunks)
-    assert chunks[0].span.start == 0
+    assert chunks[0].span is None  # no SourceEvidence means no exact span claim
     assert chunks[0].tokens_est >= 1
 
 
@@ -56,6 +65,38 @@ def test_structure_chunks_attach_heading_path():
     assert any("body two" in c.text for c in chunks)
 
 
+def test_structure_chunks_rebind_evidence_to_global_sequence(tmp_path):
+    path = tmp_path / "sections.md"
+    path.write_text(
+        "# First\n\nfirst body\n\n# Second\n\nsecond body",
+        encoding="utf-8",
+    )
+    parsed = parse_md_file(path, logical_path=path.name)
+
+    chunks = chunk_structure(
+        parsed.document.children,
+        max_size=8,
+        source=parsed.source,
+    )
+
+    assert len(chunks) >= 4
+    assert [chunk.sequence for chunk in chunks] == list(range(1, len(chunks) + 1))
+    assert all(
+        chunk.evidence.context_digest == canonical_digest(chunk.identity_context)
+        for chunk in chunks
+    )
+    assert [chunk_from_dict(chunk_to_dict(chunk)) for chunk in chunks] == chunks
+
+    mismatched = replace(
+        chunks[-1],
+        identity_context={**chunks[-1].identity_context, "sequence": 1},
+        sequence=1,
+    )
+    mismatched = refresh_chunk_id(mismatched)
+    with pytest.raises(EvidenceError, match="evidence context"):
+        chunk_to_dict(mismatched)
+
+
 def test_transformed_flag_marks_only_chunks_containing_edited_blocks():
     blocks = _blocks(["aaa", "bbb", "ccc"])
     chunks = chunk_paragraph(blocks, max_size=5, transformed=(1,))
@@ -84,9 +125,47 @@ def test_fixed_chunks_gate_clean_on_irregular_text_separators(tmp_path):
 
     p = tmp_path / "irregular.txt"
     p.write_text("alpha\n\n\nbeta\n \ngamma", encoding="utf-8")
-    result = parse_text(p)
-    chunks = chunk_fixed(result.document.children, size=10, overlap=2, source_id=result.source.id)
+    result = parse_text(p, logical_path=p.name)
+    chunks = chunk_fixed(
+        result.document.children,
+        size=10,
+        overlap=2,
+        source=result.source,
+    )
     assert gate_provenance(chunks, {result.source.id: result.source}).passed
+
+
+def test_stream_chunk_evidence_cites_only_its_local_block_window(tmp_path):
+    path = tmp_path / "many-paragraphs.md"
+    path.write_text(
+        "\n\n".join(
+            (
+                "a" * 20,
+                "b" * 20,
+                "c" * 20,
+                "d" * 20,
+                "e" * 20,
+            )
+        ),
+        encoding="utf-8",
+    )
+    parsed = parse_md_file(path, logical_path=path.name)
+
+    chunks = chunk_fixed(
+        parsed.document.children,
+        size=8,
+        overlap=0,
+        source=parsed.source,
+    )
+
+    assert len(parsed.document.children) == 5
+    assert all(
+        resolve_evidence(chunk.evidence, {parsed.source.id: parsed.source})
+        == chunk.text
+        for chunk in chunks
+    )
+    assert all(len(chunk.evidence.components) <= 2 for chunk in chunks)
+    assert any(len(chunk.evidence.components) == 1 for chunk in chunks)
 
 
 def test_paragraph_chunks_never_empty_for_isolated_empty_blocks():
@@ -100,4 +179,19 @@ def test_paragraph_chunks_never_empty_for_isolated_empty_blocks():
     chunks = chunk_paragraph(blocks, max_size=1000)
     assert len(chunks) == 2
     assert all(c.text for c in chunks)
-    assert chunks[0].span.start == 0 and chunks[0].span.end == 1502  # HR coalesced
+    assert all(chunk.span is None for chunk in chunks)
+
+
+def test_regions_are_chunked_separately_and_bound_into_identity():
+    blocks = _blocks(["same text"])
+    body = chunk_paragraph(blocks, source_id="src-x", region_id="body")[0]
+    note = chunk_paragraph(
+        blocks,
+        source_id="src-x",
+        region_id="footnote:n",
+    )[0]
+
+    assert body.id != note.id
+    assert body.identity_context["region_id"] == "body"
+    assert note.identity_context["region_id"] == "footnote:n"
+    assert body.heading_path == note.heading_path == []

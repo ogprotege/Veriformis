@@ -1,10 +1,10 @@
 # Veriformis Product Contract
 
-**Status:** Authoritative product contract when merged into `main`
+**Status:** Authoritative product contract
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core, version `0.1.0`
+**Current baseline:** M1 core plus Group 1 integrity foundation, version `0.1.0`
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -28,7 +28,9 @@ heterogeneous raw sources
 
 A cleaned corpus is an internal compiler state. It may also be the finished dataset when a recipe selects full-sequence text as the training objective. It is not the limit of the product, and it is not an unfinished handoff for another product to curate.
 
-This document establishes the product-level scope now. Roadmap Step 1 must translate it into versioned application and data contracts plus executable acceptance fixtures. That implementation work has not begun.
+This document establishes the product-level scope. Roadmap Step 1 translated it
+into [Integrity Contract v1](contracts/integrity-v1.md), public contract
+constants, and executable acceptance fixtures.
 
 ## Ownership boundary
 
@@ -40,7 +42,16 @@ Aptus begins with a finished Veriformis dataset contract. Aptus owns training pl
 
 The implemented M1 core supports a deterministic stage pipeline for Markdown, DOCX, plain text, and code. It provides cleaning, chunking, completion, instruction, and rendered-chat serialization, validation gates, a bundle writer, and a stage-command CLI. This is a working alpha foundation. It does not yet implement the complete product contract described here.
 
-The post-M1 roadmap adds transactional workspace revisions, source-scoped identity, explicit parser-loss diagnostics, replayable cleaning plans, recipe-driven dataset construction, evidence-bearing record states, curation, authoritative splitting, Aptus-native structured records, exact-snapshot sealing, broader inputs, integrations, the Mac workbench, and release controls. Documentation must label these capabilities as planned until their phase gates pass.
+Group 1 adds transactional workspace revisions, source-scoped identity,
+explicit parser-loss diagnostics, strict versioned intermediate schemas,
+immutable chunk evidence, and replayable cleaning plans. Its implemented
+identity primitives cover current sources, artifacts, transforms, chunks,
+and revisions. Candidate, record, and split identities remain future
+consumers of that substrate. Later roadmap groups add recipe-driven dataset
+construction, evidence-bearing record states, curation, authoritative
+splitting, Aptus-native structured records, exact-snapshot sealing, broader
+inputs, integrations, the Mac workbench, and release controls. Documentation
+must label each later capability as planned until its exit gate passes.
 
 ## End-to-end compiler contract
 
@@ -75,11 +86,18 @@ The enforceable promise is accountable transformation:
 4. **Coverage accounting.** The final bundle states what source material contributed, what did not, and why.
 5. **Reproducibility.** The same sources, recipe, configuration, and tool versions reproduce the same semantic artifacts, except for declared non-semantic metadata such as timestamps.
 
+Exact persisted artifact JSON and durable identity and configuration-digest
+payloads preserve Unicode string and object-key sequences. Those durable paths
+apply NFC normalization only to explicit locator fields, such as logical source
+paths, before those fields enter an identity payload. Audit revision IDs may
+differ because they also bind parent history and commit time. Portable state
+and per-source parse-input digests govern semantic reproducibility.
+
 The product may describe this as faithful, source-grounded, loss-accounted, or provenance-sealed. It must not claim byte-for-byte preservation across every stage or claim that every source token appears in training output.
 
 ## Deterministic v1 boundary
 
-The v1 dataset pipeline makes no LLM calls and performs no remote model generation. Deterministic builders may create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field datasets when the recipe states a truthful task and every constructed field has evidence.
+The v1 dataset pipeline makes no LLM calls and performs no remote model generation. Deterministic builders may create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field datasets when the recipe states a truthful task and every constructed field has evidence. Group 2 must add field-level evidence for IR-only metadata before implementing the structured-field objective.
 
 The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same curation, promotion, split, formatting, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 
@@ -109,6 +127,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 ## Related documentation
 
 - [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
+- [Integrity Contract v1](./contracts/integrity-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

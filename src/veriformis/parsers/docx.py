@@ -12,23 +12,28 @@ python-docx's high-level API, because we need ordered iteration of body
 children (paragraphs + tables interleaved) and fine control over list
 detection and hyperlink unwrapping.
 
-Provenance follows the extracted-stream contract: the canonical stream is
-built incrementally from the top-level blocks in document order — each
-block's ``block_text()`` plus a ``"\\n\\n"`` separator — and every top-level
-block carries ``span = Span(pos_before, pos_before + len(block_text))``
-plus a sequential ``block_index`` indexing that stream (never the raw
-file). ``page`` stays ``None`` (DOCX is unpaginated).
+Provenance follows the extracted-stream contract. The canonical stream orders
+body blocks first, then footnotes by ID, then endnotes by ID. Each block is
+separated by ``"\\n\\n"`` and receives a unique span and block index into that
+stream. These locations never refer to the raw ZIP bytes. ``page`` stays
+``None`` because DOCX extraction is unpaginated.
 """
 
 from __future__ import annotations
 
 import re
 import zipfile
+from io import BytesIO
 from pathlib import Path
 
 from docx import Document as OpenDocument
 from lxml import etree
 
+from veriformis.diagnostics import (
+    DiagnosticLocation,
+    make_diagnostic,
+    make_parse_report,
+)
 from veriformis.ir import (
     Blockquote,
     Bold,
@@ -52,18 +57,18 @@ from veriformis.ir import (
     ListItem,
     Math,
     Paragraph,
-    Span,
     Strikethrough,
     Subscript,
     Superscript,
     Table,
     Text,
-    block_text,
+    attach_canonical_provenance,
 )
 from veriformis.parsers import docx_styles as style_map
 from veriformis.sources import ParseResult, register_source
 
 _CITATION_RE = re.compile(r"\[@([A-Za-z][\w:.\-]*)(?:,\s*([^\]]+))?\]")
+PARSER_VERSION = "1.2.0"
 
 
 def _split_citations_in_text(value: str) -> list[Inline]:
@@ -74,7 +79,7 @@ def _split_citations_in_text(value: str) -> list[Inline]:
     last = 0
     for m in _CITATION_RE.finditer(value):
         if m.start() > last:
-            result.append(Text(value=value[last:m.start()]))
+            result.append(Text(value=value[last : m.start()]))
         result.append(Citation(key=m.group(1), locator=m.group(2)))
         last = m.end()
     if last < len(value):
@@ -82,6 +87,7 @@ def _split_citations_in_text(value: str) -> list[Inline]:
     if not result and value:
         result.append(Text(value=value))
     return result
+
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 R_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -97,22 +103,71 @@ def _q(tag: str) -> str:
     return f"{{{NS[prefix]}}}{local}"
 
 
+_BODY_WRAPPER_TAGS = {
+    _q("w:customXml"),
+    _q("w:sdt"),
+}
+
+_PARAGRAPH_WRAPPER_TAGS = {
+    _q("w:bdo"),
+    _q("w:customXml"),
+    _q("w:dir"),
+    _q("w:fldSimple"),
+    _q("w:sdt"),
+    _q("w:smartTag"),
+}
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
-def parse_docx_file(path: str | Path) -> ParseResult:
+
+def parse_docx_file(
+    path: str | Path,
+    *,
+    logical_path: str,
+    raw_bytes: bytes | None = None,
+) -> ParseResult:
     """File entry: parse, register the source, return ParseResult."""
     p = Path(path)
-    doc, stream = _parse_docx(p)
-    source = register_source(p, "docx", stream)
+    captured = raw_bytes if raw_bytes is not None else p.read_bytes()
+    doc, stream, diagnostic_specs = _parse_docx(p, raw_bytes=captured)
+    source = register_source(
+        p,
+        "docx",
+        stream,
+        logical_path=logical_path,
+        parser_version=PARSER_VERSION,
+        raw_bytes=captured,
+    )
     doc.source_id = source.id
-    return ParseResult(document=doc, source=source)
+    diagnostics = [
+        make_diagnostic(
+            source_id=source.id,
+            parser_name=source.parser,
+            parser_version=source.parser_version,
+            **spec,
+        )
+        for spec in diagnostic_specs
+    ]
+    return ParseResult(
+        document=doc,
+        source=source,
+        diagnostics=make_parse_report(
+            source_id=source.id,
+            parser_name=source.parser,
+            parser_version=source.parser_version,
+            diagnostics=diagnostics,
+        ),
+    )
 
 
-def _parse_docx(path: Path) -> tuple[Document, str]:
+def _parse_docx(
+    path: Path, *, raw_bytes: bytes | None = None
+) -> tuple[Document, str, list[dict]]:
     """Parse a .docx into a Document and its extracted-text stream."""
-    docx = OpenDocument(path)
+    docx = OpenDocument(BytesIO(raw_bytes) if raw_bytes is not None else path)
     body = docx.element.body
 
     # Build a relationship map: rId -> target (for hyperlinks and images)
@@ -120,6 +175,12 @@ def _parse_docx(path: Path) -> tuple[Document, str]:
     part = docx.part
     for rel_id, rel in part.rels.items():
         rels[rel_id] = rel.target_ref
+
+    # Inventory loss before revision cleanup mutates the source tree. The
+    # inventory uses the same boundary allowlists as the parser, so an OOXML
+    # construct is either consumed, recovered through a transparent wrapper,
+    # or represented by a located diagnostic.
+    diagnostic_specs = _loss_diagnostic_specs(body, rels)
 
     # Pre-process: strip revision marks, comments, bookmarks, etc.
     _clean_revisions(body)
@@ -131,29 +192,25 @@ def _parse_docx(path: Path) -> tuple[Document, str]:
 
     # Parse footnotes and endnotes (from word/{foot,end}notes.xml) before
     # the body walk.
-    doc_ir.footnotes = _load_notes(path, rels, numbering, note_kind="footnote")
-    doc_ir.endnotes = _load_notes(path, rels, numbering, note_kind="endnote")
+    note_source = raw_bytes if raw_bytes is not None else path
+    doc_ir.footnotes, footnote_specs = _load_notes(
+        note_source, rels, numbering, note_kind="footnote"
+    )
+    doc_ir.endnotes, endnote_specs = _load_notes(
+        note_source, rels, numbering, note_kind="endnote"
+    )
+    diagnostic_specs.extend(footnote_specs)
+    diagnostic_specs.extend(endnote_specs)
+    diagnostic_specs.extend(
+        _unresolved_note_reference_specs(
+            body,
+            footnote_ids=set(doc_ir.footnotes),
+            endnote_ids=set(doc_ir.endnotes),
+        )
+    )
 
     _walk_body(body, doc_ir.children, rels, numbering)
-    return doc_ir, _attach_provenance(doc_ir)
-
-
-def _attach_provenance(doc: Document) -> str:
-    """Build the canonical stream from the final top-level blocks, setting
-    each block's ``span`` (char offsets into the stream) and sequential
-    ``block_index`` as its text is appended. Returns the stream."""
-    parts: list[str] = []
-    pos = 0
-    for index, block in enumerate(doc.children):
-        text = block_text(block)
-        block.span = Span(pos, pos + len(text))
-        block.block_index = index
-        parts.append(text)
-        parts.append("\n\n")
-        pos += len(text) + 2
-    if parts:
-        parts.pop()  # drop the trailing separator
-    return "".join(parts)
+    return doc_ir, attach_canonical_provenance(doc_ir), diagnostic_specs
 
 
 # ---------------------------------------------------------------------------
@@ -177,36 +234,125 @@ _NOTE_CONFIG = {
 
 
 def _load_notes(
-    path: Path,
+    path: Path | bytes,
     rels: dict,
     numbering: dict,
     *,
     note_kind: str,
-) -> dict:
+) -> tuple[dict, list[dict]]:
     """Parse ``word/{note_kind}s.xml`` into a dict of ``Footnote`` or
     ``Endnote`` objects keyed by the internal integer ID."""
     cfg = _NOTE_CONFIG[note_kind]
     notes: dict = {}
+    diagnostics: list[dict] = []
     try:
-        with zipfile.ZipFile(path) as z:
+        archive = BytesIO(path) if isinstance(path, bytes) else path
+        with zipfile.ZipFile(archive) as z:
             if cfg["xml_file"] not in z.namelist():
-                return notes
+                return notes, diagnostics
             data = z.read(cfg["xml_file"])
     except (zipfile.BadZipFile, KeyError):
-        return notes
+        diagnostics.append(
+            _invalid_note_part_spec(note_kind, cfg["xml_file"], "unreadable")
+        )
+        return notes, diagnostics
 
     try:
         root = etree.fromstring(data)
     except etree.XMLSyntaxError:
-        return notes
+        diagnostics.append(
+            _invalid_note_part_spec(note_kind, cfg["xml_file"], "invalid-xml")
+        )
+        return notes, diagnostics
 
     for el in root.findall(_q(cfg["container_tag"])):
         fn_type = el.get(_q("w:type"))
-        if fn_type in ("separator", "continuationSeparator"):
+        if fn_type in ("separator", "continuationSeparator", "continuationNotice"):
+            diagnostics.append(
+                {
+                    "code": f"docx.{note_kind}-separator-omitted",
+                    "severity": "info",
+                    "disposition": "omitted",
+                    "loss_kind": "presentation",
+                    "location": DiagnosticLocation(
+                        kind="ooxml",
+                        part=cfg["xml_file"],
+                        xpath=root.getroottree().getpath(el),
+                    ),
+                    "message": (
+                        f"A generated DOCX {note_kind} separator was omitted from "
+                        "canonical text."
+                    ),
+                    "details": {"note_type": fn_type},
+                }
+            )
             continue
         internal_id = el.get(_q("w:id"))
         if not internal_id:
+            diagnostics.append(
+                {
+                    "code": f"docx.{note_kind}-id-missing",
+                    "severity": "error",
+                    "disposition": "refused",
+                    "loss_kind": "text",
+                    "location": DiagnosticLocation(
+                        kind="ooxml",
+                        part=cfg["xml_file"],
+                        xpath=root.getroottree().getpath(el),
+                    ),
+                    "message": f"A DOCX {note_kind} body has no durable note identity.",
+                    "details": {},
+                }
+            )
             continue
+        if internal_id in notes:
+            diagnostics.append(
+                {
+                    "code": f"docx.{note_kind}-id-duplicate",
+                    "severity": "error",
+                    "disposition": "refused",
+                    "loss_kind": "text",
+                    "location": DiagnosticLocation(
+                        kind="ooxml",
+                        part=cfg["xml_file"],
+                        xpath=root.getroottree().getpath(el),
+                    ),
+                    "message": (
+                        f"A duplicate DOCX {note_kind} identity would overwrite "
+                        "note text, so canonical recovery was refused."
+                    ),
+                    "details": {"note_id": internal_id},
+                }
+            )
+            continue
+        diagnostics.extend(
+            _loss_diagnostic_specs(
+                el,
+                rels,
+                part_name=cfg["xml_file"],
+                include_page_provenance=False,
+            )
+        )
+        marker = el.find(f".//{_q(cfg['marker_tag'])}")
+        if marker is not None:
+            diagnostics.append(
+                {
+                    "code": f"docx.{note_kind}-marker-normalized",
+                    "severity": "info",
+                    "disposition": "normalized",
+                    "loss_kind": "metadata",
+                    "location": DiagnosticLocation(
+                        kind="ooxml",
+                        part=cfg["xml_file"],
+                        xpath=root.getroottree().getpath(marker),
+                    ),
+                    "message": (
+                        f"The generated DOCX {note_kind} marker was represented by "
+                        "the canonical note identity."
+                    ),
+                    "details": {"note_id": internal_id},
+                }
+            )
         # Clean this subtree of revision marks before walking
         _clean_revisions(el)
         # Strip the auto-numbering marker run at the start
@@ -215,7 +361,55 @@ def _load_notes(
         children: list = []
         _walk_body(el, children, rels, numbering)
         notes[internal_id] = cfg["ir_cls"](id=internal_id, children=children)
-    return notes
+    return notes, diagnostics
+
+
+def _invalid_note_part_spec(note_kind: str, part: str, reason: str) -> dict:
+    return {
+        "code": f"docx.{note_kind}-part-invalid",
+        "severity": "error",
+        "disposition": "refused",
+        "loss_kind": "text",
+        "location": DiagnosticLocation(kind="ooxml", part=part, xpath="/"),
+        "message": f"The DOCX {note_kind} part could not be parsed safely.",
+        "details": {"reason": reason},
+    }
+
+
+def _unresolved_note_reference_specs(
+    body: etree._Element,
+    *,
+    footnote_ids: set[str],
+    endnote_ids: set[str],
+) -> list[dict]:
+    specs: list[dict] = []
+    tree = body.getroottree()
+    for note_kind, tag, known in (
+        ("footnote", "w:footnoteReference", footnote_ids),
+        ("endnote", "w:endnoteReference", endnote_ids),
+    ):
+        for element in body.iter(_q(tag)):
+            note_id = element.get(_q("w:id")) or ""
+            if note_id in known:
+                continue
+            specs.append(
+                {
+                    "code": f"docx.{note_kind}-reference-unresolved",
+                    "severity": "error",
+                    "disposition": "refused",
+                    "loss_kind": "text",
+                    "location": DiagnosticLocation(
+                        kind="ooxml",
+                        part="word/document.xml",
+                        xpath=tree.getpath(element),
+                    ),
+                    "message": (
+                        f"A DOCX {note_kind} reference has no recoverable note body."
+                    ),
+                    "details": {"note_id": note_id},
+                }
+            )
+    return specs
 
 
 def _strip_note_ref_marker(el: etree._Element, marker_tag: str) -> None:
@@ -233,16 +427,53 @@ def _strip_note_ref_marker(el: etree._Element, marker_tag: str) -> None:
         parent = run.getparent()
         if parent is None:
             continue
-        # Drop an immediately-following whitespace-only run if present.
+        for marker in list(run.iter(_q(marker_tag))):
+            marker_parent = marker.getparent()
+            if marker_parent is not None:
+                marker_parent.remove(marker)
+
+        # Keep a marker-bearing run when it also contains recoverable payload.
+        # Only an emptied marker-only run can justify removing Word's generated
+        # cosmetic spacer after it.
+        if _run_has_canonical_payload(run):
+            continue
         idx = list(parent).index(run)
         next_el = parent[idx + 1] if idx + 1 < len(parent) else None
-        if next_el is not None and next_el.tag == _q("w:r"):
-            # Check whether this run's text content is purely whitespace.
-            text_parts = [(t.text or "") for t in next_el.iter(_q("w:t"))]
-            joined = "".join(text_parts)
-            if joined and not joined.strip():
-                parent.remove(next_el)
+        if next_el is not None and _is_whitespace_only_run(next_el):
+            parent.remove(next_el)
         parent.remove(run)
+
+
+def _run_has_canonical_payload(run: etree._Element) -> bool:
+    for child in run:
+        if child.tag == _q("w:t") and (child.text or ""):
+            return True
+        if child.tag in {
+            _q("w:tab"),
+            _q("w:br"),
+            _q("w:cr"),
+            _q("w:noBreakHyphen"),
+            _q("w:softHyphen"),
+            _q("w:drawing"),
+            _q("w:footnoteReference"),
+            _q("w:endnoteReference"),
+        }:
+            return True
+    return False
+
+
+def _is_whitespace_only_run(element: etree._Element) -> bool:
+    if element.tag != _q("w:r"):
+        return False
+    text_parts: list[str] = []
+    for child in element:
+        if child.tag == _q("w:rPr"):
+            continue
+        if child.tag != _q("w:t"):
+            return False
+        text_parts.append(child.text or "")
+    joined = "".join(text_parts)
+    return bool(joined) and not joined.strip()
 
 
 # ---------------------------------------------------------------------------
@@ -258,6 +489,507 @@ _STRIP_TAGS = {
     _q("w:proofErr"),
     _q("w:lastRenderedPageBreak"),
 }
+
+
+def _loss_diagnostic_specs(
+    body: etree._Element,
+    rels: dict[str, str],
+    *,
+    part_name: str = "word/document.xml",
+    include_page_provenance: bool = True,
+) -> list[dict]:
+    """Inventory known DOCX degradations before the parser mutates OOXML."""
+    specs: list[dict] = []
+    if include_page_provenance:
+        specs.append(
+            {
+                "code": "docx.page-provenance-unavailable",
+                "severity": "info",
+                "disposition": "omitted",
+                "loss_kind": "metadata",
+                "location": DiagnosticLocation(
+                    kind="ooxml",
+                    part="word/document.xml",
+                    xpath="/w:document/w:body",
+                ),
+                "message": "DOCX layout is unpaginated during canonical extraction; page numbers are unavailable.",
+                "details": {},
+            }
+        )
+    tree = body.getroottree()
+
+    seen: set[tuple[str, str]] = set()
+
+    def add(
+        element: etree._Element,
+        code: str,
+        severity: str,
+        disposition: str,
+        loss_kind: str,
+        message: str,
+        *,
+        details: dict | None = None,
+    ) -> None:
+        xpath = tree.getpath(element)
+        key = (code, xpath)
+        if key in seen:
+            return
+        seen.add(key)
+        specs.append(
+            {
+                "code": code,
+                "severity": severity,
+                "disposition": disposition,
+                "loss_kind": loss_kind,
+                "location": DiagnosticLocation(
+                    kind="ooxml",
+                    part=part_name,
+                    xpath=xpath,
+                ),
+                "message": message,
+                "details": {
+                    "element": etree.QName(element.tag).localname,
+                    **(details or {}),
+                },
+            }
+        )
+
+    for element in list(body.iter()):
+        local = etree.QName(element.tag).localname
+        if local.startswith("comment"):
+            add(
+                element,
+                "docx.comment-omitted",
+                "warning",
+                "omitted",
+                "text",
+                "A DOCX comment marker was omitted from the canonical document.",
+            )
+        elif local.startswith("bookmark"):
+            add(
+                element,
+                "docx.bookmark-omitted",
+                "info",
+                "omitted",
+                "metadata",
+                "A DOCX bookmark marker was omitted from the canonical document.",
+            )
+        elif element.tag == _q("w:del") or element.tag == _q("w:delText"):
+            add(
+                element,
+                "docx.revision-deletion-omitted",
+                "warning",
+                "omitted",
+                "text",
+                "Rejected tracked-change text was omitted in favor of the accepted document state.",
+            )
+        elif element.tag == _q("w:ins"):
+            add(
+                element,
+                "docx.revision-insertion-normalized",
+                "info",
+                "normalized",
+                "metadata",
+                "Accepted tracked-change text was retained without revision markup.",
+            )
+        elif element.tag == _q("w:lastRenderedPageBreak"):
+            add(
+                element,
+                "docx.page-break-omitted",
+                "info",
+                "omitted",
+                "metadata",
+                "A rendered page-break marker was omitted from the unpaginated canonical document.",
+            )
+        elif element.tag == _q("w:proofErr"):
+            add(
+                element,
+                "docx.proofing-marker-omitted",
+                "info",
+                "omitted",
+                "metadata",
+                "A Word proofing-range marker was omitted from the canonical document.",
+            )
+        elif element.tag == _q("w:br") and element.get(_q("w:type")) == "page":
+            add(
+                element,
+                "docx.page-break-omitted",
+                "info",
+                "omitted",
+                "metadata",
+                "A page break was omitted from the unpaginated canonical document.",
+            )
+    for paragraph in body.iter(_q("w:p")):
+        if _paragraph_is_toc_field(paragraph):
+            add(
+                paragraph,
+                "docx.toc-cache-omitted",
+                "info",
+                "omitted",
+                "structure",
+                "A generated table-of-contents cache was omitted from the canonical document.",
+            )
+
+    _inventory_body_boundaries(body, add)
+    _inventory_table_boundaries(body, add)
+    for paragraph in body.iter(_q("w:p")):
+        _inventory_paragraph_boundary(paragraph, rels, add)
+    for run in body.iter(_q("w:r")):
+        _inventory_run_boundary(run, rels, add)
+    return specs
+
+
+def _inventory_table_boundaries(body: etree._Element, add) -> None:
+    """Refuse table semantics the current flat-cell IR cannot preserve."""
+    for table in body.iter(_q("w:tbl")):
+        if any(ancestor.tag == _q("w:tbl") for ancestor in table.iterancestors()):
+            contains_text = _element_has_text_payload(table)
+            add(
+                table,
+                "docx.nested-table-unsupported",
+                "error" if contains_text else "warning",
+                "refused" if contains_text else "omitted",
+                "text" if contains_text else "structure",
+                (
+                    "A nested DOCX table contains text that the flat canonical "
+                    "table model cannot preserve."
+                    if contains_text
+                    else "An empty nested DOCX table was omitted."
+                ),
+                details={"contains_text": contains_text},
+            )
+        rows = table.findall(_q("w:tr"))
+        for row_index, row in enumerate(rows):
+            if row_index == 0 or not _table_row_is_header(row):
+                continue
+            add(
+                row,
+                "docx.table-header-row-unsupported",
+                "error",
+                "refused",
+                "structure",
+                (
+                    "Only the first DOCX table row can map to the canonical "
+                    "single-header-row model."
+                ),
+                details={"row_index": row_index},
+            )
+    for merge in body.iter():
+        if merge.tag not in {_q("w:gridSpan"), _q("w:vMerge")}:
+            continue
+        if merge.tag == _q("w:gridSpan") and merge.get(_q("w:val")) == "1":
+            continue
+        add(
+            merge,
+            "docx.table-cell-merge-unsupported",
+            "error",
+            "refused",
+            "structure",
+            (
+                "Merged DOCX table-cell semantics cannot be represented "
+                "losslessly in the canonical table model."
+            ),
+            details={
+                "merge_kind": etree.QName(merge.tag).localname,
+                "value": merge.get(_q("w:val")) or "",
+            },
+        )
+
+
+def _element_has_text_payload(element: etree._Element) -> bool:
+    """Return whether an unconsumed element appears to carry textual data."""
+    for descendant in element.iter():
+        local = etree.QName(descendant.tag).localname
+        if local in {"t", "delText", "instrText"} and (descendant.text or ""):
+            return True
+    return False
+
+
+def _unsupported_details(element: etree._Element) -> dict:
+    name = etree.QName(element.tag)
+    return {
+        "namespace": name.namespace or "",
+        "contains_text": _element_has_text_payload(element),
+    }
+
+
+def _wrapper_content(element: etree._Element) -> etree._Element | None:
+    """Return the semantic content container for a transparent OOXML wrapper."""
+    if element.tag == _q("w:sdt"):
+        return element.find(_q("w:sdtContent"))
+    return element
+
+
+def _inventory_body_boundaries(body: etree._Element, add) -> None:
+    """Report every direct body-level decision, including nested wrappers."""
+
+    def inspect(container: etree._Element) -> None:
+        for child in container:
+            if child.tag in {_q("w:p"), _q("w:tbl")}:
+                continue
+            if child.tag == _q("w:sectPr"):
+                # Section layout is represented by the mandatory page-
+                # provenance diagnostic. Header/footer references need their
+                # own text-loss diagnostic.
+                for reference in child:
+                    if reference.tag in {
+                        _q("w:headerReference"),
+                        _q("w:footerReference"),
+                    }:
+                        add(
+                            reference,
+                            "docx.header-footer-omitted",
+                            "warning",
+                            "omitted",
+                            "text",
+                            "A referenced DOCX header or footer was not included in canonical body text.",
+                            details={
+                                "relationship_id": reference.get(_q("r:id")) or ""
+                            },
+                        )
+                continue
+            if child.tag in _BODY_WRAPPER_TAGS:
+                add(
+                    child,
+                    "docx.body-wrapper-normalized",
+                    "info",
+                    "normalized",
+                    "structure",
+                    "A body-level OOXML wrapper was removed while its supported block content was retained.",
+                )
+                content = _wrapper_content(child)
+                if content is not None:
+                    inspect(content)
+                continue
+            if child.tag in _STRIP_TAGS or child.tag in {
+                _q("w:del"),
+                _q("w:delText"),
+                _q("w:ins"),
+            }:
+                continue
+            loss_kind = (
+                "text"
+                if (child.tag == _q("w:altChunk") or _element_has_text_payload(child))
+                else "structure"
+            )
+            add(
+                child,
+                "docx.unsupported-body-element",
+                "warning",
+                "omitted",
+                loss_kind,
+                "An unsupported body-level OOXML element was omitted from the canonical document.",
+                details=_unsupported_details(child),
+            )
+
+    inspect(body)
+
+
+def _inventory_paragraph_boundary(
+    paragraph: etree._Element,
+    rels: dict[str, str],
+    add,
+) -> None:
+    """Inventory paragraph content that the inline walker consumes or omits."""
+    is_toc = _paragraph_is_toc_field(paragraph)
+
+    def inspect(container: etree._Element) -> None:
+        for child in container:
+            if child.tag in {_q("w:r"), _q("w:pPr")}:
+                continue
+            if child.tag == _q("w:hyperlink"):
+                rel_id = child.get(_q("r:id")) or ""
+                anchor = child.get(_q("w:anchor")) or ""
+                if not anchor and (not rel_id or rel_id not in rels):
+                    add(
+                        child,
+                        "docx.hyperlink-target-unresolved",
+                        "warning",
+                        "omitted",
+                        "metadata",
+                        "Hyperlink text was retained but its target could not be resolved.",
+                        details={"relationship_id": rel_id},
+                    )
+                inspect(child)
+                continue
+            if child.tag in _PARAGRAPH_WRAPPER_TAGS:
+                code = (
+                    "docx.simple-field-normalized"
+                    if child.tag == _q("w:fldSimple")
+                    else "docx.paragraph-wrapper-normalized"
+                )
+                add(
+                    child,
+                    code,
+                    "info",
+                    "normalized",
+                    "structure",
+                    "A paragraph-level OOXML wrapper was removed while its supported inline content was retained.",
+                )
+                content = _wrapper_content(child)
+                if content is not None:
+                    inspect(content)
+                continue
+            if child.tag in _STRIP_TAGS or child.tag in {
+                _q("w:del"),
+                _q("w:delText"),
+                _q("w:ins"),
+            }:
+                continue
+            # TOC field markers and instructions are accounted for by the
+            # paragraph-level TOC diagnostic.
+            if is_toc and child.tag in {_q("w:fldChar"), _q("w:instrText")}:
+                continue
+            add(
+                child,
+                "docx.unsupported-paragraph-element",
+                "warning",
+                "omitted",
+                "text" if _element_has_text_payload(child) else "structure",
+                "An unsupported paragraph-level OOXML element was omitted from the canonical document.",
+                details=_unsupported_details(child),
+            )
+
+    inspect(paragraph)
+
+    ppr = paragraph.find(_q("w:pPr"))
+    if ppr is not None:
+        handled = {_q("w:pStyle"), _q("w:numPr"), _q("w:pBdr")}
+        for prop in ppr:
+            if prop.tag not in handled:
+                add(
+                    prop,
+                    "docx.paragraph-presentation-omitted",
+                    "info",
+                    "omitted",
+                    "presentation",
+                    "A paragraph presentation property was not represented in canonical IR.",
+                    details=_unsupported_details(prop),
+                )
+
+
+def _inventory_run_boundary(
+    run: etree._Element,
+    rels: dict[str, str],
+    add,
+) -> None:
+    """Inventory run children and presentation properties."""
+    paragraph = next(
+        (ancestor for ancestor in run.iterancestors() if ancestor.tag == _q("w:p")),
+        None,
+    )
+    is_toc = paragraph is not None and _paragraph_is_toc_field(paragraph)
+    handled = {
+        _q("w:rPr"),
+        _q("w:t"),
+        _q("w:tab"),
+        _q("w:br"),
+        _q("w:cr"),
+        _q("w:noBreakHyphen"),
+        _q("w:softHyphen"),
+        _q("w:drawing"),
+        _q("w:footnoteReference"),
+        _q("w:endnoteReference"),
+        _q("w:footnoteRef"),
+        _q("w:endnoteRef"),
+    }
+    for child in run:
+        if child.tag in handled:
+            if child.tag == _q("w:drawing"):
+                blip = child.find(f".//{{{A_NS}}}blip")
+                rel_id = (
+                    ""
+                    if blip is None
+                    else (
+                        blip.get(f"{{{R_NS}}}embed")
+                        or blip.get(f"{{{R_NS}}}link")
+                        or ""
+                    )
+                )
+                if blip is None or not rel_id or rel_id not in rels:
+                    add(
+                        child,
+                        "docx.drawing-omitted",
+                        "warning",
+                        "omitted",
+                        "structure",
+                        "A drawing without a resolvable image relationship was omitted.",
+                        details={"relationship_id": rel_id},
+                    )
+            continue
+        if child.tag == _q("w:sym"):
+            add(
+                child,
+                "docx.symbol-omitted",
+                "warning",
+                "omitted",
+                "text",
+                "A font-mapped Word symbol could not be converted safely and was omitted.",
+                details={
+                    "font": child.get(_q("w:font")) or "",
+                    "char": child.get(_q("w:char")) or "",
+                },
+            )
+            continue
+        if child.tag == _q("w:instrText"):
+            if not is_toc:
+                add(
+                    child,
+                    "docx.field-instruction-omitted",
+                    "info",
+                    "omitted",
+                    "metadata",
+                    "A Word field instruction was omitted while visible field-result text was retained.",
+                    details={"instruction": child.text or ""},
+                )
+            continue
+        if child.tag == _q("w:fldChar"):
+            if not is_toc:
+                add(
+                    child,
+                    "docx.field-marker-omitted",
+                    "info",
+                    "omitted",
+                    "metadata",
+                    "A Word field boundary marker was omitted from canonical text.",
+                    details={"field_char_type": child.get(_q("w:fldCharType")) or ""},
+                )
+            continue
+        if child.tag in _STRIP_TAGS or child.tag in {_q("w:delText")}:
+            continue
+        add(
+            child,
+            "docx.unsupported-run-element",
+            "warning",
+            "omitted",
+            "text" if _element_has_text_payload(child) else "structure",
+            "An unsupported run-level OOXML element was omitted from the canonical document.",
+            details=_unsupported_details(child),
+        )
+
+    rpr = run.find(_q("w:rPr"))
+    if rpr is not None:
+        semantic = {
+            _q("w:b"),
+            _q("w:i"),
+            _q("w:strike"),
+            _q("w:dstrike"),
+            _q("w:vertAlign"),
+            _q("w:rStyle"),
+            _q("w:rFonts"),
+        }
+        for prop in rpr:
+            if prop.tag not in semantic:
+                add(
+                    prop,
+                    "docx.run-presentation-omitted",
+                    "info",
+                    "omitted",
+                    "presentation",
+                    "A run presentation property was not represented in canonical IR.",
+                    details=_unsupported_details(prop),
+                )
+
 
 # w:ins wraps inserted content — accept by unwrapping
 # w:del wraps deleted content — drop entirely
@@ -299,6 +1031,7 @@ def _clean_revisions(root: etree._Element) -> None:
 # Numbering (list detection)
 # ---------------------------------------------------------------------------
 
+
 def _load_numbering(docx) -> dict:
     """Return a map of numId -> {level_index: 'bullet' | 'decimal'}."""
     numbering: dict = {}
@@ -319,7 +1052,9 @@ def _load_numbering(docx) -> dict:
         for lvl in anum.findall(_q("w:lvl")):
             ilvl = int(lvl.get(_q("w:ilvl")) or "0")
             fmt_el = lvl.find(_q("w:numFmt"))
-            fmt = (fmt_el.get(_q("w:val")) if fmt_el is not None else "bullet") or "bullet"
+            fmt = (
+                fmt_el.get(_q("w:val")) if fmt_el is not None else "bullet"
+            ) or "bullet"
             levels[ilvl] = fmt
         abstract[aid] = levels
 
@@ -338,6 +1073,7 @@ def _load_numbering(docx) -> dict:
 # Body walker
 # ---------------------------------------------------------------------------
 
+
 def _walk_body(
     body: etree._Element,
     out: list,
@@ -347,7 +1083,7 @@ def _walk_body(
     # Collect ordered (paragraph | table) children. Consecutive list
     # paragraphs get grouped into ListBlock blocks.
     i = 0
-    children = [c for c in body if c.tag in (_q("w:p"), _q("w:tbl"))]
+    children = list(_iter_body_blocks(body))
     n = len(children)
 
     while i < n:
@@ -420,9 +1156,21 @@ def _walk_body(
         i += 1
 
 
+def _iter_body_blocks(container: etree._Element):
+    """Yield supported blocks in order through transparent body wrappers."""
+    for child in container:
+        if child.tag in {_q("w:p"), _q("w:tbl")}:
+            yield child
+        elif child.tag in _BODY_WRAPPER_TAGS:
+            content = _wrapper_content(child)
+            if content is not None:
+                yield from _iter_body_blocks(content)
+
+
 # ---------------------------------------------------------------------------
 # Paragraph inspection
 # ---------------------------------------------------------------------------
+
 
 def _paragraph_info(p: etree._Element, numbering: dict) -> dict:
     pPr = p.find(_q("w:pPr"))
@@ -457,7 +1205,12 @@ def _paragraph_info(p: etree._Element, numbering: dict) -> dict:
         # want to recognize them as list items.
         if num_id is None and style_name is not None:
             sn = style_name
-            if "ListBullet" in sn or sn == "List Bullet" or "ListParagraph" in sn or sn == "List Paragraph":
+            if (
+                "ListBullet" in sn
+                or sn == "List Bullet"
+                or "ListParagraph" in sn
+                or sn == "List Paragraph"
+            ):
                 num_id = "__style:bullet"
                 list_kind = "bullet"
             elif "ListNumber" in sn or sn == "List Number":
@@ -559,19 +1312,40 @@ def _paragraph_is_toc_field(p: etree._Element) -> bool:
 
 def _paragraph_plain_text(p: etree._Element) -> str:
     parts: list[str] = []
-    for child in p.iter():
-        if child.tag == _q("w:t"):
-            parts.append(child.text or "")
-        elif child.tag == _q("w:tab"):
-            parts.append("\t")
-        elif child.tag == _q("w:br"):
-            parts.append("\n")
+
+    def append_run(run: etree._Element) -> None:
+        for child in run:
+            if child.tag == _q("w:t"):
+                parts.append(child.text or "")
+            elif child.tag == _q("w:tab"):
+                parts.append("\t")
+            elif child.tag == _q("w:br"):
+                if child.get(_q("w:type")) != "page":
+                    parts.append("\n")
+            elif child.tag == _q("w:cr"):
+                parts.append("\n")
+            elif child.tag == _q("w:noBreakHyphen"):
+                parts.append("\N{NON-BREAKING HYPHEN}")
+            elif child.tag == _q("w:softHyphen"):
+                parts.append("\N{SOFT HYPHEN}")
+
+    def walk(container: etree._Element) -> None:
+        for child in container:
+            if child.tag == _q("w:r"):
+                append_run(child)
+            elif child.tag == _q("w:hyperlink") or child.tag in _PARAGRAPH_WRAPPER_TAGS:
+                content = _wrapper_content(child)
+                if content is not None:
+                    walk(content)
+
+    walk(p)
     return "".join(parts)
 
 
 # ---------------------------------------------------------------------------
 # List building
 # ---------------------------------------------------------------------------
+
 
 def _build_list(
     items_raw: list,
@@ -642,6 +1416,7 @@ def _detect_and_strip_docx_task_marker(inlines: list) -> bool | None:
 # Table
 # ---------------------------------------------------------------------------
 
+
 def _parse_table(
     tbl: etree._Element,
     rels: dict,
@@ -652,7 +1427,7 @@ def _parse_table(
 
     header_cells: list[Cell] = []
     body_rows: list[list[Cell]] = []
-    header_alignments: list = []
+    column_alignments: list = []
 
     for idx, tr in enumerate(rows_el):
         cells = []
@@ -679,13 +1454,15 @@ def _parse_table(
                             align = v
             cell_alignments.append(align)
         if idx == 0:
+            column_alignments = cell_alignments
+        if idx == 0 and _table_row_is_header(tr):
             header_cells = cells
-            header_alignments = cell_alignments
         else:
             body_rows.append(cells)
 
-    n_cols = len(header_cells)
-    alignments = header_alignments + [None] * (n_cols - len(header_alignments))
+    first_row = header_cells or (body_rows[0] if body_rows else [])
+    n_cols = len(first_row)
+    alignments = column_alignments + [None] * (n_cols - len(column_alignments))
     return Table(
         headers=header_cells,
         rows=body_rows,
@@ -693,16 +1470,33 @@ def _parse_table(
     )
 
 
+def _table_row_is_header(row: etree._Element) -> bool:
+    row_properties = row.find(_q("w:trPr"))
+    if row_properties is None:
+        return False
+    marker = row_properties.find(_q("w:tblHeader"))
+    return marker is not None and not _val_false(marker)
+
+
 # ---------------------------------------------------------------------------
 # Paragraph inlines (runs, hyperlinks, images, breaks)
 # ---------------------------------------------------------------------------
+
 
 def _paragraph_inlines(
     p: etree._Element,
     rels: dict,
 ) -> list[Inline]:
+    return _coalesce_text(_inline_container_inlines(p, rels))
+
+
+def _inline_container_inlines(
+    container: etree._Element,
+    rels: dict,
+) -> list[Inline]:
+    """Recover supported inline content through transparent OOXML wrappers."""
     out: list[Inline] = []
-    for child in p:
+    for child in container:
         if child.tag == _q("w:r"):
             out.extend(_run_inlines(child, rels))
         elif child.tag == _q("w:hyperlink"):
@@ -711,14 +1505,14 @@ def _paragraph_inlines(
                 anchor = child.get(_q("w:anchor"))
                 if anchor:
                     href = f"#{anchor}"
-            link_children: list[Inline] = []
-            for sub in child.findall(_q("w:r")):
-                link_children.extend(_run_inlines(sub, rels))
+            link_children = _inline_container_inlines(child, rels)
             if link_children:
-                out.append(Link(children=link_children, href=href))
-        # Everything else in a paragraph body (smartTag wrappers, etc.)
-        # we ignore — aggressive strip.
-    return _coalesce_text(out)
+                out.append(Link(children=_coalesce_text(link_children), href=href))
+        elif child.tag in _PARAGRAPH_WRAPPER_TAGS:
+            content = _wrapper_content(child)
+            if content is not None:
+                out.extend(_inline_container_inlines(content, rels))
+    return out
 
 
 def _run_inlines(
@@ -745,9 +1539,13 @@ def _run_inlines(
             bold = True
         if rPr.find(_q("w:i")) is not None and not _val_false(rPr.find(_q("w:i"))):
             italic = True
-        if rPr.find(_q("w:strike")) is not None and not _val_false(rPr.find(_q("w:strike"))):
+        if rPr.find(_q("w:strike")) is not None and not _val_false(
+            rPr.find(_q("w:strike"))
+        ):
             strike = True
-        if rPr.find(_q("w:dstrike")) is not None and not _val_false(rPr.find(_q("w:dstrike"))):
+        if rPr.find(_q("w:dstrike")) is not None and not _val_false(
+            rPr.find(_q("w:dstrike"))
+        ):
             strike = True
         vAlign = rPr.find(_q("w:vertAlign"))
         if vAlign is not None:
@@ -789,6 +1587,12 @@ def _run_inlines(
             if sub.get(_q("w:type")) == "page":
                 continue
             pieces.append(LineBreak())
+        elif sub.tag == _q("w:cr"):
+            pieces.append(LineBreak())
+        elif sub.tag == _q("w:noBreakHyphen"):
+            pieces.append(Text(value="\N{NON-BREAKING HYPHEN}"))
+        elif sub.tag == _q("w:softHyphen"):
+            pieces.append(Text(value="\N{SOFT HYPHEN}"))
         elif sub.tag == _q("w:drawing"):
             img = _extract_drawing(sub, rels)
             if img is not None:
@@ -801,7 +1605,8 @@ def _run_inlines(
             internal = sub.get(_q("w:id"))
             if internal:
                 pieces.append(EndnoteRef(id=internal))
-        # w:sym, w:instrText, etc. are ignored
+        # Unsupported or metadata-only run constructs are omitted only after
+        # the diagnostic inventory records their exact OOXML location.
 
     if not pieces:
         return []
@@ -883,11 +1688,13 @@ def _coalesce_text(nodes: list[Inline]) -> list[Inline]:
         if isinstance(n, _MERGEABLE_WRAPPERS):
             normalized.append(type(n)(children=_coalesce_text(n.children)))
         elif isinstance(n, Link):
-            normalized.append(Link(
-                children=_coalesce_text(n.children),
-                href=n.href,
-                title=n.title,
-            ))
+            normalized.append(
+                Link(
+                    children=_coalesce_text(n.children),
+                    href=n.href,
+                    title=n.title,
+                )
+            )
         else:
             normalized.append(n)
 

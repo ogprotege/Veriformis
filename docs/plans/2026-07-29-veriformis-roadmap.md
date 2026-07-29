@@ -1,18 +1,29 @@
 # Veriformis Build Roadmap
 
-**Status:** Authoritative post-M1 roadmap when merged into `main`
+**Status:** Authoritative build roadmap
 
 **Created:** 2026-07-29
 
-**Applies after:** The documentation-baseline pull request is merged
+**Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core at version `0.1.0`
+**Current implementation:** M1 core plus Group 1 integrity foundation at version `0.1.0`
 
 ## Product objective
 
-Veriformis owns the complete transformation from heterogeneous raw sources to finished, training-ready datasets. It ingests, reconstructs, cleans, normalizes, constructs records, curates, balances, splits, formats, validates, and seals the result. A cleaned corpus is an internal compiler state and can also be a selected full-sequence training objective. It is not the limit of the product.
+Veriformis owns the complete transformation from heterogeneous raw sources to finished, training-ready datasets. It captures raw bytes, performs faithful canonical recovery, cleans and normalizes the recovered structure, constructs records, curates, balances, splits, formats, validates, and seals the result. Canonical IR and a cleaned corpus are integrity-preserving compiler states. A cleaned corpus can also be selected for a full-sequence training objective, but it is not the limit of the product.
 
-The next implementation work begins only after the documentation pull request containing this roadmap has been reviewed and merged. That merge establishes the product contract against which Group 1 will be implemented.
+The documentation baseline has been reviewed and merged. Group 1 implemented
+Steps 1 through 6 against that product contract. Group 2 begins the dataset
+construction core after the Group 1 closeout gate passes.
+
+## Implementation status
+
+- Steps 1 through 6 are implemented in Group 1. Rerun the project checks for
+  current closeout evidence. Strict expected failures remain assigned to later
+  steps, and volatile test totals are intentionally omitted.
+- Steps 7 through 26 remain planned.
+- Later work must preserve the Group 1 workspace, identity, diagnostics,
+  evidence, and replay guarantees.
 
 ## Version boundary
 
@@ -23,11 +34,11 @@ Steps 1 through 24 build and deliver the deterministic product. The dataset pipe
 1. **Product and acceptance contract.** Translate the product-level contract into exact, versioned guarantees, supported training objectives, and executable M1.1 acceptance fixtures.
 2. **Regression tests.** Pin every confirmed identity, provenance, cleaning, validation, and sealing failure before changing implementation behavior.
 3. **Transactional workspace.** Introduce versioned `WorkspaceRevision` state, atomic stage commits, stale-stage invalidation, and safe recovery.
-4. **Source-scoped identities.** Make source, artifact, transform, chunk, candidate, record, and split identities deterministic and collision-resistant.
+4. **Source-scoped identities.** Define a deterministic, collision-resistant identity substrate for current source, artifact, transform, chunk, and revision primitives. Later candidate, record, and split types must adopt it when introduced.
 5. **IR, diagnostics, and source evidence.** Strengthen the canonical IR, record parser loss explicitly, and create immutable source-range evidence.
 6. **Replayable cleaning plans.** Make preview and application consume the same source-scoped edit plan while preserving structure and recording every change.
 7. **Training objectives and recipes.** Introduce versioned `TrainingObjective` and `DatasetRecipe` contracts.
-8. **Construction passes and evidence.** Introduce ordered `ConstructionPass` operations and field-level `SourceEvidence` bindings.
+8. **Construction passes and evidence.** Introduce ordered `ConstructionPass` operations and field-level `SourceEvidence` bindings, including IR-only metadata evidence before any `structured_field` constructor.
 9. **Record lifecycle.** Define `ConstructionPass -> CandidateRecord -> immutable DatasetRecord`, including rejection and optional review evidence.
 10. **Deterministic constructors.** Build truthful raw-source constructors for full-text, continuation, reconstruction, transformation, and structured-field objectives.
 11. **Curation and quality.** Add deduplication, filtering, contradiction checks, coverage accounting, balancing, and explicit rejection reasons.
@@ -51,11 +62,15 @@ Steps 1 through 24 build and deliver the deterministic product. The dataset pipe
 
 ### Documentation prerequisite
 
-The documentation-baseline pull request must be merged before Group 1 begins. No numbered implementation step starts on the documentation branch.
+Complete. The documentation-baseline pull request was merged before Group 1
+implementation began.
 
 ### Group 1: Integrity foundation
 
 **Steps 1 through 6**
+
+**Status:** Implemented. The Group 1 contract and regression suite control the
+final closeout decision.
 
 1. Product and acceptance contract
 2. Regression tests
@@ -64,7 +79,7 @@ The documentation-baseline pull request must be merged before Group 1 begins. No
 5. IR, diagnostics, and source evidence
 6. Replayable cleaning plans
 
-**Exit gate:** The new contracts are documented, the regression suite passes, and each confirmed defect remains pinned by a test that fails without its repair. Multi-source workspace revisions are atomic, identities are source-scoped and collision-resistant, duplicate identities are rejected, parser loss is explicit, provenance resolves to immutable source evidence, and cleaning preview equals application.
+**Exit gate:** The new contracts are documented, the regression suite passes, and each confirmed defect remains pinned by a test that fails without its repair. Multi-source workspace revisions are atomic, current source, artifact, transform, chunk, and revision primitives have deterministic collision-resistant identities, duplicate identities are rejected, parser loss is explicit, provenance resolves to immutable source evidence, and cleaning preview equals application.
 
 ### Group 2: Dataset construction core
 
@@ -75,7 +90,7 @@ The documentation-baseline pull request must be merged before Group 1 begins. No
 9. Record lifecycle
 10. Deterministic constructors
 
-**Exit gate:** Raw sources can produce evidence-bearing candidate records under versioned recipes. Accepted candidates become immutable dataset records, and every constructed field has a truthful deterministic derivation.
+**Exit gate:** Raw sources can produce evidence-bearing candidate records under versioned recipes. Accepted candidates become immutable dataset records, and every constructed field has a truthful deterministic derivation. IR-only metadata has field-level evidence before `structured_field` is available.
 
 ### Group 3: Finished-dataset pipeline
 

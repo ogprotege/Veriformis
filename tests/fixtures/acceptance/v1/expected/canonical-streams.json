@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "canonical_stream_contract_version": 1,
+  "streams": {
+    "generated/corpus/docx/source.docx": {
+      "text": "Generated DOCX\n\nBody with café text.",
+      "sha256": "59f1d2e91450019dcc066b02ed8147ec20aefad0d03ff5854dfa287477e1eb96"
+    },
+    "raw/adversarial/duplicate-a/repeated.txt": {
+      "text": "Repeated source text.",
+      "sha256": "0ddb612c00db9d36df84b185d54951290a27f32e6f22251b96bf18f3afe8bff3"
+    },
+    "raw/adversarial/duplicate-b/repeated.txt": {
+      "text": "Repeated source text.",
+      "sha256": "0ddb612c00db9d36df84b185d54951290a27f32e6f22251b96bf18f3afe8bff3"
+    },
+    "raw/adversarial/rich-cleaning.md": {
+      "text": "Cleaning Structure\n\nAlpha  beta\nGamma delta\n\nName\tValue\nOne  item\tCafé\n\nQuoted  material remains quoted.",
+      "sha256": "6d303dbd57bab5288643d9b20d254bb222e254dadd14b09ee8f0e890baa39912"
+    },
+    "raw/adversarial/unsupported.md": {
+      "text": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "raw/corpus/code/sample.py": {
+      "text": "def retained_value() -> str:\n    return \"source-grounded\"\n",
+      "sha256": "cd751bb279136037aa23b7b3e909610af7f78764b4bfecd60759820134db42ce"
+    },
+    "raw/corpus/markdown/source.md": {
+      "text": "Alpha Source\n\nHEADER ALPHA\n\nThe alpha source retains bold text, a reference, and café characters.\n\nEvidence\n\nSource structure must remain inspectable.",
+      "sha256": "03f670a6f612713feafbf3ce402561b0bcab6a1d5052f09ac04421b7fbe3b776"
+    },
+    "raw/corpus/text/source.txt": {
+      "text": "HEADER BETA\n\n42\n\nThe beta source contains naïve Unicode text and a standalone page number.",
+      "sha256": "66a3a732a1352380b7e9c042a8c5f39d22c62fe9ea1c3687b336301a339e4f90"
+    }
+  }
+}

@@ -194,6 +194,34 @@ class Document:
     source_id: str = ""
 
 
+def iter_document_regions(document: Document):
+    """Yield canonical block regions without coalescing body and note context."""
+    yield "body", document.children
+    for note_id in sorted(document.footnotes):
+        yield f"footnote:{note_id}", document.footnotes[note_id].children
+    for note_id in sorted(document.endnotes):
+        yield f"endnote:{note_id}", document.endnotes[note_id].children
+
+
+def iter_document_blocks(document: Document):
+    """Yield every canonical source block in deterministic stream order."""
+    for _, blocks in iter_document_regions(document):
+        yield from blocks
+
+
+def attach_canonical_provenance(document: Document) -> str:
+    """Assign canonical-stream spans and unique indices to every source block."""
+    parts: list[str] = []
+    position = 0
+    for block_index, block in enumerate(iter_document_blocks(document)):
+        text = block_text(block)
+        block.span = Span(position, position + len(text))
+        block.block_index = block_index
+        parts.append(text)
+        position += len(text) + 2
+    return "\n\n".join(parts)
+
+
 def _inline_text(node: Inline) -> str:
     if isinstance(node, (Text, Code)):
         return node.value
@@ -203,7 +231,20 @@ def _inline_text(node: Inline) -> str:
         return node.source
     if isinstance(node, LineBreak):
         return "\n"
-    return ""  # Image, FootnoteRef, EndnoteRef, Citation contribute no text
+    # Visible semantic inline content must survive the canonical text
+    # projection.  Non-text metadata such as image targets and link titles is
+    # retained in the strict IR artifact and will require field-level IR
+    # evidence when structured-field construction is implemented.
+    if isinstance(node, Image):
+        return node.alt
+    if isinstance(node, FootnoteRef):
+        return f"[^{node.id}]"
+    if isinstance(node, EndnoteRef):
+        return f"[^endnote:{node.id}]"
+    if isinstance(node, Citation):
+        locator = f", {node.locator}" if node.locator else ""
+        return f"[@{node.key}{locator}]"
+    raise TypeError(f"unsupported inline node: {type(node).__name__}")
 
 
 def block_text(block: Block) -> str:

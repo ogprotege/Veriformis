@@ -1,34 +1,86 @@
-# src/veriformis/cli.py
-"""veriformis CLI: stage commands over a workspace directory.
-(`veriformis run pipeline.yaml` is milestone M2 — intentionally absent.)"""
+"""Veriformis CLI over immutable, transactional workspace revisions.
+
+The CLI remains the M1 orchestration surface. Every inter-stage artifact is
+content-addressed and every successful stage becomes visible through one
+atomic workspace ``HEAD`` transition.
+"""
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict
 from pathlib import Path
+from typing import Any
 
 import typer
 
 import veriformis
-from veriformis.chunkers.base import Chunk
+from veriformis.chunkers.base import Chunk, chunk_from_dict, chunk_to_dict, flatten
+from veriformis.chunkers.pipeline import build_chunks
 from veriformis.chunkers.strategies import (
-    chunk_fixed, chunk_paragraph, chunk_sentence, chunk_sliding, chunk_structure,
+    chunk_fixed,
+    chunk_paragraph,
+    chunk_sentence,
+    chunk_sliding,
+    chunk_structure,
 )
-from veriformis.errors import UnsupportedInputError, VeriformisError
-from veriformis.ir import Span, document_from_dict, document_to_dict
-from veriformis.parsers.docx import parse_docx_file
-from veriformis.parsers.markdown import parse_md_file
-from veriformis.parsers.text import parse_text
-from veriformis.rules.engine import TransformRecord, clean_document
-from veriformis.rules.library import RULES, custom_regex, default_rules
+from veriformis.errors import (
+    InvalidSourceLocatorError,
+    ParseError,
+    VeriformisError,
+)
+from veriformis.diagnostics import (
+    parse_report_from_dict,
+    parse_report_to_dict,
+    validate_parse_report_locations,
+)
+from veriformis.evidence import (
+    DerivationStep,
+    EvidenceError,
+    resolve_evidence,
+)
+from veriformis.identity import (
+    canonical_digest,
+    lossless_json_bytes,
+    normalize_logical_path,
+)
+from veriformis.ir import (
+    document_from_dict,
+    document_to_dict,
+    iter_document_blocks,
+    validate_document_against_stream,
+)
+from veriformis.parsers.dispatch import CODE_EXTENSIONS, parse_captured_source
+from veriformis.rules.cleaning import (
+    cleaning_plan_from_dict,
+    cleaning_plan_to_dict,
+    cleaning_input_digest,
+    expected_transform_records,
+    plan_cleaning,
+    replay_cleaning_plan,
+)
+from veriformis.rules.engine import (
+    Rule,
+    TransformRecord,
+    transform_record_from_dict,
+    transform_record_to_dict,
+)
+from veriformis.rules.derivations import (
+    block_derivations_from_dict,
+    block_derivations_to_dict,
+    build_block_derivations,
+    load_exact_block_derivations,
+)
+from veriformis.rules.library import rules_from_clean_config, select_rules
 from veriformis.serializers.chat import serialize_chat
 from veriformis.serializers.formats import serialize_completion, serialize_instruction
-from veriformis.sources import SourceRef
-from veriformis.validate.gates import RECORD_SCHEMAS, run_gates
+from veriformis.sources import ParseResult, SourceRef
+from veriformis.validate.gates import RECORD_SCHEMAS, GateResult, run_gates
+from veriformis.workspace import SourceDescriptor, Workspace, WorkspaceRevision
 
-app = typer.Typer(help="Veriformis — local-first dataset compiler.")
+app = typer.Typer(help="Veriformis: local-first dataset compiler.")
 
-_CODE_EXTS = {".py", ".js", ".ts", ".java", ".c", ".cpp", ".go", ".rs", ".rb", ".sh"}
+_CODE_EXTS = CODE_EXTENSIONS
 _STRATEGIES = {
     "paragraph": chunk_paragraph,
     "fixed": chunk_fixed,
@@ -38,52 +90,580 @@ _STRATEGIES = {
 }
 
 
-def _parse_one(path: Path):
-    ext = path.suffix.lower()
-    if ext == ".txt":
-        return parse_text(path)
-    if ext in (".md", ".markdown"):
-        return parse_md_file(path)
-    if ext == ".docx":
-        return parse_docx_file(path)
-    if ext in _CODE_EXTS:
-        return parse_text(path, language=ext.lstrip("."))
-    raise UnsupportedInputError(f"unsupported input type: {path.name}")
+def _parse_one(path: Path, *, logical_path: str, raw_bytes: bytes) -> ParseResult:
+    return parse_captured_source(
+        path,
+        logical_path=logical_path,
+        raw_bytes=raw_bytes,
+    )
 
 
-def _load_workspace(ws: Path):
-    registry = {s["id"]: s for s in json.loads((ws / "registry.json").read_text())}
-    docs = {}
-    for ir_path in sorted(ws.glob("*.ir.json")):
-        doc = document_from_dict(json.loads(ir_path.read_text()))
-        docs[ir_path.name[: -len(".ir.json")]] = doc
-    sources = {}
-    for sid, entry in registry.items():
-        stem = Path(entry["path"]).stem
-        extracted = (ws / f"{stem}.extracted.txt").read_text(encoding="utf-8")
-        sources[sid] = SourceRef(extracted_text=extracted, **entry)
-    return docs, sources
+def _require_accepted_parse(result: ParseResult, *, logical_path: str) -> None:
+    if result.diagnostics.status != "refused":
+        return
+    codes = sorted(
+        diagnostic.code
+        for diagnostic in result.diagnostics.diagnostics
+        if diagnostic.severity == "error"
+    )
+    detail = ", ".join(codes) if codes else "unspecified-parser-error"
+    raise ParseError(f"parser refused {logical_path}: {detail}")
+
+
+def _logical_paths(
+    paths: list[Path],
+    *,
+    source_root: Path | None,
+) -> dict[Path, str]:
+    """Derive locators from one explicit root, never from batch composition."""
+    root = (source_root or Path.cwd()).resolve()
+    if not root.is_dir():
+        raise InvalidSourceLocatorError(f"source root is not a directory: {root}")
+    logical: dict[Path, str] = {}
+    for path in paths:
+        resolved = path.resolve()
+        try:
+            relative = resolved.relative_to(root)
+        except ValueError as exc:
+            raise InvalidSourceLocatorError(
+                f"source {resolved} is outside source root {root}; "
+                "pass --source-root explicitly"
+            ) from exc
+        logical[path] = normalize_logical_path(relative)
+    return logical
+
+
+def _echo_error(exc: Exception, *, status: int = 2) -> None:
+    code = getattr(exc, "code", "invalid-data")
+    message = getattr(exc, "message", str(exc))
+    typer.echo(f"error[{code}]: {message}", err=True)
+    raise typer.Exit(code=status) from exc
+
+
+def _echo_durability_warning(workspace: Workspace) -> None:
+    warning = workspace.last_commit_durability_warning
+    if warning is not None:
+        typer.echo(f"warning[commit-durability]: {warning}", err=True)
+
+
+def _json_load(data: bytes) -> Any:
+    def reject_constant(value: str) -> None:
+        raise ValueError(f"non-finite JSON number is not allowed: {value}")
+
+    def strict_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        value: dict[str, Any] = {}
+        for key, item in pairs:
+            if key in value:
+                raise EvidenceError(
+                    f"persisted JSON contains duplicate key {key!r}"
+                )
+            value[key] = item
+        return value
+
+    try:
+        return json.loads(
+            data.decode("utf-8"),
+            object_pairs_hook=strict_object,
+            parse_constant=reject_constant,
+        )
+    except EvidenceError:
+        raise
+    except (UnicodeError, ValueError, json.JSONDecodeError) as exc:
+        raise EvidenceError(f"persisted artifact is not valid UTF-8 JSON: {exc}") from exc
+
+
+def _output_bytes(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+    stage: str,
+    key: str,
+) -> bytes:
+    try:
+        artifact_id = revision.stages[stage].outputs[key]
+    except KeyError as exc:
+        raise EvidenceError(f"workspace stage {stage!r} lacks output {key!r}") from exc
+    return workspace.read_artifact(artifact_id, revision=revision)
+
+
+def _load_sources(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+) -> dict[str, SourceRef]:
+    expected_registry = [
+        descriptor.model_dump(mode="json", exclude={"original_path"})
+        for descriptor in sorted(revision.sources.values(), key=lambda item: item.id)
+    ]
+    registry = _json_load(_output_bytes(workspace, revision, "parse", "registry"))
+    if registry != expected_registry:
+        raise EvidenceError(
+            "parse registry does not match the active source descriptors"
+        )
+    sources: dict[str, SourceRef] = {}
+    for source_id, descriptor in sorted(revision.sources.items()):
+        artifact_id = descriptor.extracted_artifact_id
+        if artifact_id is None:
+            raise EvidenceError(f"source {source_id} has no canonical text artifact")
+        extracted = workspace.read_artifact(artifact_id, revision=revision).decode("utf-8")
+        report = parse_report_from_dict(
+            _json_load(
+                _output_bytes(
+                    workspace,
+                    revision,
+                    "parse",
+                    f"source/{source_id}/diagnostics",
+                )
+            )
+        )
+        if descriptor.raw_artifact_id is None:
+            raise EvidenceError(f"source {source_id} has no captured raw artifact")
+        raw_bytes = workspace.read_artifact(
+            descriptor.raw_artifact_id,
+            revision=revision,
+        )
+        try:
+            validate_parse_report_locations(report, raw_bytes)
+        except ParseError as exc:
+            raise EvidenceError(
+                f"parse report locations for {source_id} exceed the captured source"
+            ) from exc
+        if (
+            report.source_id != source_id
+            or report.parser_name != descriptor.parser_id
+            or report.parser_version != descriptor.parser_version
+            or report.status == "refused"
+        ):
+            raise EvidenceError(
+                f"parse report for {source_id} does not match its source descriptor"
+            )
+        expected = parse_captured_source(
+            descriptor.logical_path,
+            logical_path=descriptor.logical_path,
+            raw_bytes=raw_bytes,
+        )
+        document = document_from_dict(
+            _json_load(
+                _output_bytes(
+                    workspace,
+                    revision,
+                    "parse",
+                    f"source/{source_id}/document",
+                )
+            )
+        )
+        expected_source = expected.source
+        descriptor_semantics = (
+            descriptor.id,
+            descriptor.logical_path,
+            descriptor.sha256,
+            descriptor.size,
+            descriptor.parser_id,
+            descriptor.parser_version,
+            descriptor.canonical_stream_contract_version,
+            descriptor.extracted_artifact_id,
+        )
+        expected_semantics = (
+            expected_source.id,
+            expected_source.logical_path,
+            expected_source.sha256,
+            expected_source.size,
+            expected_source.parser,
+            expected_source.parser_version,
+            expected_source.canonical_stream_contract_version,
+            expected_source.artifact_id,
+        )
+        if descriptor_semantics != expected_semantics:
+            raise EvidenceError(
+                f"source descriptor {source_id} does not match captured raw bytes"
+            )
+        if (
+            extracted != expected_source.extracted_text
+            or document != expected.document
+            or report != expected.diagnostics
+        ):
+            raise EvidenceError(
+                f"parse artifacts for {source_id} do not match captured raw bytes"
+            )
+        sources[source_id] = expected_source
+    return sources
+
+
+def _cleaning_input_digest(source: SourceRef, document: Any) -> str:
+    """Identify the exact, portable parse snapshot consumed by cleaning."""
+    return cleaning_input_digest(
+        document,
+        source_id=source.id,
+        raw_sha256=source.sha256,
+        canonical_artifact_id=source.artifact_id,
+        canonical_stream_sha256=source.stream_sha256,
+        parser=source.parser,
+        parser_version=source.parser_version,
+        canonical_stream_contract_version=(
+            source.canonical_stream_contract_version
+        ),
+    )
+
+
+def _load_documents(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+    *,
+    stage: str,
+) -> dict[str, Any]:
+    configured_rules = (
+        rules_from_clean_config(revision.stages["clean"].config)
+        if stage == "clean"
+        else None
+    )
+    parsed_documents = (
+        _load_documents(workspace, revision, stage="parse")
+        if stage == "clean"
+        else None
+    )
+    parsed_sources = (
+        _load_sources(workspace, revision)
+        if stage == "clean"
+        else None
+    )
+    documents = {}
+    for source_id in sorted(revision.sources):
+        value = _json_load(
+            _output_bytes(
+                workspace,
+                revision,
+                stage,
+                f"source/{source_id}/document",
+            )
+        )
+        document = document_from_dict(value)
+        if document.source_id != source_id:
+            raise EvidenceError(
+                f"document source {document.source_id!r} does not match {source_id!r}"
+            )
+        descriptor = revision.sources[source_id]
+        if descriptor.extracted_artifact_id is None:
+            raise EvidenceError(f"source {source_id} has no canonical text artifact")
+        canonical_stream = workspace.read_artifact(
+            descriptor.extracted_artifact_id,
+            revision=revision,
+        ).decode("utf-8")
+        validate_document_against_stream(
+            document,
+            canonical_stream,
+            exact=stage == "parse",
+        )
+        if stage == "clean":
+            plan = cleaning_plan_from_dict(
+                _json_load(
+                    _output_bytes(
+                        workspace,
+                        revision,
+                        "clean",
+                        f"source/{source_id}/cleaning-plan",
+                    )
+                )
+            )
+            expected_input = _cleaning_input_digest(
+                parsed_sources[source_id], parsed_documents[source_id]
+            )
+            if plan.base_input_sha256 != expected_input:
+                raise EvidenceError(
+                    f"cleaning plan for {source_id} is not bound to its parse input"
+                )
+            expected_preview = plan_cleaning(
+                parsed_documents[source_id],
+                configured_rules,
+                max_remove_frac=(
+                    revision.stages["clean"].config["max_remove_ppm"]
+                    / 1_000_000
+                ),
+                base_input_sha256=expected_input,
+            )
+            if plan != expected_preview.plan:
+                raise EvidenceError(
+                    f"cleaning plan for {source_id} is not the configured replay"
+                )
+            if document != expected_preview.document:
+                raise EvidenceError(
+                    f"cleaned document for {source_id} does not match its replayable plan"
+                )
+        documents[source_id] = document
+    return documents
+
+
+def _load_transform_records(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+) -> list[TransformRecord]:
+    _load_documents(workspace, revision, stage="clean")
+    raw = _json_load(_output_bytes(workspace, revision, "clean", "transforms"))
+    if not isinstance(raw, list):
+        raise EvidenceError("transform artifact must contain a JSON array")
+    records = [transform_record_from_dict(value) for value in raw]
+    record_ids = [record.id for record in records]
+    if len(record_ids) != len(set(record_ids)):
+        raise EvidenceError("transform artifact contains duplicate identities")
+    expected_records: list[TransformRecord] = []
+    parsed_documents = _load_documents(workspace, revision, stage="parse")
+    for source_id in sorted(revision.sources):
+        plan = cleaning_plan_from_dict(
+            _json_load(
+                _output_bytes(
+                    workspace,
+                    revision,
+                    "clean",
+                    f"source/{source_id}/cleaning-plan",
+                )
+            )
+        )
+        expected_records.extend(
+            expected_transform_records(parsed_documents[source_id], plan)
+        )
+    if records != expected_records:
+        raise EvidenceError(
+            "transform artifact metadata does not match cleaning plan replay"
+        )
+    return records
+
+
+def _load_chunks(workspace: Workspace, revision: WorkspaceRevision) -> list[Chunk]:
+    raw = _json_load(_output_bytes(workspace, revision, "chunk", "chunks"))
+    if not isinstance(raw, list):
+        raise EvidenceError("chunk artifact must contain a JSON array")
+    chunks = [chunk_from_dict(value) for value in raw]
+    ids = [chunk.id for chunk in chunks]
+    if len(ids) != len(set(ids)):
+        raise EvidenceError("chunk artifact contains duplicate identities")
+    sources = _load_sources(workspace, revision)
+    for chunk in chunks:
+        resolved = resolve_evidence(chunk.evidence, sources)
+        if resolved != chunk.text:
+            raise EvidenceError(
+                f"chunk {chunk.id} text does not match its resolved source evidence"
+            )
+    documents = _load_documents(workspace, revision, stage="clean")
+    transforms = _load_transform_records(workspace, revision)
+    derivations_by_source: dict[
+        str, dict[int, tuple[DerivationStep, ...]]
+    ] = {}
+    for source_id, document in sorted(documents.items()):
+        plan = cleaning_plan_from_dict(
+            _json_load(
+                _output_bytes(
+                    workspace,
+                    revision,
+                    "clean",
+                    f"source/{source_id}/cleaning-plan",
+                )
+            )
+        )
+        artifact_id = revision.stages["clean"].outputs[
+            f"source/{source_id}/block-derivations"
+        ]
+        if revision.artifacts[artifact_id].config_digest != canonical_digest(
+            {**revision.stages["clean"].config, "cleaning_plan_id": plan.id}
+        ):
+            raise EvidenceError(
+                "block derivation artifact is not configured for its cleaning plan"
+            )
+        derivations_by_source[source_id] = _validated_block_derivations(
+            _json_load(workspace.read_artifact(artifact_id, revision=revision)),
+            source=sources[source_id],
+            document=document,
+            cleaning_plan_id=plan.id,
+        )
+    config = revision.stages["chunk"].config
+    if set(config) != {"strategy", "size", "overlap"}:
+        raise EvidenceError("chunk stage config does not match its v1 schema")
+    expected = build_chunks(
+        documents,
+        sources,
+        transforms,
+        derivations_by_source,
+        strategy=config["strategy"],
+        size=config["size"],
+        overlap=config["overlap"],
+    )
+    if chunks != expected:
+        raise EvidenceError(
+            "chunk artifact does not match deterministic clean-state replay"
+        )
+    return chunks
+
+
+def _select_rules(rules: str, custom: str) -> tuple[list[Rule], dict[str, Any]]:
+    return select_rules(rules, custom)
+
+
+def _build_block_derivations(
+    source: SourceRef,
+    document: Any,
+    *,
+    cleaning_plan_id: str,
+) -> dict[int, tuple[DerivationStep, ...]]:
+    return build_block_derivations(
+        source,
+        document,
+        cleaning_plan_id=cleaning_plan_id,
+    )
+
+
+def _derivations_to_dict(
+    derivations: dict[int, tuple[DerivationStep, ...]],
+) -> dict[str, list[dict]]:
+    return block_derivations_to_dict(derivations)
+
+
+def _derivations_from_dict(value: Any) -> dict[int, tuple[DerivationStep, ...]]:
+    return block_derivations_from_dict(value)
+
+
+def _validated_block_derivations(
+    value: Any,
+    *,
+    source: SourceRef,
+    document: Any,
+    cleaning_plan_id: str,
+) -> dict[int, tuple[DerivationStep, ...]]:
+    return load_exact_block_derivations(
+        value,
+        source=source,
+        document=document,
+        cleaning_plan_id=cleaning_plan_id,
+    )
 
 
 @app.command()
-def parse(paths: list[Path], out: Path = typer.Option(..., "-o")) -> None:
-    """Ingest raw files into a workspace."""
-    out.mkdir(parents=True, exist_ok=True)
-    registry = []
+def parse(
+    paths: list[Path],
+    out: Path = typer.Option(..., "-o"),
+    source_root: Path | None = typer.Option(None, "--source-root"),
+) -> None:
+    """Capture raw files and commit one canonical parse revision."""
     try:
-        for path in paths:
-            result = _parse_one(path)
-            stem = path.stem
-            (out / f"{stem}.ir.json").write_text(json.dumps(document_to_dict(result.document)))
-            (out / f"{stem}.extracted.txt").write_text(result.source.extracted_text, encoding="utf-8")
-            entry = asdict(result.source)
-            del entry["extracted_text"]
-            registry.append(entry)
-    except VeriformisError as exc:
-        typer.echo(f"error[{exc.code}]: {exc.message}", err=True)
-        raise typer.Exit(code=2) from exc
-    (out / "registry.json").write_text(json.dumps(registry, indent=2))
-    typer.echo(f"parsed {len(registry)} source(s) into {out}")
+        logical_paths = _logical_paths(paths, source_root=source_root)
+        captured = [(path, path.read_bytes()) for path in paths]
+        results = [
+            _parse_one(
+                path,
+                logical_path=logical_paths[path],
+                raw_bytes=raw_bytes,
+            )
+            for path, raw_bytes in captured
+        ]
+        for result in results:
+            _require_accepted_parse(
+                result,
+                logical_path=result.source.logical_path,
+            )
+        workspace = Workspace.create(out)
+        with workspace.begin("parse") as transaction:
+            descriptors: list[SourceDescriptor] = []
+            outputs: dict[str, Any] = {}
+            for (path, raw_bytes), result in sorted(
+                zip(captured, results, strict=True),
+                key=lambda item: item[1].source.id,
+            ):
+                source = result.source
+                parser_config = {
+                    "parser": source.parser,
+                    "parser_version": source.parser_version,
+                    "canonical_stream_contract_version": (
+                        source.canonical_stream_contract_version
+                    ),
+                }
+                raw_artifact = transaction.put_artifact(
+                    raw_bytes,
+                    kind="raw-source",
+                    media_type="application/octet-stream",
+                    source_ids=(source.id,),
+                    producer_id="veriformis.source-capture",
+                    producer_version="1",
+                    config={"logical_path": source.logical_path},
+                )
+                canonical_artifact = transaction.put_artifact(
+                    source.extracted_text,
+                    kind="canonical-source-text",
+                    media_type="text/plain; charset=utf-8",
+                    source_ids=(source.id,),
+                    producer_id=f"veriformis.parser.{source.parser}",
+                    producer_version=source.parser_version,
+                    config=parser_config,
+                )
+                if canonical_artifact.id != source.artifact_id:
+                    raise EvidenceError("parser and workspace canonical artifact IDs differ")
+                document_artifact = transaction.put_artifact(
+                    lossless_json_bytes(document_to_dict(result.document)),
+                    kind="document-ir",
+                    media_type="application/json",
+                    source_ids=(source.id,),
+                    producer_id=f"veriformis.parser.{source.parser}",
+                    producer_version=source.parser_version,
+                    config=parser_config,
+                )
+                diagnostics_artifact = transaction.put_artifact(
+                    lossless_json_bytes(parse_report_to_dict(result.diagnostics)),
+                    kind="parse-report",
+                    media_type="application/json",
+                    source_ids=(source.id,),
+                    producer_id=f"veriformis.parser.{source.parser}",
+                    producer_version=source.parser_version,
+                    config=parser_config,
+                )
+                descriptor = SourceDescriptor.create(
+                    logical_path=source.logical_path,
+                    original_path=str(path.resolve()),
+                    sha256=source.sha256,
+                    size=source.size,
+                    parser_id=source.parser,
+                    parser_version=source.parser_version,
+                    canonical_stream_contract_version=(
+                        source.canonical_stream_contract_version
+                    ),
+                    raw_artifact_id=raw_artifact.id,
+                    extracted_artifact_id=canonical_artifact.id,
+                    document_artifact_id=document_artifact.id,
+                )
+                descriptors.append(descriptor)
+                outputs.update(
+                    {
+                        f"source/{source.id}/raw": raw_artifact,
+                        f"source/{source.id}/canonical": canonical_artifact,
+                        f"source/{source.id}/document": document_artifact,
+                        f"source/{source.id}/diagnostics": diagnostics_artifact,
+                    }
+                )
+            transaction.set_sources(descriptors)
+            registry_artifact = transaction.put_artifact(
+                lossless_json_bytes(
+                    [
+                        descriptor.model_dump(
+                            mode="json",
+                            exclude={"original_path"},
+                        )
+                        for descriptor in sorted(descriptors, key=lambda item: item.id)
+                    ]
+                ),
+                kind="source-registry",
+                media_type="application/json",
+                source_ids=tuple(descriptor.id for descriptor in descriptors),
+                producer_id="veriformis.parse-stage",
+                producer_version="1",
+                config={"source_count": len(descriptors)},
+            )
+            outputs["registry"] = registry_artifact
+            revision = transaction.commit(
+                outputs=outputs,
+                config={
+                    "sources": [
+                        descriptor.logical_path
+                        for descriptor in sorted(descriptors, key=lambda item: item.id)
+                    ]
+                },
+            )
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(workspace)
+    typer.echo(f"parsed {len(results)} source(s) into revision {revision.revision_id}")
 
 
 @app.command()
@@ -92,26 +672,94 @@ def clean(
     rules: str = typer.Option("", "--rules"),
     custom: str = typer.Option("", "--custom"),
 ) -> None:
-    """Apply cleaning rules to every document in the workspace."""
-    selected = default_rules() if not rules and not custom else []
-    if rules:
-        for name in rules.split(","):
-            if name not in RULES:
-                typer.echo(f"unknown rule: {name} (have: {sorted(RULES)})", err=True)
-                raise typer.Exit(code=2)
-            selected.append(RULES[name]())
-    if custom:
-        selected.append(custom_regex(custom))
-    docs, _ = _load_workspace(workspace)
-    transforms = []
-    for stem, doc in docs.items():
-        cleaned, records, warnings = clean_document(doc, selected)
-        for warning in warnings:
-            typer.echo(f"warning: {warning}", err=True)
-        (workspace / f"{stem}.ir.json").write_text(json.dumps(document_to_dict(cleaned)))
-        transforms.extend(asdict(r) for r in records)
-    (workspace / "transforms.json").write_text(json.dumps(transforms, indent=2))
-    typer.echo(f"cleaned {len(docs)} document(s); {len(transforms)} transform record(s)")
+    """Plan, replay, and atomically commit cleaning for every source."""
+    try:
+        selected, config = _select_rules(rules, custom)
+        store = Workspace.open(workspace)
+        current = store.head()
+        if current.stages["clean"].status == "complete" \
+                and current.stages["clean"].config == config:
+            _load_documents(store, current, stage="clean")
+            _load_transform_records(store, current)
+            typer.echo(f"clean unchanged at revision {current.revision_id}")
+            return
+        with store.begin("clean") as transaction:
+            base = transaction.base
+            documents = _load_documents(store, base, stage="parse")
+            sources = _load_sources(store, base)
+            outputs: dict[str, Any] = {}
+            transforms: list[dict] = []
+            for source_id, document in sorted(documents.items()):
+                preview = plan_cleaning(
+                    document,
+                    selected,
+                    base_input_sha256=_cleaning_input_digest(
+                        sources[source_id], document
+                    ),
+                )
+                cleaned = replay_cleaning_plan(document, preview.plan)
+                for warning in preview.warnings:
+                    typer.echo(f"warning[{source_id}]: {warning}", err=True)
+                derivations = _build_block_derivations(
+                    sources[source_id],
+                    cleaned,
+                    cleaning_plan_id=preview.plan.id,
+                )
+                document_artifact = transaction.put_artifact(
+                    lossless_json_bytes(document_to_dict(cleaned)),
+                    kind="cleaned-document-ir",
+                    media_type="application/json",
+                    source_ids=(source_id,),
+                    producer_id="veriformis.cleaning",
+                    producer_version="1",
+                    config=config,
+                )
+                plan_artifact = transaction.put_artifact(
+                    lossless_json_bytes(cleaning_plan_to_dict(preview.plan)),
+                    kind="cleaning-plan",
+                    media_type="application/json",
+                    source_ids=(source_id,),
+                    producer_id="veriformis.cleaning",
+                    producer_version="1",
+                    config=config,
+                )
+                derivation_artifact = transaction.put_artifact(
+                    lossless_json_bytes(_derivations_to_dict(derivations)),
+                    kind="block-derivations",
+                    media_type="application/json",
+                    source_ids=(source_id,),
+                    producer_id="veriformis.cleaning",
+                    producer_version="1",
+                    config={**config, "cleaning_plan_id": preview.plan.id},
+                )
+                outputs.update(
+                    {
+                        f"source/{source_id}/document": document_artifact,
+                        f"source/{source_id}/cleaning-plan": plan_artifact,
+                        f"source/{source_id}/block-derivations": derivation_artifact,
+                    }
+                )
+                transforms.extend(
+                    transform_record_to_dict(record) for record in preview.records
+                )
+            transform_artifact = transaction.put_artifact(
+                lossless_json_bytes(transforms),
+                kind="transform-records",
+                media_type="application/json",
+                source_ids=tuple(sorted(sources)),
+                producer_id="veriformis.cleaning",
+                producer_version="1",
+                config=config,
+            )
+            outputs["transforms"] = transform_artifact
+            revision = transaction.commit(outputs=outputs, config=config)
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError, re.error) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    typer.echo(
+        f"cleaned {len(documents)} document(s); {len(transforms)} transform record(s); "
+        f"revision {revision.revision_id}"
+    )
 
 
 @app.command()
@@ -121,24 +769,82 @@ def chunk(
     size: int = typer.Option(1000, "--size"),
     overlap: int = typer.Option(100, "--overlap"),
 ) -> None:
-    """Chunk workspace documents with the chosen strategy."""
+    """Chunk cleaned documents with exact reconstructible source evidence."""
     if strategy not in _STRATEGIES:
         typer.echo(f"unknown strategy: {strategy} (have: {sorted(_STRATEGIES)})", err=True)
         raise typer.Exit(code=2)
-    docs, _ = _load_workspace(workspace)
-    transformed: set[int] = set()
-    t_path = workspace / "transforms.json"
-    if t_path.exists():
-        transformed = {t["block_index"] for t in json.loads(t_path.read_text())}
-    chunks: list[dict] = []
-    fn = _STRATEGIES[strategy]
-    for doc in docs.values():
-        made = fn(doc.children, max_size=size, source_id=doc.source_id, transformed=transformed) \
-            if strategy in ("paragraph", "sentence", "structure") \
-            else fn(doc.children, size=size, overlap=overlap, source_id=doc.source_id, transformed=transformed)
-        chunks.extend(asdict(c) for c in made)
-    (workspace / "chunks.json").write_text(json.dumps(chunks, indent=2))
-    typer.echo(f"wrote {len(chunks)} chunk(s)")
+    if size < 1 or overlap < 0 or overlap >= size:
+        typer.echo("size must be positive and overlap must satisfy 0 <= overlap < size", err=True)
+        raise typer.Exit(code=2)
+    config = {"strategy": strategy, "size": size, "overlap": overlap}
+    try:
+        store = Workspace.open(workspace)
+        with store.begin("chunk") as transaction:
+            base = transaction.base
+            documents = _load_documents(store, base, stage="clean")
+            sources = _load_sources(store, base)
+            raw_transforms = _load_transform_records(store, base)
+            derivations_by_source: dict[
+                str, dict[int, tuple[DerivationStep, ...]]
+            ] = {}
+            for source_id, document in sorted(documents.items()):
+                plan = cleaning_plan_from_dict(
+                    _json_load(
+                        _output_bytes(
+                            store,
+                            base,
+                            "clean",
+                            f"source/{source_id}/cleaning-plan",
+                        )
+                    )
+                )
+                derivation_artifact_id = base.stages["clean"].outputs[
+                    f"source/{source_id}/block-derivations"
+                ]
+                expected_derivation_config = canonical_digest(
+                    {**base.stages["clean"].config, "cleaning_plan_id": plan.id}
+                )
+                if (
+                    base.artifacts[derivation_artifact_id].config_digest
+                    != expected_derivation_config
+                ):
+                    raise EvidenceError(
+                        "block derivation artifact is not configured for its cleaning plan"
+                    )
+                derivations_by_source[source_id] = _validated_block_derivations(
+                    _json_load(
+                        store.read_artifact(
+                            derivation_artifact_id,
+                            revision=base,
+                        )
+                    ),
+                    source=sources[source_id],
+                    document=document,
+                    cleaning_plan_id=plan.id,
+                )
+            chunks = build_chunks(
+                documents,
+                sources,
+                raw_transforms,
+                derivations_by_source,
+                strategy=strategy,
+                size=size,
+                overlap=overlap,
+            )
+            artifact = transaction.put_artifact(
+                lossless_json_bytes([chunk_to_dict(item) for item in chunks]),
+                kind="chunks",
+                media_type="application/json",
+                source_ids=tuple(sorted(sources)),
+                producer_id=f"veriformis.chunker.{strategy}",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(outputs={"chunks": artifact}, config=config)
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    typer.echo(f"wrote {len(chunks)} chunk(s); revision {revision.revision_id}")
 
 
 @app.command(name="format")
@@ -149,124 +855,288 @@ def format_cmd(
     instruction: str = typer.Option("", "--instruction"),
     with_heading_path: bool = typer.Option(False, "--with-heading-path"),
 ) -> None:
-    """Serialize chunks into training records (records.jsonl)."""
-    raw = json.loads((workspace / "chunks.json").read_text())
-    chunks = [
-        Chunk(
-            id=c["id"], source_id=c["source_id"], block_index=c["block_index"],
-            span=Span(**c["span"]) if c["span"] else None,
-            heading_path=c["heading_path"], text=c["text"],
-            tokens_est=c["tokens_est"], transformed=c["transformed"],
-        )
-        for c in raw
-    ]
-    if format == "completion":
-        records = serialize_completion(chunks, include_heading_path=with_heading_path)
-    elif format == "instruction":
-        if not instruction:
-            typer.echo("--instruction is required for instruction format", err=True)
-            raise typer.Exit(code=2)
-        records = serialize_instruction(chunks, instruction=instruction)
-    elif format == "chat":
-        records = serialize_chat(
-            [{"user": "Summarize the following.", "assistant": c.text} for c in chunks],
-            template=template,
-        )
-    else:
-        typer.echo(f"unknown format: {format}", err=True)
+    """Serialize current chunks into the selected M1 record projection."""
+    if format not in RECORD_SCHEMAS:
+        typer.echo(f"unknown format: {format} (have: {sorted(RECORD_SCHEMAS)})", err=True)
         raise typer.Exit(code=2)
-    with (workspace / "records.jsonl").open("w", encoding="utf-8") as fh:
-        for record in records:
-            fh.write(json.dumps(record, ensure_ascii=False) + "\n")
-    meta = {"format": format, "template": template if format == "chat" else None}
-    (workspace / "records.meta.json").write_text(json.dumps(meta))
-    typer.echo(f"wrote {len(records)} record(s)")
+    if format == "instruction" and not instruction:
+        typer.echo("--instruction is required for instruction format", err=True)
+        raise typer.Exit(code=2)
+    config = {
+        "format": format,
+        "template": template if format == "chat" else None,
+        "instruction": instruction if format == "instruction" else None,
+        "with_heading_path": with_heading_path,
+    }
+    try:
+        store = Workspace.open(workspace)
+        with store.begin("format") as transaction:
+            base = transaction.base
+            chunks = _load_chunks(store, base)
+            if format == "completion":
+                records = serialize_completion(
+                    chunks,
+                    include_heading_path=with_heading_path,
+                )
+            elif format == "instruction":
+                records = serialize_instruction(chunks, instruction=instruction)
+            else:
+                records = serialize_chat(
+                    [
+                        {
+                            "user": "Summarize the following.",
+                            "assistant": item.text,
+                        }
+                        for item in chunks
+                    ],
+                    template=template,
+                )
+            record_bytes = "".join(
+                json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+                for record in records
+            ).encode("utf-8")
+            source_ids = tuple(sorted({item.source_id for item in chunks}))
+            records_artifact = transaction.put_artifact(
+                record_bytes,
+                kind="formatted-records",
+                media_type="application/x-ndjson",
+                source_ids=source_ids,
+                producer_id=f"veriformis.serializer.{format}",
+                producer_version="1",
+                config=config,
+            )
+            metadata_artifact = transaction.put_artifact(
+                lossless_json_bytes({"format": format, "template": config["template"]}),
+                kind="records-metadata",
+                media_type="application/json",
+                source_ids=source_ids,
+                producer_id=f"veriformis.serializer.{format}",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={
+                    "records": records_artifact,
+                    "records-meta": metadata_artifact,
+                },
+                config=config,
+            )
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    typer.echo(f"wrote {len(records)} record(s); revision {revision.revision_id}")
 
 
 @app.command()
 def validate(workspace: Path, format: str = typer.Option(..., "--format")) -> None:
-    """Run validation gates; exits 1 if any gate fails."""
+    """Run M1 gates against one immutable workspace revision."""
     if format not in RECORD_SCHEMAS:
         typer.echo(f"unknown format: {format} (have: {sorted(RECORD_SCHEMAS)})", err=True)
         raise typer.Exit(code=2)
-    _, sources = _load_workspace(workspace)
-    raw = json.loads((workspace / "chunks.json").read_text())
-    chunks = [
-        Chunk(
-            id=c["id"], source_id=c["source_id"], block_index=c["block_index"],
-            span=Span(**c["span"]) if c["span"] else None,
-            heading_path=c["heading_path"], text=c["text"],
-            tokens_est=c["tokens_est"], transformed=c["transformed"],
-        )
-        for c in raw
-    ]
-    records = [json.loads(line) for line in (workspace / "records.jsonl").read_text().splitlines() if line.strip()]
-    results = run_gates(records, format, chunks, sources)
-    (workspace / "validations.json").write_text(json.dumps([asdict(r) for r in results], indent=2))
+    config = {"format": format}
+    try:
+        store = Workspace.open(workspace)
+        with store.begin("validate") as transaction:
+            base = transaction.base
+            metadata = _json_load(
+                _output_bytes(store, base, "format", "records-meta")
+            )
+            if metadata.get("format") != format:
+                raise EvidenceError(
+                    f"requested format {format!r} does not match formatted records"
+                )
+            chunks = _load_chunks(store, base)
+            sources = _load_sources(store, base)
+            records = [
+                json.loads(line)
+                for line in _output_bytes(store, base, "format", "records")
+                .decode("utf-8")
+                .splitlines()
+                if line.strip()
+            ]
+            results = run_gates(records, format, chunks, sources)
+            artifact = transaction.put_artifact(
+                lossless_json_bytes([asdict(result) for result in results]),
+                kind="validation-report",
+                media_type="application/json",
+                source_ids=tuple(sorted(sources)),
+                producer_id="veriformis.validation",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={"validations": artifact},
+                config=config,
+                status="complete" if all(result.passed for result in results) else "failed",
+            )
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+        _echo_error(exc, status=1)
+    _echo_durability_warning(store)
     for result in results:
         typer.echo(f"{result.gate}: {'PASS' if result.passed else 'FAIL'}")
-    if not all(r.passed for r in results):
+        for message in result.messages:
+            typer.echo(f"  {message}")
+    if not all(result.passed for result in results):
         raise typer.Exit(code=1)
+    typer.echo(f"validation revision {revision.revision_id}")
 
 
 @app.command()
 def seal(workspace: Path, out: Path = typer.Option(..., "-o")) -> None:
-    """Seal the workspace into a verified .vfbundle."""
+    """Write the current validated snapshot using the M1 bundle format."""
     from veriformis.bundle.writer import write_bundle
 
-    _, sources = _load_workspace(workspace)
-    records = [json.loads(line) for line in (workspace / "records.jsonl").read_text().splitlines() if line.strip()]
-    raw_chunks = json.loads((workspace / "chunks.json").read_text())
-    chunks = [
-        Chunk(
-            id=c["id"], source_id=c["source_id"], block_index=c["block_index"],
-            span=Span(**c["span"]) if c["span"] else None,
-            heading_path=c["heading_path"], text=c["text"],
-            tokens_est=c["tokens_est"], transformed=c["transformed"],
-        )
-        for c in raw_chunks
-    ]
-    transforms = [TransformRecord(**t) for t in json.loads((workspace / "transforms.json").read_text())] \
-        if (workspace / "transforms.json").exists() else []
-    from veriformis.validate.gates import GateResult
-
-    validations = [GateResult(**v) for v in json.loads((workspace / "validations.json").read_text())]
-    meta_path = workspace / "records.meta.json"
-    meta = json.loads(meta_path.read_text()) if meta_path.exists() else {"format": "completion", "template": None}
     try:
-        bundle = write_bundle(
-            out, records=records, chunks=chunks, sources=list(sources.values()),
-            transforms=transforms, validations=validations,
-            format=meta["format"], template=meta.get("template"),
-        )
-    except VeriformisError as exc:
-        typer.echo(f"error[{exc.code}]: {exc.message}", err=True)
-        raise typer.Exit(code=1) from exc
+        store = Workspace.open(workspace)
+        with store.begin("seal") as transaction:
+            revision = transaction.base
+            sources = _load_sources(store, revision)
+            _load_documents(store, revision, stage="clean")
+            chunks = _load_chunks(store, revision)
+            records = [
+                json.loads(line)
+                for line in _output_bytes(store, revision, "format", "records")
+                .decode("utf-8")
+                .splitlines()
+                if line.strip()
+            ]
+            transforms = _load_transform_records(store, revision)
+            validations = [
+                GateResult(**value)
+                for value in _json_load(
+                    _output_bytes(store, revision, "validate", "validations")
+                )
+            ]
+            metadata = _json_load(
+                _output_bytes(store, revision, "format", "records-meta")
+            )
+            bundle = write_bundle(
+                out,
+                records=records,
+                chunks=chunks,
+                sources=list(sources.values()),
+                transforms=transforms,
+                validations=validations,
+                format=metadata["format"],
+                template=metadata.get("template"),
+            )
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+        _echo_error(exc, status=1)
     typer.echo(f"sealed bundle: {bundle}")
 
 
 @app.command()
-def preview(path: Path, rules: str = typer.Option("", "--rules")) -> None:
-    """Dry-run cleaning on one file; prints the log; writes nothing."""
-    result = _parse_one(path)
-    if rules:
-        unknown = [n for n in rules.split(",") if n not in RULES]
-        if unknown:
-            typer.echo(f"unknown rule(s): {', '.join(unknown)} (have: {sorted(RULES)})", err=True)
-            raise typer.Exit(code=2)
-    selected = default_rules() if not rules else [RULES[n]() for n in rules.split(",")]
-    text = result.source.extracted_text  # the whole file, not just the first block
-    from veriformis.rules.engine import apply_rules
+def preview(
+    path: Path,
+    rules: str = typer.Option("", "--rules"),
+    custom: str = typer.Option("", "--custom"),
+    source_root: Path | None = typer.Option(None, "--source-root"),
+) -> None:
+    """Plan and replay cleaning without writing state.
 
-    cleaned, records, warnings = apply_rules(text, selected)
-    for record in records:
-        typer.echo(f"{record.rule}: {record.edits} edit(s), {record.bytes_removed} byte(s) removed")
-    for warning in warnings:
-        typer.echo(f"warning: {warning}")
-    typer.echo("--- before ---")
-    typer.echo(text[:400])
-    typer.echo("--- after ---")
-    typer.echo(cleaned[:400])
+    Passing a workspace previews the exact durable plan that ``clean`` will
+    commit. A raw-file preview uses the same portable parse-input binding;
+    ``--source-root`` supplies the locator used by a later parse.
+    """
+    try:
+        selected, config = _select_rules(rules, custom)
+        previews: list[tuple[str, str, Any, tuple[TransformRecord, ...]]] = []
+        is_workspace = path.is_dir() and (path / "workspace.json").is_file()
+        if is_workspace:
+            store = Workspace.open(path)
+            revision = store.head()
+            documents = _load_documents(store, revision, stage="parse")
+            sources = _load_sources(store, revision)
+            reuse_persisted = (
+                revision.stages["clean"].status == "complete"
+                and revision.stages["clean"].config == config
+            )
+            persisted_records: list[TransformRecord] = []
+            if reuse_persisted:
+                cleaned_documents = _load_documents(
+                    store, revision, stage="clean"
+                )
+                persisted_records = _load_transform_records(store, revision)
+            for source_id, document in sorted(documents.items()):
+                if reuse_persisted:
+                    plan = cleaning_plan_from_dict(
+                        _json_load(
+                            _output_bytes(
+                                store,
+                                revision,
+                                "clean",
+                                f"source/{source_id}/cleaning-plan",
+                            )
+                        )
+                    )
+                    replayed = cleaned_documents[source_id]
+                    records = tuple(
+                        record
+                        for record in persisted_records
+                        if record.source_id == source_id
+                    )
+                else:
+                    planned = plan_cleaning(
+                        document,
+                        selected,
+                        base_input_sha256=_cleaning_input_digest(
+                            sources[source_id], document
+                        ),
+                    )
+                    plan = planned.plan
+                    replayed = replay_cleaning_plan(document, plan)
+                    records = planned.records
+                previews.append(
+                    (
+                        sources[source_id].logical_path,
+                        sources[source_id].extracted_text,
+                        (plan, replayed),
+                        records,
+                    )
+                )
+        else:
+            raw_bytes = path.read_bytes()
+            logical_path = _logical_paths([path], source_root=source_root)[path]
+            result = _parse_one(
+                path,
+                logical_path=logical_path,
+                raw_bytes=raw_bytes,
+            )
+            _require_accepted_parse(result, logical_path=logical_path)
+            planned = plan_cleaning(
+                result.document,
+                selected,
+                base_input_sha256=_cleaning_input_digest(
+                    result.source, result.document
+                ),
+            )
+            replayed = replay_cleaning_plan(result.document, planned.plan)
+            previews.append(
+                (
+                    logical_path,
+                    result.source.extracted_text,
+                    (planned.plan, replayed),
+                    planned.records,
+                )
+            )
+    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError, re.error) as exc:
+        _echo_error(exc)
+    for logical_path, before, (plan, replayed), records in previews:
+        if len(previews) > 1 or is_workspace:
+            typer.echo(f"source: {logical_path}")
+        for record in records:
+            typer.echo(
+                f"{record.rule}: {record.edits} edit(s), "
+                f"{record.bytes_removed} byte(s) removed"
+            )
+        for run in plan.runs:
+            for warning in run.warnings:
+                typer.echo(f"warning: {warning}")
+        typer.echo(f"plan: {plan.id}")
+        typer.echo("--- before ---")
+        typer.echo(before[:400])
+        typer.echo("--- after ---")
+        typer.echo(flatten(list(iter_document_blocks(replayed)))[:400])
 
 
 @app.command()

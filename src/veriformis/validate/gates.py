@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from veriformis.chunkers.base import Chunk
+from veriformis.chunkers.base import Chunk, exact_span_from_evidence
+from veriformis.evidence import EvidenceError, resolve_evidence
 from veriformis.sources import SourceRef
 
 
@@ -47,10 +48,6 @@ def gate_encoding(texts: list[str]) -> GateResult:
     return GateResult("encoding", not problems, problems[:20])
 
 
-def _squash(s: str) -> str:
-    return "".join(s.split())
-
-
 def gate_provenance(chunks: list[Chunk], sources: dict[str, SourceRef]) -> GateResult:
     problems = []
     for chunk in chunks:
@@ -60,15 +57,19 @@ def gate_provenance(chunks: list[Chunk], sources: dict[str, SourceRef]) -> GateR
             continue
         if chunk.block_index < 0:
             problems.append(f"{chunk.id}: invalid block_index")
-        if chunk.span is None:
-            continue  # linkage-only chunk (e.g. sentence-packed)
-        stream = source.extracted_text
-        if not (0 <= chunk.span.start < chunk.span.end <= len(stream)):
-            problems.append(f"{chunk.id}: span out of bounds")
+        if chunk.evidence is None:
+            problems.append(f"{chunk.id}: missing reconstructible source evidence")
             continue
-        if not chunk.transformed:
-            if _squash(stream[chunk.span.start:chunk.span.end]) != _squash(chunk.text):
-                problems.append(f"{chunk.id}: span content mismatch (not marked transformed)")
+        if chunk.span != exact_span_from_evidence(chunk.evidence):
+            problems.append(f"{chunk.id}: span is not exactly proved by evidence")
+            continue
+        try:
+            reconstructed = resolve_evidence(chunk.evidence, sources)
+        except EvidenceError as exc:
+            problems.append(f"{chunk.id}: invalid source evidence: {exc}")
+            continue
+        if reconstructed != chunk.text:
+            problems.append(f"{chunk.id}: evidence content mismatch")
     return GateResult("provenance", not problems, problems[:20])
 
 

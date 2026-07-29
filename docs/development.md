@@ -23,14 +23,14 @@ The test extra installs pytest and the repository-pinned Ruff version.
 
 ## Required checks
 
-Run both checks before submitting a change:
+Run the project checks before submitting a change:
 
 ```bash
+uv lock --check
 uv run ruff check src tests
 uv run pytest -q
+git diff --check
 ```
-
-The verified `0.1.0` baseline contains 50 passing tests.
 
 For focused work:
 
@@ -38,6 +38,10 @@ For focused work:
 uv run pytest tests/parsers/test_markdown.py -q
 uv run pytest tests/test_cli.py -q
 ```
+
+Rerun the commands above for current evidence. Test totals are intentionally
+omitted because coverage grows. Strict expected failures remain pinned to
+later-step defects.
 
 ## Repository layout
 
@@ -51,6 +55,11 @@ uv run pytest tests/test_cli.py -q
 │   ├── serializers/
 │   ├── validate/
 │   ├── bundle/
+│   ├── contracts.py
+│   ├── diagnostics.py
+│   ├── evidence.py
+│   ├── identity.py
+│   ├── workspace.py
 │   └── cli.py
 ├── tests/
 ├── docs/
@@ -66,6 +75,9 @@ The CLI is the current composition root. A surface-neutral `PipelineService` is 
 |---|---|
 | Package and version | `tests/test_scaffold.py` |
 | End-to-end CLI path | `tests/test_cli.py` |
+| Product and parser contracts | `tests/contracts/` |
+| Group 1 integrity regressions | `tests/regressions/` |
+| Pinned later-step defects | `tests/known_gaps/` |
 | Canonical IR | `tests/ir/` |
 | Text, Markdown, DOCX | `tests/parsers/` |
 | Cleaning rules and safety | `tests/rules/` |
@@ -74,7 +86,10 @@ The CLI is the current composition root. A surface-neutral `PipelineService` is 
 | Validation gates | `tests/validate/` |
 | Bundle seal and tamper check | `tests/bundle/` |
 
-Add a regression test before repairing an integrity defect. Multi-source fixtures are especially important because current stem, chunk-ID, and block-index identities can collide.
+Add a regression test before repairing an integrity defect. Keep multi-source
+fixtures because source scope and collision resistance are durable contracts.
+Group 1 defects must be ordinary passing tests. Later-step defects may remain
+strict expected failures until their owning group repairs them.
 
 ## Continuous integration
 
@@ -101,9 +116,28 @@ The implemented pipeline has no LLM or network stage. Do not introduce either ca
 
 Parser spans refer to the canonical extracted stream. Tests must verify both the emitted text and the span contract. If parsing drops or normalizes content, make that loss explicit rather than claiming raw-file fidelity.
 
-### Treat workspace artifacts as unsafe mutable state
+Visible image alt text, citations, and note references belong in that canonical
+projection. Body, footnote, and endnote blocks share one stream but must retain
+distinct evidence regions. IR-only metadata needs field-level evidence in
+Group 2 before `structured_field` construction.
 
-Until transactional revisions exist, tests should assume that upstream reruns can leave stale downstream files. Do not broaden sealing claims around the current mutable workspace.
+Persist artifact JSON and construct durable identity and configuration-digest
+payloads with exact-string serialization so distinct Unicode normalization
+forms remain distinct. In those durable paths, normalize only fields whose
+contracts explicitly define NFC equivalence, currently logical source paths.
+Do not substitute an audit revision ID for a portable state digest or per-source
+parse-input digest.
+
+### Preserve revision integrity
+
+Use `Workspace` transactions for every persisted stage result. Do not write
+inter-stage files at the workspace root or mutate content-addressed objects.
+Tests must cover atomic visibility, expected-revision conflicts, stale-stage
+invalidation, duplicate identity rejection, and digest verification. The
+transactional workspace does not imply that Step 16 atomic sealing is complete.
+
+Parse and clean artifacts must pass their cross-artifact semantic checks before
+`HEAD` promotion.
 
 ### Separate construction from serialization
 
@@ -119,18 +153,23 @@ A parser should:
 
 1. produce the canonical IR;
 2. build one canonical extracted-text stream;
-3. assign top-level block indexes and valid spans into that stream;
+3. assign body and note block indexes, regions, and valid spans into that stream;
 4. register the original file hash and parser identity;
 5. report unsupported or lost structures explicitly;
-6. include adversarial fixtures, not only a happy-path sample.
+6. serialize through the strict versioned IR and parse-report schemas;
+7. include adversarial fixtures, not only a happy-path sample.
 
 Additional declared input formats are planned for roadmap step 20. They are not part of `0.1.0`.
 
 ## Adding a rule
 
-A cleaning rule should be deterministic, preserve document meaning, and return exact edit ranges. Add tests for normal input, false-positive resistance, and the 30 percent removal safety threshold.
-
-Remember that `clean_document` currently runs rules per top-level block, while `preview` runs against the whole canonical stream. The roadmap replaces this divergence with replayable edit plans.
+A cleaning rule should be deterministic, preserve document meaning, and return
+exact edit ranges. Add tests for normal input, false-positive resistance, the
+30 percent removal safety threshold, rich-node preservation, plan serialization,
+and tamper rejection. Current prose rules must leave code, math, and other
+literal payloads unchanged. Preview and application must use the same plan and
+replay path. Given the same locator, bytes, parser, rules, and configuration,
+raw preview, workspace preview, and clean must produce the same plan ID.
 
 ## Adding a chunker or serializer
 
@@ -152,6 +191,7 @@ Use present tense only for merged, tested behavior. Label roadmap items as plann
 ## Related documentation
 
 - [Product contract](product-contract.md)
+- [Integrity Contract v1](contracts/integrity-v1.md)
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [CLI reference](cli.md)

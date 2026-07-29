@@ -1,0 +1,5 @@
+HEADER BETA
+
+42
+
+The beta source contains naïve Unicode text and a standalone page number.
