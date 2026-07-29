@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "raw/adversarial/duplicate-a/repeated.txt",
+      "source_kind": "text",
+      "parser": "text",
+      "size": 22,
+      "sha256": "d40d0dbcc0703a2e98089d159762118d1a328b951cd8ea7e07e6af844b090fd1"
+    },
+    {
+      "path": "raw/adversarial/duplicate-b/repeated.txt",
+      "source_kind": "text",
+      "parser": "text",
+      "size": 22,
+      "sha256": "d40d0dbcc0703a2e98089d159762118d1a328b951cd8ea7e07e6af844b090fd1"
+    },
+    {
+      "path": "raw/adversarial/rich-cleaning.md",
+      "source_kind": "markdown",
+      "parser": "markdown",
+      "size": 140,
+      "sha256": "a3a663eb5a0f78a825e7cce249c03ec6a3ef46100d6f71b9b24dd027709a1fe0"
+    },
+    {
+      "path": "raw/adversarial/unsupported.md",
+      "source_kind": "markdown",
+      "parser": "markdown",
+      "size": 101,
+      "sha256": "2a792c3d98b29ab809b42a71035c1713b68ec9575737399be653b5186dc74660"
+    },
+    {
+      "path": "raw/corpus/code/sample.py",
+      "source_kind": "code",
+      "parser": "text",
+      "size": 58,
+      "sha256": "cd751bb279136037aa23b7b3e909610af7f78764b4bfecd60759820134db42ce"
+    },
+    {
+      "path": "raw/corpus/markdown/source.md",
+      "source_kind": "markdown",
+      "parser": "markdown",
+      "size": 188,
+      "sha256": "992cf3191daa40448f14550971c5bfbe0350c97950fd39f1cccd30cc800f1474"
+    },
+    {
+      "path": "raw/corpus/text/source.txt",
+      "source_kind": "text",
+      "parser": "text",
+      "size": 92,
+      "sha256": "b4bdf3c1e7bbb9477a938be443336e56bfd32978de92b6db9121ecd5e223c5cf"
+    }
+  ]
+}

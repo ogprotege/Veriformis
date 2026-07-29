@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "contract_id": "veriformis.acceptance.group1",
+  "contract_version": 1,
+  "product_contract_id": "veriformis.product",
+  "product_contract_version": 1,
+  "canonical_stream_contract_id": "veriformis.canonical-stream",
+  "canonical_stream_contract_version": 1,
+  "determinism_profile": "offline-deterministic-v1",
+  "source_kinds": [
+    "text",
+    "code",
+    "markdown",
+    "docx"
+  ],
+  "generated_source_kinds": [
+    "docx"
+  ],
+  "generated_sources": [
+    {
+      "path": "generated/corpus/docx/source.docx",
+      "source_kind": "docx",
+      "parser": "docx",
+      "generator": "python-docx-normalized-zip-v1",
+      "size": 34301,
+      "sha256": "a0be6131f5630e24109f81cf28c1a53f3785decc6044bcd87607ce78540f4389"
+    }
+  ],
+  "objective_kinds": [
+    "full_text",
+    "continuation",
+    "section_reconstruction",
+    "before_after_transformation",
+    "structured_field"
+  ],
+  "row_schema_kinds": [
+    "text",
+    "prompt_completion",
+    "instruction_output",
+    "messages"
+  ],
+  "owned_stages": [
+    "raw_capture",
+    "canonical_recovery",
+    "cleaning",
+    "construction",
+    "curation",
+    "balancing_and_splitting",
+    "formatting",
+    "validation",
+    "seal"
+  ],
+  "source_inventory": "expected/source-inventory.json",
+  "canonical_streams": "expected/canonical-streams.json",
+  "acceptance_runs": [
+    {
+      "source_set": "golden-corpus",
+      "objective": "full_text",
+      "row_schema": "text"
+    },
+    {
+      "source_set": "golden-corpus",
+      "objective": "continuation",
+      "row_schema": "prompt_completion"
+    }
+  ],
+  "required_reproducible_digests": [
+    "source_inventory",
+    "canonical_streams",
+    "cleaning_plan",
+    "candidate_records",
+    "dataset_records",
+    "split_assignment",
+    "formatted_rows",
+    "bundle_content"
+  ]
+}

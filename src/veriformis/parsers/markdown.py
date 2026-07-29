@@ -2,14 +2,12 @@
 
 Built on markdown-it-py with GFM extensions (tables + strikethrough),
 plus footnote and dollar-math plugins. Walks the flat token stream into
-the canonical IR tree. Anything outside the canonical set is silently
-dropped.
+the canonical IR tree. Anything outside the canonical set is recorded in
+the mandatory parse report before it is omitted.
 
-Provenance follows the extracted-stream contract: the canonical stream is
-built incrementally as blocks are emitted — each top-level block's
-``block_text()`` plus a ``"\\n\\n"`` separator — and every top-level block
-carries ``span = Span(pos_before, pos_before + len(block_text))`` plus a
-sequential ``block_index`` indexing that stream (never the raw file).
+Provenance follows the extracted-stream contract. Body, footnote, and endnote
+blocks enter one deterministic canonical stream. Every source block carries
+a span and unique block index into that stream.
 """
 
 from __future__ import annotations
@@ -22,6 +20,12 @@ from mdit_py_plugins.footnote import footnote_plugin
 import re
 from pathlib import Path
 
+from veriformis.diagnostics import (
+    DiagnosticLocation,
+    make_diagnostic,
+    make_parse_report,
+)
+from veriformis.identity import sha256_digest
 from veriformis.ir import (
     Blockquote,
     Bold,
@@ -45,33 +49,87 @@ from veriformis.ir import (
     ListItem,
     Math,
     Paragraph,
-    Span,
     Strikethrough,
     Subscript,
     Superscript,
     Table,
     Text,
-    block_text,
+    attach_canonical_provenance,
 )
 from veriformis.sources import ParseResult, register_source
 
 ENDNOTE_PREFIX = "en:"
+PARSER_VERSION = "1.2.0"
 
 # Pandoc-style citation: ``[@key]`` or ``[@key, locator]``.
 # Keys may contain letters, digits, and a conservative set of punctuation.
 _CITATION_RE = re.compile(r"\[@([A-Za-z][\w:.\-]*)(?:,\s*([^\]]+))?\]")
 
-# Pandoc attribute/anchor cruft (see _strip_pandoc_cruft).
-#
-# An empty-bracket span carrying an attribute block — ``[]{#id .anchor}`` —
-# is removed wholesale (the optional whitespace before ``{`` is consumed so
-# ``foo []{#a}`` collapses cleanly, not leaving a trailing space). What
-# remains of a bare attribute block — ``{#id .class key=val}`` attached to a
-# heading or word — is stripped separately. We only strip blocks that begin
-# with ``#`` (id) or ``.`` (class): a leading ``#``/``.`` is the Pandoc
-# attribute-block signature and avoids eating ordinary braces in prose.
-_PANDOC_EMPTY_ANCHOR_RE = re.compile(r"\s*\[\]\{[^}]*\}")
-_PANDOC_ATTR_BLOCK_RE = re.compile(r"\{[#.][^}]*\}")
+# Pandoc cleanup is intentionally conservative. An attribute block must start
+# with a syntactically valid id/class and every remaining atom must also be a
+# valid id, class, or key/value attribute. Bare blocks are removed only at the
+# end of a heading. This prevents ordinary prose such as
+# ``{.not-an-attribute}`` from being reinterpreted and deleted.
+_PANDOC_NAME = r"[A-Za-z_][A-Za-z0-9_.:-]*"
+_PANDOC_VALUE = r'(?:"[^"{}\n]*"|\'[^\'{}\n]*\'|[^\s{}\n]+)'
+_PANDOC_ATOM = rf"(?:[.#]{_PANDOC_NAME}|{_PANDOC_NAME}={_PANDOC_VALUE})"
+_PANDOC_ATTR_BODY = rf"[.#]{_PANDOC_NAME}(?:[ \t]+{_PANDOC_ATOM})*"
+_PANDOC_EMPTY_ANCHOR_RE = re.compile(rf"\[\]\{{{_PANDOC_ATTR_BODY}\}}")
+_PANDOC_TRAILING_ATTR_RE = re.compile(rf"\{{{_PANDOC_ATTR_BODY}\}}(?=[ \t]*$)")
+
+_FOOTNOTE_DEFINITION_RE = re.compile(r"^[ \t]{0,3}\[\^([^\] \r\n]+)\]:")
+
+_SUPPORTED_TOKEN_TYPES = {
+    "blockquote_close",
+    "blockquote_open",
+    "bullet_list_close",
+    "bullet_list_open",
+    "code_block",
+    "code_inline",
+    "em_close",
+    "em_open",
+    "fence",
+    "footnote_anchor",
+    "footnote_block_close",
+    "footnote_block_open",
+    "footnote_close",
+    "footnote_open",
+    "footnote_ref",
+    "hardbreak",
+    "heading_close",
+    "heading_open",
+    "hr",
+    "image",
+    "inline",
+    "link_close",
+    "link_open",
+    "list_item_close",
+    "list_item_open",
+    "math_block",
+    "math_inline",
+    "ordered_list_close",
+    "ordered_list_open",
+    "paragraph_close",
+    "paragraph_open",
+    "s_close",
+    "s_open",
+    "softbreak",
+    "strong_close",
+    "strong_open",
+    "table_close",
+    "table_open",
+    "tbody_close",
+    "tbody_open",
+    "td_close",
+    "td_open",
+    "text",
+    "th_close",
+    "th_open",
+    "thead_close",
+    "thead_open",
+    "tr_close",
+    "tr_open",
+}
 
 
 def _make_parser() -> MarkdownIt:
@@ -81,39 +139,411 @@ def _make_parser() -> MarkdownIt:
         .use(dollarmath_plugin, allow_space=False, allow_digits=True)
         .enable(["table", "strikethrough"])
     )
+    # markdown-it records the normalized reference label on reference-link
+    # tokens only when this option is enabled. That gives the loss inventory
+    # an exact used/unused signal without re-parsing raw brackets heuristically.
+    md.options["store_labels"] = True
     return md
 
 
-def _parse_with_stream(source: str) -> tuple[Document, str]:
+def _parse_with_stream(source: str) -> tuple[Document, str, list[dict]]:
     """Parse markdown, attach provenance, return (document, stream).
 
     The stream is the canonical extracted text: top-level blocks' plain
     texts joined by ``"\\n\\n"``. Spans on the emitted blocks index it.
     """
     md = _make_parser()
-    tokens = md.parse(source)
+    environment: dict = {}
+    tokens = md.parse(source, environment)
+    diagnostic_specs = _diagnostic_specs(tokens, source, environment)
     doc = Document()
     _consume_blocks(tokens, 0, len(tokens), doc.children, doc)
     doc.children = _drop_empty_blocks(doc.children)
-    return doc, _attach_provenance(doc)
+    return doc, attach_canonical_provenance(doc), diagnostic_specs
 
 
-def _attach_provenance(doc: Document) -> str:
-    """Build the canonical stream from the final top-level blocks, setting
-    each block's ``span`` (char offsets into the stream) and sequential
-    ``block_index`` as its text is appended. Returns the stream."""
-    parts: list[str] = []
-    pos = 0
-    for index, block in enumerate(doc.children):
-        text = block_text(block)
-        block.span = Span(pos, pos + len(text))
-        block.block_index = index
-        parts.append(text)
-        parts.append("\n\n")
-        pos += len(text) + 2
-    if parts:
-        parts.pop()  # drop the trailing separator
-    return "".join(parts)
+def _diagnostic_specs(
+    tokens: list[Token], source: str, environment: dict
+) -> list[dict]:
+    """Inventory every known omission before the token stream is consumed."""
+    specs = _source_definition_diagnostic_specs(source, tokens, environment)
+
+    def walk(
+        items: list[Token],
+        inherited_map: list[int] | None,
+        prefix: tuple[int, ...],
+        *,
+        heading_inline: bool = False,
+    ) -> None:
+        inline_depth = 0
+        for index, token in enumerate(items):
+            if token.nesting < 0:
+                inline_depth = max(0, inline_depth - 1)
+            token_path = prefix + (index,)
+            location_map = token.map or inherited_map
+            child_is_heading = (
+                token.type == "inline"
+                and index > 0
+                and items[index - 1].type == "heading_open"
+            )
+            if token.type in {"html_block", "html_inline"}:
+                start, end = location_map or [0, 1]
+                specs.append(
+                    {
+                        "code": f"markdown.{token.type.replace('_', '-')}-omitted",
+                        "location": DiagnosticLocation(
+                            kind="text",
+                            line_start=start + 1,
+                            line_end=max(start + 1, end),
+                        ),
+                        "message": "Raw HTML is outside the canonical Markdown IR and was omitted.",
+                        "severity": "warning",
+                        "disposition": "omitted",
+                        "loss_kind": "text"
+                        if token.type == "html_block"
+                        else "structure",
+                        "details": {
+                            "token_type": token.type,
+                            "token_path": list(token_path),
+                            "content_sha256": sha256_digest(token.content or ""),
+                        },
+                    }
+                )
+            elif token.type not in _SUPPORTED_TOKEN_TYPES:
+                start, end = location_map or [0, 1]
+                specs.append(
+                    {
+                        "code": "markdown.unsupported-token-omitted",
+                        "location": DiagnosticLocation(
+                            kind="text",
+                            line_start=start + 1,
+                            line_end=max(start + 1, end),
+                        ),
+                        "message": (
+                            f"Markdown token {token.type!r} is outside the canonical IR "
+                            "and was omitted."
+                        ),
+                        "severity": "warning",
+                        "disposition": "omitted",
+                        "loss_kind": "unknown",
+                        "details": {
+                            "token_type": token.type,
+                            "token_tag": token.tag,
+                            "token_nesting": token.nesting,
+                            "token_path": list(token_path),
+                            "content_sha256": sha256_digest(token.content or ""),
+                        },
+                    }
+                )
+            if token.type == "ordered_list_open":
+                start_value = (token.attrs or {}).get("start", 1)
+                if str(start_value) != "1":
+                    start, end = location_map or [0, 1]
+                    specs.append(
+                        {
+                            "code": "markdown.ordered-list-start-omitted",
+                            "location": DiagnosticLocation(
+                                kind="text",
+                                line_start=start + 1,
+                                line_end=max(start + 1, end),
+                            ),
+                            "message": (
+                                "The ordered-list starting ordinal has no canonical "
+                                "IR field and was omitted."
+                            ),
+                            "severity": "warning",
+                            "disposition": "omitted",
+                            "loss_kind": "metadata",
+                            "details": {
+                                "start": str(start_value),
+                                "token_path": list(token_path),
+                            },
+                        }
+                    )
+            elif token.type == "softbreak":
+                start, end = location_map or [0, 1]
+                specs.append(
+                    {
+                        "code": "markdown.softbreak-normalized",
+                        "location": DiagnosticLocation(
+                            kind="text",
+                            line_start=start + 1,
+                            line_end=max(start + 1, end),
+                        ),
+                        "message": "A Markdown soft line break was normalized to one space.",
+                        "severity": "info",
+                        "disposition": "normalized",
+                        "loss_kind": "presentation",
+                        "details": {"token_path": list(token_path)},
+                    }
+                )
+            if token.type == "text" and token.content:
+                start, end = location_map or [0, 1]
+                occupied: list[tuple[int, int]] = []
+                for match in _PANDOC_EMPTY_ANCHOR_RE.finditer(token.content):
+                    occupied.append(match.span())
+                    specs.append(
+                        {
+                            "code": "markdown.pandoc-anchor-omitted",
+                            "location": DiagnosticLocation(
+                                kind="text",
+                                line_start=start + 1,
+                                line_end=max(start + 1, end),
+                            ),
+                            "message": (
+                                "A Pandoc empty anchor has no canonical IR node and was omitted."
+                            ),
+                            "severity": "warning",
+                            "disposition": "omitted",
+                            "loss_kind": "metadata",
+                            "details": {
+                                "token_path": list(token_path),
+                                "content_sha256": sha256_digest(match.group(0)),
+                                "text_start": match.start(),
+                                "text_end": match.end(),
+                            },
+                        }
+                    )
+                trailing_matches = (
+                    list(_PANDOC_TRAILING_ATTR_RE.finditer(token.content))
+                    if (
+                        heading_inline
+                        and inline_depth == 0
+                        and not _later_inline_content(items, index)
+                    )
+                    else []
+                )
+                for match in trailing_matches:
+                    if any(
+                        left <= match.start() and match.end() <= right
+                        for left, right in occupied
+                    ):
+                        continue
+                    specs.append(
+                        {
+                            "code": "markdown.pandoc-attributes-omitted",
+                            "location": DiagnosticLocation(
+                                kind="text",
+                                line_start=start + 1,
+                                line_end=max(start + 1, end),
+                            ),
+                            "message": (
+                                "Pandoc attributes have no canonical IR field and were omitted."
+                            ),
+                            "severity": "warning",
+                            "disposition": "omitted",
+                            "loss_kind": "metadata",
+                            "details": {
+                                "token_path": list(token_path),
+                                "content_sha256": sha256_digest(match.group(0)),
+                                "text_start": match.start(),
+                                "text_end": match.end(),
+                            },
+                        }
+                    )
+            if token.children and token.type != "image":
+                walk(
+                    token.children,
+                    location_map,
+                    token_path,
+                    heading_inline=heading_inline or child_is_heading,
+                )
+            if token.nesting > 0:
+                inline_depth += 1
+
+    walk(tokens, None, ())
+    return specs
+
+
+def _later_inline_content(tokens: list[Token], index: int) -> bool:
+    """Return whether a later sibling contributes canonical inline content."""
+    content_types = {
+        "code_inline",
+        "footnote_ref",
+        "hardbreak",
+        "image",
+        "math_inline",
+        "softbreak",
+        "text",
+    }
+    return any(
+        token.type in content_types and (token.type != "text" or bool(token.content))
+        for token in tokens[index + 1 :]
+    )
+
+
+def _source_definition_diagnostic_specs(
+    source: str,
+    tokens: list[Token],
+    environment: dict,
+) -> list[dict]:
+    """Inventory source definitions that Markdown tokenization can discard.
+
+    markdown-it resolves definitions before emitting its token stream. A raw
+    pre-pass is therefore required to catch duplicates and unused link
+    definitions with truthful source-line locations.
+    """
+    specs: list[dict] = []
+    seen_footnotes: dict[str, int] = {}
+    footnote_definitions: dict[str, tuple[int, re.Match[str]]] = {}
+    duplicate_footnotes: set[str] = set()
+    literal_lines = {
+        line_index
+        for token in tokens
+        if token.type in {"code_block", "fence", "html_block"} and token.map
+        for line_index in range(token.map[0], token.map[1])
+    }
+
+    for line_number, line in enumerate(source.splitlines(keepends=True), start=1):
+        content = line.rstrip("\r\n")
+        if line_number - 1 in literal_lines:
+            continue
+        footnote = _FOOTNOTE_DEFINITION_RE.match(content)
+        if footnote:
+            raw_label = footnote.group(1)
+            # The footnote plugin treats labels as case-sensitive identities,
+            # unlike CommonMark link-reference labels.
+            label = raw_label
+            first_line = seen_footnotes.get(label)
+            if first_line is not None:
+                duplicate_footnotes.add(label)
+                specs.append(
+                    _definition_spec(
+                        code="markdown.duplicate-footnote-definition",
+                        line_number=line_number,
+                        match=footnote,
+                        label=raw_label,
+                        first_line=first_line,
+                        loss_kind="text",
+                        message=(
+                            "A duplicate Markdown footnote definition would replace "
+                            "or discard note text, so canonical recovery was refused."
+                        ),
+                    )
+                )
+            else:
+                seen_footnotes[label] = line_number
+                footnote_definitions[label] = (line_number, footnote)
+
+    footnote_refs = environment.get("footnotes", {}).get("refs", {})
+    for label, (line_number, match) in footnote_definitions.items():
+        if label in duplicate_footnotes or footnote_refs.get(f":{label}") != -1:
+            continue
+        specs.append(
+            {
+                "code": "markdown.unused-footnote-definition-refused",
+                "severity": "error",
+                "disposition": "refused",
+                "loss_kind": "text",
+                "location": DiagnosticLocation(
+                    kind="text",
+                    line_start=line_number,
+                    line_end=line_number,
+                    column_start=match.start() + 1,
+                    column_end=match.end() + 1,
+                ),
+                "message": (
+                    "An unreferenced Markdown footnote body is absent from the "
+                    "parser token stream, so canonical recovery was refused."
+                ),
+                "details": {"label": label},
+            }
+        )
+
+    references = environment.get("references", {})
+    duplicate_references: set[str] = set()
+    for duplicate in environment.get("duplicate_refs", []):
+        label = str(duplicate.get("label", ""))
+        line_map = duplicate.get("map") or [0, 1]
+        first_map = references.get(label, {}).get("map") or [0, 1]
+        duplicate_references.add(label)
+        specs.append(
+            {
+                "code": "markdown.duplicate-reference-definition",
+                "severity": "error",
+                "disposition": "refused",
+                "loss_kind": "metadata",
+                "location": DiagnosticLocation(
+                    kind="text",
+                    line_start=line_map[0] + 1,
+                    line_end=max(line_map[0] + 1, line_map[1]),
+                ),
+                "message": (
+                    "A duplicate Markdown reference definition has an ambiguous "
+                    "destination, so canonical recovery was refused."
+                ),
+                "details": {
+                    "label": label,
+                    "first_definition_line": first_map[0] + 1,
+                },
+            }
+        )
+
+    used_references = _used_reference_labels(tokens)
+    for label, reference in references.items():
+        if label in used_references or label in duplicate_references:
+            continue
+        line_map = reference.get("map") or [0, 1]
+        specs.append(
+            {
+                "code": "markdown.unused-reference-definition-omitted",
+                "severity": "warning",
+                "disposition": "omitted",
+                "loss_kind": "metadata",
+                "location": DiagnosticLocation(
+                    kind="text",
+                    line_start=line_map[0] + 1,
+                    line_end=max(line_map[0] + 1, line_map[1]),
+                ),
+                "message": (
+                    "An unused Markdown reference definition has no canonical IR "
+                    "node and was omitted."
+                ),
+                "details": {"label": label},
+            }
+        )
+    return specs
+
+
+def _definition_spec(
+    *,
+    code: str,
+    line_number: int,
+    match: re.Match[str],
+    label: str,
+    first_line: int,
+    loss_kind: str,
+    message: str,
+) -> dict:
+    return {
+        "code": code,
+        "severity": "error",
+        "disposition": "refused",
+        "loss_kind": loss_kind,
+        "location": DiagnosticLocation(
+            kind="text",
+            line_start=line_number,
+            line_end=line_number,
+            column_start=match.start() + 1,
+            column_end=match.end() + 1,
+        ),
+        "message": message,
+        "details": {"label": label, "first_definition_line": first_line},
+    }
+
+
+def _used_reference_labels(tokens: list[Token]) -> set[str]:
+    used: set[str] = set()
+
+    def walk(items: list[Token]) -> None:
+        for token in items:
+            if token.type in {"image", "link_open"} and (token.meta or {}).get("label"):
+                used.add(str(token.meta["label"]))
+            if token.children:
+                walk(token.children)
+
+    walk(tokens)
+    return used
 
 
 def parse_md(source: str) -> Document:
@@ -121,51 +551,70 @@ def parse_md(source: str) -> Document:
 
     Blocks carry spans into a canonical stream constructed the same way
     as ``parse_md_file`` (no SourceRef is registered)."""
-    doc, _stream = _parse_with_stream(source)
+    doc, _stream, _diagnostics = _parse_with_stream(source)
     return doc
 
 
-def parse_md_file(path: str | Path) -> ParseResult:
+def parse_md_file(
+    path: str | Path,
+    *,
+    logical_path: str,
+    raw_bytes: bytes | None = None,
+) -> ParseResult:
     """File entry: read, parse, register the source, return ParseResult."""
     p = Path(path)
-    doc, stream = _parse_with_stream(p.read_text(encoding="utf-8"))
-    source = register_source(p, "markdown", stream)
+    captured = raw_bytes if raw_bytes is not None else p.read_bytes()
+    doc, stream, diagnostic_specs = _parse_with_stream(captured.decode("utf-8"))
+    source = register_source(
+        p,
+        "markdown",
+        stream,
+        logical_path=logical_path,
+        parser_version=PARSER_VERSION,
+        raw_bytes=captured,
+    )
     doc.source_id = source.id
-    return ParseResult(document=doc, source=source)
+    diagnostics = [
+        make_diagnostic(
+            source_id=source.id,
+            parser_name=source.parser,
+            parser_version=source.parser_version,
+            **spec,
+        )
+        for spec in diagnostic_specs
+    ]
+    return ParseResult(
+        document=doc,
+        source=source,
+        diagnostics=make_parse_report(
+            source_id=source.id,
+            parser_name=source.parser,
+            parser_version=source.parser_version,
+            diagnostics=diagnostics,
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
 # Empty-node cleanup (post-parse)
 # ---------------------------------------------------------------------------
 
-# A Text value left behind by a Pandoc anchor that markdown-it parsed as
-# literal emphasis markers: nothing but ``*`` repetitions (e.g. ``**`` or
-# ``*``), optionally surrounded by whitespace. These carry no content and
-# would otherwise leak into the output.
-_STRAY_EMPHASIS_RE = re.compile(r"^\s*\*+\s*$")
-
 # Wrapper inline nodes that are meaningless when they have no children.
 _EMPTY_WRAPPERS = (Bold, Italic, Strikethrough, Superscript, Subscript)
 
 
 def _clean_inlines(inlines: list) -> list:
-    """Recursively drop empty emphasis wrappers and stray emphasis-marker
-    Text nodes from an inline list.
+    """Recursively drop empty emphasis wrappers from an inline list.
 
     - ``Bold`` / ``Italic`` / ``Strikethrough`` / ``Superscript`` /
       ``Subscript`` with no remaining children are removed (Pandoc leaves
       empty ``****`` emphasis behind when it splits an anchor off a
       heading).
-    - ``Text`` whose value is only ``*`` repetitions (``**``, ``*``) is
-      removed — markdown-it parses a stray ``**`` as literal text, not
-      emphasis.
     Wrappers carrying children are cleaned in place and kept.
     """
     out: list = []
     for node in inlines:
         if isinstance(node, Text):
-            if _STRAY_EMPHASIS_RE.match(node.value):
-                continue
             out.append(node)
         elif isinstance(node, _EMPTY_WRAPPERS):
             node.children = _clean_inlines(node.children)
@@ -238,6 +687,7 @@ def _inlines_have_content(inlines: list) -> bool:
 # Block-level walker
 # ---------------------------------------------------------------------------
 
+
 def _consume_blocks(
     tokens: list[Token], start: int, end: int, out: list, doc: Document | None = None
 ) -> int:
@@ -255,7 +705,10 @@ def _consume_blocks(
         if t == "heading_open":
             level = int(tok.tag[1])
             j = _find_close(tokens, i + 1, end, "heading_close")
-            inlines = _inline_children(tokens[i + 1 : j])
+            inlines = _inline_children(
+                tokens[i + 1 : j],
+                allow_trailing_pandoc_attributes=True,
+            )
             out.append(Heading(level=level, children=inlines))
             i = j + 1
 
@@ -290,7 +743,10 @@ def _consume_blocks(
 
         elif t == "fence" or t == "code_block":
             lang = (tok.info or "").strip() or None
-            text = tok.content.rstrip("\n")
+            # markdown-it includes one block-terminating newline. Remove only
+            # that syntax terminator and preserve any intentional trailing
+            # blank lines inside the code block.
+            text = tok.content[:-1] if tok.content.endswith("\n") else tok.content
             out.append(CodeBlock(text=text, language=lang))
             i += 1
 
@@ -341,7 +797,7 @@ def _consume_footnote_block(
             # drop those during inline walking (they're a round-trip artifact).
             _consume_blocks(tokens, i + 1, j, children, doc)
             if raw_id.startswith(ENDNOTE_PREFIX):
-                en_id = raw_id[len(ENDNOTE_PREFIX):]
+                en_id = raw_id[len(ENDNOTE_PREFIX) :]
                 if en_id:
                     doc.endnotes[en_id] = Endnote(id=en_id, children=children)
             elif raw_id:
@@ -480,47 +936,62 @@ def _attr(tok: Token, name: str) -> str | None:
 # Inline walker
 # ---------------------------------------------------------------------------
 
-def _inline_children(block_tokens: list[Token]) -> list[Inline]:
+
+def _inline_children(
+    block_tokens: list[Token],
+    *,
+    allow_trailing_pandoc_attributes: bool = False,
+) -> list[Inline]:
     """Given the tokens *inside* a heading/paragraph/cell (which should be
     exactly one `inline` token), return the parsed inline children."""
     for tok in block_tokens:
         if tok.type == "inline":
-            return _walk_inline(tok.children or [])
+            return _walk_inline(
+                tok.children or [],
+                allow_trailing_pandoc_attributes=allow_trailing_pandoc_attributes,
+            )
     return []
 
 
-def _strip_pandoc_cruft(value: str) -> str:
+def _strip_pandoc_cruft(
+    value: str,
+    *,
+    allow_trailing_attributes: bool = False,
+) -> str:
     """Remove Pandoc attribute/anchor cruft from a prose Text value.
 
-    Pandoc emits attribute blocks (``{#id .class key=val}``) on headings
-    and inline empty anchor spans (``[]{#id .anchor}``) that the canonical
-    IR has no home for. They must not leak into the output as literal
-    text. This runs only on ``Text`` node values (via ``_split_sup_sub``)
-    so ``Code`` / ``CodeBlock`` content — which is literal — is untouched.
-
-    Order matters:
-    1. Drop empty-bracket anchor spans whole (``[]{...}``), consuming any
-       leading whitespace so ``foo []{#a} bar`` -> ``foo bar`` without a
-       doubled space.
-    2. Drop any remaining bare attribute block (``{#id .class}``) — the
-       form attached to headings/words with no bracket span.
-    3. Collapse the double spaces a mid-line removal can produce and
-       strip leading/trailing whitespace if the value reduced to nothing
-       meaningful.
+    Empty anchors are a strong syntactic signal and may occur in prose. Bare
+    attribute blocks are removed only at the end of a heading. For each
+    removal, at most one newly-adjacent whitespace character is removed;
+    unrelated spacing elsewhere in the value is preserved exactly.
     """
     if "{" not in value:
         return value
-    value = _PANDOC_EMPTY_ANCHOR_RE.sub("", value)
-    value = _PANDOC_ATTR_BLOCK_RE.sub("", value)
-    # Collapse runs of spaces left where cruft was excised mid-line.
-    value = re.sub(r"  +", " ", value)
-    # If stripping reduced the value to whitespace-only, normalise to "".
-    if not value.strip():
-        return ""
+
+    for match in reversed(list(_PANDOC_EMPTY_ANCHOR_RE.finditer(value))):
+        left = value[: match.start()]
+        right = value[match.end() :]
+        if left and right and left[-1] in " \t" and right[0] in " \t":
+            right = right[1:]
+        value = left + right
+
+    if allow_trailing_attributes:
+        match = _PANDOC_TRAILING_ATTR_RE.search(value)
+        if match is not None:
+            start = match.start()
+            if start > 0 and value[start - 1] in " \t":
+                start -= 1
+            value = value[:start] + value[match.end() :]
+            if not value.strip():
+                return ""
     return value
 
 
-def _split_sup_sub(text_value: str) -> list[Inline]:
+def _split_sup_sub(
+    text_value: str,
+    *,
+    allow_trailing_pandoc_attributes: bool = False,
+) -> list[Inline]:
     """Split a raw text string into Text / Superscript / Subscript /
     Citation nodes.
 
@@ -538,16 +1009,21 @@ def _split_sup_sub(text_value: str) -> list[Inline]:
     code spans and code blocks — which never reach this function — keep
     their literal ``{#id}`` / ``[]{#a}`` content.
     """
-    text_value = _strip_pandoc_cruft(text_value)
+    text_value = _strip_pandoc_cruft(
+        text_value,
+        allow_trailing_attributes=allow_trailing_pandoc_attributes,
+    )
     # First pass: extract citation matches by scanning the whole string
     # for the regex. Citations are unambiguous (opening ``[@``), so we
     # can split around them before doing the character-by-character
     # sup/sub pass on the interstitial text.
-    citation_segments: list[tuple[str, tuple | None]] = []  # (text, None) or ("", (key, locator))
+    citation_segments: list[
+        tuple[str, tuple | None]
+    ] = []  # (text, None) or ("", (key, locator))
     last = 0
     for m in _CITATION_RE.finditer(text_value):
         if m.start() > last:
-            citation_segments.append((text_value[last:m.start()], None))
+            citation_segments.append((text_value[last : m.start()], None))
         key = m.group(1)
         locator = m.group(2)
         citation_segments.append(("", (key, locator)))
@@ -587,7 +1063,9 @@ def _split_sup_sub_only(text_value: str) -> list[Inline]:
             end = _find_marker(text_value, i + 1, "^")
             if end is not None:
                 flush_buf()
-                result.append(Superscript(children=[Text(value=text_value[i + 1 : end])]))
+                result.append(
+                    Superscript(children=[Text(value=text_value[i + 1 : end])])
+                )
                 i = end + 1
                 continue
         elif ch == "~":
@@ -620,19 +1098,26 @@ def _find_marker(s: str, start: int, marker: str) -> int | None:
     return None
 
 
-def _walk_inline(children: list[Token]) -> list[Inline]:
+def _walk_inline(
+    children: list[Token],
+    *,
+    allow_trailing_pandoc_attributes: bool = False,
+) -> list[Inline]:
     out: list[Inline] = []
     stack: list[list[Inline]] = [out]
 
     def push(node: Inline) -> None:
         stack[-1].append(node)
 
-    def push_text(value: str) -> None:
+    def push_text(value: str, *, allow_trailing_attributes: bool = False) -> None:
         """Push text, but first split on Pandoc-style ``^sup^`` / ``~sub~``
         patterns. Strikethrough ``~~...~~`` is already consumed upstream by
         markdown-it-py's GFM plugin, so any ``~`` here is literal or a
         subscript marker."""
-        for node in _split_sup_sub(value):
+        for node in _split_sup_sub(
+            value,
+            allow_trailing_pandoc_attributes=allow_trailing_attributes,
+        ):
             push(node)
 
     i = 0
@@ -642,7 +1127,14 @@ def _walk_inline(children: list[Token]) -> list[Inline]:
 
         if t == "text":
             if tok.content:
-                push_text(tok.content)
+                push_text(
+                    tok.content,
+                    allow_trailing_attributes=(
+                        allow_trailing_pandoc_attributes
+                        and len(stack) == 1
+                        and not _later_inline_content(children, i)
+                    ),
+                )
         elif t == "softbreak":
             # Soft break: treat as a space in canonical form
             if stack[-1] and isinstance(stack[-1][-1], Text):
@@ -680,7 +1172,7 @@ def _walk_inline(children: list[Token]) -> list[Inline]:
         elif t == "link_close":
             stack.pop()
         elif t == "image":
-            alt = (tok.content or "").strip()
+            alt = tok.content or ""
             src = _attr(tok, "src") or ""
             title = _attr(tok, "title")
             push(Image(alt=alt, src=src, title=title))
@@ -688,7 +1180,7 @@ def _walk_inline(children: list[Token]) -> list[Inline]:
             label = (tok.meta or {}).get("label")
             raw_id = label if label is not None else str((tok.meta or {}).get("id", ""))
             if raw_id.startswith(ENDNOTE_PREFIX):
-                en_id = raw_id[len(ENDNOTE_PREFIX):]
+                en_id = raw_id[len(ENDNOTE_PREFIX) :]
                 if en_id:
                     push(EndnoteRef(id=en_id))
             elif raw_id:
