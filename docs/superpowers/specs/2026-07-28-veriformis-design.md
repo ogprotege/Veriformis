@@ -1,11 +1,28 @@
-# Veriformis — Design Spec
+# Veriformis: Design Specification
 
-**Date:** 2026-07-28 · **Status:** Draft for owner review · **Repo:** github.com/ogprotege/Veriformis
+> **Status:** Approved product direction with implementation-status amendments
+>
+> **Original date:** 2026-07-28
+>
+> **Last reviewed:** 2026-07-29
+>
+> **Repository:** `github.com/ogprotege/Veriformis`
 
-> **Veriformis** *(verus + forma, "true-formed")* — a local-first macOS dataset compiler.
-> Raw documents in → validated, provenance-sealed training bundles for LLM fine-tuning out.
-> Sibling product to **Aptus** (which plans/compiles the training run); Veriformis supplies
-> the ground truth Aptus trains on.
+> **Current implementation:** M1 core, version `0.1.0`, is complete. It implements the
+> canonical IR, Markdown, DOCX, text and code parsing, deterministic cleaning, chunking,
+> initial serializers, three validation gates, bundle writing, and the stage-command CLI.
+>
+> **Planned continuation:** Recipe-driven construction, curation, balancing, leakage-safe
+> splitting, exact-snapshot sealing, Aptus-native records, broader ingest, MCP, and the
+> macOS workbench remain planned. See the
+> [product contract](../../product-contract.md),
+> [current implementation status](../../current-status.md), and
+> [build roadmap](../../plans/2026-07-29-veriformis-roadmap.md).
+
+The target **Veriformis** product *(verus + forma, "true-formed")* is a local-first macOS
+dataset compiler. It must own the full path from heterogeneous raw sources to finished,
+validated, split, provenance-sealed training datasets. Aptus consumes the finished
+dataset contract and owns training planning and execution.
 
 ---
 
@@ -24,32 +41,47 @@ fine-tuning-native output formats.
 
 ## 2. Product doctrine (non-negotiables)
 
-1. **Canonical IR, hub-and-spoke.** Every input format parses into one document IR; every
-   output format serializes from it. N parsers + M serializers, never N×M converters —
-   the proven doctrine for markup conversion.
-2. **Nothing silent.** Originals are preserved by SHA-256. Every transformation is logged
-   with what changed, where, and why. Every output chunk traces back to source document,
-   page, and character offsets. "Lossless" means *provably nothing critical lost* — not a
-   marketing word.
+1. **Canonical IR, hub-and-spoke.** Every supported unstructured input parses into one
+   document IR. Typed structured inputs enter through declared adapters. Outputs derive
+   from accepted dataset records, not separate format-to-format converters.
+2. **Nothing silent and no impossible losslessness claim.** Originals remain hash-pinned.
+   Parsing loss, unsupported structures, transformations, exclusions, deduplication,
+   balancing, and filtering produce explicit evidence. Every accepted record field traces
+   to immutable source evidence or a declared deterministic derivation. The enforceable
+   contract is source conservation, derivation integrity, and coverage accounting. It does
+   not mean that every source byte appears unchanged in every training record.
 3. **Fail-closed.** A bundle that fails validation does not seal. An unsupported input
    (e.g., a scanned PDF with no text layer) is refused with a clear reason, never
    processed into garbage. (Aptus's evidence-ladder ethos, applied one stage earlier.)
-4. **Deterministic or it doesn't ship (v1).** No LLM calls inside the pipeline. Cleaning,
-   chunking, structuring, validating are all deterministic and testable.
+4. **Deterministic v1.** The v1 dataset pipeline makes no LLM calls and performs no remote
+   model generation. Cleaning, construction, curation, splitting, formatting, validation,
+   and sealing are deterministic and testable. A future opt-in `GeneratorPass` requires a
+   separate owner-approved plan and the same evidence, curation, review, split, validation,
+   and sealing lifecycle. It is not a v1 release prerequisite.
 5. **Local and private.** No cloud, no accounts, no telemetry. Documents never leave the
    machine. (The corpus may be sensitive — e.g., unpublished scholarly material.)
 
 ## 3. Scope
 
+This section describes the intended product. M1 currently implements Markdown, DOCX,
+plain text, source-code ingestion, the canonical IR, deterministic cleaning and chunking,
+three serializer families, three validation gates, bundle writing, and the CLI. PDF, HTML,
+structured adapters, recipe-driven construction, curation, authoritative splitting, MCP,
+and the macOS application remain planned until their roadmap gates pass.
+
 ### v1 in scope
 - **Inputs:** Markdown, DOCX, plain text, HTML, digitally-born PDF (text layer present),
   source code files, JSON/CSV/JSONL (already-structured, validated passthrough).
 - **Language:** English.
-- **Outputs:** JSONL training bundles — completion, instruction (Alpaca-style), and chat
-  formats with per-model-family templates (Llama 3, Mistral/Mixtral, Qwen 2/3, Gemma,
-  Phi) plus user-defined custom templates.
-- **Surfaces:** Python library, CLI, MCP server, macOS GUI (SwiftUI shell).
-- **Integration:** export bundle satisfies Aptus's supervised-dataset contract.
+- **Objectives:** full-sequence text and truthful source-derived supervised objectives
+  declared by a versioned `DatasetRecipe`.
+- **Outputs:** validated JSONL training bundles using Aptus-native `text`,
+  prompt-completion, instruction-output, or structured `messages` rows, with record-level
+  evidence metadata and authoritative split assignments.
+- **Surfaces:** Python library and CLI first, followed by the local MCP adapter and macOS
+  SwiftUI workbench after their roadmap gates pass.
+- **Integration:** Aptus consumes the sealed dataset and split contract. Training execution
+  remains outside Veriformis.
 
 ### Explicitly out of scope (v1)
 - OCR / scanned documents (refused cleanly; future horizon — the IR and provenance model
@@ -61,23 +93,40 @@ fine-tuning-native output formats.
 
 ## 4. Architecture
 
-One Python core, three thin front doors. Mirrors the owner's proven patterns:
-one engine shared by CLI and MCP surfaces, and a SwiftUI shell over an embedded
-Python backend on the desktop.
+Veriformis remains a layered modular monolith with one Python core and thin adapters. The
+current M1 core implements parsing through bundle writing. The planned `PipelineService`,
+construction, curation, splitting, and exact-snapshot seal complete the product without
+changing that deployment shape.
 
+```text
+CLI                 local MCP                 SwiftUI workbench
+ |                      |                            |
+ +----------------------+----------------------------+
+                        |
+                 typed PipelineService
+                        |
+raw sources -> parsers -> canonical IR -> replayable cleaning -> source evidence
+                        |
+                 versioned DatasetRecipe
+                        |
+                 ConstructionPass sequence
+                        |
+                  CandidateRecord set
+                        |
+         curation and optional recipe review
+                        |
+          validation -> immutable DatasetRecord
+                        |
+          balancing and leakage-safe split assignment
+                        |
+          Aptus-native formatting -> exact validation
+                        |
+             atomic bundle seal and verification
 ```
-┌──────────────────────────── surfaces ────────────────────────────┐
-│  veriformis CLI      MCP server      macOS GUI (SwiftUI shell)    │
-└──────────────┬──────────────┬──────────────────┬─────────────────┘
-               └──────────────┴──────┬───────────┘
-                                     │ python API
-┌────────────────────────────────────▼─────────────────────────────┐
-│  pipeline orchestrator (yaml-driven, also single-call API)        │
-├─────────┬──────────┬──────────┬────────────┬──────────┬──────────┤
-│ parsers │ rules    │ chunkers │ serializers│ validate │ bundle   │
-│ → IR    │ (clean)  │          │ (format)   │ (gates)  │ (seal)   │
-└─────────┴──────────┴──────────┴────────────┴──────────┴──────────┘
-```
+
+M1 currently reaches from supported raw sources through the existing bundle writer. The
+recipe, candidate, curation, split, shared-service, and hardened seal stages are planned
+post-M1 work governed by the build roadmap.
 
 ### 4.1 Document IR (`ir/`)
 The spine: a canonical document model with first-class provenance, designed for
@@ -129,84 +178,146 @@ Rule library (from the salvaged UDP taxonomy, with its two known bugs fixed):
 - Every chunk carries: `chunk_id`, `source_id`, IR block path, char start/end,
   `heading_path`, token estimate.
 
-### 4.5 Serializers (`serializers/`)
-- `completion` — chunk text as-is (optionally with heading-path prefix).
-- `instruction` — instruction/input/output field mapping (Alpaca-style).
-- `chat` — per-model-family templates. Templates are **Jinja2**, matching Hugging Face
-  `chat_template` convention, so output is byte-identical to what the trainer sees.
-  Built-ins: llama-3, mistral, qwen2/3 (`<|im_start|>` family), gemma, phi. Users can add
-  custom templates by name.
-- `custom` — user Jinja template over chunk/QA fields.
-- Structured inputs (CSV/JSONL with question/answer or messages columns) route here
-  directly after validation.
+### 4.5 Dataset recipes and construction (`construction/`)
 
-### 4.6 Validation gates (`validate/`)
-All gates report; the bundle seals only if every *required* gate passes.
-- `schema` — output conforms to the target format's JSON Schema.
-- `encoding` — valid UTF-8, no mojibake/control-char pollution.
-- `provenance` — every chunk resolves to a live source span (integrity check).
-- `dedup` — exact-hash duplicates always reported; near-dup (shingle/Jaccard) behind a flag
-  (decision D2, §12).
-- `pii` — regex-based email/phone/SSN/etc. scan; reports matches, never auto-redacts
-  (the owner decides — nothing silent).
-- `stats` — document/chunk counts, length distribution, char+estimated-token totals
-  (exact tokenizer counts available via optional extra — decision D3, §12).
+A versioned `TrainingObjective` states what the model should learn. A versioned
+`DatasetRecipe` binds that objective to source selection, cleaning and segmentation,
+ordered `ConstructionPass` operations, curation, balancing, splitting, target schema,
+required gates, and optional review policy.
 
-### 4.7 Bundle & seal (`bundle/`)
-Output bundle:
-```
+Each deterministic `ConstructionPass` emits append-only `CandidateRecord` objects with
+field-level `SourceEvidence`. Built-in deterministic constructors cover full-text,
+continuation, section reconstruction, logged transformation, and structured-field tasks.
+Serializers do not invent an objective.
+
+### 4.6 Curation, record promotion, and splitting (`datasets/`)
+
+Curation records deduplication, quality findings, exclusions, quarantine, balancing, and
+any recipe-defined review state. Recipe gates promote accepted candidates into immutable
+`DatasetRecord` objects. Rejected candidates remain auditable.
+
+Veriformis assigns authoritative train and evaluation partitions before formatting.
+Related records share a leakage group, and the sealed bundle binds final membership and an
+assignment digest. Aptus must consume those partitions or exactly reproduce and verify
+them under a shared versioned contract.
+
+### 4.7 Serializers (`serializers/`)
+
+Serializers lower accepted `DatasetRecord` objects into the recipe's declared row schema.
+They do not create prompts, targets, review state, or split policy.
+
+- `text`: retained sequence receives full supervision.
+- `prompt` + `completion`: prompt is context; completion receives supervision.
+- `instruction` + `input` + `output`: instruction and input are context; output receives
+  supervision.
+- structured `messages`: Aptus renders the selected tokenizer contract and supervises only
+  the final assistant suffix.
+
+Record identity, recipe identity, construction-pass identity, source evidence, quality
+facts, split group, and assignment metadata survive serialization as versioned extra
+fields. Rendered model-family chat text is a preview and conformance artifact unless a
+recipe explicitly selects it as full-sequence text.
+
+The current `0.1.0` format stage bypasses this lifecycle and maps chunks directly into
+records. Its chat branch labels unchanged source text as a summary. That behavior is a
+documented defect, not the target construction contract.
+
+### 4.8 Validation gates (`validate/`)
+
+All gates report. The bundle seals only if every required gate passes against the exact
+snapshot being published.
+
+- `schema`: output conforms to the target format's versioned schema.
+- `encoding`: required fields satisfy the declared text-encoding policy.
+- `provenance`: every accepted field resolves to source evidence or a declared
+  deterministic derivation.
+- `objective`: prompts and targets perform the task declared by the recipe.
+- `curation`: every exclusion, quarantine, deduplication, and required review has a reason
+  and policy result.
+- `split`: every accepted record has one final assignment and no leakage group crosses a
+  partition.
+- `dedup`, `pii`, and `stats`: report duplicate, sensitive-data, distribution, coverage,
+  and size facts required by the recipe.
+- `snapshot`: recipe, sources, records, assignments, formatted rows, and gate results bind
+  to the exact digests being sealed.
+
+Version `0.1.0` implements only exact-key schema, partial encoding, and partial chunk
+provenance gates. See the current implementation status for their precise limits.
+
+### 4.9 Bundle and seal (`bundle/`)
+
+The target bundle can contain:
+
+```text
 my-dataset.vfbundle/
-├── dataset.jsonl              # (or multiple split files)
-├── manifest.json              # the seal — see below
-├── sources/                   # optional: copies of originals
-└── aptus-dataset.json         # Aptus dataset-contract descriptor
+├── dataset.jsonl or partition files
+├── manifest.json
+├── sources/                   # optional under the retention policy
+└── aptus-dataset.json
 ```
-`manifest.json`: bundle id, created-at, veriformis version, sources[] (path, sha256,
-size, parser, pages), transforms[] (full cleaning log), chunks[] (provenance map),
-dataset (format, template, counts, stats), validations[] (per-gate results), and a
-SHA-256 of every emitted file. Sealing recomputes and writes hashes; any later tampering
-is detectable.
 
-### 4.8 Surfaces
-- **CLI (`veriformis`)** — typer. Stage commands (`parse`, `clean`, `chunk`, `format`,
-  `validate`, `seal`) plus `veriformis run pipeline.yaml` for end-to-end batch, and
-  `veriformis preview` for dry-run cleaning.
-- **MCP server (`mcp/`)** — built on fastmcp; tools like `veriformis_ingest`,
-  `veriformis_preview_clean`, `veriformis_build`, `veriformis_validate`. Lets
-  Claude/Cursor drive dataset prep conversationally against the same engine.
-- **macOS GUI (`desktop/macos/`)** — SwiftUI shell + embedded Python backend, cloning
-  Aptus's proven packaging (PyInstaller backend spec, local IPC). Five screens matching
-  the pipeline: **Sources** (drag-drop, hash register) → **Clean** (rule toggles, live
-  before/after diff) → **Chunk** (strategy + parameters + preview) → **Format** (template
-  picker, field mapping, rendered-sample preview) → **Seal** (gate dashboard, export).
-  UX reference: salvaged tunerepo UDP playground (its layout, not its code).
+The manifest binds the tool and schema versions, recipe, sources, extraction diagnostics,
+cleaning plans, candidate and record decisions, split assignment, dataset statistics,
+validation facts, and every permitted emitted file.
+
+Seal writes into a temporary sibling, verifies a normalized and path-safe closed file set,
+then promotes the bundle atomically. Verification rejects missing required files,
+unexpected files outside policy, absolute or parent-traversal paths, symlink escape, stale
+schema versions, and digest mismatches. A detached digest, signature, or release
+attestation binds the final manifest for cross-machine use.
+
+Version `0.1.0` writes only `dataset.jsonl` and `manifest.json`. It trusts saved gate
+results, does not seal an immutable snapshot atomically, and provides only partial
+programmatic verification.
+
+### 4.10 Surfaces
+
+- **CLI (`veriformis`):** Typer stage commands exist now. A later thin adapter will expose
+  the complete `PipelineService` without owning policy or state.
+- **MCP server (`mcp/`):** Planned constrained local automation over the same service.
+- **macOS GUI (`desktop/macos/`):** Planned SwiftUI workbench over authenticated local IPC
+  and the same service.
+
+Only the stage-command CLI exists in version `0.1.0`.
 
 ## 5. Data flow
 
+```text
+raw heterogeneous sources
+  -> source registration and faithful parsing
+  -> canonical IR plus explicit extraction diagnostics
+  -> replayable cleaning and normalized corpus state
+  -> source evidence units
+  -> versioned recipe and deterministic construction passes
+  -> candidate records
+  -> curation, optional review, and recipe gates
+  -> immutable dataset records
+  -> balancing and leakage-safe split assignment
+  -> Aptus-native formatting
+  -> exact-snapshot validation
+  -> atomic provenance-sealed bundle plus independent verification
 ```
-raw files ──parse──▶ IR docs (+source registry, sha256)
-         ──clean──▶ IR docs' (+transform log per rule firing)
-         ──chunk──▶ chunks (+provenance: source/block/offsets/heading-path)
-         ──format─▶ jsonl records (template-rendered)
-         ──gates──▶ validation report (fail-closed)
-         ──seal───▶ bundle: jsonl + manifest.json + hashes (+ aptus descriptor)
-```
+
+A full-sequence text recipe may select the clean corpus state as its final training
+objective. Supervised recipes continue through source-grounded record construction. Both
+paths use the same curation, evidence, split, validation, and sealing contracts.
 
 ## 6. Error handling
 
-- Every stage has typed errors (`ParseError`, `UnsupportedInputError`, `RuleError`,
-  `GateFailure`) carrying human-readable reasons and machine codes.
-- Unsupported input → refusal with the missing capability named (e.g., "scanned PDF —
-  OCR not supported in v1"). Never partial garbage.
-- Gate failure → bundle refuses to seal; report states exactly which gate and why.
-- GUI/CLI/MCP all surface the same error objects.
+The target application contract uses typed failures with human-readable reasons and stable
+machine codes. Unsupported input is refused with the missing capability named. Failed or
+stale required gates prevent sealing. CLI, MCP, and SwiftUI adapters must translate the
+same service results without changing policy.
+
+Version `0.1.0` has typed handling for selected parser and sealing failures, but malformed
+workspace artifacts and some invalid options can still escape that boundary.
 
 ## 7. Testing strategy
 
-"Lossless" is a testable claim, and the suite is built to prove it:
+Source fidelity, explicit loss accounting, and derivation integrity are testable claims:
 - **Roundtrip fidelity:** IR → serialize → parse ≡ identity, per format.
-- **Provenance integrity:** reconstruct each chunk's source span from the manifest and
-  assert byte equality with the original.
+- **Provenance integrity:** reconstruct accepted fields from the versioned canonical stream
+  or their declared deterministic derivations and verify the original source hash.
 - **Golden files:** fixture corpus per parser (including nasty cases: multi-column PDF,
   nested DOCX lists, malformed HTML, mixed encodings).
 - **Rule-safety regressions:** the tunerepo number-deleting regex is enshrined as a test;
@@ -220,37 +331,50 @@ raw files ──parse──▶ IR docs (+source registry, sha256)
 
 ## 8. Stack & conventions
 
-- Python 3.11+, `uv` + `pyproject.toml`, ruff (pinned, like Aptus), pytest, pydantic v2,
-  typer, Jinja2, pypdfium2, trafilatura (D4), fastmcp.
-- MIT license. Conventional commits. CI: GitHub Actions (lint + typecheck + tests).
+- The current core uses Python 3.11+, `uv`, `pyproject.toml`, Ruff, pytest, Pydantic v2,
+  Typer, Jinja2, markdown-it-py, python-docx, and lxml.
+- Later milestones may add pypdfium2, trafilatura, and fastmcp only when their roadmap
+  steps begin.
+- MIT license. Conventional commits. Current CI runs Ruff and pytest on Ubuntu with Python
+  3.12. Broader build, platform, type, coverage, security, and release gates remain planned.
 - Code conventions follow Aptus: contract-first modules, typed boundaries,
   no silent mutation, docs that state scope limits up front.
 
 ## 9. Repo layout
+
+Current directories are unmarked. Planned directories are labeled.
 
 ```
 Veriformis/
 ├── pyproject.toml / uv.lock
 ├── src/veriformis/
 │   ├── ir/  parsers/  rules/  chunkers/  serializers/  validate/  bundle/
-│   ├── pipeline/  cli.py  mcp/
-├── desktop/macos/            # SwiftUI shell (M4)
+│   ├── cli.py
+│   ├── pipeline/             # planned PipelineService
+│   └── mcp/                  # planned local adapter
+├── desktop/macos/            # planned SwiftUI workbench
 ├── tests/  fixtures/
 ├── docs/   (incl. this spec)
 └── reference/tunerepo-salvage/   # lineage material (already imported)
 ```
 
-## 10. Milestones
+## 10. Milestones and current state
 
-- **M1 — Core engine + CLI:** IR, md/txt/docx parsers, rule engine, chunkers,
-  completion + instruction + chat serializers, schema/encoding/provenance gates,
-  seal, pytest base.
-- **M2 — Full ingest + gates:** pdf + html parsers, dedup + pii + stats gates, pipeline
-  yaml runner.
-- **M3 — MCP server.**
-- **M4 — macOS GUI** (SwiftUI shell + embedded backend, Aptus packaging pattern).
-- **M5 — Aptus bundle polish:** verified end-to-end handoff (Veriformis bundle → Aptus
-  plan), joint docs.
+- **M1, completed:** canonical IR, Markdown, DOCX, text and code parsers, deterministic
+  cleaning, chunkers, initial serializers, schema, encoding and provenance gates, bundle
+  writer, and stage-command CLI. See the completed M1 plan.
+- **M1.1, planned:** transactional workspace, source-scoped identity, explicit loss
+  diagnostics, recipe-driven construction, candidate-to-record promotion, curation,
+  authoritative splits, Aptus-native rows, exact-snapshot seal, shared `PipelineService`,
+  and the dual-objective raw-to-sealed acceptance gate.
+- **M2, planned:** remaining declared inputs, expanded deterministic builders, quality
+  reporting, balancing controls, and repeatable YAML pipelines.
+- **M3, planned:** constrained local MCP automation and the versioned Aptus handoff.
+- **M4, planned:** macOS SwiftUI dataset workbench over the same service.
+- **Future, optional:** separately approved `GeneratorPass` construction. This is not part
+  of deterministic v1 and is not a prerequisite for public release.
+- **Release:** documented, packaged, signed, notarized, installed, independently verified,
+  and tested against a compatible Aptus release.
 
 ## 11. Lineage & salvage
 
@@ -259,9 +383,8 @@ Veriformis/
   regression tests), UDP playground as UX reference. Everything else from tunerepo was
   deliberately destroyed; the old repo and staging folder are deletable once this file
   is committed.
-- **Aptus** (`/Users/biscuit/Aptus`): desktop packaging pattern, dataset contract (the
-  M5 integration target — exact contract to be read from Aptus source at implementation
-  time), evidence/fail-closed philosophy. Aptus remains untouched.
+- **Aptus:** desktop packaging pattern and future dataset-contract integration target. The
+  exact shared contract must be versioned and verified when its roadmap step begins.
 - Certain md/docx parsing internals are vendored from the owner's prior private work
   (decision D1). That source is not named or referenced anywhere in this repository
   by request; it remains untouched.

@@ -1,12 +1,36 @@
-# Veriformis M1 — Core Engine + CLI Implementation Plan
+# Veriformis M1: Core Engine and CLI Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Status:** Completed historical implementation record
+>
+> **Completed:** 2026-07-28
+>
+> **Completed implementation baseline:** M1 core, version `0.1.0`
+>
+> **Final baseline commit:** `58d8f42`
+>
+> **Verification at completion:** 50 tests passed, Ruff passed, and the CLI integration
+> test passed
 
-**Goal:** Build the Veriformis core dataset-compilation engine (IR → parse → clean → chunk → serialize → validate → seal) plus a stage-command CLI, with a test suite that makes "lossless" a provable claim.
+This file records how M1 was built. Its unchecked boxes and embedded code listings are
+historical plan text, not an active task queue and not the current architecture authority.
+Do not restart or re-execute these tasks.
 
-**Architecture:** One Python package (`src/` layout). A canonical document IR with char-level provenance; per-format parsers emit IR; deterministic cleaning rules log every mutation; chunkers carry provenance forward; serializers emit training JSONL (completion/instruction/chat via Jinja2 templates matching HF `chat_template` conventions); validation gates fail closed; the bundle sealer writes `dataset.jsonl` + `manifest.json` with SHA-256 hashes.
+For current product scope and future execution, read the
+[product contract](../../product-contract.md),
+[current implementation status](../../current-status.md), and
+[Veriformis build roadmap](../../plans/2026-07-29-veriformis-roadmap.md).
 
-**Tech Stack:** Python ≥3.11, uv, setuptools src-layout, pydantic v2, typer, Jinja2, markdown-it-py + mdit-py-plugins, python-docx + lxml, pytest, ruff ==0.16.0.
+**Historical goal:** Build the first deterministic core and CLI pipeline from canonical IR
+through parsing, cleaning, chunking, initial serialization, validation, and bundle writing.
+
+**Historical architecture:** M1 intentionally moved from chunks directly into initial
+serializers. That path proved the core compiler spine. It did not implement the final
+`DatasetRecipe`, `ConstructionPass`, `CandidateRecord`, immutable `DatasetRecord`,
+curation, authoritative split, shared `PipelineService`, or exact-snapshot seal contracts.
+Those belong to the continuation roadmap.
+
+**Historical stack:** Python 3.11+, uv, setuptools src layout, Pydantic v2, Typer, Jinja2,
+markdown-it-py plus plugins, python-docx plus lxml, pytest, and Ruff 0.16.0.
 
 ## Global Constraints
 
@@ -2823,9 +2847,25 @@ git commit -m "feat(cli): stage commands (parse/clean/chunk/format/validate/seal
 
 ---
 
-## M1 definition of done
+## Historical M1 definition of done, completed
+
+The following conditions passed at M1 closeout on baseline commit `58d8f42`:
 
 - `uv run pytest -q` green across `tests/` (scaffold, ir, parsers, rules, chunkers, serializers, validate, bundle, cli).
 - `uv run ruff check src tests` clean.
 - End-to-end on a real file: `veriformis parse notes.txt -o ws && veriformis clean ws && veriformis chunk ws && veriformis format ws --format completion && veriformis validate ws --format completion && veriformis seal ws -o out.vfbundle` produces a sealed bundle whose `manifest.json` shows the source hash, transform log, chunk provenance, passing gates, and file hashes.
 - Privacy grep clean: no donor-project identifiers anywhere in the repo.
+
+## Continuation
+
+M1 is complete. All further implementation follows the
+[Veriformis build roadmap](../../plans/2026-07-29-veriformis-roadmap.md), beginning only
+after the documentation-baseline pull request is merged. The roadmap expands the proven
+compiler spine through transactional state, source evidence, dataset construction,
+curation, authoritative splitting, exact validation, sealing, integrations, desktop
+delivery, and release.
+
+The [product contract](../../product-contract.md) controls product claims and the meaning
+of faithful, loss-accounted dataset construction. If a historical M1 listing conflicts
+with a later accepted contract, preserve the listing as history and follow the current
+contract for new work.
