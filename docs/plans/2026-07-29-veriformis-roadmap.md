@@ -6,24 +6,24 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Group 1 integrity foundation at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 and 2 at version `0.1.0`
 
 ## Product objective
 
 Veriformis owns the complete transformation from heterogeneous raw sources to finished, training-ready datasets. It captures raw bytes, performs faithful canonical recovery, cleans and normalizes the recovered structure, constructs records, curates, balances, splits, formats, validates, and seals the result. Canonical IR and a cleaned corpus are integrity-preserving compiler states. A cleaned corpus can also be selected for a full-sequence training objective, but it is not the limit of the product.
 
 The documentation baseline has been reviewed and merged. Group 1 implemented
-Steps 1 through 6 against that product contract. Group 2 begins the dataset
-construction core after the Group 1 closeout gate passes.
+Steps 1 through 6, and Group 2 implemented Steps 7 through 10. Group 3 is the
+next required execution group.
 
 ## Implementation status
 
-- Steps 1 through 6 are implemented in Group 1. Rerun the project checks for
+- Steps 1 through 10 are implemented in Groups 1 and 2. Rerun the project checks for
   current closeout evidence. Strict expected failures remain assigned to later
   steps, and volatile test totals are intentionally omitted.
-- Steps 7 through 26 remain planned.
-- Later work must preserve the Group 1 workspace, identity, diagnostics,
-  evidence, and replay guarantees.
+- Steps 11 through 26 remain planned.
+- Later work must preserve the Groups 1 and 2 workspace, identity, diagnostics,
+  evidence, lifecycle, exact-source, and replay guarantees.
 
 ## Version boundary
 
@@ -84,6 +84,9 @@ final closeout decision.
 ### Group 2: Dataset construction core
 
 **Steps 7 through 10**
+
+**Status:** Implemented. Dataset Construction Contract v1 and the Group 2 test
+suite control the final closeout decision.
 
 7. Training objectives and recipes
 8. Construction passes and evidence
@@ -174,4 +177,5 @@ Group 8 requires separate owner approval. It may remain deferred while the deter
 - [Product contract](../product-contract.md)
 - [Current implementation status](../current-status.md)
 - [Architecture](../architecture.md)
+- [Dataset Construction Contract v1](../contracts/dataset-construction-v1.md)
 - [Completed M1 implementation plan](../superpowers/plans/2026-07-28-veriformis-m1.md)

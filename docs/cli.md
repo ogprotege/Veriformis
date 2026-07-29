@@ -1,7 +1,7 @@
 # CLI Reference
 
-This reference describes the implemented Veriformis `0.1.0` CLI after Group
-1. Planned commands and dataset-construction surfaces are listed separately.
+This reference describes the implemented Veriformis `0.1.0` CLI after Group 2.
+Finished-dataset commands and behavior are listed separately.
 
 ## Run the CLI
 
@@ -25,7 +25,22 @@ Source code files are ingested as one code block. Directories, PDF, HTML, CSV,
 JSON, JSONL, and other extensions are not supported in `0.1.0`. Text inputs
 must be UTF-8.
 
-## End-to-end example
+## Dataset-construction example
+
+```bash
+uv run veriformis parse source.md -o build/workspace
+uv run veriformis clean build/workspace
+uv run veriformis chunk build/workspace --strategy paragraph
+uv run veriformis construct build/workspace --objective full_text
+```
+
+This commits evidence-bearing accepted records, not a sealed bundle. Cleaned
+text remains an intermediate state unless `full_text` explicitly selects it as
+the target.
+
+## Legacy M1 bundle example
+
+The current bundle path still projects chunks directly:
 
 ```bash
 uv run veriformis parse source.md -o build/workspace
@@ -36,7 +51,8 @@ uv run veriformis validate build/workspace --format completion
 uv run veriformis seal build/workspace -o build/example.vfbundle
 ```
 
-The seal destination must not already exist.
+The seal destination must not already exist. This path does not consume the
+accepted records from `construct`.
 
 ## Workspace and artifacts
 
@@ -53,23 +69,28 @@ WORKSPACE/
 └── .txn/
 ```
 
-`HEAD` names the current immutable revision. Its manifest maps logical output
-keys to content-addressed artifact IDs. The current keys are:
+The physical workspace layout uses schema 1. Newly created and explicitly
+migrated workspaces use revision schema 2. Verified unmigrated v1 workspaces
+continue using revision schema 1 for legacy-stage commits until
+`upgrade-workspace` runs. `HEAD` names the current immutable revision. Its
+manifest maps logical output keys to content-addressed artifact IDs. The current
+keys are:
 
 | Stage | Logical output keys |
 | --- | --- |
 | Parse | `registry`; `source/<source-id>/raw`; `source/<source-id>/canonical`; `source/<source-id>/document`; `source/<source-id>/diagnostics` |
 | Clean | `transforms`; `source/<source-id>/document`; `source/<source-id>/cleaning-plan`; `source/<source-id>/block-derivations` |
 | Chunk | `chunks` |
+| Construct | `recipe`; `result` |
 | Format | `records`; `records-meta` |
 | Validate | `validations` |
 
 Each successful stage commits a new revision atomically. Rerunning an upstream
 stage invalidates dependent stage states and removes their active output keys.
 Older revisions remain available as immutable history. Workspace open verifies
-the complete parent chain and every referenced historical object. A legacy flat
-workspace fails with `unsupported-workspace-version` and requires explicit
-migration.
+the complete parent chain and every referenced historical object. Use
+`upgrade-workspace` for a verified revision-schema-v1 workspace. Pre-revision
+flat workspaces remain unsupported.
 
 If `HEAD` is committed but its final directory sync cannot be confirmed, the
 command succeeds with the visible revision and prints
@@ -82,6 +103,19 @@ digests and per-source parse-input digests bind reproducible semantic state and
 cleaning plans.
 
 ## Commands
+
+### `upgrade-workspace`
+
+```text
+veriformis upgrade-workspace WORKSPACE
+```
+
+The command verifies the current history and atomically appends the supported
+revision-schema-v1 to revision-schema-v2 migration. It preserves every existing
+source, artifact, and legacy stage fact and adds `construct` with absent state.
+Running it on an already-current workspace is a no-op. A stale expected head or
+unsupported revision schema fails closed. The physical workspace layout remains
+schema 1.
 
 ### `parse`
 
@@ -200,6 +234,77 @@ Chunks never cross `body`, `footnote:<id>`, or `endnote:<id>` boundaries. The
 region is part of both source evidence and chunk identity context. Chunk and
 evidence payloads use strict versioned schemas.
 
+### `construct`
+
+```text
+veriformis construct WORKSPACE --objective OBJECTIVE \
+  [--source SOURCE_ID_OR_LOGICAL_PATH]... \
+  [--target-row-schema ROW_SCHEMA] \
+  [--split-ratio-ppm 500000] \
+  [--require-review]
+```
+
+Objectives and exact constructed fields:
+
+| Objective | Fields |
+| --- | --- |
+| `full_text` | `text` |
+| `continuation` | `prompt`, `completion` |
+| `section_reconstruction` | `heading`, `section` |
+| `before_after_transformation` | `before`, `after` |
+| `structured_field` | `input`, `fields` |
+
+The command makes no LLM call and has no `summary` objective. `full_text`
+retains complete chunk text. `continuation` divides each eligible chunk into
+ordered non-overlapping prompt and completion slices. Its split ratio is an
+integer in parts per million from 1 through 999999. The default is 500000.
+Section reconstruction requires actual heading and body structure. Run
+`chunk --strategy structure` before selecting `section_reconstruction`; another
+segmentation strategy cannot prove a complete section boundary.
+Before-and-after construction requires a replayable cleaning transform.
+Structured-field construction copies verified scalar metadata from strict
+cleaned IR.
+
+Construction requires revision schema 2 plus complete, current parse, clean,
+and chunk stages. Run `upgrade-workspace` first when a verified workspace still
+uses revision schema 1.
+
+Without `--source`, construction selects every current source. Repeat
+`--source` to select an exact subset by source ID or logical path. The command
+sorts and binds that non-empty set. Unknown selectors and duplicate selections
+fail closed. A selected source with no constructible chunk emits the
+deterministic `source-chunks-unavailable` diagnostic for each pass while other
+selected sources continue. That diagnostic records a construction omission. It
+does not perform Group 3 coverage accounting.
+
+`--target-row-schema` accepts `text`, `prompt_completion`,
+`instruction_output`, or `messages`. It defaults to `text` for `full_text` and
+`prompt_completion` otherwise. Full text requires `text`; every other objective
+requires a supervised row schema. This option declares future lowering only.
+The command does not serialize product rows.
+
+By default, candidates that pass construction integrity receive accepted
+decisions and become immutable dataset records. `--require-review` leaves them
+`pending_review` and emits no accepted records because the current CLI does not
+ingest completed review evidence. The Python construction API supports
+separate accepted or rejected `ReviewEvidence`.
+
+The command commits exactly:
+
+- `recipe`, a canonical `dataset-recipe` artifact; and
+- `result`, a canonical `construction-result` artifact containing candidates,
+  one decision per candidate, accepted records, and diagnostics.
+
+Both artifacts bind the exact selected source scope and construct-stage
+configuration. Before `HEAD` advances, the workspace reconstructs every
+declared upstream input and requires exact semantic equality with a fresh
+deterministic replay. A self-consistent but non-replayable result is rejected.
+Repeating construction with the same current state and options is a no-op.
+
+The recipe records `curation_policy` and `split_policy` as `deferred`.
+Construction does not curate, split, serialize, run whole-dataset validation,
+or seal its accepted records.
+
 ### `format`
 
 ```text
@@ -219,7 +324,7 @@ Built-in chat templates are `llama3`, `mistral`, `qwen`, `gemma`, and `phi`.
 `llama3` is the default. User-provided template files are not supported.
 
 The command commits `records` as JSONL and `records-meta` as JSON. These are
-current M1 projections. They are not recipe-driven dataset construction.
+current M1 projections. They do not consume `construct` outputs.
 
 Important: the current chat path says `Summarize the following.` but uses the
 unchanged chunk as the answer. It also pre-renders the exchange into `text`.
@@ -277,13 +382,13 @@ Current integrity boundary:
 - programmatic verification skips the manifest self-hash and accepts undeclared extra files; and
 - no detached digest or attestation closes the trust boundary.
 
-These limits belong to roadmap Step 16. Group 1 does not claim atomic sealing
-or closed-set verification.
+These limits belong to roadmap Step 16. Groups 1 and 2 do not claim atomic
+sealing or closed-set verification.
 
 ### `preview`
 
 ```text
-veriformis preview PATH [--rules NAME,NAME] [--custom REGEX]
+veriformis preview PATH [--rules NAME,NAME] [--custom REGEX] [--source-root ROOT]
 ```
 
 Preview parses one source, creates a source-scoped cleaning plan, replays that
@@ -314,19 +419,18 @@ Prints `0.1.0`.
 | --- | --- |
 | `0` | Command completed |
 | `1` | Validation failed, seal failed, or either command could not read valid required state |
-| `2` | Unsupported input, invalid option, or another typed error from parse, clean, chunk, format, or preview |
+| `2` | Unsupported input, invalid option, or another typed error from parse, clean, chunk, construct, format, preview, or workspace upgrade |
 
 Some serializer-template and bundle-writer failures still sit outside a fully
 typed application-service result. Steps 17 and 18 close that surface boundary.
 
 ## Planned CLI behavior
 
-Group 2 adds truthful objective and recipe-driven construction behind the
-existing pipeline foundation. Group 3 adds curation, split, exact validation,
-atomic seal, and independent verification operations. Group 4 introduces a
-typed pipeline service and makes the CLI a thin adapter. Later work adds YAML
-automation. Planned commands must not appear in current examples before their
-exit gates pass.
+Group 3 adds curation, split assignment, construction-aware formatting, exact
+whole-dataset validation, atomic seal, and independent verification operations.
+Group 4 introduces a typed pipeline service and makes the CLI a thin adapter.
+Later work adds YAML automation. Planned commands must not appear in current
+examples before their exit gates pass.
 
 See the [build roadmap](plans/2026-07-29-veriformis-roadmap.md), especially
 Steps 7 through 19.
@@ -335,6 +439,7 @@ Steps 7 through 19.
 
 - [Product contract](product-contract.md)
 - [Integrity Contract v1](contracts/integrity-v1.md)
+- [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [Development guide](development.md)

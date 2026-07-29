@@ -52,6 +52,7 @@ later-step defects.
 │   ├── ir/
 │   ├── rules/
 │   ├── chunkers/
+│   ├── construction/
 │   ├── serializers/
 │   ├── validate/
 │   ├── bundle/
@@ -77,6 +78,7 @@ The CLI is the current composition root. A surface-neutral `PipelineService` is 
 | End-to-end CLI path | `tests/test_cli.py` |
 | Product and parser contracts | `tests/contracts/` |
 | Group 1 integrity regressions | `tests/regressions/` |
+| Group 2 construction models, evidence, constructors, pipeline, and CLI | `tests/construction/` |
 | Pinned later-step defects | `tests/known_gaps/` |
 | Canonical IR | `tests/ir/` |
 | Text, Markdown, DOCX | `tests/parsers/` |
@@ -88,7 +90,7 @@ The CLI is the current composition root. A surface-neutral `PipelineService` is 
 
 Add a regression test before repairing an integrity defect. Keep multi-source
 fixtures because source scope and collision resistance are durable contracts.
-Group 1 defects must be ordinary passing tests. Later-step defects may remain
+Groups 1 and 2 defects must be ordinary passing tests. Later-step defects may remain
 strict expected failures until their owning group repairs them.
 
 ## Continuous integration
@@ -118,8 +120,9 @@ Parser spans refer to the canonical extracted stream. Tests must verify both the
 
 Visible image alt text, citations, and note references belong in that canonical
 projection. Body, footnote, and endnote blocks share one stream but must retain
-distinct evidence regions. IR-only metadata needs field-level evidence in
-Group 2 before `structured_field` construction.
+distinct evidence regions. Group 2 `IRFieldEvidence` binds IR-only scalar
+metadata to its exact source, artifact, RFC 6901 pointer, value digest,
+encoding, output digest, and construction context.
 
 Persist artifact JSON and construct durable identity and configuration-digest
 payloads with exact-string serialization so distinct Unicode normalization
@@ -136,12 +139,21 @@ Tests must cover atomic visibility, expected-revision conflicts, stale-stage
 invalidation, duplicate identity rejection, and digest verification. The
 transactional workspace does not imply that Step 16 atomic sealing is complete.
 
-Parse and clean artifacts must pass their cross-artifact semantic checks before
-`HEAD` promotion.
+Parse, clean, chunk, and construct artifacts must pass their cross-artifact
+semantic checks before `HEAD` promotion. Construction must reload its canonical
+recipe and result and match a fresh deterministic replay over the exact selected
+upstream inputs.
 
-### Separate construction from serialization
+### Keep construction separate from serialization
 
-The existing CLI format branches combine record construction and serialization. New work should follow the roadmap contract: a declared objective and evidence-bearing construction pass should create records, then a serializer should lower accepted records into a target schema.
+Group 2 construction creates evidence-bearing accepted `DatasetRecord` values.
+The legacy `format` branches still project chunks directly. Group 3 must make
+new serializers lower accepted records without inventing an objective, target,
+review state, curation result, or split assignment.
+
+The cleaned corpus remains intermediate unless a `full_text` recipe explicitly
+selects its retained sequences as targets. A constructor for any other
+objective must prove its semantic field relation through replayable evidence.
 
 ### Do not strengthen unsupported claims
 
@@ -171,6 +183,21 @@ literal payloads unchanged. Preview and application must use the same plan and
 replay path. Given the same locator, bytes, parser, rules, and configuration,
 raw preview, workspace preview, and clean must produce the same plan ID.
 
+## Adding a constructor
+
+A constructor must:
+
+1. implement one declared objective and exact field shape;
+2. dispatch through a versioned constructor ID;
+3. bind each field to source-text or strict-IR evidence;
+4. retain exact source, chunk, transform, recipe, objective, and pass lineage;
+5. emit deterministic diagnostics for ineligible inputs or omissions;
+6. remain pure, local, order-independent, and exactly replayable; and
+7. include positive, negative, multi-source, Unicode, malformed, and tamper tests.
+
+Do not treat `source-chunks-unavailable` as corpus-wide coverage accounting.
+Curation and coverage are Group 3 concerns.
+
 ## Adding a chunker or serializer
 
 Chunker tests should cover:
@@ -192,6 +219,7 @@ Use present tense only for merged, tested behavior. Label roadmap items as plann
 
 - [Product contract](product-contract.md)
 - [Integrity Contract v1](contracts/integrity-v1.md)
+- [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [CLI reference](cli.md)

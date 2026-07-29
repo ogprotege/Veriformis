@@ -24,9 +24,26 @@ from veriformis.chunkers.strategies import (
     chunk_sliding,
     chunk_structure,
 )
+from veriformis.construction import (
+    ConstructionInputs,
+    ConstructionPass,
+    DatasetRecipe,
+    IRArtifactInput,
+    SegmentationPolicy,
+    TrainingObjective,
+    construct_dataset,
+    construction_result_to_dict,
+    dataset_recipe_to_dict,
+)
+from veriformis.contracts import (
+    DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    V1_ROW_SCHEMA_KINDS,
+)
 from veriformis.errors import (
+    ConstructionError,
     InvalidSourceLocatorError,
     ParseError,
+    UnsupportedWorkspaceVersionError,
     VeriformisError,
 )
 from veriformis.diagnostics import (
@@ -76,7 +93,12 @@ from veriformis.serializers.chat import serialize_chat
 from veriformis.serializers.formats import serialize_completion, serialize_instruction
 from veriformis.sources import ParseResult, SourceRef
 from veriformis.validate.gates import RECORD_SCHEMAS, GateResult, run_gates
-from veriformis.workspace import SourceDescriptor, Workspace, WorkspaceRevision
+from veriformis.workspace import (
+    CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
+    SourceDescriptor,
+    Workspace,
+    WorkspaceRevision,
+)
 
 app = typer.Typer(help="Veriformis: local-first dataset compiler.")
 
@@ -490,6 +512,75 @@ def _load_chunks(workspace: Workspace, revision: WorkspaceRevision) -> list[Chun
     return chunks
 
 
+def _select_construction_sources(
+    revision: WorkspaceRevision,
+    selectors: list[str] | None,
+) -> tuple[str, ...]:
+    """Resolve optional source IDs or logical locators to one exact source set."""
+    if not selectors:
+        return tuple(sorted(revision.sources))
+    by_path = {
+        descriptor.logical_path: source_id
+        for source_id, descriptor in revision.sources.items()
+    }
+    selected: list[str] = []
+    for selector in selectors:
+        source_id = selector if selector in revision.sources else by_path.get(selector)
+        if source_id is None:
+            raise EvidenceError(f"unknown construction source: {selector!r}")
+        selected.append(source_id)
+    if len(selected) != len(set(selected)):
+        raise EvidenceError("construction source selection contains duplicates")
+    return tuple(sorted(selected))
+
+
+def _load_construction_inputs(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+    source_ids: tuple[str, ...],
+) -> ConstructionInputs:
+    """Load the exact verified upstream state consumed by construction."""
+    selected = set(source_ids)
+    all_sources = _load_sources(workspace, revision)
+    sources = tuple(all_sources[source_id] for source_id in source_ids)
+    chunks = tuple(
+        chunk
+        for chunk in _load_chunks(workspace, revision)
+        if chunk.source_id in selected
+    )
+    transforms = tuple(
+        record
+        for record in _load_transform_records(workspace, revision)
+        if record.source_id in selected
+    )
+    clean_state = revision.stages["clean"]
+    ir_artifacts: list[IRArtifactInput] = []
+    for source_id in source_ids:
+        artifact_id = clean_state.outputs[f"source/{source_id}/document"]
+        artifact = revision.artifacts[artifact_id]
+        ir_artifacts.append(
+            IRArtifactInput.create(
+                source_id=source_id,
+                artifact_id=artifact_id,
+                artifact_kind="cleaned-document-ir",
+                document_json=workspace.read_artifact(
+                    artifact_id,
+                    revision=revision,
+                ),
+                producer_id=artifact.producer_id,
+                producer_version=artifact.producer_version,
+                config_digest=artifact.config_digest,
+            )
+        )
+    return ConstructionInputs.create(
+        cleaning_config_digest=clean_state.config_digest,
+        sources=sources,
+        chunks=chunks,
+        transforms=transforms,
+        ir_artifacts=ir_artifacts,
+    )
+
+
 def _select_rules(rules: str, custom: str) -> tuple[list[Rule], dict[str, Any]]:
     return select_rules(rules, custom)
 
@@ -845,6 +936,153 @@ def chunk(
         _echo_error(exc)
     _echo_durability_warning(store)
     typer.echo(f"wrote {len(chunks)} chunk(s); revision {revision.revision_id}")
+
+
+@app.command(name="upgrade-workspace")
+def upgrade_workspace(workspace: Path) -> None:
+    """Atomically migrate a verified revision-v1 workspace to revision v2."""
+    try:
+        store = Workspace.open(workspace)
+        before = store.head()
+        revision = store.migrate_to_current(expected_revision_id=before.revision_id)
+    except (VeriformisError, OSError, UnicodeError, ValueError) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    if revision.revision_id == before.revision_id:
+        typer.echo(f"workspace already current at revision {revision.revision_id}")
+    else:
+        typer.echo(
+            f"migrated workspace revision schema {before.schema_version} to "
+            f"{revision.schema_version}; revision {revision.revision_id}"
+        )
+
+
+@app.command()
+def construct(
+    workspace: Path,
+    objective: str = typer.Option(..., "--objective"),
+    source: list[str] | None = typer.Option(
+        None,
+        "--source",
+        help="Repeat a source ID or logical path to select a subset.",
+    ),
+    target_row_schema: str | None = typer.Option(
+        None,
+        "--target-row-schema",
+    ),
+    split_ratio_ppm: int = typer.Option(500_000, "--split-ratio-ppm"),
+    require_review: bool = typer.Option(False, "--require-review"),
+) -> None:
+    """Construct evidence-bearing candidates and immutable accepted records."""
+    try:
+        if objective not in DETERMINISTIC_V1_OBJECTIVE_KINDS:
+            raise ConstructionError(
+                f"unsupported deterministic objective {objective!r}; "
+                f"expected one of {sorted(DETERMINISTIC_V1_OBJECTIVE_KINDS)!r}"
+            )
+        row_schema = target_row_schema or (
+            "text" if objective == "full_text" else "prompt_completion"
+        )
+        if row_schema not in V1_ROW_SCHEMA_KINDS:
+            raise ConstructionError(
+                f"unsupported target row schema {row_schema!r}; "
+                f"expected one of {sorted(V1_ROW_SCHEMA_KINDS)!r}"
+            )
+        if objective == "full_text" and row_schema != "text":
+            raise ConstructionError(
+                "full_text recipes require the product 'text' row schema"
+            )
+        if objective != "full_text" and row_schema == "text":
+            raise ConstructionError(
+                f"objective {objective!r} requires a supervised row schema"
+            )
+        if not 1 <= split_ratio_ppm <= 999_999:
+            raise ConstructionError(
+                "split ratio must be from 1 to 999999 ppm"
+            )
+
+        store = Workspace.open(workspace)
+        current = store.head()
+        if "construct" not in current.stages:
+            raise UnsupportedWorkspaceVersionError(
+                "construct requires workspace revision schema 2; run "
+                "`veriformis upgrade-workspace WORKSPACE` first"
+            )
+        source_ids = _select_construction_sources(current, source)
+        inputs = _load_construction_inputs(store, current, source_ids)
+        objective_value = TrainingObjective.create(objective)
+        parameters = (
+            {"split_ratio_ppm": split_ratio_ppm}
+            if objective == "continuation"
+            else None
+        )
+        construction_pass = ConstructionPass.create(
+            sequence=1,
+            objective_kind=objective,
+            parameters=parameters,
+        )
+        chunk_config = current.stages["chunk"].config
+        try:
+            recipe = DatasetRecipe.create(
+                objective=objective_value,
+                source_ids=source_ids,
+                cleaning_config_digest=current.stages["clean"].config_digest,
+                segmentation=SegmentationPolicy(
+                    schema_version="veriformis.segmentation-policy/v1",
+                    strategy=chunk_config["strategy"],
+                    size=chunk_config["size"],
+                    overlap=chunk_config["overlap"],
+                ),
+                passes=(construction_pass,),
+                target_row_schema=row_schema,
+                review_policy="required" if require_review else "none",
+            )
+        except (TypeError, ValueError) as exc:
+            raise ConstructionError(f"invalid dataset recipe: {exc}") from exc
+        result = construct_dataset(recipe, inputs)
+        config = {
+            "schema_version": CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
+            "recipe_id": recipe.recipe_id,
+            "selected_source_ids": list(source_ids),
+        }
+        with store.begin(
+            "construct",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            recipe_artifact = transaction.put_artifact(
+                lossless_json_bytes(dataset_recipe_to_dict(recipe)),
+                kind="dataset-recipe",
+                media_type="application/json",
+                source_ids=source_ids,
+                producer_id="veriformis.construction.recipe",
+                producer_version="1",
+                config=config,
+            )
+            result_artifact = transaction.put_artifact(
+                lossless_json_bytes(construction_result_to_dict(result)),
+                kind="construction-result",
+                media_type="application/json",
+                source_ids=source_ids,
+                producer_id="veriformis.construction.result",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={
+                    "recipe": recipe_artifact,
+                    "result": result_artifact,
+                },
+                config=config,
+            )
+    except (VeriformisError, OSError, UnicodeError, ValueError, TypeError) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    typer.echo(
+        f"constructed {len(result.candidates)} candidate(s), "
+        f"{len(result.records)} accepted record(s), and "
+        f"{len(result.diagnostics)} diagnostic(s); revision "
+        f"{revision.revision_id}"
+    )
 
 
 @app.command(name="format")

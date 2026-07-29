@@ -4,7 +4,7 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Group 1 integrity foundation, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 and 2, version `0.1.0`
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -26,11 +26,16 @@ heterogeneous raw sources
   -> atomic, provenance-sealed training datasets
 ```
 
-A cleaned corpus is an internal compiler state. It may also be the finished dataset when a recipe selects full-sequence text as the training objective. It is not the limit of the product, and it is not an unfinished handoff for another product to curate.
+A cleaned corpus is an internal compiler state. When a recipe selects
+`full_text`, cleaned text supplies the exact target content for constructed
+records. Those records become a finished dataset only after the declared
+curation, split, formatting, validation, and sealing lifecycle. Clean state is
+not a handoff for another product because Veriformis owns that downstream work.
 
 This document establishes the product-level scope. Roadmap Step 1 translated it
 into [Integrity Contract v1](contracts/integrity-v1.md), public contract
-constants, and executable acceptance fixtures.
+constants, and executable acceptance fixtures. Steps 7 through 10 are governed
+by [Dataset Construction Contract v1](contracts/dataset-construction-v1.md).
 
 ## Ownership boundary
 
@@ -40,18 +45,26 @@ Aptus begins with a finished Veriformis dataset contract. Aptus owns training pl
 
 ## Current and planned capability
 
-The implemented M1 core supports a deterministic stage pipeline for Markdown, DOCX, plain text, and code. It provides cleaning, chunking, completion, instruction, and rendered-chat serialization, validation gates, a bundle writer, and a stage-command CLI. This is a working alpha foundation. It does not yet implement the complete product contract described here.
+The implemented M1 core supports a deterministic stage pipeline for Markdown,
+DOCX, plain text, and code. Group 1 adds transactional workspace revisions,
+source-scoped identity, explicit parser-loss diagnostics, strict versioned
+intermediate schemas, immutable chunk evidence, and replayable cleaning plans.
 
-Group 1 adds transactional workspace revisions, source-scoped identity,
-explicit parser-loss diagnostics, strict versioned intermediate schemas,
-immutable chunk evidence, and replayable cleaning plans. Its implemented
-identity primitives cover current sources, artifacts, transforms, chunks,
-and revisions. Candidate, record, and split identities remain future
-consumers of that substrate. Later roadmap groups add recipe-driven dataset
-construction, evidence-bearing record states, curation, authoritative
-splitting, Aptus-native structured records, exact-snapshot sealing, broader
-inputs, integrations, the Mac workbench, and release controls. Documentation
-must label each later capability as planned until its exit gate passes.
+Group 2 adds versioned training objectives and recipes, ordered deterministic
+construction passes, source-text and strict-IR field evidence, append-only
+candidates, explicit decisions, optional review evidence, immutable accepted
+records, and deterministic construction diagnostics. It implements five
+objectives: full text, continuation, section reconstruction, before-and-after
+transformation, and structured fields. A construct commit stores canonical
+recipe and result artifacts and replays their meaning against the declared
+source, clean, chunk, transform, and IR inputs before `HEAD` advances.
+
+This remains a working alpha, not the complete product contract. Group 3 must
+add curation, authoritative splitting, construction-aware serialization,
+product rows, exact-snapshot validation, atomic sealing, and independent
+verification. Later groups add the stable service surface, broader inputs,
+integrations, the Mac workbench, and release controls. Documentation must label
+each later capability as planned until its exit gate passes.
 
 ## End-to-end compiler contract
 
@@ -70,7 +83,7 @@ must label each later capability as planned until its exit gate passes.
 
 A versioned `TrainingObjective` states what the model should learn. A versioned `DatasetRecipe` binds that objective to source selection, cleaning and segmentation policy, ordered constructors, curation rules, balancing and split policy, target schema, required gates, and any human-review requirement.
 
-A deterministic `ConstructionPass` emits an append-only `CandidateRecord` with its proposed payload and field-level source evidence. Curation and recipe-defined validation gates either reject or promote that candidate. Promotion creates an immutable `DatasetRecord`. Veriformis binds the authoritative split assignment before formatting and derives the emitted row and manifest entry from the accepted record. Rejected and quarantined candidates remain auditable.
+A deterministic `ConstructionPass` emits an append-only `CandidateRecord` with its proposed payload and field-level source evidence. In Group 2, construction-integrity checks and any required review create an explicit `PromotionDecision`. Promotion creates an immutable `DatasetRecord`. Group 3 adds curation and authoritative split assignment before formatting and derives emitted rows and manifest entries from accepted records. Rejected and pending-review candidates remain auditable.
 
 Human review is a recipe or project policy, not a universal prerequisite. A deterministic recipe with no review gate may seal when all declared gates pass. A recipe that requires approval must refuse promotion or seal until approval evidence exists.
 
@@ -97,7 +110,7 @@ The product may describe this as faithful, source-grounded, loss-accounted, or p
 
 ## Deterministic v1 boundary
 
-The v1 dataset pipeline makes no LLM calls and performs no remote model generation. Deterministic builders may create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field datasets when the recipe states a truthful task and every constructed field has evidence. Group 2 must add field-level evidence for IR-only metadata before implementing the structured-field objective.
+The v1 dataset pipeline makes no LLM calls and performs no remote model generation. The implemented deterministic builders create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field candidates when the recipe states a truthful task and every constructed field has evidence. Structured-field construction binds each selected strict-IR scalar to its immutable artifact, RFC 6901 pointer, exact value digest, encoding, output digest, and construction context.
 
 The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same curation, promotion, split, formatting, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 
@@ -128,6 +141,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 
 - [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 - [Integrity Contract v1](./contracts/integrity-v1.md)
+- [Dataset Construction Contract v1](./contracts/dataset-construction-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

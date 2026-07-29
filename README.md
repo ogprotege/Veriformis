@@ -2,15 +2,22 @@
 
 Veriformis is being built as a local-first compiler that takes heterogeneous raw source material through faithful recovery, cleaning, dataset construction, curation, splitting, validation, and sealing. Its endpoint is a finished, auditable training dataset, not merely cleaned text.
 
-> **Development alpha:** Version `0.1.0` implements the M1 core, the Group 1 integrity foundation, and the stage-command CLI. It is useful for development and evaluation, but it is not yet a release-ready dataset workbench. Read the [current implementation status](docs/current-status.md) before using its output for training.
+> **Development alpha:** Version `0.1.0` implements the M1 core and roadmap Groups 1 and 2. It now constructs evidence-bearing dataset records, but it does not yet curate, split, serialize, validate, or seal those records as one finished dataset. Read the [current implementation status](docs/current-status.md) before using any output for training.
 
 ## What works today
 
-The implemented workflow is:
+The implemented paths are:
 
 ```text
-parse -> clean -> chunk -> format -> validate -> seal
+raw files -> parse -> clean -> chunk -> construct
+                                  \
+                                   -> format -> validate -> seal
+                                      (legacy M1 projection path)
 ```
+
+`construct` is the Group 2 dataset-construction stage. The older `format`,
+`validate`, and `seal` path still projects chunks directly. Group 3 will make
+those serializers consume accepted construction records.
 
 Version `0.1.0` provides:
 
@@ -22,6 +29,11 @@ Version `0.1.0` provides:
 - deterministic cleaning through replayable, source-scoped plans shared by preview and application;
 - paragraph, fixed, sliding, sentence, and structure-aware chunking;
 - reconstructible source evidence for every emitted chunk;
+- five versioned deterministic training objectives: `full_text`, `continuation`, `section_reconstruction`, `before_after_transformation`, and `structured_field`;
+- strict dataset recipes, ordered construction passes, field-level text or IR evidence, candidate decisions, optional review evidence, and immutable accepted records;
+- exact source selection by source ID or logical path;
+- canonical `dataset-recipe` and `construction-result` artifacts whose semantics are replayed before `HEAD` advances;
+- workspace layout schema 1 with revision schema 2 and an explicit revision-v1 upgrade command;
 - completion, instruction, and rendered-chat record serializers;
 - schema, encoding, and chunk-provenance gates; and
 - a bundle directory containing `dataset.jsonl` and `manifest.json`.
@@ -56,9 +68,29 @@ The last command should print:
 0.1.0
 ```
 
-## Current completion quickstart
+## Dataset-construction quickstart
 
-The completion format is the clearest currently exercised path. Start with a text, Markdown, or DOCX file such as `notes.txt`:
+Start with a text, Markdown, or DOCX file such as `notes.txt`:
+
+```bash
+uv run veriformis parse notes.txt -o workspace
+uv run veriformis clean workspace
+uv run veriformis chunk workspace --strategy paragraph
+uv run veriformis construct workspace --objective full_text
+```
+
+This commits a versioned recipe and construction result. `full_text` explicitly
+selects cleaned text as the target. For every other objective, the cleaned
+corpus remains an intermediate state from which Veriformis constructs semantic
+context and target fields.
+
+Use repeatable `--source SOURCE_ID_OR_LOGICAL_PATH` options to construct from an
+exact subset. Omit them to select every current source. See the [CLI
+reference](docs/cli.md) for all objective and review options.
+
+## Legacy M1 bundle quickstart
+
+The current bundle path remains separate from Group 2 construction:
 
 ```bash
 uv run veriformis parse notes.txt -o workspace
@@ -77,7 +109,8 @@ notes.vfbundle/
 └── manifest.json
 ```
 
-Inspect both files before using the dataset.
+Inspect both files before using the dataset. They contain the legacy M1 chunk
+projection, not the accepted records from `construct`.
 
 The workspace itself is revisioned and content-addressed. `HEAD` selects one
 immutable revision, and that revision maps logical stage-output keys to objects
@@ -95,8 +128,9 @@ digests drive reproducible semantic output.
 
 Version `0.1.0` has several high-impact limitations:
 
-- The current `format` stage projects chunks directly into rows. It does not yet execute a declared dataset recipe or construction pass.
+- The `construct` stage produces accepted `DatasetRecord` values, but `format` still projects chunks directly and does not consume them.
 - Curation, quality policy, authoritative train and evaluation splits, and coverage accounting remain planned.
+- A recipe declares a target row schema, but Group 2 does not emit those product rows or any train and evaluation files.
 - `seal` trusts persisted validation flags instead of rerunning gates against the exact candidate bundle.
 - Record serializers omit record-level provenance metadata.
 - Bundle verification checks declared payload hashes but skips the manifest self-hash and ignores undeclared files.
@@ -110,9 +144,9 @@ See [Current implementation status](docs/current-status.md) for the complete bou
 
 | Phase | Scope |
 | --- | --- |
-| Implemented M1 and Group 1 | Deterministic core, stage-command CLI, transactional workspaces, source-scoped identity, parser diagnostics, source evidence, and replayable cleaning plans |
-| Group 2 | Training objectives, dataset recipes, construction passes, candidate records, and deterministic constructors |
-| Groups 3 and 4 | Curation, splitting, structured records, exact validation and sealing, shared pipeline service, thin CLI, and M1.1 acceptance |
+| Implemented M1 and Groups 1–2 | Deterministic core, integrity foundation, versioned recipes, evidence-bearing lifecycle, and five truthful constructors |
+| Group 3 | Curation, splitting, construction-aware serialization, product rows, exact validation, atomic sealing, and verification |
+| Group 4 | Shared pipeline service, thin CLI, and M1.1 acceptance |
 | Later milestones | PDF, HTML, structured-data ingest, YAML pipelines, MCP, versioned Aptus integration, and a SwiftUI workbench |
 | Future opt-in work | Governed model-assisted construction behind a recorded `GeneratorPass` contract |
 | Public release | Supported-platform gates, artifact evidence, packaging, signing, notarization, migration checks, and release verification |
@@ -124,6 +158,7 @@ The complete sequence and exit gates are in the [authoritative build roadmap](do
 - [Documentation index](docs/README.md)
 - [Product contract](docs/product-contract.md)
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
+- [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
@@ -137,7 +172,7 @@ uv run ruff check src tests
 uv run pytest -q
 ```
 
-The current Group 1 implementation passes these checks. CI currently runs Ruff and pytest on Ubuntu with Python 3.12. Broader package, platform, type, coverage, and security gates remain future work.
+The current implementation is required to pass these checks. CI currently runs Ruff and pytest on Ubuntu with Python 3.12. Broader package, platform, type, coverage, and security gates remain future work.
 
 ## License
 
