@@ -5,6 +5,10 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
+**Last reviewed:** 2026-07-30 after Group 3 completion
+
+**Next review:** The first Group 4 service change
+
 The dependency architecture of Veriformis is organized as a strict,
 downward-pointing directed acyclic graph of roughly nine layers, running from
 a dependency-free foundation (`errors`, `contracts`) up through the canonical
@@ -253,7 +257,7 @@ cycle, and the superseded `validate` package — all three visible directly
 from the graph, which is itself evidence that the layering discipline is
 working.
 
-## Related docs
+## Related documentation
 
 - [Architecture overview](README.md)
 - [Layers](layers.md) — the layer stack this graph flattens into fan-in terms

@@ -4,6 +4,10 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
+**Last reviewed:** 2026-07-30 after Group 3 completion
+
+**Next review:** The first Group 4 service change
+
 Veriformis is organized as a strict, acyclically ordered stack of logical
 layers, above which sit two axial modules: `workspace.py`, the persistence and
 transaction kernel, and `cli.py`, the composition root. From the bottom up,
@@ -245,7 +249,7 @@ cross-layer concern. These are localized debts, however, sitting on top of —
 and made visible by — a dependency discipline that the rest of the system
 enforces without exception.
 
-## Related docs
+## Related documentation
 
 - [Architecture overview](README.md)
 - [Dependencies](dependencies.md) — fan-in figures, external containment, and

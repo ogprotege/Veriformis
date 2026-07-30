@@ -5,6 +5,12 @@ commands, the stage-gated transaction template every mutating command
 executes, the seal path that couples a workspace receipt to a published
 artifact, and the deliberately independent verification entry point.
 
+**Last reviewed:** 2026-07-30 after Group 3 completion
+
+**Next review:** The first Group 4 service change
+
+## The single executable surface
+
 The system deliberately exposes a single executable surface. The only
 installed entry point is the console script declared in the package metadata,
 which maps `veriformis` to `veriformis.cli:main` (`pyproject.toml:33-34`);
@@ -22,6 +28,8 @@ inter-stage artifact becomes visible in one atomic `HEAD` transition
 module guarantees that every state transition the system can perform passes
 through a single transactional discipline; the cost is that this module
 becomes the system's composition root and its thickest layer.
+
+## The command surface: thirteen commands, four roles
 
 The thirteen subcommands registered on the one `typer.Typer` application
 (`src/veriformis/cli.py:143`) fall into four functional roles rather than
@@ -57,6 +65,8 @@ flowchart TD
     ro --> verifier["bundle.verifier.verify_finished_bundle (verifier.py:945)"]
     ro --> plan["rules.cleaning plan and replay, no commit"]
 ```
+
+## The stage-gated transaction template
 
 Every mutating command executes the same stage-gated transactional template,
 which constitutes the system's real request-processing pipeline. The handler
@@ -105,6 +115,8 @@ while an exactly identical commit is detected as a no-op and returns the
 existing revision untouched (`src/veriformis/workspace.py:2196-2200,
 2237-2253`), giving stages idempotency beyond the CLI's own config-equality
 short-circuits.
+
+## The seal path
 
 The seal path is the most consequential call chain, because it couples a
 workspace-internal receipt to an externally visible artifact. The command
@@ -158,6 +170,8 @@ sequenceDiagram
     CLI-->>Op: bundle path, manifest SHA-256, trust grade
 ```
 
+## The independent verify path
+
 Against this workspace-centric flow, verify forms a second, deliberately
 independent entry point. The command never calls `Workspace.open`; it takes a
 sealed bundle directory, optionally pinned to an expected manifest digest, and
@@ -197,6 +211,8 @@ MCP, GUI" (`src/veriformis/errors.py:1`), which records an architectural
 anticipation of future frontends (**planned**, not implemented) that the
 current single-surface design does not yet realize.
 
+## Error funnel and exit semantics
+
 Error handling closes the boundary loop with a uniform funnel. Every stage
 raises typed errors rooted at `VeriformisError`, each carrying a stable
 machine-readable `code` (`src/veriformis/errors.py:6-140`), and each command
@@ -221,7 +237,7 @@ and removes its staging directory on any exception
 surface without ever leaving partial state behind — the property that makes
 the CLI's simple catch-and-report strategy sufficient.
 
-## Related docs
+## Related documentation
 
 - [Architecture overview](README.md)
 - [Layers](layers.md) — the modules each command drives

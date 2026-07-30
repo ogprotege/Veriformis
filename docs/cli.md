@@ -15,6 +15,10 @@ the workspace transaction layer, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior; planned work is marked as such.
 
+**Last reviewed:** 2026-07-30 after full verification against `src/veriformis/cli.py`
+
+**Next review:** The first Group 4 service change or any contract change
+
 ## Run the CLI
 
 From a development checkout:

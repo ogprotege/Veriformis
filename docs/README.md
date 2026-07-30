@@ -111,5 +111,8 @@ These documents remain intentionally deferred with their owning work:
 - stable Python API reference after `PipelineService` exists;
 - dual-objective M1.1 API and CLI acceptance procedure;
 - versioned Aptus bundle handoff and backend partition enforcement;
-- expanded input, security, release, and migration guidance; and
-- troubleshooting for the future supported release surface.
+- expanded input, security, release, and migration guidance;
+- troubleshooting for the future supported release surface;
+- architecture deep-dive `file:line` citations pin current source positions
+  and must be re-verified at the first Group 4 change; and
+- Mermaid diagrams are hand-reviewed but not machine-rendered in CI.

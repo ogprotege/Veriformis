@@ -225,7 +225,7 @@ code computes.
 | [Data flow](data-flow.md) | Shape evolution across the nine stages, the provenance backbone, egress separation, persistence, and defense in depth |
 | [Entry points](entry-points.md) | The single CLI surface, the stage-gated transaction template, the seal path, and the independent verifier |
 
-## Related docs
+## Related documentation
 
 - [Architecture hub](../architecture.md) — pipeline at a glance, workspace
   layout, stage graph, and bundle layout

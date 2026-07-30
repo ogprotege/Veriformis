@@ -3,6 +3,8 @@
 **Last reviewed:** 2026-07-30, with every command and claim below re-verified
 against the repository
 
+**Next review:** The first Group 4 service change or any contract change
+
 This guide covers the implemented Veriformis `0.1.0` project. The current CLI
 owns stage orchestration. `PipelineService`, thin CLI conversion, and M1.1
 dual-objective API and CLI acceptance remain planned Group 4 work.

@@ -5,6 +5,10 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
+**Last reviewed:** 2026-07-30 after Group 3 completion
+
+**Next review:** The first Group 4 service change
+
 The pipeline organizes its entire data lifecycle as a chain of immutable,
 content-addressed shapes whose identities are recomputed at every boundary.
 One identity substrate serves every stage: `derive_id` hashes a
@@ -217,7 +221,7 @@ re-walks the published tree. The cumulative effect is that consistency is an
 emergent property of re-derivation at six independent layers; any single
 compromised or buggy stage is caught by the next replay rather than trusted.
 
-## Related docs
+## Related documentation
 
 - [Architecture overview](README.md)
 - [Layers](layers.md) — the module boundaries these shapes cross
