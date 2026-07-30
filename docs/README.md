@@ -41,6 +41,13 @@ whichever comes first
 | [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered implementation sequence, groups, and exit gates | Authoritative implementation order |
 | [Contributing](../CONTRIBUTING.md) | Contribution standards and pull request checklist | Contribution policy |
 
+## Working inventory
+
+Use the root [Work in Progress](../WIP.md) file as the reviewed checklist of
+completed steps, remaining groups, immediate Group 4 work, and nonblocking
+follow-ups. It is a convenience tracker. It never overrides current status,
+the roadmap, or a versioned contract.
+
 ## Historical implementation records
 
 The dated design specification and completed M1 plan preserve product and

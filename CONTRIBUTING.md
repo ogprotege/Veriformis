@@ -7,7 +7,9 @@ Veriformis is an alpha dataset compiler with strict source-fidelity and integrit
 Before changing code, read:
 
 - [Product contract](docs/product-contract.md)
+- [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
+- [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
@@ -15,6 +17,9 @@ Before changing code, read:
 - [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
 
 The roadmap is ordered. Do not implement a later group while an earlier exit gate remains incomplete unless the roadmap is revised through review.
+
+After reading these authorities, consult [Work in progress](WIP.md) as the
+non-authoritative reviewed work queue.
 
 ## Set up
 
@@ -57,7 +62,8 @@ For integrity or provenance repairs:
 - Bind every constructed field to replayable source-text or strict-IR evidence.
 - Keep structured prompt and target boundaries when downstream masking depends on them.
 - Treat human review as a recipe or policy state, not a universal prerequisite for dataset construction.
-- Preserve `curation_policy` and `split_policy` as deferred until Group 3 implements them.
+- Keep curation and split policy explicit, versioned, deterministic, and bound
+  to the finished plan.
 - Keep `0.1.0` deterministic and offline unless an approved roadmap step changes that boundary.
 
 ### Safety and compatibility
@@ -102,11 +108,13 @@ For integrity or provenance repairs:
 
 ## Current project boundary
 
-Version `0.1.0` provides the core Python package and stage-command CLI,
-transactional workspace revision schema 2, and recipe-driven deterministic
-construction. It does not yet connect accepted records to curation, splits,
-product-row serialization, exact whole-dataset validation, or final sealing.
-Additional ingest formats, MCP, downstream handoff, and the SwiftUI application
-also remain planned.
+Version `0.1.0` provides the core Python package, the complete stage-command
+runtime through independent bundle verification, transactional workspace
+revision schema 3, deterministic construction, curation, leakage-safe splits,
+product rows, and exact 17-gate validation. Groups 1 through 3 are complete.
+Group 4 must add `PipelineService`, make the CLI a thin adapter, and prove
+dual-objective M1.1 API and CLI parity. Additional ingest formats, YAML, MCP,
+the versioned Aptus handoff, the SwiftUI application, and public release gates
+remain planned.
 
 Follow the numbered sequence and exit gates in the [build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md).

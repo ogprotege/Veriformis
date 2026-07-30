@@ -179,6 +179,7 @@ the versioned Aptus handoff, the SwiftUI workbench, and release controls.
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Current implementation status](docs/current-status.md)
+- [Work in progress and remaining tasks](WIP.md)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
 - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
