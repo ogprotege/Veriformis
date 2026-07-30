@@ -7,7 +7,7 @@ Group 3 merge
 
 **Product version:** `0.1.0` development alpha
 
-**Last reviewed:** 2026-07-29
+**Last reviewed:** 2026-07-30
 
 **Next review:** Any merged implementation group, contract or roadmap change,
 or listed-item status change
@@ -262,6 +262,38 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
   material. Closed-bundle verification remains workspace-independent, while
   full source replay remains available through workspace history.
 
+## Documentation revamp
+
+**Status:** In review as [PR #6](https://github.com/ogprotege/Veriformis/pull/6)
+on `docs/architecture-revamp`; not yet merged to `main`.
+
+What it is: a full documentation overhaul built on a citation-verified
+architecture analysis of the current source. It changes documentation only; it
+alters no numbered roadmap step, versioned contract, or exit gate.
+
+Done on the branch:
+
+- [x] Architecture deep-dive tree added under `docs/architecture/` (overview,
+  layers, dependencies, data flow, entry points) with verified `file:line`
+  citations and Mermaid diagrams.
+- [x] `docs/architecture.md` rewritten as the architecture hub routing into
+  the tree.
+- [x] Root `README` and documentation index elevated: pipeline diagram,
+  badges, audience reading paths, and a complete documentation map.
+- [x] CLI reference and development guide re-verified against source,
+  correcting the exit-status table, schema gating, seal failure typing, and
+  chunk option constraints.
+- [x] `current-status.md` re-verified against code and tests; no capability
+  drift. Contracts drift-checked against the implementation; no drift found.
+- [x] Review metadata (`Last reviewed` / `Next review`) aligned across the
+  reference docs.
+
+Remaining:
+
+- [ ] Review and merge PR #6.
+- [ ] Re-verify deep-dive `file:line` citations at the first Group 4 change.
+- [ ] Machine-render Mermaid diagrams in CI (currently hand-reviewed).
+
 ## Deferred documentation
 
 - [ ] Add the stable Python API reference after `PipelineService` exists.
@@ -299,6 +331,10 @@ A supported two-source raw-input demonstration reached a sealed bundle and
 `external_digest` verification. The independent review found no unresolved
 Critical, High, or Important defect.
 
+On 2026-07-30 the documentation branch re-ran `uv run pytest -q` (606 passed)
+plus link and diagram-fence checks across the revamped documentation; the
+pre-push hook repeated the suite green on both documentation commits.
+
 Rerun these checks before calling this snapshot current.
 
 ## Maintenance rules
@@ -322,5 +358,6 @@ Rerun these checks before calling this snapshot current.
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Architecture](docs/architecture.md)
+- [Architecture tree](docs/architecture/README.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
