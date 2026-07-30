@@ -1,10 +1,13 @@
 # Development Guide
 
-**Last reviewed:** 2026-07-29 after Group 3 completion
+**Last reviewed:** 2026-07-30, with every command and claim below re-verified
+against the repository
+
+**Next review:** The first Group 4 service change or any contract change
 
 This guide covers the implemented Veriformis `0.1.0` project. The current CLI
 owns stage orchestration. `PipelineService`, thin CLI conversion, and M1.1
-dual-objective API and CLI acceptance remain Group 4 work.
+dual-objective API and CLI acceptance remain planned Group 4 work.
 
 ## Requirements
 
@@ -13,7 +16,7 @@ dual-objective API and CLI acceptance remain Group 4 work.
 - Git
 
 The package uses a setuptools `src/` layout. Runtime dependencies are declared
-in `pyproject.toml` and locked in `uv.lock`.
+in `pyproject.toml` and locked in `uv.lock`, which is checked in.
 
 ## Set up the project
 
@@ -24,9 +27,10 @@ uv sync --extra test
 uv run veriformis --help
 ```
 
-The test extra installs pytest and the repository-pinned Ruff version.
+The `test` extra installs pytest and the repository-pinned Ruff version
+(`ruff==0.16.0`, enforced by `required-version` in `pyproject.toml`).
 
-## Required checks
+## Daily checks
 
 Run these checks before submitting a change:
 
@@ -37,8 +41,9 @@ uv run pytest -q
 git diff --check
 ```
 
-The Group 3 closeout completed with `606 passed`. Rerun the commands for
-current evidence because totals can grow.
+The suite last passed with `606 passed` on 2026-07-30. Rerun the commands for
+current evidence because totals can grow. Ruff lints only the `E4`, `E7`,
+`E9`, and `F` rule families; there is no configured formatter or type checker.
 
 Focused examples:
 
@@ -50,37 +55,32 @@ uv run pytest tests/regressions/test_workspace_v3_migration.py -q
 uv run pytest tests/test_cli.py -q
 ```
 
-## Repository layout
+## Where things live
 
-```text
-.
-├── src/veriformis/
-│   ├── parsers/
-│   ├── ir/
-│   ├── rules/
-│   ├── chunkers/
-│   ├── construction/
-│   ├── datasets/
-│   ├── serializers/
-│   ├── validate/
-│   ├── bundle/
-│   ├── contracts.py
-│   ├── diagnostics.py
-│   ├── evidence.py
-│   ├── identity.py
-│   ├── workspace.py
-│   └── cli.py
-├── tests/
-├── docs/
-├── pyproject.toml
-└── uv.lock
-```
+The active revision-v3 pipeline runs through `cli.py`, `workspace.py`, and the
+`parsers/`, `ir/`, `rules/`, `chunkers/`, `construction/`, `datasets/`, and
+`bundle/` packages. `serializers/` and `validate/` hold legacy M1 code that
+remains for historical compatibility but is not the active CLI path.
 
-`datasets/` owns Group 3 plan, curation, split, product-row, provenance,
-snapshot, and validation contracts. `bundle/finished.py` and
-`bundle/verifier.py` own the finished bundle. Legacy M1 serializers and bundle
-helpers remain available for historical compatibility but are not the active
-revision-v3 CLI path.
+| Path | Responsibility |
+| --- | --- |
+| `src/veriformis/cli.py` | Typer CLI; the current stage-orchestration surface (13 stage and utility commands) |
+| `src/veriformis/workspace.py` | Immutable transactional workspace revisions and content-addressed artifacts (layout schema 1, revision schema 3) |
+| `src/veriformis/identity.py` | Deterministic, domain-separated identities for persisted data |
+| `src/veriformis/sources.py` | Source registration; hash-pinned identity for every ingested file |
+| `src/veriformis/contracts.py` | Public versioned contract constants: objectives, gates, schema IDs, error codes |
+| `src/veriformis/diagnostics.py` | Versioned, deterministic parser diagnostics |
+| `src/veriformis/evidence.py` | Immutable source ranges and replayable text evidence (`SourceEvidence`) |
+| `src/veriformis/errors.py` | Typed errors shared by every surface |
+| `src/veriformis/parsers/` | Text, Markdown, and DOCX parsers plus deterministic suffix dispatch |
+| `src/veriformis/ir/` | Canonical document IR nodes and strict serialization |
+| `src/veriformis/rules/` | Deterministic cleaning-rule engine, rule library, and edit derivations |
+| `src/veriformis/chunkers/` | Five evidence-bearing chunk strategies and the chunk-stage projection |
+| `src/veriformis/construction/` | Group 2: objectives, recipes, passes, constructors, candidate lifecycle, exact replay |
+| `src/veriformis/datasets/` | Group 3: finished plan, curation, leakage-safe split, row serialization, 17-gate validation |
+| `src/veriformis/bundle/` | `finished.py` and `verifier.py` own the six-file finished bundle; `writer.py` and `manifest.py` are legacy M1 |
+| `src/veriformis/serializers/` | Legacy M1 serializers and chat templates |
+| `src/veriformis/validate/` | Legacy and shared gate helpers |
 
 ## Test map
 
@@ -99,6 +99,7 @@ revision-v3 CLI path.
 | Legacy projection and preview helpers | `tests/serializers/` |
 | Legacy and shared gate helpers | `tests/validate/` |
 | Finished seal, verifier, and tamper checks | `tests/bundle/` |
+| Checked-in fixtures, including the pinned acceptance corpus | `tests/fixtures/` (support, not a test package) |
 
 Add a regression test before repairing an integrity defect. Keep multi-source
 fixtures because source scope, leakage closure, collision resistance, and raw
@@ -107,8 +108,10 @@ tests, not expected failures.
 
 ## Continuous integration
 
-GitHub Actions runs on pushes and pull requests. The current job uses Ubuntu,
-Python 3.12, uv, Ruff, and pytest.
+GitHub Actions (`.github/workflows/ci.yml`) runs on pushes and pull requests.
+The single job uses Ubuntu, Python 3.12, uv, Ruff (`uv run ruff check src
+tests`), and pytest (`uv run pytest -q`). CI does not run `uv lock --check` or
+`git diff --check`; those remain local responsibilities.
 
 CI does not yet run:
 
@@ -279,12 +282,31 @@ Bundle changes require closed-set path tests, canonical bytes, exact record
 counts, tamper cases, independent verification, and explicit trust-grade
 behavior. Adding a file to `minimal-v1` is a contract change.
 
+## Contribution flow
+
+1. Read the contract documents and current status listed under
+   [Related documentation](#related-documentation) before changing governed
+   behavior. The roadmap is ordered; do not implement a later group while an
+   earlier exit gate is open.
+2. Keep each change focused on one behavior or one coherent roadmap step.
+3. For integrity or provenance repairs, write the failing regression test
+   first, then implement the smallest complete repair.
+4. Run the focused tests, then the full [daily checks](#daily-checks).
+5. Update the CLI reference, architecture, status, product boundary, and
+   tests in the same change when behavior moves.
+6. Follow the pull-request checklist in [Contributing](../CONTRIBUTING.md),
+   which also lists the minimum test evidence expected per change type.
+
 ## Documentation discipline
 
 Use present tense only for tested behavior. Label Group 4 and later work as
 planned. Update the CLI reference, architecture, status, product boundary, and
 tests in the same change. Preserve dated historical records and amend only
 their status notes when later implementation changes.
+
+Never describe a green build as release readiness. Aptus support is row-shape
+validation only. Do not claim external bundle trust without a retained
+manifest digest.
 
 ## Related documentation
 
@@ -293,7 +315,7 @@ their status notes when later implementation changes.
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Current implementation status](current-status.md)
-- [Architecture](architecture.md)
+- [Architecture](architecture.md) and the [architecture tree](architecture/README.md)
 - [CLI reference](cli.md)
 - [Build roadmap](plans/2026-07-29-veriformis-roadmap.md)
 - [Contributing](../CONTRIBUTING.md)
