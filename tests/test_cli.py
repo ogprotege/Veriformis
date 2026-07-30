@@ -205,24 +205,72 @@ def test_full_pipeline_on_text_file(tmp_path):
     assert chunks
     assert all(chunk.evidence is not None for chunk in chunks)
 
-    result = runner.invoke(app, ["format", str(ws), "--format", "completion"])
+    result = runner.invoke(
+        app,
+        ["construct", str(ws), "--objective", "full_text"],
+    )
+    _assert_command_succeeded(result)
+    constructed = workspace.head()
+    assert constructed.committed_stage == "construct"
+    assert set(constructed.stages["construct"].outputs) == {"recipe", "result"}
+
+    result = runner.invoke(app, ["curate", str(ws), "--allow-empty-evaluation"])
+    _assert_command_succeeded(result)
+    curated = workspace.head()
+    assert curated.committed_stage == "curate"
+    assert set(curated.stages["curate"].outputs) == {"plan", "result"}
+
+    result = runner.invoke(app, ["split", str(ws)])
+    _assert_command_succeeded(result)
+    split = workspace.head()
+    assert split.committed_stage == "split"
+    assert set(split.stages["split"].outputs) == {"result"}
+
+    result = runner.invoke(app, ["format", str(ws)])
     _assert_command_succeeded(result)
     formatted = workspace.head()
-    records = _jsonl_output(workspace, formatted, "format", "records")
+    assert formatted.committed_stage == "format"
+    assert set(formatted.stages["format"].outputs) == {
+        "row-set",
+        "train",
+        "evaluation",
+        "provenance",
+    }
+    records = _jsonl_output(workspace, formatted, "format", "train")
     assert records
-    assert _json_output(workspace, formatted, "format", "records-meta")["format"] == "completion"
+    assert all(set(record) == {"text"} for record in records)
+    row_set = _json_output(workspace, formatted, "format", "row-set")
+    assert row_set["row_schema"] == "text"
+    assert row_set["train_row_count"] == len(records)
+    assert row_set["evaluation_row_count"] == 0
 
-    result = runner.invoke(app, ["validate", str(ws), "--format", "completion"])
+    result = runner.invoke(app, ["validate", str(ws)])
     _assert_command_succeeded(result)
     validated = workspace.head()
-    validations = _json_output(workspace, validated, "validate", "validations")
-    assert validations
-    assert all(item["passed"] for item in validations)
+    assert validated.committed_stage == "validate"
+    assert set(validated.stages["validate"].outputs) == {"snapshot", "report"}
+    report = _json_output(workspace, validated, "validate", "report")
+    assert report["status"] == "passed"
+    assert report["gate_results"]
+    assert all(item["status"] == "passed" for item in report["gate_results"])
 
     bundle = tmp_path / "out.vfbundle"
     result = runner.invoke(app, ["seal", str(ws), "-o", str(bundle)])
     _assert_command_succeeded(result)
+    sealed = workspace.head()
+    assert sealed.committed_stage == "seal"
+    assert set(sealed.stages["seal"].outputs) == {"manifest", "attestation"}
     assert (bundle / "manifest.json").exists()
+    assert (bundle / "attestation.json").exists()
+    assert (bundle / "data" / "train.jsonl").exists()
+    assert (bundle / "data" / "evaluation.jsonl").exists()
+    assert (bundle / "metadata" / "row-provenance.jsonl").exists()
+    assert (bundle / "validation.json").exists()
+
+    result = runner.invoke(app, ["verify", str(bundle)])
+    _assert_command_succeeded(result)
+    assert "verification grade:" in result.output
+    assert "dataset rows:" in result.output
 
 
 def test_chunk_commit_rejects_self_consistent_but_false_source_evidence(tmp_path):
@@ -316,7 +364,7 @@ def test_downstream_chunk_loader_resolves_evidence_against_source(
 
     result = runner.invoke(
         app,
-        ["format", str(workspace.root), "--format", "completion"],
+        ["construct", str(workspace.root), "--objective", "full_text"],
     )
 
     assert result.exit_code == 2
@@ -733,10 +781,14 @@ def test_semantic_inline_content_survives_parse_clean_chunk(tmp_path):
     assert "[^n]" in body.text
 
 
-def test_validate_rejects_unknown_format(tmp_path):
-    result = runner.invoke(app, ["validate", str(tmp_path), "--format", "bogus"])
-    assert result.exit_code == 2
-    assert "unknown format" in result.output.lower()
+def test_format_and_validate_expose_no_row_format_override():
+    format_help = runner.invoke(app, ["format", "--help"])
+    validate_help = runner.invoke(app, ["validate", "--help"])
+
+    _assert_command_succeeded(format_help)
+    _assert_command_succeeded(validate_help)
+    assert "--format" not in format_help.output
+    assert "--format" not in validate_help.output
 
 
 def test_source_identity_is_independent_of_parse_batch(tmp_path):

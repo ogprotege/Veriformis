@@ -8,7 +8,12 @@ from veriformis.identity import (
 )
 from veriformis.sources import SourceRef
 from veriformis.validate.gates import (
-    gate_encoding, gate_provenance, gate_schema, run_gates,
+    gate_encoding,
+    gate_nonempty,
+    gate_provenance,
+    gate_record_binding,
+    gate_schema,
+    run_gates,
 )
 
 
@@ -82,8 +87,35 @@ def test_provenance_gate_exact_and_transformed():
 
 
 def test_run_gates_order():
-    results = run_gates([{"text": "a"}], "completion", [], {})
-    assert [r.gate for r in results] == ["schema", "encoding", "provenance"]
+    src = _source("a")
+    chunk = Chunk(
+        id="c1",
+        source_id=src.id,
+        block_index=0,
+        span=_span(0, 1),
+        heading_path=[],
+        text="a",
+        tokens_est=1,
+        transformed=False,
+        evidence=_evidence(src, 0, 1, "a"),
+    )
+    results = run_gates([{"text": "a"}], "completion", [chunk], {src.id: src})
+    assert [r.gate for r in results] == [
+        "schema",
+        "encoding",
+        "provenance",
+        "nonempty",
+        "record-binding",
+    ]
+    assert all(result.passed for result in results)
+
+
+def test_nonempty_and_record_binding_gates():
+    assert not gate_nonempty([]).passed
+    assert gate_nonempty([{"text": "alpha"}]).passed
+    assert not gate_record_binding(
+        [{"text": "fabricated"}], "completion", []
+    ).passed
 
 
 def _span(a, b):

@@ -4,17 +4,27 @@ The CLI remains the M1 orchestration surface. Every inter-stage artifact is
 content-addressed and every successful stage becomes visible through one
 atomic workspace ``HEAD`` transition.
 """
+
 from __future__ import annotations
 
 import json
+import os
 import re
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 import typer
 
 import veriformis
+from veriformis.bundle import (
+    BundleAttestation,
+    BundlePublicationReceipt,
+    FinishedBundleManifest,
+    build_finished_bundle,
+    verify_finished_bundle,
+    write_finished_bundle,
+)
+from veriformis.bundle.finished import FinishedBundleError
 from veriformis.chunkers.base import Chunk, chunk_from_dict, chunk_to_dict, flatten
 from veriformis.chunkers.pipeline import build_chunks
 from veriformis.chunkers.strategies import (
@@ -32,12 +42,43 @@ from veriformis.construction import (
     SegmentationPolicy,
     TrainingObjective,
     construct_dataset,
+    construction_result_from_json_bytes,
     construction_result_to_dict,
+    dataset_recipe_from_json_bytes,
     dataset_recipe_to_dict,
+    validate_construction_result,
 )
 from veriformis.contracts import (
+    CURATION_STAGE_SCHEMA_ID,
     DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    FORMAT_STAGE_SCHEMA_ID,
+    SEAL_STAGE_SCHEMA_ID,
+    SPLIT_STAGE_SCHEMA_ID,
+    VALIDATION_STAGE_SCHEMA_ID,
     V1_ROW_SCHEMA_KINDS,
+)
+from veriformis.datasets import (
+    CurationPolicy,
+    DatasetValidationReport,
+    FinishedDatasetPlan,
+    SerializationOutput,
+    SerializationPlan,
+    SplitPolicy,
+    curate_dataset,
+    curation_result_from_json_bytes,
+    curation_result_to_dict,
+    dataset_snapshot_json_bytes,
+    dataset_validation_report_from_json_bytes,
+    dataset_validation_report_json_bytes,
+    finished_dataset_plan_from_json_bytes,
+    finished_dataset_plan_to_dict,
+    row_set_from_json_bytes,
+    row_set_to_dict,
+    serialize_dataset,
+    split_dataset,
+    split_result_from_json_bytes,
+    split_result_to_dict,
+    validate_finished_dataset,
 )
 from veriformis.errors import (
     ConstructionError,
@@ -60,6 +101,7 @@ from veriformis.identity import (
     canonical_digest,
     lossless_json_bytes,
     normalize_logical_path,
+    sha256_digest,
 )
 from veriformis.ir import (
     document_from_dict,
@@ -89,12 +131,10 @@ from veriformis.rules.derivations import (
     load_exact_block_derivations,
 )
 from veriformis.rules.library import rules_from_clean_config, select_rules
-from veriformis.serializers.chat import serialize_chat
-from veriformis.serializers.formats import serialize_completion, serialize_instruction
 from veriformis.sources import ParseResult, SourceRef
-from veriformis.validate.gates import RECORD_SCHEMAS, GateResult, run_gates
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
+    WORKSPACE_REVISION_SCHEMA_VERSION,
     SourceDescriptor,
     Workspace,
     WorkspaceRevision,
@@ -168,6 +208,86 @@ def _echo_durability_warning(workspace: Workspace) -> None:
         typer.echo(f"warning[commit-durability]: {warning}", err=True)
 
 
+def _recover_exact_finished_bundle(
+    target: Path,
+    *,
+    files: dict[str, bytes],
+    manifest: FinishedBundleManifest,
+    attestation: BundleAttestation,
+    manifest_bytes: bytes,
+    attestation_bytes: bytes,
+    expected_report: DatasetValidationReport,
+) -> BundlePublicationReceipt:
+    """Adopt only an independently verified, byte-identical prior publication."""
+    expected_manifest_sha256 = sha256_digest(manifest_bytes)
+    verification = verify_finished_bundle(
+        target,
+        expected_manifest_sha256=expected_manifest_sha256,
+    )
+    if (
+        verification.bundle_id != manifest.bundle_id
+        or verification.dataset_snapshot_id != manifest.dataset_snapshot_id
+        or verification.validation_report_id != manifest.validation_report_id
+        or verification.content_root_sha256 != manifest.content_root_sha256
+        or verification.trust_grade != "external_digest"
+    ):
+        raise FinishedBundleError(
+            "existing finished bundle does not match the current dataset binding"
+        )
+
+    expected_files = {
+        "manifest.json": manifest_bytes,
+        "attestation.json": attestation_bytes,
+        **files,
+    }
+    try:
+        observed_files = {
+            relative_path: (target / relative_path).read_bytes()
+            for relative_path in expected_files
+        }
+    except OSError as exc:
+        raise FinishedBundleError(
+            f"existing finished bundle changed during recovery: {exc}"
+        ) from exc
+    mismatched = sorted(
+        path
+        for path, expected in expected_files.items()
+        if observed_files[path] != expected
+    )
+    if mismatched:
+        raise FinishedBundleError(
+            "existing finished bundle differs from the current exact payload: "
+            f"{mismatched}"
+        )
+    recovered_report = dataset_validation_report_from_json_bytes(
+        observed_files["validation.json"]
+    )
+    if recovered_report != expected_report:
+        raise FinishedBundleError(
+            "existing finished bundle report or snapshot differs from the current "
+            "validated dataset"
+        )
+
+    final_verification = verify_finished_bundle(
+        target,
+        expected_manifest_sha256=expected_manifest_sha256,
+    )
+    if final_verification != verification:
+        raise FinishedBundleError(
+            "existing finished bundle changed during exact recovery"
+        )
+    return BundlePublicationReceipt(
+        bundle_path=target,
+        manifest=manifest,
+        attestation=attestation,
+        manifest_bytes=manifest_bytes,
+        attestation_bytes=attestation_bytes,
+        manifest_sha256=expected_manifest_sha256,
+        verification=final_verification,
+        durability_warning=None,
+    )
+
+
 def _json_load(data: bytes) -> Any:
     def reject_constant(value: str) -> None:
         raise ValueError(f"non-finite JSON number is not allowed: {value}")
@@ -176,9 +296,7 @@ def _json_load(data: bytes) -> Any:
         value: dict[str, Any] = {}
         for key, item in pairs:
             if key in value:
-                raise EvidenceError(
-                    f"persisted JSON contains duplicate key {key!r}"
-                )
+                raise EvidenceError(f"persisted JSON contains duplicate key {key!r}")
             value[key] = item
         return value
 
@@ -191,7 +309,9 @@ def _json_load(data: bytes) -> Any:
     except EvidenceError:
         raise
     except (UnicodeError, ValueError, json.JSONDecodeError) as exc:
-        raise EvidenceError(f"persisted artifact is not valid UTF-8 JSON: {exc}") from exc
+        raise EvidenceError(
+            f"persisted artifact is not valid UTF-8 JSON: {exc}"
+        ) from exc
 
 
 def _output_bytes(
@@ -225,7 +345,9 @@ def _load_sources(
         artifact_id = descriptor.extracted_artifact_id
         if artifact_id is None:
             raise EvidenceError(f"source {source_id} has no canonical text artifact")
-        extracted = workspace.read_artifact(artifact_id, revision=revision).decode("utf-8")
+        extracted = workspace.read_artifact(artifact_id, revision=revision).decode(
+            "utf-8"
+        )
         report = parse_report_from_dict(
             _json_load(
                 _output_bytes(
@@ -319,9 +441,7 @@ def _cleaning_input_digest(source: SourceRef, document: Any) -> str:
         canonical_stream_sha256=source.stream_sha256,
         parser=source.parser,
         parser_version=source.parser_version,
-        canonical_stream_contract_version=(
-            source.canonical_stream_contract_version
-        ),
+        canonical_stream_contract_version=(source.canonical_stream_contract_version),
     )
 
 
@@ -341,11 +461,7 @@ def _load_documents(
         if stage == "clean"
         else None
     )
-    parsed_sources = (
-        _load_sources(workspace, revision)
-        if stage == "clean"
-        else None
-    )
+    parsed_sources = _load_sources(workspace, revision) if stage == "clean" else None
     documents = {}
     for source_id in sorted(revision.sources):
         value = _json_load(
@@ -395,8 +511,7 @@ def _load_documents(
                 parsed_documents[source_id],
                 configured_rules,
                 max_remove_frac=(
-                    revision.stages["clean"].config["max_remove_ppm"]
-                    / 1_000_000
+                    revision.stages["clean"].config["max_remove_ppm"] / 1_000_000
                 ),
                 base_input_sha256=expected_input,
             )
@@ -464,9 +579,7 @@ def _load_chunks(workspace: Workspace, revision: WorkspaceRevision) -> list[Chun
             )
     documents = _load_documents(workspace, revision, stage="clean")
     transforms = _load_transform_records(workspace, revision)
-    derivations_by_source: dict[
-        str, dict[int, tuple[DerivationStep, ...]]
-    ] = {}
+    derivations_by_source: dict[str, dict[int, tuple[DerivationStep, ...]]] = {}
     for source_id, document in sorted(documents.items()):
         plan = cleaning_plan_from_dict(
             _json_load(
@@ -581,6 +694,87 @@ def _load_construction_inputs(
     )
 
 
+def _require_group3_revision(revision: WorkspaceRevision) -> None:
+    if revision.schema_version != WORKSPACE_REVISION_SCHEMA_VERSION:
+        raise UnsupportedWorkspaceVersionError(
+            "finished-dataset stages require workspace revision schema 3; run "
+            "`veriformis upgrade-workspace WORKSPACE` first"
+        )
+
+
+def _finished_stage_config(schema_version: str, plan_id: str) -> dict[str, str]:
+    return {"schema_version": schema_version, "plan_id": plan_id}
+
+
+def _load_constructed_dataset(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+) -> tuple[DatasetRecipe, Any, ConstructionInputs]:
+    _require_group3_revision(revision)
+    recipe = dataset_recipe_from_json_bytes(
+        _output_bytes(workspace, revision, "construct", "recipe")
+    )
+    result = construction_result_from_json_bytes(
+        _output_bytes(workspace, revision, "construct", "result")
+    )
+    inputs = _load_construction_inputs(workspace, revision, recipe.source_ids)
+    validate_construction_result(recipe, inputs, result)
+    return recipe, result, inputs
+
+
+def _load_finished_plan(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+) -> FinishedDatasetPlan:
+    return finished_dataset_plan_from_json_bytes(
+        _output_bytes(workspace, revision, "curate", "plan")
+    )
+
+
+def _load_curation_result(workspace: Workspace, revision: WorkspaceRevision):
+    return curation_result_from_json_bytes(
+        _output_bytes(workspace, revision, "curate", "result")
+    )
+
+
+def _load_split_result(workspace: Workspace, revision: WorkspaceRevision):
+    return split_result_from_json_bytes(
+        _output_bytes(workspace, revision, "split", "result")
+    )
+
+
+def _load_serialization_output(
+    workspace: Workspace,
+    revision: WorkspaceRevision,
+) -> SerializationOutput:
+    row_set = row_set_from_json_bytes(
+        _output_bytes(workspace, revision, "format", "row-set")
+    )
+    output = SerializationOutput(
+        row_set=row_set,
+        train_jsonl=_output_bytes(workspace, revision, "format", "train"),
+        evaluation_jsonl=_output_bytes(
+            workspace,
+            revision,
+            "format",
+            "evaluation",
+        ),
+        provenance_jsonl=_output_bytes(
+            workspace,
+            revision,
+            "format",
+            "provenance",
+        ),
+    )
+    if (
+        row_set.train_jsonl_sha256 != sha256_digest(output.train_jsonl)
+        or row_set.evaluation_jsonl_sha256 != sha256_digest(output.evaluation_jsonl)
+        or row_set.provenance_jsonl_sha256 != sha256_digest(output.provenance_jsonl)
+    ):
+        raise EvidenceError("formatted bytes do not match their row-set digests")
+    return output
+
+
 def _select_rules(rules: str, custom: str) -> tuple[list[Rule], dict[str, Any]]:
     return select_rules(rules, custom)
 
@@ -681,7 +875,9 @@ def parse(
                     config=parser_config,
                 )
                 if canonical_artifact.id != source.artifact_id:
-                    raise EvidenceError("parser and workspace canonical artifact IDs differ")
+                    raise EvidenceError(
+                        "parser and workspace canonical artifact IDs differ"
+                    )
                 document_artifact = transaction.put_artifact(
                     lossless_json_bytes(document_to_dict(result.document)),
                     kind="document-ir",
@@ -768,8 +964,10 @@ def clean(
         selected, config = _select_rules(rules, custom)
         store = Workspace.open(workspace)
         current = store.head()
-        if current.stages["clean"].status == "complete" \
-                and current.stages["clean"].config == config:
+        if (
+            current.stages["clean"].status == "complete"
+            and current.stages["clean"].config == config
+        ):
             _load_documents(store, current, stage="clean")
             _load_transform_records(store, current)
             typer.echo(f"clean unchanged at revision {current.revision_id}")
@@ -844,7 +1042,14 @@ def clean(
             )
             outputs["transforms"] = transform_artifact
             revision = transaction.commit(outputs=outputs, config=config)
-    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError, re.error) as exc:
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        re.error,
+    ) as exc:
         _echo_error(exc)
     _echo_durability_warning(store)
     typer.echo(
@@ -862,10 +1067,15 @@ def chunk(
 ) -> None:
     """Chunk cleaned documents with exact reconstructible source evidence."""
     if strategy not in _STRATEGIES:
-        typer.echo(f"unknown strategy: {strategy} (have: {sorted(_STRATEGIES)})", err=True)
+        typer.echo(
+            f"unknown strategy: {strategy} (have: {sorted(_STRATEGIES)})", err=True
+        )
         raise typer.Exit(code=2)
     if size < 1 or overlap < 0 or overlap >= size:
-        typer.echo("size must be positive and overlap must satisfy 0 <= overlap < size", err=True)
+        typer.echo(
+            "size must be positive and overlap must satisfy 0 <= overlap < size",
+            err=True,
+        )
         raise typer.Exit(code=2)
     config = {"strategy": strategy, "size": size, "overlap": overlap}
     try:
@@ -875,9 +1085,7 @@ def chunk(
             documents = _load_documents(store, base, stage="clean")
             sources = _load_sources(store, base)
             raw_transforms = _load_transform_records(store, base)
-            derivations_by_source: dict[
-                str, dict[int, tuple[DerivationStep, ...]]
-            ] = {}
+            derivations_by_source: dict[str, dict[int, tuple[DerivationStep, ...]]] = {}
             for source_id, document in sorted(documents.items()):
                 plan = cleaning_plan_from_dict(
                     _json_load(
@@ -940,7 +1148,7 @@ def chunk(
 
 @app.command(name="upgrade-workspace")
 def upgrade_workspace(workspace: Path) -> None:
-    """Atomically migrate a verified revision-v1 workspace to revision v2."""
+    """Advance a verified workspace through every supported revision migration."""
     try:
         store = Workspace.open(workspace)
         before = store.head()
@@ -997,15 +1205,13 @@ def construct(
                 f"objective {objective!r} requires a supervised row schema"
             )
         if not 1 <= split_ratio_ppm <= 999_999:
-            raise ConstructionError(
-                "split ratio must be from 1 to 999999 ppm"
-            )
+            raise ConstructionError("split ratio must be from 1 to 999999 ppm")
 
         store = Workspace.open(workspace)
         current = store.head()
         if "construct" not in current.stages:
             raise UnsupportedWorkspaceVersionError(
-                "construct requires workspace revision schema 2; run "
+                "construct requires workspace revision schema 2 or later; run "
                 "`veriformis upgrade-workspace WORKSPACE` first"
             )
         source_ids = _select_construction_sources(current, source)
@@ -1085,182 +1291,520 @@ def construct(
     )
 
 
-@app.command(name="format")
-def format_cmd(
+@app.command()
+def curate(
     workspace: Path,
-    format: str = typer.Option(..., "--format"),
-    template: str = typer.Option("llama3", "--template"),
-    instruction: str = typer.Option("", "--instruction"),
-    with_heading_path: bool = typer.Option(False, "--with-heading-path"),
+    minimum_target_characters: int = typer.Option(
+        1,
+        "--minimum-target-characters",
+    ),
+    balance_mode: str = typer.Option("none", "--balance-mode"),
+    maximum_records_per_primary_source: int | None = typer.Option(
+        None,
+        "--maximum-records-per-primary-source",
+    ),
+    evaluation_ratio_ppm: int = typer.Option(500_000, "--evaluation-ratio-ppm"),
+    evaluation_required: bool = typer.Option(
+        True,
+        "--require-evaluation/--allow-empty-evaluation",
+    ),
+    split_seed: str = typer.Option("veriformis-v1", "--split-seed"),
+    instruction: str | None = typer.Option(None, "--instruction"),
 ) -> None:
-    """Serialize current chunks into the selected M1 record projection."""
-    if format not in RECORD_SCHEMAS:
-        typer.echo(f"unknown format: {format} (have: {sorted(RECORD_SCHEMAS)})", err=True)
-        raise typer.Exit(code=2)
-    if format == "instruction" and not instruction:
-        typer.echo("--instruction is required for instruction format", err=True)
-        raise typer.Exit(code=2)
-    config = {
-        "format": format,
-        "template": template if format == "chat" else None,
-        "instruction": instruction if format == "instruction" else None,
-        "with_heading_path": with_heading_path,
-    }
+    """Fix the complete dataset plan, then curate constructed records."""
     try:
+        if balance_mode not in {"none", "primary-source-cap"}:
+            raise ValueError("balance mode must be 'none' or 'primary-source-cap'")
         store = Workspace.open(workspace)
-        with store.begin("format") as transaction:
-            base = transaction.base
-            chunks = _load_chunks(store, base)
-            if format == "completion":
-                records = serialize_completion(
-                    chunks,
-                    include_heading_path=with_heading_path,
+        current = store.head()
+        _require_group3_revision(current)
+        recipe, result, inputs = _load_constructed_dataset(store, current)
+        if recipe.target_row_schema == "instruction_output":
+            if instruction is None or not instruction:
+                raise ValueError(
+                    "--instruction is required for instruction_output rows"
                 )
-            elif format == "instruction":
-                records = serialize_instruction(chunks, instruction=instruction)
-            else:
-                records = serialize_chat(
-                    [
-                        {
-                            "user": "Summarize the following.",
-                            "assistant": item.text,
-                        }
-                        for item in chunks
-                    ],
-                    template=template,
-                )
-            record_bytes = "".join(
-                json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
-                for record in records
-            ).encode("utf-8")
-            source_ids = tuple(sorted({item.source_id for item in chunks}))
-            records_artifact = transaction.put_artifact(
-                record_bytes,
-                kind="formatted-records",
-                media_type="application/x-ndjson",
-                source_ids=source_ids,
-                producer_id=f"veriformis.serializer.{format}",
+        elif instruction is not None:
+            raise ValueError("--instruction is valid only for instruction_output rows")
+        curation_policy = CurationPolicy.create(
+            minimum_target_characters=minimum_target_characters,
+            balance_mode=balance_mode,
+            maximum_records_per_primary_source=(maximum_records_per_primary_source),
+        )
+        split_policy = SplitPolicy.create(
+            evaluation_ratio_ppm=evaluation_ratio_ppm,
+            evaluation_required=evaluation_required,
+            seed=split_seed,
+        )
+        serialization_plan = SerializationPlan.create(
+            row_schema=recipe.target_row_schema,
+            instruction_text=instruction,
+        )
+        plan = FinishedDatasetPlan.create(
+            recipe_id=recipe.recipe_id,
+            construction_result_id=result.result_id,
+            curation_policy=curation_policy,
+            split_policy=split_policy,
+            serialization_plan=serialization_plan,
+        )
+        curated = curate_dataset(plan, recipe, inputs, result)
+        config = _finished_stage_config(CURATION_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "curate",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            plan_artifact = transaction.put_artifact(
+                lossless_json_bytes(finished_dataset_plan_to_dict(plan)),
+                kind="finished-dataset-plan",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.curation.plan",
                 producer_version="1",
                 config=config,
             )
-            metadata_artifact = transaction.put_artifact(
-                lossless_json_bytes({"format": format, "template": config["template"]}),
-                kind="records-metadata",
+            result_artifact = transaction.put_artifact(
+                lossless_json_bytes(curation_result_to_dict(curated)),
+                kind="curation-result",
                 media_type="application/json",
-                source_ids=source_ids,
-                producer_id=f"veriformis.serializer.{format}",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.curation.result",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={"plan": plan_artifact, "result": result_artifact},
+                config=config,
+            )
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    excluded = sum(decision.status == "excluded" for decision in curated.decisions)
+    quarantined = sum(
+        decision.status == "quarantined" for decision in curated.decisions
+    )
+    blockers = sorted(
+        {
+            code
+            for entry in curated.coverage_ledger.entries
+            for code in entry.blocker_codes
+        }
+    )
+    typer.echo(
+        f"curated {len(curated.included_record_ids)} included, {excluded} excluded, "
+        f"and {quarantined} quarantined record(s); plan {plan.plan_id}; "
+        f"revision {revision.revision_id}"
+    )
+    if blockers:
+        typer.echo(f"coverage blockers: {', '.join(blockers)}", err=True)
+
+
+@app.command()
+def split(workspace: Path) -> None:
+    """Assign complete transitive leakage groups to fixed partitions."""
+    try:
+        store = Workspace.open(workspace)
+        current = store.head()
+        recipe, construction, _ = _load_constructed_dataset(store, current)
+        plan = _load_finished_plan(store, current)
+        curated = _load_curation_result(store, current)
+        raw_digests = {
+            source_id: current.sources[source_id].sha256
+            for source_id in recipe.source_ids
+        }
+        result = split_dataset(
+            plan,
+            construction,
+            curated,
+            raw_digests,
+        )
+        config = _finished_stage_config(SPLIT_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "split",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            artifact = transaction.put_artifact(
+                lossless_json_bytes(split_result_to_dict(result)),
+                kind="split-result",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.splitting.result",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(outputs={"result": artifact}, config=config)
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        _echo_error(exc)
+    _echo_durability_warning(store)
+    typer.echo(
+        f"split {result.realized_train_record_count} train and "
+        f"{result.realized_evaluation_record_count} evaluation record(s) across "
+        f"{len(result.groups)} leakage group(s); revision {revision.revision_id}"
+    )
+
+
+@app.command(name="format")
+def format_cmd(workspace: Path) -> None:
+    """Lower curated records into the row schema fixed by their dataset plan."""
+    try:
+        store = Workspace.open(workspace)
+        current = store.head()
+        recipe, construction, _ = _load_constructed_dataset(store, current)
+        plan = _load_finished_plan(store, current)
+        curated = _load_curation_result(store, current)
+        split_result = _load_split_result(store, current)
+        output = serialize_dataset(
+            plan,
+            recipe,
+            construction,
+            curated,
+            split_result,
+        )
+        config = _finished_stage_config(FORMAT_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "format",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            row_set_artifact = transaction.put_artifact(
+                lossless_json_bytes(row_set_to_dict(output.row_set)),
+                kind="formatted-row-set",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.row-set",
+                producer_version="1",
+                config=config,
+            )
+            train_artifact = transaction.put_artifact(
+                output.train_jsonl,
+                kind="training-partition",
+                media_type="application/jsonl",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.train",
+                producer_version="1",
+                config=config,
+            )
+            evaluation_artifact = transaction.put_artifact(
+                output.evaluation_jsonl,
+                kind="evaluation-partition",
+                media_type="application/jsonl",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.evaluation",
+                producer_version="1",
+                config=config,
+            )
+            provenance_artifact = transaction.put_artifact(
+                output.provenance_jsonl,
+                kind="row-provenance",
+                media_type="application/jsonl",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.provenance",
                 producer_version="1",
                 config=config,
             )
             revision = transaction.commit(
                 outputs={
-                    "records": records_artifact,
-                    "records-meta": metadata_artifact,
+                    "row-set": row_set_artifact,
+                    "train": train_artifact,
+                    "evaluation": evaluation_artifact,
+                    "provenance": provenance_artifact,
                 },
                 config=config,
             )
-    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
         _echo_error(exc)
     _echo_durability_warning(store)
-    typer.echo(f"wrote {len(records)} record(s); revision {revision.revision_id}")
+    typer.echo(
+        f"wrote {len(output.row_set.train_rows)} train and "
+        f"{len(output.row_set.evaluation_rows)} evaluation row(s) as "
+        f"{output.row_set.row_schema}; revision {revision.revision_id}"
+    )
 
 
 @app.command()
-def validate(workspace: Path, format: str = typer.Option(..., "--format")) -> None:
-    """Run M1 gates against one immutable workspace revision."""
-    if format not in RECORD_SCHEMAS:
-        typer.echo(f"unknown format: {format} (have: {sorted(RECORD_SCHEMAS)})", err=True)
-        raise typer.Exit(code=2)
-    config = {"format": format}
+def validate(workspace: Path) -> None:
+    """Replay and validate one exact finished-dataset byte snapshot."""
     try:
         store = Workspace.open(workspace)
-        with store.begin("validate") as transaction:
-            base = transaction.base
-            metadata = _json_load(
-                _output_bytes(store, base, "format", "records-meta")
-            )
-            if metadata.get("format") != format:
-                raise EvidenceError(
-                    f"requested format {format!r} does not match formatted records"
-                )
-            chunks = _load_chunks(store, base)
-            sources = _load_sources(store, base)
-            records = [
-                json.loads(line)
-                for line in _output_bytes(store, base, "format", "records")
-                .decode("utf-8")
-                .splitlines()
-                if line.strip()
-            ]
-            results = run_gates(records, format, chunks, sources)
-            artifact = transaction.put_artifact(
-                lossless_json_bytes([asdict(result) for result in results]),
-                kind="validation-report",
+        current = store.head()
+        recipe, construction, inputs = _load_constructed_dataset(store, current)
+        plan = _load_finished_plan(store, current)
+        curated = _load_curation_result(store, current)
+        split_result = _load_split_result(store, current)
+        output = _load_serialization_output(store, current)
+        report = validate_finished_dataset(
+            plan,
+            recipe,
+            inputs,
+            construction,
+            curated,
+            split_result,
+            output.row_set,
+            train_jsonl=output.train_jsonl,
+            evaluation_jsonl=output.evaluation_jsonl,
+            provenance_jsonl=output.provenance_jsonl,
+        )
+        config = _finished_stage_config(VALIDATION_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "validate",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            snapshot_artifact = transaction.put_artifact(
+                dataset_snapshot_json_bytes(report.snapshot),
+                kind="dataset-snapshot",
                 media_type="application/json",
-                source_ids=tuple(sorted(sources)),
-                producer_id="veriformis.validation",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-validation.snapshot",
+                producer_version="1",
+                config=config,
+            )
+            report_artifact = transaction.put_artifact(
+                dataset_validation_report_json_bytes(report),
+                kind="dataset-validation-report",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-validation.report",
                 producer_version="1",
                 config=config,
             )
             revision = transaction.commit(
-                outputs={"validations": artifact},
+                outputs={"snapshot": snapshot_artifact, "report": report_artifact},
                 config=config,
-                status="complete" if all(result.passed for result in results) else "failed",
+                status="complete" if report.status == "passed" else "failed",
             )
-    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
         _echo_error(exc, status=1)
     _echo_durability_warning(store)
-    for result in results:
-        typer.echo(f"{result.gate}: {'PASS' if result.passed else 'FAIL'}")
-        for message in result.messages:
-            typer.echo(f"  {message}")
-    if not all(result.passed for result in results):
-        raise typer.Exit(code=1)
+    for result in report.gate_results:
+        typer.echo(f"{result.gate_id}: {result.status.upper()}")
+        for finding in result.finding_codes:
+            typer.echo(f"  {finding}")
+    typer.echo(f"snapshot {report.snapshot_id}")
     typer.echo(f"validation revision {revision.revision_id}")
+    if report.status != "passed":
+        raise typer.Exit(code=1)
 
 
 @app.command()
 def seal(workspace: Path, out: Path = typer.Option(..., "-o")) -> None:
-    """Write the current validated snapshot using the M1 bundle format."""
-    from veriformis.bundle.writer import write_bundle
-
+    """Revalidate, atomically publish, and receipt one finished dataset."""
+    publication = None
     try:
         store = Workspace.open(workspace)
-        with store.begin("seal") as transaction:
-            revision = transaction.base
-            sources = _load_sources(store, revision)
-            _load_documents(store, revision, stage="clean")
-            chunks = _load_chunks(store, revision)
-            records = [
-                json.loads(line)
-                for line in _output_bytes(store, revision, "format", "records")
-                .decode("utf-8")
-                .splitlines()
-                if line.strip()
-            ]
-            transforms = _load_transform_records(store, revision)
-            validations = [
-                GateResult(**value)
-                for value in _json_load(
-                    _output_bytes(store, revision, "validate", "validations")
+        current = store.head()
+        expected_revision_id = current.revision_id
+        with store.begin(
+            "seal",
+            expected_revision_id=expected_revision_id,
+        ) as transaction:
+            base = transaction.base
+            recipe, construction, inputs = _load_constructed_dataset(store, base)
+            plan = _load_finished_plan(store, base)
+            curated = _load_curation_result(store, base)
+            split_result = _load_split_result(store, base)
+            output = _load_serialization_output(store, base)
+            expected_report = validate_finished_dataset(
+                plan,
+                recipe,
+                inputs,
+                construction,
+                curated,
+                split_result,
+                output.row_set,
+                train_jsonl=output.train_jsonl,
+                evaluation_jsonl=output.evaluation_jsonl,
+                provenance_jsonl=output.provenance_jsonl,
+            )
+            report_bytes = _output_bytes(store, base, "validate", "report")
+            saved_report = dataset_validation_report_from_json_bytes(report_bytes)
+            if saved_report != expected_report or saved_report.status != "passed":
+                raise ValueError(
+                    "seal requires the exact current passing validation report"
                 )
-            ]
-            metadata = _json_load(
-                _output_bytes(store, revision, "format", "records-meta")
+            files = {
+                "data/train.jsonl": output.train_jsonl,
+                "data/evaluation.jsonl": output.evaluation_jsonl,
+                "metadata/row-provenance.jsonl": output.provenance_jsonl,
+                "validation.json": report_bytes,
+            }
+            roles = {
+                "data/train.jsonl": "training-partition",
+                "data/evaluation.jsonl": "evaluation-partition",
+                "metadata/row-provenance.jsonl": "row-provenance",
+                "validation.json": "dataset-validation-report",
+            }
+            media_types = {
+                "data/train.jsonl": "application/jsonl",
+                "data/evaluation.jsonl": "application/jsonl",
+                "metadata/row-provenance.jsonl": "application/jsonl",
+                "validation.json": "application/json",
+            }
+            record_counts = {
+                "data/train.jsonl": output.row_set.train_row_count,
+                "data/evaluation.jsonl": output.row_set.evaluation_row_count,
+                "metadata/row-provenance.jsonl": output.row_set.total_row_count,
+            }
+            manifest, attestation = build_finished_bundle(
+                files,
+                roles=roles,
+                media_types=media_types,
+                record_counts=record_counts,
+                dataset_snapshot_id=saved_report.snapshot_id,
+                validation_report_id=saved_report.report_id,
             )
-            bundle = write_bundle(
-                out,
-                records=records,
-                chunks=chunks,
-                sources=list(sources.values()),
-                transforms=transforms,
-                validations=validations,
-                format=metadata["format"],
-                template=metadata.get("template"),
+            manifest_bytes = manifest.canonical_bytes()
+            attestation_bytes = attestation.canonical_bytes()
+            config = _finished_stage_config(SEAL_STAGE_SCHEMA_ID, plan.plan_id)
+            manifest_artifact = transaction.put_artifact(
+                manifest_bytes,
+                kind="finished-bundle-manifest",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.bundle.manifest",
+                producer_version="1",
+                config=config,
             )
-    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError) as exc:
+            attestation_artifact = transaction.put_artifact(
+                attestation_bytes,
+                kind="finished-bundle-attestation",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.bundle.attestation",
+                producer_version="1",
+                config=config,
+            )
+
+            def publish_or_recover() -> None:
+                nonlocal publication
+                target = Path(os.path.abspath(os.fspath(out)))
+                if os.path.lexists(target):
+                    publication = _recover_exact_finished_bundle(
+                        target,
+                        files=files,
+                        manifest=manifest,
+                        attestation=attestation,
+                        manifest_bytes=manifest_bytes,
+                        attestation_bytes=attestation_bytes,
+                        expected_report=saved_report,
+                    )
+                    return
+                try:
+                    publication = write_finished_bundle(
+                        target,
+                        files,
+                        roles=roles,
+                        media_types=media_types,
+                        record_counts=record_counts,
+                        dataset_snapshot_id=saved_report.snapshot_id,
+                        validation_report_id=saved_report.report_id,
+                    )
+                except FinishedBundleError:
+                    if not os.path.lexists(target):
+                        raise
+                    publication = _recover_exact_finished_bundle(
+                        target,
+                        files=files,
+                        manifest=manifest,
+                        attestation=attestation,
+                        manifest_bytes=manifest_bytes,
+                        attestation_bytes=attestation_bytes,
+                        expected_report=saved_report,
+                    )
+                    return
+                if (
+                    publication.manifest_bytes != manifest_bytes
+                    or publication.attestation_bytes != attestation_bytes
+                    or publication.manifest != manifest
+                    or publication.attestation != attestation
+                ):
+                    raise FinishedBundleError(
+                        "visible finished bundle receipt differs from the staged "
+                        "workspace receipt"
+                    )
+
+            transaction._set_seal_publication_action(publish_or_recover)
+            revision = transaction.commit(
+                outputs={
+                    "manifest": manifest_artifact,
+                    "attestation": attestation_artifact,
+                },
+                config=config,
+            )
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        if publication is not None:
+            typer.echo(
+                f"published bundle remains visible at {publication.bundle_path}; "
+                f"manifest SHA-256 {publication.manifest_sha256}; workspace receipt "
+                "did not commit",
+                err=True,
+            )
         _echo_error(exc, status=1)
-    typer.echo(f"sealed bundle: {bundle}")
+    _echo_durability_warning(store)
+    if publication.durability_warning is not None:
+        typer.echo(
+            f"warning[bundle-durability]: {publication.durability_warning}",
+            err=True,
+        )
+    typer.echo(f"sealed bundle: {publication.bundle_path}")
+    typer.echo(f"manifest SHA-256: {publication.manifest_sha256}")
+    typer.echo(f"verification grade: {publication.trust_grade}")
+    typer.echo(f"seal revision {revision.revision_id}")
+
+
+@app.command(name="verify")
+def verify_cmd(
+    bundle: Path,
+    manifest_sha256: str | None = typer.Option(None, "--manifest-sha256"),
+) -> None:
+    """Independently verify one closed finished-dataset bundle."""
+    from veriformis.bundle import verify_finished_bundle
+
+    try:
+        result = verify_finished_bundle(
+            bundle,
+            expected_manifest_sha256=manifest_sha256,
+        )
+    except (VeriformisError, OSError, UnicodeError, ValueError, TypeError) as exc:
+        _echo_error(exc, status=1)
+    typer.echo(f"verification grade: {result.trust_grade}")
+    typer.echo(f"bundle: {result.bundle_id}")
+    typer.echo(f"snapshot: {result.dataset_snapshot_id}")
+    typer.echo(f"validation report: {result.validation_report_id}")
+    typer.echo(f"manifest SHA-256: {result.manifest_sha256}")
+    typer.echo(f"dataset rows: {result.declared_record_count}")
 
 
 @app.command()
@@ -1291,9 +1835,7 @@ def preview(
             )
             persisted_records: list[TransformRecord] = []
             if reuse_persisted:
-                cleaned_documents = _load_documents(
-                    store, revision, stage="clean"
-                )
+                cleaned_documents = _load_documents(store, revision, stage="clean")
                 persisted_records = _load_transform_records(store, revision)
             for source_id, document in sorted(documents.items()):
                 if reuse_persisted:
@@ -1357,7 +1899,14 @@ def preview(
                     planned.records,
                 )
             )
-    except (VeriformisError, EvidenceError, OSError, UnicodeError, ValueError, re.error) as exc:
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        re.error,
+    ) as exc:
         _echo_error(exc)
     for logical_path, before, (plan, replayed), records in previews:
         if len(previews) > 1 or is_workspace:

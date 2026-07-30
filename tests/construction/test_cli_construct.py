@@ -157,7 +157,7 @@ def test_construct_cli_required_review_keeps_candidates_pending(tmp_path):
     assert {decision.status for decision in result.decisions} == {"pending_review"}
 
 
-def test_rerunning_chunk_invalidates_construct_but_not_legacy_format(tmp_path):
+def test_rerunning_chunk_invalidates_construct_and_all_finished_stages(tmp_path):
     root, workspace = _workspace_with_sources(
         tmp_path,
         [("source.txt", "One paragraph with enough source text for construction.")],
@@ -165,17 +165,22 @@ def test_rerunning_chunk_invalidates_construct_but_not_legacy_format(tmp_path):
     _succeeded(
         runner.invoke(
             app,
-            ["format", str(root), "--format", "completion"],
+            ["construct", str(root), "--objective", "full_text"],
         )
     )
     _succeeded(
         runner.invoke(
             app,
-            ["construct", str(root), "--objective", "full_text"],
+            ["curate", str(root), "--allow-empty-evaluation"],
         )
     )
+    _succeeded(runner.invoke(app, ["split", str(root)]))
+    _succeeded(runner.invoke(app, ["format", str(root)]))
     before = workspace.head()
-    legacy_format = before.stages["format"]
+    assert all(
+        before.stages[stage].status == "complete"
+        for stage in ("construct", "curate", "split", "format")
+    )
 
     _succeeded(
         runner.invoke(
@@ -194,10 +199,9 @@ def test_rerunning_chunk_invalidates_construct_but_not_legacy_format(tmp_path):
     )
     revision = workspace.head()
 
-    assert revision.stages["construct"].status == "stale"
-    assert revision.stages["construct"].invalidated_by == "chunk"
-    assert revision.stages["format"].status == "stale"
-    assert legacy_format.status == "complete"
+    for stage in ("construct", "curate", "split", "format"):
+        assert revision.stages[stage].status == "stale"
+        assert revision.stages[stage].invalidated_by == "chunk"
 
 
 def test_construct_cli_failure_leaves_head_unchanged(tmp_path):

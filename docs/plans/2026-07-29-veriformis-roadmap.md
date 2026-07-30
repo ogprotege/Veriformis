@@ -6,24 +6,24 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 and 2 at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 through 3 at version `0.1.0`
 
 ## Product objective
 
 Veriformis owns the complete transformation from heterogeneous raw sources to finished, training-ready datasets. It captures raw bytes, performs faithful canonical recovery, cleans and normalizes the recovered structure, constructs records, curates, balances, splits, formats, validates, and seals the result. Canonical IR and a cleaned corpus are integrity-preserving compiler states. A cleaned corpus can also be selected for a full-sequence training objective, but it is not the limit of the product.
 
 The documentation baseline has been reviewed and merged. Group 1 implemented
-Steps 1 through 6, and Group 2 implemented Steps 7 through 10. Group 3 is the
-next required execution group.
+Steps 1 through 6, Group 2 implemented Steps 7 through 10, and Group 3
+implemented Steps 11 through 16. Group 4 is the next required execution group.
 
 ## Implementation status
 
-- Steps 1 through 10 are implemented in Groups 1 and 2. Rerun the project checks for
-  current closeout evidence. Strict expected failures remain assigned to later
-  steps, and volatile test totals are intentionally omitted.
-- Steps 11 through 26 remain planned.
-- Later work must preserve the Groups 1 and 2 workspace, identity, diagnostics,
-  evidence, lifecycle, exact-source, and replay guarantees.
+- Steps 1 through 16 are implemented in Groups 1 through 3. Rerun the project
+  checks for current evidence. Volatile test totals are intentionally omitted.
+- Steps 17 through 26 remain planned. Group 4 owns Steps 17 through 19 next.
+- Later work must preserve the Groups 1 through 3 workspace, identity,
+  diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
+  validation, sealing, and verification guarantees.
 
 ## Version boundary
 
@@ -41,12 +41,12 @@ Steps 1 through 24 build and deliver the deterministic product. The dataset pipe
 8. **Construction passes and evidence.** Introduce ordered `ConstructionPass` operations and field-level `SourceEvidence` bindings, including IR-only metadata evidence before any `structured_field` constructor.
 9. **Record lifecycle.** Define `ConstructionPass -> CandidateRecord -> immutable DatasetRecord`, including rejection and optional review evidence.
 10. **Deterministic constructors.** Build truthful raw-source constructors for full-text, continuation, reconstruction, transformation, and structured-field objectives.
-11. **Curation and quality.** Add deduplication, filtering, contradiction checks, coverage accounting, balancing, and explicit rejection reasons.
+11. **Curation and quality.** Add deduplication, filtering, exact source-scoped conflicting-target quarantine, coverage accounting, balancing, and explicit rejection reasons.
 12. **Leakage-safe splitting.** Create authoritative deterministic train and evaluation assignments with leakage groups and an assignment digest.
 13. **Construction and serialization separation.** Make serializers lower accepted records without inventing the training objective.
-14. **Aptus-native output records.** Emit supported `text`, prompt-completion, instruction-output, and structured `messages` rows with provenance metadata.
+14. **Contract product rows.** Emit `text`, prompt-completion, instruction-output, and structured `messages` rows with aligned provenance metadata, while claiming only current Aptus row-shape compatibility.
 15. **Exact dataset validation.** Validate recipe semantics, evidence, records, curation results, split assignment, schema, encoding, and compatibility as one snapshot.
-16. **Atomic sealing and verification.** Seal a normalized closed file set atomically and provide independent bundle verification with an external digest or attestation.
+16. **Atomic sealing and verification.** Seal a normalized closed file set atomically, use the co-located attestation for internal self-consistency, and accept a separately retained manifest digest for external binding.
 17. **Pipeline service.** Move complete orchestration into a typed, surface-neutral `PipelineService`.
 18. **Thin CLI adapter.** Make the CLI translate arguments and results without owning pipeline state or policy.
 19. **Dual-objective M1.1 acceptance.** From one raw multi-source corpus, produce both a full-text dataset and a source-derived supervised dataset through API and CLI.
@@ -99,10 +99,14 @@ suite control the final closeout decision.
 
 **Steps 11 through 16**
 
+**Status:** Implemented. Finished Dataset Contract v1, the Group 3 test suite,
+and the independent architecture and security review control the completed
+boundary.
+
 11. Curation and quality
 12. Leakage-safe splitting
 13. Construction and serialization separation
-14. Aptus-native output records
+14. Contract product rows
 15. Exact dataset validation
 16. Atomic sealing and verification
 
@@ -111,6 +115,8 @@ suite control the final closeout decision.
 ### Group 4: M1.1 completion
 
 **Steps 17 through 19**
+
+**Status:** Next.
 
 17. Pipeline service
 18. Thin CLI adapter

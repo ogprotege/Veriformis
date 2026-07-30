@@ -23,8 +23,11 @@ def test_post_validation_record_mutation_refuses_seal(tmp_path):
         ],
         ["clean", str(workspace)],
         ["chunk", str(workspace), "--strategy", "paragraph"],
-        ["format", str(workspace), "--format", "completion"],
-        ["validate", str(workspace), "--format", "completion"],
+        ["construct", str(workspace), "--objective", "full_text"],
+        ["curate", str(workspace), "--allow-empty-evaluation"],
+        ["split", str(workspace)],
+        ["format", str(workspace)],
+        ["validate", str(workspace)],
     ]
     for command in commands:
         result = runner.invoke(app, command)
@@ -32,12 +35,18 @@ def test_post_validation_record_mutation_refuses_seal(tmp_path):
 
     store = Workspace.open(workspace)
     revision = store.head()
-    records_id = revision.stages["format"].outputs["records"]
-    records_ref = revision.artifacts[records_id]
-    records_path = store._object_path(records_ref.sha256)
-    records_path.chmod(0o600)
-    records_path.write_text(
-        json.dumps({"text": "fabricated after validation"}) + "\n",
+    train_id = revision.stages["format"].outputs["train"]
+    train_ref = revision.artifacts[train_id]
+    train_path = store._object_path(train_ref.sha256)
+    train_path.chmod(0o600)
+    train_path.write_text(
+        json.dumps(
+            {"text": "fabricated after validation"},
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+        + "\n",
         encoding="utf-8",
     )
     bundle = tmp_path / "stale.vfbundle"

@@ -163,6 +163,8 @@ def write_bundle(
         raise GateFailure(
             "bundle refused: failed gates: " + ", ".join(v.gate for v in failed)
         )
+    if not records:
+        raise GateFailure("bundle refused: required dataset is empty")
     _validate_integrity_inputs(sources, transforms, chunks)
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=False)
@@ -247,20 +249,52 @@ def write_bundle(
     manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
     manifest.files["manifest.json"] = _sha256(manifest_path)
     manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
+    attestation_path = out.with_name(out.name + ".sha256")
+    attestation_path.write_text(_sha256(manifest_path) + "\n", encoding="ascii")
     return out
 
 
 def verify_bundle(bundle_dir) -> bool:
     out = Path(bundle_dir)
-    manifest = Manifest.model_validate_json(
-        (out / "manifest.json").read_text(encoding="utf-8")
-    )
+    manifest_path = out / "manifest.json"
+    attestation_path = out.with_name(out.name + ".sha256")
+    try:
+        expected_manifest_digest = attestation_path.read_text(
+            encoding="ascii"
+        ).strip()
+        if expected_manifest_digest != _sha256(manifest_path):
+            return False
+        manifest = Manifest.model_validate_json(
+            manifest_path.read_text(encoding="utf-8")
+        )
+    except (OSError, UnicodeError, ValueError):
+        return False
+    declared = set(manifest.files)
+    if declared != {"dataset.jsonl", "manifest.json"}:
+        return False
+    try:
+        actual = {entry.name for entry in out.iterdir()}
+    except OSError:
+        return False
+    if actual != declared:
+        return False
     for rel, digest in manifest.files.items():
+        if (
+            not rel
+            or rel.startswith("/")
+            or "\\" in rel
+            or rel in {".", ".."}
+            or any(part in {"", ".", ".."} for part in rel.split("/"))
+        ):
+            return False
         path = out / rel
-        if not path.exists():
+        try:
+            if path.is_symlink() or not path.is_file():
+                return False
+        except OSError:
             return False
         if rel == "manifest.json":
-            continue  # self-hash is informational only
+            continue  # the adjacent attestation binds the exact manifest bytes
         if _sha256(path) != digest:
             return False
     return True

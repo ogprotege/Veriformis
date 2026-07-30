@@ -1,14 +1,9 @@
-import pytest
 from typer.testing import CliRunner
 
 from veriformis.cli import app
 from veriformis.workspace import Workspace
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="roadmap-step-10-and-13: objective construction precedes serialization",
-)
 def test_unchanged_chunk_cannot_claim_summary_objective(tmp_path):
     runner = CliRunner()
     source = tmp_path / "source.txt"
@@ -31,12 +26,19 @@ def test_unchanged_chunk_cannot_claim_summary_objective(tmp_path):
         assert prepared.exit_code == 0, prepared.output
 
     workspace = Workspace.open(workspace_path)
-    before_format = workspace.head_id
+    before_construct = workspace.head_id
     result = runner.invoke(
         app,
-        ["format", str(workspace_path), "--format", "chat", "--template", "llama3"],
+        [
+            "construct",
+            str(workspace_path),
+            "--objective",
+            "summary",
+            "--target-row-schema",
+            "messages",
+        ],
     )
 
     assert result.exit_code != 0
     assert "objective" in result.output.lower()
-    assert workspace.head_id == before_format
+    assert workspace.head_id == before_construct

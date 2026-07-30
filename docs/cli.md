@@ -1,7 +1,10 @@
 # CLI Reference
 
-This reference describes the implemented Veriformis `0.1.0` CLI after Group 2.
-Finished-dataset commands and behavior are listed separately.
+**Last reviewed:** 2026-07-29 after Group 3 completion
+
+This reference describes the implemented Veriformis `0.1.0` stage-command CLI.
+The Group 3 runtime is complete. `PipelineService` and thin CLI conversion
+remain Group 4 work.
 
 ## Run the CLI
 
@@ -19,45 +22,47 @@ The installed console command is `veriformis`.
 `parse` accepts explicit files with these extensions:
 
 - documents: `.txt`, `.md`, `.markdown`, `.docx`;
-- source code: `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh`.
+- source code: `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`,
+  `.rb`, `.sh`.
 
-Source code files are ingested as one code block. Directories, PDF, HTML, CSV,
-JSON, JSONL, and other extensions are not supported in `0.1.0`. Text inputs
-must be UTF-8.
+Source code enters as one language-tagged code block. Directories, PDF, HTML,
+CSV, JSON, JSONL, and other extensions are not supported in `0.1.0`. Text
+inputs must be UTF-8.
 
-## Dataset-construction example
+## Complete raw-source example
+
+The default split requires a non-empty evaluation partition, so use at least
+two independent source groups:
 
 ```bash
-uv run veriformis parse source.md -o build/workspace
+uv run veriformis parse source-a.md source-b.md -o build/workspace
 uv run veriformis clean build/workspace
 uv run veriformis chunk build/workspace --strategy paragraph
 uv run veriformis construct build/workspace --objective full_text
+uv run veriformis curate build/workspace
+uv run veriformis split build/workspace
+uv run veriformis format build/workspace
+uv run veriformis validate build/workspace
+uv run veriformis seal build/workspace -o build/example.vfbundle
+uv run veriformis verify build/example.vfbundle
 ```
 
-This commits evidence-bearing accepted records, not a sealed bundle. Cleaned
-text remains an intermediate state unless `full_text` explicitly selects it as
-the target.
-
-## Legacy M1 bundle example
-
-The current bundle path still projects chunks directly:
+The final command reports `self_consistent`. `seal` prints the manifest
+SHA-256. Retain it outside the bundle and supply it for external binding:
 
 ```bash
-uv run veriformis parse source.md -o build/workspace
-uv run veriformis clean build/workspace
-uv run veriformis chunk build/workspace --strategy paragraph
-uv run veriformis format build/workspace --format completion
-uv run veriformis validate build/workspace --format completion
-uv run veriformis seal build/workspace -o build/example.vfbundle
+uv run veriformis verify build/example.vfbundle \
+  --manifest-sha256 EXPECTED_MANIFEST_SHA256
 ```
 
-The seal destination must not already exist. This path does not consume the
-accepted records from `construct`.
+A matching expected digest produces `external_digest`.
+
+For one leakage group, use `curate --allow-empty-evaluation` only when an empty
+evaluation partition is intentional.
 
 ## Workspace and artifacts
 
-Commands no longer exchange mutable files such as `registry.json` or
-`chunks.json` at the workspace root. A workspace contains:
+Commands exchange immutable artifacts through this workspace layout:
 
 ```text
 WORKSPACE/
@@ -69,38 +74,29 @@ WORKSPACE/
 └── .txn/
 ```
 
-The physical workspace layout uses schema 1. Newly created and explicitly
-migrated workspaces use revision schema 2. Verified unmigrated v1 workspaces
-continue using revision schema 1 for legacy-stage commits until
-`upgrade-workspace` runs. `HEAD` names the current immutable revision. Its
-manifest maps logical output keys to content-addressed artifact IDs. The current
-keys are:
+The physical layout is schema 1. Active revisions use schema 3. `HEAD` names
+the current immutable revision and its logical output map.
 
 | Stage | Logical output keys |
 | --- | --- |
-| Parse | `registry`; `source/<source-id>/raw`; `source/<source-id>/canonical`; `source/<source-id>/document`; `source/<source-id>/diagnostics` |
-| Clean | `transforms`; `source/<source-id>/document`; `source/<source-id>/cleaning-plan`; `source/<source-id>/block-derivations` |
+| Parse | `registry`; per-source `raw`, `canonical`, `document`, `diagnostics` |
+| Clean | `transforms`; per-source `document`, `cleaning-plan`, `block-derivations` |
 | Chunk | `chunks` |
-| Construct | `recipe`; `result` |
-| Format | `records`; `records-meta` |
-| Validate | `validations` |
+| Construct | `recipe`, `result` |
+| Curate | `plan`, `result` |
+| Split | `result` |
+| Format | `row-set`, `train`, `evaluation`, `provenance` |
+| Validate | `snapshot`, `report` |
+| Seal | `manifest`, `attestation` |
 
-Each successful stage commits a new revision atomically. Rerunning an upstream
-stage invalidates dependent stage states and removes their active output keys.
-Older revisions remain available as immutable history. Workspace open verifies
-the complete parent chain and every referenced historical object. Use
-`upgrade-workspace` for a verified revision-schema-v1 workspace. Pre-revision
-flat workspaces remain unsupported.
+Every successful stage commits a revision atomically. Rerunning an upstream
+stage invalidates every descendant. Older revisions remain immutable history.
+Workspace open verifies the complete parent chain and all referenced object
+digests.
 
-If `HEAD` is committed but its final directory sync cannot be confirmed, the
-command succeeds with the visible revision and prints
-`warning[commit-durability]`. Treat that warning as a request to preserve the
-workspace and verify it again after storage is stable.
-
-Revision IDs are audit identities and bind parent history plus commit time.
-Equivalent runs can therefore have different revision IDs. Portable state
-digests and per-source parse-input digests bind reproducible semantic state and
-cleaning plans.
+If `HEAD` becomes visible but final directory sync cannot be confirmed, the
+command succeeds and prints `warning[commit-durability]`. Preserve the
+workspace and verify it after storage is stable.
 
 ## Commands
 
@@ -110,12 +106,14 @@ cleaning plans.
 veriformis upgrade-workspace WORKSPACE
 ```
 
-The command verifies the current history and atomically appends the supported
-revision-schema-v1 to revision-schema-v2 migration. It preserves every existing
-source, artifact, and legacy stage fact and adds `construct` with absent state.
-Running it on an already-current workspace is a no-op. A stale expected head or
-unsupported revision schema fails closed. The physical workspace layout remains
-schema 1.
+The command verifies the current history and applies every supported revision
+migration. It migrates v1 to v2 and then v2 to v3 when both are needed.
+
+The v2 to v3 migration preserves parse, clean, chunk, and construct facts. It
+adds curate and split as absent. It resets legacy format, validate, and seal
+state to absent because those artifacts do not satisfy the finished-dataset
+contract. Historical revisions and objects remain intact. Running the command
+on a current workspace is a no-op.
 
 ### `parse`
 
@@ -123,43 +121,24 @@ schema 1.
 veriformis parse PATHS... -o WORKSPACE [--source-root ROOT]
 ```
 
-The command captures every raw file before parsing and commits all selected
-sources together. Each source receives a deterministic ID bound to its logical
-path and raw SHA-256. Same-basename inputs remain distinct when their logical
-paths differ. Distinct logical source instances with identical bytes also
-remain distinct.
+The command captures raw bytes before parsing and commits all paths together.
+Each source ID binds its logical path and raw SHA-256. Same-basename inputs
+remain distinct when their logical paths differ. Distinct logical sources with
+identical bytes also remain distinct.
 
-`--source-root` defines the stable root used to derive every logical path. It
-defaults to the current directory. Every input must resolve beneath that root.
-An absolute input outside the default root fails closed and tells the caller to
-set `--source-root`. Adding another file to the parse batch never changes an
-existing source's logical path or identity.
+`--source-root` defines the stable root for logical paths. It defaults to the
+current directory. Every input must resolve beneath it. Adding another file to
+a parse batch does not change an existing source identity.
 
-The parse revision stores:
-
-- `registry` for source descriptors;
-- `source/<source-id>/raw` for exact captured bytes;
-- `source/<source-id>/canonical` for canonical extracted text;
-- `source/<source-id>/document` for canonical IR; and
-- `source/<source-id>/diagnostics` for the mandatory parse report.
-
-Document IR and parse reports use strict versioned schemas. The canonical
-visible-text projection retains image alt text, citations, and note references.
-Footnote and endnote bodies remain distinct logical regions within the shared
-canonical stream.
-
-Diagnostics use stable IDs and format-native locations. A report may be empty.
-Known Markdown HTML and Pandoc omissions, unknown Markdown tokens, text
-separator normalization, DOCX page limits, and unsupported or normalized
-DOCX body and note constructs are explicit. A parser refusal does not create
-or advance a workspace.
-
-Before `HEAD` advances, parse cross-validates the registry, canonical text,
-exact IR projection, source descriptors, and parse reports.
+The parse revision stores the source registry and each source's raw bytes,
+canonical extracted text, strict document IR, and mandatory parse report.
+Error diagnostics prevent commit. Before `HEAD` advances, the transaction
+cross-validates the registry, source descriptors, canonical text, IR
+projection, and diagnostics.
 
 The output directory may be new or an existing revision workspace. It may not
-be a non-empty unrelated directory. Replacing parse state invalidates every
-later stage.
+be a non-empty unrelated directory. Replacing parse state invalidates all later
+stages.
 
 ### `clean`
 
@@ -167,7 +146,7 @@ later stage.
 veriformis clean WORKSPACE [--rules NAME,NAME] [--custom REGEX]
 ```
 
-Built-in rules:
+Built-in rules are:
 
 - `page-numbers`
 - `headers-footers`
@@ -177,32 +156,20 @@ Built-in rules:
 - `special-chars`
 - `lowercase`
 
-With no `--rules` or `--custom`, cleaning uses `page-numbers` and
-`whitespace`. Supplying either option replaces that default selection.
-`--custom` adds one regular-expression removal rule. There is no
-replacement-text option in the CLI.
+With no option, clean uses `page-numbers` and `whitespace`. Supplying
+`--rules` or `--custom` replaces that default selection. `--custom` adds one
+regular-expression removal rule. There is no replacement-text option.
 
-For each source, the command creates and replays one source-scoped cleaning
-plan. The plan binds its rule configuration, ordered operations, allowed
-document paths, source locations, before and after digests, character counts,
-UTF-8 byte counts, warnings, and a portable per-source parse-input digest. The
-commit stores:
-
-- `transforms` for the combined compatibility transform log;
-- `source/<source-id>/document` for cleaned IR;
-- `source/<source-id>/cleaning-plan` for the exact replayable plan; and
-- `source/<source-id>/block-derivations` for later evidence reconstruction.
+For each source, clean creates and replays a source-scoped plan. The plan binds
+configuration, operations, allowed paths, locations, before and after digests,
+character and byte counts, warnings, and a portable parse-input digest. The
+revision stores cleaned IR, the exact plan, block derivations, and the combined
+transform log.
 
 A rule that would remove more than 30 percent of its target is skipped and
-reported. Safe text edits preserve rich wrappers. Structural block removal is
-limited to supported explicit operations. Invalid or tampered plans fail
-closed. Repeating clean with the same current configuration is a no-op and
-does not advance `HEAD`.
-
-Current prose rules do not edit inline code, code blocks, math, or other
-literal payloads. These are no-op regions until an explicitly typed literal
-rule exists. Before promotion, clean cross-validates strict cleaned IR,
-replayed plans, block derivations, and transform records.
+reported. Current prose rules do not edit inline code, code blocks, math, or
+other literal payloads. Repeating clean with unchanged current configuration
+is a no-op.
 
 ### `chunk`
 
@@ -214,25 +181,16 @@ veriformis chunk WORKSPACE \
 ```
 
 `paragraph` is the default. `size` and `overlap` are character counts.
-`overlap` affects `fixed` and `sliding`; the other strategies ignore it.
+`overlap` affects fixed and sliding strategies.
 
-Strategies:
+- `paragraph` groups blocks without exceeding `size` when possible.
+- `fixed` creates fixed character windows with optional overlap.
+- `sliding` uses overlapping windows.
+- `sentence` groups heuristic English sentence splits up to `size`.
+- `structure` starts sections at headings and applies paragraph grouping.
 
-- `paragraph`: groups blocks without exceeding `size` when possible;
-- `fixed`: creates fixed character windows with optional overlap;
-- `sliding`: uses the current overlapping window engine;
-- `sentence`: groups heuristic English sentence splits up to `size`;
-- `structure`: starts sections at headings, then applies paragraph grouping.
-
-The command commits `chunks`. Every chunk has a source-scoped identity and
-reconstructible `SourceEvidence`. Evidence binds canonical source ranges and
-any ordered cleaning, slicing, or joining derivations. The command rejects
-duplicate chunk IDs. Estimated tokens use `ceil(characters / 4)`, with a
-minimum of one.
-
-Chunks never cross `body`, `footnote:<id>`, or `endnote:<id>` boundaries. The
-region is part of both source evidence and chunk identity context. Chunk and
-evidence payloads use strict versioned schemas.
+Every chunk has a source-scoped identity and reconstructible
+`SourceEvidence`. Chunks never cross body, footnote, or endnote regions.
 
 ### `construct`
 
@@ -244,7 +202,7 @@ veriformis construct WORKSPACE --objective OBJECTIVE \
   [--require-review]
 ```
 
-Objectives and exact constructed fields:
+Objectives and exact fields are:
 
 | Objective | Fields |
 | --- | --- |
@@ -254,102 +212,140 @@ Objectives and exact constructed fields:
 | `before_after_transformation` | `before`, `after` |
 | `structured_field` | `input`, `fields` |
 
-The command makes no LLM call and has no `summary` objective. `full_text`
-retains complete chunk text. `continuation` divides each eligible chunk into
-ordered non-overlapping prompt and completion slices. Its split ratio is an
-integer in parts per million from 1 through 999999. The default is 500000.
-Section reconstruction requires actual heading and body structure. Run
-`chunk --strategy structure` before selecting `section_reconstruction`; another
-segmentation strategy cannot prove a complete section boundary.
-Before-and-after construction requires a replayable cleaning transform.
-Structured-field construction copies verified scalar metadata from strict
-cleaned IR.
+The command makes no LLM call and has no `summary` objective.
 
-Construction requires revision schema 2 plus complete, current parse, clean,
-and chunk stages. Run `upgrade-workspace` first when a verified workspace still
-uses revision schema 1.
-
-Without `--source`, construction selects every current source. Repeat
-`--source` to select an exact subset by source ID or logical path. The command
-sorts and binds that non-empty set. Unknown selectors and duplicate selections
-fail closed. A selected source with no constructible chunk emits the
-deterministic `source-chunks-unavailable` diagnostic for each pass while other
-selected sources continue. That diagnostic records a construction omission. It
-does not perform Group 3 coverage accounting.
+Without `--source`, construction selects every current source. Repeat the
+option to select an exact subset by source ID or logical path. Unknown or
+duplicate selections fail closed.
 
 `--target-row-schema` accepts `text`, `prompt_completion`,
 `instruction_output`, or `messages`. It defaults to `text` for `full_text` and
-`prompt_completion` otherwise. Full text requires `text`; every other objective
-requires a supervised row schema. This option declares future lowering only.
-The command does not serialize product rows.
+`prompt_completion` otherwise. Full text requires `text`. Other objectives
+require a supervised row schema.
 
-By default, candidates that pass construction integrity receive accepted
-decisions and become immutable dataset records. `--require-review` leaves them
-`pending_review` and emits no accepted records because the current CLI does not
-ingest completed review evidence. The Python construction API supports
-separate accepted or rejected `ReviewEvidence`.
+`--split-ratio-ppm` applies only to continuation construction and must be from
+1 through 999999. It controls the prompt and completion boundary. It is not the
+later train and evaluation ratio.
 
-The command commits exactly:
+By default, construction-integrity decisions accept valid candidates.
+`--require-review` leaves them pending because the current CLI does not ingest
+completed review evidence. The Python construction API supports separate
+review values.
 
-- `recipe`, a canonical `dataset-recipe` artifact; and
-- `result`, a canonical `construction-result` artifact containing candidates,
-  one decision per candidate, accepted records, and diagnostics.
+The command commits canonical `recipe` and `result` artifacts. Before commit,
+the workspace reconstructs all selected upstream inputs and requires exact
+semantic equality with fresh construction replay.
 
-Both artifacts bind the exact selected source scope and construct-stage
-configuration. Before `HEAD` advances, the workspace reconstructs every
-declared upstream input and requires exact semantic equality with a fresh
-deterministic replay. A self-consistent but non-replayable result is rejected.
-Repeating construction with the same current state and options is a no-op.
+### `curate`
 
-The recipe records `curation_policy` and `split_policy` as `deferred`.
-Construction does not curate, split, serialize, run whole-dataset validation,
-or seal its accepted records.
+```text
+veriformis curate WORKSPACE \
+  [--minimum-target-characters 1] \
+  [--balance-mode none|primary-source-cap] \
+  [--maximum-records-per-primary-source COUNT] \
+  [--evaluation-ratio-ppm 500000] \
+  [--require-evaluation | --allow-empty-evaluation] \
+  [--split-seed veriformis-v1] \
+  [--instruction TEXT]
+```
+
+This command fixes the complete `FinishedDatasetPlan` and applies its curation
+policy. Curation runs minimum target filtering, source-scoped conflict
+quarantine, exact deduplication, optional primary-source cap, and coverage
+closure in that order.
+
+`--balance-mode none` is the default. `primary-source-cap` requires a positive
+`--maximum-records-per-primary-source`. A maximum is invalid in `none` mode.
+
+`--evaluation-ratio-ppm` is the requested partition ratio, from 1 through
+999999. Evaluation is required by default. `--allow-empty-evaluation` permits a
+sole leakage group to remain entirely in train. It does not force evaluation
+empty when two or more groups exist.
+
+`--split-seed` enters the deterministic group order. `--instruction` is
+required only when the recipe selected `instruction_output`. It is rejected
+for all other row schemas.
+
+The command commits `plan` and `result`. It prints included, excluded, and
+quarantined counts plus coverage blockers. A curation result with blockers
+remains auditable, but later validation cannot pass.
+
+### `split`
+
+```text
+veriformis split WORKSPACE
+```
+
+Split reads the plan fixed during `curate`. It has no policy options because a
+second policy surface could contradict that plan.
+
+Included records connect through shared source IDs, equal raw-source digests,
+multi-source joins, and inherited exact-dedup-family relations. Complete
+transitive components become indivisible leakage groups. Assignment is
+deterministic from the bound ratio and seed. No group crosses partitions.
+
+When evaluation is required, fewer than two groups fails with `split-invalid`.
+The committed result records groups, assignments, requested and realized
+counts, and an assignment digest.
 
 ### `format`
 
 ```text
-veriformis format WORKSPACE --format FORMAT \
-  [--template llama3] \
-  [--instruction TEXT] \
-  [--with-heading-path]
+veriformis format WORKSPACE
 ```
 
-Formats:
+Format has no `--format` option. It reads the row schema from the bound recipe
+and finished plan. It consumes construction records, curation decisions, and
+authoritative assignments. It never projects chunks directly.
 
-- `completion`: emits `{"text": chunk_text}`. `--with-heading-path` prefixes the heading path.
-- `instruction`: emits `instruction`, `input`, and `output`. `--instruction` is required. The heading path becomes `input`, and source chunk text becomes `output`.
-- `chat`: renders a generic user and assistant exchange into one `text` field.
+One included record produces one payload row and one provenance row. The
+command commits:
 
-Built-in chat templates are `llama3`, `mistral`, `qwen`, `gemma`, and `phi`.
-`llama3` is the default. User-provided template files are not supported.
+- `row-set`, the strict semantic row-set artifact;
+- `train`, payload-only training JSONL;
+- `evaluation`, payload-only evaluation JSONL; and
+- `provenance`, one combined aligned metadata stream.
 
-The command commits `records` as JSONL and `records-meta` as JSON. These are
-current M1 projections. They do not consume `construct` outputs.
+`text` rows contain only `text`. Prompt-completion rows contain only `prompt`
+and `completion`. Instruction rows contain only `instruction`, `input`, and
+`output`. Message rows contain only the exact two-turn `messages` value.
 
-Important: the current chat path says `Summarize the following.` but uses the
-unchanged chunk as the answer. It also pre-renders the exchange into `text`.
-Do not treat it as a truthful summary dataset or structured assistant-only
-supervision.
+Rows are sorted by record ID within each partition. Provenance is train first,
+then evaluation, with zero-based partition ordinals and exact payload digests.
 
 ### `validate`
 
 ```text
-veriformis validate WORKSPACE --format completion|instruction|chat
+veriformis validate WORKSPACE
 ```
 
-The command reads one immutable revision and runs:
+Validate has no format option. It builds one exact snapshot and runs all 17
+required gates in this order:
 
-- `schema`: exact keys and string values for the selected current format;
-- `encoding`: selected mojibake markers and disallowed control characters in `text`, or in `output` for instruction rows; and
-- `provenance`: exact reconstruction of every chunk from immutable source evidence.
+1. `construction-replay`
+2. `record-lifecycle`
+3. `curation`
+4. `deduplication`
+5. `quality`
+6. `balance`
+7. `coverage`
+8. `split`
+9. `leakage`
+10. `row-binding`
+11. `objective`
+12. `schema`
+13. `encoding`
+14. `masking`
+15. `partition-nonempty`
+16. `aptus-row-shape`
+17. `snapshot`
 
-It commits `validations` with stage status `complete` when all gates pass and
-`failed` otherwise. A failed gate exits with status 1 and cannot satisfy the
-seal dependency.
+The command prints every gate status and finding, then the snapshot and
+revision IDs. It commits `snapshot` and `report`. A valid failing report is
+committed with failed stage status and the command exits 1.
 
-Validation does not yet check dataset-recipe semantics, record-to-chunk
-cardinality, duplicates, PII, coverage, quality, balancing, split leakage,
-non-empty output, or compatibility with a specific Aptus backend.
+`aptus-row-shape` proves only current schema shape. It does not prove Aptus
+bundle intake or backend partition enforcement.
 
 ### `seal`
 
@@ -357,33 +353,61 @@ non-empty output, or compatibility with a specific Aptus backend.
 veriformis seal WORKSPACE -o OUTPUT.vfbundle
 ```
 
-The command requires complete parse, clean, chunk, format, and validation
-states in the current immutable revision. It reads the logical outputs
-`registry`, `transforms`, `chunks`, `records`, `records-meta`, and
-`validations`, plus the source descriptors and canonical artifacts referenced
-by that revision.
+For a fresh publication, the destination must not exist. Seal loads one current
+complete revision, rebuilds the exact validation report, and requires equality
+with the saved passing report. If an earlier attempt published the exact bundle
+but failed before committing workspace receipts, a retry may recover only after
+external-digest verification and byte-for-byte comparison. It never overwrites
+the destination.
 
-It writes:
+It publishes exactly:
 
 ```text
 OUTPUT.vfbundle/
-├── dataset.jsonl
-└── manifest.json
+├── data/train.jsonl
+├── data/evaluation.jsonl
+├── metadata/row-provenance.jsonl
+├── validation.json
+├── manifest.json
+└── attestation.json
 ```
 
-The manifest includes current source, transform, chunk, dataset, validation,
-version, and hash metadata.
+Seal writes into a private temporary sibling, copies the validated payload
+bytes without reserialization, writes the deterministic manifest and
+attestation, syncs and independently verifies the temporary bundle, rechecks
+the expected workspace revision, and atomically promotes the directory. It
+then commits the exact manifest and attestation bytes as workspace receipts.
 
-Current integrity boundary:
+The command prints the bundle path, manifest SHA-256, verification grade, and
+seal revision. Fresh internal publication verification reports
+`self_consistent`. Exact receipt recovery reports `external_digest` because the
+retry supplies the expected manifest digest. Retain the printed digest outside
+the bundle when external binding matters.
 
-- seal trusts the committed validation report instead of rerunning every gate against a normalized candidate file set;
-- seal writes no committed workspace seal-stage output;
-- the CLI does not expose or automatically call `verify_bundle`;
-- programmatic verification skips the manifest self-hash and accepts undeclared extra files; and
-- no detached digest or attestation closes the trust boundary.
+Bundle promotion and receipt commit cannot share one atomic filesystem action.
+If publication becomes visible but receipt commit fails, the command reports
+the visible path and digest with the failure. It does not overwrite or claim
+rollback.
 
-These limits belong to roadmap Step 16. Groups 1 and 2 do not claim atomic
-sealing or closed-set verification.
+### `verify`
+
+```text
+veriformis verify BUNDLE [--manifest-sha256 EXPECTED_SHA256]
+```
+
+The verifier uses only bundle bytes and the optional expected digest. It does
+not read a workspace or trust producer state. It requires the exact file and
+directory set, safe canonical paths, regular files, valid link policy, exact
+sizes, digests, record counts, row and provenance alignment, a passing bound
+validation report, and correct attestation binding.
+
+It reports:
+
+- `self_consistent` when all internal checks agree; or
+- `external_digest` when those checks pass and the supplied expected manifest
+  SHA-256 matches.
+
+A co-located attestation alone never produces an external trust claim.
 
 ### `preview`
 
@@ -391,19 +415,14 @@ sealing or closed-set verification.
 veriformis preview PATH [--rules NAME,NAME] [--custom REGEX] [--source-root ROOT]
 ```
 
-Preview parses one source, creates a source-scoped cleaning plan, replays that
-plan through the same engine used by `clean`, and prints:
+Preview parses one raw source or reads one workspace, creates the same
+source-scoped cleaning plan used by clean, replays it, and prints transform
+counts, removed byte counts, warnings, the plan ID, and before and after text
+samples. It writes nothing.
 
-- transform counts and removed UTF-8 bytes;
-- warnings;
-- the deterministic plan ID; and
-- the first 400 characters before and after cleaning.
-
-It writes no workspace state. With the same source and rule selection, preview
-and clean produce the same cleaned document content. With the same locator,
-bytes, parser, rules, and cleaning configuration, raw-file preview, workspace
-preview, and clean produce the exact same plan ID. Use `preview --source-root`
-to match the locator chosen by `parse --source-root`.
+Use `--source-root` to match the locator selected by parse. Given identical
+locator, bytes, parser, rules, and configuration, raw preview, workspace
+preview, and clean produce the same plan ID.
 
 ### `version`
 
@@ -418,28 +437,23 @@ Prints `0.1.0`.
 | Status | Meaning |
 | --- | --- |
 | `0` | Command completed |
-| `1` | Validation failed, seal failed, or either command could not read valid required state |
-| `2` | Unsupported input, invalid option, or another typed error from parse, clean, chunk, construct, format, preview, or workspace upgrade |
+| `1` | Validation failed, seal failed, verification failed, or required state for one of those commands was invalid |
+| `2` | Unsupported input, invalid option, workspace failure, or another typed error from earlier stage commands |
 
-Some serializer-template and bundle-writer failures still sit outside a fully
-typed application-service result. Steps 17 and 18 close that surface boundary.
+Errors use `error[stable-code]: message` when a typed code exists.
 
-## Planned CLI behavior
+## Deferred CLI work
 
-Group 3 adds curation, split assignment, construction-aware formatting, exact
-whole-dataset validation, atomic seal, and independent verification operations.
-Group 4 introduces a typed pipeline service and makes the CLI a thin adapter.
-Later work adds YAML automation. Planned commands must not appear in current
-examples before their exit gates pass.
-
-See the [build roadmap](plans/2026-07-29-veriformis-roadmap.md), especially
-Steps 7 through 19.
+Group 4 adds a typed `PipelineService`, converts this CLI into a thin adapter,
+and proves the dual-objective M1.1 raw-source path through both direct API and
+CLI. YAML automation remains later work.
 
 ## Related documentation
 
 - [Product contract](product-contract.md)
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
+- [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [Development guide](development.md)
