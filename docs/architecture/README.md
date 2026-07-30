@@ -1,0 +1,239 @@
+# Architecture
+
+The entry point to the Veriformis architecture documentation: a system
+overview, the top-level module diagram, and an index into the four deep-dive
+references that carry the verified, citation-backed detail.
+
+**Last reviewed:** 2026-07-30 after Group 3 completion
+
+**Next review:** The first Group 4 service change
+
+## System overview
+
+### Domain boundary and positioning
+
+Veriformis occupies a specific and deliberately narrow position in the
+data-engineering landscape: it is a local-first compiler for fine-tuning
+datasets, transforming heterogeneous raw documents — plain text, source code,
+Markdown, and DOCX — into sealed, independently verifiable training bundles.
+The system's stated product promise frames the entire corpus-to-dataset
+trajectory as a compilation problem rather than an ad-hoc scripting task (see
+`docs/product-contract.md:19`), and this framing defines both what the system
+owns and what it refuses to own. The ownership boundary runs from raw source
+capture through final seal: ingestion, canonical recovery, cleaning, evidence
+preservation, record construction, curation, leakage-safe splitting,
+formatting, validation, and bundle publication all live inside the system.
+Training itself does not. A downstream product named Aptus begins where a
+sealed Veriformis bundle ends, owning training planning and execution while
+consuming the dataset contract Veriformis publishes (see
+`docs/product-contract.md:52`). This division matters architecturally because
+it converts dataset preparation from a disposable preprocessing step into an
+artifact with its own integrity guarantees, a guarantee the design enforces
+through fail-closed sealing: a dataset is not considered finished because a
+JSONL file exists, but only when the exact validated snapshot, manifest, and
+attestation agree (see `docs/product-contract.md:159`).
+
+The core problem the system addresses is accountability in dataset
+construction. Conventional dataset pipelines — shell scripts, notebooks,
+one-off Pandas transformations — produce outputs whose provenance is
+unrecoverable: which source bytes produced which training row, which edits
+were applied, and whether a rerun would reproduce the same result are
+questions such pipelines cannot answer. Veriformis answers them structurally.
+Every stage emits explicit evidence rather than silent transformation, a
+doctrine the product contract names "honest loss accounting": parsing loss,
+cleaning edits, construction omissions, curation exclusions, and deduplication
+each produce inspectable records instead of disappearing (see
+`docs/product-contract.md:112`). Consequently, the system positions itself
+against the implicit tolerance for silent mutation that pervades dataset
+tooling, and its architecture is best understood as the enforcement machinery
+for that position.
+
+### Architectural paradigm
+
+The architecture embodies three mutually reinforcing paradigms:
+compiler-style pipeline architecture, stage-gated transactional processing,
+and content-addressed identity. The compiler metaphor is not decorative; it is
+load-bearing. The system has a recognizable front end, intermediate
+representation, and back end. Parsers recover raw bytes into a canonical
+`Document` IR with a mandatory diagnostics report, exactly as a language
+front end produces an AST plus diagnostics (see
+`src/veriformis/parsers/dispatch.py:31`). The IR — a `Document`/`Block`/
+`Inline` tree serialized under the strict `veriformis.ir/v1` schema (see
+`src/veriformis/ir/serde.py:12`) — is the shared intermediate vocabulary that
+every transformation consumes and produces, which is precisely the role an IR
+plays in a multi-pass compiler. The back end lowers semantic records into
+target bytes: the format stage serializes accepted records into JSONL row
+streams much as a code generator lowers IR into object code (see
+`src/veriformis/datasets/serialization.py`). The root reason for this choice
+is that compilation theory already solved the problem the domain presents: how
+to keep a long chain of lossy transformations auditable. The answer — one
+canonical representation, explicit passes, and diagnostics instead of silent
+degradation — transfers directly.
+
+Stage-gated transactional processing supplies the execution discipline. The
+nine stages — parse, clean, chunk, construct, curate, split, format, validate,
+seal — form an explicit dependency graph declared in the workspace kernel (see
+`src/veriformis/workspace.py:138`), where each stage reads its predecessors'
+artifacts from an immutable revision and commits its own atomically; rerunning
+a stage invalidates all descendants. The pivotal rule is replay-before-commit:
+a stage's outputs are accepted only after deterministic re-execution
+reproduces them, and the workspace itself reloads and semantically replays the
+Group 3 stages before promoting `HEAD` (see `src/veriformis/workspace.py:2074`).
+This design exists because reproducibility cannot be a testing afterthought in
+a system whose product is verifiability; it must be a precondition of state
+transition. The impact is that the workspace, not the CLI, is the real
+control-flow backbone — pipeline ordering is enforced by revision state, not
+by any orchestrator's good behavior.
+
+Content-addressed identity binds the first two paradigms together. Every
+persisted model derives its identity from its complete semantic payload
+through `derive_id`, producing domain-separated `kind-v1-<64 hex>` identifiers
+over exact-string canonical JSON (see `src/veriformis/identity.py:137`), and a
+validator recomputes that identity on every load, failing on any drift. The
+reason for this rigor is that verification claims are only as strong as the
+bytes they cover; approximate serialization would make every downstream digest
+negotiable. Consequently the system treats canonical JSON — floats rejected,
+duplicate keys rejected, Unicode normalization applied only to declared
+locator fields — as a correctness mechanism, not a style preference.
+
+```mermaid
+flowchart TB
+    subgraph entry["Composition and Infrastructure"]
+        CLI["cli.py — Typer composition root, 13 commands (9 stage-gated)"]
+        WS["workspace.py — revision store, stage graph, replay-on-commit"]
+    end
+
+    subgraph stages["Stage Packages in Pipeline Order"]
+        P["parsers — text, markdown, docx ingestion"]
+        R["rules — replayable cleaning plans"]
+        C["chunkers — evidence-bearing chunks"]
+        CT["construction — objective-driven records"]
+        DS["datasets — curate, split, format, validate"]
+        B["bundle — atomic seal and independent verify"]
+    end
+
+    subgraph core["Canonical Model"]
+        IR["ir — Document, Block, Inline vocabulary"]
+        EV["evidence — replayable provenance chains"]
+    end
+
+    subgraph foundation["Foundation Kernel"]
+        ERR["errors — shared exception taxonomy"]
+        CON["contracts — schema, gate, and stage registries"]
+        ID["identity — canonical JSON, digests, derive_id"]
+        SRC["sources and diagnostics — ParseResult contract"]
+    end
+
+    CLI --> WS
+    CLI --> P
+    CLI --> DS
+    WS -. "lazy import replay validation" .-> stages
+    P --> IR
+    R --> IR
+    C --> IR
+    C --> EV
+    CT --> C
+    DS --> CT
+    B --> DS
+    P --> SRC
+    IR --> ID
+    EV --> ID
+    stages -.-> foundation
+```
+
+### Core technology decisions
+
+The technology stack is small and each choice maps onto a non-functional
+requirement. Python 3.11+ is the substrate, chosen for ecosystem proximity to
+its problem domain — document processing and machine-learning tooling — and
+the modular-monolith organization keeps deployment to a single installed
+console script (see `pyproject.toml:34`). Typer provides the CLI surface; it
+is deliberately confined to exactly one module, `cli.py`, so the command
+surface can later become a thin adapter over a surface-neutral
+`PipelineService` (**planned**, Group 4) without touching domain code (see
+`src/veriformis/cli.py:143`). Pydantic serves as the persisted-contract
+backbone: fourteen modules — precisely those that own on-disk schemas in
+construction, datasets, bundle, and the workspace revisions themselves —
+build strict, frozen, extra-forbidden models whose validators recompute
+content-derived identities at load time. This choice directly serves the
+verifiability requirement, because model validation becomes the first rung of
+a defense-in-depth ladder that continues through stage-entry replay, snapshot
+gates, seal-time rebuild, and independent verification.
+
+External dependencies are contained with unusual discipline, which serves the
+correctness requirement by bounding blast radius. Format libraries never
+escape the ingestion layer: markdown-it-py appears only in
+`parsers/markdown.py`, python-docx and lxml only in the DOCX parser and
+diagnostics helpers, while jinja2's sole consumer is the retained legacy
+chat-preview module. The workspace revision store is a custom,
+dependency-free persistence kernel — content-addressed objects under
+`objects/sha256/`, immutable revisions, an atomic `HEAD` pointer, and an
+exclusive-lock commit protocol (see `src/veriformis/workspace.py:1737`) —
+rather than an off-the-shelf database. This is a deliberate decision: a
+general-purpose store could not express the system's central invariant, that
+committing a revision requires semantically replaying the stage being
+committed. The cost of that decision is concentration — the kernel is the
+largest module in the system — but the payoff is that durability, ordering,
+and replay validation share one transaction boundary, which is exactly where
+the reproducibility guarantee must live.
+
+### Top-level module division
+
+The highest-level division separates four kinds of units. The foundation
+kernel — `errors.py`, `contracts.py`, `identity.py`, plus the `diagnostics`,
+`sources`, and `evidence` modules — holds the primitives every other layer
+shares: a common exception taxonomy, a zero-dependency registry of schema IDs,
+gate names, and reason codes, the identity substrate, and the provenance model
+whose `SourceEvidence` chains make any post-parse text replayable to immutable
+source ranges (see `src/veriformis/evidence.py:59`). Above it sit the
+canonical model (`ir/`) and the six stage packages in pipeline order, each
+owning one stage's pure, deterministic transformation: parsers recover, rules
+clean through plan/replay separation (see
+`src/veriformis/rules/cleaning.py:737`), chunkers segment, construction builds
+objective-driven records, datasets curate, split, format, and validate, and
+bundle seals and verifies. Two infrastructure units sit beside rather than
+inside this stack: `workspace.py`, the transactional kernel, and `cli.py`, the
+composition root whose thirteen commands funnel into that graph — nine stage
+commands gated by workspace revisions, plus maintenance, read-only inspection,
+and meta entries (see `src/veriformis/cli.py:820`).
+
+Collaboration between these units is governed by two mechanisms worth naming
+explicitly. The first is the strict acyclic import graph: no lower layer
+imports a higher one, verified across the source tree with a single
+load-order-safe intra-package exception (`ir/__init__.py` ↔ `ir/serde.py`),
+and the layering itself functions as a correctness mechanism — the datasets
+package, for instance, never imports chunkers, rules, or ir, so the legacy
+chunk-row path is unreachable from the finished-dataset stages by construction
+rather than by convention. The second is the lazy function-level import
+pattern that lets the workspace kernel remain the architectural hub without
+closing the graph into cycles: the kernel imports only contracts, errors, and
+identity at module level, deferring its twelve-plus domain imports into the
+methods that replay-validate each stage before commit (see
+`src/veriformis/workspace.py:2339`). The same trick appears in the independent
+verifier (see `src/veriformis/bundle/verifier.py:389`). Taken together, these
+mechanisms show an architecture that treats its dependency graph as part of
+the product: the guarantees the system sells — determinism, provenance,
+verifiability — are enforced as much by where imports point as by what the
+code computes.
+
+## Deep-dive documents
+
+| Document | Contents |
+| --- | --- |
+| [Layers](layers.md) | The strict acyclic layer stack, responsibility allocation, the lazy-kernel and serde-membrane isolation techniques, and exception flow |
+| [Dependencies](dependencies.md) | The fan-in kernel, external-dependency containment, the pydantic posture, deferred imports, and versioning governance |
+| [Data flow](data-flow.md) | Shape evolution across the nine stages, the provenance backbone, egress separation, persistence, and defense in depth |
+| [Entry points](entry-points.md) | The single CLI surface, the stage-gated transaction template, the seal path, and the independent verifier |
+
+## Related docs
+
+- [Architecture hub](../architecture.md) — pipeline at a glance, workspace
+  layout, stage graph, and bundle layout
+- [CLI reference](../cli.md)
+- [Development guide](../development.md)
+- [Current implementation status](../current-status.md)
+- [Product contract](../product-contract.md)
+- [Integrity Contract v1](../contracts/integrity-v1.md)
+- [Dataset Construction Contract v1](../contracts/dataset-construction-v1.md)
+- [Finished Dataset Contract v1](../contracts/finished-dataset-v1.md)
+- [Build roadmap](../plans/2026-07-29-veriformis-roadmap.md)

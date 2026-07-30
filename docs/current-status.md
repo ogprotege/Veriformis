@@ -6,7 +6,7 @@
 
 **Implementation state:** Groups 1 through 3 complete
 
-**Review date:** 2026-07-29
+**Review date:** 2026-07-30 (re-verified against code and tests; no capability drift)
 
 **Next review:** The first Group 4 service change or any contract change
 

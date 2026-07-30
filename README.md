@@ -1,5 +1,11 @@
 # Veriformis
 
+**Local-first dataset compiler: raw documents to validated, provenance-sealed fine-tuning bundles.**
+
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![uv-managed](https://img.shields.io/badge/uv-managed-orange.svg)](https://docs.astral.sh/uv/)
+
 Veriformis is a local-first compiler that turns heterogeneous raw source
 material into a curated, split, validated, and sealed training dataset. It owns
 the difficult path from source capture through the finished bundle. Cleaned
@@ -15,12 +21,15 @@ explicitly selects it as training content.
 
 ## What works today
 
-The active compiler path is:
+The active compiler path runs nine stage-gated stages from raw files to a
+sealed bundle, verified by a separate command:
 
-```text
-raw files
-  -> parse -> clean -> chunk -> construct -> curate -> split
-  -> format -> validate -> seal -> verify
+```mermaid
+flowchart LR
+    raw[Raw files] --> parse[parse] --> clean[clean] --> chunk[chunk]
+    chunk --> construct[construct] --> curate[curate] --> split[split]
+    split --> format[format] --> validate[validate] --> seal[seal]
+    seal --> bundle[Sealed .vfbundle] --> verify[verify]
 ```
 
 Version `0.1.0` provides:
@@ -173,16 +182,29 @@ the versioned Aptus handoff, the SwiftUI workbench, and release controls.
 
 ## Documentation
 
-- [Documentation index](docs/README.md)
-- [Product contract](docs/product-contract.md)
-- [Integrity Contract v1](docs/contracts/integrity-v1.md)
-- [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
-- [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
-- [Current implementation status](docs/current-status.md)
-- [Work in progress and remaining tasks](WIP.md)
-- [Architecture](docs/architecture.md)
-- [CLI reference](docs/cli.md)
-- [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
+The [documentation index](docs/README.md) defines document authority and
+reading paths for each audience. The map:
+
+- **Product and status**
+  - [Product contract](docs/product-contract.md) — ownership boundary and non-claims
+  - [Current implementation status](docs/current-status.md) — exact alpha boundary and Group 3 evidence
+  - [Work in progress and remaining tasks](WIP.md)
+- **Architecture**
+  - [Architecture hub](docs/architecture.md) — current module, workspace, artifact, and bundle flow
+  - [Architecture tree](docs/architecture/README.md) — layered detail:
+    - [Layers](docs/architecture/layers.md) — architectural layers and their responsibilities
+    - [Dependencies](docs/architecture/dependencies.md) — allowed dependency directions between modules
+    - [Data flow](docs/architecture/data-flow.md) — how data moves through the nine stages
+    - [Entry points](docs/architecture/entry-points.md) — CLI and future service surfaces
+- **Implemented contracts**
+  - [Integrity Contract v1](docs/contracts/integrity-v1.md)
+  - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
+  - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+- **Reference and plans**
+  - [CLI reference](docs/cli.md)
+  - [Development guide](docs/development.md)
+  - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
+  - [Contributing](CONTRIBUTING.md)
 
 ## Development checks
 
