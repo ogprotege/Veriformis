@@ -4,7 +4,13 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 and 2, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 through 3 runtime, version `0.1.0`
+
+**Implementation review state:** Groups 1 through 3 complete
+
+**Last reviewed:** 2026-07-29
+
+**Next review:** The first Group 4 service change or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -36,6 +42,8 @@ This document establishes the product-level scope. Roadmap Step 1 translated it
 into [Integrity Contract v1](contracts/integrity-v1.md), public contract
 constants, and executable acceptance fixtures. Steps 7 through 10 are governed
 by [Dataset Construction Contract v1](contracts/dataset-construction-v1.md).
+Steps 11 through 16 are governed by
+[Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
 
 ## Ownership boundary
 
@@ -59,12 +67,20 @@ transformation, and structured fields. A construct commit stores canonical
 recipe and result artifacts and replays their meaning against the declared
 source, clean, chunk, transform, and IR inputs before `HEAD` advances.
 
-This remains a working alpha, not the complete product contract. Group 3 must
-add curation, authoritative splitting, construction-aware serialization,
-product rows, exact-snapshot validation, atomic sealing, and independent
-verification. Later groups add the stable service surface, broader inputs,
-integrations, the Mac workbench, and release controls. Documentation must label
-each later capability as planned until its exit gate passes.
+Group 3 implements the finished-dataset runtime. `FinishedDatasetPlan` binds one
+exact recipe and construction result to deterministic curation, leakage-safe
+split policy, serialization, all 17 validation gates, and the `minimal-v1`
+retention profile. Revision schema v3 persists curation, split, product-row,
+snapshot, validation, manifest, and attestation artifacts. Seal revalidates the
+exact current snapshot, atomically publishes a closed six-file bundle, and
+supports independent `self_consistent` or externally anchored
+`external_digest` verification.
+
+This remains a working alpha, not the complete M1.1 product. Group 3 passed its
+independent architecture and security closeout. Group 4 must add the stable
+`PipelineService`, convert the CLI into a thin adapter, and pass the
+dual-objective M1.1 API and CLI acceptance gate. Later groups add broader
+inputs, integrations, the Mac workbench, and release controls.
 
 ## End-to-end compiler contract
 
@@ -73,17 +89,23 @@ each later capability as planned until its exit gate passes.
 | Raw capture | Register every source and preserve its identity before transformation | Source identifier, original path or retained copy, SHA-256, size, parser selection |
 | Canonical recovery | Recover text, structure, metadata, and source locations into one canonical IR | Canonical-stream version and digest, source ranges, parser diagnostics, extraction coverage, explicit degradation |
 | Cleaning and normalization | Apply declared changes without silently flattening or deleting source meaning | Replayable edit plan, rule identity and parameters, before and after hashes, structure-preservation result, warnings |
-| Dataset construction | Build records for a declared `TrainingObjective` through ordered `ConstructionPass` operations | Versioned `DatasetRecipe`, field-level `SourceEvidence`, constructor identity and version, deterministic derivation |
-| Curation and promotion | Measure, reject, quarantine, deduplicate, and optionally review candidate records | Quality facts, rejection reasons, review policy and state, coverage accounting, promotion decision |
+| Dataset construction and promotion | Build candidates for a declared `TrainingObjective`, apply construction integrity and any required review, then create immutable records | Versioned `DatasetRecipe`, field-level evidence, constructor identity and version, review evidence, promotion decision, deterministic derivation |
+| Dataset curation | Measure, exclude, quarantine, deduplicate, balance, and account for accepted records | `FinishedDatasetPlan`, quality facts, curation reasons and decisions, coverage ledger |
 | Balancing and splitting | Produce authoritative train and evaluation partitions without related-record leakage | Leakage groups, balancing decisions, final membership, assignment digest, realized split statistics |
-| Formatting and compatibility | Lower accepted records into the selected training schema without inventing a task | Row-schema version, masking expectation, preserved metadata, Aptus compatibility result |
-| Validation and seal | Validate the exact snapshot, write a closed file set, and make later mutation detectable | Gate versions and results, input and output digests, bundle manifest, detached digest or attestation, independent verification result |
+| Formatting and compatibility | Lower accepted records into the selected training schema without inventing a task | Row-schema version, masking expectation, preserved metadata, current Aptus row-shape result |
+| Validation and seal | Validate the exact snapshot, write a closed file set, and make later mutation detectable | Gate versions and results, input and output digests, bundle manifest, co-located attestation, separately retained manifest digest when external binding is required, independent verification result |
 
 ## Training objective, recipe, and record states
 
-A versioned `TrainingObjective` states what the model should learn. A versioned `DatasetRecipe` binds that objective to source selection, cleaning and segmentation policy, ordered constructors, curation rules, balancing and split policy, target schema, required gates, and any human-review requirement.
+A versioned `TrainingObjective` states what the model should learn. A versioned
+`DatasetRecipe` binds that objective to source selection, cleaning and
+segmentation policy, ordered constructors, target schema, construction gates,
+and any human-review requirement. Its Group 2 curation and split fields remain
+explicitly deferred. Group 3 `FinishedDatasetPlan` binds one exact recipe and
+construction result to executable curation, balancing, split, serialization,
+validation-gate, partition, and bundle-retention policy.
 
-A deterministic `ConstructionPass` emits an append-only `CandidateRecord` with its proposed payload and field-level source evidence. In Group 2, construction-integrity checks and any required review create an explicit `PromotionDecision`. Promotion creates an immutable `DatasetRecord`. Group 3 adds curation and authoritative split assignment before formatting and derives emitted rows and manifest entries from accepted records. Rejected and pending-review candidates remain auditable.
+A deterministic `ConstructionPass` emits an append-only `CandidateRecord` with its proposed payload and field-level source evidence. Construction-integrity checks and any required review create an explicit `PromotionDecision`. Promotion creates an immutable `DatasetRecord`. Group 3 then applies deterministic curation and authoritative split assignment before formatting. It derives emitted rows and manifest entries from unchanged accepted records. Rejected, pending-review, excluded, and quarantined values remain auditable.
 
 Human review is a recipe or project policy, not a universal prerequisite. A deterministic recipe with no review gate may seal when all declared gates pass. A recipe that requires approval must refuse promotion or seal until approval evidence exists.
 
@@ -96,7 +118,7 @@ The enforceable promise is accountable transformation:
 1. **Source conservation.** Originals remain hash-pinned and recoverable according to the selected retention policy.
 2. **Nothing silent.** Parsing loss, unsupported structures, cleaning edits, construction omissions, curation exclusions, deduplication, balancing, and filtering produce explicit evidence.
 3. **Derivation integrity.** Every accepted field resolves to immutable source evidence or a declared deterministic derivation.
-4. **Coverage accounting.** The final bundle states what source material contributed, what did not, and why.
+4. **Coverage accounting.** Workspace artifacts state what source material contributed, what did not, and why. The final minimal bundle binds those artifact identities and digests through its validation snapshot.
 5. **Reproducibility.** The same sources, recipe, configuration, and tool versions reproduce the same semantic artifacts, except for declared non-semantic metadata such as timestamps.
 
 Exact persisted artifact JSON and durable identity and configuration-digest
@@ -112,7 +134,7 @@ The product may describe this as faithful, source-grounded, loss-accounted, or p
 
 The v1 dataset pipeline makes no LLM calls and performs no remote model generation. The implemented deterministic builders create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field candidates when the recipe states a truthful task and every constructed field has evidence. Structured-field construction binds each selected strict-IR scalar to its immutable artifact, RFC 6901 pointer, exact value digest, encoding, output digest, and construction context.
 
-The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same curation, promotion, split, formatting, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
+The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, formatting, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 
 ## Aptus-facing semantics
 
@@ -127,9 +149,20 @@ Veriformis selects the row schema according to the recipe and preserves the inte
 
 Rendered model-family chat text may be used for preview and conformance checks. It must not replace structured `messages` when doing so would change Aptus masking behavior.
 
+The implemented Group 3 boundary validates Aptus row shape only. It does not
+claim a shared bundle handoff or backend enforcement of Veriformis partitions.
+Current Aptus MLX intake does not accept plain `text` rows. Roadmap Step 23
+owns the shared descriptor, partition, masking, and backend capability contract.
+
 ## Fail-closed seal
 
 A dataset is not finished because a JSONL file exists. Seal must validate the exact recipe, sources, edit plans, candidates, accepted records, split assignment, formatted rows, and file set that it publishes. Missing evidence, stale validation, empty required output, path escape, unexpected files outside policy, digest mismatch, or post-validation mutation must prevent sealing or make verification fail.
+
+The implemented `minimal-v1` seal contains exactly train and evaluation JSONL,
+one aligned provenance stream, the validation report, the manifest, and the
+attestation. Its co-located attestation establishes internal consistency. Only
+a caller-supplied expected manifest SHA-256 establishes the
+`external_digest` verification grade.
 
 The M1.1 acceptance gate requires one raw multi-source corpus to produce two independently verifiable bundles through the same compiler foundation: one full-text objective and one source-derived supervised objective. Repeating the run must reproduce candidate, dataset, split-assignment, and bundle-content digests, except for declared non-semantic fields.
 
@@ -142,6 +175,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 - [Integrity Contract v1](./contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](./contracts/dataset-construction-v1.md)
+- [Finished Dataset Contract v1](./contracts/finished-dataset-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

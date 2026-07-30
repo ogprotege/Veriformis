@@ -37,6 +37,8 @@ from veriformis.identity import (
 )
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
+    GROUP2_REVISION_SCHEMA_VERSION,
+    GROUP2_STAGES,
     LEGACY_REVISION_SCHEMA_VERSION,
     LEGACY_STAGES,
     STAGES,
@@ -195,7 +197,6 @@ def _workspace_with_chunks(tmp_path: Path) -> Workspace:
         ],
         ["clean", str(root)],
         ["chunk", str(root)],
-        ["format", str(root), "--format", "completion"],
     ):
         result = runner.invoke(app, command)
         assert result.exit_code == 0, result.output
@@ -411,24 +412,47 @@ def test_construct_requires_an_explicit_legacy_migration(tmp_path):
     assert workspace.head() == before
 
 
-def test_migration_appends_v2_without_rewriting_any_v1_fact(tmp_path):
+def test_migration_appends_v2_then_v3_without_rewriting_any_v1_fact(tmp_path):
     workspace = _legacy_workspace(tmp_path / "legacy")
     _complete_legacy_pipeline(workspace)
     before = workspace.head()
     before_history = workspace.verify_history()
 
     migrated = workspace.migrate_to_current(expected_revision_id=before.revision_id)
+    assert migrated.parent_revision_id is not None
+    group2 = workspace.get_revision(migrated.parent_revision_id)
 
     assert migrated.schema_version == WORKSPACE_REVISION_SCHEMA_VERSION
-    assert migrated.parent_revision_id == before.revision_id
+    assert set(migrated.stages) == set(STAGES)
+    assert group2.schema_version == GROUP2_REVISION_SCHEMA_VERSION
+    assert set(group2.stages) == set(GROUP2_STAGES)
+    assert group2.parent_revision_id == before.revision_id
+    assert group2.committed_stage == "migration"
+    assert group2.sources == before.sources
+    assert group2.artifacts == before.artifacts
+    assert {
+        stage: group2.stages[stage] for stage in LEGACY_STAGES
+    } == before.stages
+    assert group2.stages["construct"] == StageState.absent("construct")
+
+    assert migrated.parent_revision_id == group2.revision_id
     assert migrated.committed_stage == "migration"
     assert migrated.sources == before.sources
-    assert migrated.artifacts == before.artifacts
     assert {
-        stage: migrated.stages[stage] for stage in LEGACY_STAGES
-    } == before.stages
+        stage: migrated.stages[stage]
+        for stage in ("parse", "clean", "chunk", "construct")
+    } == {
+        stage: group2.stages[stage]
+        for stage in ("parse", "clean", "chunk", "construct")
+    }
     assert migrated.stages["construct"] == StageState.absent("construct")
-    assert workspace.verify_history() == (migrated.revision_id, *before_history)
+    for stage in ("curate", "split", "format", "validate", "seal"):
+        assert migrated.stages[stage] == StageState.absent(stage)
+    assert workspace.verify_history() == (
+        migrated.revision_id,
+        group2.revision_id,
+        *before_history,
+    )
 
 
 def test_migration_is_idempotent_after_reaching_current_schema(tmp_path):
@@ -455,10 +479,14 @@ def test_migration_rejects_a_stale_expected_head(tmp_path):
 
 
 def test_history_rejects_a_fabricated_v2_to_v2_migration(tmp_path):
-    workspace = Workspace.create(tmp_path / "workspace")
-    parent = workspace.head()
+    workspace = _legacy_workspace(tmp_path / "legacy")
+    migrated = workspace.migrate_to_current()
+    assert migrated.parent_revision_id is not None
+    parent = workspace.get_revision(migrated.parent_revision_id)
+    assert parent.schema_version == GROUP2_REVISION_SCHEMA_VERSION
+    assert set(parent.stages) == set(GROUP2_STAGES)
     fabricated = _new_revision(
-        schema_version=WORKSPACE_REVISION_SCHEMA_VERSION,
+        schema_version=GROUP2_REVISION_SCHEMA_VERSION,
         parent_revision_id=parent.revision_id,
         committed_stage="migration",
         committed_at="2026-01-01T00:00:00+00:00",
@@ -473,7 +501,10 @@ def test_history_rejects_a_fabricated_v2_to_v2_migration(tmp_path):
         fabricated.revision_id + "\n", encoding="ascii"
     )
 
-    with pytest.raises(UnsupportedWorkspaceVersionError, match="migration contract"):
+    with pytest.raises(
+        UnsupportedWorkspaceVersionError,
+        match="unsupported migration transition",
+    ):
         Workspace.open(workspace.root)
 
 
@@ -495,7 +526,7 @@ def test_history_rejects_a_v1_to_v2_migration_that_alters_legacy_state(tmp_path)
     )
     stages["construct"] = StageState.absent("construct")
     fabricated = _new_revision(
-        schema_version=WORKSPACE_REVISION_SCHEMA_VERSION,
+        schema_version=GROUP2_REVISION_SCHEMA_VERSION,
         parent_revision_id=parent.revision_id,
         committed_stage="migration",
         committed_at="2026-01-01T00:00:00+00:00",
@@ -510,13 +541,21 @@ def test_history_rejects_a_v1_to_v2_migration_that_alters_legacy_state(tmp_path)
         fabricated.revision_id + "\n", encoding="ascii"
     )
 
-    with pytest.raises(UnsupportedWorkspaceVersionError, match="migration contract"):
+    with pytest.raises(
+        UnsupportedWorkspaceVersionError,
+        match="v1-to-v2 migration contract",
+    ):
         Workspace.open(workspace.root)
 
 
 def test_history_rejects_a_v2_to_v1_downgrade(tmp_path):
-    workspace = _workspace_with_chunks(tmp_path)
-    parent = workspace.head()
+    workspace = _legacy_workspace(tmp_path / "legacy")
+    _complete_legacy_pipeline(workspace)
+    migrated = workspace.migrate_to_current()
+    assert migrated.parent_revision_id is not None
+    parent = workspace.get_revision(migrated.parent_revision_id)
+    assert parent.schema_version == GROUP2_REVISION_SCHEMA_VERSION
+    assert set(parent.stages) == set(GROUP2_STAGES)
     downgraded = _new_revision(
         schema_version=LEGACY_REVISION_SCHEMA_VERSION,
         parent_revision_id=parent.revision_id,
@@ -569,8 +608,14 @@ def test_migration_failure_before_head_keeps_legacy_head_visible(tmp_path):
     migrated = workspace.migrate_to_current()
 
     assert workspace.head() == migrated
-    assert workspace.verify_history()[1] == before.revision_id
-    assert orphan_ids.isdisjoint(workspace.verify_history())
+    history = workspace.verify_history()
+    assert len(history) == 3
+    assert history[0] == migrated.revision_id
+    group2 = workspace.get_revision(history[1])
+    assert group2.schema_version == GROUP2_REVISION_SCHEMA_VERSION
+    assert group2.parent_revision_id == before.revision_id
+    assert history[2] == before.revision_id
+    assert orphan_ids.isdisjoint(history)
     assert not any((workspace.root / ".txn").iterdir())
 
 
@@ -583,10 +628,17 @@ def test_upgrade_workspace_cli_migrates_verified_v1_head(tmp_path):
 
     assert result.exit_code == 0, result.output
     migrated = workspace.head()
+    assert migrated.parent_revision_id is not None
+    group2 = workspace.get_revision(migrated.parent_revision_id)
     assert before.schema_version == LEGACY_REVISION_SCHEMA_VERSION
+    assert group2.schema_version == GROUP2_REVISION_SCHEMA_VERSION
+    assert group2.parent_revision_id == before.revision_id
+    assert group2.stages["construct"] == StageState.absent("construct")
     assert migrated.schema_version == WORKSPACE_REVISION_SCHEMA_VERSION
-    assert migrated.parent_revision_id == before.revision_id
+    assert migrated.parent_revision_id == group2.revision_id
     assert migrated.stages["construct"] == StageState.absent("construct")
+    for stage in ("curate", "split", "format", "validate", "seal"):
+        assert migrated.stages[stage] == StageState.absent(stage)
 
 
 def test_migration_reports_unconfirmed_post_commit_durability(tmp_path, monkeypatch):

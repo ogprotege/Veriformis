@@ -41,6 +41,42 @@ class ConstructionError(VeriformisError):
     code = "construction-invalid"
 
 
+class CurationError(VeriformisError):
+    """Curation policy or results are incomplete, altered, or unreplayable."""
+
+    code = "curation-invalid"
+
+
+class SplitError(VeriformisError):
+    """A leakage group or authoritative split assignment is invalid."""
+
+    code = "split-invalid"
+
+
+class SerializationError(VeriformisError):
+    """A product row invents semantics or diverges from its accepted record."""
+
+    code = "serialization-invalid"
+
+
+class DatasetValidationError(VeriformisError):
+    """The finished-dataset snapshot or validation report is invalid."""
+
+    code = "dataset-validation-invalid"
+
+
+class SealError(VeriformisError):
+    """An exact validated dataset cannot be sealed or published safely."""
+
+    code = "seal-invalid"
+
+
+class BundleVerificationError(VeriformisError):
+    """A sealed bundle is malformed, open-ended, altered, or untrusted."""
+
+    code = "bundle-invalid"
+
+
 class InvalidIRError(VeriformisError):
     """Persisted document IR violates the versioned schema or provenance rules."""
 

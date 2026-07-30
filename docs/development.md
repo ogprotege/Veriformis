@@ -1,6 +1,10 @@
 # Development Guide
 
-This guide covers the implemented Veriformis `0.1.0` Python project. Planned services, applications, and release tooling are documented only in the [build roadmap](plans/2026-07-29-veriformis-roadmap.md).
+**Last reviewed:** 2026-07-29 after Group 3 completion
+
+This guide covers the implemented Veriformis `0.1.0` project. The current CLI
+owns stage orchestration. `PipelineService`, thin CLI conversion, and M1.1
+dual-objective API and CLI acceptance remain Group 4 work.
 
 ## Requirements
 
@@ -8,7 +12,8 @@ This guide covers the implemented Veriformis `0.1.0` Python project. Planned ser
 - `uv`
 - Git
 
-The package uses a setuptools `src/` layout. Runtime dependencies are declared in `pyproject.toml` and locked in `uv.lock`.
+The package uses a setuptools `src/` layout. Runtime dependencies are declared
+in `pyproject.toml` and locked in `uv.lock`.
 
 ## Set up the project
 
@@ -23,7 +28,7 @@ The test extra installs pytest and the repository-pinned Ruff version.
 
 ## Required checks
 
-Run the project checks before submitting a change:
+Run these checks before submitting a change:
 
 ```bash
 uv lock --check
@@ -32,16 +37,18 @@ uv run pytest -q
 git diff --check
 ```
 
-For focused work:
+The Group 3 closeout completed with `606 passed`. Rerun the commands for
+current evidence because totals can grow.
+
+Focused examples:
 
 ```bash
-uv run pytest tests/parsers/test_markdown.py -q
+uv run pytest tests/construction -q
+uv run pytest tests/datasets -q
+uv run pytest tests/bundle -q
+uv run pytest tests/regressions/test_workspace_v3_migration.py -q
 uv run pytest tests/test_cli.py -q
 ```
-
-Rerun the commands above for current evidence. Test totals are intentionally
-omitted because coverage grows. Strict expected failures remain pinned to
-later-step defects.
 
 ## Repository layout
 
@@ -53,6 +60,7 @@ later-step defects.
 │   ├── rules/
 │   ├── chunkers/
 │   ├── construction/
+│   ├── datasets/
 │   ├── serializers/
 │   ├── validate/
 │   ├── bundle/
@@ -68,120 +76,168 @@ later-step defects.
 └── uv.lock
 ```
 
-The CLI is the current composition root. A surface-neutral `PipelineService` is planned but does not exist in `0.1.0`.
+`datasets/` owns Group 3 plan, curation, split, product-row, provenance,
+snapshot, and validation contracts. `bundle/finished.py` and
+`bundle/verifier.py` own the finished bundle. Legacy M1 serializers and bundle
+helpers remain available for historical compatibility but are not the active
+revision-v3 CLI path.
 
 ## Test map
 
 | Area | Tests |
-|---|---|
+| --- | --- |
 | Package and version | `tests/test_scaffold.py` |
-| End-to-end CLI path | `tests/test_cli.py` |
-| Product and parser contracts | `tests/contracts/` |
-| Group 1 integrity regressions | `tests/regressions/` |
-| Group 2 construction models, evidence, constructors, pipeline, and CLI | `tests/construction/` |
-| Pinned later-step defects | `tests/known_gaps/` |
+| Raw-source and full CLI paths | `tests/test_cli.py`, `tests/known_gaps/` |
+| Public contracts | `tests/contracts/` |
+| Workspace, migration, staleness, and tamper regressions | `tests/regressions/` |
+| Construction models, objectives, evidence, replay, and CLI | `tests/construction/` |
+| Curation, coverage, leakage split, serialization, and exact validation | `tests/datasets/` |
 | Canonical IR | `tests/ir/` |
-| Text, Markdown, DOCX | `tests/parsers/` |
+| Text, Markdown, and DOCX parsing | `tests/parsers/` |
 | Cleaning rules and safety | `tests/rules/` |
 | Chunk coverage and provenance | `tests/chunkers/` |
-| Record and chat serialization | `tests/serializers/` |
-| Validation gates | `tests/validate/` |
-| Bundle seal and tamper check | `tests/bundle/` |
+| Legacy projection and preview helpers | `tests/serializers/` |
+| Legacy and shared gate helpers | `tests/validate/` |
+| Finished seal, verifier, and tamper checks | `tests/bundle/` |
 
 Add a regression test before repairing an integrity defect. Keep multi-source
-fixtures because source scope and collision resistance are durable contracts.
-Groups 1 and 2 defects must be ordinary passing tests. Later-step defects may remain
-strict expected failures until their owning group repairs them.
+fixtures because source scope, leakage closure, collision resistance, and raw
+entry are durable contracts. Group 3 defects must remain ordinary passing
+tests, not expected failures.
 
 ## Continuous integration
 
-GitHub Actions runs on pushes and pull requests. The current job uses Ubuntu, Python 3.12, uv, Ruff, and pytest.
+GitHub Actions runs on pushes and pull requests. The current job uses Ubuntu,
+Python 3.12, uv, Ruff, and pytest.
 
 CI does not yet run:
 
-- a Python version matrix;
+- a Python-version matrix;
 - a package build and installation smoke test;
 - static type checking;
 - coverage enforcement;
 - dependency or security scanning;
 - macOS packaging, signing, or installation checks.
 
-Do not describe these as release gates until they exist. Roadmap Step 26 requires release evidence, but its detailed gate order still needs an implementation plan.
+Do not describe those checks as release gates until they exist.
 
 ## Engineering constraints
 
+### Keep raw sources as the entry boundary
+
+Product acceptance begins with supported raw source material. A test that
+starts from cleaned text, a `DatasetRecord`, or prebuilt JSONL can exercise a
+domain unit but cannot prove the product path.
+
+Cleaned corpus state remains intermediate unless a `full_text` objective
+selects it. Other objectives must derive exact semantic context and targets
+before curation.
+
 ### Keep current behavior deterministic and local
 
-The implemented pipeline has no LLM or network stage. Do not introduce either casually. Governed model-assisted construction is a later, optional roadmap item.
+The implemented pipeline has no LLM or network stage. Do not add either to the
+deterministic path. Any future model-assisted `GeneratorPass` requires a
+separate approved contract and the same evidence, curation, split, validation,
+and seal lifecycle.
 
 ### Preserve source evidence
 
-Parser spans refer to the canonical extracted stream. Tests must verify both the emitted text and the span contract. If parsing drops or normalizes content, make that loss explicit rather than claiming raw-file fidelity.
+Parser spans refer to the canonical extracted stream. Tests must verify both
+text and span contracts. If parsing drops or normalizes content, make the loss
+explicit.
 
-Visible image alt text, citations, and note references belong in that canonical
-projection. Body, footnote, and endnote blocks share one stream but must retain
-distinct evidence regions. Group 2 `IRFieldEvidence` binds IR-only scalar
-metadata to its exact source, artifact, RFC 6901 pointer, value digest,
-encoding, output digest, and construction context.
+Visible image alt text, citations, and note references belong in the canonical
+projection. Body, footnote, and endnote blocks share one stream but retain
+separate evidence regions. `IRFieldEvidence` binds IR-only scalar metadata to
+its exact source, artifact, RFC 6901 pointer, value and output digests,
+encoding, and construction context.
 
-Persist artifact JSON and construct durable identity and configuration-digest
-payloads with exact-string serialization so distinct Unicode normalization
-forms remain distinct. In those durable paths, normalize only fields whose
-contracts explicitly define NFC equivalence, currently logical source paths.
-Do not substitute an audit revision ID for a portable state digest or per-source
-parse-input digest.
+Use exact-string serialization for artifacts, identities, and configuration
+digests. Normalize only fields whose contracts define NFC equivalence,
+currently logical source paths. Do not substitute revision IDs for portable
+semantic digests.
 
 ### Preserve revision integrity
 
-Use `Workspace` transactions for every persisted stage result. Do not write
+Use `Workspace` transactions for every persisted stage result. Never write
 inter-stage files at the workspace root or mutate content-addressed objects.
-Tests must cover atomic visibility, expected-revision conflicts, stale-stage
-invalidation, duplicate identity rejection, and digest verification. The
-transactional workspace does not imply that Step 16 atomic sealing is complete.
+Tests must cover expected-revision conflicts, atomic visibility, descendant
+invalidation, duplicate identities, and digest verification.
 
-Parse, clean, chunk, and construct artifacts must pass their cross-artifact
-semantic checks before `HEAD` promotion. Construction must reload its canonical
-recipe and result and match a fresh deterministic replay over the exact selected
-upstream inputs.
+Active workspaces use revision schema 3. Group 3 stage configs and artifacts
+must bind one `plan_id`. Curate, split, format, validate, and seal commits must
+reload and replay their semantic inputs before promotion.
 
-### Keep construction separate from serialization
+The v2 to v3 migration must preserve Group 2 facts and retire legacy
+downstream state without reinterpreting it.
 
-Group 2 construction creates evidence-bearing accepted `DatasetRecord` values.
-The legacy `format` branches still project chunks directly. Group 3 must make
-new serializers lower accepted records without inventing an objective, target,
-review state, curation result, or split assignment.
+### Keep construction, curation, and serialization distinct
 
-The cleaned corpus remains intermediate unless a `full_text` recipe explicitly
-selects its retained sequences as targets. A constructor for any other
-objective must prove its semantic field relation through replayable evidence.
+Construction creates evidence-bearing accepted `DatasetRecord` values.
+Curation decides which records remain and why. Splitting assigns complete
+leakage groups. Serialization lowers each included record into the schema
+fixed by the recipe and plan.
 
-### Do not strengthen unsupported claims
+A serializer must not invent an objective, target, instruction, review state,
+curation decision, or split assignment. It must not read chunks as substitute
+rows.
 
-Current validation has only schema, encoding, and provenance gates. Current verification does not authenticate the manifest or reject extra files. Documentation and tests must state those boundaries precisely.
+### Preserve exact validation closure
+
+Validation binds one exact set of upstream artifacts and emitted bytes. Every
+required gate reports. A failed or blocked gate cannot become a passing seal
+dependency.
+
+Adding or changing a finished-dataset artifact, emitted path, schema, or
+validator version requires updating the snapshot binding and replay tests. A
+saved Boolean is never sufficient.
+
+### Preserve seal and trust boundaries
+
+The `minimal-v1` bundle has exactly six files. The publisher must build in a
+private sibling, avoid overwrite, verify before promotion, recheck the
+workspace revision, and persist exact receipt bytes.
+
+The verifier must remain independent of workspace state. `self_consistent`
+means internal closure only. `external_digest` requires a caller-supplied
+expected manifest SHA-256. Never infer external trust from the co-located
+attestation.
+
+Directory publication and workspace receipt commit are separate atomic
+operations. Tests and errors must report a visible publication honestly if a
+later receipt commit fails.
+
+### Keep Aptus claims narrow
+
+Group 3 proves Aptus row shape only. It does not prove shared bundle intake,
+backend partition enforcement, or complete masking integration. Current Aptus
+MLX intake rejects plain `text` rows. Step 23 owns the shared contract.
 
 ## Adding a parser
 
 A parser should:
 
-1. produce the canonical IR;
-2. build one canonical extracted-text stream;
-3. assign body and note block indexes, regions, and valid spans into that stream;
-4. register the original file hash and parser identity;
-5. report unsupported or lost structures explicitly;
-6. serialize through the strict versioned IR and parse-report schemas;
-7. include adversarial fixtures, not only a happy-path sample.
+1. capture exact raw bytes before parsing;
+2. produce canonical IR and one canonical extracted-text stream;
+3. assign valid body and note regions and spans;
+4. register source and parser identities;
+5. report unsupported, normalized, or lost structures explicitly;
+6. serialize through strict versioned schemas; and
+7. include adversarial fixtures and a raw-source finished-pipeline test where
+   appropriate.
 
-Additional declared input formats are planned for roadmap step 20. They are not part of `0.1.0`.
+Additional declared input formats remain later work.
 
-## Adding a rule
+## Adding a cleaning rule
 
-A cleaning rule should be deterministic, preserve document meaning, and return
-exact edit ranges. Add tests for normal input, false-positive resistance, the
-30 percent removal safety threshold, rich-node preservation, plan serialization,
-and tamper rejection. Current prose rules must leave code, math, and other
-literal payloads unchanged. Preview and application must use the same plan and
-replay path. Given the same locator, bytes, parser, rules, and configuration,
-raw preview, workspace preview, and clean must produce the same plan ID.
+A rule must be deterministic, preserve document meaning, and return exact edit
+ranges. Add tests for normal input, false-positive resistance, the 30 percent
+safety threshold, rich-node preservation, plan serialization, replay, and
+tamper rejection. Current prose rules must leave code, math, and literal
+payloads unchanged.
+
+Preview and clean must share the planner and replay engine. Identical locator,
+bytes, parser, rules, and configuration must produce the same plan ID.
 
 ## Adding a constructor
 
@@ -189,37 +245,53 @@ A constructor must:
 
 1. implement one declared objective and exact field shape;
 2. dispatch through a versioned constructor ID;
-3. bind each field to source-text or strict-IR evidence;
-4. retain exact source, chunk, transform, recipe, objective, and pass lineage;
-5. emit deterministic diagnostics for ineligible inputs or omissions;
-6. remain pure, local, order-independent, and exactly replayable; and
-7. include positive, negative, multi-source, Unicode, malformed, and tamper tests.
+3. bind every field to source-text or strict-IR evidence;
+4. retain source, chunk, transform, recipe, objective, and pass lineage;
+5. emit typed deterministic diagnostics for omissions;
+6. remain pure, local, order-independent, and replayable; and
+7. include positive, negative, multi-source, Unicode, malformed, and tamper
+   tests.
 
-Do not treat `source-chunks-unavailable` as corpus-wide coverage accounting.
-Curation and coverage are Group 3 concerns.
+`source-chunks-unavailable` is construction omission evidence. It does not
+replace Group 3 coverage accounting.
 
-## Adding a chunker or serializer
+## Changing curation or splitting
 
-Chunker tests should cover:
+Curation order is contractual: target length, conflict quarantine, exact
+deduplication, balance, then coverage. Preserve one explicit decision per
+record and the closed reason registries.
 
-- complete source coverage or explicit rejection;
-- empty and short inputs;
-- heading context;
-- transformed-block attribution;
-- multi-source identity;
-- span and overlap semantics.
+Splitting must operate on whole transitive leakage groups. New relations must
+not weaken existing source ID, raw digest, multi-source join, or inherited
+dedup-family closure. Input reordering must reproduce groups, assignments, and
+digests.
 
-Serializer tests should verify exact row fields and training-loss semantics. A serializer must not invent an instruction, target, review state, or training objective.
+Policy expansion belongs to a new version or later approved roadmap work. Do
+not add a CLI switch that contradicts the bound plan.
+
+## Changing product rows or bundles
+
+Row tests must cover all allowed objective-to-schema combinations, exact keys,
+target preservation, instruction constraints, messages ordering, provenance
+alignment, and Aptus row-shape limits.
+
+Bundle changes require closed-set path tests, canonical bytes, exact record
+counts, tamper cases, independent verification, and explicit trust-grade
+behavior. Adding a file to `minimal-v1` is a contract change.
 
 ## Documentation discipline
 
-Use present tense only for merged, tested behavior. Label roadmap items as planned. When behavior changes, update the CLI reference, architecture, limitations, and tests in the same pull request.
+Use present tense only for tested behavior. Label Group 4 and later work as
+planned. Update the CLI reference, architecture, status, product boundary, and
+tests in the same change. Preserve dated historical records and amend only
+their status notes when later implementation changes.
 
 ## Related documentation
 
 - [Product contract](product-contract.md)
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
+- [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [CLI reference](cli.md)

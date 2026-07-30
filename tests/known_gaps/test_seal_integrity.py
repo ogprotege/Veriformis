@@ -37,7 +37,6 @@ def _valid_inputs() -> dict:
     }
 
 
-@pytest.mark.xfail(strict=True, reason="roadmap-step-16: empty output cannot seal")
 def test_empty_dataset_cannot_seal(tmp_path):
     inputs = _valid_inputs()
     inputs.update(records=[], chunks=[])
@@ -45,9 +44,6 @@ def test_empty_dataset_cannot_seal(tmp_path):
         write_bundle(tmp_path / "empty.vfbundle", **inputs)
 
 
-@pytest.mark.xfail(
-    strict=True, reason="roadmap-step-16: manifest needs an external trust root"
-)
 def test_manifest_mutation_fails_external_verification(tmp_path):
     bundle = write_bundle(tmp_path / "bundle.vfbundle", **_valid_inputs())
     manifest_path = bundle / "manifest.json"
@@ -57,18 +53,12 @@ def test_manifest_mutation_fails_external_verification(tmp_path):
     assert verify_bundle(bundle) is False
 
 
-@pytest.mark.xfail(
-    strict=True, reason="roadmap-step-16: verification requires a closed file set"
-)
 def test_undeclared_file_fails_verification(tmp_path):
     bundle = write_bundle(tmp_path / "bundle.vfbundle", **_valid_inputs())
     (bundle / "undeclared.txt").write_text("not in manifest", encoding="utf-8")
     assert verify_bundle(bundle) is False
 
 
-@pytest.mark.xfail(
-    strict=True, reason="roadmap-step-16: bundle paths must remain inside the bundle"
-)
 def test_parent_traversal_fails_verification(tmp_path):
     bundle = write_bundle(tmp_path / "bundle.vfbundle", **_valid_inputs())
     outside = tmp_path / "outside.txt"

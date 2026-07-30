@@ -3,6 +3,7 @@
 These constants describe the product contract. They do not claim that every
 declared v1 capability is implemented in the current package release.
 """
+
 from __future__ import annotations
 
 from typing import Final
@@ -15,6 +16,9 @@ GROUP1_ACCEPTANCE_CONTRACT_VERSION: Final = 1
 
 DATASET_CONSTRUCTION_CONTRACT_ID: Final = "veriformis.dataset-construction"
 DATASET_CONSTRUCTION_CONTRACT_VERSION: Final = 1
+
+FINISHED_DATASET_CONTRACT_ID: Final = "veriformis.finished-dataset"
+FINISHED_DATASET_CONTRACT_VERSION: Final = 1
 
 CANONICAL_STREAM_CONTRACT_ID: Final = "veriformis.canonical-stream"
 CANONICAL_STREAM_CONTRACT_VERSION: Final = 1
@@ -78,6 +82,88 @@ CONSTRUCTION_SCHEMA_IDS: Final = (
 )
 
 CONSTRUCTION_STAGE_SCHEMA_ID: Final = "veriformis.construction-stage/v1"
+CURATION_STAGE_SCHEMA_ID: Final = "veriformis.curation-stage/v1"
+SPLIT_STAGE_SCHEMA_ID: Final = "veriformis.split-stage/v1"
+FORMAT_STAGE_SCHEMA_ID: Final = "veriformis.finished-format-stage/v1"
+VALIDATION_STAGE_SCHEMA_ID: Final = "veriformis.dataset-validation-stage/v1"
+SEAL_STAGE_SCHEMA_ID: Final = "veriformis.finished-seal-stage/v1"
+
+V1_DATASET_PARTITIONS: Final = ("train", "evaluation")
+
+V1_CURATION_REASON_CODES: Final = (
+    "conflicting-target",
+    "exact-duplicate",
+    "primary-source-cap",
+    "quality-passed",
+    "target-too-short",
+)
+
+V1_QUALITY_FINDING_CODES: Final = (
+    "conflicting-target",
+    "exact-duplicate",
+    "primary-source-cap",
+    "target-too-short",
+)
+
+V1_COVERAGE_BLOCKER_CODES: Final = (
+    "no-constructed-candidates",
+    "no-dataset-records",
+    "no-included-contribution",
+)
+
+V1_FINISHED_DATASET_GATES: Final = (
+    "construction-replay",
+    "record-lifecycle",
+    "curation",
+    "deduplication",
+    "quality",
+    "balance",
+    "coverage",
+    "split",
+    "leakage",
+    "row-binding",
+    "objective",
+    "schema",
+    "encoding",
+    "masking",
+    "partition-nonempty",
+    "aptus-row-shape",
+    "snapshot",
+)
+
+FINISHED_DATASET_SCHEMA_IDS: Final = (
+    "veriformis.finished-dataset-plan/v1",
+    "veriformis.curation-policy/v1",
+    "veriformis.quality-finding/v1",
+    "veriformis.curation-decision/v1",
+    "veriformis.coverage-ledger-entry/v1",
+    "veriformis.coverage-ledger/v1",
+    "veriformis.curation-result/v1",
+    "veriformis.exact-record-fingerprint/v1",
+    "veriformis.split-policy/v1",
+    "veriformis.leakage-group/v1",
+    "veriformis.record-assignment/v1",
+    "veriformis.split-result/v1",
+    "veriformis.serialization-plan/v1",
+    "veriformis.product-row/v1",
+    "veriformis.row-provenance/v1",
+    "veriformis.row-set/v1",
+    "veriformis.snapshot-artifact-binding/v1",
+    "veriformis.snapshot-file-binding/v1",
+    "veriformis.snapshot-validator-binding/v1",
+    "veriformis.dataset-snapshot/v1",
+    "veriformis.dataset-gate-result/v1",
+    "veriformis.dataset-validation-report/v1",
+    "veriformis.finished-bundle-file/v1",
+    "veriformis.finished-bundle-manifest/v1",
+    "veriformis.bundle-attestation/v1",
+    "veriformis.bundle-verification/v1",
+)
+
+V1_BUNDLE_VERIFICATION_GRADES: Final = (
+    "self_consistent",
+    "external_digest",
+)
 
 CONSTRUCTION_OUTPUT_CONTRACTS: Final = (
     (
@@ -90,6 +176,74 @@ CONSTRUCTION_OUTPUT_CONTRACTS: Final = (
         "result",
         "construction-result",
         "veriformis.construction.result",
+        "1",
+    ),
+)
+
+FINISHED_DATASET_OUTPUT_CONTRACTS: Final = (
+    ("curate", "plan", "finished-dataset-plan", "veriformis.curation.plan", "1"),
+    (
+        "curate",
+        "result",
+        "curation-result",
+        "veriformis.curation.result",
+        "1",
+    ),
+    ("split", "result", "split-result", "veriformis.splitting.result", "1"),
+    (
+        "format",
+        "row-set",
+        "formatted-row-set",
+        "veriformis.dataset-serializer.row-set",
+        "1",
+    ),
+    (
+        "format",
+        "train",
+        "training-partition",
+        "veriformis.dataset-serializer.train",
+        "1",
+    ),
+    (
+        "format",
+        "evaluation",
+        "evaluation-partition",
+        "veriformis.dataset-serializer.evaluation",
+        "1",
+    ),
+    (
+        "format",
+        "provenance",
+        "row-provenance",
+        "veriformis.dataset-serializer.provenance",
+        "1",
+    ),
+    (
+        "validate",
+        "snapshot",
+        "dataset-snapshot",
+        "veriformis.dataset-validation.snapshot",
+        "1",
+    ),
+    (
+        "validate",
+        "report",
+        "dataset-validation-report",
+        "veriformis.dataset-validation.report",
+        "1",
+    ),
+    (
+        "seal",
+        "manifest",
+        "finished-bundle-manifest",
+        "veriformis.bundle.manifest",
+        "1",
+    ),
+    (
+        "seal",
+        "attestation",
+        "finished-bundle-attestation",
+        "veriformis.bundle.attestation",
         "1",
     ),
 )
@@ -133,26 +287,61 @@ GROUP2_ERROR_CODES: Final = (
     "duplicate-identity",
 )
 
+GROUP3_ERROR_CODES: Final = (
+    "curation-invalid",
+    "split-invalid",
+    "serialization-invalid",
+    "dataset-validation-invalid",
+    "gate-failure",
+    "seal-invalid",
+    "bundle-invalid",
+    "artifact-digest-mismatch",
+    "construction-invalid",
+    "workspace-revision-conflict",
+    "unsupported-workspace-version",
+    "workspace-corrupt",
+    "missing-stage-input",
+    "stale-stage",
+    "source-evidence-invalid",
+    "duplicate-identity",
+)
+
 __all__ = [
     "CANONICAL_STREAM_CONTRACT_ID",
     "CANONICAL_STREAM_CONTRACT_VERSION",
     "CONSTRUCTION_OUTPUT_CONTRACTS",
     "CONSTRUCTION_SCHEMA_IDS",
     "CONSTRUCTION_STAGE_SCHEMA_ID",
+    "CURATION_STAGE_SCHEMA_ID",
     "DATASET_CONSTRUCTION_CONTRACT_ID",
     "DATASET_CONSTRUCTION_CONTRACT_VERSION",
     "DETERMINISM_PROFILE",
     "DETERMINISTIC_V1_OBJECTIVE_KINDS",
+    "FINISHED_DATASET_CONTRACT_ID",
+    "FINISHED_DATASET_CONTRACT_VERSION",
+    "FINISHED_DATASET_OUTPUT_CONTRACTS",
+    "FINISHED_DATASET_SCHEMA_IDS",
+    "FORMAT_STAGE_SCHEMA_ID",
     "GROUP1_ACCEPTANCE_CONTRACT_ID",
     "GROUP1_ACCEPTANCE_CONTRACT_VERSION",
     "GROUP1_ERROR_CODES",
     "GROUP2_ERROR_CODES",
+    "GROUP3_ERROR_CODES",
     "M1_1_ACCEPTANCE_OBJECTIVE_KINDS",
     "M1_SOURCE_KINDS",
     "PRODUCT_CONTRACT_ID",
     "PRODUCT_CONTRACT_VERSION",
+    "SEAL_STAGE_SCHEMA_ID",
+    "SPLIT_STAGE_SCHEMA_ID",
+    "VALIDATION_STAGE_SCHEMA_ID",
     "V1_CONSTRUCTION_DIAGNOSTIC_CODES",
+    "V1_BUNDLE_VERIFICATION_GRADES",
+    "V1_COVERAGE_BLOCKER_CODES",
+    "V1_CURATION_REASON_CODES",
+    "V1_DATASET_PARTITIONS",
+    "V1_FINISHED_DATASET_GATES",
     "V1_PROMOTION_REASON_CODES",
+    "V1_QUALITY_FINDING_CODES",
     "V1_ROW_SCHEMA_KINDS",
     "VERIFORMIS_OWNED_STAGES",
 ]

@@ -2,11 +2,20 @@ import fcntl
 import hashlib
 import json
 from copy import deepcopy
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
 
 from veriformis.cli import app
+from veriformis.contracts import (
+    CONSTRUCTION_STAGE_SCHEMA_ID,
+    CURATION_STAGE_SCHEMA_ID,
+    FORMAT_STAGE_SCHEMA_ID,
+    SEAL_STAGE_SCHEMA_ID,
+    SPLIT_STAGE_SCHEMA_ID,
+    VALIDATION_STAGE_SCHEMA_ID,
+)
 from veriformis.errors import (
     ArtifactDigestMismatchError,
     DuplicateIdentityError,
@@ -26,38 +35,126 @@ from veriformis.identity import (
 )
 from veriformis.ir import document_to_dict
 from veriformis.parsers.text import parse_text
-from veriformis.workspace import SourceDescriptor, StageState, Workspace
+from veriformis.workspace import (
+    STAGES,
+    STAGE_DEPENDENCIES,
+    SourceDescriptor,
+    StageState,
+    Workspace,
+)
 
 
-def _commit_stage(workspace, stage, text=None, *, config=None, status="complete"):
-    payload = (text or stage).encode()
+_V3_STAGE_OUTPUTS = {
+    "parse": {"registry": "source-registry"},
+    "clean": {"transforms": "transform-records"},
+    "chunk": {"chunks": "chunks"},
+    "construct": {
+        "recipe": "dataset-recipe",
+        "result": "construction-result",
+    },
+    "curate": {
+        "plan": "finished-dataset-plan",
+        "result": "curation-result",
+    },
+    "split": {"result": "split-result"},
+    "format": {
+        "row-set": "formatted-row-set",
+        "train": "training-partition",
+        "evaluation": "evaluation-partition",
+        "provenance": "row-provenance",
+    },
+    "validate": {
+        "snapshot": "dataset-snapshot",
+        "report": "dataset-validation-report",
+    },
+    "seal": {
+        "manifest": "finished-bundle-manifest",
+        "attestation": "finished-bundle-attestation",
+    },
+}
+
+_V3_FINISHED_STAGE_SCHEMAS = {
+    "curate": CURATION_STAGE_SCHEMA_ID,
+    "split": SPLIT_STAGE_SCHEMA_ID,
+    "format": FORMAT_STAGE_SCHEMA_ID,
+    "validate": VALIDATION_STAGE_SCHEMA_ID,
+    "seal": SEAL_STAGE_SCHEMA_ID,
+}
+
+
+def _synthetic_commit(transaction, **kwargs):
+    """Bypass domain replay only; retain revision, output, and lineage checks."""
+    with patch.object(transaction, "_validate_stage_semantics", return_value=None):
+        return transaction.commit(**kwargs)
+
+
+def _finished_plan_id(workspace):
+    revision = workspace.head(verify_objects=False)
+    curate = revision.stages["curate"]
+    if curate.status == "complete":
+        return curate.config["plan_id"]
+    construct = revision.stages["construct"]
+    assert construct.status == "complete"
+    return derive_id(
+        "fdp",
+        {
+            "schema_version": "veriformis.synthetic-finished-plan/v1",
+            "recipe_id": construct.config["recipe_id"],
+        },
+    )
+
+
+def _default_stage_config(workspace, stage, text=None):
     if stage == "parse":
-        stage_config = {"sources": []}
-    elif stage == "clean" and config is None:
-        stage_config = {
-            "rules": ["lowercase"] if text is not None else ["page-numbers", "whitespace"],
+        return {"sources": []}
+    if stage == "clean":
+        return {
+            "rules": ["lowercase"]
+            if text is not None
+            else ["page-numbers", "whitespace"],
             "custom": None,
             "max_remove_ppm": 300_000,
         }
-    elif stage == "chunk" and config is None:
-        stage_config = {"strategy": "paragraph", "size": 1000, "overlap": 100}
-    elif stage == "format" and config is None:
-        stage_config = {
-            "format": "completion",
-            "template": None,
-            "instruction": None,
-            "with_heading_path": False,
-        }
-        if text is not None:
-            stage_config["test_payload"] = text
-    elif stage == "validate" and config is None:
-        stage_config = {"format": "completion"}
-        if text is not None:
-            stage_config["test_payload"] = text
-    else:
-        stage_config = (
-            {"test_payload": text} if text is not None and config is None else config
+    if stage == "chunk":
+        return {"strategy": "paragraph", "size": 1000, "overlap": 100}
+    if stage == "construct":
+        selected_source_ids = tuple(
+            sorted(workspace.head(verify_objects=False).sources)
         )
+        assert selected_source_ids, "synthetic construct requires a captured source"
+        recipe_id = derive_id(
+            "rcp",
+            {
+                "schema_version": "veriformis.synthetic-recipe/v1",
+                "selected_source_ids": selected_source_ids,
+            },
+        )
+        return {
+            "schema_version": CONSTRUCTION_STAGE_SCHEMA_ID,
+            "recipe_id": recipe_id,
+            "selected_source_ids": list(selected_source_ids),
+        }
+    if stage in _V3_FINISHED_STAGE_SCHEMAS:
+        return {
+            "schema_version": _V3_FINISHED_STAGE_SCHEMAS[stage],
+            "plan_id": _finished_plan_id(workspace),
+        }
+    raise AssertionError(f"unsupported synthetic stage {stage}")
+
+
+def _commit_stage(
+    workspace,
+    stage,
+    text=None,
+    *,
+    config=None,
+    status="complete",
+    lineage_forgery=None,
+):
+    payload = (text or stage).encode()
+    stage_config = (
+        _default_stage_config(workspace, stage, text) if config is None else config
+    )
     with workspace.begin(stage) as transaction:
         if stage == "parse" and text is not None:
             source, outputs = _put_parsed_source(
@@ -67,26 +164,35 @@ def _commit_stage(workspace, stage, text=None, *, config=None, status="complete"
             )
             transaction.set_sources((source,))
             outputs["registry"] = _put_registry(transaction, (source,))
-            return transaction.commit(
+            return _synthetic_commit(
+                transaction,
                 outputs=outputs,
                 config={"sources": ["source.txt"]},
                 status=status,
             )
-        schemas = {
-            "parse": {"registry": "source-registry"},
-            "clean": {"transforms": "transform-records"},
-            "chunk": {"chunks": "chunks"},
-            "format": {
-                "records": "formatted-records",
-                "records-meta": "records-metadata",
-            },
-            "validate": {"validations": "validation-report"},
-            "seal": {"seal": "seal-output"},
-        }
+        schemas = dict(_V3_STAGE_OUTPUTS[stage])
+        all_source_ids = tuple(sorted(transaction.sources))
+        if stage == "clean":
+            for source_id in all_source_ids:
+                schemas.update(
+                    {
+                        f"source/{source_id}/document": "cleaned-document-ir",
+                        f"source/{source_id}/cleaning-plan": "cleaning-plan",
+                        f"source/{source_id}/block-derivations": ("block-derivations"),
+                    }
+                )
+        if stage == "construct":
+            stage_source_ids = tuple(stage_config["selected_source_ids"])
+        elif stage in {"curate", "split", "format", "validate", "seal"}:
+            stage_source_ids = tuple(
+                transaction.base.stages["construct"].config["selected_source_ids"]
+            )
+        else:
+            stage_source_ids = all_source_ids
         if stage == "parse":
             producer_id, artifact_config = (
                 "veriformis.parse-stage",
-                {"source_count": 0},
+                {"source_count": len(all_source_ids)},
             )
         elif stage == "clean":
             producer_id, artifact_config = "veriformis.cleaning", stage_config
@@ -95,17 +201,36 @@ def _commit_stage(workspace, stage, text=None, *, config=None, status="complete"
                 f"veriformis.chunker.{stage_config['strategy']}",
                 stage_config,
             )
-        elif stage == "format":
-            producer_id, artifact_config = (
-                f"veriformis.serializer.{stage_config['format']}",
-                stage_config,
-            )
-        elif stage == "validate":
-            producer_id, artifact_config = "veriformis.validation", stage_config
         else:
-            producer_id, artifact_config = "seal-test", stage_config
-        outputs = {
-            name: transaction.put_artifact(
+            producer_id, artifact_config = None, stage_config
+        outputs = {}
+        for name, kind in schemas.items():
+            expected_producer = (
+                producer_id
+                if producer_id is not None
+                else {
+                    "construct": f"veriformis.construction.{name}",
+                    "curate": f"veriformis.curation.{name}",
+                    "split": f"veriformis.splitting.{name}",
+                    "format": f"veriformis.dataset-serializer.{name}",
+                    "validate": f"veriformis.dataset-validation.{name}",
+                    "seal": f"veriformis.bundle.{name}",
+                }[stage]
+            )
+            output_producer = expected_producer
+            output_version = "1"
+            output_config = artifact_config
+            if lineage_forgery is not None and name == lineage_forgery[0]:
+                forgery = lineage_forgery[1]
+                if forgery == "producer":
+                    output_producer = "forged.producer"
+                elif forgery == "version":
+                    output_version = "999"
+                elif forgery == "config":
+                    output_config = {**artifact_config, "forged": True}
+                else:  # pragma: no cover - test helper contract
+                    raise AssertionError(f"unknown lineage forgery {forgery}")
+            outputs[name] = transaction.put_artifact(
                 (
                     b"[]"
                     if (stage, name)
@@ -113,18 +238,23 @@ def _commit_stage(workspace, stage, text=None, *, config=None, status="complete"
                         ("parse", "registry"),
                         ("clean", "transforms"),
                         ("chunk", "chunks"),
+                        ("format", "provenance"),
                     }
                     else payload + name.encode()
                 ),
                 kind=kind,
                 media_type="application/octet-stream",
-                producer_id=producer_id,
-                producer_version="1",
-                config=artifact_config,
+                source_ids=(
+                    (name.split("/")[1],)
+                    if name.startswith("source/")
+                    else stage_source_ids
+                ),
+                producer_id=output_producer,
+                producer_version=output_version,
+                config=output_config,
             )
-            for name, kind in schemas[stage].items()
-        }
-        return transaction.commit(
+        return _synthetic_commit(
+            transaction,
             outputs=outputs,
             config=stage_config,
             status=status,
@@ -132,8 +262,12 @@ def _commit_stage(workspace, stage, text=None, *, config=None, status="complete"
 
 
 def _complete_pipeline(workspace):
-    for stage in ("parse", "clean", "chunk", "format", "validate", "seal"):
-        _commit_stage(workspace, stage)
+    for stage in STAGES:
+        _commit_stage(
+            workspace,
+            stage,
+            "captured source" if stage == "parse" else None,
+        )
 
 
 def _put_parsed_source(transaction, logical_path, raw, *, original_path=None):
@@ -170,9 +304,7 @@ def _put_parsed_source(transaction, logical_path, raw, *, original_path=None):
             config=parser_config,
         ),
         "document": transaction.put_artifact(
-            lossless_json_bytes(
-                document_to_dict(parsed.document)
-            ),
+            lossless_json_bytes(document_to_dict(parsed.document)),
             kind="document-ir",
             media_type="application/json",
             source_ids=(source_id,),
@@ -181,9 +313,7 @@ def _put_parsed_source(transaction, logical_path, raw, *, original_path=None):
             config=parser_config,
         ),
         "diagnostics": transaction.put_artifact(
-            lossless_json_bytes(
-                parse_report_to_dict(parsed.diagnostics)
-            ),
+            lossless_json_bytes(parse_report_to_dict(parsed.diagnostics)),
             kind="parse-report",
             media_type="application/json",
             source_ids=(source_id,),
@@ -303,6 +433,7 @@ def test_initial_empty_revision_is_deterministic(tmp_path):
 
     assert first.revision_id == second.revision_id
     assert first.state_digest == second.state_digest
+    assert tuple(sorted(first.stages)) == tuple(sorted(STAGES))
     assert all(state.status == "absent" for state in first.stages.values())
 
 
@@ -394,7 +525,10 @@ def test_rehashed_migration_manifest_is_rejected_without_a_contract(tmp_path):
 
     _install_rehashed_manifest(workspace, revision, mark_as_migration)
 
-    with pytest.raises(UnsupportedWorkspaceVersionError, match="migration contract"):
+    with pytest.raises(
+        UnsupportedWorkspaceVersionError,
+        match="supported workspace migration",
+    ):
         workspace.head(verify_objects=False)
 
 
@@ -475,8 +609,9 @@ def test_historical_stale_revision_remains_valid_after_descendant_rerun(
 
     assert historical.stages["chunk"].invalidated_by == "clean"
     assert historical.stages["chunk"].prior_revision_id == cleaned.parent_revision_id
-    assert chunked.stages["format"].invalidated_by == "chunk"
-    assert chunked.stages["format"].prior_revision_id == cleaned.revision_id
+    for stage in ("construct", "curate", "split", "format", "validate", "seal"):
+        assert chunked.stages[stage].invalidated_by == "chunk"
+        assert chunked.stages[stage].prior_revision_id == cleaned.revision_id
 
 
 def test_commit_is_immutable_and_content_addressed(tmp_path):
@@ -687,8 +822,12 @@ def test_only_validation_can_persist_a_failed_result(tmp_path):
         _commit_stage(workspace, "parse", status="failed")
     assert workspace.head().revision_id == before.revision_id
 
-    for stage in ("parse", "clean", "chunk", "format"):
-        _commit_stage(workspace, stage)
+    for stage in STAGES[: STAGES.index("validate")]:
+        _commit_stage(
+            workspace,
+            stage,
+            "captured source" if stage == "parse" else None,
+        )
     failed = _commit_stage(workspace, "validate", status="failed")
 
     assert failed.stages["validate"].status == "failed"
@@ -747,7 +886,15 @@ def test_upstream_commit_invalidates_all_dependent_stage_records(tmp_path):
 
     assert revised.stages["parse"].status == "complete"
     assert revised.stages["clean"].status == "complete"
-    for stage in ("chunk", "format", "validate", "seal"):
+    for stage in (
+        "chunk",
+        "construct",
+        "curate",
+        "split",
+        "format",
+        "validate",
+        "seal",
+    ):
         assert revised.stages[stage].status == "stale"
         assert revised.stages[stage].outputs == {}
         assert revised.stages[stage].invalidated_by == "clean"
@@ -767,6 +914,9 @@ def test_parse_change_invalidates_every_later_stage(tmp_path):
         for stage in (
             "clean",
             "chunk",
+            "construct",
+            "curate",
+            "split",
             "format",
             "validate",
             "seal",
@@ -841,10 +991,7 @@ def test_workspace_open_rejects_a_missing_parent_revision(tmp_path):
     revision = _commit_stage(workspace, "parse")
     assert revision.parent_revision_id is not None
     parent_manifest = (
-        workspace.root
-        / "revisions"
-        / revision.parent_revision_id
-        / "revision.json"
+        workspace.root / "revisions" / revision.parent_revision_id / "revision.json"
     )
     parent_manifest.unlink()
 
@@ -895,9 +1042,7 @@ def test_workspace_open_rejects_a_valid_upstream_stage_splice(tmp_path):
     old_artifact = first_clean.artifacts[old_artifact_id]
 
     def mutate(manifest):
-        current_artifact_id = manifest["stages"]["clean"]["outputs"][
-            "transforms"
-        ]
+        current_artifact_id = manifest["stages"]["clean"]["outputs"]["transforms"]
         manifest["stages"]["clean"] = old_state.model_dump(mode="json")
         chunk_state = manifest["stages"]["chunk"]
         chunk_state["input_artifact_ids"] = [old_artifact_id]
@@ -1241,43 +1386,82 @@ def test_workspace_open_rejects_a_fabricated_noop_child(tmp_path):
     (
         "stage",
         "dependencies",
-        "stage_config",
         "output_name",
         "artifact_kind",
         "producer_id",
-        "artifact_config",
     ),
     (
         (
             "parse",
             (),
-            {"sources": []},
             "registry",
             "source-registry",
             "veriformis.parse-stage",
-            {"source_count": 0},
         ),
         (
             "clean",
             ("parse",),
-            {
-                "rules": ["page-numbers", "whitespace"],
-                "custom": None,
-                "max_remove_ppm": 300_000,
-            },
             "transforms",
             "transform-records",
             "veriformis.cleaning",
-            None,
         ),
         (
             "chunk",
-            ("parse", "clean"),
-            {"strategy": "paragraph", "size": 1000, "overlap": 100},
+            ("clean",),
             "chunks",
             "chunks",
             "veriformis.chunker.paragraph",
-            None,
+        ),
+        (
+            "construct",
+            ("parse", "clean", "chunk"),
+            "recipe",
+            "dataset-recipe",
+            "veriformis.construction.recipe",
+        ),
+        (
+            "curate",
+            ("construct",),
+            "plan",
+            "finished-dataset-plan",
+            "veriformis.curation.plan",
+        ),
+        (
+            "split",
+            ("construct", "curate"),
+            "result",
+            "split-result",
+            "veriformis.splitting.result",
+        ),
+        (
+            "format",
+            ("construct", "curate", "split"),
+            "row-set",
+            "formatted-row-set",
+            "veriformis.dataset-serializer.row-set",
+        ),
+        (
+            "validate",
+            ("parse", "clean", "chunk", "construct", "curate", "split", "format"),
+            "snapshot",
+            "dataset-snapshot",
+            "veriformis.dataset-validation.snapshot",
+        ),
+        (
+            "seal",
+            (
+                "parse",
+                "clean",
+                "chunk",
+                "construct",
+                "curate",
+                "split",
+                "format",
+                "validate",
+            ),
+            "manifest",
+            "finished-bundle-manifest",
+            "veriformis.bundle.manifest",
         ),
     ),
 )
@@ -1286,53 +1470,57 @@ def test_stage_output_lineage_rejects_self_consistent_forgery(
     tmp_path,
     stage,
     dependencies,
-    stage_config,
     output_name,
     artifact_kind,
     producer_id,
-    artifact_config,
     forgery,
 ):
     workspace = Workspace.create(tmp_path / "ws")
-    for dependency in dependencies:
-        _commit_stage(workspace, dependency)
-    expected_artifact_config = (
-        stage_config if artifact_config is None else artifact_config
-    )
-    forged_producer = "forged.producer" if forgery == "producer" else producer_id
-    forged_version = "999" if forgery == "version" else "1"
-    forged_config = (
-        {**expected_artifact_config, "forged": True}
-        if forgery == "config"
-        else expected_artifact_config
-    )
-
-    with workspace.begin(stage) as transaction:
-        artifact = transaction.put_artifact(
-            b"[]",
-            kind=artifact_kind,
-            media_type="application/json",
-            producer_id=forged_producer,
-            producer_version=forged_version,
-            config=forged_config,
+    assert STAGE_DEPENDENCIES[stage] == dependencies
+    assert _V3_STAGE_OUTPUTS[stage][output_name] == artifact_kind
+    expected_producer = {
+        "parse": "veriformis.parse-stage",
+        "clean": "veriformis.cleaning",
+        "chunk": "veriformis.chunker.paragraph",
+        "construct": f"veriformis.construction.{output_name}",
+        "curate": f"veriformis.curation.{output_name}",
+        "split": f"veriformis.splitting.{output_name}",
+        "format": f"veriformis.dataset-serializer.{output_name}",
+        "validate": f"veriformis.dataset-validation.{output_name}",
+        "seal": f"veriformis.bundle.{output_name}",
+    }[stage]
+    assert producer_id == expected_producer
+    for dependency in STAGES[: STAGES.index(stage)]:
+        _commit_stage(
+            workspace,
+            dependency,
+            "captured source" if dependency == "parse" else None,
         )
-        with pytest.raises(WorkspaceCorruptError, match="artifact lineage"):
-            transaction.commit(
-                outputs={output_name: artifact},
-                config=stage_config,
-            )
+    with pytest.raises(WorkspaceCorruptError, match="artifact lineage"):
+        _commit_stage(
+            workspace,
+            stage,
+            lineage_forgery=(output_name, forgery),
+        )
 
 
-@pytest.mark.parametrize("stage", ("parse", "clean", "chunk", "format", "validate"))
+@pytest.mark.parametrize("stage", STAGES)
 def test_complete_stage_cannot_bypass_its_required_output_schema(tmp_path, stage):
     workspace = Workspace.create(tmp_path / "ws")
-    ordered = ("parse", "clean", "chunk", "format", "validate")
-    for dependency in ordered[: ordered.index(stage)]:
-        _commit_stage(workspace, dependency)
+    for dependency in STAGES[: STAGES.index(stage)]:
+        _commit_stage(
+            workspace,
+            dependency,
+            "captured source" if dependency == "parse" else None,
+        )
 
     with workspace.begin(stage) as transaction:
         with pytest.raises(WorkspaceCorruptError, match="output schema mismatch"):
-            transaction.commit(outputs={})
+            _synthetic_commit(
+                transaction,
+                outputs={},
+                config=_default_stage_config(workspace, stage),
+            )
 
 
 def test_complete_stage_rejects_outputs_outside_its_schema(tmp_path):
