@@ -2,12 +2,12 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** Group 7 SwiftUI workbench on
-branch `agent/group-7-swiftui-workbench`
+**Implementation baseline reviewed:** `d42d527` on `origin/main` after Group 7
+merge (PR #12); Groups 1 through 7 complete
 
 **Product version:** `0.1.0` development alpha
 
-**Last reviewed:** 2026-08-05
+**Last reviewed:** 2026-08-05 (full documentation sync)
 
 **Next review:** Any merged implementation group, contract or roadmap change,
 or listed-item status change
@@ -132,8 +132,7 @@ the [Group 3 plan](dev/active/group-3-finished-dataset/plan.md), and the
 parity for `full_text` and `continuation` on the golden multi-source corpus.
 
 **Evidence:** [Group 4 plan](dev/active/group-4-pipeline-service/plan.md),
-`tests/pipeline/test_pipeline_service.py`, and repository checks with
-`609 passed`.
+`tests/pipeline/test_pipeline_service.py`.
 
 ## Completed: Group 5
 
@@ -294,56 +293,49 @@ Done on the branch:
 
 Remaining:
 
-- [ ] Review and merge PR #6.
-- [ ] Re-verify deep-dive `file:line` citations at the first Group 4 change.
+- [ ] Re-verify architecture deep-dive `file:line` citations when entry points
+  drift materially.
 - [ ] Machine-render Mermaid diagrams in CI (currently hand-reviewed).
+- [ ] Group 9: security, packaging, notarization, and release troubleshooting
+  documentation.
 
 ## Deferred documentation
 
 - [x] Add the stable Python API surface via `PipelineService`.
 - [x] Add the dual-objective M1.1 API and CLI acceptance procedure.
-- [ ] Add the versioned Aptus handoff and backend enforcement guidance.
-- [ ] Add expanded input, security, release, and migration guidance.
-- [ ] Add troubleshooting for the future supported release surface.
+- [x] Add the versioned Aptus handoff contract and consumer verification.
+- [x] Document expanded declared ingest and YAML pipelines.
+- [x] Document MCP and SwiftUI workbench surfaces.
+- [ ] Expand security, migration, and release troubleshooting for Group 9.
 
 ## Known current limitations
 
-- Inputs are limited to text, Markdown, DOCX, and listed source-code formats.
-- OCR is unsupported.
-- There is no one-command `run` surface or YAML pipeline.
-- There is no MCP adapter or SwiftUI workbench.
-- Aptus support validates current row shape only.
-- Current Aptus MLX intake rejects plain `text` rows.
+- OCR is unsupported (empty-text PDFs refuse with a named limitation).
+- Declared inputs are text, Markdown, DOCX, HTML, digitally-born PDF, CSV,
+  JSON, JSONL, and listed source-code formats — not arbitrary binary.
+- Current Aptus MLX intake rejects plain `text` rows (recorded in handoff
+  capabilities).
 - The CLI cannot submit completed human review evidence.
 - The minimal bundle omits raw sources and complete replay artifacts.
 - External trust requires a manifest digest retained outside the bundle.
-- Model-assisted construction remains optional and unapproved.
-- CI and packaging do not yet establish public release readiness.
+- Model-assisted construction remains optional and unapproved (Group 8).
+- CI and packaging do not yet establish public release readiness (Group 9).
 
 ## Verification snapshot
 
-The Group 4 closeout recorded:
+Post–Group 7 merge on `main` (`d42d527`, 2026-08-05):
 
 ```text
 uv lock --check             passed
 uv run ruff check src tests passed
-uv run pytest -q            623 passed
-uv run pytest -q            646 passed
+uv run pytest -q            655 passed
 git diff --check            passed
 ```
 
-A supported two-source raw-input demonstration reached a sealed bundle and
-`external_digest` verification. The independent review found no unresolved
-Critical, High, or Important defect.
-
-On 2026-07-30 the documentation branch re-ran `uv run pytest -q` (606 passed)
-plus link and diagram-fence checks across the revamped documentation; the
-pre-push hook repeated the suite green on both documentation commits.
+Additional permanent locks: Group 5 declared-format e2e regressions, MCP/service
+parity, Aptus handoff consumer tests, and `macos/scripts/parity_check.sh`.
 
 Rerun these checks before calling this snapshot current.
-Dual-objective API and CLI acceptance passes for `full_text` and
-`continuation` on the golden multi-source corpus. Rerun these checks before
-calling this snapshot current.
 
 ## Maintenance rules
 
@@ -365,7 +357,9 @@ calling this snapshot current.
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+- [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Architecture](docs/architecture.md)
 - [Architecture tree](docs/architecture/README.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
+- [macOS workbench](macos/README.md)

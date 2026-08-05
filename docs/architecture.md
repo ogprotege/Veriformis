@@ -1,15 +1,16 @@
 # Architecture
 
-**Last reviewed:** 2026-08-05 after Group 5 completion
+**Last reviewed:** 2026-08-05 after Groups 1–7 merge to `main`
 
-**Next review:** The first Group 6 integration change
+**Next review:** The first Group 9 release-gate change or any service-boundary
+change
 
-Veriformis `0.1.0` is a Python 3.11+ modular monolith with one installed
-entry point, the `veriformis` CLI, and one typed orchestration surface,
-`veriformis.pipeline.PipelineService`. Domain modules own strict persisted
-contracts and pure transformations; the service is the composition root over
-a content-addressed, replay-gated workspace; the CLI is a thin adapter. No
-MCP server or application shell exists in `0.1.0`.
+Veriformis `0.1.0` is a Python 3.11+ modular monolith with a typed
+composition root, `veriformis.pipeline.PipelineService`, and multiple thin
+adapters: the `veriformis` CLI, constrained local MCP (`veriformis.mcp`), and
+the SwiftUI workbench under `macos/` (CLI shell). Domain modules own strict
+persisted contracts and pure transformations; adapters must not reimplement
+stage policy. Workspace state is content-addressed and replay-gated.
 
 This hub holds the pipeline at a glance, the module map, and the operational
 layouts; the overview and four citation-backed deep dives live under
@@ -37,10 +38,11 @@ A foundation kernel (`errors.py`, `contracts.py`, `identity.py`,
 taxonomy, schema and gate registries, canonical-JSON identity substrate, and
 provenance model. Above it sit `ir/` (the canonical document model) and six
 stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
-`construction/`, `datasets/`, `bundle/` — flanked by three axial modules:
-`workspace.py`, the revision and stage-graph kernel; `pipeline/`, the typed
-`PipelineService` composition root; and `cli.py`, the Typer adapter. Retained
-legacy packages (`serializers/`, `validate/`) have no production callers.
+`construction/`, `datasets/`, `bundle/` — flanked by axial modules:
+`workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
+`handoff/`; `mcp/`; and `cli.py` (Typer adapter). The macOS workbench lives
+outside the Python package under `macos/`. Retained legacy packages
+(`serializers/`, `validate/`) have no production callers.
 
 Deep dives: [Layers](architecture/layers.md) — stack and isolation;
 [Dependencies](architecture/dependencies.md) — fan-in and containment;

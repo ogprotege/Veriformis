@@ -4,9 +4,9 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-07-30 after Group 3 completion
+**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
 
-**Next review:** The first Group 4 service change
+**Next review:** The first Group 9 release-gate change or architecture change
 
 ## System overview
 
@@ -15,7 +15,8 @@ references that carry the verified, citation-backed detail.
 Veriformis occupies a specific and deliberately narrow position in the
 data-engineering landscape: it is a local-first compiler for fine-tuning
 datasets, transforming heterogeneous raw documents — plain text, source code,
-Markdown, and DOCX — into sealed, independently verifiable training bundles.
+Markdown, DOCX, HTML, digitally-born PDF, CSV, JSON, and JSONL — into sealed,
+independently verifiable training bundles.
 The system's stated product promise frames the entire corpus-to-dataset
 trajectory as a compilation problem rather than an ad-hoc scripting task (see
 `docs/product-contract.md:19`), and this framing defines both what the system

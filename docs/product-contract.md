@@ -76,12 +76,15 @@ exact current snapshot, atomically publishes a closed six-file bundle, and
 supports independent `self_consistent` or externally anchored
 `external_digest` verification.
 
-This remains a working alpha. Group 3 passed its independent architecture and
-security closeout. Group 4 delivered the stable `PipelineService`, thin CLI
-adapter, and dual-objective M1.1 API and CLI acceptance gate. Group 5 expanded
-declared ingest (HTML, digitally-born PDF, CSV, JSON, JSONL), named OCR refusal,
-the deterministic recipe library, statistics, and YAML pipelines. Later groups
-add MCP, Aptus handoff, the Mac workbench, and release controls.
+This remains a working alpha until Group 9 public release gates pass. Group 3
+passed its independent architecture and security closeout. Group 4 delivered
+`PipelineService`, the thin CLI adapter, and dual-objective M1.1 acceptance.
+Group 5 expanded declared ingest (HTML, digitally-born PDF, CSV, JSON, JSONL),
+named OCR refusal, the recipe library, statistics, and YAML pipelines. Group 6
+delivered constrained local MCP and the versioned Aptus handoff. Group 7
+delivered the SwiftUI workbench over the CLI. Optional Group 8
+(model-assisted construction) remains owner-gated. Group 9 owns release
+packaging and install verification.
 
 ## End-to-end compiler contract
 

@@ -4,22 +4,22 @@
 >
 > **Original date:** 2026-07-28
 >
-> **Last reviewed:** 2026-07-29
+> **Last reviewed:** 2026-08-05 (status header only; body remains historical)
 >
 > **Repository:** `github.com/ogprotege/Veriformis`
 
-> **Current implementation:** M1 core and Groups 1 through 3 are implemented in the
-> `0.1.0` stage-command runtime. Supported raw sources now reach deterministic
-> construction, curation, leakage-safe splitting, product-row formatting, exact 17-gate
-> validation, atomic six-file sealing, and independent verification. Group 3 passed its
-> independent architecture and security closeout.
+> **Current implementation:** Groups 1 through 7 are implemented on `main` at
+> version `0.1.0` (compiler through workbench). See
+> [current implementation status](../../current-status.md).
 >
-> **Planned continuation:** `PipelineService`, thin CLI conversion, and dual-objective
-> M1.1 API and CLI acceptance are Group 4. Broader ingest, policy libraries, MCP, the
-> versioned Aptus handoff, and the macOS workbench remain later work. See the
-> [product contract](../../product-contract.md),
+> **Planned continuation:** Optional Group 8 and Group 9 public release gates.
+> Body text below may still describe earlier surfaces as planned;
+> **current-status.md controls present claims.**
+>
+> See the [product contract](../../product-contract.md),
 > [current implementation status](../../current-status.md), and
 > [build roadmap](../../plans/2026-07-29-veriformis-roadmap.md).
+>
 
 The target **Veriformis** product *(verus + forma, "true-formed")* is a local-first macOS
 dataset compiler. It must own the full path from heterogeneous raw sources to finished,

@@ -153,9 +153,10 @@ in its aligned metadata stream. The co-located attestation proves internal
 agreement, not external authenticity. The optional expected manifest digest
 provides the external binding.
 
-Group 3 validates current Aptus row shape only. It does not yet provide the
-shared Aptus bundle handoff or enforce Veriformis partitions inside an Aptus
-backend. Current Aptus MLX intake also does not accept plain `text` rows.
+Group 3 validates Aptus row shape. Group 6 adds the versioned sibling Aptus
+handoff (`*.aptus-handoff.json`) and `handoff-verify` consumer checks. Live
+training remains Aptus's job. Current Aptus MLX intake still rejects plain
+`text` rows; the handoff records that limit.
 
 ## Workspace integrity
 
@@ -176,39 +177,32 @@ source paths.
 
 ## Current boundary
 
-Groups 1 through 3 implement the stage-command runtime. They do not complete
-M1.1 or public release readiness. Group 4 still owns:
-
-- a surface-neutral `PipelineService`;
-- conversion of the CLI into a thin adapter over that service; and
-- the dual-objective M1.1 API and CLI acceptance gate.
-
-Later work adds remaining source adapters, broader deterministic policies, MCP,
-the versioned Aptus handoff, the SwiftUI workbench, and release controls.
+**Groups 1 through 7 are implemented** on `main` (compiler through workbench).
+This is still a development alpha: **Group 9** public release gates (CI matrix,
+packaging, signing, notarization, install verification) are not complete.
+**Group 8** model-assisted construction is optional and owner-gated.
 
 ## Documentation
 
 The [documentation index](docs/README.md) defines document authority and
-reading paths for each audience. The map:
+reading paths. The map:
 
 - **Product and status**
   - [Product contract](docs/product-contract.md) — ownership boundary and non-claims
-  - [Current implementation status](docs/current-status.md) — exact alpha boundary and Group 3 evidence
-  - [Work in progress and remaining tasks](WIP.md)
+  - [Current implementation status](docs/current-status.md) — exact alpha boundary (Groups 1–7)
+  - [Work in progress](WIP.md) — non-authoritative tracker
 - **Architecture**
-  - [Architecture hub](docs/architecture.md) — current module, workspace, artifact, and bundle flow
-  - [Architecture tree](docs/architecture/README.md) — layered detail:
-    - [Layers](docs/architecture/layers.md) — architectural layers and their responsibilities
-    - [Dependencies](docs/architecture/dependencies.md) — allowed dependency directions between modules
-    - [Data flow](docs/architecture/data-flow.md) — how data moves through the nine stages
-    - [Entry points](docs/architecture/entry-points.md) — CLI and future service surfaces
-- **Implemented contracts**
+  - [Architecture hub](docs/architecture.md)
+  - [Architecture tree](docs/architecture/README.md)
+- **Contracts**
   - [Integrity Contract v1](docs/contracts/integrity-v1.md)
   - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
   - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+  - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
+  - [macOS workbench](macos/README.md)
   - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)
 
@@ -221,9 +215,9 @@ uv run pytest -q
 git diff --check
 ```
 
-The Group 3 closeout run completed with `606 passed`. CI currently runs
-Ruff and pytest on Ubuntu with Python 3.12. Broader package, platform, type,
-coverage, security, and release gates remain future work.
+Post–Group 7 merge on `main`: `655 passed`. CI currently runs Ruff and pytest
+on Ubuntu with Python 3.12. Broader package, platform, type, coverage, security,
+and release gates remain Group 9 work.
 
 ## License
 

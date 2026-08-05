@@ -1,118 +1,99 @@
 # Veriformis Documentation
 
 This documentation describes the development-alpha compiler from raw source
-capture through a verified finished-dataset bundle.
+capture through a verified finished-dataset bundle, plus local automation and
+workbench surfaces built in Groups 1 through 7.
 
-**Last reviewed:** 2026-07-30 after the architecture documentation revamp
+**Last reviewed:** 2026-08-05 after Groups 1–7 merge to `main`
 
-**Next review:** The first Group 4 service change or any contract change,
-whichever comes first
+**Next review:** The first Group 9 release-gate change or any contract change
 
 ## Start here
 
-1. Read the repository [README](../README.md) for the product goal, setup, and
-   raw-source quickstart.
+1. Read the repository [README](../README.md) for product goal, setup, and
+   quickstart.
 2. Read [Current implementation status](current-status.md) for the exact alpha
-   boundary and completed Group 3 evidence.
-3. Read the [product contract](product-contract.md) for the complete ownership
-   boundary.
-4. Read [Integrity Contract v1](contracts/integrity-v1.md) for Group 1.
-5. Read [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
-   for Group 2.
-6. Read [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) for the
-   implemented Group 3 curation, split, row, validation, seal, and verification
-   contracts.
-7. Use the [authoritative build roadmap](plans/2026-07-29-veriformis-roadmap.md)
-   for the remaining Group 4 and later work.
+   boundary (Groups 1–7) and verification evidence.
+3. Read the [product contract](product-contract.md) for ownership and non-claims.
+4. Use the [authoritative build roadmap](plans/2026-07-29-veriformis-roadmap.md)
+   for remaining Group 8 (optional) and Group 9 (public release) work.
 
 ## Reading paths
 
-- **New contributor:** repository [README](../README.md), then
-  [current status](current-status.md), the [development guide](development.md),
-  and the architecture [hub](architecture.md) and
-  [tree](architecture/README.md) for structure.
-- **CLI operator:** the quickstart in the repository [README](../README.md),
-  then the [CLI reference](cli.md); consult
-  [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) for bundle
-  layout and verification semantics.
-- **Contract reviewer:** the [product contract](product-contract.md), then the
-  three implemented contracts ([Integrity v1](contracts/integrity-v1.md),
-  [Dataset Construction v1](contracts/dataset-construction-v1.md),
-  [Finished Dataset v1](contracts/finished-dataset-v1.md)), with
-  [current status](current-status.md) for the supporting evidence.
+- **New contributor:** [README](../README.md) → [current status](current-status.md)
+  → [development guide](development.md) → [architecture hub](architecture.md).
+- **CLI operator:** [README](../README.md) quickstart → [CLI reference](cli.md)
+  → [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) for bundles
+  → [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) for handoff.
+- **Workbench operator:** [macOS workbench README](../macos/README.md).
+- **Contract reviewer:** [product contract](product-contract.md), then Integrity,
+  Dataset Construction, Finished Dataset, and Aptus Handoff contracts, with
+  [current status](current-status.md) for evidence.
 
 ## Active documentation
 
 | Document | Purpose | Authority |
 | --- | --- | --- |
-| [README](../README.md) | Product introduction, setup, raw-source quickstart, and major warnings | Current `0.1.0` entry point |
-| [Current implementation status](current-status.md) | Exact capabilities, limitations, verification evidence, and phase boundary | Current source truth after Group 3 completion |
-| [Product contract](product-contract.md) | End-to-end ownership, integrity guarantees, and non-claims | Product authority |
-| [Integrity Contract v1](contracts/integrity-v1.md) | Group 1 workspace, identity, evidence, and cleaning guarantees | Implemented contract |
-| [Dataset Construction Contract v1](contracts/dataset-construction-v1.md) | Group 2 objectives, recipes, evidence, lifecycle, and replay guarantees | Implemented contract |
-| [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) | Group 3 curation, leakage splitting, product rows, exact validation, minimal bundle, seal, and verification | Implemented contract |
-| [Architecture hub](architecture.md) | Current module, workspace, artifact, and bundle flow | Current architecture reference |
-| [Architecture tree](architecture/README.md) | Layered detail: [layers](architecture/layers.md), [dependencies](architecture/dependencies.md), [data flow](architecture/data-flow.md), and [entry points](architecture/entry-points.md) | Current architecture detail |
-| [CLI reference](cli.md) | Current commands, options, artifacts, and failure boundaries | Current `0.1.0` CLI reference |
-| [Development guide](development.md) | Setup, checks, test map, CI scope, and engineering constraints | Current contributor guide |
-| [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered implementation sequence, groups, and exit gates | Authoritative implementation order |
-| [Contributing](../CONTRIBUTING.md) | Contribution standards and pull request checklist | Contribution policy |
+| [README](../README.md) | Product introduction, setup, quickstart | Current `0.1.0` entry point |
+| [Current implementation status](current-status.md) | Exact capabilities, limitations, evidence, phase boundary | **Current source of truth** for capability claims |
+| [Product contract](product-contract.md) | End-to-end ownership, integrity guarantees, non-claims | Product authority |
+| [Integrity Contract v1](contracts/integrity-v1.md) | Workspace, identity, evidence, cleaning | Implemented contract |
+| [Dataset Construction Contract v1](contracts/dataset-construction-v1.md) | Objectives, recipes, evidence, lifecycle | Implemented contract |
+| [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) | Curation, split, rows, validation, seal, verify | Implemented contract |
+| [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
+| [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
+| [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
+| [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
+| [Development guide](development.md) | Setup, checks, tests, engineering constraints | Contributor guide |
+| [macOS workbench](../macos/README.md) | SwiftUI workbench build and parity | Workbench operator guide |
+| [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered sequence, groups, exit gates | Authoritative work order |
+| [Contributing](../CONTRIBUTING.md) | PR checklist and standards | Contribution policy |
 
 ## Working inventory
 
-Use the root [Work in Progress](../WIP.md) file as the reviewed checklist of
-completed steps, remaining groups, immediate Group 4 work, and nonblocking
-follow-ups. It is a convenience tracker. It never overrides current status,
-the roadmap, or a versioned contract.
+Root [WIP.md](../WIP.md) is a reviewed convenience checklist. It never overrides
+current status, the roadmap, or a versioned contract.
 
-## Historical implementation records
+## Implementation vocabulary
 
-The dated design specification and completed M1 plan preserve product and
-implementation history. Their status notes identify later implementation, but
-their original decisions remain historical.
+| Term | Meaning |
+| --- | --- |
+| **Implemented** | Present in current source and ordinary passing tests |
+| **Groups 1–3** | Integrity, construction, finished-dataset stage runtime (Steps 1–16) |
+| **Group 4** | `PipelineService`, thin CLI, dual-objective M1.1 (Steps 17–19) |
+| **Group 5** | Expanded ingest + recipe library / YAML (Steps 20–21) |
+| **Group 6** | MCP + Aptus handoff v1 (Steps 22–23) |
+| **Group 7** | SwiftUI workbench (Step 24) |
+| **Group 8** | Optional model-assisted construction (Step 25; owner-gated) |
+| **Group 9** | Public release gates (Step 26; **next required**) |
+| **Unsupported** | Not available (for example OCR) |
+
+## Historical records
+
+Dated design specs and completed plans are historical. Their status sections
+may note later completion; they do not redefine current capability.
 
 - [Initial design specification](superpowers/specs/2026-07-28-veriformis-design.md)
 - [Completed M1 implementation plan](superpowers/plans/2026-07-28-veriformis-m1.md)
 
-When a historical document conflicts with `current-status.md`, the current
-status document controls present behavior. The roadmap controls future order.
-
-## Status vocabulary
-
-- **Implemented:** Present in current source and ordinary passing tests.
-- **Groups 1 through 3:** The integrity, construction, and finished-dataset
-  stage-command runtime for Steps 1 through 16.
-- **Group 3 Complete:** Runtime, repository checks, raw-source demonstration,
-  and independent architecture and security review satisfy the Group 3 gate.
-- **Group 4:** `PipelineService`, a thin CLI, and dual-objective M1.1 API and CLI
-  acceptance.
-- **Later:** Approved direction after M1.1, but not implemented.
-- **Unsupported:** Not available in the current product.
+When historical prose conflicts with `current-status.md`, **current status
+controls**.
 
 ## Documentation rules
 
 - Separate implemented behavior from planned behavior.
-- Keep raw source material as the product entry point.
-- Treat clean corpus state as intermediate unless `full_text` selects it.
+- Keep raw source as the product entry; clean state is intermediate unless
+  `full_text` selects it.
 - State evidence limits beside integrity claims.
-- Distinguish exact persisted bytes, portable semantic digests, and historical
-  revision IDs.
 - Do not describe a green build as release readiness.
 - Do not call a bundle externally trusted without a retained expected manifest
   digest.
-- Describe Group 3 Aptus support as row-shape validation only.
-- Keep historical reference material separate from active guidance.
 - Update documentation and tests in the same implementation group.
 
-## Documentation debt
+## Documentation debt (remaining)
 
-These documents remain intentionally deferred with their owning work:
-
-- stable Python API reference after `PipelineService` exists;
-- dual-objective M1.1 API and CLI acceptance procedure;
-- versioned Aptus bundle handoff and backend partition enforcement;
-- expanded input, security, release, and migration guidance;
-- troubleshooting for the future supported release surface;
-- architecture deep-dive `file:line` citations pin current source positions
-  and must be re-verified at the first Group 4 change; and
-- Mermaid diagrams are hand-reviewed but not machine-rendered in CI.
+- Expanded security, migration, and troubleshooting guides for a supported
+  public release surface (Group 9).
+- Architecture deep-dive `file:line` citations should be re-verified when
+  entry-point line numbers drift.
+- Mermaid diagrams are hand-reviewed; not machine-rendered in CI.
