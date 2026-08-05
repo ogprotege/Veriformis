@@ -41,6 +41,12 @@ uv run pytest -q
 git diff --check
 ```
 
+Before a push that touches release gates or packaging, also run:
+
+```bash
+bash scripts/release/check_local.sh
+```
+
 Rerun the commands for current evidence because totals can grow. Ruff lints
 only the `E4`, `E7`, `E9`, and `F` rule families; there is no configured
 formatter or type checker in this alpha.
