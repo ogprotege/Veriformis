@@ -4,13 +4,15 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 through 7 runtime, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 through 7 runtime and Group 9
+automated release gates, version `0.1.0`
 
-**Implementation review state:** Groups 1 through 7 complete
+**Implementation review state:** Groups 1 through 7 complete; Group 9
+automated gates landed; public-ready claim still owner-gated
 
 **Last reviewed:** 2026-08-05
 
-**Next review:** The first public-release gate change or any product-contract change
+**Next review:** Owner public-ready checklist completion or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -76,15 +78,18 @@ exact current snapshot, atomically publishes a closed six-file bundle, and
 supports independent `self_consistent` or externally anchored
 `external_digest` verification.
 
-This remains a working alpha until Group 9 public release gates pass. Group 3
+This remains a working alpha until the full Group 9 public-ready checklist
+passes with retained evidence (see [release guide](release.md)). Group 3
 passed its independent architecture and security closeout. Group 4 delivered
 `PipelineService`, the thin CLI adapter, and dual-objective M1.1 acceptance.
 Group 5 expanded declared ingest (HTML, digitally-born PDF, CSV, JSON, JSONL),
 named OCR refusal, the recipe library, statistics, and YAML pipelines. Group 6
 delivered constrained local MCP and the versioned Aptus handoff. Group 7
-delivered the SwiftUI workbench over the CLI. Optional Group 8
-(model-assisted construction) remains owner-gated. Group 9 owns release
-packaging and install verification.
+delivered the SwiftUI workbench over the CLI. Group 9 automated gates cover
+supported-platform CI, package-install smoke, golden corpus compile evidence,
+and the packaging runbook. Owner-executed signing, notarization, and clean-Mac
+install evidence remain required for a public-ready claim. Optional Group 8
+(model-assisted construction) remains owner-gated.
 
 ## End-to-end compiler contract
 

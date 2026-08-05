@@ -46,3 +46,14 @@ assignment, partition digests, and manifest SHA-256.
 
 A user can complete raw sources → sealed `.vfbundle` (+ handoff) without the
 terminal; digests match CLI.
+
+## Packaging and release
+
+Local unsigned dry-run (not public-ready):
+
+```bash
+bash scripts/release/macos_package_local.sh
+```
+
+Signed distribution, notarization, and clean-Mac install evidence are
+owner-executed steps documented in [docs/release.md](../docs/release.md).

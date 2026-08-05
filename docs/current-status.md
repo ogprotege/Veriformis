@@ -4,12 +4,14 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1 through 7 complete
+**Implementation state:** Groups 1 through 7 complete; Group 9 automated
+release gates landed (full public readiness still owner-gated for Mac
+signing/notarization evidence)
 
-**Review date:** 2026-08-05 (docs sync after Group 7 merge to `main`)
+**Review date:** 2026-08-05 (Group 9 automated release gates)
 
-**Next review:** The first Group 9 release-gate change, optional Group 8 plan,
-or any contract change
+**Next review:** Owner-executed public-ready checklist completion, optional
+Group 8 plan, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -40,12 +42,19 @@ v1 with fail-closed consumer verification.
 **Group 7** adds the SwiftUI workbench under `macos/`, a thin shell over the
 same CLI so digests match terminal runs.
 
+**Group 9 (automated subset)** expands CI to a Python 3.11–3.13 matrix plus
+macOS Python 3.12, lockfile check, wheel install smoke, golden-corpus
+compile through `external_digest` verify and Aptus handoff-verify, release
+scripts under `scripts/release/`, and [docs/release.md](release.md). Signed
+and notarized Mac distribution remains an owner-executed checklist item.
+
 Raw source material remains the product entry. Clean corpus state is an
 accountable intermediate, except when a `full_text` recipe explicitly selects
 the retained text as its target.
 
-The complete repository check on `main` after Group 7 merge passed with
-`655 passed`. This does **not** claim public release readiness (Group 9).
+Green automated gates do **not** alone claim public release readiness. That
+claim requires the full checklist in [docs/release.md](release.md), including
+owner Mac signing, notarization, clean-Mac install, and recorded evidence.
 
 ## Implemented interfaces
 
@@ -356,11 +365,13 @@ primary-source cap. Group 5 adds a named recipe library, deterministic
 statistics, and versioned YAML pipelines executed only through
 `PipelineService`.
 
-### Public release gates remain incomplete
+### Public release readiness remains incomplete
 
-CI does not yet provide a Python-version matrix, type checking, coverage
-enforcement, dependency review, package-install testing, macOS packaging,
-signing, notarization, or release verification.
+Automated Group 9 gates are present (matrix CI, lock check, install smoke,
+golden compile). Still incomplete for a public-ready claim: type checking and
+coverage as hard gates, dependency audit, signed/notarized Mac distribution,
+and clean-Mac install plus Aptus handoff evidence under owner credentials.
+See [docs/release.md](release.md).
 
 ## Phase boundary
 
@@ -374,21 +385,25 @@ signing, notarization, or release verification.
 | Implemented Group 5 | HTML/PDF/CSV/JSON/JSONL ingest, OCR refusal, recipe library, statistics, YAML pipelines |
 | Implemented Group 6 | Local MCP adapter, versioned Aptus handoff, consumer verification |
 | Implemented Group 7 | SwiftUI workbench (CLI adapter) with digest parity |
-| Later | Public release gates; optional model-assisted construction |
+| Implemented Group 9 (automated) | CI matrix, lock check, wheel smoke, golden compile/handoff scripts, release runbook |
+| Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready claim |
+| Later / optional | Group 8 model-assisted construction (owner plan) |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
-| Public release | Supported-platform gates, artifact evidence, packaging, signing, notarization, migration checks, and release verification |
+| Public release | Full checklist in [docs/release.md](release.md) with retained evidence |
 | Outside current product | OCR, model training, cloud accounts, multi-user service, billing, and telemetry |
 
 The implemented path remains offline and makes no LLM calls.
 
 ## Development and release evidence
 
-Post–Group 7 merge on `main` (2026-08-05):
+Group 9 automated gates (local or CI):
 
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q            # 655 passed
+uv run pytest -q
+bash scripts/release/smoke_install.sh
+bash scripts/release/golden_compile.sh
 git diff --check
 ```
 
@@ -401,14 +416,17 @@ Selected permanent locks:
 | MCP / service parity | `tests/mcp/test_mcp_pipeline_parity.py` |
 | Aptus handoff | `tests/handoff/test_aptus_handoff_v1.py`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
 | Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/Tests/` |
+| Group 9 golden + scripts | `tests/regressions/test_group9_release_gates.py`, `scripts/release/`, [release guide](release.md) |
 
 Group 3 independent architecture and security review:
 [Group 3 code review](../dev/active/group-3-finished-dataset/group-3-finished-dataset-code-review.md).
 
-Version `0.1.0` remains a development alpha until Group 9 release gates pass.
+Version `0.1.0` remains a development alpha until the full public-ready
+checklist in [docs/release.md](release.md) is executed with retained evidence.
 
 ## Next authority
 
-Group 9 public release gates are next for a shippable product. Group 8 remains
-optional owner-approved work. See the
-[Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).
+Owner-executed Group 9 remainder (signed/notarized Mac + clean-Mac evidence)
+closes public readiness. Group 8 remains optional owner-approved work. See the
+[Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md) and
+[release guide](release.md).

@@ -15,9 +15,9 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
+**Last reviewed:** 2026-08-05 after Group 9 automated release gates
 
-**Next review:** The first Group 9 release-gate change or any CLI surface change
+**Next review:** Any CLI surface or release-gate documentation change
 
 ## Run the CLI
 
@@ -708,8 +708,10 @@ See [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) and
 
 ## Deferred CLI work
 
-Public release packaging, signing, and install verification are Group 9. No
-further stage-command redesign is planned before then.
+Automated Group 9 release scripts and CI gates live under `scripts/release/`
+and [docs/release.md](release.md). Owner Mac signing and notarization remain
+checklist items. No further stage-command redesign is planned for public
+release.
 
 ## Related documentation
 
@@ -722,5 +724,6 @@ further stage-command redesign is planned before then.
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [Development guide](development.md)
+- [Release guide](release.md)
 - [macOS workbench](../macos/README.md)
 - [Build roadmap](plans/2026-07-29-veriformis-roadmap.md)

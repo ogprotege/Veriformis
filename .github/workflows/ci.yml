@@ -1,13 +1,77 @@
-# .github/workflows/ci.yml
+# Group 9 public release gates (automated subset).
+# Signing/notarization remain owner-executed; see docs/release.md.
 name: ci
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+
 jobs:
   test:
+    name: test (py${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13"]
+        include:
+          - os: macos-latest
+            python-version: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Lockfile check
+        run: uv lock --check
+
+      - name: Sync test extras
+        run: uv sync --python ${{ matrix.python-version }} --extra test
+
+      - name: Ruff
+        run: uv run --python ${{ matrix.python-version }} ruff check src tests
+
+      - name: Pytest
+        run: uv run --python ${{ matrix.python-version }} pytest -q
+
+  install-smoke:
+    name: install-smoke
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - run: uv python install 3.12
-      - run: uv sync --extra test
-      - run: uv run ruff check src tests
-      - run: uv run pytest -q
+      - name: Wheel build and clean-venv CLI smoke
+        run: bash scripts/release/smoke_install.sh
+
+  golden-compile:
+    name: golden-compile
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --python 3.12 --extra test
+      - name: Golden corpus seal + external_digest + handoff-verify
+        run: bash scripts/release/golden_compile.sh
+        env:
+          GOLDEN_EVIDENCE_DIR: ${{ runner.temp }}/golden-evidence
+      - name: Upload golden evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-compile-evidence
+          path: ${{ runner.temp }}/golden-evidence
+          if-no-files-found: ignore

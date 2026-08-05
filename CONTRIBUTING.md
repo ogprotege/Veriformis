@@ -11,16 +11,18 @@ Before changing code, read:
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
-- [Current implementation status](docs/current-status.md) (Groups 1–7 implemented)
+- [Current implementation status](docs/current-status.md) (Groups 1–7 + Group 9 automated gates)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
+- [Release guide](docs/release.md)
 - [macOS workbench](macos/README.md)
 - [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
 
-The roadmap is ordered. Groups 1–7 exit gates are closed on `main`. Next
-required product work is Group 9 (public release); Group 8 is optional and
-owner-gated.
+The roadmap is ordered. Groups 1–7 exit gates are closed on `main`. Group 9
+automated gates (CI matrix, install smoke, golden compile) are landed; owner
+Mac signing/notarization evidence remains for a public-ready claim. Group 8 is
+optional and owner-gated.
 
 After reading these authorities, consult [Work in progress](WIP.md) as the
 non-authoritative reviewed work queue.
@@ -33,7 +35,9 @@ uv run ruff check src tests
 uv run pytest -q
 ```
 
-Python 3.11 or newer is required. CI currently runs Python 3.12 on Ubuntu.
+Python 3.11 or newer is required. CI runs Python 3.11–3.13 on Ubuntu plus
+Python 3.12 on macOS, with install-smoke and golden-compile jobs (see
+[docs/release.md](docs/release.md)).
 
 ## Choose a focused change
 

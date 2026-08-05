@@ -13,10 +13,11 @@ text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
-> Groups 1 through 7. Stage runtime, `PipelineService`, expanded ingest, recipes,
-> YAML pipelines, local MCP, Aptus handoff, and the SwiftUI workbench are working.
-> Read the [current implementation status](docs/current-status.md) before treating
-> this alpha as release-ready.
+> Groups 1 through 7, plus Group 9 automated release gates (matrix CI, install
+> smoke, golden compile). Signed/notarized Mac public readiness remains an
+> owner checklist — see [docs/release.md](docs/release.md). Read the
+> [current implementation status](docs/current-status.md) before treating this
+> alpha as release-ready.
 
 ## What works today
 
@@ -178,9 +179,11 @@ source paths.
 ## Current boundary
 
 **Groups 1 through 7 are implemented** on `main` (compiler through workbench).
-This is still a development alpha: **Group 9** public release gates (CI matrix,
-packaging, signing, notarization, install verification) are not complete.
-**Group 8** model-assisted construction is optional and owner-gated.
+**Group 9 automated release gates** (matrix CI, install smoke, golden compile,
+release runbook) are in place. This is still a development alpha: **public
+readiness** still requires owner Mac signing/notarization evidence per
+[docs/release.md](docs/release.md). **Group 8** model-assisted construction is
+optional and owner-gated.
 
 ## Documentation
 
@@ -189,7 +192,7 @@ reading paths. The map:
 
 - **Product and status**
   - [Product contract](docs/product-contract.md) — ownership boundary and non-claims
-  - [Current implementation status](docs/current-status.md) — exact alpha boundary (Groups 1–7)
+  - [Current implementation status](docs/current-status.md) — exact alpha boundary
   - [Work in progress](WIP.md) — non-authoritative tracker
 - **Architecture**
   - [Architecture hub](docs/architecture.md)
@@ -202,6 +205,7 @@ reading paths. The map:
 - **Reference and plans**
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
+  - [Release guide](docs/release.md)
   - [macOS workbench](macos/README.md)
   - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)
