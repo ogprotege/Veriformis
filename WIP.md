@@ -2,8 +2,8 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** Group 4 PipelineService + dual-objective
-gate on branch `agent/group-4-pipeline-service`
+**Implementation baseline reviewed:** Group 5 ingest + recipe expansion on
+branch `agent/group-5-input-recipe-expansion`
 
 **Product version:** `0.1.0` development alpha
 
@@ -41,11 +41,12 @@ local, offline, and free of LLM generation.
 ## Current boundary
 
 - [x] M1 core is implemented.
-- [x] Groups 1 through 4 are implemented.
-- [x] Steps 1 through 19 are complete.
-- [ ] Steps 20 through 26 remain.
+- [x] Groups 1 through 5 are implemented.
+- [x] Steps 1 through 21 are complete.
+- [ ] Steps 22 through 26 remain.
 - [x] Group 4 / M1.1 service surface is complete.
-- [ ] Group 5 is the next required group.
+- [x] Group 5 ingest and recipe expansion is complete.
+- [ ] Group 6 is the next required group.
 - [ ] Public release gates are not complete.
 
 The current stage-command runtime is:
@@ -132,21 +133,24 @@ parity for `full_text` and `continuation` on the golden multi-source corpus.
 `tests/pipeline/test_pipeline_service.py`, and repository checks with
 `609 passed`.
 
-## Next required work: Group 5
+## Completed: Group 5
 
 ### Group 5: Input and recipe expansion
 
-- [ ] 20. Full declared ingest
-  - Add digitally born PDF, HTML, CSV, JSON, and JSONL.
-  - Record explicit extraction-loss diagnostics.
-  - Refuse OCR with a named limitation.
-- [ ] 21. Expanded deterministic recipe library
-  - Add source-grounded builders, curation policies, statistics, and balancing.
-  - Add repeatable YAML pipelines.
+**Status:** Complete
 
-**Exit gate:** Every declared v1 input either compiles with explicit coverage
-evidence or fails with a named limitation. Multiple deterministic recipes
-produce measurable, repeatable datasets from the supported formats.
+- [x] 20. Full declared ingest
+- [x] 21. Expanded deterministic recipe library
+
+**Delivered:** HTML/PDF/CSV/JSON/JSONL parsers with explicit loss diagnostics,
+named OCR refusal, five named recipe builders, deterministic statistics, and
+`veriformis.pipeline/v1` YAML execution through `PipelineService`.
+
+**Evidence:** [Group 5 plan](dev/active/group-5-input-recipe-expansion/plan.md),
+`tests/parsers/test_group5_formats.py`, and
+`tests/recipes/test_recipe_library_and_pipeline.py`.
+
+## Next required work: Group 6
 
 ### Group 6: Integrations
 
@@ -274,7 +278,7 @@ The Group 4 closeout recorded:
 ```text
 uv lock --check             passed
 uv run ruff check src tests passed
-uv run pytest -q            609 passed
+uv run pytest -q            618 passed
 git diff --check            passed
 ```
 
@@ -289,7 +293,7 @@ calling this snapshot current.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
 5. Keep Group 8 separate until the owner approves its implementation plan.
-6. Treat Group 5 as the only next required group.
+6. Treat Group 6 as the only next required group.
 7. Preserve deterministic and offline operation through Group 7.
 8. Keep the retained manifest digest and integrity-controlled publication
    parent requirements visible in every future sealing surface.

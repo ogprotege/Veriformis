@@ -4,13 +4,13 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 through 4 runtime, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 through 5 runtime, version `0.1.0`
 
-**Implementation review state:** Groups 1 through 4 complete
+**Implementation review state:** Groups 1 through 5 complete
 
 **Last reviewed:** 2026-08-05
 
-**Next review:** The first Group 5 input or recipe change or any product-contract change
+**Next review:** The first Group 6 integration change or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -78,8 +78,10 @@ supports independent `self_consistent` or externally anchored
 
 This remains a working alpha. Group 3 passed its independent architecture and
 security closeout. Group 4 delivered the stable `PipelineService`, thin CLI
-adapter, and dual-objective M1.1 API and CLI acceptance gate. Later groups add
-broader inputs, integrations, the Mac workbench, and release controls.
+adapter, and dual-objective M1.1 API and CLI acceptance gate. Group 5 expanded
+declared ingest (HTML, digitally-born PDF, CSV, JSON, JSONL), named OCR refusal,
+the deterministic recipe library, statistics, and YAML pipelines. Later groups
+add MCP, Aptus handoff, the Mac workbench, and release controls.
 
 ## End-to-end compiler contract
 

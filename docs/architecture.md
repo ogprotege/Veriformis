@@ -1,8 +1,8 @@
 # Architecture
 
-**Last reviewed:** 2026-08-05 after Group 4 completion
+**Last reviewed:** 2026-08-05 after Group 5 completion
 
-**Next review:** The first Group 5 input or recipe change
+**Next review:** The first Group 6 integration change
 
 Veriformis `0.1.0` is a Python 3.11+ modular monolith with one installed
 entry point, the `veriformis` CLI, and one typed orchestration surface,
