@@ -100,6 +100,7 @@ def test_release_scripts_are_executable_entry_points():
         "check_local.sh",
         "smoke_install.sh",
         "golden_compile.sh",
+        "record_clean_path_evidence.sh",
         "macos_package_local.sh",
     )
     for name in required:

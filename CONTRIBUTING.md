@@ -16,6 +16,7 @@ Before changing code, read:
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
 - [Release guide](docs/release.md)
+- [Beta limitations](docs/beta-limitations.md)
 - [macOS workbench](macos/README.md)
 - [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
 
