@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E861917972A8445E9CAD4C5 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6F40FCBC7EB09ED99275BE /* ResultView.swift */; };
+		4D6288666D33E39E303F674F /* VeriformisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB02DB7B54E088357F19EC2 /* VeriformisApp.swift */; };
+		721713B62C5B16E7ED90F571 /* WorkbenchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FA88DAC38F54CD79FDB550 /* WorkbenchViewModel.swift */; };
+		92D9A1898D8127438EEEAC56 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB040350CF5A9FCB4330EE /* ContentView.swift */; };
+		ACCAE40DD7DDCB25171806DB /* SourceDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */; };
+		AF846AA42ED1DFAC874E2735 /* VeriformisCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E01900D4217D4C71D78091 /* VeriformisCLI.swift */; };
+		C42F93602C75AB5754CAF037 /* WorkbenchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44828F255DF039B4B53ED41D /* WorkbenchModels.swift */; };
+		D0A79A3FAD32081C9D34628F /* CLIBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EA6E817E714BFC2BBF8FF4 /* CLIBridgeTests.swift */; };
+		EAEBC61DE29BB95518FFCA47 /* StagePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBF5F22E5B16EFED501C6C /* StagePanelView.swift */; };
+		FAA5A038686A1489C906C2FA /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5975EE5DE33F44423DBF671F /* LogView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6285EEB7947AF327BDBC2711 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7F09953F16BCEDA09938D9CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC0C865B7E898F21B2B7EE18;
+			remoteInfo = Veriformis;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		11FA88DAC38F54CD79FDB550 /* WorkbenchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkbenchViewModel.swift; sourceTree = "<group>"; };
+		2FB02DB7B54E088357F19EC2 /* VeriformisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeriformisApp.swift; sourceTree = "<group>"; };
+		370964DBCBB2CF00291B7E66 /* Veriformis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Veriformis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceDropView.swift; sourceTree = "<group>"; };
+		44828F255DF039B4B53ED41D /* WorkbenchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkbenchModels.swift; sourceTree = "<group>"; };
+		5975EE5DE33F44423DBF671F /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+		5AFBF5F22E5B16EFED501C6C /* StagePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagePanelView.swift; sourceTree = "<group>"; };
+		72E01900D4217D4C71D78091 /* VeriformisCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeriformisCLI.swift; sourceTree = "<group>"; };
+		72EA6E817E714BFC2BBF8FF4 /* CLIBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIBridgeTests.swift; sourceTree = "<group>"; };
+		772D14C01C6C66539C668EB7 /* VeriformisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VeriformisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C6F40FCBC7EB09ED99275BE /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
+		B5BB040350CF5A9FCB4330EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0E87AEDD75D1FF6BD7213461 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				72E01900D4217D4C71D78091 /* VeriformisCLI.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		150DE0883932ED2C1935380E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B5BB040350CF5A9FCB4330EE /* ContentView.swift */,
+				5975EE5DE33F44423DBF671F /* LogView.swift */,
+				9C6F40FCBC7EB09ED99275BE /* ResultView.swift */,
+				3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */,
+				5AFBF5F22E5B16EFED501C6C /* StagePanelView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		19581414C657BF57319C6FDD /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				72EA6E817E714BFC2BBF8FF4 /* CLIBridgeTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		66820E3289C255475BB7F34F /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				2FB02DB7B54E088357F19EC2 /* VeriformisApp.swift */,
+				67AB259D5A57FA5CD61F6F87 /* Models */,
+				0E87AEDD75D1FF6BD7213461 /* Services */,
+				690B7AF5D6DC9BE09EFA9EA3 /* ViewModels */,
+				150DE0883932ED2C1935380E /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		67AB259D5A57FA5CD61F6F87 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				44828F255DF039B4B53ED41D /* WorkbenchModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		690B7AF5D6DC9BE09EFA9EA3 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				11FA88DAC38F54CD79FDB550 /* WorkbenchViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		9164878A8FB79C1B04968FA5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				370964DBCBB2CF00291B7E66 /* Veriformis.app */,
+				772D14C01C6C66539C668EB7 /* VeriformisTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FE0521053AC2C5A4F6ACACF7 = {
+			isa = PBXGroup;
+			children = (
+				66820E3289C255475BB7F34F /* Sources */,
+				19581414C657BF57319C6FDD /* Tests */,
+				9164878A8FB79C1B04968FA5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		96537FA441A392EA2067E1B1 /* VeriformisTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8355A1FD7ADE78E6DC1135BD /* Build configuration list for PBXNativeTarget "VeriformisTests" */;
+			buildPhases = (
+				9E665CE2D9D6CE198C0739B8 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8261F38B3D3D4EC4EA8A7C73 /* PBXTargetDependency */,
+			);
+			name = VeriformisTests;
+			packageProductDependencies = (
+			);
+			productName = VeriformisTests;
+			productReference = 772D14C01C6C66539C668EB7 /* VeriformisTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC0C865B7E898F21B2B7EE18 /* Veriformis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 760F2887F1BB8E82602FDE88 /* Build configuration list for PBXNativeTarget "Veriformis" */;
+			buildPhases = (
+				2F1CB60056AB43A6A943EAE8 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Veriformis;
+			packageProductDependencies = (
+			);
+			productName = Veriformis;
+			productReference = 370964DBCBB2CF00291B7E66 /* Veriformis.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7F09953F16BCEDA09938D9CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = A0A5A863A6D096257A9304C5 /* Build configuration list for PBXProject "Veriformis" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FE0521053AC2C5A4F6ACACF7;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9164878A8FB79C1B04968FA5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC0C865B7E898F21B2B7EE18 /* Veriformis */,
+				96537FA441A392EA2067E1B1 /* VeriformisTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2F1CB60056AB43A6A943EAE8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92D9A1898D8127438EEEAC56 /* ContentView.swift in Sources */,
+				FAA5A038686A1489C906C2FA /* LogView.swift in Sources */,
+				0E861917972A8445E9CAD4C5 /* ResultView.swift in Sources */,
+				ACCAE40DD7DDCB25171806DB /* SourceDropView.swift in Sources */,
+				EAEBC61DE29BB95518FFCA47 /* StagePanelView.swift in Sources */,
+				4D6288666D33E39E303F674F /* VeriformisApp.swift in Sources */,
+				AF846AA42ED1DFAC874E2735 /* VeriformisCLI.swift in Sources */,
+				C42F93602C75AB5754CAF037 /* WorkbenchModels.swift in Sources */,
+				721713B62C5B16E7ED90F571 /* WorkbenchViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E665CE2D9D6CE198C0739B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0A79A3FAD32081C9D34628F /* CLIBridgeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8261F38B3D3D4EC4EA8A7C73 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC0C865B7E898F21B2B7EE18 /* Veriformis */;
+			targetProxy = 6285EEB7947AF327BDBC2711 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1E3E21D96FABE6AC14C39926 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.veriformis.workbench.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Veriformis.app/Contents/MacOS/Veriformis";
+			};
+			name = Debug;
+		};
+		21D7E74A2040094A43FA17E2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/Veriformis.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.veriformis.workbench;
+				PRODUCT_NAME = Veriformis;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		52BD06D77F93FFD82A974999 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT = "$(SRCROOT)/..";
+			};
+			name = Debug;
+		};
+		5603F1DF62BA3CCD6C67BF16 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.veriformis.workbench.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Veriformis.app/Contents/MacOS/Veriformis";
+			};
+			name = Release;
+		};
+		CC11D5CF5CA6077A2262C8E4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT = "";
+			};
+			name = Release;
+		};
+		D959AC67300B3BD54BA1D7B4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/Veriformis.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.veriformis.workbench;
+				PRODUCT_NAME = Veriformis;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		760F2887F1BB8E82602FDE88 /* Build configuration list for PBXNativeTarget "Veriformis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D959AC67300B3BD54BA1D7B4 /* Debug */,
+				21D7E74A2040094A43FA17E2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8355A1FD7ADE78E6DC1135BD /* Build configuration list for PBXNativeTarget "VeriformisTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E3E21D96FABE6AC14C39926 /* Debug */,
+				5603F1DF62BA3CCD6C67BF16 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A0A5A863A6D096257A9304C5 /* Build configuration list for PBXProject "Veriformis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52BD06D77F93FFD82A974999 /* Debug */,
+				CC11D5CF5CA6077A2262C8E4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7F09953F16BCEDA09938D9CF /* Project object */;
+}

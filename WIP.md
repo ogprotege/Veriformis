@@ -2,8 +2,8 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** Group 6 MCP + Aptus handoff on
-branch `agent/group-6-integrations`
+**Implementation baseline reviewed:** Group 7 SwiftUI workbench on
+branch `agent/group-7-swiftui-workbench`
 
 **Product version:** `0.1.0` development alpha
 
@@ -41,13 +41,14 @@ local, offline, and free of LLM generation.
 ## Current boundary
 
 - [x] M1 core is implemented.
-- [x] Groups 1 through 6 are implemented.
-- [x] Steps 1 through 23 are complete.
-- [ ] Steps 24 through 26 remain.
+- [x] Groups 1 through 7 are implemented.
+- [x] Steps 1 through 24 are complete.
+- [ ] Steps 25 through 26 remain.
 - [x] Group 4 / M1.1 service surface is complete.
 - [x] Group 5 ingest and recipe expansion is complete.
 - [x] Group 6 MCP and Aptus handoff is complete.
-- [ ] Group 7 is the next required group.
+- [x] Group 7 SwiftUI workbench is complete.
+- [ ] Group 9 public release is next (Group 8 optional).
 - [ ] Public release gates are not complete.
 
 The current stage-command runtime is:
@@ -169,36 +170,29 @@ external digest, partitions, rows, and assignment projection.
 **Evidence:** `tests/mcp/`, `tests/handoff/`,
 `docs/contracts/aptus-handoff-v1.md`.
 
-## Next required work: Group 7
-
-### Group 7 placeholder
-
-- [ ] 24. SwiftUI dataset workbench
-
-### Group 6 residual notes
-
-- [x] 22. MCP automation
-  - Expose recipe, preview, construction, validation, sealing, and verification
-    through a constrained local MCP adapter.
-- [ ] 23. Versioned Aptus handoff
-  - Define the shared bundle descriptor and row semantics.
-  - Bind masking expectations, sealed splits, evidence, and backend capability.
-  - Prove Aptus consumes authoritative partitions or reproduces their digest.
-
-**Exit gate:** Python, CLI, and MCP produce identical results. Aptus consumes
-sealed partitions or exactly reproduces and verifies their assignment digest
-while preserving row semantics and provenance metadata.
+## Completed: Group 7
 
 ### Group 7: macOS product
 
-- [ ] 24. SwiftUI dataset workbench
-  - Provide source, cleaning, construction, curation, split, validation, and
-    seal views.
-  - Produce the same canonical result as the CLI.
+**Status:** Complete
 
-**Exit gate:** A user can complete the raw-source-to-sealed-dataset workflow
-without the terminal, and the application produces the same canonical result
-as the CLI.
+- [x] 24. SwiftUI dataset workbench
+
+**Delivered:** `macos/` SwiftUI app shells to `veriformis` CLI; drag-drop sources;
+stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
+
+## Next required work: Group 9 / optional Group 8
+
+### Group 8: Advanced construction (optional)
+
+- [ ] 25. Governed model-assisted construction (owner-approved plan required)
+
+### Group 9: Public release
+
+- [ ] 26. Public release gates (CI matrix, packaging, signing, notarization)
+
+**Evidence for Group 7:** [`macos/README.md`](macos/README.md),
+`macos/scripts/parity_check.sh`, and Xcode unit tests under `macos/Tests/`.
 
 ## Optional work requiring owner approval
 
@@ -358,7 +352,7 @@ calling this snapshot current.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
 5. Keep Group 8 separate until the owner approves its implementation plan.
-6. Treat Group 7 as the only next required group.
+6. Treat Group 9 public release as the next required product gate; Group 8 remains optional.
 7. Preserve deterministic and offline operation through Group 7.
 8. Keep the retained manifest digest and integrity-controlled publication
    parent requirements visible in every future sealing surface.

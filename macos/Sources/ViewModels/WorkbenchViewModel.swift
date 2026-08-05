@@ -1,0 +1,208 @@
+import AppKit
+import Foundation
+import SwiftUI
+import UniformTypeIdentifiers
+
+@MainActor
+final class WorkbenchViewModel: ObservableObject {
+    @Published var sourceURLs: [URL] = []
+    @Published var sourceRootURL: URL?
+    @Published var outputDirectoryURL: URL?
+    @Published var objective: TrainingObjective = .fullText
+    @Published var allowEmptyEvaluation = true
+    @Published var splitRatioPPM = 400_000
+    @Published var writeAptusHandoff = true
+
+    @Published var isRunning = false
+    @Published var currentStage: WorkbenchStage?
+    @Published var completedStages: Set<WorkbenchStage> = []
+    @Published var logLines: [String] = []
+    @Published var lastError: String?
+    @Published var lastResult: CompileResult?
+
+    private var cli: VeriformisCLI?
+
+    var canCompile: Bool {
+        !isRunning && !sourceURLs.isEmpty && resolvedSourceRoot != nil && outputDirectoryURL != nil
+    }
+
+    var resolvedSourceRoot: URL? {
+        sourceRootURL ?? sourceURLs.first?.deletingLastPathComponent()
+    }
+
+    func bootstrapCLI() {
+        do {
+            cli = try VeriformisCLI.resolve()
+            appendLog("CLI ready: \(cli!.executableURL.path) \(cli!.prefixArguments.joined(separator: " "))")
+        } catch {
+            lastError = error.localizedDescription
+            appendLog("error: \(error.localizedDescription)")
+        }
+    }
+
+    func addSources(_ urls: [URL]) {
+        let existing = Set(sourceURLs.map(\.path))
+        for url in urls where !existing.contains(url.path) {
+            sourceURLs.append(url)
+        }
+        sourceURLs.sort { $0.path < $1.path }
+        if sourceRootURL == nil {
+            sourceRootURL = commonAncestor(of: sourceURLs)
+        }
+    }
+
+    func removeSource(_ url: URL) {
+        sourceURLs.removeAll { $0.path == url.path }
+    }
+
+    func clearSources() {
+        sourceURLs = []
+        lastResult = nil
+    }
+
+    func chooseOutputDirectory() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
+        panel.prompt = "Choose Output Folder"
+        if panel.runModal() == .OK, let url = panel.url {
+            outputDirectoryURL = url
+        }
+    }
+
+    func chooseSourceRoot() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.prompt = "Choose Source Root"
+        if panel.runModal() == .OK, let url = panel.url {
+            sourceRootURL = url
+        }
+    }
+
+    func compile() {
+        guard !isRunning else { return }
+        lastError = nil
+        lastResult = nil
+        completedStages = []
+        currentStage = nil
+
+        guard !sourceURLs.isEmpty else {
+            lastError = WorkbenchError.noSources.localizedDescription
+            return
+        }
+        guard let sourceRoot = resolvedSourceRoot else {
+            lastError = WorkbenchError.invalidConfiguration("Source root is required.").localizedDescription
+            return
+        }
+        guard let outputDirectory = outputDirectoryURL else {
+            lastError = WorkbenchError.invalidConfiguration("Output folder is required.").localizedDescription
+            return
+        }
+
+        isRunning = true
+        Task {
+            defer { isRunning = false }
+            do {
+                let cli = try self.cli ?? VeriformisCLI.resolve()
+                self.cli = cli
+
+                let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+                let workspace = outputDirectory.appendingPathComponent("workspace-\(stamp)", isDirectory: true)
+                let bundle = outputDirectory.appendingPathComponent("dataset-\(stamp).vfbundle", isDirectory: true)
+
+                let plan = VeriformisCLI.compilePlan(
+                    sources: sourceURLs,
+                    sourceRoot: sourceRoot,
+                    workspace: workspace,
+                    bundle: bundle,
+                    objective: objective,
+                    allowEmptyEvaluation: allowEmptyEvaluation,
+                    splitRatioPPM: splitRatioPPM,
+                    includeHandoff: writeAptusHandoff
+                )
+
+                var combinedLog = ""
+                for command in plan {
+                    currentStage = command.stage
+                    appendLog("→ \(command.stage.rawValue): veriformis \(command.arguments.joined(separator: " "))")
+                    let result = try cli.run(arguments: command.arguments) { [weak self] line in
+                        Task { @MainActor in
+                            self?.appendLog(line)
+                        }
+                    }
+                    combinedLog += result.combinedOutput
+                    if result.exitCode != 0 {
+                        throw WorkbenchError.processFailed(
+                            stage: command.stage.rawValue,
+                            message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+                        )
+                    }
+                    completedStages.insert(command.stage)
+                }
+
+                let manifest = Self.extractManifestSHA256(from: combinedLog)
+                let handoff = writeAptusHandoff
+                    ? URL(fileURLWithPath: bundle.path + ".aptus-handoff.json")
+                    : nil
+                if let handoff, FileManager.default.fileExists(atPath: handoff.path) {
+                    appendLog("aptus handoff: \(handoff.path)")
+                }
+
+                currentStage = nil
+                lastResult = CompileResult(
+                    workspaceURL: workspace,
+                    bundleURL: bundle,
+                    handoffURL: handoff.flatMap {
+                        FileManager.default.fileExists(atPath: $0.path) ? $0 : nil
+                    },
+                    manifestSHA256: manifest,
+                    log: combinedLog
+                )
+                appendLog("Compile complete.")
+            } catch {
+                currentStage = nil
+                lastError = error.localizedDescription
+                appendLog("error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func appendLog(_ line: String) {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        logLines.append(trimmed)
+        if logLines.count > 2_000 {
+            logLines.removeFirst(logLines.count - 2_000)
+        }
+    }
+
+    nonisolated static func extractManifestSHA256(from log: String) -> String? {
+        for line in log.split(separator: "\n") {
+            let text = String(line)
+            if text.lowercased().contains("manifest sha-256:") {
+                let parts = text.split(separator: ":", maxSplits: 1)
+                if parts.count == 2 {
+                    return parts[1].trimmingCharacters(in: .whitespaces)
+                }
+            }
+        }
+        return nil
+    }
+
+    private func commonAncestor(of urls: [URL]) -> URL? {
+        guard let first = urls.first else { return nil }
+        var components = first.pathComponents
+        for url in urls.dropFirst() {
+            let other = url.pathComponents
+            var shared: [String] = []
+            for (a, b) in zip(components, other) {
+                if a == b { shared.append(a) } else { break }
+            }
+            components = shared
+        }
+        guard components.count >= 1 else { return nil }
+        return URL(fileURLWithPath: components.joined(separator: "/"))
+    }
+}

@@ -13,10 +13,10 @@ text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
-> Groups 1 through 6. Stage runtime, `PipelineService`, expanded ingest, recipes,
-> YAML pipelines, local MCP, and versioned Aptus handoff are working. Read the
-> [current implementation status](docs/current-status.md) before treating this
-> alpha as release-ready.
+> Groups 1 through 7. Stage runtime, `PipelineService`, expanded ingest, recipes,
+> YAML pipelines, local MCP, Aptus handoff, and the SwiftUI workbench are working.
+> Read the [current implementation status](docs/current-status.md) before treating
+> this alpha as release-ready.
 
 ## What works today
 
@@ -56,6 +56,12 @@ Version `0.1.0` provides:
   caller supplies the manifest SHA-256 retained outside the bundle.
 
 The pipeline makes no LLM calls and sends no document to a network service.
+
+## macOS workbench
+
+A SwiftUI adapter lives under [`macos/`](macos/README.md). It shells to the same
+`veriformis` CLI used by terminal workflows so digests match. Build with
+XcodeGen + Xcode; run `./macos/scripts/parity_check.sh` for CLI sequence parity.
 
 ## Supported inputs
 

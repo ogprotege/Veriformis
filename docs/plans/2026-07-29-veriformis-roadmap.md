@@ -6,7 +6,7 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 through 6 at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 through 7 at version `0.1.0`
 
 ## Product objective
 
@@ -15,14 +15,14 @@ Veriformis owns the complete transformation from heterogeneous raw sources to fi
 The documentation baseline has been reviewed and merged. Group 1 implemented
 Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
 implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
-Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22
-through 23. Group 7 is the next required execution group.
+Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22 through 23, and Group 7 implemented Step 24.
+Group 9 public release is the next required execution group (Group 8 is optional).
 
 ## Implementation status
 
-- Steps 1 through 23 are implemented in Groups 1 through 6. Rerun the project
+- Steps 1 through 24 are implemented in Groups 1 through 7. Rerun the project
   checks for current evidence. Volatile test totals are intentionally omitted.
-- Steps 24 through 26 remain planned. Group 7 owns Step 24 next.
+- Steps 25 through 26 remain planned. Group 8 is optional; Group 9 owns Step 26 next.
 - Later work must preserve the Groups 1 through 3 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, and verification guarantees.
@@ -155,6 +155,9 @@ verification control the completed boundary.
 ### Group 7: macOS product
 
 **Step 24**
+
+**Status:** Implemented. SwiftUI workbench under `macos/` shells to the CLI and
+proves digest parity via `macos/scripts/parity_check.sh`.
 
 24. SwiftUI dataset workbench
 

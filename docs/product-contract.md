@@ -4,13 +4,13 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 through 6 runtime, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 through 7 runtime, version `0.1.0`
 
-**Implementation review state:** Groups 1 through 6 complete
+**Implementation review state:** Groups 1 through 7 complete
 
 **Last reviewed:** 2026-08-05
 
-**Next review:** The first Group 7 workbench change or any product-contract change
+**Next review:** The first public-release gate change or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 

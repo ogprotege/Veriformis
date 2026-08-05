@@ -11,4 +11,6 @@ build/
 .ruff_cache/
 .superpowers/
 /graphify-out/
+macos/**/xcuserdata/
+macos/**/DerivedData/
 !/CLAUDE.md
