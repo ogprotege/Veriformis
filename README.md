@@ -13,10 +13,10 @@ text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
-> Groups 1 through 5. The complete stage-command runtime, typed
-> `PipelineService`, expanded ingest formats, named recipes, and YAML pipelines
-> are working. Read the [current implementation status](docs/current-status.md)
-> before treating this alpha as release-ready.
+> Groups 1 through 6. Stage runtime, `PipelineService`, expanded ingest, recipes,
+> YAML pipelines, local MCP, and versioned Aptus handoff are working. Read the
+> [current implementation status](docs/current-status.md) before treating this
+> alpha as release-ready.
 
 ## What works today
 

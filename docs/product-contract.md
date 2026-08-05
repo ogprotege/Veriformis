@@ -4,13 +4,13 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 through 5 runtime, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 through 6 runtime, version `0.1.0`
 
-**Implementation review state:** Groups 1 through 5 complete
+**Implementation review state:** Groups 1 through 6 complete
 
 **Last reviewed:** 2026-08-05
 
-**Next review:** The first Group 6 integration change or any product-contract change
+**Next review:** The first Group 7 workbench change or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -150,10 +150,12 @@ Veriformis selects the row schema according to the recipe and preserves the inte
 
 Rendered model-family chat text may be used for preview and conformance checks. It must not replace structured `messages` when doing so would change Aptus masking behavior.
 
-The implemented Group 3 boundary validates Aptus row shape only. It does not
-claim a shared bundle handoff or backend enforcement of Veriformis partitions.
-Current Aptus MLX intake does not accept plain `text` rows. Roadmap Step 23
-owns the shared descriptor, partition, masking, and backend capability contract.
+Group 3 validates Aptus row shape. Group 6 emits the versioned sibling Aptus
+handoff descriptor (`veriformis.aptus-handoff/v1`) and a fail-closed consumer
+check that verifies external digest, partition digests, row schema, masking
+expectations, and the portable assignment projection. Current Aptus MLX intake
+still rejects plain `text` rows; the handoff records that capability limit.
+Live training execution remains outside Veriformis.
 
 ## Fail-closed seal
 

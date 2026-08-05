@@ -16,6 +16,7 @@ from veriformis.pipeline.service import (
     DEFAULT_PIPELINE_SERVICE,
     PipelineService,
     SealPartialPublicationError,
+    SealOutcome,
     StageOutcome,
     _load_chunks,
     _load_sources,
@@ -215,9 +216,66 @@ def validate(workspace: Path) -> None:
 
 
 @app.command()
-def seal(workspace: Path, out: Path = typer.Option(..., "-o")) -> None:
+def seal(
+    workspace: Path,
+    out: Path = typer.Option(..., "-o"),
+    aptus_handoff: bool = typer.Option(
+        True,
+        "--aptus-handoff/--no-aptus-handoff",
+        help="Write the sibling Aptus handoff descriptor after a successful seal.",
+    ),
+) -> None:
     """Revalidate, atomically publish, and receipt one finished dataset."""
-    _run(lambda: _SERVICE.seal(workspace, out), status=1)
+    from veriformis.handoff import (
+        build_aptus_handoff,
+        handoff_path_for_bundle,
+        write_aptus_handoff,
+    )
+
+    outcome: SealOutcome | None = None
+    try:
+        outcome = _SERVICE.seal(workspace, out)
+    except SealPartialPublicationError as exc:
+        publication = exc.publication
+        typer.echo(
+            f"published bundle remains visible at {publication.bundle_path}; "
+            f"manifest SHA-256 {publication.manifest_sha256}; workspace receipt "
+            "did not commit",
+            err=True,
+        )
+        _echo_error(exc.cause if isinstance(exc.cause, Exception) else exc, status=1)
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        _echo_error(exc, status=1)
+    assert outcome is not None
+    _emit_outcome(outcome)
+    if aptus_handoff and outcome.publication is not None:
+        try:
+            handoff = build_aptus_handoff(
+                outcome.publication.bundle_path,
+                expected_manifest_sha256=outcome.publication.manifest_sha256,
+            )
+            path = write_aptus_handoff(
+                handoff,
+                handoff_path_for_bundle(outcome.publication.bundle_path),
+            )
+        except (
+            VeriformisError,
+            EvidenceError,
+            OSError,
+            UnicodeError,
+            ValueError,
+            TypeError,
+        ) as exc:
+            _echo_error(exc, status=1)
+        typer.echo(f"aptus handoff: {path}")
+        typer.echo(f"assignment digest: {handoff.assignment_digest}")
 
 
 @app.command(name="verify")
@@ -297,6 +355,79 @@ def run_pipeline(pipeline: Path) -> None:
     if result.bundle is not None:
         typer.echo(f"pipeline bundle: {result.bundle}")
     typer.echo(f"pipeline workspace: {result.workspace}")
+
+
+@app.command(name="mcp")
+def mcp_serve() -> None:
+    """Run the constrained local MCP adapter over PipelineService (stdio)."""
+    from veriformis.mcp import run_mcp_stdio
+
+    run_mcp_stdio(_SERVICE)
+
+
+@app.command(name="handoff")
+def handoff_cmd(
+    bundle: Path,
+    manifest_sha256: str = typer.Option(..., "--manifest-sha256"),
+    out: Path | None = typer.Option(None, "-o", help="Handoff path (default sibling)."),
+) -> None:
+    """Build the versioned Aptus handoff descriptor for a sealed bundle."""
+    from veriformis.handoff import (
+        build_aptus_handoff,
+        handoff_path_for_bundle,
+        write_aptus_handoff,
+    )
+
+    try:
+        handoff = build_aptus_handoff(
+            bundle,
+            expected_manifest_sha256=manifest_sha256,
+        )
+        target = out if out is not None else handoff_path_for_bundle(bundle)
+        write_aptus_handoff(handoff, target)
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        _echo_error(exc)
+    typer.echo(f"aptus handoff: {target}")
+    typer.echo(f"handoff id: {handoff.handoff_id}")
+    typer.echo(f"assignment digest: {handoff.assignment_digest}")
+    typer.echo(f"row schema: {handoff.row_schema}")
+
+
+@app.command(name="handoff-verify")
+def handoff_verify_cmd(
+    handoff: Path,
+    bundle: Path = typer.Option(..., "-b", "--bundle"),
+) -> None:
+    """Independently verify that a sealed bundle satisfies an Aptus handoff."""
+    from veriformis.handoff import consume_aptus_handoff
+
+    try:
+        report = consume_aptus_handoff(handoff, bundle=bundle)
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        _echo_error(exc, status=1)
+    typer.echo(f"status: {report.status}")
+    typer.echo(f"handoff id: {report.handoff_id}")
+    typer.echo(f"bundle: {report.bundle_id}")
+    typer.echo(f"assignment digest: {report.assignment_digest}")
+    typer.echo(f"verification grade: {report.verified_grade}")
+    for finding in report.findings:
+        typer.echo(f"finding: {finding}", err=True)
+    if report.status != "accepted":
+        raise typer.Exit(code=1)
 
 
 def main() -> None:

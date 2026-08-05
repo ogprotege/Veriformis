@@ -6,7 +6,7 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 through 5 at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 through 6 at version `0.1.0`
 
 ## Product objective
 
@@ -15,14 +15,14 @@ Veriformis owns the complete transformation from heterogeneous raw sources to fi
 The documentation baseline has been reviewed and merged. Group 1 implemented
 Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
 implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
-Group 5 implemented Steps 20 through 21. Group 6 is the next required execution
-group.
+Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22
+through 23. Group 7 is the next required execution group.
 
 ## Implementation status
 
-- Steps 1 through 21 are implemented in Groups 1 through 5. Rerun the project
+- Steps 1 through 23 are implemented in Groups 1 through 6. Rerun the project
   checks for current evidence. Volatile test totals are intentionally omitted.
-- Steps 22 through 26 remain planned. Group 6 owns Steps 22 through 23 next.
+- Steps 24 through 26 remain planned. Group 7 owns Step 24 next.
 - Later work must preserve the Groups 1 through 3 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, and verification guarantees.
@@ -143,6 +143,9 @@ boundary.
 ### Group 6: Integrations
 
 **Steps 22 through 23**
+
+**Status:** Implemented. Local MCP adapter, Aptus handoff v1, and consumer
+verification control the completed boundary.
 
 22. MCP automation
 23. Versioned Aptus handoff

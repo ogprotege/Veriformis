@@ -2,8 +2,8 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** Group 5 ingest + recipe expansion on
-branch `agent/group-5-input-recipe-expansion`
+**Implementation baseline reviewed:** Group 6 MCP + Aptus handoff on
+branch `agent/group-6-integrations`
 
 **Product version:** `0.1.0` development alpha
 
@@ -41,12 +41,13 @@ local, offline, and free of LLM generation.
 ## Current boundary
 
 - [x] M1 core is implemented.
-- [x] Groups 1 through 5 are implemented.
-- [x] Steps 1 through 21 are complete.
-- [ ] Steps 22 through 26 remain.
+- [x] Groups 1 through 6 are implemented.
+- [x] Steps 1 through 23 are complete.
+- [ ] Steps 24 through 26 remain.
 - [x] Group 4 / M1.1 service surface is complete.
 - [x] Group 5 ingest and recipe expansion is complete.
-- [ ] Group 6 is the next required group.
+- [x] Group 6 MCP and Aptus handoff is complete.
+- [ ] Group 7 is the next required group.
 - [ ] Public release gates are not complete.
 
 The current stage-command runtime is:
@@ -152,11 +153,31 @@ named OCR refusal, five named recipe builders, deterministic statistics, and
 `tests/regressions/test_group5_declared_format_pipeline.py` (solo/mixed
 seal+verify, CLI, OCR refusal, YAML, construction replay).
 
-## Next required work: Group 6
+## Completed: Group 6
 
 ### Group 6: Integrations
 
-- [ ] 22. MCP automation
+**Status:** Complete
+
+- [x] 22. MCP automation
+- [x] 23. Versioned Aptus handoff
+
+**Delivered:** local MCP adapter over PipelineService; sibling Aptus handoff
+v1; CLI `mcp` / `handoff` / `handoff-verify`; consumer verification of
+external digest, partitions, rows, and assignment projection.
+
+**Evidence:** `tests/mcp/`, `tests/handoff/`,
+`docs/contracts/aptus-handoff-v1.md`.
+
+## Next required work: Group 7
+
+### Group 7 placeholder
+
+- [ ] 24. SwiftUI dataset workbench
+
+### Group 6 residual notes
+
+- [x] 22. MCP automation
   - Expose recipe, preview, construction, validation, sealing, and verification
     through a constrained local MCP adapter.
 - [ ] 23. Versioned Aptus handoff
@@ -312,6 +333,7 @@ The Group 4 closeout recorded:
 ```text
 uv lock --check             passed
 uv run ruff check src tests passed
+uv run pytest -q            623 passed
 uv run pytest -q            646 passed
 git diff --check            passed
 ```
@@ -336,7 +358,7 @@ calling this snapshot current.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
 5. Keep Group 8 separate until the owner approves its implementation plan.
-6. Treat Group 6 as the only next required group.
+6. Treat Group 7 as the only next required group.
 7. Preserve deterministic and offline operation through Group 7.
 8. Keep the retained manifest digest and integrity-controlled publication
    parent requirements visible in every future sealing surface.
