@@ -1,9 +1,8 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
+**Last reviewed:** 2026-08-05 after Group 9 automated release gates
 
-**Next review:** The first Group 9 release-gate change or any contributor-tooling
-change
+**Next review:** Any CI gate, packaging, or contributor-tooling change
 
 This guide covers the implemented Veriformis `0.1.0` project. Stage policy
 lives in `veriformis.pipeline.PipelineService`. The CLI, MCP adapter, and
@@ -42,10 +41,9 @@ uv run pytest -q
 git diff --check
 ```
 
-The suite last passed with `655 passed` on `main` after Group 7 merge
-(2026-08-05). Rerun the commands for current evidence because totals can grow.
-Ruff lints only the `E4`, `E7`, `E9`, and `F` rule families; there is no
-configured formatter or type checker in this alpha.
+Rerun the commands for current evidence because totals can grow. Ruff lints
+only the `E4`, `E7`, `E9`, and `F` rule families; there is no configured
+formatter or type checker in this alpha.
 
 Focused examples:
 
@@ -110,6 +108,7 @@ and adapted by `cli.py`, with state in `workspace.py`. Domain packages:
 | Aptus handoff | `tests/handoff/` |
 | Finished seal / verifier | `tests/bundle/` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |
+| Group 9 release gates | `tests/regressions/test_group9_release_gates.py`, `scripts/release/` |
 | Fixtures | `tests/fixtures/` (support) |
 
 Add a regression test before repairing an integrity defect. Keep multi-source
@@ -120,20 +119,18 @@ tests, not expected failures.
 ## Continuous integration
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on pushes and pull requests.
-The single job uses Ubuntu, Python 3.12, uv, Ruff (`uv run ruff check src
-tests`), and pytest (`uv run pytest -q`). CI does not run `uv lock --check` or
-`git diff --check`; those remain local responsibilities.
 
-CI does not yet run:
+| Job | What it runs |
+| --- | --- |
+| `test` | Matrix: Python 3.11–3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, pytest |
+| `install-smoke` | `scripts/release/smoke_install.sh` (wheel build + clean-venv CLI smoke) |
+| `golden-compile` | `scripts/release/golden_compile.sh` (golden corpus → seal → external_digest → handoff-verify) |
 
-- a Python-version matrix;
-- a package build and installation smoke test;
-- static type checking;
-- coverage enforcement;
-- dependency or security scanning;
-- macOS packaging, signing, or installation checks.
+Local-only: `git diff --check`. Not yet hard gates: static type checking,
+coverage thresholds, dependency audit, signed/notarized Mac install.
 
-Do not describe those checks as release gates until they exist.
+Release procedure and owner Mac signing/notarization checklist:
+[docs/release.md](release.md).
 
 ## Engineering constraints
 

@@ -2,12 +2,13 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `d42d527` on `origin/main` after Group 7
-merge (PR #12); Groups 1 through 7 complete
+**Implementation baseline reviewed:** Group 9 automated release gates on
+`agent/group-9-public-release` (Groups 1–7 complete on `main`; Group 9
+automated subset in flight)
 
 **Product version:** `0.1.0` development alpha
 
-**Last reviewed:** 2026-08-05 (full documentation sync)
+**Last reviewed:** 2026-08-05 (Group 9 automated release gates)
 
 **Next review:** Any merged implementation group, contract or roadmap change,
 or listed-item status change
@@ -43,13 +44,14 @@ local, offline, and free of LLM generation.
 - [x] M1 core is implemented.
 - [x] Groups 1 through 7 are implemented.
 - [x] Steps 1 through 24 are complete.
-- [ ] Steps 25 through 26 remain.
+- [ ] Step 25 remains (optional Group 8).
 - [x] Group 4 / M1.1 service surface is complete.
 - [x] Group 5 ingest and recipe expansion is complete.
 - [x] Group 6 MCP and Aptus handoff is complete.
 - [x] Group 7 SwiftUI workbench is complete.
-- [ ] Group 9 public release is next (Group 8 optional).
-- [ ] Public release gates are not complete.
+- [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts.
+- [ ] Group 9 owner remainder: signed/notarized Mac + clean-Mac evidence (blocks public-ready claim).
+- [ ] Group 8 optional (owner-gated).
 
 The current stage-command runtime is:
 
@@ -180,7 +182,7 @@ external digest, partitions, rows, and assignment projection.
 **Delivered:** `macos/` SwiftUI app shells to `veriformis` CLI; drag-drop sources;
 stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 
-## Next required work: Group 9 / optional Group 8
+## Next required work: Group 9 owner remainder / optional Group 8
 
 ### Group 8: Advanced construction (optional)
 
@@ -188,10 +190,18 @@ stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 
 ### Group 9: Public release
 
-- [ ] 26. Public release gates (CI matrix, packaging, signing, notarization)
+- [x] 26a. Automated gates — CI matrix (3.11–3.13 + macOS 3.12), `uv lock --check`,
+  wheel install smoke, golden corpus seal/verify/handoff-verify, `scripts/release/`,
+  [docs/release.md](docs/release.md), permanent regression
+  `tests/regressions/test_group9_release_gates.py`
+- [ ] 26b. Owner Mac distribution — Developer ID sign, notarize, staple, clean-Mac
+  install, golden + Aptus evidence (see release checklist)
 
 **Evidence for Group 7:** [`macos/README.md`](macos/README.md),
 `macos/scripts/parity_check.sh`, and Xcode unit tests under `macos/Tests/`.
+
+**Evidence for Group 9 automated:** [docs/release.md](docs/release.md),
+`.github/workflows/ci.yml`, `scripts/release/`.
 
 ## Optional work requiring owner approval
 
@@ -216,12 +226,15 @@ curation, split, validation, and sealing contracts as deterministic candidates.
 
 ### Group 9: Public release
 
-- [ ] 26. Public release gates
-  - Complete documentation and supported-platform CI.
-  - Complete dependency review and artifact evidence.
-  - Complete package installation and migration verification.
-  - Complete macOS packaging, signing, notarization, and release verification.
-  - Verify the golden raw corpus and compatible Aptus handoff on a clean Mac.
+- [x] 26a. Automated public-release gates (CI, install smoke, golden path, docs)
+  - Supported-platform CI matrix and lockfile check.
+  - Package installation smoke and golden corpus compile evidence scripts.
+  - Migration verification remains in the ordinary regression suite.
+  - Release runbook documents owner signing/notarization (no silent skip).
+- [ ] 26b. Owner-executed public-ready evidence
+  - macOS packaging with Developer ID signing, notarization, and staple.
+  - Clean supported Mac install of the signed product.
+  - Golden raw corpus compile + verify + Aptus-compatible handoff with retained logs.
 
 **Exit gate:** A clean supported Mac can install the signed and notarized
 product, compile the golden raw corpus, verify the final bundles, and hand them
@@ -296,7 +309,8 @@ Remaining:
 - [ ] Re-verify architecture deep-dive `file:line` citations when entry points
   drift materially.
 - [ ] Machine-render Mermaid diagrams in CI (currently hand-reviewed).
-- [ ] Group 9: security, packaging, notarization, and release troubleshooting
+- [x] Group 9 automated: packaging runbook + release troubleshooting entry in docs/release.md
+- [ ] Group 9 owner: notarization evidence and security hardening follow-ups
   documentation.
 
 ## Deferred documentation
@@ -306,7 +320,8 @@ Remaining:
 - [x] Add the versioned Aptus handoff contract and consumer verification.
 - [x] Document expanded declared ingest and YAML pipelines.
 - [x] Document MCP and SwiftUI workbench surfaces.
-- [ ] Expand security, migration, and release troubleshooting for Group 9.
+- [x] Release guide and troubleshooting entry points for Group 9 automated gates.
+- [ ] Expand security hardening and owner notarization evidence as needed.
 
 ## Known current limitations
 
@@ -319,7 +334,7 @@ Remaining:
 - The minimal bundle omits raw sources and complete replay artifacts.
 - External trust requires a manifest digest retained outside the bundle.
 - Model-assisted construction remains optional and unapproved (Group 8).
-- CI and packaging do not yet establish public release readiness (Group 9).
+- Automated CI/packaging gates land; public readiness still needs owner Mac evidence.
 
 ## Verification snapshot
 
@@ -344,7 +359,7 @@ Rerun these checks before calling this snapshot current.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
 5. Keep Group 8 separate until the owner approves its implementation plan.
-6. Treat Group 9 public release as the next required product gate; Group 8 remains optional.
+6. Complete Group 9 owner Mac evidence for a public-ready claim; Group 8 remains optional.
 7. Preserve deterministic and offline operation through Group 7.
 8. Keep the retained manifest digest and integrity-controlled publication
    parent requirements visible in every future sealing surface.

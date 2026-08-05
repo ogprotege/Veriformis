@@ -6,7 +6,8 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 through 7 at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 through 7 at version `0.1.0`;
+Group 9 automated release gates landed (owner Mac public-ready evidence open)
 
 ## Product objective
 
@@ -16,7 +17,8 @@ The documentation baseline has been reviewed and merged. Group 1 implemented
 Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
 implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
 Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22 through 23, and Group 7 implemented Step 24.
-Group 9 public release is the next required execution group (Group 8 is optional).
+Group 9 automated release gates are implemented; owner Mac signing/notarization
+evidence remains for a public-ready claim (Group 8 is optional).
 
 ## Implementation status
 
@@ -179,6 +181,14 @@ Group 8 requires separate owner approval. It may remain deferred while the deter
 **Step 26**
 
 26. Public release gates
+
+**Automated subset (landed):** supported-platform CI matrix, `uv lock --check`,
+wheel install smoke, golden-corpus compile through external_digest verify and
+Aptus handoff-verify, release scripts under `scripts/release/`, and
+[docs/release.md](../release.md). Migration checks remain ordinary suite tests.
+
+**Owner remainder (open):** Developer ID signing, notarization, staple,
+clean-Mac install, and retained Aptus handoff evidence.
 
 **Exit gate:** A clean supported Mac can install the signed and notarized product, compile the golden raw corpus, verify the final bundles, and hand them to a compatible Aptus release with independently recorded evidence.
 

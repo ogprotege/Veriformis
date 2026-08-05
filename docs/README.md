@@ -4,19 +4,20 @@ This documentation describes the development-alpha compiler from raw source
 capture through a verified finished-dataset bundle, plus local automation and
 workbench surfaces built in Groups 1 through 7.
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 merge to `main`
+**Last reviewed:** 2026-08-05 after Group 9 automated release gates
 
-**Next review:** The first Group 9 release-gate change or any contract change
+**Next review:** Owner public-ready checklist completion or any contract change
 
 ## Start here
 
 1. Read the repository [README](../README.md) for product goal, setup, and
    quickstart.
 2. Read [Current implementation status](current-status.md) for the exact alpha
-   boundary (Groups 1–7) and verification evidence.
+   boundary (Groups 1–7 plus Group 9 automated gates) and verification evidence.
 3. Read the [product contract](product-contract.md) for ownership and non-claims.
 4. Use the [authoritative build roadmap](plans/2026-07-29-veriformis-roadmap.md)
-   for remaining Group 8 (optional) and Group 9 (public release) work.
+   for remaining Group 9 owner Mac evidence and optional Group 8 work.
+5. Use [Release guide](release.md) for CI gates, golden compile, and Mac packaging.
 
 ## Reading paths
 
@@ -45,6 +46,7 @@ workbench surfaces built in Groups 1 through 7.
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
 | [Development guide](development.md) | Setup, checks, tests, engineering constraints | Contributor guide |
+| [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
 | [macOS workbench](../macos/README.md) | SwiftUI workbench build and parity | Workbench operator guide |
 | [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered sequence, groups, exit gates | Authoritative work order |
 | [Contributing](../CONTRIBUTING.md) | PR checklist and standards | Contribution policy |
@@ -65,7 +67,7 @@ current status, the roadmap, or a versioned contract.
 | **Group 6** | MCP + Aptus handoff v1 (Steps 22–23) |
 | **Group 7** | SwiftUI workbench (Step 24) |
 | **Group 8** | Optional model-assisted construction (Step 25; owner-gated) |
-| **Group 9** | Public release gates (Step 26; **next required**) |
+| **Group 9** | Public release gates (Step 26; automated subset landed; owner Mac remainder for public-ready) |
 | **Unsupported** | Not available (for example OCR) |
 
 ## Historical records
@@ -92,8 +94,8 @@ controls**.
 
 ## Documentation debt (remaining)
 
-- Expanded security, migration, and troubleshooting guides for a supported
-  public release surface (Group 9).
+- Owner notarization evidence notes and any security hardening follow-ups
+  after signed Mac distribution.
 - Architecture deep-dive `file:line` citations should be re-verified when
   entry-point line numbers drift.
 - Mermaid diagrams are hand-reviewed; not machine-rendered in CI.
