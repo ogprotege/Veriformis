@@ -4,11 +4,11 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1 through 6 complete
+**Implementation state:** Groups 1 through 7 complete
 
-**Review date:** 2026-08-05 (Group 6 MCP + Aptus handoff)
+**Review date:** 2026-08-05 (Group 7 SwiftUI workbench)
 
-**Next review:** The first Group 7 workbench change or any contract change
+**Next review:** The first Group 8 or release-gate change or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -367,7 +367,8 @@ signing, notarization, or release verification.
 | Implemented Group 4 | `PipelineService`, thin CLI adapter, and dual-objective M1.1 API and CLI acceptance |
 | Implemented Group 5 | HTML/PDF/CSV/JSON/JSONL ingest, OCR refusal, recipe library, statistics, YAML pipelines |
 | Implemented Group 6 | Local MCP adapter, versioned Aptus handoff, consumer verification |
-| Later | SwiftUI workbench |
+| Implemented Group 7 | SwiftUI workbench (CLI adapter) with digest parity |
+| Later | Public release gates; optional model-assisted construction |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
 | Public release | Supported-platform gates, artifact evidence, packaging, signing, notarization, migration checks, and release verification |
 | Outside current product | OCR, model training, cloud accounts, multi-user service, billing, and telemetry |
@@ -398,6 +399,6 @@ Version `0.1.0` remains a development alpha.
 
 ## Next authority
 
-Group 7 is next. It delivers the SwiftUI dataset workbench while preserving
-Groups 1 through 6 integrity, service, ingest, MCP, and handoff guarantees.
-See the [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).
+Group 9 public release gates are next for a shippable product. Group 8 remains
+optional owner-approved work. See the
+[Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).

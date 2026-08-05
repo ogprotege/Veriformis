@@ -1,0 +1,50 @@
+name: Veriformis
+
+options:
+  bundleIdPrefix: com.veriformis
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    CLANG_ENABLE_MODULES: YES
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    SWIFT_VERSION: "5.0"
+  configs:
+    Debug:
+      VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT: "$(SRCROOT)/.."
+    Release:
+      VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT: ""
+      ENABLE_HARDENED_RUNTIME: YES
+
+targets:
+  Veriformis:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.veriformis.workbench
+        PRODUCT_NAME: Veriformis
+        INFOPLIST_FILE: Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Resources/Veriformis.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_TESTABILITY: YES
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks"
+    scheme:
+      testTargets:
+        - VeriformisTests
+
+  VeriformisTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Veriformis
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.veriformis.workbench.tests
+        GENERATE_INFOPLIST_FILE: YES

@@ -5,7 +5,7 @@ This file gives coding-agent guidance for the current Veriformis repository.
 ## Current state
 
 Veriformis is a Python development alpha with implemented source code and tests.
-Version `0.1.0` includes the M1 core and roadmap Groups 1 through 6. Read these
+Version `0.1.0` includes the M1 core and roadmap Groups 1 through 7. Read these
 current authorities before changing code:
 
 1. `docs/product-contract.md`
@@ -66,7 +66,8 @@ Key modules under `src/veriformis/` are:
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;
 - `workspace.py` for revisioned atomic state; and
-- `cli.py` for the Typer adapter.
+- `cli.py` for the Typer adapter; and
+- `macos/` for the SwiftUI workbench (thin CLI adapter; same digests as terminal).
 
 The physical workspace layout schema is 1. Current revision schema is 3.
 `upgrade-workspace` migrates verified revision-v1 workspaces through v2 and
