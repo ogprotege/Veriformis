@@ -13,9 +13,9 @@ text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
-> Groups 1 through 3. The complete stage-command runtime is working and the
-> repository test suite passes. Group 3 independent architecture and security
-> closeout found no unresolved Critical, High, or Important defect. Read the
+> Groups 1 through 4. The complete stage-command runtime and typed
+> `PipelineService` are working, the dual-objective M1.1 API/CLI gate passes,
+> and the repository test suite is green. Read the
 > [current implementation status](docs/current-status.md) before treating this
 > alpha as release-ready.
 

@@ -2,12 +2,12 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `ff938ac` on `origin/main`, after the
-Group 3 merge
+**Implementation baseline reviewed:** Group 4 PipelineService + dual-objective
+gate on branch `agent/group-4-pipeline-service`
 
 **Product version:** `0.1.0` development alpha
 
-**Last reviewed:** 2026-07-29
+**Last reviewed:** 2026-08-05
 
 **Next review:** Any merged implementation group, contract or roadmap change,
 or listed-item status change
@@ -41,11 +41,11 @@ local, offline, and free of LLM generation.
 ## Current boundary
 
 - [x] M1 core is implemented.
-- [x] Groups 1 through 3 are implemented and merged.
-- [x] Steps 1 through 16 are complete.
-- [ ] Steps 17 through 26 remain.
-- [ ] Group 4 is the next required group.
-- [ ] M1.1 is not complete.
+- [x] Groups 1 through 4 are implemented.
+- [x] Steps 1 through 19 are complete.
+- [ ] Steps 20 through 26 remain.
+- [x] Group 4 / M1.1 service surface is complete.
+- [ ] Group 5 is the next required group.
 - [ ] Public release gates are not complete.
 
 The current stage-command runtime is:
@@ -114,42 +114,25 @@ independent verification.
 the [Group 3 plan](dev/active/group-3-finished-dataset/plan.md), and the
 [Group 3 code review](dev/active/group-3-finished-dataset/group-3-finished-dataset-code-review.md).
 
-## Next required work: Group 4
+## Completed: Group 4
 
 ### Group 4: M1.1 completion
 
-**Status:** Next
+**Status:** Complete
 
-- [ ] 17. Pipeline service
-  - Move complete orchestration into a typed, surface-neutral
-    `PipelineService`.
-  - Keep pipeline state and policy out of interface adapters.
-- [ ] 18. Thin CLI adapter
-  - Make CLI commands translate inputs, service results, and failures.
-  - Preserve current command behavior and fail-closed guarantees.
-- [ ] 19. Dual-objective M1.1 acceptance
-  - Compile one raw multi-source corpus into a full-text dataset.
-  - Compile the same corpus into a source-derived supervised dataset.
-  - Exercise both objectives through the Python API and CLI.
-  - Prove identical canonical digests, evidence graphs, split assignments,
-    validation facts, and verified bundles across both surfaces.
+- [x] 17. Pipeline service
+- [x] 18. Thin CLI adapter
+- [x] 19. Dual-objective M1.1 acceptance
 
-**Exit gate:** The same raw corpus produces both required dataset objectives
-through the Python API and CLI with identical canonical digests, evidence
-graphs, split assignments, validation facts, and verified bundles. Nothing
-after Group 4 begins until this gate passes.
+**Delivered:** `veriformis.pipeline.PipelineService` owns stage orchestration;
+`cli.py` is a thin Typer adapter; dual-objective acceptance proves API/CLI
+parity for `full_text` and `continuation` on the golden multi-source corpus.
 
-**Execution checklist:**
+**Evidence:** [Group 4 plan](dev/active/group-4-pipeline-service/plan.md),
+`tests/pipeline/test_pipeline_service.py`, and repository checks with
+`609 passed`.
 
-1. Write and approve the Group 4 implementation plan.
-2. Pin service, CLI-parity, and dual-objective acceptance tests first.
-3. Implement `PipelineService` without weakening existing contracts.
-4. Refactor the CLI into a thin adapter over the service.
-5. Run both objectives from raw sources through verified bundles.
-6. Complete repository checks and documentation. Run independent review as a
-   non-gating quality check unless the Group 4 plan adds it to the gate.
-
-## Later roadmap work
+## Next required work: Group 5
 
 ### Group 5: Input and recipe expansion
 
@@ -264,8 +247,8 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
 
 ## Deferred documentation
 
-- [ ] Add the stable Python API reference after `PipelineService` exists.
-- [ ] Add the dual-objective M1.1 API and CLI acceptance procedure.
+- [x] Add the stable Python API surface via `PipelineService`.
+- [x] Add the dual-objective M1.1 API and CLI acceptance procedure.
 - [ ] Add the versioned Aptus handoff and backend enforcement guidance.
 - [ ] Add expanded input, security, release, and migration guidance.
 - [ ] Add troubleshooting for the future supported release surface.
@@ -274,8 +257,8 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
 
 - Inputs are limited to text, Markdown, DOCX, and listed source-code formats.
 - OCR is unsupported.
-- There is no stable `PipelineService` or one-command `run` surface.
-- There is no YAML pipeline, MCP adapter, or SwiftUI workbench.
+- There is no one-command `run` surface or YAML pipeline.
+- There is no MCP adapter or SwiftUI workbench.
 - Aptus support validates current row shape only.
 - Current Aptus MLX intake rejects plain `text` rows.
 - The CLI cannot submit completed human review evidence.
@@ -286,20 +269,18 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
 
 ## Verification snapshot
 
-The Group 3 closeout and this baseline review recorded:
+The Group 4 closeout recorded:
 
 ```text
 uv lock --check             passed
 uv run ruff check src tests passed
-uv run pytest -q            606 passed
+uv run pytest -q            609 passed
 git diff --check            passed
 ```
 
-A supported two-source raw-input demonstration reached a sealed bundle and
-`external_digest` verification. The independent review found no unresolved
-Critical, High, or Important defect.
-
-Rerun these checks before calling this snapshot current.
+Dual-objective API and CLI acceptance passes for `full_text` and
+`continuation` on the golden multi-source corpus. Rerun these checks before
+calling this snapshot current.
 
 ## Maintenance rules
 
@@ -308,7 +289,7 @@ Rerun these checks before calling this snapshot current.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
 5. Keep Group 8 separate until the owner approves its implementation plan.
-6. Treat Group 4 as the only next required group.
+6. Treat Group 5 as the only next required group.
 7. Preserve deterministic and offline operation through Group 7.
 8. Keep the retained manifest digest and integrity-controlled publication
    parent requirements visible in every future sealing surface.

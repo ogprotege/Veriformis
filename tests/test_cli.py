@@ -934,7 +934,10 @@ def test_parse_refusal_never_commits_a_workspace(tmp_path, monkeypatch):
             diagnostics=[diagnostic],
         ),
     )
-    monkeypatch.setattr("veriformis.cli._parse_one", lambda *args, **kwargs: refused)
+    monkeypatch.setattr(
+        "veriformis.pipeline.service._parse_one",
+        lambda *args, **kwargs: refused,
+    )
     workspace = tmp_path / "refused-ws"
 
     result = runner.invoke(
@@ -978,9 +981,9 @@ def test_multi_source_clean_failure_rolls_back_without_advancing_head(
         )
     )
     before = Workspace.open(workspace_path).head()
-    from veriformis import cli as cli_module
+    from veriformis.pipeline import service as pipeline_service
 
-    real_plan = cli_module.plan_cleaning
+    real_plan = pipeline_service.plan_cleaning
     calls = 0
 
     def fail_second(*args, **kwargs):
@@ -990,7 +993,7 @@ def test_multi_source_clean_failure_rolls_back_without_advancing_head(
             raise RuleError("injected second-source failure")
         return real_plan(*args, **kwargs)
 
-    monkeypatch.setattr(cli_module, "plan_cleaning", fail_second)
+    monkeypatch.setattr(pipeline_service, "plan_cleaning", fail_second)
 
     result = runner.invoke(app, ["clean", str(workspace_path)])
 

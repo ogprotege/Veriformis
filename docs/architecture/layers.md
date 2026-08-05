@@ -4,13 +4,14 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-07-30 after Group 3 completion
+**Last reviewed:** 2026-08-05 after Group 4 completion
 
-**Next review:** The first Group 4 service change
+**Next review:** The first Group 5 input or recipe change
 
 Veriformis is organized as a strict, acyclically ordered stack of logical
-layers, above which sit two axial modules: `workspace.py`, the persistence and
-transaction kernel, and `cli.py`, the composition root. From the bottom up,
+layers, above which sit three axial modules: `workspace.py`, the persistence
+and transaction kernel; `pipeline/`, the typed composition root; and
+`cli.py`, the Typer adapter. From the bottom up,
 the stack comprises a foundation kernel (`errors.py`, `contracts.py`,
 `identity.py`, `diagnostics.py`, `sources.py`, `evidence.py`), the canonical
 document model (`ir/`), ingestion adapters (`parsers/`), deterministic
@@ -26,7 +27,8 @@ the module dependency graph two expressions of the same acyclic order.
 
 ```mermaid
 flowchart TD
-    CLI["cli.py — composition root, 13 commands (9 stage-gated)"]
+    CLI["cli.py — thin Typer adapter, 13 commands"]
+    PIP["pipeline/ — PipelineService composition root"]
     WS["workspace.py — revision & stage-graph kernel"]
     BUN["bundle/ — seal + independent verifier"]
     DAT["datasets/ — curate, split, format, validate"]
@@ -37,13 +39,14 @@ flowchart TD
     IR["ir/ — canonical document model"]
     FND["foundation — errors, contracts, identity, diagnostics, sources, evidence"]
 
-    CLI --> WS
-    CLI --> BUN
-    CLI --> DAT
-    CLI --> CON
-    CLI --> CHK
-    CLI --> RUL
-    CLI --> PAR
+    CLI --> PIP
+    PIP --> WS
+    PIP --> BUN
+    PIP --> DAT
+    PIP --> CON
+    PIP --> CHK
+    PIP --> RUL
+    PIP --> PAR
     WS -. "function-level lazy imports only" .-> BUN
     WS -.-> DAT
     WS -.-> CON
