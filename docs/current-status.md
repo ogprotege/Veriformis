@@ -381,15 +381,18 @@ The Group 4 runtime closeout completed:
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q            # 618 passed
+uv run pytest -q            # 650 passed
 git diff --check
 ```
 
 Group 4 evidence includes the dual-objective acceptance suite under
 `tests/pipeline/test_pipeline_service.py` and the plan record at
-[Group 4 plan](../dev/active/group-4-pipeline-service/plan.md). The prior
-independent Group 3 architecture and security review found no unresolved
-Critical, High, or Important defect. Its record is the
+[Group 4 plan](../dev/active/group-4-pipeline-service/plan.md). Group 5
+declared-format correctness is locked by permanent regressions under
+`tests/regressions/test_group5_declared_format_pipeline.py` (solo and mixed
+seal/verify, CLI parse, OCR refusal, YAML pipeline, construction replay).
+The prior independent Group 3 architecture and security review found no
+unresolved Critical, High, or Important defect. Its record is the
 [Group 3 code review](../dev/active/group-3-finished-dataset/group-3-finished-dataset-code-review.md).
 Version `0.1.0` remains a development alpha.
 

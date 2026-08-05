@@ -148,8 +148,10 @@ named OCR refusal, five named recipe builders, deterministic statistics, and
 `veriformis.pipeline/v1` YAML execution through `PipelineService`.
 
 **Evidence:** [Group 5 plan](dev/active/group-5-input-recipe-expansion/plan.md),
-`tests/parsers/test_group5_formats.py`, and
-`tests/recipes/test_recipe_library_and_pipeline.py`.
+`tests/parsers/test_group5_formats.py`,
+`tests/recipes/test_recipe_library_and_pipeline.py`, and permanent
+`tests/regressions/test_group5_declared_format_pipeline.py` (solo/mixed
+seal+verify, CLI, OCR refusal, YAML, construction replay).
 
 ## Completed: Group 6
 
@@ -332,6 +334,7 @@ The Group 4 closeout recorded:
 uv lock --check             passed
 uv run ruff check src tests passed
 uv run pytest -q            623 passed
+uv run pytest -q            646 passed
 git diff --check            passed
 ```
 
