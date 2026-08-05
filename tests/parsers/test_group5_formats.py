@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 
 import pytest
 
@@ -12,48 +13,11 @@ from veriformis.parsers.html import parse_html_file
 from veriformis.parsers.pdf import parse_pdf_file
 from veriformis.parsers.structured import parse_csv_file, parse_json_file, parse_jsonl_file
 
-_MINIMAL_TEXT_PDF = b"""%PDF-1.1
-1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj
-2 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj
-3 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 144] /Contents 4 0 R /Resources<< /Font<< /F1 5 0 R >> >> >>endobj
-4 0 obj<< /Length 44 >>stream
-BT /F1 24 Tf 100 100 Td (Hello) Tj ET
-endstream
-endobj
-5 0 obj<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>endobj
-xref
-0 6
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000266 00000 n 
-0000000361 00000 n 
-trailer<< /Size 6 /Root 1 0 R >>
-startxref
-441
-%%EOF
-"""
+_G5 = Path(__file__).resolve().parents[1] / "fixtures" / "group5"
 
-_EMPTY_TEXT_PDF = b"""%PDF-1.1
-1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj
-2 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj
-3 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 144] /Contents 4 0 R >>endobj
-4 0 obj<< /Length 0 >>stream
-endstream
-endobj
-xref
-0 5
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000214 00000 n 
-trailer<< /Size 5 /Root 1 0 R >>
-startxref
-264
-%%EOF
-"""
+
+def _pdf(name: str) -> bytes:
+    return (_G5 / name).read_bytes()
 
 
 def _assert_exact(result) -> None:
@@ -82,14 +46,14 @@ def test_html_omits_script_and_recovers_text(tmp_path):
 
 def test_pdf_text_layer_and_ocr_refusal(tmp_path):
     good = tmp_path / "born.pdf"
-    good.write_bytes(_MINIMAL_TEXT_PDF)
+    good.write_bytes(_pdf("minimal-text.pdf"))
     result = parse_pdf_file(good, logical_path=good.name)
     _assert_exact(result)
     assert result.diagnostics.status == "complete"
     assert "Hello" in result.source.extracted_text
 
     empty = tmp_path / "scan.pdf"
-    empty.write_bytes(_EMPTY_TEXT_PDF)
+    empty.write_bytes(_pdf("empty-text.pdf"))
     refused = parse_pdf_file(empty, logical_path=empty.name)
     assert refused.diagnostics.status == "refused"
     codes = {item.code for item in refused.diagnostics.diagnostics}
@@ -123,7 +87,7 @@ def test_csv_json_jsonl_projection(tmp_path):
 def test_dispatch_covers_declared_group5_suffixes(tmp_path):
     samples = {
         ".html": b"<html><body><p>x</p></body></html>",
-        ".pdf": _MINIMAL_TEXT_PDF,
+        ".pdf": _pdf("minimal-text.pdf"),
         ".csv": b"a,b\n1,2\n",
         ".json": b'{"k":"v"}',
         ".jsonl": b'{"k":"v"}\n',
