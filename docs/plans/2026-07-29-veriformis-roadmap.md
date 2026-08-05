@@ -6,21 +6,22 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 through 3 at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 through 4 at version `0.1.0`
 
 ## Product objective
 
 Veriformis owns the complete transformation from heterogeneous raw sources to finished, training-ready datasets. It captures raw bytes, performs faithful canonical recovery, cleans and normalizes the recovered structure, constructs records, curates, balances, splits, formats, validates, and seals the result. Canonical IR and a cleaned corpus are integrity-preserving compiler states. A cleaned corpus can also be selected for a full-sequence training objective, but it is not the limit of the product.
 
 The documentation baseline has been reviewed and merged. Group 1 implemented
-Steps 1 through 6, Group 2 implemented Steps 7 through 10, and Group 3
-implemented Steps 11 through 16. Group 4 is the next required execution group.
+Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
+implemented Steps 11 through 16, and Group 4 implemented Steps 17 through 19.
+Group 5 is the next required execution group.
 
 ## Implementation status
 
-- Steps 1 through 16 are implemented in Groups 1 through 3. Rerun the project
+- Steps 1 through 19 are implemented in Groups 1 through 4. Rerun the project
   checks for current evidence. Volatile test totals are intentionally omitted.
-- Steps 17 through 26 remain planned. Group 4 owns Steps 17 through 19 next.
+- Steps 20 through 26 remain planned. Group 5 owns Steps 20 through 21 next.
 - Later work must preserve the Groups 1 through 3 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, and verification guarantees.
@@ -116,7 +117,8 @@ boundary.
 
 **Steps 17 through 19**
 
-**Status:** Next.
+**Status:** Implemented. `PipelineService`, the thin CLI adapter, and the
+dual-objective acceptance suite control the completed boundary.
 
 17. Pipeline service
 18. Thin CLI adapter

@@ -5,7 +5,7 @@ This file gives coding-agent guidance for the current Veriformis repository.
 ## Current state
 
 Veriformis is a Python development alpha with implemented source code and tests.
-Version `0.1.0` includes the M1 core and roadmap Groups 1 through 3. Read these
+Version `0.1.0` includes the M1 core and roadmap Groups 1 through 4. Read these
 current authorities before changing code:
 
 1. `docs/product-contract.md`
@@ -46,10 +46,10 @@ as a summary or another transformation that did not occur.
 
 ## Current architecture
 
-The installed `veriformis` CLI is the current composition root. The main flow
-is `parse -> clean -> chunk -> construct -> curate -> split -> format ->
-validate -> seal -> verify`. Group 4 will move orchestration into a typed
-surface-neutral `PipelineService` and make the CLI a thin adapter.
+The typed composition root is `veriformis.pipeline.PipelineService`. The
+installed `veriformis` CLI is a thin Typer adapter over that service. The main
+flow is `parse -> clean -> chunk -> construct -> curate -> split -> format ->
+validate -> seal -> verify`.
 
 Key modules under `src/veriformis/` are:
 
@@ -60,9 +60,10 @@ Key modules under `src/veriformis/` are:
 - `datasets/` for curation, leakage-safe splitting, product rows, and exact
   dataset validation;
 - `bundle/` for atomic finished-bundle publication and independent verification;
+- `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `serializers/` and `validate/` for retained M1 compatibility utilities;
 - `workspace.py` for revisioned atomic state; and
-- `cli.py` for command orchestration.
+- `cli.py` for the Typer adapter.
 
 The physical workspace layout schema is 1. Current revision schema is 3.
 `upgrade-workspace` migrates verified revision-v1 workspaces through v2 and

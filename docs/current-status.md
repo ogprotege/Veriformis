@@ -4,11 +4,11 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1 through 3 complete
+**Implementation state:** Groups 1 through 4 complete (M1.1 service surface)
 
-**Review date:** 2026-07-30 (re-verified against code and tests; no capability drift)
+**Review date:** 2026-08-05 (Group 4 service extraction and dual-objective gate)
 
-**Next review:** The first Group 4 service change or any contract change
+**Next review:** The first Group 5 input or recipe change or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -36,16 +36,20 @@ declared row schema, validates one exact artifact-and-byte snapshot through 17
 ordered gates, publishes an exact six-file bundle, and independently verifies
 that closed file set.
 
+Group 4 completes the M1.1 service surface. `PipelineService` owns stage
+policy and workspace orchestration. The CLI is a thin adapter that translates
+arguments, messages, and exit codes. The dual-objective acceptance gate proves
+that the same multi-source golden corpus yields identical semantic digests for
+`full_text` and `continuation` through the Python API and CLI.
+
 Raw source material remains the product entry. Clean corpus state is an
 accountable intermediate, except when a `full_text` recipe explicitly selects
 the retained text as its target. The Group 3 path does not project chunks
 around construction.
 
-The complete repository check passed with `606 passed`. The independent Group
-3 architecture and security review found no unresolved Critical, High, or
-Important defect. A supported two-source raw-input demonstration reached a
-sealed bundle and `external_digest` verification. The Group 3 exit gate is
-closed, but this does not claim M1.1 or public release readiness.
+The complete repository check passed with `609 passed`. The Group 4 dual-
+objective API and CLI acceptance gate is closed. This does not claim public
+release readiness or the later Aptus handoff.
 
 ## Implemented interfaces
 
@@ -67,8 +71,9 @@ The installed console entry point is `veriformis`.
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `version` | Prints the package version | Terminal output only |
 
-There is no `run`, YAML-pipeline, MCP, GUI, or stable `PipelineService` command
-in `0.1.0`.
+The Python API surface is `veriformis.pipeline.PipelineService`. Stage methods
+return typed outcomes; adapters must not reimplement stage policy. There is no
+`run`, YAML-pipeline, MCP, or GUI command in `0.1.0`.
 
 ## Workspace and identity status
 
@@ -322,12 +327,6 @@ not claim rollback.
 
 ## Remaining limitations
 
-### Group 4 is not implemented
-
-The CLI still owns orchestration. A stable surface-neutral `PipelineService`,
-thin CLI adapter, and the dual-objective M1.1 API and CLI acceptance gate remain
-Steps 17 through 19.
-
 ### Aptus integration is row-shape only
 
 Veriformis does not yet emit the versioned shared Aptus bundle descriptor or
@@ -355,7 +354,7 @@ signing, notarization, or release verification.
 | Implemented Group 1 | Transactional workspace, source-scoped identities, diagnostics, immutable evidence, replayable cleaning plans, and regression coverage |
 | Implemented Group 2 | Five objectives, strict recipes and passes, field evidence, candidate lifecycle, exact source selection, and construction replay |
 | Implemented Group 3 | Curation, leakage-safe split, construction-aware rows, exact 17-gate validation, atomic six-file seal, and independent verification |
-| Planned Group 4 | `PipelineService`, thin CLI, and dual-objective M1.1 API and CLI acceptance |
+| Implemented Group 4 | `PipelineService`, thin CLI adapter, and dual-objective M1.1 API and CLI acceptance |
 | Later | Expanded ingest and policies, YAML, MCP, versioned Aptus handoff, and SwiftUI workbench |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
 | Public release | Supported-platform gates, artifact evidence, packaging, signing, notarization, migration checks, and release verification |
@@ -365,23 +364,26 @@ The implemented path remains offline and makes no LLM calls.
 
 ## Development and release evidence
 
-The Group 3 runtime closeout completed:
+The Group 4 runtime closeout completed:
 
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q            # 606 passed
+uv run pytest -q            # 609 passed
 git diff --check
 ```
 
-The independent architecture and security review found no unresolved Critical,
-High, or Important defect. Its record is the
+Group 4 evidence includes the dual-objective acceptance suite under
+`tests/pipeline/test_pipeline_service.py` and the plan record at
+[Group 4 plan](../dev/active/group-4-pipeline-service/plan.md). The prior
+independent Group 3 architecture and security review found no unresolved
+Critical, High, or Important defect. Its record is the
 [Group 3 code review](../dev/active/group-3-finished-dataset/group-3-finished-dataset-code-review.md).
 Version `0.1.0` remains a development alpha.
 
 ## Next authority
 
-Group 4 is next. It must add `PipelineService`, make the CLI a thin adapter,
-and prove the raw multi-source full-text and source-derived supervised
-objectives through both direct API and CLI paths.
-See the [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).
+Group 5 is next. It expands declared ingest and the deterministic recipe
+library while preserving Groups 1 through 4 integrity and M1.1 service
+guarantees. See the
+[Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).

@@ -5,29 +5,22 @@ commands, the stage-gated transaction template every mutating command
 executes, the seal path that couples a workspace receipt to a published
 artifact, and the deliberately independent verification entry point.
 
-**Last reviewed:** 2026-07-30 after Group 3 completion
+**Last reviewed:** 2026-08-05 after Group 4 completion
 
-**Next review:** The first Group 4 service change
+**Next review:** The first Group 5 input or recipe change
 
-## The single executable surface
+## Two surfaces, one orchestration root
 
-The system deliberately exposes a single executable surface. The only
-installed entry point is the console script declared in the package metadata,
-which maps `veriformis` to `veriformis.cli:main` (`pyproject.toml:33-34`);
-`main()` does nothing beyond invoking the Typer application object
-(`src/veriformis/cli.py:1934-1935`), and the `if __name__ == "__main__"` guard
-(`src/veriformis/cli.py:1938`) exists only so the file can be executed
-directly during development. There is no package `__main__.py`, so
-`python -m veriformis` is unsupported, and the top-level package exports
-nothing but `__version__` (`src/veriformis/__init__.py:4`). The design intent
-is that the command line is not one frontend among several but the product
-boundary itself: the module docstring describes the CLI as the orchestration
-surface over immutable, transactional workspace revisions, through which every
-inter-stage artifact becomes visible in one atomic `HEAD` transition
-(`src/veriformis/cli.py:1-6`). Concentrating all invocation in one 1939-line
-module guarantees that every state transition the system can perform passes
-through a single transactional discipline; the cost is that this module
-becomes the system's composition root and its thickest layer.
+The system exposes two invocation surfaces that share one orchestration root.
+The installed console script maps `veriformis` to `veriformis.cli:main`
+(`pyproject.toml`); the CLI translates arguments, messages, and exit codes
+only. Typed programmatic callers use
+`veriformis.pipeline.PipelineService`, which owns stage policy and workspace
+transactions. There is no package `__main__.py`, so `python -m veriformis` is
+unsupported, and the top-level package still exports only `__version__`.
+Every mutating stage still becomes visible through one atomic workspace
+`HEAD` transition; the difference after Group 4 is that the transactional
+discipline lives in the service, not in Typer command bodies.
 
 ## The command surface: thirteen commands, four roles
 
