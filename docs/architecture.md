@@ -1,15 +1,15 @@
 # Architecture
 
-**Last reviewed:** 2026-07-30 after Group 3 completion
+**Last reviewed:** 2026-08-05 after Group 4 completion
 
-**Next review:** The first Group 4 service change
+**Next review:** The first Group 5 input or recipe change
 
 Veriformis `0.1.0` is a Python 3.11+ modular monolith with one installed
-entry point, the `veriformis` CLI. Domain modules own strict persisted
-contracts and pure transformations; the CLI is the composition root over a
-content-addressed, replay-gated workspace. A surface-neutral
-`PipelineService` and thin CLI adapter are **planned** for Group 4; no
-service layer, MCP server, or application exists in `0.1.0`.
+entry point, the `veriformis` CLI, and one typed orchestration surface,
+`veriformis.pipeline.PipelineService`. Domain modules own strict persisted
+contracts and pure transformations; the service is the composition root over
+a content-addressed, replay-gated workspace; the CLI is a thin adapter. No
+MCP server or application shell exists in `0.1.0`.
 
 This hub holds the pipeline at a glance, the module map, and the operational
 layouts; the overview and four citation-backed deep dives live under
@@ -37,10 +37,10 @@ A foundation kernel (`errors.py`, `contracts.py`, `identity.py`,
 taxonomy, schema and gate registries, canonical-JSON identity substrate, and
 provenance model. Above it sit `ir/` (the canonical document model) and six
 stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
-`construction/`, `datasets/`, `bundle/` — flanked by two axial modules:
-`workspace.py`, the revision and stage-graph kernel, and `cli.py`, the Typer
-composition root. Retained legacy packages (`serializers/`, `validate/`) have
-no production callers.
+`construction/`, `datasets/`, `bundle/` — flanked by three axial modules:
+`workspace.py`, the revision and stage-graph kernel; `pipeline/`, the typed
+`PipelineService` composition root; and `cli.py`, the Typer adapter. Retained
+legacy packages (`serializers/`, `validate/`) have no production callers.
 
 Deep dives: [Layers](architecture/layers.md) — stack and isolation;
 [Dependencies](architecture/dependencies.md) — fan-in and containment;

@@ -4,11 +4,11 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from veriformis import cli as cli_module
 from veriformis import workspace as workspace_module
 from veriformis.bundle.finished import FinishedBundleError
 from veriformis.cli import app
 from veriformis.errors import WorkspaceCorruptError
+from veriformis.pipeline import service as pipeline_service
 from veriformis.workspace import Workspace
 
 
@@ -69,7 +69,7 @@ def test_cli_publication_runs_under_commit_lock_before_head(tmp_path, monkeypatc
     bundle = tmp_path / "locked.vfbundle"
     before = Workspace.open(workspace_path).head_id
     observations: list[tuple[str, bool]] = []
-    real_write = cli_module.write_finished_bundle
+    real_write = pipeline_service.write_finished_bundle
 
     def inspect_lock_then_write(*args, **kwargs):
         with (workspace_path / "LOCK").open("a+b") as lock:
@@ -80,7 +80,9 @@ def test_cli_publication_runs_under_commit_lock_before_head(tmp_path, monkeypatc
         observations.append((Workspace.open(workspace_path).head_id, bundle.exists()))
         return receipt
 
-    monkeypatch.setattr(cli_module, "write_finished_bundle", inspect_lock_then_write)
+    monkeypatch.setattr(
+        pipeline_service, "write_finished_bundle", inspect_lock_then_write
+    )
     result = runner.invoke(app, ["seal", str(workspace_path), "-o", str(bundle)])
 
     assert result.exit_code == 0, result.output
@@ -98,7 +100,7 @@ def test_publication_failure_leaves_head_and_target_unchanged(tmp_path, monkeypa
     def fail_publication(*args, **kwargs):
         raise FinishedBundleError("injected publication failure")
 
-    monkeypatch.setattr(cli_module, "write_finished_bundle", fail_publication)
+    monkeypatch.setattr(pipeline_service, "write_finished_bundle", fail_publication)
     result = runner.invoke(app, ["seal", str(workspace_path), "-o", str(bundle)])
 
     assert result.exit_code != 0
@@ -139,7 +141,7 @@ def test_visible_bundle_is_recovered_exactly_after_head_failure(tmp_path, monkey
     def forbid_rewrite(*args, **kwargs):
         raise AssertionError("exact recovery must not invoke the bundle writer")
 
-    monkeypatch.setattr(cli_module, "write_finished_bundle", forbid_rewrite)
+    monkeypatch.setattr(pipeline_service, "write_finished_bundle", forbid_rewrite)
     retry = runner.invoke(app, ["seal", str(workspace_path), "-o", str(bundle)])
 
     assert retry.exit_code == 0, retry.output
