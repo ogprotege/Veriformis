@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
+# Prefer an explicit interpreter for reproducible CI/local smoke (default 3.12).
+SMOKE_PYTHON="${SMOKE_PYTHON:-${UV_PYTHON:-3.12}}"
+
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/veriformis-smoke-install.XXXXXX")"
 cleanup() { rm -rf "$TMP"; }
 trap cleanup EXIT
@@ -13,20 +16,21 @@ trap cleanup EXIT
 echo "==> smoke_install: uv lock --check"
 uv lock --check
 
+echo "==> smoke_install: ensure Python $SMOKE_PYTHON"
+uv python install "$SMOKE_PYTHON"
+
 echo "==> smoke_install: build wheel"
-rm -rf "$ROOT/dist"
-uv build --wheel --out-dir "$TMP/dist"
+uv build --python "$SMOKE_PYTHON" --wheel --out-dir "$TMP/dist"
 WHEEL="$(find "$TMP/dist" -name 'veriformis-*.whl' | head -n 1)"
 test -n "$WHEEL"
 test -f "$WHEEL"
 echo "wheel: $WHEEL"
 
-echo "==> smoke_install: clean venv install"
-python3 -m venv "$TMP/venv"
+echo "==> smoke_install: clean venv install (Python $SMOKE_PYTHON)"
+uv venv --python "$SMOKE_PYTHON" "$TMP/venv"
 # shellcheck disable=SC1091
 source "$TMP/venv/bin/activate"
-python -m pip install --upgrade pip
-python -m pip install "$WHEEL"
+uv pip install "$WHEEL"
 
 echo "==> smoke_install: CLI smoke"
 command -v veriformis >/dev/null
