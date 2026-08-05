@@ -9,8 +9,6 @@ from __future__ import annotations
 import stat
 from pathlib import Path
 
-import pytest
-
 from veriformis.handoff import (
     build_aptus_handoff,
     consume_aptus_handoff,
@@ -32,7 +30,7 @@ def _golden_sources() -> list[Path]:
     )
 
 
-def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str]:
+def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str, Path]:
     sources = _golden_sources()
     assert sources
     workspace = tmp_path / f"ws-{objective}"
@@ -99,6 +97,7 @@ def test_release_scripts_are_executable_entry_points():
     `install-smoke` jobs (see `.github/workflows/ci.yml` and `docs/release.md`).
     """
     required = (
+        "check_local.sh",
         "smoke_install.sh",
         "golden_compile.sh",
         "macos_package_local.sh",

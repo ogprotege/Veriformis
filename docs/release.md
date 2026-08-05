@@ -38,6 +38,10 @@ Those remain owner-executed checklist items.
 From a clean checkout:
 
 ```bash
+# One-shot local parity with automated gates (recommended before push):
+bash scripts/release/check_local.sh
+
+# Or step-by-step:
 uv sync --extra test
 uv lock --check
 uv run ruff check src tests
@@ -45,6 +49,7 @@ uv run pytest -q
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 ```
+
 
 Optional: set `GOLDEN_EVIDENCE_DIR=/path/to/dir` when running
 `golden_compile.sh` to retain per-objective evidence files.
