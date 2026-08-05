@@ -1,13 +1,14 @@
 # Development Guide
 
-**Last reviewed:** 2026-07-30, with every command and claim below re-verified
-against the repository
+**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
 
-**Next review:** The first Group 4 service change or any contract change
+**Next review:** The first Group 9 release-gate change or any contributor-tooling
+change
 
-This guide covers the implemented Veriformis `0.1.0` project. The current CLI
-owns stage orchestration. `PipelineService`, thin CLI conversion, and M1.1
-dual-objective API and CLI acceptance remain planned Group 4 work.
+This guide covers the implemented Veriformis `0.1.0` project. Stage policy
+lives in `veriformis.pipeline.PipelineService`. The CLI, MCP adapter, and
+SwiftUI workbench are thin adapters over that service (workbench shells the
+CLI).
 
 ## Requirements
 
@@ -41,9 +42,10 @@ uv run pytest -q
 git diff --check
 ```
 
-The suite last passed with `606 passed` on 2026-07-30. Rerun the commands for
-current evidence because totals can grow. Ruff lints only the `E4`, `E7`,
-`E9`, and `F` rule families; there is no configured formatter or type checker.
+The suite last passed with `655 passed` on `main` after Group 7 merge
+(2026-08-05). Rerun the commands for current evidence because totals can grow.
+Ruff lints only the `E4`, `E7`, `E9`, and `F` rule families; there is no
+configured formatter or type checker in this alpha.
 
 Focused examples:
 
@@ -57,28 +59,34 @@ uv run pytest tests/test_cli.py -q
 
 ## Where things live
 
-The active revision-v3 pipeline runs through `cli.py`, `workspace.py`, and the
-`parsers/`, `ir/`, `rules/`, `chunkers/`, `construction/`, `datasets/`, and
-`bundle/` packages. `serializers/` and `validate/` hold legacy M1 code that
-remains for historical compatibility but is not the active CLI path.
+The active revision-v3 pipeline is orchestrated by `pipeline/PipelineService`
+and adapted by `cli.py`, with state in `workspace.py`. Domain packages:
+`parsers/`, `ir/`, `rules/`, `chunkers/`, `construction/`, `datasets/`,
+`bundle/`, plus `recipes/`, `handoff/`, and `mcp/`. The SwiftUI workbench is
+`macos/`. `serializers/` and `validate/` are legacy M1 only.
 
 | Path | Responsibility |
 | --- | --- |
-| `src/veriformis/cli.py` | Typer CLI; the current stage-orchestration surface (13 stage and utility commands) |
-| `src/veriformis/workspace.py` | Immutable transactional workspace revisions and content-addressed artifacts (layout schema 1, revision schema 3) |
-| `src/veriformis/identity.py` | Deterministic, domain-separated identities for persisted data |
-| `src/veriformis/sources.py` | Source registration; hash-pinned identity for every ingested file |
-| `src/veriformis/contracts.py` | Public versioned contract constants: objectives, gates, schema IDs, error codes |
-| `src/veriformis/diagnostics.py` | Versioned, deterministic parser diagnostics |
-| `src/veriformis/evidence.py` | Immutable source ranges and replayable text evidence (`SourceEvidence`) |
+| `src/veriformis/pipeline/` | Typed `PipelineService` composition root |
+| `src/veriformis/cli.py` | Thin Typer adapter (stages + run/recipes/mcp/handoff) |
+| `src/veriformis/workspace.py` | Immutable transactional revisions (layout 1, revision 3) |
+| `src/veriformis/identity.py` | Deterministic domain-separated identities |
+| `src/veriformis/sources.py` | Source registration and hash-pinned identity |
+| `src/veriformis/contracts.py` | Public versioned contract constants |
+| `src/veriformis/diagnostics.py` | Versioned parser diagnostics |
+| `src/veriformis/evidence.py` | Immutable source ranges and `SourceEvidence` |
 | `src/veriformis/errors.py` | Typed errors shared by every surface |
-| `src/veriformis/parsers/` | Text, Markdown, and DOCX parsers plus deterministic suffix dispatch |
-| `src/veriformis/ir/` | Canonical document IR nodes and strict serialization |
-| `src/veriformis/rules/` | Deterministic cleaning-rule engine, rule library, and edit derivations |
-| `src/veriformis/chunkers/` | Five evidence-bearing chunk strategies and the chunk-stage projection |
-| `src/veriformis/construction/` | Group 2: objectives, recipes, passes, constructors, candidate lifecycle, exact replay |
-| `src/veriformis/datasets/` | Group 3: finished plan, curation, leakage-safe split, row serialization, 17-gate validation |
-| `src/veriformis/bundle/` | `finished.py` and `verifier.py` own the six-file finished bundle; `writer.py` and `manifest.py` are legacy M1 |
+| `src/veriformis/parsers/` | Text, Markdown, DOCX, HTML, PDF, CSV, JSON, JSONL, code |
+| `src/veriformis/ir/` | Canonical document IR and strict serialization |
+| `src/veriformis/rules/` | Cleaning-rule engine, library, and derivations |
+| `src/veriformis/chunkers/` | Five evidence-bearing chunk strategies |
+| `src/veriformis/construction/` | Objectives, recipes, constructors, lifecycle, replay |
+| `src/veriformis/datasets/` | Finished plan, curation, split, rows, 17-gate validation |
+| `src/veriformis/bundle/` | Six-file finished bundle + independent verifier |
+| `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
+| `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
+| `src/veriformis/mcp/` | Constrained local MCP adapter |
+| `macos/` | SwiftUI workbench (CLI shell) |
 | `src/veriformis/serializers/` | Legacy M1 serializers and chat templates |
 | `src/veriformis/validate/` | Legacy and shared gate helpers |
 
@@ -89,17 +97,20 @@ remains for historical compatibility but is not the active CLI path.
 | Package and version | `tests/test_scaffold.py` |
 | Raw-source and full CLI paths | `tests/test_cli.py`, `tests/known_gaps/` |
 | Public contracts | `tests/contracts/` |
-| Workspace, migration, staleness, and tamper regressions | `tests/regressions/` |
-| Construction models, objectives, evidence, replay, and CLI | `tests/construction/` |
-| Curation, coverage, leakage split, serialization, and exact validation | `tests/datasets/` |
+| Workspace, migration, staleness, format e2e, tamper | `tests/regressions/` |
+| Pipeline service / dual-objective | `tests/pipeline/` |
+| Construction | `tests/construction/` |
+| Curation, split, serialization, validation | `tests/datasets/` |
 | Canonical IR | `tests/ir/` |
-| Text, Markdown, and DOCX parsing | `tests/parsers/` |
-| Cleaning rules and safety | `tests/rules/` |
-| Chunk coverage and provenance | `tests/chunkers/` |
-| Legacy projection and preview helpers | `tests/serializers/` |
-| Legacy and shared gate helpers | `tests/validate/` |
-| Finished seal, verifier, and tamper checks | `tests/bundle/` |
-| Checked-in fixtures, including the pinned acceptance corpus | `tests/fixtures/` (support, not a test package) |
+| Parsers (including Group 5 formats) | `tests/parsers/` |
+| Cleaning rules | `tests/rules/` |
+| Chunkers | `tests/chunkers/` |
+| Recipes / YAML | `tests/recipes/` |
+| MCP parity | `tests/mcp/` |
+| Aptus handoff | `tests/handoff/` |
+| Finished seal / verifier | `tests/bundle/` |
+| macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |
+| Fixtures | `tests/fixtures/` (support) |
 
 Add a regression test before repairing an integrity defect. Keep multi-source
 fixtures because source scope, leakage closure, collision resistance, and raw
@@ -210,11 +221,13 @@ Directory publication and workspace receipt commit are separate atomic
 operations. Tests and errors must report a visible publication honestly if a
 later receipt commit fails.
 
-### Keep Aptus claims narrow
+### Keep Aptus claims accurate
 
-Group 3 proves Aptus row shape only. It does not prove shared bundle intake,
-backend partition enforcement, or complete masking integration. Current Aptus
-MLX intake rejects plain `text` rows. Step 23 owns the shared contract.
+Group 3 proves Aptus row shape. Group 6 adds the versioned sibling handoff and
+fail-closed consumer verification (external digest, partition digests, row
+schema, masking expectations, assignment projection). Live training and
+backend enforcement inside Aptus remain outside this repository. Current Aptus
+MLX intake rejects plain `text` rows; the handoff records that capability.
 
 ## Adding a parser
 
@@ -229,7 +242,8 @@ A parser should:
 7. include adversarial fixtures and a raw-source finished-pipeline test where
    appropriate.
 
-Additional declared input formats remain later work.
+Declared Group 5 formats (HTML, digitally-born PDF, CSV, JSON, JSONL) are
+implemented. OCR and non-declared formats remain unsupported.
 
 ## Adding a cleaning rule
 
@@ -299,12 +313,14 @@ behavior. Adding a file to `minimal-v1` is a contract change.
 
 ## Documentation discipline
 
-Use present tense only for tested behavior. Label Group 4 and later work as
-planned. Update the CLI reference, architecture, status, product boundary, and
-tests in the same change. Preserve dated historical records and amend only
-their status notes when later implementation changes.
+Use present tense only for tested behavior. Label Group 8/9 work as planned
+when it is not yet implemented. Update the CLI reference, architecture,
+status, product boundary, and tests in the same change. Preserve dated
+historical records and amend only their status notes when later implementation
+changes.
 
-Never describe a green build as release readiness. Aptus support is row-shape
+Never describe a green build as release readiness. Aptus handoff is versioned;
+live training remains outside Veriformis. Aptus row-shape
 validation only. Do not claim external bundle trust without a retained
 manifest digest.
 

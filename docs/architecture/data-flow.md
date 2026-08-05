@@ -5,9 +5,9 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-07-30 after Group 3 completion
+**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
 
-**Next review:** The first Group 4 service change
+**Next review:** The first Group 9 release-gate change or data-flow change
 
 The pipeline organizes its entire data lifecycle as a chain of immutable,
 content-addressed shapes whose identities are recomputed at every boundary.

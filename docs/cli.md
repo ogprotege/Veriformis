@@ -1,23 +1,23 @@
 # CLI Reference
 
 Veriformis ships one console entry point, `veriformis`
-(`veriformis.cli:main`, pyproject.toml:34) — a single Typer application
-(`src/veriformis/cli.py:143`) with 13 subcommands. Nine are **stage commands**
+(`veriformis.cli:main`) — a thin Typer adapter over
+`veriformis.pipeline.PipelineService`. **Stage commands**
 (`parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`,
-`validate`, `seal`) that advance one immutable, transactional workspace
-through the dataset pipeline; each is gated on the state its upstream stages
-committed. The other four are `upgrade-workspace` (maintenance), `verify` and
-`preview` (read-only), and `version` (meta).
+`validate`, `seal`) advance one immutable, transactional workspace through
+the dataset pipeline. Additional commands cover maintenance
+(`upgrade-workspace`), read-only inspection (`verify`, `preview`), recipes
+and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
+`handoff-verify`), local MCP (`mcp`), and `version`.
 
-This page is the command reference. For the call chain from each command into
-the workspace transaction layer, see
+This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
-implemented `0.1.0` behavior; planned work is marked as such.
+implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-07-30 after full verification against `src/veriformis/cli.py`
+**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
 
-**Next review:** The first Group 4 service change or any contract change
+**Next review:** The first Group 9 release-gate change or any CLI surface change
 
 ## Run the CLI
 
@@ -35,8 +35,10 @@ examples below use the installed name.
 
 | Role | Commands | Writes state? |
 | --- | --- | --- |
-| Stage | `parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` also publishes a bundle |
+| Stage | `parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` also publishes a bundle and, by default, a sibling Aptus handoff |
 | Maintenance | `upgrade-workspace` | Appends migration revisions when the workspace is behind |
+| Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
+| Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Read-only | `verify`, `preview` | Nothing |
 | Meta | `version` | Nothing |
 
@@ -44,13 +46,15 @@ examples below use the installed name.
 
 `parse` (and raw-file `preview`) accepts explicit files with these extensions:
 
-- documents: `.txt`, `.md`, `.markdown`, `.docx`;
+- documents: `.txt`, `.md`, `.markdown`, `.docx`, `.html`, `.htm`, `.pdf`;
+- structured: `.csv`, `.json`, `.jsonl`;
 - source code: `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`,
-  `.rb`, `.sh` (`src/veriformis/parsers/dispatch.py:17`).
+  `.rb`, `.sh`.
 
-Source code enters as one language-tagged code block. Directories, PDF, HTML,
-CSV, JSON, JSONL, and other extensions are not supported in `0.1.0`. Text
-inputs must be UTF-8.
+Source code enters as one language-tagged code block. Digitally-born PDFs with
+no extractable text layer refuse with a named OCR limitation. Directories are
+not expanded by the CLI (the workbench may expand folders before calling
+`parse`). Text and structured inputs must be UTF-8.
 
 ## Workspace and artifacts
 
@@ -688,12 +692,24 @@ not call), and `legacy-workspace-ambiguous` / `legacy-source-unavailable`
 (reserved in `errors.py`). The base-class fallback `veriformis-error` is never
 raised directly.
 
+## Additional Group 5–6 commands (summary)
+
+| Command | Purpose |
+| --- | --- |
+| `run PIPELINE.yaml` | Execute a `veriformis.pipeline/v1` YAML document through `PipelineService` |
+| `list-recipes` | Print named recipe library identifiers |
+| `mcp` | Run the constrained local MCP server on stdio |
+| `handoff BUNDLE --manifest-sha256 DIGEST` | Write sibling Aptus handoff descriptor |
+| `handoff-verify HANDOFF --bundle BUNDLE` | Fail-closed consumer verification |
+| `seal ... --aptus-handoff` / `--no-aptus-handoff` | Control sibling handoff write (default: on) |
+
+See [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) and
+[current status](current-status.md) for full semantics.
+
 ## Deferred CLI work
 
-Group 4 adds a typed `PipelineService`, converts this CLI into a thin adapter,
-and proves the dual-objective M1.1 raw-source path through both direct API and
-CLI. YAML automation remains later work. This is planned, not implemented; see
-[current-status.md](current-status.md).
+Public release packaging, signing, and install verification are Group 9. No
+further stage-command redesign is planned before then.
 
 ## Related documentation
 
@@ -702,7 +718,9 @@ CLI. YAML automation remains later work. This is planned, not implemented; see
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)
 - [Current implementation status](current-status.md)
 - [Architecture](architecture.md)
 - [Development guide](development.md)
+- [macOS workbench](../macos/README.md)
 - [Build roadmap](plans/2026-07-29-veriformis-roadmap.md)

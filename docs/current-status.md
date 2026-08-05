@@ -6,50 +6,46 @@
 
 **Implementation state:** Groups 1 through 7 complete
 
-**Review date:** 2026-08-05 (Group 7 SwiftUI workbench)
+**Review date:** 2026-08-05 (docs sync after Group 7 merge to `main`)
 
-**Next review:** The first Group 8 or release-gate change or any contract change
+**Next review:** The first Group 9 release-gate change, optional Group 8 plan,
+or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
 
 ## Executive status
 
-Veriformis now runs one deterministic stage-command pipeline from supported raw
-files to a closed, independently verifiable training-dataset bundle:
+Veriformis is a local-first, offline dataset compiler from supported raw
+sources to a closed, independently verifiable training-dataset bundle:
 
 ```text
 parse -> clean -> chunk -> construct -> curate -> split
       -> format -> validate -> seal -> verify
 ```
 
-Groups 1 and 2 provide immutable source capture, canonical IR, explicit parser
-diagnostics, replayable cleaning, reconstructible chunk evidence, versioned
-training objectives, evidence-bearing candidate records, promotion decisions,
-and exact construction replay.
+**Groups 1–3** deliver integrity, construction, and the finished-dataset
+lifecycle (curation, leakage-safe split, product rows, 17-gate validation,
+atomic six-file seal, independent verification).
 
-Group 3 adds the complete finished-dataset lifecycle. A
-`FinishedDatasetPlan` binds one recipe and construction result to curation,
-split, serialization, validation, and retention policy. Veriformis then curates
-accepted records, assigns whole leakage groups, lowers objective fields into the
-declared row schema, validates one exact artifact-and-byte snapshot through 17
-ordered gates, publishes an exact six-file bundle, and independently verifies
-that closed file set.
+**Group 4** delivers the typed `PipelineService` composition root, thin CLI
+adapter, and dual-objective M1.1 API/CLI acceptance.
 
-Group 4 completes the M1.1 service surface. `PipelineService` owns stage
-policy and workspace orchestration. The CLI is a thin adapter that translates
-arguments, messages, and exit codes. The dual-objective acceptance gate proves
-that the same multi-source golden corpus yields identical semantic digests for
-`full_text` and `continuation` through the Python API and CLI.
+**Group 5** expands declared ingest (HTML, digitally-born PDF, CSV, JSON,
+JSONL), named OCR refusal, the recipe library, statistics, and YAML pipelines.
+
+**Group 6** adds the constrained local MCP adapter and versioned Aptus handoff
+v1 with fail-closed consumer verification.
+
+**Group 7** adds the SwiftUI workbench under `macos/`, a thin shell over the
+same CLI so digests match terminal runs.
 
 Raw source material remains the product entry. Clean corpus state is an
 accountable intermediate, except when a `full_text` recipe explicitly selects
-the retained text as its target. The Group 3 path does not project chunks
-around construction.
+the retained text as its target.
 
-The complete repository check passed with `609 passed`. The Group 4 dual-
-objective API and CLI acceptance gate is closed. This does not claim public
-release readiness or the later Aptus handoff.
+The complete repository check on `main` after Group 7 merge passed with
+`655 passed`. This does **not** claim public release readiness (Group 9).
 
 ## Implemented interfaces
 
@@ -66,18 +62,26 @@ The installed console entry point is `veriformis`.
 | `split WORKSPACE` | Assigns complete transitive leakage groups to train and evaluation | `result` |
 | `format WORKSPACE` | Lowers included records into the row schema bound by the plan | `row-set`, `train`, `evaluation`, `provenance` |
 | `validate WORKSPACE` | Replays all semantics and validates one exact byte snapshot through 17 gates | `snapshot`, `report` |
-| `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle | External six-file bundle; `manifest`, `attestation` receipts |
+| `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle; writes sibling Aptus handoff by default | External six-file bundle; `manifest`, `attestation`; optional `*.aptus-handoff.json` |
 | `verify BUNDLE` | Verifies the closed bundle without workspace access | Terminal verification result |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
 | `list-recipes` | Lists named deterministic recipe library identifiers | Terminal output only |
+| `mcp` | Runs the constrained local MCP adapter on stdio | MCP tool surface over `PipelineService` |
+| `handoff BUNDLE --manifest-sha256 DIGEST` | Builds the versioned Aptus handoff sibling descriptor | `*.aptus-handoff.json` |
+| `handoff-verify HANDOFF --bundle BUNDLE` | Fail-closed consumer check of handoff against sealed bundle | Terminal verification result |
 | `version` | Prints the package version | Terminal output only |
 
-The Python API surface is `veriformis.pipeline.PipelineService`. Stage methods
-return typed outcomes; adapters must not reimplement stage policy. Named recipes,
-statistics, and YAML pipeline loading live under `veriformis.recipes`. There is
-no GUI command in `0.1.0`. The constrained MCP adapter is available via
-`veriformis mcp` (stdio).
+Surfaces over the same composition root:
+
+| Surface | Location | Role |
+| --- | --- | --- |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter |
+| Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation |
+| Aptus handoff | `veriformis.handoff` | Sibling descriptor + consumer verify |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter |
 
 ## Workspace and identity status
 
@@ -289,9 +293,11 @@ A valid failing report persists with failed stage status and retains all
 findings. Unreadable critical input blocks dependent gates rather than
 producing false passes. A failed or stale report cannot satisfy seal.
 
-The Aptus gate proves row shape only. It does not prove shared bundle intake,
-backend partition enforcement, or training compatibility. Current Aptus MLX
-intake rejects plain `text` rows.
+The `aptus-row-shape` validation gate proves product-row shape only. Group 6
+adds the sibling Aptus handoff and consumer verification for sealed partitions
+and assignment projection. Live training and in-Aptus backend enforcement
+remain outside this repository. Current Aptus MLX intake rejects plain `text`
+rows.
 
 ## Bundle and verification boundary
 
@@ -377,25 +383,29 @@ The implemented path remains offline and makes no LLM calls.
 
 ## Development and release evidence
 
-The Group 4 runtime closeout completed:
+Post–Group 7 merge on `main` (2026-08-05):
 
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q            # 650 passed
+uv run pytest -q            # 655 passed
 git diff --check
 ```
 
-Group 4 evidence includes the dual-objective acceptance suite under
-`tests/pipeline/test_pipeline_service.py` and the plan record at
-[Group 4 plan](../dev/active/group-4-pipeline-service/plan.md). Group 5
-declared-format correctness is locked by permanent regressions under
-`tests/regressions/test_group5_declared_format_pipeline.py` (solo and mixed
-seal/verify, CLI parse, OCR refusal, YAML pipeline, construction replay).
-The prior independent Group 3 architecture and security review found no
-unresolved Critical, High, or Important defect. Its record is the
+Selected permanent locks:
+
+| Area | Evidence |
+| --- | --- |
+| Dual-objective M1.1 | `tests/pipeline/test_pipeline_service.py` |
+| Declared-format e2e | `tests/regressions/test_group5_declared_format_pipeline.py` |
+| MCP / service parity | `tests/mcp/test_mcp_pipeline_parity.py` |
+| Aptus handoff | `tests/handoff/test_aptus_handoff_v1.py`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
+| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/Tests/` |
+
+Group 3 independent architecture and security review:
 [Group 3 code review](../dev/active/group-3-finished-dataset/group-3-finished-dataset-code-review.md).
-Version `0.1.0` remains a development alpha.
+
+Version `0.1.0` remains a development alpha until Group 9 release gates pass.
 
 ## Next authority
 

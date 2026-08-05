@@ -10,13 +10,17 @@ Before changing code, read:
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
-- [Current implementation status](docs/current-status.md)
+- [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
+- [Current implementation status](docs/current-status.md) (Groups 1–7 implemented)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
+- [macOS workbench](macos/README.md)
 - [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
 
-The roadmap is ordered. Do not implement a later group while an earlier exit gate remains incomplete unless the roadmap is revised through review.
+The roadmap is ordered. Groups 1–7 exit gates are closed on `main`. Next
+required product work is Group 9 (public release); Group 8 is optional and
+owner-gated.
 
 After reading these authorities, consult [Work in progress](WIP.md) as the
 non-authoritative reviewed work queue.

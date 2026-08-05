@@ -5,44 +5,36 @@ commands, the stage-gated transaction template every mutating command
 executes, the seal path that couples a workspace receipt to a published
 artifact, and the deliberately independent verification entry point.
 
-**Last reviewed:** 2026-08-05 after Group 4 completion
+**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
 
-**Next review:** The first Group 5 input or recipe change
+**Next review:** The first Group 9 release-gate change or any entry-point change
 
-## Two surfaces, one orchestration root
+## Multiple adapters, one orchestration root
 
-The system exposes two invocation surfaces that share one orchestration root.
-The installed console script maps `veriformis` to `veriformis.cli:main`
-(`pyproject.toml`); the CLI translates arguments, messages, and exit codes
-only. Typed programmatic callers use
+Invocation surfaces share one orchestration root:
 `veriformis.pipeline.PipelineService`, which owns stage policy and workspace
-transactions. There is no package `__main__.py`, so `python -m veriformis` is
-unsupported, and the top-level package still exports only `__version__`.
-Every mutating stage still becomes visible through one atomic workspace
-`HEAD` transition; the difference after Group 4 is that the transactional
-discipline lives in the service, not in Typer command bodies.
+transactions.
 
-## The command surface: thirteen commands, four roles
+| Surface | How it enters |
+| --- | --- |
+| Python API | Call `PipelineService` methods directly |
+| CLI | Console script `veriformis` → thin Typer adapter |
+| MCP | `veriformis mcp` → stdio tools over the same service |
+| macOS workbench | SwiftUI app shells the `veriformis` CLI |
 
-The thirteen subcommands registered on the one `typer.Typer` application
-(`src/veriformis/cli.py:143`) fall into four functional roles rather than
-thirteen peers. Nine stage commands — parse (`src/veriformis/cli.py:821`),
-clean (957), chunk (1062), construct (1169), curate (1295), split (1409),
-format (1460), validate (1544), and seal (1615) — map one-to-one onto the nine
-workspace stages enumerated in `STAGES` (`src/veriformis/workspace.py:114-124`),
-and each command's name doubles as the stage key it passes to
-`Workspace.begin`. A maintenance command, upgrade-workspace
-(`src/veriformis/cli.py:1150`), funnels into `Workspace.migrate_to_current`
-(`src/veriformis/workspace.py:1769`) to advance legacy revision schemas
-stepwise. Two read-only commands, verify (`src/veriformis/cli.py:1788`) and
-preview (1811), inspect artifacts without committing state, and a meta
-command, version (1929-1931), surfaces the package version. Because command
-names are stage keys, the pipeline order is legible from the command list
-alone; yet ordering is not enforced by the CLI at all — it is enforced by the
-workspace's dependency table `STAGE_DEPENDENCIES`
-(`src/veriformis/workspace.py:138-165`), which the stage commands merely
-trigger. This separation keeps the CLI thin in authority even where it is
-thick in code.
+There is no package `__main__.py`, so `python -m veriformis` is unsupported,
+and the top-level package still exports only `__version__`. Every mutating
+stage still becomes visible through one atomic workspace `HEAD` transition.
+
+## The CLI command surface
+
+Stage commands (`parse`, `clean`, `chunk`, `construct`, `curate`, `split`,
+`format`, `validate`, `seal`) map one-to-one onto the nine workspace stages in
+`STAGES`. Additional commands cover `upgrade-workspace`, `verify`, `preview`,
+`run`, `list-recipes`, `mcp`, `handoff`, `handoff-verify`, and `version`.
+Ordering is enforced by the workspace dependency table `STAGE_DEPENDENCIES`,
+not by the CLI. Line numbers in older deep-dive prose may drift; re-verify
+against source when citing exact locations.
 
 ```mermaid
 flowchart TD

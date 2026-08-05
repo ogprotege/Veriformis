@@ -23,9 +23,10 @@ Group 9 public release is the next required execution group (Group 8 is optional
 - Steps 1 through 24 are implemented in Groups 1 through 7. Rerun the project
   checks for current evidence. Volatile test totals are intentionally omitted.
 - Steps 25 through 26 remain planned. Group 8 is optional; Group 9 owns Step 26 next.
-- Later work must preserve the Groups 1 through 3 workspace, identity,
+- Later work must preserve the Groups 1 through 7 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
-  validation, sealing, and verification guarantees.
+  validation, sealing, verification, service, handoff, and workbench
+  guarantees.
 
 ## Version boundary
 
