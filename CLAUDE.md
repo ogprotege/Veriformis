@@ -5,7 +5,7 @@ This file gives coding-agent guidance for the current Veriformis repository.
 ## Current state
 
 Veriformis is a Python development alpha with implemented source code and tests.
-Version `0.1.0` includes the M1 core and roadmap Groups 1 through 5. Read these
+Version `0.1.0` includes the M1 core and roadmap Groups 1 through 6. Read these
 current authorities before changing code:
 
 1. `docs/product-contract.md`
@@ -62,6 +62,8 @@ Key modules under `src/veriformis/` are:
 - `bundle/` for atomic finished-bundle publication and independent verification;
 - `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `recipes/` for named recipe builders, statistics, and YAML pipeline specs;
+- `mcp/` for the constrained local MCP adapter;
+- `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;
 - `workspace.py` for revisioned atomic state; and
 - `cli.py` for the Typer adapter.

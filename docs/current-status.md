@@ -4,11 +4,11 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1 through 5 complete
+**Implementation state:** Groups 1 through 6 complete
 
-**Review date:** 2026-08-05 (Group 5 ingest and recipe expansion)
+**Review date:** 2026-08-05 (Group 6 MCP + Aptus handoff)
 
-**Next review:** The first Group 6 integration change or any contract change
+**Next review:** The first Group 7 workbench change or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -76,7 +76,8 @@ The installed console entry point is `veriformis`.
 The Python API surface is `veriformis.pipeline.PipelineService`. Stage methods
 return typed outcomes; adapters must not reimplement stage policy. Named recipes,
 statistics, and YAML pipeline loading live under `veriformis.recipes`. There is
-no MCP or GUI command in `0.1.0`.
+no GUI command in `0.1.0`. The constrained MCP adapter is available via
+`veriformis mcp` (stdio).
 
 ## Workspace and identity status
 
@@ -334,11 +335,12 @@ not claim rollback.
 
 ## Remaining limitations
 
-### Aptus integration is row-shape only
+### Aptus handoff is versioned; live Aptus training remains outside this repo
 
-Veriformis does not yet emit the versioned shared Aptus bundle descriptor or
-prove that an Aptus backend consumes authoritative partitions and masking
-semantics. Step 23 owns that integration.
+Group 6 emits sibling `*.aptus-handoff.json` descriptors and a fail-closed
+consumer check (`handoff-verify`) that proves external-digest verification,
+partition digests, row schema, masking expectations, and assignment
+projection digests. Live training execution remains Aptus's responsibility.
 
 ### Input and policy breadth remains limited
 
@@ -364,7 +366,8 @@ signing, notarization, or release verification.
 | Implemented Group 3 | Curation, leakage-safe split, construction-aware rows, exact 17-gate validation, atomic six-file seal, and independent verification |
 | Implemented Group 4 | `PipelineService`, thin CLI adapter, and dual-objective M1.1 API and CLI acceptance |
 | Implemented Group 5 | HTML/PDF/CSV/JSON/JSONL ingest, OCR refusal, recipe library, statistics, YAML pipelines |
-| Later | MCP, versioned Aptus handoff, and SwiftUI workbench |
+| Implemented Group 6 | Local MCP adapter, versioned Aptus handoff, consumer verification |
+| Later | SwiftUI workbench |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
 | Public release | Supported-platform gates, artifact evidence, packaging, signing, notarization, migration checks, and release verification |
 | Outside current product | OCR, model training, cloud accounts, multi-user service, billing, and telemetry |
@@ -392,7 +395,6 @@ Version `0.1.0` remains a development alpha.
 
 ## Next authority
 
-Group 6 is next. It adds constrained local MCP automation and the versioned
-Aptus handoff while preserving Groups 1 through 5 integrity, service, and
-ingest guarantees. See the
-[Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).
+Group 7 is next. It delivers the SwiftUI dataset workbench while preserving
+Groups 1 through 6 integrity, service, ingest, MCP, and handoff guarantees.
+See the [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).
