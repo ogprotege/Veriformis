@@ -4,11 +4,11 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1 through 4 complete (M1.1 service surface)
+**Implementation state:** Groups 1 through 5 complete
 
-**Review date:** 2026-08-05 (Group 4 service extraction and dual-objective gate)
+**Review date:** 2026-08-05 (Group 5 ingest and recipe expansion)
 
-**Next review:** The first Group 5 input or recipe change or any contract change
+**Next review:** The first Group 6 integration change or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -69,11 +69,14 @@ The installed console entry point is `veriformis`.
 | `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle | External six-file bundle; `manifest`, `attestation` receipts |
 | `verify BUNDLE` | Verifies the closed bundle without workspace access | Terminal verification result |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
+| `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
+| `list-recipes` | Lists named deterministic recipe library identifiers | Terminal output only |
 | `version` | Prints the package version | Terminal output only |
 
 The Python API surface is `veriformis.pipeline.PipelineService`. Stage methods
-return typed outcomes; adapters must not reimplement stage policy. There is no
-`run`, YAML-pipeline, MCP, or GUI command in `0.1.0`.
+return typed outcomes; adapters must not reimplement stage policy. Named recipes,
+statistics, and YAML pipeline loading live under `veriformis.recipes`. There is
+no MCP or GUI command in `0.1.0`.
 
 ## Workspace and identity status
 
@@ -132,11 +135,15 @@ and artifact identities carry semantic reproducibility.
 | `.txt` | UTF-8 blank-line paragraph parsing with canonical-stream spans and separator-normalization diagnostics |
 | `.md`, `.markdown` | Markdown parsing into canonical IR with located diagnostics for HTML, Pandoc metadata, and unsupported tokens |
 | `.docx` | Body and note parsing with OOXML-located diagnostics for unsupported constructs, normalization, unresolved notes, and unavailable page provenance |
+| `.html`, `.htm` | Deterministic `lxml` body extraction; scripts/styles omitted with diagnostics |
+| `.pdf` | Digitally-born PDF text-layer extraction via `pypdfium2`; page headings; empty text layer refuses with named OCR limitation |
+| `.csv` | UTF-8 rectangular table recovery with fixed excel dialect and explicit padding diagnostics |
+| `.json`, `.jsonl` | UTF-8 structured path projection into evidence-bearing paragraphs |
 | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` | UTF-8 text captured as one language-tagged code block |
 
 Every parser returns a `ParseReport`, which may be empty. Its status,
-diagnostics, locations, IDs, and digest are persisted. HTML, PDF, CSV, JSON,
-and JSONL ingest remain unsupported. OCR remains unsupported.
+diagnostics, locations, IDs, and digest are persisted. OCR remains unsupported
+and is refused by name on empty-text PDFs.
 
 The canonical visible-text projection preserves image alt text, citations, and
 footnote and endnote references. Note bodies share the canonical artifact but
@@ -335,10 +342,11 @@ semantics. Step 23 owns that integration.
 
 ### Input and policy breadth remains limited
 
-HTML, PDF, CSV, JSON, JSONL, and OCR ingest are not implemented. Curation
-supports deterministic minimum target filtering, conflict quarantine, exact
-deduplication, coverage, and an optional primary-source cap. Broader quality
-policies and recipes remain later work.
+OCR remains unsupported. Curation supports deterministic minimum target
+filtering, conflict quarantine, exact deduplication, coverage, and an optional
+primary-source cap. Group 5 adds a named recipe library, deterministic
+statistics, and versioned YAML pipelines executed only through
+`PipelineService`.
 
 ### Public release gates remain incomplete
 
@@ -355,7 +363,8 @@ signing, notarization, or release verification.
 | Implemented Group 2 | Five objectives, strict recipes and passes, field evidence, candidate lifecycle, exact source selection, and construction replay |
 | Implemented Group 3 | Curation, leakage-safe split, construction-aware rows, exact 17-gate validation, atomic six-file seal, and independent verification |
 | Implemented Group 4 | `PipelineService`, thin CLI adapter, and dual-objective M1.1 API and CLI acceptance |
-| Later | Expanded ingest and policies, YAML, MCP, versioned Aptus handoff, and SwiftUI workbench |
+| Implemented Group 5 | HTML/PDF/CSV/JSON/JSONL ingest, OCR refusal, recipe library, statistics, YAML pipelines |
+| Later | MCP, versioned Aptus handoff, and SwiftUI workbench |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
 | Public release | Supported-platform gates, artifact evidence, packaging, signing, notarization, migration checks, and release verification |
 | Outside current product | OCR, model training, cloud accounts, multi-user service, billing, and telemetry |
@@ -369,7 +378,7 @@ The Group 4 runtime closeout completed:
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q            # 609 passed
+uv run pytest -q            # 618 passed
 git diff --check
 ```
 
@@ -383,7 +392,7 @@ Version `0.1.0` remains a development alpha.
 
 ## Next authority
 
-Group 5 is next. It expands declared ingest and the deterministic recipe
-library while preserving Groups 1 through 4 integrity and M1.1 service
-guarantees. See the
+Group 6 is next. It adds constrained local MCP automation and the versioned
+Aptus handoff while preserving Groups 1 through 5 integrity, service, and
+ingest guarantees. See the
 [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md).

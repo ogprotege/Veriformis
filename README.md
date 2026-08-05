@@ -13,11 +13,10 @@ text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
-> Groups 1 through 4. The complete stage-command runtime and typed
-> `PipelineService` are working, the dual-objective M1.1 API/CLI gate passes,
-> and the repository test suite is green. Read the
-> [current implementation status](docs/current-status.md) before treating this
-> alpha as release-ready.
+> Groups 1 through 5. The complete stage-command runtime, typed
+> `PipelineService`, expanded ingest formats, named recipes, and YAML pipelines
+> are working. Read the [current implementation status](docs/current-status.md)
+> before treating this alpha as release-ready.
 
 ## What works today
 
@@ -34,7 +33,8 @@ flowchart LR
 
 Version `0.1.0` provides:
 
-- local parsing for plain text, Markdown, DOCX, and selected source-code files;
+- local parsing for plain text, Markdown, DOCX, HTML, digitally-born PDF, CSV,
+  JSON, JSONL, and selected source-code files;
 - immutable workspace revisions with atomic commits and stale-stage invalidation;
 - source-scoped identities for sources, artifacts, transforms, chunks, and revisions;
 - strict canonical IR, parser diagnostics, source evidence, and replayable cleaning plans;

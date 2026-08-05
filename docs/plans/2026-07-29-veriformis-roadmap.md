@@ -6,7 +6,7 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 through 4 at version `0.1.0`
+**Current implementation:** M1 core plus Groups 1 through 5 at version `0.1.0`
 
 ## Product objective
 
@@ -14,14 +14,15 @@ Veriformis owns the complete transformation from heterogeneous raw sources to fi
 
 The documentation baseline has been reviewed and merged. Group 1 implemented
 Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
-implemented Steps 11 through 16, and Group 4 implemented Steps 17 through 19.
-Group 5 is the next required execution group.
+implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
+Group 5 implemented Steps 20 through 21. Group 6 is the next required execution
+group.
 
 ## Implementation status
 
-- Steps 1 through 19 are implemented in Groups 1 through 4. Rerun the project
+- Steps 1 through 21 are implemented in Groups 1 through 5. Rerun the project
   checks for current evidence. Volatile test totals are intentionally omitted.
-- Steps 20 through 26 remain planned. Group 5 owns Steps 20 through 21 next.
+- Steps 22 through 26 remain planned. Group 6 owns Steps 22 through 23 next.
 - Later work must preserve the Groups 1 through 3 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, and verification guarantees.
@@ -129,6 +130,10 @@ dual-objective acceptance suite control the completed boundary.
 ### Group 5: Input and recipe expansion
 
 **Steps 20 through 21**
+
+**Status:** Implemented. Declared-format parsers, OCR refusal, the named recipe
+library, statistics helpers, and YAML pipeline execution control the completed
+boundary.
 
 20. Full declared ingest
 21. Expanded deterministic recipe library

@@ -263,6 +263,42 @@ def version() -> None:
     _emit_outcome(_SERVICE.version())
 
 
+@app.command(name="list-recipes")
+def list_recipes() -> None:
+    """List named deterministic recipe library identifiers."""
+    from veriformis.recipes import list_named_recipes
+
+    for item in list_named_recipes():
+        typer.echo(
+            f"{item['recipe_library_id']}: objective={item['objective']} "
+            f"row_schema={item['target_row_schema']}"
+        )
+
+
+@app.command(name="run")
+def run_pipeline(pipeline: Path) -> None:
+    """Execute one versioned YAML pipeline document through PipelineService."""
+    from veriformis.recipes import load_pipeline_spec, run_pipeline_spec
+
+    try:
+        spec = load_pipeline_spec(pipeline)
+        result = run_pipeline_spec(spec, service=_SERVICE)
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        _echo_error(exc)
+    for outcome in result.outcomes:
+        _emit_outcome(outcome)
+    if result.bundle is not None:
+        typer.echo(f"pipeline bundle: {result.bundle}")
+    typer.echo(f"pipeline workspace: {result.workspace}")
+
+
 def main() -> None:
     app()
 
