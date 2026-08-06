@@ -15,7 +15,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -709,9 +709,10 @@ See [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) and
 ## Deferred CLI work
 
 Automated Group 9 release scripts and CI gates live under `scripts/release/`
-and [docs/release.md](release.md). Owner Mac signing and notarization remain
-checklist items. No further stage-command redesign is planned for public
-release.
+and [docs/release.md](release.md). The Mac workbench shells this CLI (see
+[install.md](install.md) and [macos/README.md](../macos/README.md)). Owner Mac
+signing and notarization remain public-release checklist items. No further
+stage-command redesign is planned solely for packaging.
 
 ## Related documentation
 
@@ -722,6 +723,7 @@ release.
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)
 - [Current implementation status](current-status.md)
+- [Install guide](install.md)
 - [Architecture](architecture.md)
 - [Development guide](development.md)
 - [Release guide](release.md)

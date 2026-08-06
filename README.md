@@ -12,15 +12,12 @@ the difficult path from source capture through the finished bundle. Cleaned
 text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
-> **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
-> Groups 1 through 7, plus Group 9 automated release gates (matrix CI, install
-> smoke, golden compile). This is **not** a beta or public release label.
-> Hard non-claims and operator limits:
-> [docs/beta-limitations.md](docs/beta-limitations.md). Signed/notarized Mac
-> public readiness remains an owner checklist —
-> [docs/release.md](docs/release.md). Read the
-> [current implementation status](docs/current-status.md) before treating this
-> alpha as shippable.
+> **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
+> automated release gates, beta-prep docs, and a **private beta Mac workbench**
+> (Phases 0–1: KISS shell over the CLI). This is **not** a public beta or
+> production label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
+> Install: [docs/install.md](docs/install.md). Status:
+> [docs/current-status.md](docs/current-status.md).
 
 ## What works today
 
@@ -61,11 +58,20 @@ Version `0.1.0` provides:
 
 The pipeline makes no LLM calls and sends no document to a network service.
 
-## macOS workbench
+## macOS workbench (private beta)
 
-A SwiftUI adapter lives under [`macos/`](macos/README.md). It shells to the same
-`veriformis` CLI used by terminal workflows so digests match. Build with
-XcodeGen + Xcode; run `./macos/scripts/parity_check.sh` for CLI sequence parity.
+A SwiftUI adapter lives under [`macos/`](macos/README.md). It **compiles**
+sources into a sealed `.vfbundle` by shelling the same `veriformis` CLI as the
+terminal (thin adapter; digests match). Phases 0–1 on `main`: sidebar Home /
+Compile / History / Settings; run sheet with progress and live log.
+
+```bash
+# From the repo (preferred private-beta launch):
+bash macos/scripts/run_workbench.sh
+```
+
+See [docs/install.md](docs/install.md), [macos/README.md](macos/README.md), and
+the [private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md).
 
 ## Supported inputs
 
@@ -197,14 +203,13 @@ source paths.
 
 ## Current boundary
 
-**Groups 1 through 7** and **Group 9 automated release gates** (matrix CI,
-install smoke, golden compile, release runbook) are on `main`, with
-**beta-prep** limitations and clean-path evidence also on `main`. This is still
-a development **alpha** — not a beta or public label. A future beta cut must
-follow [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app**
-readiness still requires owner signing/notarization evidence per
-[docs/release.md](docs/release.md). **Group 8** model-assisted construction is
-optional and owner-gated.
+On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
+and **private beta workbench Phases 0–1**. Maturity remains development
+**alpha** (not a public beta label). Next workbench step is Phase 2 debugger
+power. A future beta cut must follow
+[docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
+need owner signing/notarization per [docs/release.md](docs/release.md).
+**Group 8** model-assisted construction is optional and owner-gated.
 
 ## Documentation
 
@@ -224,11 +229,13 @@ reading paths. The map:
   - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
   - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
+  - [Install guide](docs/install.md)
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
   - [Release guide](docs/release.md)
   - [Beta limitations](docs/beta-limitations.md)
   - [macOS workbench](macos/README.md)
+  - [Private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
   - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)
 

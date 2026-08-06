@@ -2,15 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `fc33c56` on `main` after PR #16
-(Groups 1–7, Group 9 automated gates PRs #14/#15, beta-prep docs/evidence PR #16)
+**Implementation baseline reviewed:** `18d7541` on `main` (PR #22 Phase 1
+workbench; Groups 1–7; Group 9 automated gates; beta-prep; private beta
+workbench Phases 0–1)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-06 (full docs/WIP sync to post–Group 9 + beta-prep main)
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
-**Next review:** Deliberate beta label cut, public-ready Mac evidence, optional
-Group 8 plan, or any listed-item status change
+**Next review:** Phase 2 workbench merge, beta label cut, public Mac evidence,
+optional Group 8, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -49,10 +50,11 @@ local, offline, and free of LLM generation.
 - [x] Group 6 MCP and Aptus handoff is complete.
 - [x] Group 7 SwiftUI workbench is complete.
 - [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts (on `main`).
-- [x] Beta-prep: [docs/beta-limitations.md](docs/beta-limitations.md), clean-path evidence recorder + pack.
-- [ ] Private beta workbench plan:
-      [docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
-      (Phase 0 dogfood → Phase 1 shell → …).
+- [x] Beta-prep: [docs/beta-limitations.md](docs/beta-limitations.md), clean-path evidence, [docs/install.md](docs/install.md).
+- [x] Private beta workbench plan Phases **0–1** on `main`
+      ([plan](docs/plans/2026-08-06-private-beta-workbench.md): dogfood + KISS shell).
+- [ ] Phase 2 workbench debugger power (open PR #24 unless already merged).
+- [ ] Phase 3–4 workbench (optional export / heavy post-processors).
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -193,9 +195,9 @@ stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 Authority:
 [docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
 
-- [x] Phase 0 — Dogfood current workbench; punch list of UX/debug pain
+- [x] Phase 0 — Dogfood; punch list
       ([phase-0-dogfood.md](dev/active/private-beta-workbench/phase-0-dogfood.md))
-- [x] Phase 1 — KISS shell: Home / Compile / History / Settings + run sheet
+- [x] Phase 1 — KISS shell on `main` (PR #22)
       ([phase-1-design.md](dev/active/private-beta-workbench/phase-1-design.md))
 - [x] Phase 2 — Debugger power (digests, reveal, failure stage, re-run)
       ([phase-2-design.md](dev/active/private-beta-workbench/phase-2-design.md))
@@ -348,26 +350,28 @@ Remaining documentation debt:
 
 ## Verification snapshot
 
-Post–Group 9 + beta-prep on `main` (`fc33c56`, 2026-08-06):
+Post–Phase 1 workbench on `main` (`18d7541`, 2026-08-06):
 
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q            # 658 passed locally at Group 9 land; re-run for current total
+uv run pytest -q
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
+bash macos/scripts/parity_check.sh
 git diff --check
 ```
 
-CI on `main` (after PR #15/#16): Python 3.11–3.13 Ubuntu + 3.12 macOS, Ruff,
-pytest, install-smoke, golden-compile.
+CI on `main`: Python 3.11–3.13 Ubuntu + 3.12 macOS; Ruff; pytest;
+install-smoke; golden-compile.
 
 Additional permanent locks: Group 5 declared-format e2e, MCP/service parity,
-Aptus handoff consumer tests, Group 9 release-gate regressions,
-`macos/scripts/parity_check.sh`, and clean-path pack under
+Aptus handoff, Group 9 release-gate regressions, workbench Swift tests,
+`macos/scripts/parity_check.sh`, clean-path evidence under
 `dev/active/group-9-public-release/evidence/`.
 
-Rerun these checks before calling this snapshot current.
+Rerun these checks before calling this snapshot current. Do not hard-code
+pytest totals; they grow.
 
 ## Maintenance rules
 
@@ -395,6 +399,7 @@ Rerun these checks before calling this snapshot current.
 - [Architecture tree](docs/architecture/README.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
+- [Install guide](docs/install.md)
 - [Release guide](docs/release.md)
 - [Beta limitations](docs/beta-limitations.md)
 - [Private beta workbench vision](docs/plans/2026-08-06-private-beta-workbench.md)

@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any architecture or data-flow change
 

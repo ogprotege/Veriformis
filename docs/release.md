@@ -2,7 +2,7 @@
 
 **Status:** Active release-gate documentation for version `0.1.0` development alpha
 
-**Last reviewed:** 2026-08-06 (Group 9 + beta-prep on `main` via PRs #14–#16)
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any public-release claim, packaging change, or CI gate change
 

@@ -4,17 +4,17 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 through 7 runtime, Group 9
-automated release gates, and beta-prep limitations/evidence on `main`,
+**Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
+release gates, beta-prep, and private beta Mac workbench Phases 0–1 on `main`,
 version `0.1.0` development alpha
 
-**Implementation review state:** Groups 1 through 7 complete; Group 9
-automated gates and beta-prep docs landed; maturity alpha; public Mac claim
-still owner-gated
+**Implementation review state:** Groups 1–7 complete; Group 9 automated gates
+and beta-prep landed; private beta workbench Phases 0–1 on `main`; maturity
+alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-06
+**Last reviewed:** 2026-08-06 (documentation consistency pass)
 
-**Next review:** Deliberate beta label cut, public-ready checklist, or any product-contract change
+**Next review:** Phase 2 workbench, beta label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -89,13 +89,14 @@ thin CLI adapter, and dual-objective M1.1 acceptance. Group 5 expanded declared
 ingest (HTML, digitally-born PDF, CSV, JSON, JSONL), named OCR refusal, the
 recipe library, statistics, and YAML pipelines. Group 6 delivered constrained
 local MCP and the versioned Aptus handoff. Group 7 delivered the SwiftUI
-workbench over the CLI. Group 9 automated gates cover supported-platform CI,
-package-install smoke, golden corpus compile evidence, and the packaging
-runbook. Beta-prep documentation records operator non-claims and clean-path
-evidence without rebranding the product as beta. Owner-executed signing,
-notarization, and clean-Mac install evidence remain required for a **public
-Mac app** claim. Optional Group 8 (model-assisted construction) remains
-owner-gated.
+workbench over the CLI; private beta Phases 0–1 add a KISS compile shell
+(sidebar, run sheet, history, settings) without changing stage policy. Group 9
+automated gates cover supported-platform CI, package-install smoke, golden
+corpus compile evidence, and the packaging runbook. Beta-prep and
+[install](install.md) documentation record operator setup and non-claims without
+rebranding the product as beta. Owner-executed signing, notarization, and
+clean-Mac install evidence remain required for a **public Mac app** claim.
+Optional Group 8 (model-assisted construction) remains owner-gated.
 
 ## End-to-end compiler contract
 

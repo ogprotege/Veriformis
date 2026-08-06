@@ -5,10 +5,10 @@ This file gives coding-agent guidance for the current Veriformis repository.
 ## Current state
 
 Veriformis is a Python development **alpha** with implemented source code and
-tests. Version `0.1.0` includes the M1 core, roadmap Groups 1 through 7, Group 9
-automated release gates, and beta-prep documentation/evidence on `main`. Do not
-claim beta or public readiness without the deliberate label cut and checklists
-in `docs/beta-limitations.md` and `docs/release.md`.
+tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
+automated release gates; beta-prep docs; private beta Mac workbench Phases 0–1
+(thin SwiftUI over CLI). Do not claim public beta or production readiness
+without the checklists in `docs/beta-limitations.md` and `docs/release.md`.
 
 Read these current authorities before changing code:
 
@@ -20,7 +20,8 @@ Read these current authorities before changing code:
 6. `docs/contracts/aptus-handoff-v1.md`
 7. `docs/architecture.md`
 8. `docs/plans/2026-07-29-veriformis-roadmap.md`
-9. `docs/beta-limitations.md` and `docs/release.md` for maturity and release claims
+9. `docs/plans/2026-08-06-private-beta-workbench.md` (private Mac workbench phases)
+10. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.

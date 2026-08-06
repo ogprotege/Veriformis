@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-06 after PR #16 docs sync baseline on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 

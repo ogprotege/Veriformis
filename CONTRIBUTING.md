@@ -11,22 +11,23 @@ Before changing code, read:
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
-- [Current implementation status](docs/current-status.md) (Groups 1–7 + Group 9 automated gates)
+- [Current implementation status](docs/current-status.md)
+- [Install guide](docs/install.md)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
 - [Release guide](docs/release.md)
 - [Beta limitations](docs/beta-limitations.md)
 - [macOS workbench](macos/README.md)
+- [Private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
 - [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
 
-The roadmap is ordered. Groups 1–7 exit gates are closed on `main`. Group 9
-automated gates (CI matrix, install smoke, golden compile) and beta-prep
-docs/evidence are on `main`; maturity remains development **alpha**. Owner Mac
-signing/notarization evidence remains for a **public Mac app** claim. Group 8
-is optional and owner-gated. Do not describe the product as beta or
-public-ready without the checklists in [docs/beta-limitations.md](docs/beta-limitations.md)
-and [docs/release.md](docs/release.md).
+The roadmap is ordered. On `main`: Groups 1–7, Group 9 automated gates,
+beta-prep, and private beta workbench Phases 0–1. Maturity remains development
+**alpha**. Next typical work: workbench Phase 2, optional Group 8 (owner plan),
+or public Mac packaging (owner credentials). Do not describe the product as
+public-ready without [docs/beta-limitations.md](docs/beta-limitations.md) and
+[docs/release.md](docs/release.md).
 
 After reading these authorities, consult [Work in progress](WIP.md) as the
 non-authoritative reviewed work queue.
