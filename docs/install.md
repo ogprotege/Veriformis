@@ -1,0 +1,196 @@
+# Install Veriformis (private beta / local use)
+
+**Status:** Operator install guide for development alpha `0.1.0`  
+**Last reviewed:** 2026-08-06
+
+This page is the **standard local install** path. It is separate from “I only
+use `uv run` inside a checkout,” though that path remains valid for
+contributors.
+
+The Mac workbench does **not** reimplement the compiler. It shells to the
+`veriformis` **CLI**. If the GUI compiled your encyclicals, the CLI ran under
+the hood (usually via the repo’s `.venv` or `uv`).
+
+---
+
+## What you get
+
+| Piece | Role |
+| --- | --- |
+| **`veriformis` CLI** | Real product: parse → … → seal / verify |
+| **Mac workbench** (optional) | Thin GUI over that CLI |
+| **Sealed `.vfbundle`** | Finished dataset product |
+
+There is not yet a notarized App Store–style installer. Private beta means:
+install the CLI on your machine, optionally build/open the Debug app.
+
+---
+
+## Prerequisites
+
+- macOS or Linux (CI proves Ubuntu + macOS Python)
+- Python **3.11+**
+- [uv](https://docs.astral.sh/uv/) (recommended) **or** pip + venv
+
+```bash
+# install uv if needed (example)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+---
+
+## Standard CLI install (recommended for operators)
+
+### Option A — Install from a local checkout (private beta)
+
+```bash
+git clone https://github.com/ogprotege/Veriformis.git
+cd Veriformis
+uv sync
+```
+
+**Use without “installing” onto PATH:**
+
+```bash
+uv run veriformis version          # expect 0.1.0
+uv run veriformis --help
+```
+
+**Put `veriformis` on your PATH for this checkout** (stable for Terminal and for
+the GUI if you point at this binary):
+
+```bash
+# After uv sync — console script lives here:
+ls .venv/bin/veriformis
+
+# Optional: add to your shell profile for this machine only
+export PATH="$PWD/.venv/bin:$PATH"
+veriformis version
+```
+
+**Or install as a uv tool** (global-ish user tool entry; re-run after updates):
+
+```bash
+cd /path/to/Veriformis
+uv tool install --editable .
+veriformis version
+```
+
+### Option B — Editable pip install into a venv you control
+
+```bash
+cd /path/to/Veriformis
+python3.12 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e .
+veriformis version
+```
+
+---
+
+## Mac workbench (GUI)
+
+The app is still a **Debug build from the repo**, not a signed public installer.
+
+**One command (preferred):**
+
+```bash
+cd /path/to/Veriformis
+bash macos/scripts/run_workbench.sh
+```
+
+That script:
+
+1. Ensures `uv sync` / `.venv/bin/veriformis`
+2. Builds the Debug `.app`
+3. Opens it with `open --env` so the GUI finds the CLI (plain `export` + `open`
+   does **not** pass env into GUI apps)
+
+**Prerequisites for the GUI:** Xcode + [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+
+Details: [macos/README.md](../macos/README.md).
+
+---
+
+## CLI command map (the real surface)
+
+All stage policy lives here. Full options: [cli.md](cli.md).
+
+| Command | Purpose |
+| --- | --- |
+| `veriformis version` | Print package version |
+| `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |
+| `veriformis clean WORKSPACE` | Cleaning plan + apply |
+| `veriformis chunk WORKSPACE` | Evidence-bearing chunks |
+| `veriformis construct WORKSPACE --objective NAME` | Build records (`full_text`, `continuation`, …) |
+| `veriformis curate WORKSPACE` | Curation (`--allow-empty-evaluation` when needed) |
+| `veriformis split WORKSPACE` | Train / evaluation assignment |
+| `veriformis format WORKSPACE` | Lower to product rows |
+| `veriformis validate WORKSPACE` | 17-gate validation |
+| `veriformis seal WORKSPACE -o BUNDLE.vfbundle` | Atomic sealed bundle (+ Aptus handoff by default) |
+| `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
+| `veriformis handoff BUNDLE --manifest-sha256 HEX` | Build/write Aptus handoff |
+| `veriformis handoff-verify HANDOFF --bundle BUNDLE` | Consumer check |
+| `veriformis list-recipes` | Named recipes |
+| `veriformis run PIPELINE.yaml` | YAML pipeline |
+| `veriformis mcp` | Local MCP adapter |
+| `veriformis preview PATH` | Cleaning preview without commit |
+| `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions |
+
+### Minimal terminal compile (same path as the GUI)
+
+```bash
+# After install / uv sync:
+veriformis parse document.md -o /tmp/ws --source-root /path/to/dir
+veriformis clean /tmp/ws
+veriformis chunk /tmp/ws
+veriformis construct /tmp/ws --objective full_text
+veriformis curate /tmp/ws --allow-empty-evaluation
+veriformis split /tmp/ws
+veriformis format /tmp/ws
+veriformis validate /tmp/ws
+veriformis seal /tmp/ws -o /tmp/out.vfbundle
+veriformis verify /tmp/out.vfbundle
+```
+
+For Aptus-friendly supervised rows, prefer `--objective continuation` (and a
+split that can produce evaluation when you care about both partitions).
+
+---
+
+## How the GUI related to “I never installed the CLI”
+
+If you used `bash macos/scripts/run_workbench.sh` (or a Debug build from this
+repo after `uv sync`):
+
+1. `uv sync` created `.venv/bin/veriformis`
+2. The app was pointed at that binary (or `uv run … veriformis`)
+3. Every stage chip ran a real CLI command
+
+So you **did** use the CLI bundle — through the workbench — without a global
+`pip install` or a notarized app.
+
+A future **public** Mac installer (signed/notarized) is separate (Group 9 owner
+checklist). Private beta standard install = **CLI on the machine + optional
+Debug workbench**.
+
+---
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| GUI: could not locate CLI | `bash macos/scripts/run_workbench.sh` after `uv sync` |
+| `veriformis: command not found` | Use `uv run veriformis` or put `.venv/bin` on PATH / `uv tool install` |
+| `source root is not a directory` | Pass a directory to `--source-root`, not a file (fixed in recent workbench) |
+| Aptus handoff rejected for `full_text` | Expected: plain `text` schema; try `continuation` |
+
+---
+
+## Related
+
+- [CLI reference](cli.md)
+- [macOS workbench](../macos/README.md)
+- [Beta limitations](beta-limitations.md)
+- [Private beta workbench plan](plans/2026-08-06-private-beta-workbench.md)
+- [Release guide](release.md) (public Mac packaging)

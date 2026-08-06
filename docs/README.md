@@ -47,6 +47,7 @@ workbench surfaces built in Groups 1 through 7.
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
 | [Development guide](development.md) | Setup, checks, tests, engineering constraints | Contributor guide |
+| [Install guide](install.md) | Standard local CLI + Debug workbench install | Operator setup (private beta) |
 | [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
 | [Beta limitations](beta-limitations.md) | Hard non-claims and operator limits for any future beta cut | Limitations register (maturity still alpha) |
 | [macOS workbench](../macos/README.md) | SwiftUI workbench build and parity | Workbench operator guide |
