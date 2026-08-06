@@ -26,22 +26,34 @@ SwiftUI desktop adapter for the Veriformis dataset compiler.
 
 ## Build and run (private beta / dogfood)
 
-```bash
-# From the repository root — once per machine / after dependency changes:
-uv sync
+**Recommended (one command):** builds Debug, kills old instances, opens the
+correct app, and passes CLI paths via `open --env` (plain `export` + `open`
+does **not** inject env into GUI apps on macOS):
 
+```bash
+# From the repository root — on branch with the workbench fix:
+bash macos/scripts/run_workbench.sh
+```
+
+Manual equivalent:
+
+```bash
+uv sync
 cd macos
 xcodegen generate
 xcodebuild -scheme Veriformis -configuration Debug \
   -derivedDataPath /tmp/veriformis-dd build
-open /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
+killall Veriformis 2>/dev/null || true
+open --env "VERIFORMIS_CLI=$PWD/../.venv/bin/veriformis" \
+     --env "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT=$(cd .. && pwd)" \
+     /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
 ```
 
 Or open `Veriformis.xcodeproj` in Xcode and Run (⌘R) from this checkout.
 
-On launch the log should show `CLI ready: …`. If you see **Could not locate the
-veriformis CLI**, complete `uv sync` and relaunch a **Debug** build from this
-repo (or set the overrides below).
+On launch the **Log** panel should show `Workbench bootstrap…` then
+`CLI ready: …`. If you still see a missing-CLI alert, read the bootstrap
+diagnostic lines in that log (PATH, plist root, venv path).
 
 ### Development CLI resolution (order)
 

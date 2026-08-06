@@ -51,7 +51,7 @@ struct VeriformisCLI: Sendable {
         if let env = ProcessInfo.processInfo.environment["VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT"],
            !env.isEmpty
         {
-            let url = URL(fileURLWithPath: env)
+            let url = URL(fileURLWithPath: env).standardizedFileURL
             if looksLikeRepoRoot(url, fileManager: fileManager) {
                 return url
             }
@@ -61,13 +61,13 @@ struct VeriformisCLI: Sendable {
            !builtIn.isEmpty,
            !builtIn.hasPrefix("$(")
         {
-            let url = URL(fileURLWithPath: builtIn)
+            let url = URL(fileURLWithPath: builtIn).standardizedFileURL
             if looksLikeRepoRoot(url, fileManager: fileManager) {
                 return url
             }
         }
         // Walk up from CWD for `uv run` style launches during development.
-        var dir = URL(fileURLWithPath: fileManager.currentDirectoryPath)
+        var dir = URL(fileURLWithPath: fileManager.currentDirectoryPath).standardizedFileURL
         for _ in 0 ..< 8 {
             if looksLikeRepoRoot(dir, fileManager: fileManager) {
                 return dir
@@ -75,16 +75,47 @@ struct VeriformisCLI: Sendable {
             dir.deleteLastPathComponent()
         }
         // Walk up from the .app bundle (…/macos/…/Veriformis.app → repo root).
-        if let bundleURL = bundle.bundleURL as URL? {
-            var candidate = bundleURL
-            for _ in 0 ..< 10 {
-                if looksLikeRepoRoot(candidate, fileManager: fileManager) {
-                    return candidate
-                }
-                candidate.deleteLastPathComponent()
+        var candidate = bundle.bundleURL.standardizedFileURL
+        for _ in 0 ..< 12 {
+            if looksLikeRepoRoot(candidate, fileManager: fileManager) {
+                return candidate
             }
+            let parent = candidate.deletingLastPathComponent()
+            if parent.path == candidate.path { break }
+            candidate = parent
         }
         return nil
+    }
+
+    /// Human-readable diagnostic for dogfood when resolution fails.
+    static func resolutionDiagnostics(
+        fileManager: FileManager = .default
+    ) -> String {
+        var lines: [String] = []
+        let envCLI = ProcessInfo.processInfo.environment["VERIFORMIS_CLI"] ?? "(unset)"
+        let envRoot = ProcessInfo.processInfo.environment["VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT"] ?? "(unset)"
+        let plistRoot = Bundle.main.object(forInfoDictionaryKey: "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT") as? String ?? "(missing)"
+        lines.append("PATH=\(ProcessInfo.processInfo.environment["PATH"] ?? "(nil)")")
+        lines.append("VERIFORMIS_CLI=\(envCLI)")
+        lines.append("VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT=\(envRoot)")
+        lines.append("Info.plist repo root=\(plistRoot)")
+        lines.append("cwd=\(fileManager.currentDirectoryPath)")
+        lines.append("bundle=\(Bundle.main.bundleURL.path)")
+        if let root = developmentRepositoryRoot(fileManager: fileManager) {
+            lines.append("resolved repo root=\(root.path)")
+            let venv = root.appendingPathComponent(".venv/bin/veriformis")
+            lines.append("venv CLI exists=\(fileManager.fileExists(atPath: venv.path)) executable=\(fileManager.isExecutableFile(atPath: venv.path)) path=\(venv.path)")
+        } else {
+            lines.append("resolved repo root=(nil)")
+        }
+        for name in ["veriformis", "uv"] {
+            if let url = findExecutable(name, fileManager: fileManager) {
+                lines.append("found \(name)=\(url.path)")
+            } else {
+                lines.append("found \(name)=(nil)")
+            }
+        }
+        return lines.joined(separator: "\n")
     }
 
     func buildArguments(_ stageArguments: [String]) -> [String] {
