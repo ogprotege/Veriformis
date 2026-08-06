@@ -65,6 +65,28 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertTrue(message.contains("VERIFORMIS_CLI"))
     }
 
+    func testDefaultSourceRootForSingleFileIsParentDirectory() {
+        let file = URL(fileURLWithPath: "/Users/biscuit/docs/encyclical.md")
+        let root = WorkbenchViewModel.defaultSourceRoot(for: [file])
+        XCTAssertEqual(root?.path, "/Users/biscuit/docs")
+        XCTAssertNotEqual(root?.path, file.path)
+        XCTAssertFalse(root?.path.hasPrefix("//") ?? true)
+    }
+
+    func testDefaultSourceRootForSiblingFilesIsSharedParent() {
+        let a = URL(fileURLWithPath: "/data/raw/corpus/a.txt")
+        let b = URL(fileURLWithPath: "/data/raw/corpus/b.md")
+        let root = WorkbenchViewModel.defaultSourceRoot(for: [a, b])
+        XCTAssertEqual(root?.path, "/data/raw/corpus")
+    }
+
+    func testDefaultSourceRootForNestedFilesIsCommonAncestor() {
+        let a = URL(fileURLWithPath: "/data/raw/en/a.md")
+        let b = URL(fileURLWithPath: "/data/raw/la/b.md")
+        let root = WorkbenchViewModel.defaultSourceRoot(for: [a, b])
+        XCTAssertEqual(root?.path, "/data/raw")
+    }
+
     func testResolveFindsRepoVenvOrUvWhenRootProvided() throws {
         // Walk from this source file up to the repository root (…/macos/Tests → repo).
         var dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()

@@ -7,6 +7,8 @@ import UniformTypeIdentifiers
 final class WorkbenchViewModel: ObservableObject {
     @Published var sourceURLs: [URL] = []
     @Published var sourceRootURL: URL?
+    /// True after the user picks Source root… so auto-inference does not overwrite it.
+    private var userPinnedSourceRoot = false
     @Published var outputDirectoryURL: URL?
     @Published var objective: TrainingObjective = .fullText
     @Published var allowEmptyEvaluation = true
@@ -52,18 +54,26 @@ final class WorkbenchViewModel: ObservableObject {
             sourceURLs.append(url)
         }
         sourceURLs.sort { $0.path < $1.path }
-        if sourceRootURL == nil {
-            sourceRootURL = commonAncestor(of: sourceURLs)
+        // Always recompute when the user has not pinned an explicit root.
+        // (A single file must use its parent directory, never the file path.)
+        if sourceRootURL == nil || !userPinnedSourceRoot {
+            sourceRootURL = Self.defaultSourceRoot(for: sourceURLs)
         }
     }
 
     func removeSource(_ url: URL) {
         sourceURLs.removeAll { $0.path == url.path }
+        if !userPinnedSourceRoot {
+            sourceRootURL = Self.defaultSourceRoot(for: sourceURLs)
+        }
     }
 
     func clearSources() {
         sourceURLs = []
         lastResult = nil
+        if !userPinnedSourceRoot {
+            sourceRootURL = nil
+        }
     }
 
     func chooseOutputDirectory() {
@@ -83,7 +93,8 @@ final class WorkbenchViewModel: ObservableObject {
         panel.canChooseDirectories = true
         panel.prompt = "Choose Source Root"
         if panel.runModal() == .OK, let url = panel.url {
-            sourceRootURL = url
+            sourceRootURL = url.standardizedFileURL
+            userPinnedSourceRoot = true
         }
     }
 
@@ -197,18 +208,37 @@ final class WorkbenchViewModel: ObservableObject {
         return nil
     }
 
-    private func commonAncestor(of urls: [URL]) -> URL? {
-        guard let first = urls.first else { return nil }
-        var components = first.pathComponents
-        for url in urls.dropFirst() {
-            let other = url.pathComponents
-            var shared: [String] = []
-            for (a, b) in zip(components, other) {
-                if a == b { shared.append(a) } else { break }
+    /// Directory that contains every source. Never a file path.
+    nonisolated static func defaultSourceRoot(for sources: [URL]) -> URL? {
+        guard !sources.isEmpty else { return nil }
+        let directories: [URL] = sources.map { url in
+            let standardized = url.standardizedFileURL
+            var isDir: ObjCBool = false
+            if FileManager.default.fileExists(atPath: standardized.path, isDirectory: &isDir),
+               isDir.boolValue
+            {
+                return standardized
             }
-            components = shared
+            return standardized.deletingLastPathComponent()
         }
-        guard components.count >= 1 else { return nil }
-        return URL(fileURLWithPath: components.joined(separator: "/"))
+        guard var shared = directories.first?.pathComponents, !shared.isEmpty else { return nil }
+        for directory in directories.dropFirst() {
+            let other = directory.pathComponents
+            var index = 0
+            while index < shared.count, index < other.count, shared[index] == other[index] {
+                index += 1
+            }
+            shared = Array(shared.prefix(index))
+        }
+        guard !shared.isEmpty else { return nil }
+        // Rebuild without joining "/" components into "//Users/...".
+        if shared.first == "/" {
+            return shared.dropFirst().reduce(URL(fileURLWithPath: "/")) { partial, component in
+                partial.appendingPathComponent(component)
+            }
+        }
+        return shared.dropFirst().reduce(URL(fileURLWithPath: shared[0])) { partial, component in
+            partial.appendingPathComponent(component)
+        }
     }
 }
