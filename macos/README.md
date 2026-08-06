@@ -47,6 +47,16 @@ assignment, partition digests, and manifest SHA-256.
 A user can complete raw sources → sealed `.vfbundle` (+ handoff) without the
 terminal; digests match CLI.
 
+## Private beta vision
+
+Owner plan for KISS navigation, compile (not convert) framing, live run log,
+and phased debugger UX:
+
+[docs/plans/2026-08-06-private-beta-workbench.md](../docs/plans/2026-08-06-private-beta-workbench.md)
+
+The workbench remains a thin CLI adapter. Success is a sealed dataset product,
+not a multi-format file converter.
+
 ## Packaging and release
 
 Local unsigned dry-run (not public-ready):

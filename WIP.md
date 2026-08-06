@@ -50,6 +50,9 @@ local, offline, and free of LLM generation.
 - [x] Group 7 SwiftUI workbench is complete.
 - [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts (on `main`).
 - [x] Beta-prep: [docs/beta-limitations.md](docs/beta-limitations.md), clean-path evidence recorder + pack.
+- [ ] Private beta workbench plan:
+      [docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
+      (Phase 0 dogfood → Phase 1 shell → …).
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -183,7 +186,18 @@ external digest, partitions, rows, and assignment projection.
 **Delivered:** `macos/` SwiftUI app shells to `veriformis` CLI; drag-drop sources;
 stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 
-## Next required work: Group 9 owner remainder / optional Group 8
+## Next work: private beta workbench / Group 9 owner / optional Group 8
+
+### Private beta Mac workbench (owner plan)
+
+Authority:
+[docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
+
+- [ ] Phase 0 — Dogfood current workbench; punch list of UX/debug pain
+- [ ] Phase 1 — KISS shell: Home / Compile / History / Settings + run sheet
+- [ ] Phase 2 — Debugger power (digests, reveal, failure stage)
+- [ ] Phase 3 — Optional post-seal export (only formats we implement)
+- [ ] Phase 4 — Heavy post-processors if still needed (never replace seal)
 
 ### Group 8: Advanced construction (optional)
 
@@ -380,5 +394,6 @@ Rerun these checks before calling this snapshot current.
 - [Development guide](docs/development.md)
 - [Release guide](docs/release.md)
 - [Beta limitations](docs/beta-limitations.md)
+- [Private beta workbench vision](docs/plans/2026-08-06-private-beta-workbench.md)
 - [Beta readiness audit](dev/active/group-9-public-release/beta-readiness-audit.md)
 - [macOS workbench](macos/README.md)
