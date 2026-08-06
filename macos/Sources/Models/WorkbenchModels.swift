@@ -94,8 +94,26 @@ struct CompileResult: Equatable {
     let bundleURL: URL
     let handoffURL: URL?
     let manifestSHA256: String?
+    let assignmentDigest: String?
     let log: String
     let logFileURL: URL?
+}
+
+/// Structured failure for debugger UI (Phase 2).
+struct CompileFailure: Equatable {
+    let stage: String
+    let exitCode: Int32?
+    let message: String
+    let lastLogLines: [String]
+    let workspaceURL: URL?
+    let logFileURL: URL?
+
+    var summary: String {
+        if let exitCode {
+            return "Stage \(stage) failed (exit \(exitCode))"
+        }
+        return "Stage \(stage) failed"
+    }
 }
 
 enum RunStatus: String, Codable {
@@ -116,7 +134,15 @@ struct RunHistoryEntry: Identifiable, Codable, Equatable {
     let handoffPath: String?
     let logFilePath: String?
     let manifestSHA256: String?
+    let assignmentDigest: String?
     let errorSummary: String?
+    /// Optional re-run fidelity (older history entries may omit these).
+    let sourceRootPath: String?
+    let allowEmptyEvaluation: Bool?
+    let writeAptusHandoff: Bool?
+    let splitRatioPPM: Int?
+    let failedStage: String?
+    let exitCode: Int?
 
     var title: String {
         let stamp = RunHistoryEntry.shortDate.string(from: finishedAt)
@@ -134,7 +160,7 @@ struct RunHistoryEntry: Identifiable, Codable, Equatable {
 enum WorkbenchError: LocalizedError, Equatable {
     case missingCLI
     case noSources
-    case processFailed(stage: String, message: String)
+    case processFailed(stage: String, exitCode: Int32, message: String)
     case invalidConfiguration(String)
 
     var errorDescription: String? {
@@ -156,8 +182,9 @@ enum WorkbenchError: LocalizedError, Equatable {
             """
         case .noSources:
             return "Add at least one source file before compiling."
-        case .processFailed(let stage, let message):
-            return "Stage \(stage) failed: \(message)"
+        case .processFailed(let stage, let exitCode, let message):
+            let head = message.split(separator: "\n", omittingEmptySubsequences: true).prefix(3).joined(separator: "\n")
+            return "Stage \(stage) failed (exit \(exitCode)): \(head)"
         case .invalidConfiguration(let message):
             return message
         }

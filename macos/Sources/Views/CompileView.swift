@@ -27,18 +27,27 @@ struct CompileView: View {
                             .foregroundStyle(.orange)
                     }
 
-                    Button {
-                        workbench.compile()
-                    } label: {
-                        Label(
-                            workbench.isRunning ? "Compiling…" : "Compile to sealed bundle",
-                            systemImage: "shippingbox.fill"
-                        )
-                        .frame(maxWidth: .infinity)
+                    HStack {
+                        Button {
+                            workbench.compile()
+                        } label: {
+                            Label(
+                                workbench.isRunning ? "Compiling…" : "Compile to sealed bundle",
+                                systemImage: "shippingbox.fill"
+                            )
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .disabled(!workbench.canCompile)
+
+                        if !workbench.runHistory.isEmpty {
+                            Button("Re-run last") {
+                                workbench.reRunLastConfiguration()
+                            }
+                            .disabled(workbench.isRunning)
+                        }
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .disabled(!workbench.canCompile)
 
                     if let result = workbench.lastResult {
                         ResultView(result: result)

@@ -103,6 +103,11 @@ default output:
 
 [dev/active/private-beta-workbench/phase-1-design.md](../dev/active/private-beta-workbench/phase-1-design.md)
 
+**Phase 2** (implemented): failure stage/exit/log tail, copy digests, reveal
+artifacts, re-run from History/last settings:
+
+[dev/active/private-beta-workbench/phase-2-design.md](../dev/active/private-beta-workbench/phase-2-design.md)
+
 Operator install (CLI + workbench): [docs/install.md](../docs/install.md)
 
 The workbench remains a thin CLI adapter. Success is a sealed dataset product,

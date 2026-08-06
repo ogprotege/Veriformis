@@ -199,7 +199,8 @@ Authority:
       ([phase-0-dogfood.md](dev/active/private-beta-workbench/phase-0-dogfood.md))
 - [x] Phase 1 — KISS shell on `main` (PR #22)
       ([phase-1-design.md](dev/active/private-beta-workbench/phase-1-design.md))
-- [ ] Phase 2 — Debugger power (copy digests, failure detail, re-run) — PR #24
+- [x] Phase 2 — Debugger power (digests, reveal, failure stage, re-run)
+      ([phase-2-design.md](dev/active/private-beta-workbench/phase-2-design.md))
 - [ ] Phase 3 — Optional post-seal export (only formats we implement)
 - [ ] Phase 4 — Heavy post-processors if still needed (never replace seal)
 

@@ -16,7 +16,16 @@ struct ResultView: View {
                 gridRow("Aptus handoff", handoff.path)
             }
             if let sha = result.manifestSHA256 {
-                gridRow("Manifest SHA-256", sha)
+                digestRow(label: "Manifest SHA-256", value: sha, copyLabel: "manifest SHA-256")
+            }
+            if let digest = result.assignmentDigest {
+                digestRow(label: "Assignment digest", value: digest, copyLabel: "assignment digest")
+            }
+
+            if let notice = workbench.lastCopiedNotice {
+                Text(notice)
+                    .font(.caption)
+                    .foregroundStyle(.green)
             }
 
             HStack {
@@ -36,6 +45,9 @@ struct ResultView: View {
                         workbench.openLogFile(log)
                     }
                 }
+                Button("Re-run") {
+                    workbench.reRunLastConfiguration()
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,6 +62,21 @@ struct ResultView: View {
             Text(value)
                 .textSelection(.enabled)
                 .font(.system(.body, design: .monospaced))
+        }
+    }
+
+    private func digestRow(label: String, value: String, copyLabel: String) -> some View {
+        HStack(alignment: .top) {
+            Text(label)
+                .foregroundStyle(.secondary)
+                .frame(width: 140, alignment: .leading)
+            Text(value)
+                .textSelection(.enabled)
+                .font(.system(.body, design: .monospaced))
+            Button("Copy") {
+                workbench.copyToPasteboard(value, label: copyLabel)
+            }
+            .buttonStyle(.borderless)
         }
     }
 }

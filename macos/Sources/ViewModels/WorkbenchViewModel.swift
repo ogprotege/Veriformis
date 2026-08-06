@@ -27,7 +27,9 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var logLines: [String] = []
     @Published var logExpanded = true
     @Published var lastError: String?
+    @Published var lastFailure: CompileFailure?
     @Published var lastResult: CompileResult?
+    @Published var lastCopiedNotice: String?
     @Published var runStatusMessage = "Ready"
 
     // History + settings
@@ -186,7 +188,9 @@ final class WorkbenchViewModel: ObservableObject {
         guard !isRunning else { return }
         applyDefaultOutputIfNeeded()
         lastError = nil
+        lastFailure = nil
         lastResult = nil
+        lastCopiedNotice = nil
         completedStages = []
         currentStage = nil
         progressPercent = 0
@@ -215,7 +219,11 @@ final class WorkbenchViewModel: ObservableObject {
         showRunSheet = true
         let startedAt = Date()
         let sourcesSnapshot = sourceURLs
+        let sourceRootSnapshot = sourceRoot
         let objectiveSnapshot = objective
+        let allowEmptySnapshot = allowEmptyEvaluation
+        let handoffSnapshot = writeAptusHandoff
+        let splitSnapshot = splitRatioPPM
 
         Task {
             defer { isRunning = false }
@@ -235,13 +243,13 @@ final class WorkbenchViewModel: ObservableObject {
 
                 let plan = VeriformisCLI.compilePlan(
                     sources: sourcesSnapshot,
-                    sourceRoot: sourceRoot,
+                    sourceRoot: sourceRootSnapshot,
                     workspace: workspace,
                     bundle: bundle,
                     objective: objectiveSnapshot,
-                    allowEmptyEvaluation: allowEmptyEvaluation,
-                    splitRatioPPM: splitRatioPPM,
-                    includeHandoff: writeAptusHandoff
+                    allowEmptyEvaluation: allowEmptySnapshot,
+                    splitRatioPPM: splitSnapshot,
+                    includeHandoff: handoffSnapshot
                 )
 
                 let total = Double(WorkbenchStage.pipelineStages.count)
@@ -261,6 +269,7 @@ final class WorkbenchViewModel: ObservableObject {
                     if result.exitCode != 0 {
                         throw WorkbenchError.processFailed(
                             stage: command.stage.rawValue,
+                            exitCode: result.exitCode,
                             message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
                         )
                     }
@@ -269,7 +278,8 @@ final class WorkbenchViewModel: ObservableObject {
                 }
 
                 let manifest = Self.extractManifestSHA256(from: combinedLog)
-                let handoff = writeAptusHandoff
+                let assignment = Self.extractAssignmentDigest(from: combinedLog)
+                let handoff = handoffSnapshot
                     ? URL(fileURLWithPath: bundle.path + ".aptus-handoff.json")
                     : nil
                 if let handoff, FileManager.default.fileExists(atPath: handoff.path) {
@@ -286,6 +296,7 @@ final class WorkbenchViewModel: ObservableObject {
                         FileManager.default.fileExists(atPath: $0.path) ? $0 : nil
                     },
                     manifestSHA256: manifest,
+                    assignmentDigest: assignment,
                     log: combinedLog,
                     logFileURL: logFileURL
                 )
@@ -298,35 +309,113 @@ final class WorkbenchViewModel: ObservableObject {
                     startedAt: startedAt,
                     status: .succeeded,
                     sources: sourcesSnapshot,
+                    sourceRoot: sourceRootSnapshot,
                     objective: objectiveSnapshot,
+                    allowEmptyEvaluation: allowEmptySnapshot,
+                    writeAptusHandoff: handoffSnapshot,
+                    splitRatioPPM: splitSnapshot,
                     workspace: workspace,
                     bundle: bundle,
                     handoff: lastResult?.handoffURL,
                     logFile: logFileURL,
                     manifest: manifest,
-                    error: nil
+                    assignmentDigest: assignment,
+                    error: nil,
+                    failedStage: nil,
+                    exitCode: nil
                 )
             } catch {
+                let failure = Self.makeFailure(
+                    error: error,
+                    logLines: logLines,
+                    workspace: workspace,
+                    logFile: logFileURL
+                )
                 currentStage = nil
-                runStatusMessage = "Compile failed"
-                lastError = error.localizedDescription
-                appendLog("error: \(error.localizedDescription)")
+                runStatusMessage = failure.summary
+                lastFailure = failure
+                lastError = failure.summary + "\n" + failure.message
+                logExpanded = true
+                appendLog("error: \(failure.summary)")
                 if let logFileURL {
-                    appendToLogFile(logFileURL, text: "error: \(error.localizedDescription)\n")
+                    appendToLogFile(
+                        logFileURL,
+                        text: "error: \(failure.summary)\n\(failure.message)\n"
+                    )
                 }
                 recordHistory(
                     startedAt: startedAt,
                     status: .failed,
                     sources: sourcesSnapshot,
+                    sourceRoot: sourceRootSnapshot,
                     objective: objectiveSnapshot,
+                    allowEmptyEvaluation: allowEmptySnapshot,
+                    writeAptusHandoff: handoffSnapshot,
+                    splitRatioPPM: splitSnapshot,
                     workspace: workspace,
                     bundle: bundle,
                     handoff: nil,
                     logFile: logFileURL,
                     manifest: nil,
-                    error: error.localizedDescription
+                    assignmentDigest: nil,
+                    error: failure.summary,
+                    failedStage: failure.stage,
+                    exitCode: failure.exitCode.map { Int($0) }
                 )
             }
+        }
+    }
+
+    /// Restore compile form from a history entry and start again.
+    func reRun(from entry: RunHistoryEntry) {
+        guard !isRunning else { return }
+        sourceURLs = entry.sourcePaths.map { URL(fileURLWithPath: $0) }
+        if let root = entry.sourceRootPath {
+            sourceRootURL = URL(fileURLWithPath: root)
+            userPinnedSourceRoot = true
+        } else {
+            userPinnedSourceRoot = false
+            sourceRootURL = Self.defaultSourceRoot(for: sourceURLs)
+        }
+        if let objective = TrainingObjective(rawValue: entry.objective) {
+            self.objective = objective
+        }
+        allowEmptyEvaluation = entry.allowEmptyEvaluation ?? true
+        writeAptusHandoff = entry.writeAptusHandoff ?? true
+        splitRatioPPM = entry.splitRatioPPM ?? 400_000
+        let parent = URL(fileURLWithPath: entry.workspacePath).deletingLastPathComponent()
+        if FileManager.default.fileExists(atPath: parent.path) {
+            outputDirectoryURL = parent
+        }
+        destination = .compile
+        compile()
+    }
+
+    func reRunLastConfiguration() {
+        if let entry = runHistory.first {
+            reRun(from: entry)
+        } else {
+            compile()
+        }
+    }
+
+    func copyToPasteboard(_ text: String, label: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        lastCopiedNotice = "Copied \(label)"
+        runStatusMessage = "Copied \(label)"
+        appendLog("copied \(label)")
+    }
+
+    func copyManifestIfAvailable() {
+        if let sha = lastResult?.manifestSHA256 ?? selectedHistoryEntry?.manifestSHA256 {
+            copyToPasteboard(sha, label: "manifest SHA-256")
+        }
+    }
+
+    func copyAssignmentDigestIfAvailable() {
+        if let digest = lastResult?.assignmentDigest ?? selectedHistoryEntry?.assignmentDigest {
+            copyToPasteboard(digest, label: "assignment digest")
         }
     }
 
@@ -348,16 +437,55 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     nonisolated static func extractManifestSHA256(from log: String) -> String? {
+        extractLabeledDigest(from: log, label: "manifest sha-256")
+    }
+
+    nonisolated static func extractAssignmentDigest(from log: String) -> String? {
+        extractLabeledDigest(from: log, label: "assignment digest")
+    }
+
+    nonisolated static func extractLabeledDigest(from log: String, label: String) -> String? {
+        let needle = label.lowercased() + ":"
         for line in log.split(separator: "\n") {
             let text = String(line)
-            if text.lowercased().contains("manifest sha-256:") {
-                let parts = text.split(separator: ":", maxSplits: 1)
-                if parts.count == 2 {
-                    return parts[1].trimmingCharacters(in: .whitespaces)
-                }
-            }
+            let lower = text.lowercased()
+            guard let range = lower.range(of: needle) else { continue }
+            let value = text[range.upperBound...].trimmingCharacters(in: .whitespaces)
+            if !value.isEmpty { return value }
         }
         return nil
+    }
+
+    nonisolated static func makeFailure(
+        error: Error,
+        logLines: [String],
+        workspace: URL,
+        logFile: URL?
+    ) -> CompileFailure {
+        let lastLines = Array(logLines.suffix(12))
+        if let workbenchError = error as? WorkbenchError {
+            switch workbenchError {
+            case .processFailed(let stage, let exitCode, let message):
+                return CompileFailure(
+                    stage: stage,
+                    exitCode: exitCode,
+                    message: message,
+                    lastLogLines: lastLines,
+                    workspaceURL: FileManager.default.fileExists(atPath: workspace.path) ? workspace : nil,
+                    logFileURL: logFile
+                )
+            default:
+                break
+            }
+        }
+        return CompileFailure(
+            stage: "unknown",
+            exitCode: nil,
+            message: error.localizedDescription,
+            lastLogLines: lastLines,
+            workspaceURL: FileManager.default.fileExists(atPath: workspace.path) ? workspace : nil,
+            logFileURL: logFile
+        )
     }
 
     /// Directory that contains every source. Never a file path.
@@ -453,13 +581,20 @@ final class WorkbenchViewModel: ObservableObject {
         startedAt: Date,
         status: RunStatus,
         sources: [URL],
+        sourceRoot: URL,
         objective: TrainingObjective,
+        allowEmptyEvaluation: Bool,
+        writeAptusHandoff: Bool,
+        splitRatioPPM: Int,
         workspace: URL,
         bundle: URL,
         handoff: URL?,
         logFile: URL?,
         manifest: String?,
-        error: String?
+        assignmentDigest: String?,
+        error: String?,
+        failedStage: String?,
+        exitCode: Int?
     ) {
         let entry = RunHistoryEntry(
             id: UUID(),
@@ -474,7 +609,14 @@ final class WorkbenchViewModel: ObservableObject {
             handoffPath: handoff?.path,
             logFilePath: logFile?.path,
             manifestSHA256: manifest,
-            errorSummary: error
+            assignmentDigest: assignmentDigest,
+            errorSummary: error,
+            sourceRootPath: sourceRoot.path,
+            allowEmptyEvaluation: allowEmptyEvaluation,
+            writeAptusHandoff: writeAptusHandoff,
+            splitRatioPPM: splitRatioPPM,
+            failedStage: failedStage,
+            exitCode: exitCode
         )
         runHistory.insert(entry, at: 0)
         if runHistory.count > historyLimit {
