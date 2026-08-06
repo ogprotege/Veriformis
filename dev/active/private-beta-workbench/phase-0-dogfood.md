@@ -110,8 +110,16 @@ cd .. && bash macos/scripts/parity_check.sh
 
 Set `VERIFORMIS_CLI` or keep repo layout so `uv run veriformis` resolves.
 
+## Owner GUI dogfood (2026-08-06)
+
+- Real Magisterium sources (including ~132 KB) compiled end-to-end in the GUI.
+- Source-root single-file fix verified (`…/EN` directory).
+- Sealed `.vfbundle` opens/reads correctly; all validation gates PASSED.
+- Owner note: CLI felt “not installed” — clarified that the workbench shells
+  `.venv`/`uv`; standard install docs added at `docs/install.md`.
+
 ## Phase 0 exit
 
-Agent-assisted Phase 0 is **done**: current workbench builds, parity holds, real compiles succeed, and a concrete punch list feeds Phase 1.
+Agent-assisted Phase 0 is **done**: current workbench builds, parity holds, real compiles succeed, and a concrete punch list feeds Phase 1. Owner GUI success on real corpora.
 
 **Next:** Phase 1 private beta shell (sidebar + run sheet + history + settings), prioritizing D1–D6 and copy fixes D7–D10.

@@ -78,24 +78,40 @@ XcodeGen + Xcode; run `./macos/scripts/parity_check.sh` for CLI sequence parity.
 
 Other extensions fail with an `unsupported-input` error.
 
-## Development setup
+## Install (CLI — standard local path)
 
-Veriformis requires Python 3.11 or newer and uses
-[uv](https://docs.astral.sh/uv/).
+Full operator guide: **[docs/install.md](docs/install.md)**.
 
 ```bash
 git clone https://github.com/ogprotege/Veriformis.git
 cd Veriformis
-uv sync --extra test
-uv run veriformis version
+uv sync                         # creates .venv/bin/veriformis
+uv run veriformis version       # expect 0.1.0
+uv run veriformis --help        # full command list
 ```
 
-The last command should print `0.1.0`.
+Optional: put the CLI on PATH for this checkout:
+
+```bash
+export PATH="$PWD/.venv/bin:$PATH"
+veriformis version
+```
+
+Mac workbench (Debug, private beta): `bash macos/scripts/run_workbench.sh`  
+(see [docs/install.md](docs/install.md) and [macos/README.md](macos/README.md)).
+
+### Development / contributor setup
+
+```bash
+uv sync --extra test
+uv run ruff check src tests
+uv run pytest -q
+```
 
 ## Raw source to verified bundle
 
-Use at least two independent sources for the default required evaluation
-partition:
+The GUI runs this same stage sequence. Use at least two independent sources when
+you need a non-empty evaluation partition under default split rules:
 
 ```bash
 uv run veriformis parse source-a.txt source-b.txt -o build/workspace
