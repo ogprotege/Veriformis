@@ -28,7 +28,6 @@ struct VeriformisCLI: Sendable {
 
         let root = repositoryRoot ?? developmentRepositoryRoot(fileManager: fileManager)
         if let root {
-            // Prefer the project venv console script when present (no PATH needed).
             let venvCLI = root.appendingPathComponent(".venv/bin/veriformis")
             if fileManager.isExecutableFile(atPath: venvCLI.path) {
                 return VeriformisCLI(executableURL: venvCLI, prefixArguments: [])
@@ -56,7 +55,6 @@ struct VeriformisCLI: Sendable {
                 return url
             }
         }
-        // Debug builds embed the repo root via Info.plist + project.yml build setting.
         if let builtIn = bundle.object(forInfoDictionaryKey: "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT") as? String,
            !builtIn.isEmpty,
            !builtIn.hasPrefix("$(")
@@ -66,7 +64,6 @@ struct VeriformisCLI: Sendable {
                 return url
             }
         }
-        // Walk up from CWD for `uv run` style launches during development.
         var dir = URL(fileURLWithPath: fileManager.currentDirectoryPath).standardizedFileURL
         for _ in 0 ..< 8 {
             if looksLikeRepoRoot(dir, fileManager: fileManager) {
@@ -74,7 +71,6 @@ struct VeriformisCLI: Sendable {
             }
             dir.deleteLastPathComponent()
         }
-        // Walk up from the .app bundle (…/macos/…/Veriformis.app → repo root).
         var candidate = bundle.bundleURL.standardizedFileURL
         for _ in 0 ..< 12 {
             if looksLikeRepoRoot(candidate, fileManager: fileManager) {
@@ -87,7 +83,6 @@ struct VeriformisCLI: Sendable {
         return nil
     }
 
-    /// Human-readable diagnostic for dogfood when resolution fails.
     static func resolutionDiagnostics(
         fileManager: FileManager = .default
     ) -> String {
@@ -104,7 +99,9 @@ struct VeriformisCLI: Sendable {
         if let root = developmentRepositoryRoot(fileManager: fileManager) {
             lines.append("resolved repo root=\(root.path)")
             let venv = root.appendingPathComponent(".venv/bin/veriformis")
-            lines.append("venv CLI exists=\(fileManager.fileExists(atPath: venv.path)) executable=\(fileManager.isExecutableFile(atPath: venv.path)) path=\(venv.path)")
+            lines.append(
+                "venv CLI exists=\(fileManager.fileExists(atPath: venv.path)) executable=\(fileManager.isExecutableFile(atPath: venv.path)) path=\(venv.path)"
+            )
         } else {
             lines.append("resolved repo root=(nil)")
         }
@@ -122,7 +119,6 @@ struct VeriformisCLI: Sendable {
         prefixArguments + stageArguments
     }
 
-    /// Build the ordered stage command list the workbench will execute.
     static func compilePlan(
         sources: [URL],
         sourceRoot: URL,
@@ -183,27 +179,26 @@ struct VeriformisCLI: Sendable {
         process.standardOutput = stdout
         process.standardError = stderr
 
-        try process.run()
+        let stream = LineStream(onLine: onOutputLine)
+        stdout.fileHandleForReading.readabilityHandler = { handle in
+            let data = handle.availableData
+            guard !data.isEmpty else { return }
+            stream.append(data)
+        }
+        stderr.fileHandleForReading.readabilityHandler = { handle in
+            let data = handle.availableData
+            guard !data.isEmpty else { return }
+            stream.append(data)
+        }
 
-        var chunks: [String] = []
-        let outData = stdout.fileHandleForReading.readDataToEndOfFile()
-        let errData = stderr.fileHandleForReading.readDataToEndOfFile()
+        try process.run()
         process.waitUntilExit()
 
-        if let text = String(data: outData, encoding: .utf8), !text.isEmpty {
-            chunks.append(text)
-            text.split(separator: "\n", omittingEmptySubsequences: false).forEach {
-                onOutputLine?(String($0))
-            }
-        }
-        if let text = String(data: errData, encoding: .utf8), !text.isEmpty {
-            chunks.append(text)
-            text.split(separator: "\n", omittingEmptySubsequences: false).forEach {
-                onOutputLine?(String($0))
-            }
-        }
+        stdout.fileHandleForReading.readabilityHandler = nil
+        stderr.fileHandleForReading.readabilityHandler = nil
+        stream.flushRemainder()
 
-        return (process.terminationStatus, chunks.joined())
+        return (process.terminationStatus, stream.combinedOutput)
     }
 
     private static func looksLikeRepoRoot(_ url: URL, fileManager: FileManager) -> Bool {
@@ -249,5 +244,54 @@ struct VeriformisCLI: Sendable {
             }
         }
         return nil
+    }
+}
+
+/// Thread-safe line splitter for live process output.
+private final class LineStream: @unchecked Sendable {
+    private let lock = NSLock()
+    private var buffer = Data()
+    private var chunks: [String] = []
+    private let onLine: ((String) -> Void)?
+
+    init(onLine: ((String) -> Void)?) {
+        self.onLine = onLine
+    }
+
+    var combinedOutput: String {
+        lock.lock()
+        defer { lock.unlock() }
+        return chunks.joined()
+    }
+
+    func append(_ data: Data) {
+        lock.lock()
+        buffer.append(data)
+        while let range = buffer.range(of: Data([0x0A])) {
+            let lineData = buffer.subdata(in: buffer.startIndex ..< range.lowerBound)
+            buffer.removeSubrange(buffer.startIndex ... range.lowerBound)
+            if let line = String(data: lineData, encoding: .utf8) {
+                chunks.append(line + "\n")
+                let callback = onLine
+                lock.unlock()
+                callback?(line)
+                lock.lock()
+            }
+        }
+        lock.unlock()
+    }
+
+    func flushRemainder() {
+        lock.lock()
+        let remainder = buffer
+        buffer.removeAll(keepingCapacity: false)
+        guard !remainder.isEmpty, let line = String(data: remainder, encoding: .utf8) else {
+            lock.unlock()
+            return
+        }
+        chunks.append(line)
+        let callback = onLine
+        lock.unlock()
+        callback?(line)
     }
 }

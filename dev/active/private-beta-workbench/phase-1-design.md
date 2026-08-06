@@ -1,6 +1,6 @@
 # Phase 1 — Private beta workbench shell (design)
 
-**Status:** Design authority for implementation  
+**Status:** Implemented (2026-08-06)  
 **Date:** 2026-08-06  
 **Parent plan:** [docs/plans/2026-08-06-private-beta-workbench.md](../../docs/plans/2026-08-06-private-beta-workbench.md)  
 **Dogfood inputs:** [phase-0-dogfood.md](phase-0-dogfood.md) (D1–D10, D15, D16, D22)

@@ -59,6 +59,17 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testPipelineStageCountIsNine() {
+        XCTAssertEqual(WorkbenchStage.pipelineStages.count, 9)
+        XCTAssertFalse(WorkbenchStage.pipelineStages.contains(.verify))
+    }
+
+    func testObjectiveSubtitlesAreNonEmpty() {
+        for objective in TrainingObjective.allCases {
+            XCTAssertFalse(objective.subtitle.isEmpty, objective.rawValue)
+        }
+    }
+
     func testMissingCLIErrorMentionsPrerequisites() throws {
         let message = WorkbenchError.missingCLI.localizedDescription
         XCTAssertTrue(message.contains("uv sync"))
