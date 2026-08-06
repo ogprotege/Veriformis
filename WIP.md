@@ -195,7 +195,7 @@ Authority:
 
 - [x] Phase 0 — Dogfood current workbench; punch list of UX/debug pain
       ([phase-0-dogfood.md](dev/active/private-beta-workbench/phase-0-dogfood.md))
-- [ ] Phase 1 — KISS shell: Home / Compile / History / Settings + run sheet
+- [x] Phase 1 — KISS shell: Home / Compile / History / Settings + run sheet
       ([phase-1-design.md](dev/active/private-beta-workbench/phase-1-design.md))
 - [ ] Phase 2 — Debugger power (digests, reveal, failure stage)
 - [ ] Phase 3 — Optional post-seal export (only formats we implement)

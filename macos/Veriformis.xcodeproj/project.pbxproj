@@ -8,11 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		0E861917972A8445E9CAD4C5 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6F40FCBC7EB09ED99275BE /* ResultView.swift */; };
+		2698325F12E7E4A07EF4D6E8 /* RunSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43684FC8CB1F9FC5B922034 /* RunSheetView.swift */; };
+		3BF3EA68FBAE96D5E6971261 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136604CDE345707A3C063CAA /* HistoryView.swift */; };
 		4D6288666D33E39E303F674F /* VeriformisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB02DB7B54E088357F19EC2 /* VeriformisApp.swift */; };
 		721713B62C5B16E7ED90F571 /* WorkbenchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FA88DAC38F54CD79FDB550 /* WorkbenchViewModel.swift */; };
+		8E278DA5292F7D7A83AD5459 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1189607C715AFA41B0533A8 /* SettingsView.swift */; };
 		92D9A1898D8127438EEEAC56 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB040350CF5A9FCB4330EE /* ContentView.swift */; };
 		ACCAE40DD7DDCB25171806DB /* SourceDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */; };
 		AF846AA42ED1DFAC874E2735 /* VeriformisCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E01900D4217D4C71D78091 /* VeriformisCLI.swift */; };
+		BB49402B4D8C3096C9A8F1C9 /* CompileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000538D22DEB19336D0FA5 /* CompileView.swift */; };
+		BF1FD6A5079B5063C7B62E9F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E889DF5653DBBD8CBF68D9 /* HomeView.swift */; };
 		C42F93602C75AB5754CAF037 /* WorkbenchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44828F255DF039B4B53ED41D /* WorkbenchModels.swift */; };
 		D0A79A3FAD32081C9D34628F /* CLIBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EA6E817E714BFC2BBF8FF4 /* CLIBridgeTests.swift */; };
 		EAEBC61DE29BB95518FFCA47 /* StagePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBF5F22E5B16EFED501C6C /* StagePanelView.swift */; };
@@ -31,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		11FA88DAC38F54CD79FDB550 /* WorkbenchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkbenchViewModel.swift; sourceTree = "<group>"; };
+		136604CDE345707A3C063CAA /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		2FB02DB7B54E088357F19EC2 /* VeriformisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeriformisApp.swift; sourceTree = "<group>"; };
 		370964DBCBB2CF00291B7E66 /* Veriformis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Veriformis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceDropView.swift; sourceTree = "<group>"; };
@@ -40,8 +46,12 @@
 		72E01900D4217D4C71D78091 /* VeriformisCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeriformisCLI.swift; sourceTree = "<group>"; };
 		72EA6E817E714BFC2BBF8FF4 /* CLIBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIBridgeTests.swift; sourceTree = "<group>"; };
 		772D14C01C6C66539C668EB7 /* VeriformisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VeriformisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		82E889DF5653DBBD8CBF68D9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9C6F40FCBC7EB09ED99275BE /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		B5BB040350CF5A9FCB4330EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D43684FC8CB1F9FC5B922034 /* RunSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunSheetView.swift; sourceTree = "<group>"; };
+		E0000538D22DEB19336D0FA5 /* CompileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompileView.swift; sourceTree = "<group>"; };
+		F1189607C715AFA41B0533A8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -56,9 +66,14 @@
 		150DE0883932ED2C1935380E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E0000538D22DEB19336D0FA5 /* CompileView.swift */,
 				B5BB040350CF5A9FCB4330EE /* ContentView.swift */,
+				136604CDE345707A3C063CAA /* HistoryView.swift */,
+				82E889DF5653DBBD8CBF68D9 /* HomeView.swift */,
 				5975EE5DE33F44423DBF671F /* LogView.swift */,
 				9C6F40FCBC7EB09ED99275BE /* ResultView.swift */,
+				D43684FC8CB1F9FC5B922034 /* RunSheetView.swift */,
+				F1189607C715AFA41B0533A8 /* SettingsView.swift */,
 				3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */,
 				5AFBF5F22E5B16EFED501C6C /* StagePanelView.swift */,
 			);
@@ -193,9 +208,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB49402B4D8C3096C9A8F1C9 /* CompileView.swift in Sources */,
 				92D9A1898D8127438EEEAC56 /* ContentView.swift in Sources */,
+				3BF3EA68FBAE96D5E6971261 /* HistoryView.swift in Sources */,
+				BF1FD6A5079B5063C7B62E9F /* HomeView.swift in Sources */,
 				FAA5A038686A1489C906C2FA /* LogView.swift in Sources */,
 				0E861917972A8445E9CAD4C5 /* ResultView.swift in Sources */,
+				2698325F12E7E4A07EF4D6E8 /* RunSheetView.swift in Sources */,
+				8E278DA5292F7D7A83AD5459 /* SettingsView.swift in Sources */,
 				ACCAE40DD7DDCB25171806DB /* SourceDropView.swift in Sources */,
 				EAEBC61DE29BB95518FFCA47 /* StagePanelView.swift in Sources */,
 				4D6288666D33E39E303F674F /* VeriformisApp.swift in Sources */,

@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 
 struct ResultView: View {
+    @EnvironmentObject private var workbench: WorkbenchViewModel
     let result: CompileResult
 
     var body: some View {
@@ -19,17 +20,26 @@ struct ResultView: View {
             }
 
             HStack {
+                Button("Reveal workspace") {
+                    workbench.reveal(result.workspaceURL)
+                }
                 Button("Reveal bundle") {
-                    NSWorkspace.shared.activateFileViewerSelecting([result.bundleURL])
+                    workbench.reveal(result.bundleURL)
                 }
                 if let handoff = result.handoffURL {
                     Button("Reveal handoff") {
-                        NSWorkspace.shared.activateFileViewerSelecting([handoff])
+                        workbench.reveal(handoff)
+                    }
+                }
+                if let log = result.logFileURL {
+                    Button("Open log") {
+                        workbench.openLogFile(log)
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 8)
     }
 
     private func gridRow(_ label: String, _ value: String) -> some View {

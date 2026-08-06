@@ -166,7 +166,7 @@ should still do one interactive GUI pass and append notes if needed.
 
 ### Phase 1 — Private beta shell (UI)
 
-**Status:** Design landed; implementation in progress (2026-08-06).  
+**Status:** Implemented (2026-08-06).  
 **Design:** [dev/active/private-beta-workbench/phase-1-design.md](../../dev/active/private-beta-workbench/phase-1-design.md)
 
 **Scope:** Information architecture and run visibility. No new dataset formats.

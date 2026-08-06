@@ -8,8 +8,13 @@ struct StagePanelView: View {
             Text("Pipeline")
                 .font(.headline)
 
-            HStack(spacing: 8) {
-                ForEach(WorkbenchStage.allCases.filter { $0 != .verify }) { stage in
+            // Wrap-friendly layout for nine stages.
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 72), spacing: 8)],
+                alignment: .leading,
+                spacing: 8
+            ) {
+                ForEach(WorkbenchStage.pipelineStages) { stage in
                     stageChip(stage)
                 }
             }
