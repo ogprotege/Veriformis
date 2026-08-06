@@ -47,11 +47,13 @@ workbench surfaces built in Groups 1 through 7.
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
 | [Development guide](development.md) | Setup, checks, tests, engineering constraints | Contributor guide |
+| [Install guide](install.md) | Standard local CLI + Debug workbench install | Operator setup (private beta) |
 | [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
 | [Beta limitations](beta-limitations.md) | Hard non-claims and operator limits for any future beta cut | Limitations register (maturity still alpha) |
 | [macOS workbench](../macos/README.md) | SwiftUI workbench build and parity | Workbench operator guide |
 | [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered sequence, groups, exit gates | Authoritative work order |
 | [Private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Compile framing, KISS UI, phases 0–4 | Owner private-beta plan (not public claim) |
+| [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 implementation authority |
 | [Contributing](../CONTRIBUTING.md) | PR checklist and standards | Contribution policy |
 
 ## Working inventory
