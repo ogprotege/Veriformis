@@ -15,23 +15,50 @@ SwiftUI desktop adapter for the Veriformis dataset compiler.
 - macOS 14+
 - Xcode 15+ (Xcode 26 tested in development)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- Python package available as `veriformis` on `PATH`, or `uv` in a checkout
+- Python **3.11+** and [uv](https://docs.astral.sh/uv/) for the compiler backend
+- A synced checkout (`uv sync` from the repo root at least once) so
+  `.venv/bin/veriformis` exists, **or** `veriformis` on your PATH
 
-## Build
+> **GUI apps do not use your Terminal PATH.** Double-clicking the `.app` will
+> not see tools that only exist via shell profile unless they live in a standard
+> location (`~/.local/bin`, Homebrew) or the app finds the repo `.venv` / Debug
+> embedded repo root.
+
+## Build and run (private beta / dogfood)
 
 ```bash
+# From the repository root — once per machine / after dependency changes:
+uv sync
+
 cd macos
 xcodegen generate
-xcodebuild -scheme Veriformis -configuration Debug build
+xcodebuild -scheme Veriformis -configuration Debug \
+  -derivedDataPath /tmp/veriformis-dd build
+open /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
 ```
 
-Open `Veriformis.xcodeproj` after generation.
+Or open `Veriformis.xcodeproj` in Xcode and Run (⌘R) from this checkout.
 
-### Development CLI resolution
+On launch the log should show `CLI ready: …`. If you see **Could not locate the
+veriformis CLI**, complete `uv sync` and relaunch a **Debug** build from this
+repo (or set the overrides below).
+
+### Development CLI resolution (order)
 
 1. `VERIFORMIS_CLI` absolute path override  
-2. `veriformis` on `PATH`  
-3. `uv run --directory <repo> veriformis` when a repo root is found  
+2. `veriformis` on PATH **or** common install locations  
+3. `<repo>/.venv/bin/veriformis` when the checkout root is known  
+4. `uv run --directory <repo> veriformis` (`uv` from PATH or common locations)  
+
+Repo root discovery: `VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT` env, Debug
+Info.plist key (from `project.yml`), walk up from CWD, walk up from the `.app`.
+
+```bash
+# Optional explicit launch from Terminal (repo root):
+export VERIFORMIS_CLI="$PWD/.venv/bin/veriformis"
+export VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT="$PWD"
+open /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
+```
 
 ## Parity check
 

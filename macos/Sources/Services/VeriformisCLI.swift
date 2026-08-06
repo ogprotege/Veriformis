@@ -6,6 +6,10 @@ struct VeriformisCLI: Sendable {
     let prefixArguments: [String]
 
     /// Resolve the CLI: env override, PATH `veriformis`, or repo-local `uv run veriformis`.
+    ///
+    /// GUI apps inherit a minimal PATH (often without Homebrew or `~/.local/bin`).
+    /// Resolution therefore also probes common install locations for `uv` and
+    /// `veriformis`, and reads the Debug Info.plist repo root.
     static func resolve(
         repositoryRoot: URL? = nil,
         fileManager: FileManager = .default
@@ -18,14 +22,18 @@ struct VeriformisCLI: Sendable {
             return VeriformisCLI(executableURL: url, prefixArguments: [])
         }
 
-        if let pathCLI = which("veriformis", fileManager: fileManager) {
+        if let pathCLI = findExecutable("veriformis", fileManager: fileManager) {
             return VeriformisCLI(executableURL: pathCLI, prefixArguments: [])
         }
 
-        let root = repositoryRoot ?? developmentRepositoryRoot()
+        let root = repositoryRoot ?? developmentRepositoryRoot(fileManager: fileManager)
         if let root {
-            let uv = which("uv", fileManager: fileManager) ?? URL(fileURLWithPath: "/opt/homebrew/bin/uv")
-            if fileManager.isExecutableFile(atPath: uv.path) {
+            // Prefer the project venv console script when present (no PATH needed).
+            let venvCLI = root.appendingPathComponent(".venv/bin/veriformis")
+            if fileManager.isExecutableFile(atPath: venvCLI.path) {
+                return VeriformisCLI(executableURL: venvCLI, prefixArguments: [])
+            }
+            if let uv = findExecutable("uv", fileManager: fileManager) {
                 return VeriformisCLI(
                     executableURL: uv,
                     prefixArguments: ["run", "--directory", root.path, "veriformis"]
@@ -43,22 +51,38 @@ struct VeriformisCLI: Sendable {
         if let env = ProcessInfo.processInfo.environment["VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT"],
            !env.isEmpty
         {
-            return URL(fileURLWithPath: env)
+            let url = URL(fileURLWithPath: env)
+            if looksLikeRepoRoot(url, fileManager: fileManager) {
+                return url
+            }
         }
-        // Debug builds may embed the repo root via Xcode build setting.
+        // Debug builds embed the repo root via Info.plist + project.yml build setting.
         if let builtIn = bundle.object(forInfoDictionaryKey: "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT") as? String,
-           !builtIn.isEmpty
+           !builtIn.isEmpty,
+           !builtIn.hasPrefix("$(")
         {
-            return URL(fileURLWithPath: builtIn)
+            let url = URL(fileURLWithPath: builtIn)
+            if looksLikeRepoRoot(url, fileManager: fileManager) {
+                return url
+            }
         }
         // Walk up from CWD for `uv run` style launches during development.
         var dir = URL(fileURLWithPath: fileManager.currentDirectoryPath)
-        for _ in 0 ..< 6 {
-            let marker = dir.appendingPathComponent("pyproject.toml")
-            if fileManager.fileExists(atPath: marker.path) {
+        for _ in 0 ..< 8 {
+            if looksLikeRepoRoot(dir, fileManager: fileManager) {
                 return dir
             }
             dir.deleteLastPathComponent()
+        }
+        // Walk up from the .app bundle (…/macos/…/Veriformis.app → repo root).
+        if let bundleURL = bundle.bundleURL as URL? {
+            var candidate = bundleURL
+            for _ in 0 ..< 10 {
+                if looksLikeRepoRoot(candidate, fileManager: fileManager) {
+                    return candidate
+                }
+                candidate.deleteLastPathComponent()
+            }
         }
         return nil
     }
@@ -151,11 +175,42 @@ struct VeriformisCLI: Sendable {
         return (process.terminationStatus, chunks.joined())
     }
 
+    private static func looksLikeRepoRoot(_ url: URL, fileManager: FileManager) -> Bool {
+        let pyproject = url.appendingPathComponent("pyproject.toml")
+        let src = url.appendingPathComponent("src/veriformis")
+        return fileManager.fileExists(atPath: pyproject.path)
+            && fileManager.fileExists(atPath: src.path)
+    }
+
+    private static func findExecutable(
+        _ name: String,
+        fileManager: FileManager
+    ) -> URL? {
+        if let fromPath = which(name, fileManager: fileManager) {
+            return fromPath
+        }
+        let home = fileManager.homeDirectoryForCurrentUser.path
+        let candidates: [String] = [
+            "\(home)/.local/bin/\(name)",
+            "\(home)/.cargo/bin/\(name)",
+            "/opt/homebrew/bin/\(name)",
+            "/usr/local/bin/\(name)",
+            "/opt/local/bin/\(name)",
+        ]
+        for path in candidates {
+            if fileManager.isExecutableFile(atPath: path) {
+                return URL(fileURLWithPath: path)
+            }
+        }
+        return nil
+    }
+
     private static func which(
         _ name: String,
         fileManager: FileManager
     ) -> URL? {
-        let path = ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin"
+        let path = ProcessInfo.processInfo.environment["PATH"]
+            ?? "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/usr/local/bin"
         for directory in path.split(separator: ":") {
             let candidate = URL(fileURLWithPath: String(directory)).appendingPathComponent(name)
             if fileManager.isExecutableFile(atPath: candidate.path) {
