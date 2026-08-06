@@ -2,13 +2,12 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** Group 9 automated release gates on
-`agent/group-9-public-release` (Groups 1–7 complete on `main`; Group 9
-automated subset in flight)
+**Implementation baseline reviewed:** `452b6e5` on `main` (Groups 1–7 + Group 9
+automated gates; PRs #14/#15). Beta-prep docs/evidence on follow-up branch.
 
-**Product version:** `0.1.0` development alpha
+**Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-05 (Group 9 automated release gates)
+**Last reviewed:** 2026-08-05 (beta limitations + clean-path evidence)
 
 **Next review:** Any merged implementation group, contract or roadmap change,
 or listed-item status change
@@ -49,8 +48,10 @@ local, offline, and free of LLM generation.
 - [x] Group 5 ingest and recipe expansion is complete.
 - [x] Group 6 MCP and Aptus handoff is complete.
 - [x] Group 7 SwiftUI workbench is complete.
-- [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts.
-- [ ] Group 9 owner remainder: signed/notarized Mac + clean-Mac evidence (blocks public-ready claim).
+- [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts (on `main`).
+- [x] Beta-prep: [docs/beta-limitations.md](docs/beta-limitations.md), clean-path evidence recorder + pack.
+- [ ] Deliberate beta **label** cut (still alpha until then).
+- [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
 
 The current stage-command runtime is:
@@ -194,14 +195,19 @@ stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
   wheel install smoke, golden corpus seal/verify/handoff-verify, `scripts/release/`,
   [docs/release.md](docs/release.md), permanent regression
   `tests/regressions/test_group9_release_gates.py`
+- [x] 26a+. Beta limitations register + clean-path evidence pack (CLI beta prep; not a label cut)
 - [ ] 26b. Owner Mac distribution — Developer ID sign, notarize, staple, clean-Mac
-  install, golden + Aptus evidence (see release checklist)
+  install, golden + Aptus evidence (see release checklist) — **public** Mac claim
 
 **Evidence for Group 7:** [`macos/README.md`](macos/README.md),
 `macos/scripts/parity_check.sh`, and Xcode unit tests under `macos/Tests/`.
 
 **Evidence for Group 9 automated:** [docs/release.md](docs/release.md),
-`.github/workflows/ci.yml`, `scripts/release/`.
+`.github/workflows/ci.yml`, `scripts/release/`, main CI green after PR #15.
+
+**Beta prep:** [docs/beta-limitations.md](docs/beta-limitations.md),
+[beta readiness audit](dev/active/group-9-public-release/beta-readiness-audit.md),
+[evidence packs](dev/active/group-9-public-release/evidence/).
 
 ## Optional work requiring owner approval
 

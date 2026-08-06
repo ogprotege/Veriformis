@@ -1,0 +1,106 @@
+==> golden_compile: full_text (parse → seal)
+parsed 3 source(s) into revision rev-v1-d1c2179da2718d7daf71f03b77c9f0946d911435d5405611eb0615b06ebd23d9
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 3:4 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 20:21 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 23:24 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 29:33 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 39:40 touches a generated structural separator
+cleaned 3 document(s); 1 transform record(s); revision rev-v1-957f5b4d58ef53b952c70c5482d0a92ee45b7af8876f7351724600034cbabe35
+wrote 3 chunk(s); revision rev-v1-cb76da51fdde99216a678d9a810399eeb1be7ae75c0f148f376a54ce3ec8a001
+constructed 3 candidate(s), 3 accepted record(s), and 0 diagnostic(s); revision rev-v1-f33766e3de7d88cb3b9260e26eb58b6cf5a5865b291fc009ca28b94b48afe92a
+curated 3 included, 0 excluded, and 0 quarantined record(s); plan fdp-v1-fe0f430e9e371bffa94980d8a387216b28dc8c6af4279a75eabd93663458e982; revision rev-v1-ce397f25142716dc6e721198dbc830d8a94dff858c4dd0b44e521cc98059ba47
+split 1 train and 2 evaluation record(s) across 3 leakage group(s); revision rev-v1-ab15fe33762800518be9a8d316535298c5b820aeb5a540e0d955011fb7379b44
+wrote 1 train and 2 evaluation row(s) as text; revision rev-v1-172bc55112890809f22fc408bc5a84dac0d218443d044d744c912c171021dfc1
+construction-replay: PASSED
+record-lifecycle: PASSED
+curation: PASSED
+deduplication: PASSED
+quality: PASSED
+balance: PASSED
+coverage: PASSED
+split: PASSED
+leakage: PASSED
+row-binding: PASSED
+objective: PASSED
+schema: PASSED
+encoding: PASSED
+masking: PASSED
+partition-nonempty: PASSED
+aptus-row-shape: PASSED
+snapshot: PASSED
+snapshot dss-v1-2a404381be393491b24d92cc440b3ed60ac7f5aa4395df91528a2fa9f5ccf136
+validation revision rev-v1-0078e2fd7821ccba851e852b6a322b71653c8cde5b53c7d62dea5e91afc30b8c
+sealed bundle: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.oECAiM/full_text.vfbundle
+manifest SHA-256: 2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733
+verification grade: self_consistent
+seal revision rev-v1-1150babb6e8ae256af246af54faf7385f175fd4d4d109625595f3f5c7cef42c6
+aptus handoff: /private/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.oECAiM/full_text.vfbundle.aptus-handoff.json
+assignment digest: 18ba643049155e555428ce7ad31b6ca32d74100b53a16a5a1d2265a66a03ecbc
+==> golden_compile: full_text external_digest verify
+verification grade: external_digest
+bundle: bundle-v1-49a6b50ed50218b8a22ce834dc69a64eb8d47f0605267bc029b3f938a6b13b4a
+snapshot: dss-v1-2a404381be393491b24d92cc440b3ed60ac7f5aa4395df91528a2fa9f5ccf136
+validation report: dvr-v1-a50965035c861807237ac7cad778dbbe4a360fe7acd57bca50e3a1ef5c094820
+manifest SHA-256: 2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733
+dataset rows: 3
+==> golden_compile: full_text handoff present (Aptus rejects text schema by contract)
+status: rejected
+handoff id: ahd-v1-af3d69fcf21eb1df5d08f25b8e9cef436c9dad5193cac8e2e71eff33cbf9dffa
+bundle: bundle-v1-49a6b50ed50218b8a22ce834dc69a64eb8d47f0605267bc029b3f938a6b13b4a
+assignment digest: 18ba643049155e555428ce7ad31b6ca32d74100b53a16a5a1d2265a66a03ecbc
+verification grade: external_digest
+finding: backend-rejects-row-schema:text
+golden_compile: full_text PASS (manifest=2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733)
+==> golden_compile: continuation (parse → seal)
+parsed 3 source(s) into revision rev-v1-02e7794ce46041c3dc8c4583f308b9daf7fd04e82a1581a230c911d767ae5b77
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 3:4 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 20:21 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 23:24 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 29:33 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 39:40 touches a generated structural separator
+cleaned 3 document(s); 1 transform record(s); revision rev-v1-75d62c73a94b00361009eeb416c2bf0b928c32b52e0f0f95437659b28de7fb78
+wrote 3 chunk(s); revision rev-v1-1a057719b7c14691ba065f5fe9f245129b248d215ca502be46401c5395ea50de
+constructed 3 candidate(s), 3 accepted record(s), and 0 diagnostic(s); revision rev-v1-e5e95639ced4c0ceee81e7cd841b3055c941a31a756cc39f1869e55c007a1382
+curated 3 included, 0 excluded, and 0 quarantined record(s); plan fdp-v1-1e666315bfd4a949d5b4e2c260099e2881f68799a3f6955733fb20e30348ae32; revision rev-v1-e1c939da7b71ae3403c54f27b943171242c47972c4b75e8be84ba7a293e6e493
+split 1 train and 2 evaluation record(s) across 3 leakage group(s); revision rev-v1-e07ba08b1fcfa4bba2baf0f11a2dba90d6c2b0ed5968bc30a3558e9ae588899c
+wrote 1 train and 2 evaluation row(s) as prompt_completion; revision rev-v1-1a14df00400166f387189dcd2802b48f095b80406887edaa757b420eb836ca42
+construction-replay: PASSED
+record-lifecycle: PASSED
+curation: PASSED
+deduplication: PASSED
+quality: PASSED
+balance: PASSED
+coverage: PASSED
+split: PASSED
+leakage: PASSED
+row-binding: PASSED
+objective: PASSED
+schema: PASSED
+encoding: PASSED
+masking: PASSED
+partition-nonempty: PASSED
+aptus-row-shape: PASSED
+snapshot: PASSED
+snapshot dss-v1-845bf050969885ccd632d29c860a57838e40b21fc1ec451e86e513d4e0888ef2
+validation revision rev-v1-3911b391a8e45d98905463e25518529e81c54d0aa6e24aff107b32115c0b16b2
+sealed bundle: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.oECAiM/continuation.vfbundle
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+verification grade: self_consistent
+seal revision rev-v1-dec8639a7b4fed24499cca08f227f2fa60289061b76f3227f89bac6249ff3b06
+aptus handoff: /private/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.oECAiM/continuation.vfbundle.aptus-handoff.json
+assignment digest: d6b5adedc9c45ad7f564e2de78ad9de3200835911436c6323dae409bd5e19481
+==> golden_compile: continuation external_digest verify
+verification grade: external_digest
+bundle: bundle-v1-0192a85a0cd4a0422cbde832eb8ab3adbe8617bc28267bafe56a7bb5052289d9
+snapshot: dss-v1-845bf050969885ccd632d29c860a57838e40b21fc1ec451e86e513d4e0888ef2
+validation report: dvr-v1-a7b1ae06fba39324a317cf3a139b4079b39ffcb8b71c74326b545c85ef99e078
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+dataset rows: 3
+==> golden_compile: continuation handoff-verify (must accept)
+status: accepted
+handoff id: ahd-v1-e92a12fdbd0f1cfa73932d4f1549b384bb1dcacad293ece5ed67bbcefec5ed3f
+bundle: bundle-v1-0192a85a0cd4a0422cbde832eb8ab3adbe8617bc28267bafe56a7bb5052289d9
+assignment digest: d6b5adedc9c45ad7f564e2de78ad9de3200835911436c6323dae409bd5e19481
+verification grade: external_digest
+golden_compile: continuation PASS (manifest=58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b)
+golden_compile: PASS (full_text + continuation external_digest; continuation handoff accepted)

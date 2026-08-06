@@ -1,0 +1,6 @@
+recorded_at_utc=20260805T-local-mac
+git_head=452b6e545061d3abc06072b5450d5878a0408245
+git_describe=452b6e5
+uname=Darwin WWW-MBP 25.6.0 Darwin Kernel Version 25.6.0: Sat Jul 11 15:27:04 PDT 2026; root:xnu-12377.161.13~4/RELEASE_ARM64_T6050 arm64
+smoke_python=3.12
+python_resolved=3.12.13 (main, May 10 2026, 19:20:41) [Clang 22.1.3 ]

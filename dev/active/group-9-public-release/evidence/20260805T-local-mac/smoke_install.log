@@ -1,0 +1,341 @@
+==> smoke_install: uv lock --check
+Resolved 50 packages in 3ms
+==> smoke_install: ensure Python 3.12
+Python 3.12 is already installed
+==> smoke_install: build wheel
+Building wheel...
+running egg_info
+writing src/veriformis.egg-info/PKG-INFO
+writing dependency_links to src/veriformis.egg-info/dependency_links.txt
+writing entry points to src/veriformis.egg-info/entry_points.txt
+writing requirements to src/veriformis.egg-info/requires.txt
+writing top-level names to src/veriformis.egg-info/top_level.txt
+reading manifest file 'src/veriformis.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'src/veriformis.egg-info/SOURCES.txt'
+running bdist_wheel
+running build
+running build_py
+copying src/veriformis/diagnostics.py -> build/lib/veriformis
+copying src/veriformis/__init__.py -> build/lib/veriformis
+copying src/veriformis/sources.py -> build/lib/veriformis
+copying src/veriformis/cli.py -> build/lib/veriformis
+copying src/veriformis/contracts.py -> build/lib/veriformis
+copying src/veriformis/errors.py -> build/lib/veriformis
+copying src/veriformis/workspace.py -> build/lib/veriformis
+copying src/veriformis/identity.py -> build/lib/veriformis
+copying src/veriformis/evidence.py -> build/lib/veriformis
+copying src/veriformis/pipeline/service.py -> build/lib/veriformis/pipeline
+copying src/veriformis/pipeline/__init__.py -> build/lib/veriformis/pipeline
+copying src/veriformis/validate/__init__.py -> build/lib/veriformis/validate
+copying src/veriformis/validate/gates.py -> build/lib/veriformis/validate
+copying src/veriformis/parsers/docx.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/dispatch.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/html.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/__init__.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/pdf.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/docx_styles.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/markdown.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/text.py -> build/lib/veriformis/parsers
+copying src/veriformis/parsers/structured.py -> build/lib/veriformis/parsers
+copying src/veriformis/ir/serde.py -> build/lib/veriformis/ir
+copying src/veriformis/ir/__init__.py -> build/lib/veriformis/ir
+copying src/veriformis/ir/nodes.py -> build/lib/veriformis/ir
+copying src/veriformis/handoff/__init__.py -> build/lib/veriformis/handoff
+copying src/veriformis/handoff/aptus_v1.py -> build/lib/veriformis/handoff
+copying src/veriformis/chunkers/strategies.py -> build/lib/veriformis/chunkers
+copying src/veriformis/chunkers/__init__.py -> build/lib/veriformis/chunkers
+copying src/veriformis/chunkers/pipeline.py -> build/lib/veriformis/chunkers
+copying src/veriformis/chunkers/base.py -> build/lib/veriformis/chunkers
+copying src/veriformis/datasets/_json.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/plan.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/splitting.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/curation.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/models.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/__init__.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/serialization.py -> build/lib/veriformis/datasets
+copying src/veriformis/datasets/validation.py -> build/lib/veriformis/datasets
+copying src/veriformis/bundle/manifest.py -> build/lib/veriformis/bundle
+copying src/veriformis/bundle/__init__.py -> build/lib/veriformis/bundle
+copying src/veriformis/bundle/writer.py -> build/lib/veriformis/bundle
+copying src/veriformis/bundle/verifier.py -> build/lib/veriformis/bundle
+copying src/veriformis/bundle/finished.py -> build/lib/veriformis/bundle
+copying src/veriformis/mcp/server.py -> build/lib/veriformis/mcp
+copying src/veriformis/mcp/__init__.py -> build/lib/veriformis/mcp
+copying src/veriformis/serializers/__init__.py -> build/lib/veriformis/serializers
+copying src/veriformis/serializers/chat.py -> build/lib/veriformis/serializers
+copying src/veriformis/serializers/formats.py -> build/lib/veriformis/serializers
+copying src/veriformis/recipes/runner.py -> build/lib/veriformis/recipes
+copying src/veriformis/recipes/library.py -> build/lib/veriformis/recipes
+copying src/veriformis/recipes/pipeline_spec.py -> build/lib/veriformis/recipes
+copying src/veriformis/recipes/__init__.py -> build/lib/veriformis/recipes
+copying src/veriformis/recipes/statistics.py -> build/lib/veriformis/recipes
+copying src/veriformis/rules/library.py -> build/lib/veriformis/rules
+copying src/veriformis/rules/derivations.py -> build/lib/veriformis/rules
+copying src/veriformis/rules/__init__.py -> build/lib/veriformis/rules
+copying src/veriformis/rules/engine.py -> build/lib/veriformis/rules
+copying src/veriformis/rules/cleaning.py -> build/lib/veriformis/rules
+copying src/veriformis/construction/_json.py -> build/lib/veriformis/construction
+copying src/veriformis/construction/models.py -> build/lib/veriformis/construction
+copying src/veriformis/construction/__init__.py -> build/lib/veriformis/construction
+copying src/veriformis/construction/pipeline.py -> build/lib/veriformis/construction
+copying src/veriformis/construction/evidence.py -> build/lib/veriformis/construction
+copying src/veriformis/construction/constructors.py -> build/lib/veriformis/construction
+copying src/veriformis/serializers/templates/__init__.py -> build/lib/veriformis/serializers/templates
+copying src/veriformis/serializers/templates/chat/__init__.py -> build/lib/veriformis/serializers/templates/chat
+running egg_info
+writing src/veriformis.egg-info/PKG-INFO
+writing dependency_links to src/veriformis.egg-info/dependency_links.txt
+writing entry points to src/veriformis.egg-info/entry_points.txt
+writing requirements to src/veriformis.egg-info/requires.txt
+writing top-level names to src/veriformis.egg-info/top_level.txt
+reading manifest file 'src/veriformis.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'src/veriformis.egg-info/SOURCES.txt'
+copying src/veriformis/serializers/templates/chat/mistral.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/llama3.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/gemma.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/phi.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/qwen.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/gemma.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/llama3.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/mistral.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/phi.jinja -> build/lib/veriformis/serializers/templates/chat
+copying src/veriformis/serializers/templates/chat/qwen.jinja -> build/lib/veriformis/serializers/templates/chat
+installing to build/bdist.macosx-11.0-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-11.0-arm64/wheel
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/pipeline
+copying build/lib/veriformis/pipeline/service.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/pipeline
+copying build/lib/veriformis/pipeline/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/pipeline
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/validate
+copying build/lib/veriformis/validate/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/validate
+copying build/lib/veriformis/validate/gates.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/validate
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/parsers
+copying build/lib/veriformis/parsers/docx.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/dispatch.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/html.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/pdf.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/docx_styles.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/markdown.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/text.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+copying build/lib/veriformis/parsers/structured.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/parsers
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/ir
+copying build/lib/veriformis/ir/serde.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/ir
+copying build/lib/veriformis/ir/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/ir
+copying build/lib/veriformis/ir/nodes.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/ir
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/handoff
+copying build/lib/veriformis/handoff/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/handoff
+copying build/lib/veriformis/handoff/aptus_v1.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/handoff
+copying build/lib/veriformis/diagnostics.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/chunkers
+copying build/lib/veriformis/chunkers/strategies.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/chunkers
+copying build/lib/veriformis/chunkers/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/chunkers
+copying build/lib/veriformis/chunkers/pipeline.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/chunkers
+copying build/lib/veriformis/chunkers/base.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/chunkers
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/datasets
+copying build/lib/veriformis/datasets/_json.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/plan.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/splitting.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/curation.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/models.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/serialization.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/datasets/validation.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/datasets
+copying build/lib/veriformis/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/bundle
+copying build/lib/veriformis/bundle/manifest.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/bundle
+copying build/lib/veriformis/bundle/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/bundle
+copying build/lib/veriformis/bundle/writer.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/bundle
+copying build/lib/veriformis/bundle/verifier.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/bundle
+copying build/lib/veriformis/bundle/finished.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/bundle
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/mcp
+copying build/lib/veriformis/mcp/server.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/mcp
+copying build/lib/veriformis/mcp/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/mcp
+copying build/lib/veriformis/sources.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/serializers
+copying build/lib/veriformis/serializers/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers
+copying build/lib/veriformis/serializers/chat.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers
+copying build/lib/veriformis/serializers/formats.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/serializers/templates
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/chat/mistral.jinja -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/chat/llama3.jinja -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/chat/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/chat/gemma.jinja -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/chat/phi.jinja -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/chat/qwen.jinja -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates/chat
+copying build/lib/veriformis/serializers/templates/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/serializers/templates
+copying build/lib/veriformis/cli.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/recipes
+copying build/lib/veriformis/recipes/runner.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/recipes
+copying build/lib/veriformis/recipes/library.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/recipes
+copying build/lib/veriformis/recipes/pipeline_spec.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/recipes
+copying build/lib/veriformis/recipes/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/recipes
+copying build/lib/veriformis/recipes/statistics.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/recipes
+copying build/lib/veriformis/contracts.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/rules
+copying build/lib/veriformis/rules/library.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/rules
+copying build/lib/veriformis/rules/derivations.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/rules
+copying build/lib/veriformis/rules/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/rules
+copying build/lib/veriformis/rules/engine.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/rules
+copying build/lib/veriformis/rules/cleaning.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/rules
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis/construction
+copying build/lib/veriformis/construction/_json.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/construction
+copying build/lib/veriformis/construction/models.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/construction
+copying build/lib/veriformis/construction/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/construction
+copying build/lib/veriformis/construction/pipeline.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/construction
+copying build/lib/veriformis/construction/evidence.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/construction
+copying build/lib/veriformis/construction/constructors.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis/construction
+copying build/lib/veriformis/errors.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+copying build/lib/veriformis/workspace.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+copying build/lib/veriformis/identity.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+copying build/lib/veriformis/evidence.py -> build/bdist.macosx-11.0-arm64/wheel/./veriformis
+running install_egg_info
+Copying src/veriformis.egg-info to build/bdist.macosx-11.0-arm64/wheel/./veriformis-0.1.0-py3.12.egg-info
+running install_scripts
+creating build/bdist.macosx-11.0-arm64/wheel/veriformis-0.1.0.dist-info/WHEEL
+creating '/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-smoke-install.VDBCW8/dist/.tmp-f9afav8u/veriformis-0.1.0-py3-none-any.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
+adding 'veriformis/__init__.py'
+adding 'veriformis/cli.py'
+adding 'veriformis/contracts.py'
+adding 'veriformis/diagnostics.py'
+adding 'veriformis/errors.py'
+adding 'veriformis/evidence.py'
+adding 'veriformis/identity.py'
+adding 'veriformis/sources.py'
+adding 'veriformis/workspace.py'
+adding 'veriformis/bundle/__init__.py'
+adding 'veriformis/bundle/finished.py'
+adding 'veriformis/bundle/manifest.py'
+adding 'veriformis/bundle/verifier.py'
+adding 'veriformis/bundle/writer.py'
+adding 'veriformis/chunkers/__init__.py'
+adding 'veriformis/chunkers/base.py'
+adding 'veriformis/chunkers/pipeline.py'
+adding 'veriformis/chunkers/strategies.py'
+adding 'veriformis/construction/__init__.py'
+adding 'veriformis/construction/_json.py'
+adding 'veriformis/construction/constructors.py'
+adding 'veriformis/construction/evidence.py'
+adding 'veriformis/construction/models.py'
+adding 'veriformis/construction/pipeline.py'
+adding 'veriformis/datasets/__init__.py'
+adding 'veriformis/datasets/_json.py'
+adding 'veriformis/datasets/curation.py'
+adding 'veriformis/datasets/models.py'
+adding 'veriformis/datasets/plan.py'
+adding 'veriformis/datasets/serialization.py'
+adding 'veriformis/datasets/splitting.py'
+adding 'veriformis/datasets/validation.py'
+adding 'veriformis/handoff/__init__.py'
+adding 'veriformis/handoff/aptus_v1.py'
+adding 'veriformis/ir/__init__.py'
+adding 'veriformis/ir/nodes.py'
+adding 'veriformis/ir/serde.py'
+adding 'veriformis/mcp/__init__.py'
+adding 'veriformis/mcp/server.py'
+adding 'veriformis/parsers/__init__.py'
+adding 'veriformis/parsers/dispatch.py'
+adding 'veriformis/parsers/docx.py'
+adding 'veriformis/parsers/docx_styles.py'
+adding 'veriformis/parsers/html.py'
+adding 'veriformis/parsers/markdown.py'
+adding 'veriformis/parsers/pdf.py'
+adding 'veriformis/parsers/structured.py'
+adding 'veriformis/parsers/text.py'
+adding 'veriformis/pipeline/__init__.py'
+adding 'veriformis/pipeline/service.py'
+adding 'veriformis/recipes/__init__.py'
+adding 'veriformis/recipes/library.py'
+adding 'veriformis/recipes/pipeline_spec.py'
+adding 'veriformis/recipes/runner.py'
+adding 'veriformis/recipes/statistics.py'
+adding 'veriformis/rules/__init__.py'
+adding 'veriformis/rules/cleaning.py'
+adding 'veriformis/rules/derivations.py'
+adding 'veriformis/rules/engine.py'
+adding 'veriformis/rules/library.py'
+adding 'veriformis/serializers/__init__.py'
+adding 'veriformis/serializers/chat.py'
+adding 'veriformis/serializers/formats.py'
+adding 'veriformis/serializers/templates/__init__.py'
+adding 'veriformis/serializers/templates/chat/__init__.py'
+adding 'veriformis/serializers/templates/chat/gemma.jinja'
+adding 'veriformis/serializers/templates/chat/llama3.jinja'
+adding 'veriformis/serializers/templates/chat/mistral.jinja'
+adding 'veriformis/serializers/templates/chat/phi.jinja'
+adding 'veriformis/serializers/templates/chat/qwen.jinja'
+adding 'veriformis/validate/__init__.py'
+adding 'veriformis/validate/gates.py'
+adding 'veriformis-0.1.0.dist-info/licenses/LICENSE'
+adding 'veriformis-0.1.0.dist-info/METADATA'
+adding 'veriformis-0.1.0.dist-info/WHEEL'
+adding 'veriformis-0.1.0.dist-info/entry_points.txt'
+adding 'veriformis-0.1.0.dist-info/top_level.txt'
+adding 'veriformis-0.1.0.dist-info/RECORD'
+removing build/bdist.macosx-11.0-arm64/wheel
+Successfully built /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-smoke-install.VDBCW8/dist/veriformis-0.1.0-py3-none-any.whl
+wheel: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T//veriformis-smoke-install.VDBCW8/dist/veriformis-0.1.0-py3-none-any.whl
+==> smoke_install: clean venv install (Python 3.12)
+Using CPython 3.12.13
+Creating virtual environment at: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T//veriformis-smoke-install.VDBCW8/venv
+Activate with: source /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-smoke-install.VDBCW8/venv/bin/activate
+Using Python 3.12.13 environment at: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-smoke-install.VDBCW8/venv
+Resolved 43 packages in 243ms
+Prepared 1 package in 10ms
+Installed 43 packages in 49ms
+ + annotated-doc==0.0.5
+ + annotated-types==0.8.0
+ + anyio==4.14.2
+ + attrs==26.1.0
+ + cffi==2.1.1
+ + click==8.4.2
+ + cryptography==50.0.0
+ + h11==0.16.0
+ + httpcore2==2.9.1
+ + httpx2==2.9.1
+ + idna==3.18
+ + jinja2==3.1.6
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + lxml==6.1.1
+ + markdown-it-py==4.2.0
+ + markupsafe==3.0.3
+ + mcp==2.0.0
+ + mcp-types==2.0.0
+ + mdit-py-plugins==0.6.1
+ + mdurl==0.1.2
+ + opentelemetry-api==1.44.0
+ + pycparser==3.0
+ + pydantic==2.13.4
+ + pydantic-core==2.46.4
+ + pygments==2.20.0
+ + pyjwt==2.13.0
+ + pypdfium2==5.12.1
+ + python-docx==1.2.0
+ + python-multipart==0.0.32
+ + pyyaml==6.0.3
+ + referencing==0.37.0
+ + rich==15.0.0
+ + rpds-py==2026.6.3
+ + shellingham==1.5.4
+ + sse-starlette==3.4.8
+ + starlette==1.4.1
+ + truststore==0.10.4
+ + typer==0.27.1
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.2
+ + uvicorn==0.52.1
+ + veriformis==0.1.0 (from file:///var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-smoke-install.VDBCW8/dist/veriformis-0.1.0-py3-none-any.whl)
+==> smoke_install: CLI smoke
+0.1.0
+full_text.default: objective=full_text row_schema=text
+continuation.default: objective=continuation row_schema=prompt_completion
+section_reconstruction.default: objective=section_reconstruction row_schema=prompt_completion
+before_after_transformation.default: objective=before_after_transformation row_schema=prompt_completion
+structured_field.default: objective=structured_field row_schema=prompt_completion
+smoke_install: PASS

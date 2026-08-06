@@ -14,10 +14,13 @@ explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
 > Groups 1 through 7, plus Group 9 automated release gates (matrix CI, install
-> smoke, golden compile). Signed/notarized Mac public readiness remains an
-> owner checklist — see [docs/release.md](docs/release.md). Read the
+> smoke, golden compile). This is **not** a beta or public release label.
+> Hard non-claims and operator limits:
+> [docs/beta-limitations.md](docs/beta-limitations.md). Signed/notarized Mac
+> public readiness remains an owner checklist —
+> [docs/release.md](docs/release.md). Read the
 > [current implementation status](docs/current-status.md) before treating this
-> alpha as release-ready.
+> alpha as shippable.
 
 ## What works today
 
@@ -206,6 +209,7 @@ reading paths. The map:
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
   - [Release guide](docs/release.md)
+  - [Beta limitations](docs/beta-limitations.md)
   - [macOS workbench](macos/README.md)
   - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)
