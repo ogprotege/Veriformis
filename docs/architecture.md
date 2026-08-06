@@ -1,9 +1,8 @@
 # Architecture
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 merge to `main`
+**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
 
-**Next review:** The first Group 9 release-gate change or any service-boundary
-change
+**Next review:** Any service-boundary or architecture change
 
 Veriformis `0.1.0` is a Python 3.11+ modular monolith with a typed
 composition root, `veriformis.pipeline.PipelineService`, and multiple thin

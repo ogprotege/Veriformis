@@ -5,9 +5,9 @@ commands, the stage-gated transaction template every mutating command
 executes, the seal path that couples a workspace receipt to a published
 artifact, and the deliberately independent verification entry point.
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
+**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
 
-**Next review:** The first Group 9 release-gate change or any entry-point change
+**Next review:** Any entry-point or architecture change
 
 ## Multiple adapters, one orchestration root
 
