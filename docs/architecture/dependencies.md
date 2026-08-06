@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any architecture or dependency change
 

@@ -2,32 +2,34 @@
 
 This documentation describes the development-alpha compiler from raw source
 capture through a verified finished-dataset bundle, plus local automation and
-workbench surfaces built in Groups 1 through 7.
+the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
+gates, workbench Phases 0–1).
 
-**Last reviewed:** 2026-08-06 after PR #16 (beta-prep) merge to `main`
+**Last reviewed:** 2026-08-06 (full consistency pass; baseline `18d7541`)
 
-**Next review:** Deliberate beta label cut, public-ready checklist, or any contract change
+**Next review:** Phase 2 workbench, beta label cut, public-ready checklist, or any contract change
 
 ## Start here
 
-1. Read the repository [README](../README.md) for product goal, setup, and
-   quickstart.
-2. Read [Current implementation status](current-status.md) for the exact alpha
-   boundary (Groups 1–7 plus Group 9 automated gates) and verification evidence.
-3. Read the [product contract](product-contract.md) for ownership and non-claims.
-4. Use the [authoritative build roadmap](plans/2026-07-29-veriformis-roadmap.md)
-   for remaining Group 9 owner Mac evidence and optional Group 8 work.
-5. Use [Release guide](release.md) for CI gates, golden compile, and Mac packaging.
-6. Read [Beta limitations](beta-limitations.md) before any beta or external invite.
+1. [README](../README.md) — product goal, install, quickstart.
+2. [Current implementation status](current-status.md) — exact alpha boundary and evidence.
+3. [Install guide](install.md) — standard local CLI + workbench launch.
+4. [Product contract](product-contract.md) — ownership and non-claims.
+5. [Beta limitations](beta-limitations.md) — hard non-claims before any beta invite.
+6. [Private beta workbench plan](plans/2026-08-06-private-beta-workbench.md) — compile framing and phases.
+7. [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) — numbered groups; Group 9 public remainder; optional Group 8.
+8. [Release guide](release.md) — CI gates and owner Mac packaging checklist.
 
 ## Reading paths
 
 - **New contributor:** [README](../README.md) → [current status](current-status.md)
   → [development guide](development.md) → [architecture hub](architecture.md).
-- **CLI operator:** [README](../README.md) quickstart → [CLI reference](cli.md)
-  → [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) for bundles
-  → [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) for handoff.
-- **Workbench operator:** [macOS workbench README](../macos/README.md).
+- **CLI operator:** [install.md](install.md) → [CLI reference](cli.md)
+  → [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+  → [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
+- **Workbench operator:** [install.md](install.md) →
+  [macOS workbench](../macos/README.md) →
+  [private beta plan](plans/2026-08-06-private-beta-workbench.md).
 - **Contract reviewer:** [product contract](product-contract.md), then Integrity,
   Dataset Construction, Finished Dataset, and Aptus Handoff contracts, with
   [current status](current-status.md) for evidence.
@@ -50,10 +52,10 @@ workbench surfaces built in Groups 1 through 7.
 | [Install guide](install.md) | Standard local CLI + Debug workbench install | Operator setup (private beta) |
 | [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
 | [Beta limitations](beta-limitations.md) | Hard non-claims and operator limits for any future beta cut | Limitations register (maturity still alpha) |
-| [macOS workbench](../macos/README.md) | SwiftUI workbench build and parity | Workbench operator guide |
+| [macOS workbench](../macos/README.md) | SwiftUI workbench build, launch, parity | Workbench operator guide |
 | [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered sequence, groups, exit gates | Authoritative work order |
 | [Private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Compile framing, KISS UI, phases 0–4 | Owner private-beta plan (not public claim) |
-| [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 implementation authority |
+| [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |
 | [Contributing](../CONTRIBUTING.md) | PR checklist and standards | Contribution policy |
 
 ## Working inventory
@@ -70,9 +72,10 @@ current status, the roadmap, or a versioned contract.
 | **Group 4** | `PipelineService`, thin CLI, dual-objective M1.1 (Steps 17–19) |
 | **Group 5** | Expanded ingest + recipe library / YAML (Steps 20–21) |
 | **Group 6** | MCP + Aptus handoff v1 (Steps 22–23) |
-| **Group 7** | SwiftUI workbench (Step 24) |
+| **Group 7** | SwiftUI workbench (Step 24); private beta Phases 0–1 on `main` |
 | **Group 8** | Optional model-assisted construction (Step 25; owner-gated) |
 | **Group 9** | Public release gates (Step 26; automated subset landed; owner Mac remainder for public-ready) |
+| **Private beta workbench** | Owner Mac GUI over CLI; Phases 0–1 done; Phase 2+ next |
 | **Unsupported** | Not available (for example OCR) |
 
 ## Historical records

@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any architecture documentation change
 

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any service-boundary or architecture change
 

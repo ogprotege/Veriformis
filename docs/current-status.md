@@ -4,14 +4,15 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1 through 7 complete; Group 9 automated
-release gates and beta-prep documentation/evidence on `main` (maturity remains
-development alpha; public Mac readiness still owner-gated)
+**Implementation state:** Groups 1–7 complete; Group 9 automated release gates
+and beta-prep on `main`; private beta Mac workbench Phases 0–1 on `main`
+(maturity remains development alpha; public Mac readiness still owner-gated)
 
-**Review date:** 2026-08-06 (docs sync after PR #16 merge to `main`)
+**Review date:** 2026-08-06 (full documentation consistency pass; baseline
+`18d7541`)
 
-**Next review:** Deliberate beta label cut, public-ready checklist, optional
-Group 8 plan, or any contract change
+**Next review:** Phase 2 workbench, beta label cut, public-ready checklist,
+optional Group 8, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -40,7 +41,13 @@ JSONL), named OCR refusal, the recipe library, statistics, and YAML pipelines.
 v1 with fail-closed consumer verification.
 
 **Group 7** adds the SwiftUI workbench under `macos/`, a thin shell over the
-same CLI so digests match terminal runs.
+same CLI so digests match terminal runs. **Private beta workbench Phases 0–1**
+extend that surface: dogfood punch list; KISS sidebar (Home / Compile /
+History / Settings); run sheet with progress % and live log; history
+persistence; settings for CLI and default output. Launch with
+`bash macos/scripts/run_workbench.sh`. Operator install:
+[install.md](install.md). Vision/plan:
+[plans/2026-08-06-private-beta-workbench.md](plans/2026-08-06-private-beta-workbench.md).
 
 **Group 9 (automated subset)** expands CI to a Python 3.11–3.13 matrix plus
 macOS Python 3.12, lockfile check, wheel install smoke, golden-corpus
@@ -391,8 +398,10 @@ See [docs/release.md](release.md).
 | Implemented Group 5 | HTML/PDF/CSV/JSON/JSONL ingest, OCR refusal, recipe library, statistics, YAML pipelines |
 | Implemented Group 6 | Local MCP adapter, versioned Aptus handoff, consumer verification |
 | Implemented Group 7 | SwiftUI workbench (CLI adapter) with digest parity |
+| Implemented private beta workbench Phases 0–1 | Dogfood; KISS shell (sidebar, run sheet, history, settings) on `main` |
 | Implemented Group 9 (automated) | CI matrix, lock check, wheel smoke, golden compile/handoff scripts, release runbook |
-| Implemented beta-prep (docs/evidence) | Limitations register, clean-path recorder + pack; still alpha maturity |
+| Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
+| Next workbench | Phase 2 debugger power (failure detail, copy digests, re-run) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -423,10 +432,12 @@ Selected permanent locks:
 | Declared-format e2e | `tests/regressions/test_group5_declared_format_pipeline.py` |
 | MCP / service parity | `tests/mcp/test_mcp_pipeline_parity.py` |
 | Aptus handoff | `tests/handoff/test_aptus_handoff_v1.py`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
-| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/Tests/` |
+| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/Tests/`, `macos/scripts/run_workbench.sh` |
 | Group 9 golden + scripts | `tests/regressions/test_group9_release_gates.py`, `scripts/release/`, [release guide](release.md) |
+| Operator install | [install.md](install.md) |
 | Beta limitations | [beta-limitations.md](beta-limitations.md) |
-| Clean-path evidence pack | `dev/active/group-9-public-release/evidence/` (wheel + golden via installed CLI) |
+| Clean-path evidence pack | `dev/active/group-9-public-release/evidence/` |
+| Private beta workbench plan | [plans/2026-08-06-private-beta-workbench.md](plans/2026-08-06-private-beta-workbench.md) |
 
 Group 3 independent architecture and security review:
 [Group 3 code review](../dev/active/group-3-finished-dataset/group-3-finished-dataset-code-review.md).
@@ -437,10 +448,18 @@ requires [docs/release.md](release.md) with retained evidence.
 
 ## Next authority
 
-On `main` after PR #16: Group 9 automated gates and beta-prep docs/evidence are
-landed; maturity is still **alpha**. Next product decisions are (1) deliberate
-beta label cut if desired, (2) owner Mac public checklist for a signed app
-claim, (3) optional Group 8. See the
-[Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md),
-[release guide](release.md), [beta limitations](beta-limitations.md), and
+On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
+private beta workbench Phases 0–1 are landed; maturity is still **alpha**.
+
+Suggested next product work (ordered for private use):
+
+1. Workbench **Phase 2** debugger power (failure detail, copy digests, re-run).
+2. Deliberate **beta label** cut if inviting others (see beta-limitations).
+3. Owner **public Mac** checklist only if shipping a signed app.
+4. Optional **Group 8** (model-assisted construction) under a separate plan.
+
+See the [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md),
+[private beta workbench plan](plans/2026-08-06-private-beta-workbench.md),
+[install guide](install.md), [release guide](release.md),
+[beta limitations](beta-limitations.md), and
 [beta readiness audit](../dev/active/group-9-public-release/beta-readiness-audit.md).

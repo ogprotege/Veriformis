@@ -1,11 +1,12 @@
 # Entry points
 
-How invocation reaches the system: the single CLI surface and its thirteen
-commands, the stage-gated transaction template every mutating command
-executes, the seal path that couples a workspace receipt to a published
-artifact, and the deliberately independent verification entry point.
+How invocation reaches the system: the CLI surface and stage commands, the
+stage-gated transaction template every mutating command executes, the seal
+path that couples a workspace receipt to a published artifact, the
+deliberately independent verification entry point, and thin adapters (MCP,
+SwiftUI workbench) over `PipelineService`.
 
-**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
+**Last reviewed:** 2026-08-06 (full documentation consistency pass)
 
 **Next review:** Any entry-point or architecture change
 

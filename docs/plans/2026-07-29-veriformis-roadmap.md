@@ -6,9 +6,10 @@
 
 **Documentation prerequisite:** Complete
 
-**Current implementation:** M1 core plus Groups 1 through 7 at version `0.1.0`;
-Group 9 automated release gates and beta-prep docs/evidence on `main`; maturity
-remains development alpha; owner Mac public-ready evidence open
+**Current implementation:** M1 core plus Groups 1–7 at version `0.1.0`; Group 9
+automated release gates and beta-prep on `main`; private beta Mac workbench
+Phases 0–1 on `main`; maturity remains development alpha; owner Mac
+public-ready evidence open
 
 ## Product objective
 
@@ -19,6 +20,9 @@ Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
 implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
 Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22 through 23, and Group 7 implemented Step 24.
 Group 9 automated release gates and beta-prep documentation are on `main`.
+Private beta workbench Phases 0–1 (dogfood + KISS shell) are on `main` as
+Group 7 follow-on UI (see
+[private beta workbench plan](2026-08-06-private-beta-workbench.md)).
 Owner Mac signing/notarization evidence remains for a **public** Mac claim.
 A **beta** product label is a separate deliberate cut (Group 8 is optional).
 
@@ -30,6 +34,7 @@ A **beta** product label is a separate deliberate cut (Group 8 is optional).
 - Step 26 automated subset (CI, install smoke, golden path, release runbook)
   and beta-prep limitations/evidence are implemented; Step 26 owner Mac
   public-ready remainder is open.
+- Private beta workbench Phases 0–1 are implemented; Phase 2+ remains open.
 - Later work must preserve the Groups 1 through 7 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, verification, service, handoff, and workbench

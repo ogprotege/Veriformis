@@ -1,14 +1,18 @@
-# Veriformis macOS Workbench (Group 7)
+# Veriformis macOS Workbench (Group 7 + private beta Phases 0–1)
 
-SwiftUI desktop adapter for the Veriformis dataset compiler.
+SwiftUI desktop adapter for the Veriformis dataset compiler. On `main` this is
+the **private beta** shell: compile (not convert) framing, KISS navigation, and
+a run sheet with live log.
 
 ## Design
 
 - **Thin adapter only.** The app shells to the `veriformis` CLI (`PipelineService`).
 - **Same digests as CLI.** Stage order and flags match
   `VeriformisCLI.compilePlan`.
-- **Drag-and-drop sources**, objective picker, output folder, live log,
-  sealed bundle + Aptus handoff reveal.
+- **Sidebar:** Home / Compile / History / Settings.
+- **Compile:** drag-and-drop sources, objective picker, output folder, sealed
+  bundle + Aptus handoff.
+- **Run sheet:** progress %, stage chips, expandable live log.
 
 ## Requirements
 
