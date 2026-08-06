@@ -93,6 +93,14 @@ and phased debugger UX:
 
 [docs/plans/2026-08-06-private-beta-workbench.md](../docs/plans/2026-08-06-private-beta-workbench.md)
 
+**Phase 1** (implemented): sidebar Home / Compile / History / Settings, run
+sheet with progress % and live log, history persistence, settings for CLI and
+default output:
+
+[dev/active/private-beta-workbench/phase-1-design.md](../dev/active/private-beta-workbench/phase-1-design.md)
+
+Operator install (CLI + workbench): [docs/install.md](../docs/install.md)
+
 The workbench remains a thin CLI adapter. Success is a sealed dataset product,
 not a multi-format file converter.
 

@@ -113,11 +113,11 @@ Call **workbench beta** only when CLI beta is true **and** Mac packaging path is
 
 ## Immediate next actions (ordered)
 
-1. ~~Fix CI (P0.1)~~ — done on main.  
-2. ~~Harden G9 + check_local~~ — done.  
-3. ~~Beta limitations doc (P0.2)~~ — `docs/beta-limitations.md`.  
-4. ~~Clean-path evidence (P0.3)~~ — retained pack + recorder script.  
-5. **Before any external beta invite:** deliberate label decision (P0.4), optional second OS clean-path pack, and owner Mac path only if shipping workbench.
+1. **Fix CI** (P0.1) — remove unused imports; push; wait for green.  
+2. **Harden G9** — independent smoke/golden jobs; pinned smoke Python; `check_local.sh`.  
+3. **Write beta limitations** when ready to label (P0.2) — not required for merging G9 infrastructure.  
+4. **Owner clean-path evidence** (P0.3) when hardware/time allows.  
+5. **Decide CLI-only vs workbench beta** (P1.1) before any external invite.
 
 ---
 

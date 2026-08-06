@@ -166,6 +166,9 @@ should still do one interactive GUI pass and append notes if needed.
 
 ### Phase 1 — Private beta shell (UI)
 
+**Status:** Implemented (2026-08-06).  
+**Design:** [dev/active/private-beta-workbench/phase-1-design.md](../../dev/active/private-beta-workbench/phase-1-design.md)
+
 **Scope:** Information architecture and run visibility. No new dataset formats.
 
 - Sidebar: Home / Compile / History / Settings.
@@ -174,6 +177,7 @@ should still do one interactive GUI pass and append notes if needed.
 - History: past runs, open log, reveal bundle.
 - Settings: CLI path resolution, default output directory.
 - Keep thin CLI adapter; parity script remains green.
+- Dogfood items D1–D10, D15, live stream D4, source-root directory rule.
 
 **Exit:** Owner can do a full compile from the new shell with live log and
 history retention.
