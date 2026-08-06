@@ -193,7 +193,8 @@ stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 Authority:
 [docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
 
-- [ ] Phase 0 — Dogfood current workbench; punch list of UX/debug pain
+- [x] Phase 0 — Dogfood current workbench; punch list of UX/debug pain
+      ([phase-0-dogfood.md](dev/active/private-beta-workbench/phase-0-dogfood.md))
 - [ ] Phase 1 — KISS shell: Home / Compile / History / Settings + run sheet
 - [ ] Phase 2 — Debugger power (digests, reveal, failure stage)
 - [ ] Phase 3 — Optional post-seal export (only formats we implement)

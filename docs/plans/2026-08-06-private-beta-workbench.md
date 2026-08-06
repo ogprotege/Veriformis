@@ -153,15 +153,16 @@ Only after the compile path is muscle memory:
 
 ### Phase 0 — Dogfood current workbench
 
-**Status:** Ready to start when owner says go (no large code gate).
+**Status:** Complete (2026-08-06 agent-assisted dogfood).  
+**Evidence:** [dev/active/private-beta-workbench/phase-0-dogfood.md](../../dev/active/private-beta-workbench/phase-0-dogfood.md)
 
 - Build and run `macos/` workbench against current `main`.
 - Compile real sources; break things; live in the log.
 - Note confusing control names, missing affordances, and pain points.
-- Outcome: short punch list that informs Phase 1 (can live in
-  `dev/active/` or as notes against this plan).
+- Outcome: punch list that informs Phase 1.
 
-**Exit:** Owner has used the app enough to trust the dogfood list.
+**Exit:** Punch list landed; build + parity + real compiles verified. Owner
+should still do one interactive GUI pass and append notes if needed.
 
 ### Phase 1 — Private beta shell (UI)
 
