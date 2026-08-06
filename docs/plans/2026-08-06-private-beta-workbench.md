@@ -184,10 +184,13 @@ history retention.
 
 ### Phase 2 — Debugger power
 
+**Status:** Implemented (2026-08-06).  
+**Notes:** [dev/active/private-beta-workbench/phase-2-design.md](../../dev/active/private-beta-workbench/phase-2-design.md)
+
 - Failures show stage, exit code, and last log lines.
 - One-click copy manifest SHA-256 / assignment digest.
 - Reveal in Finder for workspace and bundle.
-- Optional: re-run with same settings.
+- Re-run with same settings (last run or History entry).
 
 **Exit:** Debugging a failed compile is faster in the app than retyping CLI.
 

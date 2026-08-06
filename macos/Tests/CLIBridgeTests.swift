@@ -59,6 +59,35 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testAssignmentDigestExtraction() {
+        let log = """
+        aptus handoff: /tmp/out.vfbundle.aptus-handoff.json
+        assignment digest: deadbeefcafebabe
+        """
+        XCTAssertEqual(
+            WorkbenchViewModel.extractAssignmentDigest(from: log),
+            "deadbeefcafebabe"
+        )
+    }
+
+    func testMakeFailureCapturesExitCodeAndStage() {
+        let error = WorkbenchError.processFailed(
+            stage: "construct",
+            exitCode: 2,
+            message: "boom\nline2"
+        )
+        let failure = WorkbenchViewModel.makeFailure(
+            error: error,
+            logLines: ["a", "b", "c"],
+            workspace: URL(fileURLWithPath: "/tmp/ws"),
+            logFile: nil
+        )
+        XCTAssertEqual(failure.stage, "construct")
+        XCTAssertEqual(failure.exitCode, 2)
+        XCTAssertTrue(failure.summary.contains("exit 2"))
+        XCTAssertEqual(failure.lastLogLines, ["a", "b", "c"])
+    }
+
     func testPipelineStageCountIsNine() {
         XCTAssertEqual(WorkbenchStage.pipelineStages.count, 9)
         XCTAssertFalse(WorkbenchStage.pipelineStages.contains(.verify))
