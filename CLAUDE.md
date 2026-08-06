@@ -4,17 +4,23 @@ This file gives coding-agent guidance for the current Veriformis repository.
 
 ## Current state
 
-Veriformis is a Python development alpha with implemented source code and tests.
-Version `0.1.0` includes the M1 core and roadmap Groups 1 through 7. Read these
-current authorities before changing code:
+Veriformis is a Python development **alpha** with implemented source code and
+tests. Version `0.1.0` includes the M1 core, roadmap Groups 1 through 7, Group 9
+automated release gates, and beta-prep documentation/evidence on `main`. Do not
+claim beta or public readiness without the deliberate label cut and checklists
+in `docs/beta-limitations.md` and `docs/release.md`.
+
+Read these current authorities before changing code:
 
 1. `docs/product-contract.md`
 2. `docs/current-status.md`
 3. `docs/contracts/integrity-v1.md`
 4. `docs/contracts/dataset-construction-v1.md`
 5. `docs/contracts/finished-dataset-v1.md`
-6. `docs/architecture.md`
-7. `docs/plans/2026-07-29-veriformis-roadmap.md`
+6. `docs/contracts/aptus-handoff-v1.md`
+7. `docs/architecture.md`
+8. `docs/plans/2026-07-29-veriformis-roadmap.md`
+9. `docs/beta-limitations.md` and `docs/release.md` for maturity and release claims
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.

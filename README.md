@@ -181,10 +181,12 @@ source paths.
 
 ## Current boundary
 
-**Groups 1 through 7 are implemented** on `main` (compiler through workbench).
-**Group 9 automated release gates** (matrix CI, install smoke, golden compile,
-release runbook) are in place. This is still a development alpha: **public
-readiness** still requires owner Mac signing/notarization evidence per
+**Groups 1 through 7** and **Group 9 automated release gates** (matrix CI,
+install smoke, golden compile, release runbook) are on `main`, with
+**beta-prep** limitations and clean-path evidence also on `main`. This is still
+a development **alpha** — not a beta or public label. A future beta cut must
+follow [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app**
+readiness still requires owner signing/notarization evidence per
 [docs/release.md](docs/release.md). **Group 8** model-assisted construction is
 optional and owner-gated.
 
@@ -223,9 +225,13 @@ uv run pytest -q
 git diff --check
 ```
 
-Post–Group 7 merge on `main`: `655 passed`. CI currently runs Ruff and pytest
-on Ubuntu with Python 3.12. Broader package, platform, type, coverage, security,
-and release gates remain Group 9 work.
+CI on `main` runs a Python 3.11–3.13 matrix (Ubuntu) plus Python 3.12 on
+macOS, `uv lock --check`, Ruff, pytest, wheel install-smoke, and golden-corpus
+compile. Local totals grow over time — re-run `uv run pytest -q` for current
+counts. Type-check, coverage thresholds, dependency audit, and signed/notarized
+Mac distribution are not automated release claims; see
+[docs/release.md](docs/release.md) and
+[docs/beta-limitations.md](docs/beta-limitations.md).
 
 ## License
 

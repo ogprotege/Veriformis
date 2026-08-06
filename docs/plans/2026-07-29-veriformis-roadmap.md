@@ -7,7 +7,8 @@
 **Documentation prerequisite:** Complete
 
 **Current implementation:** M1 core plus Groups 1 through 7 at version `0.1.0`;
-Group 9 automated release gates landed (owner Mac public-ready evidence open)
+Group 9 automated release gates and beta-prep docs/evidence on `main`; maturity
+remains development alpha; owner Mac public-ready evidence open
 
 ## Product objective
 
@@ -17,14 +18,18 @@ The documentation baseline has been reviewed and merged. Group 1 implemented
 Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
 implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
 Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22 through 23, and Group 7 implemented Step 24.
-Group 9 automated release gates are implemented; owner Mac signing/notarization
-evidence remains for a public-ready claim (Group 8 is optional).
+Group 9 automated release gates and beta-prep documentation are on `main`.
+Owner Mac signing/notarization evidence remains for a **public** Mac claim.
+A **beta** product label is a separate deliberate cut (Group 8 is optional).
 
 ## Implementation status
 
 - Steps 1 through 24 are implemented in Groups 1 through 7. Rerun the project
   checks for current evidence. Volatile test totals are intentionally omitted.
-- Steps 25 through 26 remain planned. Group 8 is optional; Group 9 owns Step 26 next.
+- Step 25 remains planned and optional (Group 8).
+- Step 26 automated subset (CI, install smoke, golden path, release runbook)
+  and beta-prep limitations/evidence are implemented; Step 26 owner Mac
+  public-ready remainder is open.
 - Later work must preserve the Groups 1 through 7 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, verification, service, handoff, and workbench
@@ -182,13 +187,20 @@ Group 8 requires separate owner approval. It may remain deferred while the deter
 
 26. Public release gates
 
-**Automated subset (landed):** supported-platform CI matrix, `uv lock --check`,
-wheel install smoke, golden-corpus compile through external_digest verify and
-Aptus handoff-verify, release scripts under `scripts/release/`, and
-[docs/release.md](../release.md). Migration checks remain ordinary suite tests.
+**Automated subset (landed on `main`):** supported-platform CI matrix,
+`uv lock --check`, wheel install smoke, golden-corpus compile through
+external_digest verify and Aptus handoff-verify, release scripts under
+`scripts/release/`, and [docs/release.md](../release.md). Migration checks
+remain ordinary suite tests.
 
-**Owner remainder (open):** Developer ID signing, notarization, staple,
-clean-Mac install, and retained Aptus handoff evidence.
+**Beta-prep (landed on `main`, still alpha maturity):**
+[docs/beta-limitations.md](../beta-limitations.md), clean-path evidence
+recorder, and retained packs under
+`dev/active/group-9-public-release/evidence/`.
+
+**Owner remainder (open for public Mac claim):** Developer ID signing,
+notarization, staple, clean-Mac install of the signed product, and retained
+Aptus handoff evidence.
 
 **Exit gate:** A clean supported Mac can install the signed and notarized product, compile the golden raw corpus, verify the final bundles, and hand them to a compatible Aptus release with independently recorded evidence.
 

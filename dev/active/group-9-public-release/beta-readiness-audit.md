@@ -2,9 +2,10 @@
 
 **Date:** 2026-08-05  
 **Scope:** Honest gap list for a **flawless beta** (not public production).  
-**Baseline:** Groups 1–7 + Group 9 automated gates on `main` (PRs #14/#15).  
+**Baseline:** Groups 1–7 + Group 9 automated gates + beta-prep on `main`
+(PRs #14/#15/#16; HEAD `fc33c56` at sync).  
 **Policy:** Do not publish until this list is closed or explicitly accepted as beta limitations.  
-**Updated:** 2026-08-05 (P0.1–P0.3 progress after #15 merge)
+**Updated:** 2026-08-06 (PR #16 merged; docs/WIP full sync)
 
 ## Verdict (current)
 

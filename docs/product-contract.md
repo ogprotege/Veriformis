@@ -4,15 +4,17 @@
 
 **Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
 
-**Current baseline:** M1 core plus Groups 1 through 7 runtime and Group 9
-automated release gates, version `0.1.0`
+**Current baseline:** M1 core plus Groups 1 through 7 runtime, Group 9
+automated release gates, and beta-prep limitations/evidence on `main`,
+version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1 through 7 complete; Group 9
-automated gates landed; public-ready claim still owner-gated
+automated gates and beta-prep docs landed; maturity alpha; public Mac claim
+still owner-gated
 
-**Last reviewed:** 2026-08-05
+**Last reviewed:** 2026-08-06
 
-**Next review:** Owner public-ready checklist completion or any product-contract change
+**Next review:** Deliberate beta label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
 
@@ -78,18 +80,22 @@ exact current snapshot, atomically publishes a closed six-file bundle, and
 supports independent `self_consistent` or externally anchored
 `external_digest` verification.
 
-This remains a working alpha until the full Group 9 public-ready checklist
-passes with retained evidence (see [release guide](release.md)). Group 3
-passed its independent architecture and security closeout. Group 4 delivered
-`PipelineService`, the thin CLI adapter, and dual-objective M1.1 acceptance.
-Group 5 expanded declared ingest (HTML, digitally-born PDF, CSV, JSON, JSONL),
-named OCR refusal, the recipe library, statistics, and YAML pipelines. Group 6
-delivered constrained local MCP and the versioned Aptus handoff. Group 7
-delivered the SwiftUI workbench over the CLI. Group 9 automated gates cover
-supported-platform CI, package-install smoke, golden corpus compile evidence,
-and the packaging runbook. Owner-executed signing, notarization, and clean-Mac
-install evidence remain required for a public-ready claim. Optional Group 8
-(model-assisted construction) remains owner-gated.
+This remains a working **alpha** until a deliberate maturity cut and, for
+public Mac distribution, the full Group 9 public-ready checklist with retained
+evidence (see [release guide](release.md) and
+[beta limitations](beta-limitations.md)). Group 3 passed its independent
+architecture and security closeout. Group 4 delivered `PipelineService`, the
+thin CLI adapter, and dual-objective M1.1 acceptance. Group 5 expanded declared
+ingest (HTML, digitally-born PDF, CSV, JSON, JSONL), named OCR refusal, the
+recipe library, statistics, and YAML pipelines. Group 6 delivered constrained
+local MCP and the versioned Aptus handoff. Group 7 delivered the SwiftUI
+workbench over the CLI. Group 9 automated gates cover supported-platform CI,
+package-install smoke, golden corpus compile evidence, and the packaging
+runbook. Beta-prep documentation records operator non-claims and clean-path
+evidence without rebranding the product as beta. Owner-executed signing,
+notarization, and clean-Mac install evidence remain required for a **public
+Mac app** claim. Optional Group 8 (model-assisted construction) remains
+owner-gated.
 
 ## End-to-end compiler contract
 

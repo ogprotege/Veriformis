@@ -2,7 +2,7 @@
 
 **Status:** Active limitations register for any future **beta** cut of `0.1.0`
 
-**Last reviewed:** 2026-08-05
+**Last reviewed:** 2026-08-06 (on `main` via PR #16)
 
 **Maturity today:** Development **alpha** — this document exists so a beta cut
 can be honest. **Do not treat the current tag as beta** until the beta cut

@@ -5,10 +5,10 @@
 **Maturity:** Development alpha
 
 **Implementation state:** Groups 1 through 7 complete; Group 9 automated
-release gates landed (full public readiness still owner-gated for Mac
-signing/notarization evidence)
+release gates and beta-prep documentation/evidence on `main` (maturity remains
+development alpha; public Mac readiness still owner-gated)
 
-**Review date:** 2026-08-05 (Group 9 on main; beta-prep limitations + clean-path evidence)
+**Review date:** 2026-08-06 (docs sync after PR #16 merge to `main`)
 
 **Next review:** Deliberate beta label cut, public-ready checklist, optional
 Group 8 plan, or any contract change
@@ -45,8 +45,12 @@ same CLI so digests match terminal runs.
 **Group 9 (automated subset)** expands CI to a Python 3.11–3.13 matrix plus
 macOS Python 3.12, lockfile check, wheel install smoke, golden-corpus
 compile through `external_digest` verify and Aptus handoff-verify, release
-scripts under `scripts/release/`, and [docs/release.md](release.md). Signed
-and notarized Mac distribution remains an owner-executed checklist item.
+scripts under `scripts/release/`, and [docs/release.md](release.md).
+**Beta-prep** on `main` adds [beta-limitations.md](beta-limitations.md) and
+retained clean-path evidence under
+`dev/active/group-9-public-release/evidence/`. Maturity remains **alpha** until
+a deliberate beta label cut. Signed and notarized Mac distribution remains an
+owner-executed checklist for any public Mac app claim.
 
 Raw source material remains the product entry. Clean corpus state is an
 accountable intermediate, except when a `full_text` recipe explicitly selects
@@ -388,7 +392,9 @@ See [docs/release.md](release.md).
 | Implemented Group 6 | Local MCP adapter, versioned Aptus handoff, consumer verification |
 | Implemented Group 7 | SwiftUI workbench (CLI adapter) with digest parity |
 | Implemented Group 9 (automated) | CI matrix, lock check, wheel smoke, golden compile/handoff scripts, release runbook |
-| Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready claim |
+| Implemented beta-prep (docs/evidence) | Limitations register, clean-path recorder + pack; still alpha maturity |
+| Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
+| Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
 | Public release | Full checklist in [docs/release.md](release.md) with retained evidence |
@@ -431,10 +437,10 @@ requires [docs/release.md](release.md) with retained evidence.
 
 ## Next authority
 
-Beta prep P0 docs and clean-path evidence are landed; maturity is still alpha
-until a deliberate label cut. Owner-executed Group 9 remainder
-(signed/notarized Mac) closes **public** readiness when claiming a Mac app.
-Group 8 remains optional owner-approved work. See the
+On `main` after PR #16: Group 9 automated gates and beta-prep docs/evidence are
+landed; maturity is still **alpha**. Next product decisions are (1) deliberate
+beta label cut if desired, (2) owner Mac public checklist for a signed app
+claim, (3) optional Group 8. See the
 [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md),
-[release guide](release.md), and
+[release guide](release.md), [beta limitations](beta-limitations.md), and
 [beta readiness audit](../dev/active/group-9-public-release/beta-readiness-audit.md).

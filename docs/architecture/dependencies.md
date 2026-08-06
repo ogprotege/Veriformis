@@ -5,9 +5,9 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
+**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
 
-**Next review:** The first Group 9 release-gate change or dependency change
+**Next review:** Any architecture or dependency change
 
 The dependency architecture of Veriformis is organized as a strict,
 downward-pointing directed acyclic graph of roughly nine layers, running from

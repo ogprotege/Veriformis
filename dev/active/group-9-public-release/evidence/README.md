@@ -18,7 +18,7 @@ Only logs and digests are written (no wheel binary in-tree).
 
 | Directory | Host | Git HEAD | Result |
 | --- | --- | --- | --- |
-| `20260805T-local-mac/` | macOS arm64 Darwin 25.6, Python 3.12.13 | `452b6e5` (main after PR #15) | PASS |
+| `20260805T-local-mac/` | macOS arm64 Darwin 25.6, Python 3.12.13 | `452b6e5` (main after PR #15; retained via PR #16) | PASS |
 
 CI also runs `install-smoke` and `golden-compile` on Ubuntu for every PR/main push;
 those jobs are complementary machine evidence without a committed log tree.

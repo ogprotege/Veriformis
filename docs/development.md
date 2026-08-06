@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-05 after Group 9 automated release gates
+**Last reviewed:** 2026-08-06 after PR #16 docs sync baseline on `main`
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 

@@ -4,9 +4,9 @@ This documentation describes the development-alpha compiler from raw source
 capture through a verified finished-dataset bundle, plus local automation and
 workbench surfaces built in Groups 1 through 7.
 
-**Last reviewed:** 2026-08-05 after Group 9 automated release gates
+**Last reviewed:** 2026-08-06 after PR #16 (beta-prep) merge to `main`
 
-**Next review:** Owner public-ready checklist completion or any contract change
+**Next review:** Deliberate beta label cut, public-ready checklist, or any contract change
 
 ## Start here
 

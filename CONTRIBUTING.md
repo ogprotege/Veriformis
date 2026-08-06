@@ -21,9 +21,12 @@ Before changing code, read:
 - [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
 
 The roadmap is ordered. Groups 1–7 exit gates are closed on `main`. Group 9
-automated gates (CI matrix, install smoke, golden compile) are landed; owner
-Mac signing/notarization evidence remains for a public-ready claim. Group 8 is
-optional and owner-gated.
+automated gates (CI matrix, install smoke, golden compile) and beta-prep
+docs/evidence are on `main`; maturity remains development **alpha**. Owner Mac
+signing/notarization evidence remains for a **public Mac app** claim. Group 8
+is optional and owner-gated. Do not describe the product as beta or
+public-ready without the checklists in [docs/beta-limitations.md](docs/beta-limitations.md)
+and [docs/release.md](docs/release.md).
 
 After reading these authorities, consult [Work in progress](WIP.md) as the
 non-authoritative reviewed work queue.
