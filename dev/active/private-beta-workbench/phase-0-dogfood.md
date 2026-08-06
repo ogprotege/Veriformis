@@ -46,6 +46,7 @@ Owner GUI pass (still recommended): open the app, drop a source, set output fold
 | D5 | **No History** | Prior workspaces/bundles only if you remember Finder paths | Persist run records (paths, objective, status, log path) |
 | D6 | **No Settings UI for CLI path** | Failure mode is alert “missing CLI”; no place to set `VERIFORMIS_CLI` | Settings: show resolved CLI, paste override, open docs |
 | D21 | **GUI launch could not find CLI** (PATH + Info.plist) | Double-click `.app` has minimal PATH; Debug repo root was not in Info.plist | Fixed: inject plist key, probe `~/.local/bin` / Homebrew / `.venv/bin/veriformis`, clearer error + README prerequisites |
+| D22 | **Single-file compile set source-root to the file** | `commonAncestor` used the file path → `invalid-source-locator` / double-slash `//Users/...` | Fixed: `defaultSourceRoot` uses parent directory(ies); tests added |
 
 ### P1 debugger / honesty (Phase 2 or late Phase 1)
 
