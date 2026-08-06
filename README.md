@@ -14,10 +14,13 @@ explicitly selects it as training content.
 
 > **Development alpha:** Version `0.1.0` implements the M1 core and roadmap
 > Groups 1 through 7, plus Group 9 automated release gates (matrix CI, install
-> smoke, golden compile). Signed/notarized Mac public readiness remains an
-> owner checklist — see [docs/release.md](docs/release.md). Read the
+> smoke, golden compile). This is **not** a beta or public release label.
+> Hard non-claims and operator limits:
+> [docs/beta-limitations.md](docs/beta-limitations.md). Signed/notarized Mac
+> public readiness remains an owner checklist —
+> [docs/release.md](docs/release.md). Read the
 > [current implementation status](docs/current-status.md) before treating this
-> alpha as release-ready.
+> alpha as shippable.
 
 ## What works today
 
@@ -178,10 +181,12 @@ source paths.
 
 ## Current boundary
 
-**Groups 1 through 7 are implemented** on `main` (compiler through workbench).
-**Group 9 automated release gates** (matrix CI, install smoke, golden compile,
-release runbook) are in place. This is still a development alpha: **public
-readiness** still requires owner Mac signing/notarization evidence per
+**Groups 1 through 7** and **Group 9 automated release gates** (matrix CI,
+install smoke, golden compile, release runbook) are on `main`, with
+**beta-prep** limitations and clean-path evidence also on `main`. This is still
+a development **alpha** — not a beta or public label. A future beta cut must
+follow [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app**
+readiness still requires owner signing/notarization evidence per
 [docs/release.md](docs/release.md). **Group 8** model-assisted construction is
 optional and owner-gated.
 
@@ -206,6 +211,7 @@ reading paths. The map:
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
   - [Release guide](docs/release.md)
+  - [Beta limitations](docs/beta-limitations.md)
   - [macOS workbench](macos/README.md)
   - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)
@@ -219,9 +225,13 @@ uv run pytest -q
 git diff --check
 ```
 
-Post–Group 7 merge on `main`: `655 passed`. CI currently runs Ruff and pytest
-on Ubuntu with Python 3.12. Broader package, platform, type, coverage, security,
-and release gates remain Group 9 work.
+CI on `main` runs a Python 3.11–3.13 matrix (Ubuntu) plus Python 3.12 on
+macOS, `uv lock --check`, Ruff, pytest, wheel install-smoke, and golden-corpus
+compile. Local totals grow over time — re-run `uv run pytest -q` for current
+counts. Type-check, coverage thresholds, dependency audit, and signed/notarized
+Mac distribution are not automated release claims; see
+[docs/release.md](docs/release.md) and
+[docs/beta-limitations.md](docs/beta-limitations.md).
 
 ## License
 

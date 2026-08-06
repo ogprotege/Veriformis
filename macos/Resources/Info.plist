@@ -26,5 +26,9 @@
 	<string>NSApplication</string>
 	<key>CFBundleDisplayName</key>
 	<string>Veriformis</string>
+	<!-- Debug builds inject the checkout root via Xcode build setting (project.yml). -->
+	<key>VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT</key>
+	<string>$(VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT)</string>
 </dict>
 </plist>
+

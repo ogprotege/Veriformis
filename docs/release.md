@@ -2,7 +2,7 @@
 
 **Status:** Active release-gate documentation for version `0.1.0` development alpha
 
-**Last reviewed:** 2026-08-05 (Group 9 release infrastructure)
+**Last reviewed:** 2026-08-06 (Group 9 + beta-prep on `main` via PRs #14–#16)
 
 **Next review:** Any public-release claim, packaging change, or CI gate change
 
@@ -11,6 +11,9 @@ prove the installable Python path and the golden raw-corpus compile. Signed and
 notarized Mac distribution requires owner Apple Developer credentials and
 recorded evidence. **Do not claim public release readiness until the full
 checklist below has been executed with retained evidence on a clean Mac.**
+
+Operator non-claims and any future **beta** cut criteria:
+[beta-limitations.md](beta-limitations.md).
 
 ## What automated gates prove
 
@@ -60,6 +63,26 @@ After a wheel install, the golden path can use the installed CLI:
 export VERIFORMIS_USE_PATH=1
 bash scripts/release/golden_compile.sh
 ```
+
+To retain a clean-path evidence pack (logs + digests only):
+
+```bash
+bash scripts/release/record_clean_path_evidence.sh
+```
+
+Packs land under `dev/active/group-9-public-release/evidence/` by default.
+
+### Workspace upgrades (beta operators)
+
+Workspaces use physical layout schema 1 and revision schema 3. If you open an
+older verified workspace, run:
+
+```bash
+veriformis upgrade-workspace WORKSPACE
+```
+
+Do not hand-edit content-addressed objects or `HEAD`. Migration behavior is
+covered by ordinary suite tests under `tests/regressions/`.
 
 ## Golden corpus
 

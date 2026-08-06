@@ -1,0 +1,2 @@
+wheel_path_basename=veriformis-0.1.0-py3-none-any.whl
+wheel_sha256=2caad54abf4a60fd1997b5720f36faa953e5389419b55ecab3104101e2a86763

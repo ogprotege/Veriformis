@@ -4,9 +4,9 @@ This documentation describes the development-alpha compiler from raw source
 capture through a verified finished-dataset bundle, plus local automation and
 workbench surfaces built in Groups 1 through 7.
 
-**Last reviewed:** 2026-08-05 after Group 9 automated release gates
+**Last reviewed:** 2026-08-06 after PR #16 (beta-prep) merge to `main`
 
-**Next review:** Owner public-ready checklist completion or any contract change
+**Next review:** Deliberate beta label cut, public-ready checklist, or any contract change
 
 ## Start here
 
@@ -18,6 +18,7 @@ workbench surfaces built in Groups 1 through 7.
 4. Use the [authoritative build roadmap](plans/2026-07-29-veriformis-roadmap.md)
    for remaining Group 9 owner Mac evidence and optional Group 8 work.
 5. Use [Release guide](release.md) for CI gates, golden compile, and Mac packaging.
+6. Read [Beta limitations](beta-limitations.md) before any beta or external invite.
 
 ## Reading paths
 
@@ -47,8 +48,10 @@ workbench surfaces built in Groups 1 through 7.
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
 | [Development guide](development.md) | Setup, checks, tests, engineering constraints | Contributor guide |
 | [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
+| [Beta limitations](beta-limitations.md) | Hard non-claims and operator limits for any future beta cut | Limitations register (maturity still alpha) |
 | [macOS workbench](../macos/README.md) | SwiftUI workbench build and parity | Workbench operator guide |
 | [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered sequence, groups, exit gates | Authoritative work order |
+| [Private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Compile framing, KISS UI, phases 0–4 | Owner private-beta plan (not public claim) |
 | [Contributing](../CONTRIBUTING.md) | PR checklist and standards | Contribution policy |
 
 ## Working inventory

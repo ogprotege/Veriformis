@@ -58,4 +58,32 @@ final class CLIBridgeTests: XCTestCase {
             "abcdef0123456789"
         )
     }
+
+    func testMissingCLIErrorMentionsPrerequisites() throws {
+        let message = WorkbenchError.missingCLI.localizedDescription
+        XCTAssertTrue(message.contains("uv sync"))
+        XCTAssertTrue(message.contains("VERIFORMIS_CLI"))
+    }
+
+    func testResolveFindsRepoVenvOrUvWhenRootProvided() throws {
+        // Walk from this source file up to the repository root (…/macos/Tests → repo).
+        var dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        var root: URL?
+        for _ in 0 ..< 6 {
+            let marker = dir.appendingPathComponent("pyproject.toml")
+            if FileManager.default.fileExists(atPath: marker.path) {
+                root = dir
+                break
+            }
+            dir.deleteLastPathComponent()
+        }
+        guard let root else {
+            throw XCTSkip("Could not locate repo root from test file path")
+        }
+        let cli = try VeriformisCLI.resolve(repositoryRoot: root)
+        XCTAssertTrue(
+            FileManager.default.isExecutableFile(atPath: cli.executableURL.path),
+            "expected executable at \(cli.executableURL.path)"
+        )
+    }
 }

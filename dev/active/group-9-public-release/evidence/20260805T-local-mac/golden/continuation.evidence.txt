@@ -1,0 +1,9 @@
+objective=continuation
+manifest_sha256=58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+bundle=/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T//veriformis-golden-compile.oECAiM/continuation.vfbundle
+handoff=/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T//veriformis-golden-compile.oECAiM/continuation.vfbundle.aptus-handoff.json
+status: accepted
+handoff id: ahd-v1-e92a12fdbd0f1cfa73932d4f1549b384bb1dcacad293ece5ed67bbcefec5ed3f
+bundle: bundle-v1-0192a85a0cd4a0422cbde832eb8ab3adbe8617bc28267bafe56a7bb5052289d9
+assignment digest: d6b5adedc9c45ad7f564e2de78ad9de3200835911436c6323dae409bd5e19481
+verification grade: external_digest

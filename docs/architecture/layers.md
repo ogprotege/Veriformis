@@ -4,9 +4,9 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-05 after Groups 1–7 documentation sync
+**Last reviewed:** 2026-08-06 after Group 9 + beta-prep on `main`
 
-**Next review:** The first Group 9 release-gate change or any layering change
+**Next review:** Any layering or architecture change
 
 Veriformis is organized as a strict, acyclically ordered stack of logical
 layers, above which sit axial modules: `workspace.py` (persistence kernel),

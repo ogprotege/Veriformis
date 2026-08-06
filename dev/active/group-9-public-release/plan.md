@@ -1,6 +1,7 @@
 # Group 9 Public Release Gates Plan
 
-**Status:** Automated gates implemented; owner Mac remainder open
+**Status:** Automated gates + beta-prep on `main` (PRs #14–#16); maturity alpha;
+owner Mac public remainder open
 
 **Roadmap scope:** Step 26
 

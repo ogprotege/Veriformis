@@ -1,0 +1,3 @@
+status=PASS
+evidence_dir=/Users/biscuit/Veriformis/dev/active/group-9-public-release/evidence/20260805T-local-mac
+notes=wheel install outside repo .venv; golden path used VERIFORMIS_USE_PATH=1

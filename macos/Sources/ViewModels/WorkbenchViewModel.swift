@@ -31,12 +31,18 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     func bootstrapCLI() {
+        appendLog("Workbench bootstrap…")
+        appendLog(VeriformisCLI.resolutionDiagnostics())
         do {
             cli = try VeriformisCLI.resolve()
-            appendLog("CLI ready: \(cli!.executableURL.path) \(cli!.prefixArguments.joined(separator: " "))")
+            let prefix = cli!.prefixArguments.isEmpty
+                ? ""
+                : " " + cli!.prefixArguments.joined(separator: " ")
+            appendLog("CLI ready: \(cli!.executableURL.path)\(prefix)")
         } catch {
             lastError = error.localizedDescription
             appendLog("error: \(error.localizedDescription)")
+            appendLog("hint: use macos/scripts/run_workbench.sh from the repo so the Debug app is rebuilt and opened.")
         }
     }
 

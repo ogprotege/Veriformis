@@ -2,16 +2,15 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** Group 9 automated release gates on
-`agent/group-9-public-release` (Groups 1–7 complete on `main`; Group 9
-automated subset in flight)
+**Implementation baseline reviewed:** `fc33c56` on `main` after PR #16
+(Groups 1–7, Group 9 automated gates PRs #14/#15, beta-prep docs/evidence PR #16)
 
-**Product version:** `0.1.0` development alpha
+**Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-05 (Group 9 automated release gates)
+**Last reviewed:** 2026-08-06 (full docs/WIP sync to post–Group 9 + beta-prep main)
 
-**Next review:** Any merged implementation group, contract or roadmap change,
-or listed-item status change
+**Next review:** Deliberate beta label cut, public-ready Mac evidence, optional
+Group 8 plan, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -49,8 +48,13 @@ local, offline, and free of LLM generation.
 - [x] Group 5 ingest and recipe expansion is complete.
 - [x] Group 6 MCP and Aptus handoff is complete.
 - [x] Group 7 SwiftUI workbench is complete.
-- [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts.
-- [ ] Group 9 owner remainder: signed/notarized Mac + clean-Mac evidence (blocks public-ready claim).
+- [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts (on `main`).
+- [x] Beta-prep: [docs/beta-limitations.md](docs/beta-limitations.md), clean-path evidence recorder + pack.
+- [ ] Private beta workbench plan:
+      [docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
+      (Phase 0 dogfood → Phase 1 shell → …).
+- [ ] Deliberate beta **label** cut (still alpha until then).
+- [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
 
 The current stage-command runtime is:
@@ -182,7 +186,19 @@ external digest, partitions, rows, and assignment projection.
 **Delivered:** `macos/` SwiftUI app shells to `veriformis` CLI; drag-drop sources;
 stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 
-## Next required work: Group 9 owner remainder / optional Group 8
+## Next work: private beta workbench / Group 9 owner / optional Group 8
+
+### Private beta Mac workbench (owner plan)
+
+Authority:
+[docs/plans/2026-08-06-private-beta-workbench.md](docs/plans/2026-08-06-private-beta-workbench.md)
+
+- [x] Phase 0 — Dogfood current workbench; punch list of UX/debug pain
+      ([phase-0-dogfood.md](dev/active/private-beta-workbench/phase-0-dogfood.md))
+- [ ] Phase 1 — KISS shell: Home / Compile / History / Settings + run sheet
+- [ ] Phase 2 — Debugger power (digests, reveal, failure stage)
+- [ ] Phase 3 — Optional post-seal export (only formats we implement)
+- [ ] Phase 4 — Heavy post-processors if still needed (never replace seal)
 
 ### Group 8: Advanced construction (optional)
 
@@ -194,14 +210,19 @@ stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
   wheel install smoke, golden corpus seal/verify/handoff-verify, `scripts/release/`,
   [docs/release.md](docs/release.md), permanent regression
   `tests/regressions/test_group9_release_gates.py`
+- [x] 26a+. Beta limitations register + clean-path evidence pack (CLI beta prep; not a label cut)
 - [ ] 26b. Owner Mac distribution — Developer ID sign, notarize, staple, clean-Mac
-  install, golden + Aptus evidence (see release checklist)
+  install, golden + Aptus evidence (see release checklist) — **public** Mac claim
 
 **Evidence for Group 7:** [`macos/README.md`](macos/README.md),
 `macos/scripts/parity_check.sh`, and Xcode unit tests under `macos/Tests/`.
 
 **Evidence for Group 9 automated:** [docs/release.md](docs/release.md),
-`.github/workflows/ci.yml`, `scripts/release/`.
+`.github/workflows/ci.yml`, `scripts/release/`, main CI green after PR #15.
+
+**Beta prep:** [docs/beta-limitations.md](docs/beta-limitations.md),
+[beta readiness audit](dev/active/group-9-public-release/beta-readiness-audit.md),
+[evidence packs](dev/active/group-9-public-release/evidence/).
 
 ## Optional work requiring owner approval
 
@@ -231,14 +252,19 @@ curation, split, validation, and sealing contracts as deterministic candidates.
   - Package installation smoke and golden corpus compile evidence scripts.
   - Migration verification remains in the ordinary regression suite.
   - Release runbook documents owner signing/notarization (no silent skip).
+- [x] 26a+. Beta-prep on `main` (PR #16) — limitations register, clean-path
+  evidence pack, alpha honesty (not a beta label cut).
 - [ ] 26b. Owner-executed public-ready evidence
   - macOS packaging with Developer ID signing, notarization, and staple.
   - Clean supported Mac install of the signed product.
   - Golden raw corpus compile + verify + Aptus-compatible handoff with retained logs.
 
-**Exit gate:** A clean supported Mac can install the signed and notarized
-product, compile the golden raw corpus, verify the final bundles, and hand them
-to a compatible Aptus release with independently recorded evidence.
+**Exit gate (public):** A clean supported Mac can install the signed and
+notarized product, compile the golden raw corpus, verify the final bundles, and
+hand them to a compatible Aptus release with independently recorded evidence.
+
+**CLI beta (future label cut):** See [docs/beta-limitations.md](docs/beta-limitations.md)
+and the [beta readiness audit](dev/active/group-9-public-release/beta-readiness-audit.md).
 
 ## Execution order and dependencies
 
@@ -278,40 +304,21 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
   material. Closed-bundle verification remains workspace-independent, while
   full source replay remains available through workspace history.
 
-## Documentation revamp
+## Documentation status
 
-**Status:** In review as [PR #6](https://github.com/ogprotege/Veriformis/pull/6)
-on `docs/architecture-revamp`; not yet merged to `main`.
+Architecture deep-dive, Groups 1–7 docs sync, Group 9 release guide, and beta
+limitations are on `main` (through PRs #6 lineage, #13–#16).
 
-What it is: a full documentation overhaul built on a citation-verified
-architecture analysis of the current source. It changes documentation only; it
-alters no numbered roadmap step, versioned contract, or exit gate.
-
-Done on the branch:
-
-- [x] Architecture deep-dive tree added under `docs/architecture/` (overview,
-  layers, dependencies, data flow, entry points) with verified `file:line`
-  citations and Mermaid diagrams.
-- [x] `docs/architecture.md` rewritten as the architecture hub routing into
-  the tree.
-- [x] Root `README` and documentation index elevated: pipeline diagram,
-  badges, audience reading paths, and a complete documentation map.
-- [x] CLI reference and development guide re-verified against source,
-  correcting the exit-status table, schema gating, seal failure typing, and
-  chunk option constraints.
-- [x] `current-status.md` re-verified against code and tests; no capability
-  drift. Contracts drift-checked against the implementation; no drift found.
-- [x] Review metadata (`Last reviewed` / `Next review`) aligned across the
-  reference docs.
-
-Remaining:
+Remaining documentation debt:
 
 - [ ] Re-verify architecture deep-dive `file:line` citations when entry points
   drift materially.
 - [ ] Machine-render Mermaid diagrams in CI (currently hand-reviewed).
-- [x] Group 9 automated: packaging runbook + release troubleshooting entry in docs/release.md
+- [x] Group 9 automated: packaging runbook + release troubleshooting
+  (`docs/release.md`).
+- [x] Beta limitations register + clean-path evidence docs (PR #16).
 - [ ] Group 9 owner: notarization evidence and security hardening follow-ups
-  documentation.
+  when claiming a public Mac app.
 
 ## Deferred documentation
 
@@ -321,6 +328,7 @@ Remaining:
 - [x] Document expanded declared ingest and YAML pipelines.
 - [x] Document MCP and SwiftUI workbench surfaces.
 - [x] Release guide and troubleshooting entry points for Group 9 automated gates.
+- [x] Beta limitations and clean-path evidence documentation (PR #16).
 - [ ] Expand security hardening and owner notarization evidence as needed.
 
 ## Known current limitations
@@ -338,17 +346,24 @@ Remaining:
 
 ## Verification snapshot
 
-Post–Group 7 merge on `main` (`d42d527`, 2026-08-05):
+Post–Group 9 + beta-prep on `main` (`fc33c56`, 2026-08-06):
 
 ```text
-uv lock --check             passed
-uv run ruff check src tests passed
-uv run pytest -q            655 passed
-git diff --check            passed
+uv lock --check
+uv run ruff check src tests
+uv run pytest -q            # 658 passed locally at Group 9 land; re-run for current total
+bash scripts/release/smoke_install.sh
+bash scripts/release/golden_compile.sh
+git diff --check
 ```
 
-Additional permanent locks: Group 5 declared-format e2e regressions, MCP/service
-parity, Aptus handoff consumer tests, and `macos/scripts/parity_check.sh`.
+CI on `main` (after PR #15/#16): Python 3.11–3.13 Ubuntu + 3.12 macOS, Ruff,
+pytest, install-smoke, golden-compile.
+
+Additional permanent locks: Group 5 declared-format e2e, MCP/service parity,
+Aptus handoff consumer tests, Group 9 release-gate regressions,
+`macos/scripts/parity_check.sh`, and clean-path pack under
+`dev/active/group-9-public-release/evidence/`.
 
 Rerun these checks before calling this snapshot current.
 
@@ -359,7 +374,8 @@ Rerun these checks before calling this snapshot current.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
 5. Keep Group 8 separate until the owner approves its implementation plan.
-6. Complete Group 9 owner Mac evidence for a public-ready claim; Group 8 remains optional.
+6. Keep maturity as alpha until a deliberate beta label cut; complete Group 9
+   owner Mac evidence only for a public Mac app claim. Group 8 remains optional.
 7. Preserve deterministic and offline operation through Group 7.
 8. Keep the retained manifest digest and integrity-controlled publication
    parent requirements visible in every future sealing surface.
@@ -377,4 +393,8 @@ Rerun these checks before calling this snapshot current.
 - [Architecture tree](docs/architecture/README.md)
 - [CLI reference](docs/cli.md)
 - [Development guide](docs/development.md)
+- [Release guide](docs/release.md)
+- [Beta limitations](docs/beta-limitations.md)
+- [Private beta workbench vision](docs/plans/2026-08-06-private-beta-workbench.md)
+- [Beta readiness audit](dev/active/group-9-public-release/beta-readiness-audit.md)
 - [macOS workbench](macos/README.md)
