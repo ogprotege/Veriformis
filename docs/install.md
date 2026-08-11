@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-06 (full documentation consistency pass; workbench Phases 0–1 on `main`)
+**Last reviewed:** 2026-08-11 (workbench Phases 0–2 on `main`; independent-product authority pass)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -127,7 +127,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis split WORKSPACE` | Train / evaluation assignment |
 | `veriformis format WORKSPACE` | Lower to product rows |
 | `veriformis validate WORKSPACE` | 17-gate validation |
-| `veriformis seal WORKSPACE -o BUNDLE.vfbundle` | Atomic sealed bundle (+ Aptus handoff by default) |
+| `veriformis seal WORKSPACE -o BUNDLE.vfbundle` | Atomic canonical six-file bundle; no integration artifact by default |
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis handoff BUNDLE --manifest-sha256 HEX` | Build/write Aptus handoff |
 | `veriformis handoff-verify HANDOFF --bundle BUNDLE` | Consumer check |
@@ -153,8 +153,10 @@ veriformis seal /tmp/ws -o /tmp/out.vfbundle
 veriformis verify /tmp/out.vfbundle
 ```
 
-For Aptus-friendly supervised rows, prefer `--objective continuation` (and a
-split that can produce evaluation when you care about both partitions).
+Optional Aptus adapter use is explicit: pass `--aptus-handoff` to `seal`, or
+run `handoff` after retaining the manifest digest. The adapter's current policy
+accepts supervised row schemas such as `continuation` and rejects plain
+`full_text` rows; this does not constrain standalone Veriformis output.
 
 ---
 
@@ -183,7 +185,7 @@ Debug workbench**.
 | GUI: could not locate CLI | `bash macos/scripts/run_workbench.sh` after `uv sync` |
 | `veriformis: command not found` | Use `uv run veriformis` or put `.venv/bin` on PATH / `uv tool install` |
 | `source root is not a directory` | Pass a directory to `--source-root`, not a file (fixed in recent workbench) |
-| Aptus handoff rejected for `full_text` | Expected: plain `text` schema; try `continuation` |
+| Optional Aptus handoff rejected for `full_text` | Expected under the adapter policy: plain `text` schema; use a supported supervised objective only when that integration is your target |
 
 ---
 

@@ -54,9 +54,6 @@ struct HistoryView: View {
                 row("Source", entry.primarySourceName)
                 row("Workspace", entry.workspacePath)
                 row("Bundle", entry.bundlePath)
-                if let handoff = entry.handoffPath {
-                    row("Aptus handoff", handoff)
-                }
                 if let sha = entry.manifestSHA256 {
                     digestRow("Manifest SHA-256", sha, copyLabel: "manifest SHA-256")
                 }
@@ -79,6 +76,19 @@ struct HistoryView: View {
                         .foregroundStyle(.green)
                 }
 
+                if let handoff = entry.handoffPath {
+                    GroupBox("Optional integrations") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            row("Aptus handoff", handoff)
+                            Button("Reveal handoff") {
+                                workbench.reveal(URL(fileURLWithPath: handoff))
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 2)
+                    }
+                }
+
                 HStack {
                     Button("Re-run") {
                         workbench.reRun(from: entry)
@@ -89,11 +99,6 @@ struct HistoryView: View {
                     }
                     Button("Reveal bundle") {
                         workbench.reveal(URL(fileURLWithPath: entry.bundlePath))
-                    }
-                    if let handoff = entry.handoffPath {
-                        Button("Reveal handoff") {
-                            workbench.reveal(URL(fileURLWithPath: handoff))
-                        }
                     }
                     if let log = entry.logFilePath {
                         Button("Open log") {

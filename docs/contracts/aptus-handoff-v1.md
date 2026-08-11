@@ -10,13 +10,14 @@
 
 **Implementation status:** Implemented
 
-**Last reviewed:** 2026-08-05
+**Last reviewed:** 2026-08-11 (optional-integration boundary clarified)
 
 ## Purpose
 
-This contract defines the sibling descriptor that lets a training system
-(Aptus) consume a sealed Veriformis finished bundle without rewriting
-partitions or inventing split policy.
+This contract defines an optional sibling descriptor that lets Aptus consume a
+sealed Veriformis finished bundle without rewriting partitions or inventing
+split policy. Veriformis installation, compilation, sealing, independent bundle
+verification, and workbench operation do not require Aptus or this descriptor.
 
 The closed `minimal-v1` six-file bundle is unchanged. The handoff is written
 beside the bundle as:
@@ -25,6 +26,10 @@ beside the bundle as:
 name.vfbundle
 name.vfbundle.aptus-handoff.json
 ```
+
+The descriptor is an integration artifact, not a seventh bundle file, a
+canonical downstream requirement, or evidence that every trainer accepts the
+bundle. Core verification remains governed by the Finished Dataset Contract.
 
 ## Required verification
 

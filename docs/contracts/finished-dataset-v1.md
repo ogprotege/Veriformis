@@ -15,7 +15,7 @@
 **Implementation status:** Implemented. The Group 3 exit gate in this document
 passed on 2026-07-29.
 
-**Last reviewed:** 2026-07-29
+**Last reviewed:** 2026-08-11 (active implementation reconciliation)
 
 **Next review:** Any finished-dataset schema or Group 4 service-boundary change
 
@@ -38,7 +38,8 @@ This contract governs:
   coverage accounting, and optional balancing;
 - authoritative train and evaluation assignments over leakage groups;
 - one-to-one lowering of included `DatasetRecord` values into product rows;
-- payload-only Aptus-compatible JSONL and one aligned provenance stream;
+- payload-only trainer-facing JSONL in one declared product row schema and one
+  aligned provenance stream;
 - validation of one exact dataset snapshot;
 - atomic publication of one normalized closed file set; and
 - independent verification with explicit verification grades.
@@ -67,14 +68,10 @@ captured raw source
   -> atomic closed-set seal and independent verification
 ```
 
-Veriformis owns every stage in this flow. Aptus begins with a finished dataset.
-Aptus does not replace Veriformis curation, balancing, split assignment, or
-validation.
-
-Group 3 emits row shapes that current Aptus can recognize. It does not define
-the later shared Aptus bundle descriptor, make Aptus consume a Veriformis
-bundle, or prove that every Aptus backend enforces Veriformis's authoritative
-partitions. Those are Step 23 responsibilities.
+Veriformis owns every stage in this flow. Any trainer begins with a finished
+dataset and does not replace Veriformis curation, balancing, split assignment,
+or validation. Aptus is an optional consumer integration implemented through a
+versioned sibling descriptor; it is not part of the canonical bundle.
 
 ## Composition with Group 2
 
@@ -439,9 +436,10 @@ row. It MAY be produced as an unsealed preview or conformance display.
 
 ### Payload and provenance separation
 
-Aptus payload JSONL contains only the exact schema keys above. It contains no
+Trainer-facing payload JSONL contains only the exact declared schema keys
+above. It contains no
 Veriformis metadata, split group, record ID, evidence object, validation flag,
-or competing Aptus schema key.
+or competing row-schema key.
 
 There is one canonical provenance artifact for the complete row set. Each line
 contains `partition` and its zero-based partition ordinal, plus the row ID,
@@ -455,20 +453,21 @@ combined row-set and provenance order is all `train` rows followed by all
 `evaluation` rows. The row-set identity binds both ordered payload sequences
 and this one ordered provenance sequence.
 
-### Aptus compatibility boundary
+### Generic row-shape boundary and optional Aptus compatibility
 
-Group 3 row-shape validation pins these current Aptus-compatible facts:
+Row-shape validation pins these generic product facts:
 
 - `text` is a non-empty full-supervision sequence;
 - prompt and instruction shapes preserve a non-empty supervised target;
 - `messages` ends in a non-empty assistant turn; and
 - a row contains exactly one recognized top-level schema.
 
-This does not claim a shared bundle handoff. In particular, current Aptus MLX
-compilation rejects plain `text` rows and does not enforce Veriformis leakage
-groups from payload-only rows. Group 3 MUST report backend limitations and
-MUST NOT claim authoritative Aptus split enforcement. Step 23 defines and tests
-that shared contract.
+The registered gate name `aptus-row-shape` is a legacy contract ID retained for
+version compatibility. The gate checks the generic declared product-row shape;
+it does not require Aptus, prove handoff consumption, or establish backend
+partition enforcement. The optional Aptus handoff contract separately reports
+backend limitations; its current MLX capability profile rejects plain `text`
+rows.
 
 ## Exact dataset validation
 
@@ -495,7 +494,7 @@ The required v1 gates run in this order and all report:
 13. `encoding`;
 14. `masking`;
 15. `partition-nonempty`;
-16. `aptus-row-shape`; and
+16. `aptus-row-shape` (legacy ID; generic declared row-shape validation); and
 17. `snapshot`.
 
 Validation MUST prove:
@@ -516,7 +515,7 @@ Validation MUST prove:
 - every row is the exact lowering of its unchanged record fields;
 - every target field resolves through its original evidence;
 - payload and provenance files use canonical UTF-8 JSONL bytes;
-- current declared Aptus row-shape requirements pass; and
+- current declared product row-shape requirements pass; and
 - all snapshot artifact and file digests match the exact bytes being sealed.
 
 A valid but failing report is persisted with failed status so every finding
@@ -763,7 +762,7 @@ The closed quality-finding registry is `conflicting-target`,
 | Split | Source IDs, raw digests, multi-source joins, and inherited dedup-family relations remain whole; deterministic prefix assignment replays exactly |
 | Serialization | All five objectives lower one-to-one into every allowed declared schema without invented targets or changed evidence |
 | Instructions | Only `instruction_output` uses the exact plan-bound instruction; `messages` uses exact source context and target |
-| Aptus rows | Payload files contain only one supported schema and preserve target-only boundaries where the schema declares them |
+| Product rows | Payload files contain only one declared schema and preserve target-only boundaries where the schema declares them (`aptus-row-shape` remains the legacy gate ID) |
 | Provenance | One combined artifact aligns one-to-one by partition ordinal, row identity, payload digest, record, evidence, curation, group, and assignment |
 | Validation | One snapshot binds all upstream identities and exact emitted bytes; every required gate reports; failed or stale state cannot seal |
 | Migration | Revision v2 to v3 is atomic, preserves Group 2 history, adds curate and split, and retires legacy downstream state without reinterpretation |
@@ -785,16 +784,23 @@ serialization, validation, sealing, and independent verification. Inspecting a
 prebuilt `DatasetRecord`, row file, or cleaned corpus alone does not satisfy the
 product acceptance path.
 
-## Exact later deferrals
+## Historical later deferrals
 
-- Steps 17 through 19 add `PipelineService`, a thin CLI adapter, and the
+The list below records the implementation allocation when Group 3 closed. It
+is historical, not a statement of current missing behavior: Steps 17 through
+24 were subsequently implemented. Consult [current status](../current-status.md)
+and the [independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)
+for current maturity and remaining work.
+
+- Steps 17 through 19 added `PipelineService`, a thin CLI adapter, and the
   dual-objective M1.1 acceptance gate.
-- Step 20 adds the remaining declared source adapters.
-- Step 21 expands deterministic recipes and policy libraries.
-- Step 22 adds constrained MCP automation.
-- Step 23 defines the shared Aptus bundle descriptor, partition consumption,
-  masking contract, evidence handoff, and backend capability enforcement.
-- Step 24 adds the SwiftUI workbench.
+- Step 20 added the remaining declared source adapters.
+- Step 21 expanded deterministic recipes and policy libraries.
+- Step 22 added constrained MCP automation.
+- Step 23 defined the optional Aptus sibling descriptor, partition
+  consumption, masking contract, evidence handoff, and backend capability
+  enforcement.
+- Step 24 added the SwiftUI workbench.
 - Step 25 governs optional model-assisted candidate generation under a separate
   owner-approved contract.
 
@@ -803,7 +809,7 @@ product acceptance path.
 - [Product contract](../product-contract.md)
 - [Integrity Contract v1](integrity-v1.md)
 - [Dataset Construction Contract v1](dataset-construction-v1.md)
-- [Authoritative build roadmap](../plans/2026-07-29-veriformis-roadmap.md)
+- [Authoritative independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)
 - [Architecture](../architecture.md)
 - [Current implementation status](../current-status.md)
 - [Group 3 implementation plan](../../dev/active/group-3-finished-dataset/plan.md)

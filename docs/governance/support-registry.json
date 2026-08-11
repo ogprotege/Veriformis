@@ -1,0 +1,231 @@
+{
+  "schema_version": "veriformis.support-registry/v1",
+  "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+  "last_reviewed": "2026-08-11",
+  "claim_policy": "docs/governance/project-tracking.md",
+  "product": {
+    "name": "Veriformis",
+    "version": "0.1.0",
+    "maturity": "development-alpha",
+    "offline_deterministic_core": true,
+    "aptus_required": false
+  },
+  "inputs": {
+    "implemented_extensions": [
+      ".c",
+      ".cpp",
+      ".csv",
+      ".docx",
+      ".go",
+      ".htm",
+      ".html",
+      ".java",
+      ".js",
+      ".json",
+      ".jsonl",
+      ".markdown",
+      ".md",
+      ".pdf",
+      ".py",
+      ".rb",
+      ".rs",
+      ".sh",
+      ".ts",
+      ".txt"
+    ],
+    "implemented_modes": [
+      "document-source-compilation"
+    ],
+    "planned_modes": [
+      "existing-dataset-row-mapping",
+      "mixed-document-and-dataset-project"
+    ],
+    "explicitly_unsupported": [
+      {
+        "capability": "ocr",
+        "reason": "Image-only and empty-text PDFs fail closed with a named limitation.",
+        "evidence": "docs/beta-limitations.md"
+      }
+    ],
+    "evidence": [
+      "src/veriformis/parsers/dispatch.py",
+      "tests/regressions/test_group5_declared_format_pipeline.py"
+    ]
+  },
+  "training": {
+    "implemented_objectives": [
+      "before_after_transformation",
+      "continuation",
+      "full_text",
+      "section_reconstruction",
+      "structured_field"
+    ],
+    "implemented_row_schemas": [
+      "instruction_output",
+      "messages",
+      "prompt_completion",
+      "text"
+    ],
+    "planned_families": [
+      "preference-and-ranking",
+      "tool-call-conversations",
+      "stepwise-supervision",
+      "governed-generated-candidates"
+    ],
+    "evidence": [
+      "src/veriformis/recipes/library.py",
+      "src/veriformis/datasets/serialization.py",
+      "docs/contracts/dataset-construction-v1.md"
+    ]
+  },
+  "artifacts": {
+    "implemented_bundle_profiles": [
+      {
+        "profile": "minimal-v1",
+        "state": "implemented",
+        "paths": [
+          "attestation.json",
+          "data/evaluation.jsonl",
+          "data/train.jsonl",
+          "manifest.json",
+          "metadata/row-provenance.jsonl",
+          "validation.json"
+        ],
+        "evidence": "src/veriformis/bundle/finished.py"
+      }
+    ],
+    "generic_export_containers": [
+      {
+        "container": "split-jsonl-directory",
+        "state": "planned",
+        "roadmap_phase": 5
+      },
+      {
+        "container": "json",
+        "state": "planned",
+        "roadmap_phase": 5
+      },
+      {
+        "container": "constrained-csv",
+        "state": "planned",
+        "roadmap_phase": 5
+      },
+      {
+        "container": "parquet",
+        "state": "planned",
+        "roadmap_phase": 9
+      },
+      {
+        "container": "arrow",
+        "state": "planned",
+        "roadmap_phase": 9
+      },
+      {
+        "container": "hugging-face-dataset",
+        "state": "planned",
+        "roadmap_phase": 9
+      }
+    ]
+  },
+  "surfaces": {
+    "implemented": [
+      "python-pipeline-service",
+      "typer-cli",
+      "local-mcp",
+      "macos-swiftui-workbench"
+    ],
+    "evidence": [
+      "src/veriformis/pipeline/service.py",
+      "src/veriformis/cli.py",
+      "src/veriformis/mcp/server.py",
+      "macos/Sources"
+    ]
+  },
+  "consumer_profiles": [
+    {
+      "profile": "aptus-handoff-v1",
+      "state": "implemented",
+      "product_role": "optional-integration",
+      "default_handoff": {
+        "cli_seal": false,
+        "mcp_seal": false,
+        "workbench": false
+      },
+      "legacy_core_gate_id": "aptus-row-shape",
+      "evidence": [
+        "src/veriformis/handoff/aptus_v1.py",
+        "src/veriformis/cli.py",
+        "src/veriformis/mcp/server.py",
+        "macos/Sources/ViewModels/WorkbenchViewModel.swift",
+        "tests/handoff/test_aptus_handoff_v1.py"
+      ]
+    },
+    {
+      "profile": "trl",
+      "state": "planned",
+      "roadmap_phase": 8
+    },
+    {
+      "profile": "mlx-lm",
+      "state": "planned",
+      "roadmap_phase": 8
+    },
+    {
+      "profile": "axolotl",
+      "state": "candidate",
+      "roadmap_phase": 10
+    },
+    {
+      "profile": "llama-factory",
+      "state": "candidate",
+      "roadmap_phase": 10
+    },
+    {
+      "profile": "unsloth",
+      "state": "candidate",
+      "roadmap_phase": 10
+    }
+  ],
+  "known_current_gaps": [
+    {
+      "id": "gap-workbench-main-actor-process",
+      "state": "verified-open",
+      "evidence": "macos/Sources/Services/VeriformisCLI.swift"
+    },
+    {
+      "id": "gap-finder-bundle-mutation",
+      "state": "verified-open",
+      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
+    },
+    {
+      "id": "gap-generic-export-service",
+      "state": "verified-open",
+      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
+    },
+    {
+      "id": "gap-existing-dataset-row-mapping",
+      "state": "verified-open",
+      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
+    },
+    {
+      "id": "gap-retained-scale-benchmarks",
+      "state": "verified-open",
+      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
+    },
+    {
+      "id": "gap-representative-owner-corpus",
+      "state": "verified-open",
+      "evidence": "docs/governance/corpus-demand-matrix.json"
+    },
+    {
+      "id": "gap-observed-trainer-and-container-demand",
+      "state": "verified-open",
+      "evidence": "docs/governance/corpus-demand-matrix.json"
+    },
+    {
+      "id": "gap-legacy-aptus-row-shape-gate-id",
+      "state": "verified-open",
+      "evidence": "src/veriformis/contracts.py"
+    }
+  ]
+}

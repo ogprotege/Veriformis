@@ -220,18 +220,15 @@ def seal(
     workspace: Path,
     out: Path = typer.Option(..., "-o"),
     aptus_handoff: bool = typer.Option(
-        True,
+        False,
         "--aptus-handoff/--no-aptus-handoff",
-        help="Write the sibling Aptus handoff descriptor after a successful seal.",
+        help=(
+            "Opt in to writing the sibling Aptus handoff descriptor after a "
+            "successful standalone seal."
+        ),
     ),
 ) -> None:
     """Revalidate, atomically publish, and receipt one finished dataset."""
-    from veriformis.handoff import (
-        build_aptus_handoff,
-        handoff_path_for_bundle,
-        write_aptus_handoff,
-    )
-
     outcome: SealOutcome | None = None
     try:
         outcome = _SERVICE.seal(workspace, out)
@@ -256,6 +253,12 @@ def seal(
     assert outcome is not None
     _emit_outcome(outcome)
     if aptus_handoff and outcome.publication is not None:
+        from veriformis.handoff import (
+            build_aptus_handoff,
+            handoff_path_for_bundle,
+            write_aptus_handoff,
+        )
+
         try:
             handoff = build_aptus_handoff(
                 outcome.publication.bundle_path,

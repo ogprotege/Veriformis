@@ -1,0 +1,43 @@
+# Architecture Decision Records
+
+**Status:** Active index
+
+**Last reviewed:** 2026-08-11
+
+**Next review:** Every material architecture or product-boundary decision
+
+ADRs record durable decisions and their evidence. They explain why a decision
+was accepted, what it does not prove, and which events require review. They are
+not substitutes for implementation or tests.
+
+## Status values
+
+- **Proposed:** Under review; not binding implementation policy.
+- **Accepted:** Current decision.
+- **Superseded:** Replaced by a linked later ADR; retained as history.
+- **Deprecated:** Still observable but should not be used for new work.
+- **Rejected:** Considered and explicitly declined.
+
+## Index
+
+| ADR | Decision | Status | Review trigger |
+| --- | --- | --- | --- |
+| [0001](0001-tracking-authority-and-evidence.md) | Tracking authority and evidence grades | Accepted | Governance schema or completion-policy change |
+| [0002](0002-standalone-product-boundary.md) | Standalone Veriformis product boundary | Accepted | Any proposal to require a downstream trainer |
+| [0003](0003-four-axis-dataset-model.md) | Four-axis dataset model | Accepted | Persisted taxonomy or loss-policy design |
+| [0004](0004-canonical-bundle-derived-exports.md) | Canonical bundle and derived exports | Accepted | Export contract or bundle-profile implementation |
+
+## ADR template
+
+Each ADR contains:
+
+1. Status, date, and deciders.
+2. Context and evidence.
+3. Decision.
+4. Consequences and limitations.
+5. Alternatives considered.
+6. Verification and review triggers.
+
+New ADRs use a zero-padded sequential number. An accepted ADR is changed only
+to clarify non-semantic metadata or add evidence; a changed decision receives a
+new ADR that supersedes the old one.

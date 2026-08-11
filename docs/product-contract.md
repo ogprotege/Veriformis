@@ -2,21 +2,23 @@
 
 **Status:** Authoritative product contract
 
-**Applies to:** Product scope, implementation plans, user-facing claims, and Aptus handoff
+**Applies to:** Product scope, implementation plans, user-facing claims, and
+optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
-release gates, beta-prep, and private beta Mac workbench Phases 0–1 on `main`,
+release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
 version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
-and beta-prep landed; private beta workbench Phases 0–1 on `main`; maturity
+and beta-prep landed; private beta workbench Phases 0–2 on `main`; maturity
 alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-06 (documentation consistency pass)
+**Last reviewed:** 2026-08-11 (independent-product authority pass)
 
-**Next review:** Phase 2 workbench, beta label cut, public-ready checklist, or any product-contract change
+**Next review:** Independent-roadmap Phase 2 start; beta label cut,
+public-ready checklist, or any product-contract change
 
-**Next execution document:** [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
+**Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
 ## Product promise
 
@@ -53,7 +55,12 @@ Steps 11 through 16 are governed by
 
 Veriformis owns the dataset from raw source capture through final seal. Its responsibility includes ingestion, faithful extraction, normalization, cleaning, source-evidence preservation, training-objective selection, deterministic record construction, curation, quality measurement, balancing, leakage-safe splitting, target formatting, validation, and bundle verification.
 
-Aptus begins with a finished Veriformis dataset contract. Aptus owns training planning, runtime selection, artifact compilation, and training execution. Aptus may verify or exactly reproduce a sealed split assignment under a shared versioned contract, but it must not silently replace Veriformis's curation or split policy.
+Downstream training systems begin with a finished Veriformis dataset contract.
+They own training planning, runtime selection, artifact compilation, and
+training execution. A versioned consumer profile may rename or adapt a verified
+dataset under explicit semantics, but it must not silently replace Veriformis's
+curation, membership, or split policy. Aptus is one optional consumer
+integration and is not required for the Veriformis product.
 
 ## Current and planned capability
 
@@ -89,8 +96,9 @@ thin CLI adapter, and dual-objective M1.1 acceptance. Group 5 expanded declared
 ingest (HTML, digitally-born PDF, CSV, JSON, JSONL), named OCR refusal, the
 recipe library, statistics, and YAML pipelines. Group 6 delivered constrained
 local MCP and the versioned Aptus handoff. Group 7 delivered the SwiftUI
-workbench over the CLI; private beta Phases 0–1 add a KISS compile shell
-(sidebar, run sheet, history, settings) without changing stage policy. Group 9
+workbench over the CLI; private beta Phases 0–2 add a KISS compile shell and
+debugger tools (sidebar, run sheet, history, settings, failure detail, digests,
+and rerun) without changing stage policy. Group 9
 automated gates cover supported-platform CI, package-install smoke, golden
 corpus compile evidence, and the packaging runbook. Beta-prep and
 [install](install.md) documentation record operator setup and non-claims without
@@ -108,7 +116,7 @@ Optional Group 8 (model-assisted construction) remains owner-gated.
 | Dataset construction and promotion | Build candidates for a declared `TrainingObjective`, apply construction integrity and any required review, then create immutable records | Versioned `DatasetRecipe`, field-level evidence, constructor identity and version, review evidence, promotion decision, deterministic derivation |
 | Dataset curation | Measure, exclude, quarantine, deduplicate, balance, and account for accepted records | `FinishedDatasetPlan`, quality facts, curation reasons and decisions, coverage ledger |
 | Balancing and splitting | Produce authoritative train and evaluation partitions without related-record leakage | Leakage groups, balancing decisions, final membership, assignment digest, realized split statistics |
-| Formatting and compatibility | Lower accepted records into the selected training schema without inventing a task | Row-schema version, masking expectation, preserved metadata, current Aptus row-shape result |
+| Formatting and compatibility | Lower accepted records into the selected training schema without inventing a task | Row-schema version, masking expectation, preserved metadata, generic row-shape result (currently persisted under the legacy ID `aptus-row-shape`) |
 | Validation and seal | Validate the exact snapshot, write a closed file set, and make later mutation detectable | Gate versions and results, input and output digests, bundle manifest, co-located attestation, separately retained manifest digest when external binding is required, independent verification result |
 
 ## Training objective, recipe, and record states
@@ -152,7 +160,7 @@ The v1 dataset pipeline makes no LLM calls and performs no remote model generati
 
 The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, formatting, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 
-## Aptus-facing semantics
+## Trainer-facing semantics and optional Aptus integration
 
 Veriformis selects the row schema according to the recipe and preserves the intended loss boundary:
 
@@ -163,14 +171,20 @@ Veriformis selects the row schema according to the recipe and preserves the inte
 | Instruction-output | Instruction and input are context; output receives supervision |
 | Structured `messages` | The conversation is rendered by the selected tokenizer contract; only the final assistant suffix receives supervision |
 
-Rendered model-family chat text may be used for preview and conformance checks. It must not replace structured `messages` when doing so would change Aptus masking behavior.
+Rendered model-family chat text may be used for preview and conformance checks.
+It must not replace structured `messages` when doing so would change the
+declared consumer masking behavior.
 
-Group 3 validates Aptus row shape. Group 6 emits the versioned sibling Aptus
+Group 3 validates the implemented semantic row shapes. Group 6 emits the
+optional versioned sibling Aptus
 handoff descriptor (`veriformis.aptus-handoff/v1`) and a fail-closed consumer
 check that verifies external digest, partition digests, row schema, masking
-expectations, and the portable assignment projection. Current Aptus MLX intake
-still rejects plain `text` rows; the handoff records that capability limit.
-Live training execution remains outside Veriformis.
+expectations, and the portable assignment projection. The adapter policy
+currently rejects plain `text` rows. Its repository checks prove descriptor
+self-conformance, not compatibility with a live named Aptus build. Live
+training execution remains outside Veriformis. The independent product roadmap
+replaces this one-off destination emphasis with a consumer-neutral export
+contract and versioned optional trainer profiles.
 
 ## Fail-closed seal
 
@@ -190,7 +204,10 @@ Veriformis does not train models, prove that a dataset will improve a particular
 
 ## Related documentation
 
-- [Veriformis Build Roadmap](./plans/2026-07-29-veriformis-roadmap.md)
+- [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
+- [Independent Product Analysis](./analysis/2026-08-11-independent-product-analysis.md)
+- [Project Tracking and Evidence Policy](./governance/project-tracking.md)
+- [Machine-readable Support Registry](./governance/support-registry.json)
 - [Integrity Contract v1](./contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](./contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](./contracts/finished-dataset-v1.md)

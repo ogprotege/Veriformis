@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (active implementation reconciliation)
 
 **Next review:** Any layering or architecture change
 
@@ -28,7 +28,9 @@ the module dependency graph two expressions of the same acyclic order.
 
 ```mermaid
 flowchart TD
-    CLI["cli.py — thin Typer adapter, 13 commands"]
+    CLI["cli.py — thin Typer adapter, 18 commands"]
+    MCP["mcp/ — thin local stdio adapter"]
+    MAC["macOS workbench — CLI shell"]
     PIP["pipeline/ — PipelineService composition root"]
     WS["workspace.py — revision & stage-graph kernel"]
     BUN["bundle/ — seal + independent verifier"]
@@ -41,6 +43,8 @@ flowchart TD
     FND["foundation — errors, contracts, identity, diagnostics, sources, evidence"]
 
     CLI --> PIP
+    MCP --> PIP
+    MAC --> CLI
     PIP --> WS
     PIP --> BUN
     PIP --> DAT
@@ -170,21 +174,16 @@ Between stages, isolation is achieved through a serde membrane rather than
 shared mutable objects. Every persisted model ships paired
 `x_to_dict`/`x_from_dict` functions built on the exact-string JSON of
 `identity.py`, so the bytes committed to the workspace — not the in-memory
-objects of the producing layer — are the authoritative interface. The CLI's
-load-helpers reconstruct domain objects from these versioned payloads, meaning
-a consumer never observes a producer's internals, only its registered schema.
-Each domain package additionally curates its public surface through
-`__init__.py` re-exports, although the composition root itself breaks this
-convention by importing submodules directly, as in
-`from veriformis.chunkers.base import ...` and
-`from veriformis.parsers.dispatch import ...` (see `src/veriformis/cli.py:28-29`
-and `src/veriformis/cli.py:112`). This eager, submodule-level wiring is
-coherent with `cli.py`'s role as the single composition root — the one place
-where all layers are permitted to meet (its import block spans every layer at
-`src/veriformis/cli.py:18-141`) — but the accompanying per-command
-load–run–commit ceremony, duplicated across thirteen commands, is the
-acknowledged debt that a surface-neutral PipelineService (**planned**,
-Group 4) is intended to absorb.
+objects of the producing layer — are the authoritative interface.
+`PipelineService` load helpers reconstruct domain objects from these versioned
+payloads, meaning a consumer never observes a producer's internals, only its
+registered schema. Each domain package additionally curates its public surface
+through `__init__.py` re-exports. `pipeline/service.py` is the intentional
+exception: as the composition root it imports domain implementations and owns
+the load–run–commit ceremony. `cli.py` imports the service and translates
+Typer arguments, outcomes, and failures; `mcp/server.py` exposes the same
+service as local stdio tools. The workbench remains outside the Python graph
+and shells the CLI.
 
 ## Exception handling flow
 
@@ -201,10 +200,10 @@ subclass carries its code, an error's layer of origin survives translation all
 the way to the terminal.
 
 Transformation happens at boundaries with explicit chaining. A representative
-case is the CLI's evidence-binding check: a `ParseError` raised while
+case is the service's evidence-binding check: a `ParseError` raised while
 validating report locations is caught and re-raised as an `EvidenceError` with
-source-scoped context via `raise ... from exc` (see
-`src/veriformis/cli.py:369-371`), converting a lower-layer diagnostic failure
+source-scoped context via `raise ... from exc` in
+`veriformis.pipeline.service._load_sources`, converting a lower-layer diagnostic failure
 into the provenance-layer vocabulary the caller understands. The workspace
 kernel adds a second, temporal dimension to error handling:
 `_validate_stage_semantics` replays each stage deterministically and raises
@@ -217,9 +216,8 @@ fallible work is permitted after HEAD replacement (see the invariant at
 can never become durable; failures surface as exceptions on the producing side
 of the transaction, never as corrupted revisions on the consuming side. At the
 outermost boundary, `_echo_error` renders any typed failure as
-`error[code]: message` on stderr with a deterministic exit status (see
-`src/veriformis/cli.py:198-202`), invoked from command-level catches of
-`VeriformisError` and its companions (see `src/veriformis/cli.py:950-951`).
+`error[code]: message` on stderr with a deterministic exit status through
+`veriformis.cli._echo_error`, invoked by the adapter's shared `_run` funnel.
 
 A deliberate second channel complements the exception path: diagnostics as
 data. Parsers do not raise for recoverable degradations; they emit a

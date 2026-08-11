@@ -44,8 +44,8 @@ jobs:
       - name: Ruff
         run: uv run --python ${{ matrix.python-version }} ruff check src tests
 
-      - name: Pytest
-        run: uv run --python ${{ matrix.python-version }} pytest -q
+      - name: Core pytest (optional integrations excluded)
+        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration"
 
   # Independent of the matrix so packaging signal is not lost when one cell fails.
   install-smoke:
@@ -76,7 +76,7 @@ jobs:
         run: uv python install 3.12
       - name: Sync test extras
         run: uv sync --python 3.12 --extra test
-      - name: Golden corpus seal + external_digest + handoff-verify
+      - name: Standalone golden corpus seal + external_digest verify
         run: bash scripts/release/golden_compile.sh
         env:
           GOLDEN_EVIDENCE_DIR: ${{ runner.temp }}/golden-evidence
@@ -86,4 +86,33 @@ jobs:
         with:
           name: golden-compile-evidence
           path: ${{ runner.temp }}/golden-evidence
+          if-no-files-found: ignore
+
+  # Explicit adapter self-conformance evidence. This signal is visible but cannot block
+  # the standalone Veriformis release path.
+  aptus-integration:
+    name: aptus-integration (optional)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python 3.12
+        run: uv python install 3.12
+      - name: Sync test extras
+        run: uv sync --python 3.12 --extra test
+      - name: Optional Aptus pytest selection
+        run: uv run --python 3.12 pytest -q -m "aptus_integration"
+      - name: Explicit Aptus adapter self-conformance
+        run: bash scripts/release/aptus_integration.sh
+        env:
+          APTUS_EVIDENCE_DIR: ${{ runner.temp }}/aptus-evidence
+      - name: Upload optional integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aptus-integration-evidence
+          path: ${{ runner.temp }}/aptus-evidence
           if-no-files-found: ignore

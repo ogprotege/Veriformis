@@ -49,7 +49,7 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
     var subtitle: String {
         switch self {
         case .fullText:
-            return "Whole cleaned text as training rows (Aptus may reject plain text handoff)"
+            return "Whole cleaned text as training rows"
         case .continuation:
             return "Prompt/completion pairs for next-token style training"
         case .sectionReconstruction:
@@ -143,6 +143,12 @@ struct RunHistoryEntry: Identifiable, Codable, Equatable {
     let splitRatioPPM: Int?
     let failedStage: String?
     let exitCode: Int?
+
+    /// Missing values belong to legacy history records and preserve the
+    /// standalone default. Explicitly stored opt-ins remain true.
+    var requestsAptusHandoff: Bool {
+        writeAptusHandoff ?? false
+    }
 
     var title: String {
         let stamp = RunHistoryEntry.shortDate.string(from: finishedAt)

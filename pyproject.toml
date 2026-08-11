@@ -62,3 +62,8 @@ source = ["veriformis"]
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.pytest.ini_options]
+markers = [
+  "aptus_integration: optional Aptus compatibility checks excluded from core release gates",
+]

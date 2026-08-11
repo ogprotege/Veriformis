@@ -2,21 +2,20 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `18d7541` on `main` (PR #22 Phase 1
-workbench; Groups 1–7; Group 9 automated gates; beta-prep; private beta
-workbench Phases 0–1)
+**Implementation baseline reviewed:** `7d116e9` on `main` (Groups 1–7; Group 9
+automated gates; beta-prep; private beta workbench Phases 0–2)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (independent-product authority pass)
 
-**Next review:** Phase 2 workbench merge, beta label cut, public Mac evidence,
-optional Group 8, or any listed-item status change
+**Next review:** Independent-roadmap Phase 2 start; beta label cut, public Mac
+evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
 > present capability claims. The
-> [build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md) controls work
+> [independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) controls future work
 > order and exit gates. The applicable versioned contract controls guarantees
 > within its scope. If this file conflicts with those sources, the canonical
 > source controls. Test totals and verification results are dated snapshots.
@@ -51,13 +50,68 @@ local, offline, and free of LLM generation.
 - [x] Group 7 SwiftUI workbench is complete.
 - [x] Group 9 automated gates: CI matrix, lock check, install smoke, golden compile, release docs/scripts (on `main`).
 - [x] Beta-prep: [docs/beta-limitations.md](docs/beta-limitations.md), clean-path evidence, [docs/install.md](docs/install.md).
-- [x] Private beta workbench plan Phases **0–1** on `main`
-      ([plan](docs/plans/2026-08-06-private-beta-workbench.md): dogfood + KISS shell).
-- [ ] Phase 2 workbench debugger power (open PR #24 unless already merged).
-- [ ] Phase 3–4 workbench (optional export / heavy post-processors).
+- [x] Private beta workbench plan Phases **0–2** on `main`
+      ([historical plan](docs/plans/2026-08-06-private-beta-workbench.md): dogfood,
+      KISS shell, and debugger power).
+- [ ] Independent product roadmap Phases 0–20; machine state and next gates:
+      [program.json](dev/active/independent-product/program.json).
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
+
+## Independent product program
+
+The machine-readable ledger is authoritative for execution state. This table
+is checked against it by `scripts/check_project_tracking.py` and pytest.
+
+<!-- INDEPENDENT-PROGRAM:START -->
+| Phase | Title | Status | Packet / authority |
+| --- | --- | --- | --- |
+| 0 | Establish authority, baseline, and decision records | Completed | [Completed packet](dev/active/independent-product/phase-00-foundation/README.md) |
+| 1 | Enforce standalone independence | Completed | [Completed packet](dev/active/independent-product/phase-01-standalone-independence/README.md) |
+| 2 | Close known reliability and artifact-boundary defects | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 3 | Formalize the goal, schema, container, and profile taxonomy | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 4 | Build the verified export foundation | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 9 | Add columnar and Hugging Face dataset containers | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 10 | Expand consumer profiles under evidence gates | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 11 | Harden collection ingest and qualify additional formats | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 12 | Add optional local OCR with accountable recovery | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 13 | Build dataset quality intelligence | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 14 | Deliver human review and correction workflows | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 15 | Measure and engineer scale, streaming, and sharding | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 16 | Establish a safe extension architecture | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 17 | Add governed advanced dataset families | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 18 | Complete the goal-first Mac workbench | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 19 | Complete automation and optional publication boundaries | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 20 | Cut the stable independent 1.0 product | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+<!-- INDEPENDENT-PROGRAM:END -->
+
+### Completed Phase 0 status
+
+- [x] Phase 0.1 tracking and claim-control structures created.
+- [x] Machine program ledger created.
+- [x] Machine support registry created and bound to code constants.
+- [x] Machine evidence index and evidence grades created.
+- [x] Standard phase packet and ADR set created.
+- [x] Automated drift checker and pytest regression added.
+- [x] Phase 0.1 final verification and evidence recording.
+- [x] Privacy-preserving corpus/workflow-demand matrix, with representative
+      owner-corpus and trainer-frequency gaps explicitly unranked.
+- [x] Active-document reconciliation against current code and authority.
+- [x] Phase 0 closeout and final evidence recording.
+
+### Completed Phase 1 status
+
+- [x] CLI, MCP, and workbench default handoff disabled; explicit opt-in retained.
+- [x] Default CLI/MCP import isolation and artifact absence locked by regression.
+- [x] Required release and parity gates made standalone; optional Aptus adapter
+      evidence split into a non-blocking job and explicit script.
+- [x] Clean-wheel installed-CLI golden proof and standalone workbench smoke added.
+- [x] Integrated Phase 1 closeout gates and final evidence recording.
 
 The current stage-command runtime is:
 
@@ -188,7 +242,11 @@ external digest, partitions, rows, and assignment projection.
 **Delivered:** `macos/` SwiftUI app shells to `veriformis` CLI; drag-drop sources;
 stage log; sealed bundle + handoff reveal; `parity_check.sh` digest lock.
 
-## Next work: private beta workbench / Group 9 owner / optional Group 8
+## Historical implementation program: private workbench / Groups 8–9
+
+This section preserves the pre-independent-program implementation record. It
+is not the active work queue; the machine ledger and phase table above control
+current execution order.
 
 ### Private beta Mac workbench (owner plan)
 
@@ -201,8 +259,8 @@ Authority:
       ([phase-1-design.md](dev/active/private-beta-workbench/phase-1-design.md))
 - [x] Phase 2 — Debugger power (digests, reveal, failure stage, re-run)
       ([phase-2-design.md](dev/active/private-beta-workbench/phase-2-design.md))
-- [ ] Phase 3 — Optional post-seal export (only formats we implement)
-- [ ] Phase 4 — Heavy post-processors if still needed (never replace seal)
+- Historical Phase 3–4 proposals are superseded by independent-roadmap Phases
+  4–10 and 18. They are retained in the historical plan, not active here.
 
 ### Group 8: Advanced construction (optional)
 
@@ -211,12 +269,14 @@ Authority:
 ### Group 9: Public release
 
 - [x] 26a. Automated gates — CI matrix (3.11–3.13 + macOS 3.12), `uv lock --check`,
-  wheel install smoke, golden corpus seal/verify/handoff-verify, `scripts/release/`,
+  wheel install smoke, and the then-current golden corpus
+  seal/verify/handoff-verify path under `scripts/release/`,
   [docs/release.md](docs/release.md), permanent regression
   `tests/regressions/test_group9_release_gates.py`
 - [x] 26a+. Beta limitations register + clean-path evidence pack (CLI beta prep; not a label cut)
-- [ ] 26b. Owner Mac distribution — Developer ID sign, notarize, staple, clean-Mac
-  install, golden + Aptus evidence (see release checklist) — **public** Mac claim
+- [ ] 26b. Owner Mac distribution — Developer ID sign, notarize, staple, and
+  clean-Mac install (see release checklist) — **public** Mac claim. Aptus proof
+  is optional integration evidence, not a core product-release requirement.
 
 **Evidence for Group 7:** [`macos/README.md`](macos/README.md),
 `macos/scripts/parity_check.sh`, and Xcode unit tests under `macos/Tests/`.
@@ -247,7 +307,7 @@ contracts.
 source-evidence, output, quality, and review lineage. They pass through the same
 curation, split, validation, and sealing contracts as deterministic candidates.
 
-## Final required work
+## Historical Group 9 remainder
 
 ### Group 9: Public release
 
@@ -261,16 +321,21 @@ curation, split, validation, and sealing contracts as deterministic candidates.
 - [ ] 26b. Owner-executed public-ready evidence
   - macOS packaging with Developer ID signing, notarization, and staple.
   - Clean supported Mac install of the signed product.
-  - Golden raw corpus compile + verify + Aptus-compatible handoff with retained logs.
+  - Golden raw corpus compile + standalone verification with retained logs.
+  - Optional Aptus integration evidence is recorded separately when claimed.
 
 **Exit gate (public):** A clean supported Mac can install the signed and
-notarized product, compile the golden raw corpus, verify the final bundles, and
-hand them to a compatible Aptus release with independently recorded evidence.
+notarized product, compile the golden raw corpus, and independently verify the
+final bundles. Any named consumer compatibility claim requires its own
+independently recorded profile evidence.
 
 **CLI beta (future label cut):** See [docs/beta-limitations.md](docs/beta-limitations.md)
 and the [beta readiness audit](dev/active/group-9-public-release/beta-readiness-audit.md).
 
-## Execution order and dependencies
+## Historical execution order and dependencies
+
+These rules governed the completed group-based program. The independent
+product roadmap now controls active sequencing.
 
 - Complete required Groups 1 through 7 in order.
 - Do not start a later required group before the earlier exit gate passes.
@@ -310,13 +375,14 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
 
 ## Documentation status
 
-Architecture deep-dive, Groups 1–7 docs sync, Group 9 release guide, and beta
-limitations are on `main` (through PRs #6 lineage, #13–#16).
+Groups 1–7 documentation, the Group 9 release guide, and beta limitations are
+retained as implementation history. The active architecture deep-dive is being
+reconciled against `PipelineService` and the independent product authority.
 
 Remaining documentation debt:
 
-- [ ] Re-verify architecture deep-dive `file:line` citations when entry points
-  drift materially.
+- [ ] Keep architecture deep-dives semantic and symbol-oriented; avoid fragile
+  line citations where stable source symbols are available.
 - [ ] Machine-render Mermaid diagrams in CI (currently hand-reviewed).
 - [x] Group 9 automated: packaging runbook + release troubleshooting
   (`docs/release.md`).
@@ -340,8 +406,8 @@ Remaining documentation debt:
 - OCR is unsupported (empty-text PDFs refuse with a named limitation).
 - Declared inputs are text, Markdown, DOCX, HTML, digitally-born PDF, CSV,
   JSON, JSONL, and listed source-code formats — not arbitrary binary.
-- Current Aptus MLX intake rejects plain `text` rows (recorded in handoff
-  capabilities).
+- The checked-in optional Aptus adapter policy rejects plain `text` rows; live
+  named-version compatibility has not been established in this repository.
 - The CLI cannot submit completed human review evidence.
 - The minimal bundle omits raw sources and complete replay artifacts.
 - External trust requires a manifest digest retained outside the bundle.
@@ -350,23 +416,24 @@ Remaining documentation debt:
 
 ## Verification snapshot
 
-Post–Phase 1 workbench on `main` (`18d7541`, 2026-08-06):
+Historical post–private-beta-workbench snapshot (`18d7541`, 2026-08-06):
 
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 bash macos/scripts/parity_check.sh
 git diff --check
 ```
 
-CI on `main`: Python 3.11–3.13 Ubuntu + 3.12 macOS; Ruff; pytest;
-install-smoke; golden-compile.
+Current CI definition: Python 3.11–3.13 Ubuntu + 3.12 macOS; Ruff; core
+pytest; clean-wheel installed-CLI smoke; standalone golden compile; optional
+non-blocking Aptus adapter self-conformance.
 
 Additional permanent locks: Group 5 declared-format e2e, MCP/service parity,
-Aptus handoff, Group 9 release-gate regressions, workbench Swift tests,
+optional Aptus adapter, Group 9 release-gate regressions, workbench Swift tests,
 `macos/scripts/parity_check.sh`, clean-path evidence under
 `dev/active/group-9-public-release/evidence/`.
 
@@ -389,7 +456,7 @@ pytest totals; they grow.
 ## Canonical references
 
 - [Current implementation status](docs/current-status.md)
-- [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
+- [Authoritative independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 - [Product contract](docs/product-contract.md)
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)

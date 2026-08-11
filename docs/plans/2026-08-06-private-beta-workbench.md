@@ -1,6 +1,8 @@
 # Private Beta Mac Workbench — Vision and Plan
 
-**Status:** Owner-directed product plan (not a public-release claim)
+**Status:** Historical owner-directed workbench plan; Phases 0–2 implemented;
+superseded for future work by the
+[Independent Product Roadmap](2026-08-11-veriformis-independent-product-roadmap.md)
 
 **Created:** 2026-08-06
 
@@ -252,8 +254,9 @@ history retention.
 1. ~~Land this document on `main`.~~ Done (PR #18).
 2. ~~**Phase 0** dogfood.~~ Done (PR #19 + owner GUI).
 3. ~~**Phase 1** KISS shell.~~ Done on `main` (PRs #21–#22).
-4. **Phase 2** debugger power — next recommended workbench change.
-5. **Phase 3–4** only if still needed after private use stabilizes.
+4. ~~**Phase 2** debugger power.~~ Implemented on 2026-08-06.
+5. **Phase 3–4** are replaced by the independent product roadmap's verified
+   export, quality, and goal-first workbench phases.
 
-This plan does not replace the numbered roadmap; it specializes Group 7
-workbench evolution toward a private beta debugger under KISS discipline.
+This plan remains evidence for the implemented private-beta debugger work. The
+independent product roadmap now controls future work.

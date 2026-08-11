@@ -12,6 +12,9 @@ Before changing code, read:
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
+- [Project tracking and evidence policy](docs/governance/project-tracking.md)
+- [Active independent-product ledger](dev/active/independent-product/program.json)
+- [Support registry](docs/governance/support-registry.json)
 - [Install guide](docs/install.md)
 - [Architecture](docs/architecture.md)
 - [CLI reference](docs/cli.md)
@@ -19,15 +22,15 @@ Before changing code, read:
 - [Release guide](docs/release.md)
 - [Beta limitations](docs/beta-limitations.md)
 - [macOS workbench](macos/README.md)
-- [Private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
-- [Build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
+- [Independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
-The roadmap is ordered. On `main`: Groups 1–7, Group 9 automated gates,
-beta-prep, and private beta workbench Phases 0–1. Maturity remains development
-**alpha**. Next typical work: workbench Phase 2, optional Group 8 (owner plan),
-or public Mac packaging (owner credentials). Do not describe the product as
-public-ready without [docs/beta-limitations.md](docs/beta-limitations.md) and
-[docs/release.md](docs/release.md).
+The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
+beta-prep, and private beta workbench Phases 0–2 are implemented. Independent
+product Phases 0 and 1 are complete; consult the machine ledger before creating
+the Phase 2 packet or starting later work. Maturity remains
+development **alpha**. Do not describe the
+product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)
+and [docs/release.md](docs/release.md).
 
 After reading these authorities, consult [Work in progress](WIP.md) as the
 non-authoritative reviewed work queue.
@@ -37,11 +40,13 @@ non-authoritative reviewed work queue.
 ```bash
 uv sync --extra test
 uv run ruff check src tests
-uv run pytest -q
+uv run python scripts/check_project_tracking.py
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
 ```
 
-Python 3.11 or newer is required. CI runs Python 3.11–3.13 on Ubuntu plus
-Python 3.12 on macOS, with install-smoke and golden-compile jobs (see
+Python 3.11 or newer is required. The test matrix runs Python 3.11, 3.12, and
+3.13 on Ubuntu plus Python 3.12 on macOS. Separate Ubuntu jobs run install
+smoke and golden compilation (see
 [docs/release.md](docs/release.md)).
 
 ## Choose a focused change
@@ -84,7 +89,7 @@ For integrity or provenance repairs:
 - Fail closed on unsupported formats and failed validation.
 - Avoid destructive cleaning defaults.
 - Add negative tests for malformed input and stale state.
-- Preserve Python 3.11 compatibility even though current CI runs Python 3.12.
+- Preserve Python 3.11 compatibility; it is an explicit CI matrix cell.
 - Do not add a dependency without checking its license, maintenance status, and necessity.
 
 ### Documentation
@@ -94,6 +99,8 @@ For integrity or provenance repairs:
 - Update command examples when CLI flags or defaults change.
 - State known integrity and provenance limitations directly.
 - Do not claim a gate, input format, interface, or bundle guarantee that is not exercised by code and tests.
+- Update the active phase packet, program ledger, support registry, WIP,
+  current status, and evidence records when tracked truth changes.
 
 ## Tests expected by change type
 
@@ -113,7 +120,8 @@ For integrity or provenance repairs:
 - [ ] The change has a narrow stated purpose.
 - [ ] New behavior has regression or acceptance tests.
 - [ ] `uv run ruff check src tests` passes.
-- [ ] `uv run pytest -q` passes.
+- [ ] `uv run python scripts/check_project_tracking.py` passes.
+- [ ] `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"` passes.
 - [ ] Current and planned behavior remain clearly separated.
 - [ ] Relevant CLI, architecture, development, and limitation docs are updated.
 - [ ] No unrelated generated files, secrets, credentials, or local configuration are included.
@@ -121,13 +129,12 @@ For integrity or provenance repairs:
 
 ## Current project boundary
 
-Version `0.1.0` provides the core Python package, the complete stage-command
-runtime through independent bundle verification, transactional workspace
-revision schema 3, deterministic construction, curation, leakage-safe splits,
-product rows, and exact 17-gate validation. Groups 1 through 3 are complete.
-Group 4 must add `PipelineService`, make the CLI a thin adapter, and prove
-dual-objective M1.1 API and CLI parity. Additional ingest formats, YAML, MCP,
-the versioned Aptus handoff, the SwiftUI application, and public release gates
-remain planned.
-
-Follow the numbered sequence and exit gates in the [build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md).
+Version `0.1.0` provides the complete deterministic stage-command runtime
+through independent bundle verification, `PipelineService`, transactional
+workspace revision schema 3, five objectives, curation, leakage-safe splits,
+four row schemas, exact 17-gate validation, expanded declared ingest, YAML,
+local MCP, optional Aptus handoff, and the SwiftUI workbench. It remains a
+development alpha. Follow the current state and exit gates in the
+[independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md),
+[program ledger](dev/active/independent-product/program.json), and active phase
+packet.

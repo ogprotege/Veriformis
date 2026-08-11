@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from veriformis.cli import app
@@ -16,6 +17,7 @@ from veriformis.handoff import (
 from veriformis.pipeline import PipelineService
 
 runner = CliRunner()
+pytestmark = pytest.mark.aptus_integration
 
 
 def _seal_supervised(tmp_path: Path) -> tuple[Path, str]:
@@ -98,7 +100,7 @@ def test_cli_seal_writes_handoff_and_handoff_verify(tmp_path):
         ["split", str(workspace)],
         ["format", str(workspace)],
         ["validate", str(workspace)],
-        ["seal", str(workspace), "-o", str(bundle)],
+        ["seal", str(workspace), "-o", str(bundle), "--aptus-handoff"],
     ]
     for command in commands:
         result = runner.invoke(app, command)
@@ -106,7 +108,10 @@ def test_cli_seal_writes_handoff_and_handoff_verify(tmp_path):
     handoff_path = handoff_path_for_bundle(bundle)
     assert handoff_path.is_file()
     # Extract manifest sha from seal output
-    sealed = runner.invoke(app, ["seal", str(workspace), "-o", str(bundle)])
+    sealed = runner.invoke(
+        app,
+        ["seal", str(workspace), "-o", str(bundle), "--aptus-handoff"],
+    )
     # second seal recovers exact bundle
     assert sealed.exit_code == 0, sealed.output
     manifest_line = next(

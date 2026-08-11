@@ -30,21 +30,47 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertTrue(plan[3].arguments.contains("continuation"))
         XCTAssertTrue(plan[3].arguments.contains("400000"))
         XCTAssertTrue(plan[4].arguments.contains("--allow-empty-evaluation"))
-        XCTAssertEqual(plan[8].arguments, ["seal", workspace.path, "-o", bundle.path])
+        XCTAssertEqual(
+            plan[8].arguments,
+            ["seal", workspace.path, "-o", bundle.path, "--aptus-handoff"]
+        )
     }
 
-    func testCompilePlanCanDisableHandoff() {
+    func testCompilePlanStandaloneModeEmitsNoAptusFlag() {
+        let workspace = URL(fileURLWithPath: "/tmp/ws")
+        let bundle = URL(fileURLWithPath: "/tmp/b.vfbundle")
         let plan = VeriformisCLI.compilePlan(
             sources: [URL(fileURLWithPath: "/data/a.txt")],
             sourceRoot: URL(fileURLWithPath: "/data"),
-            workspace: URL(fileURLWithPath: "/tmp/ws"),
-            bundle: URL(fileURLWithPath: "/tmp/b.vfbundle"),
+            workspace: workspace,
+            bundle: bundle,
             objective: .fullText,
             allowEmptyEvaluation: false,
-            splitRatioPPM: 500_000,
-            includeHandoff: false
+            splitRatioPPM: 500_000
         )
-        XCTAssertTrue(plan.last!.arguments.contains("--no-aptus-handoff"))
+        XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path])
+        XCTAssertFalse(plan.last!.arguments.contains { $0.lowercased().contains("aptus") })
+    }
+
+    func testWorkbenchAndLegacyHistoryDefaultToStandalone() throws {
+        XCTAssertFalse(WorkbenchViewModel.defaultWriteAptusHandoff)
+        let data = try JSONEncoder().encode(historyEntry(writeAptusHandoff: nil))
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: data) as? [String: Any]
+        )
+        XCTAssertNil(json["writeAptusHandoff"])
+        let decoded = try JSONDecoder().decode(RunHistoryEntry.self, from: data)
+        XCTAssertFalse(decoded.requestsAptusHandoff)
+    }
+
+    func testHistoryPreservesExplicitAptusOptIn() throws {
+        let data = try JSONEncoder().encode(historyEntry(writeAptusHandoff: true))
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: data) as? [String: Any]
+        )
+        XCTAssertEqual(json["writeAptusHandoff"] as? Bool, true)
+        let decoded = try JSONDecoder().decode(RunHistoryEntry.self, from: data)
+        XCTAssertTrue(decoded.requestsAptusHandoff)
     }
 
     func testManifestSHAExtraction() {
@@ -146,6 +172,33 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertTrue(
             FileManager.default.isExecutableFile(atPath: cli.executableURL.path),
             "expected executable at \(cli.executableURL.path)"
+        )
+    }
+
+    private func historyEntry(writeAptusHandoff: Bool?) -> RunHistoryEntry {
+        RunHistoryEntry(
+            id: UUID(),
+            startedAt: Date(timeIntervalSince1970: 0),
+            finishedAt: Date(timeIntervalSince1970: 1),
+            status: .succeeded,
+            objective: TrainingObjective.fullText.rawValue,
+            primarySourceName: "a.txt",
+            sourcePaths: ["/data/a.txt"],
+            workspacePath: "/tmp/ws",
+            bundlePath: "/tmp/out.vfbundle",
+            handoffPath: writeAptusHandoff == true
+                ? "/tmp/out.vfbundle.aptus-handoff.json"
+                : nil,
+            logFilePath: nil,
+            manifestSHA256: nil,
+            assignmentDigest: nil,
+            errorSummary: nil,
+            sourceRootPath: "/data",
+            allowEmptyEvaluation: true,
+            writeAptusHandoff: writeAptusHandoff,
+            splitRatioPPM: 400_000,
+            failedStage: nil,
+            exitCode: nil
         )
     }
 }

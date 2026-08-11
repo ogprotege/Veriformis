@@ -3,6 +3,7 @@ import SwiftUI
 struct CompileView: View {
     @EnvironmentObject private var workbench: WorkbenchViewModel
     @State private var showAdvanced = false
+    @State private var showIntegrations = false
 
     var body: some View {
         HSplitView {
@@ -105,11 +106,6 @@ struct CompileView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Toggle("Write Aptus handoff file", isOn: $workbench.writeAptusHandoff)
-            Text("Sibling descriptor for training consumers. Plain text rows may still be rejected by Aptus.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
             HStack {
                 Button("Output folder…") { workbench.chooseOutputDirectory() }
                 if let out = workbench.outputDirectoryURL {
@@ -119,6 +115,17 @@ struct CompileView: View {
                         .foregroundStyle(.secondary)
                         .help(out.path)
                 }
+            }
+
+            DisclosureGroup("Integrations (optional)", isExpanded: $showIntegrations) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Toggle("Write Aptus handoff file", isOn: $workbench.writeAptusHandoff)
+                    Text("Off by default. Writes a sibling compatibility descriptor; Veriformis compilation and verification do not require it.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.top, 4)
             }
 
             DisclosureGroup("Advanced", isExpanded: $showAdvanced) {

@@ -9,12 +9,6 @@ from __future__ import annotations
 import stat
 from pathlib import Path
 
-from veriformis.handoff import (
-    build_aptus_handoff,
-    consume_aptus_handoff,
-    handoff_path_for_bundle,
-    write_aptus_handoff,
-)
 from veriformis.pipeline import PipelineService
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -30,7 +24,7 @@ def _golden_sources() -> list[Path]:
     )
 
 
-def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str, Path]:
+def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str]:
     sources = _golden_sources()
     assert sources
     workspace = tmp_path / f"ws-{objective}"
@@ -59,35 +53,31 @@ def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str, Path]:
     )
     assert verify.verification is not None
     assert verify.verification.trust_grade == "external_digest"
-    # Service seal is surface-neutral; Aptus sibling is built like CLI default.
-    handoff = build_aptus_handoff(
-        bundle,
-        expected_manifest_sha256=sealed.publication.manifest_sha256,
-    )
-    path = write_aptus_handoff(handoff, handoff_path_for_bundle(bundle))
-    return bundle, sealed.publication.manifest_sha256, path
+    assert not Path(f"{bundle.resolve()}.aptus-handoff.json").exists()
+    for relative in (
+        "manifest.json",
+        "attestation.json",
+        "data/train.jsonl",
+        "data/evaluation.jsonl",
+        "metadata/row-provenance.jsonl",
+        "validation.json",
+    ):
+        assert (bundle / relative).is_file(), relative
+    return bundle, sealed.publication.manifest_sha256
 
 
-def test_golden_corpus_full_text_external_digest_and_text_schema_handoff(tmp_path):
-    """full_text seals and verifies; Aptus v1 rejects plain text row schema."""
-    bundle, manifest_sha, handoff = _seal_objective(tmp_path, "full_text")
-    assert handoff.is_file()
-    report = consume_aptus_handoff(handoff, bundle=bundle)
-    assert report.status == "rejected"
-    assert any("backend-rejects-row-schema:text" in f for f in report.findings)
+def test_golden_corpus_full_text_seals_and_external_digest_verifies(tmp_path):
+    """The full-text product path is complete without an integration adapter."""
+    bundle, manifest_sha = _seal_objective(tmp_path, "full_text")
     assert len(manifest_sha) == 64
-    # Bundle itself remains externally digests-verified (service path above).
     assert (bundle / "manifest.json").is_file()
 
 
-def test_golden_corpus_continuation_external_digest_and_handoff_accepted(tmp_path):
-    """continuation is the Aptus-compatible golden handoff path."""
-    bundle, manifest_sha, handoff = _seal_objective(tmp_path, "continuation")
-    assert handoff.is_file()
-    report = consume_aptus_handoff(handoff, bundle=bundle)
-    assert report.status == "accepted", report.findings
-    assert report.verified_grade == "external_digest"
+def test_golden_corpus_continuation_seals_and_external_digest_verifies(tmp_path):
+    """The continuation product path is complete without an integration adapter."""
+    bundle, manifest_sha = _seal_objective(tmp_path, "continuation")
     assert len(manifest_sha) == 64
+    assert (bundle / "manifest.json").is_file()
 
 
 def test_release_scripts_are_executable_entry_points():
@@ -100,6 +90,7 @@ def test_release_scripts_are_executable_entry_points():
         "check_local.sh",
         "smoke_install.sh",
         "golden_compile.sh",
+        "aptus_integration.sh",
         "record_clean_path_evidence.sh",
         "macos_package_local.sh",
     )
@@ -110,3 +101,27 @@ def test_release_scripts_are_executable_entry_points():
         assert mode & stat.S_IXUSR, f"{name} must be executable"
         text = path.read_text(encoding="utf-8")
         assert text.startswith("#!/"), name
+
+
+def test_core_golden_does_not_invoke_optional_handoff_commands():
+    """The core product proof may assert absence, but never create/consume a handoff."""
+    text = (RELEASE_SCRIPTS / "golden_compile.sh").read_text(encoding="utf-8")
+    assert "vf handoff " not in text
+    assert "vf handoff-verify " not in text
+    assert "test ! -e \"$automatic_handoff\"" in text
+
+
+def test_required_pytest_commands_do_not_collect_adapter_only_module():
+    """Optional adapter collection failures cannot block the core test gate."""
+    required = (
+        RELEASE_SCRIPTS / "check_local.sh",
+        REPO_ROOT / ".github/workflows/ci.yml",
+    )
+    for path in required:
+        text = path.read_text(encoding="utf-8")
+        assert "--ignore=tests/handoff" in text, path
+        assert 'not aptus_integration' in text, path
+
+    ci_text = required[1].read_text(encoding="utf-8")
+    assert "continue-on-error: true" in ci_text
+    assert 'pytest -q -m "aptus_integration"' in ci_text

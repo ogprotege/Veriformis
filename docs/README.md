@@ -3,11 +3,13 @@
 This documentation describes the development-alpha compiler from raw source
 capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
-gates, workbench Phases 0–1).
+gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-06 (full consistency pass; baseline `18d7541`)
+**Last reviewed:** 2026-08-11 (independent-product roadmap authority pass;
+baseline `7d116e9`)
 
-**Next review:** Phase 2 workbench, beta label cut, public-ready checklist, or any contract change
+**Next review:** Independent-roadmap Phase 2 start; beta label cut,
+public-ready checklist, or any contract change
 
 ## Start here
 
@@ -16,17 +18,19 @@ gates, workbench Phases 0–1).
 3. [Install guide](install.md) — standard local CLI + workbench launch.
 4. [Product contract](product-contract.md) — ownership and non-claims.
 5. [Beta limitations](beta-limitations.md) — hard non-claims before any beta invite.
-6. [Private beta workbench plan](plans/2026-08-06-private-beta-workbench.md) — compile framing and phases.
-7. [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) — numbered groups; Group 9 public remainder; optional Group 8.
-8. [Release guide](release.md) — CI gates and owner Mac packaging checklist.
+6. [Independent product analysis](analysis/2026-08-11-independent-product-analysis.md) — evidence and architectural correction.
+7. [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md) — authoritative future work and exit gates.
+8. [Project tracking and evidence](governance/README.md) — live phase, claim, ADR, evidence, and completion controls.
+9. [Release guide](release.md) — current CI gates and owner Mac packaging checklist.
 
 ## Reading paths
 
 - **New contributor:** [README](../README.md) → [current status](current-status.md)
-  → [development guide](development.md) → [architecture hub](architecture.md).
+  → [project tracking](governance/project-tracking.md) →
+  [development guide](development.md) → [architecture hub](architecture.md).
 - **CLI operator:** [install.md](install.md) → [CLI reference](cli.md)
-  → [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
-  → [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
+  → [Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
+- **Optional Aptus integration:** [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
 - **Workbench operator:** [install.md](install.md) →
   [macOS workbench](../macos/README.md) →
   [private beta plan](plans/2026-08-06-private-beta-workbench.md).
@@ -53,15 +57,21 @@ gates, workbench Phases 0–1).
 | [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
 | [Beta limitations](beta-limitations.md) | Hard non-claims and operator limits for any future beta cut | Limitations register (maturity still alpha) |
 | [macOS workbench](../macos/README.md) | SwiftUI workbench build, launch, parity | Workbench operator guide |
-| [Build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Numbered sequence, groups, exit gates | Authoritative work order |
-| [Private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Compile framing, KISS UI, phases 0–4 | Owner private-beta plan (not public claim) |
+| [Independent product analysis](analysis/2026-08-11-independent-product-analysis.md) | Evidence for the trainer-neutral product direction | Analysis baseline |
+| [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md) | Standalone product phases, dependencies, and exit gates | **Authoritative future work order** |
+| [Project governance](governance/README.md) | Program ledger, support registry, evidence, ADRs, and completion policy | Active tracking authority |
+| [Program ledger](../dev/active/independent-product/program.json) | Phase 0–20 states, dependencies, and next gates | Machine execution state |
+| [Phase 0 packet](../dev/active/independent-product/phase-00-foundation/README.md) | Current plan, progress, decisions, risks, evidence, and closeout | Active implementation record |
+| [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
+| [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |
 | [Contributing](../CONTRIBUTING.md) | PR checklist and standards | Contribution policy |
 
 ## Working inventory
 
 Root [WIP.md](../WIP.md) is a reviewed convenience checklist. It never overrides
-current status, the roadmap, or a versioned contract.
+current status, the support registry, program ledger, roadmap, or a versioned
+contract. Pytest checks its independent-program table against the ledger.
 
 ## Implementation vocabulary
 
@@ -72,10 +82,10 @@ current status, the roadmap, or a versioned contract.
 | **Group 4** | `PipelineService`, thin CLI, dual-objective M1.1 (Steps 17–19) |
 | **Group 5** | Expanded ingest + recipe library / YAML (Steps 20–21) |
 | **Group 6** | MCP + Aptus handoff v1 (Steps 22–23) |
-| **Group 7** | SwiftUI workbench (Step 24); private beta Phases 0–1 on `main` |
+| **Group 7** | SwiftUI workbench (Step 24); private beta Phases 0–2 on `main` |
 | **Group 8** | Optional model-assisted construction (Step 25; owner-gated) |
 | **Group 9** | Public release gates (Step 26; automated subset landed; owner Mac remainder for public-ready) |
-| **Private beta workbench** | Owner Mac GUI over CLI; Phases 0–1 done; Phase 2+ next |
+| **Private beta workbench** | Owner Mac GUI over CLI; Phases 0–2 implemented |
 | **Unsupported** | Not available (for example OCR) |
 
 ## Historical records
@@ -99,11 +109,15 @@ controls**.
 - Do not call a bundle externally trusted without a retained expected manifest
   digest.
 - Update documentation and tests in the same implementation group.
+- Update the active phase packet, program ledger, support registry, WIP, and
+  evidence records when tracked truth changes.
 
 ## Documentation debt (remaining)
 
 - Owner notarization evidence notes and any security hardening follow-ups
   after signed Mac distribution.
-- Architecture deep-dive `file:line` citations should be re-verified when
-  entry-point line numbers drift.
+- Architecture deep-dives should prefer stable symbols and file ownership over
+  fragile line-number citations.
 - Mermaid diagrams are hand-reviewed; not machine-rendered in CI.
+- The complete active debt list is maintained in
+  [documentation debt](governance/documentation-debt.md).

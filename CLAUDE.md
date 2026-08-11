@@ -6,7 +6,7 @@ This file gives coding-agent guidance for the current Veriformis repository.
 
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
-automated release gates; beta-prep docs; private beta Mac workbench Phases 0–1
+automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
 (thin SwiftUI over CLI). Do not claim public beta or production readiness
 without the checklists in `docs/beta-limitations.md` and `docs/release.md`.
 
@@ -17,11 +17,16 @@ Read these current authorities before changing code:
 3. `docs/contracts/integrity-v1.md`
 4. `docs/contracts/dataset-construction-v1.md`
 5. `docs/contracts/finished-dataset-v1.md`
-6. `docs/contracts/aptus-handoff-v1.md`
-7. `docs/architecture.md`
-8. `docs/plans/2026-07-29-veriformis-roadmap.md`
-9. `docs/plans/2026-08-06-private-beta-workbench.md` (private Mac workbench phases)
-10. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+6. `docs/architecture.md`
+7. `docs/analysis/2026-08-11-independent-product-analysis.md`
+8. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+9. `docs/governance/project-tracking.md`,
+   `dev/active/independent-product/program.json`, and the active phase packet
+10. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+11. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+12. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+    `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
+13. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.
@@ -35,6 +40,9 @@ Veriformis owns the path from heterogeneous raw sources through faithful
 canonical recovery, cleaning, objective-driven construction, curation, splits,
 formatting, validation, and final seal. A cleaned corpus is an intermediate
 compiler state unless a `full_text` recipe explicitly selects it as the target.
+It must install, compile, verify, export, and release independently of Aptus or
+any other trainer. Consumer profiles are optional adapters over verified
+datasets.
 
 Non-negotiable rules:
 
@@ -91,6 +99,7 @@ version.
 uv sync --extra test
 uv lock --check
 uv run ruff check src tests
+uv run python scripts/check_project_tracking.py
 uv run pytest -q
 git diff --check
 ```

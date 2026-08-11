@@ -31,7 +31,7 @@ struct HomeView: View {
                         Text("• Start with one source file on Compile.")
                         Text("• Output defaults to Documents/Veriformis (change in Settings).")
                         Text("• Success means a sealed .vfbundle — not a format converter.")
-                        Text("• Prefer Continuation for Aptus-friendly handoff; Full text may be rejected by Aptus.")
+                        Text("• Choose the training objective that matches the rows your trainer expects.")
                         Text("• Install / CLI help: docs/install.md in the repo.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
