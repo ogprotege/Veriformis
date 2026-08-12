@@ -30,6 +30,7 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var logExpanded = true
     @Published var lastError: String?
     @Published var lastFailure: CompileFailure?
+    @Published var lastCancellation: RunCancellationReceipt?
     @Published var lastResult: CompileResult?
     @Published var lastCopiedNotice: String?
     @Published var runStatusMessage = "Ready"
@@ -42,11 +43,16 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var defaultOutputPath: String = ""
 
     private var cli: VeriformisCLI?
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
+    private let supportDirectoryOverride: URL?
     private let historyKey = "veriformis.workbench.runHistory.v1"
     private let defaultOutputKey = "veriformis.workbench.defaultOutput"
     private let cliOverrideKey = "veriformis.workbench.cliOverride"
     private let historyLimit = 100
+    private var activeProcessController: CLIProcessController?
+    private var compileTask: Task<Void, Never>?
+    private var cancellationRequestedAt: Date?
+    private var runFinishedCallbacks: [() -> Void] = []
 
     var canCompile: Bool {
         !isRunning
@@ -58,7 +64,7 @@ final class WorkbenchViewModel: ObservableObject {
 
     var compileBlockedReason: String? {
         if isRunning { return "A compile is already running." }
-        if cli == nil { return "CLI is not ready. Open Settings or relaunch via run_workbench.sh." }
+        if cli == nil { return "CLI is not ready. Open Settings or relaunch via ./script/build_and_run.sh." }
         if sourceURLs.isEmpty { return "Add at least one source file." }
         if resolvedSourceRoot == nil { return "Source root directory is missing." }
         if outputDirectoryURL == nil { return "Choose an output folder (or set a default in Settings)." }
@@ -74,7 +80,21 @@ final class WorkbenchViewModel: ObservableObject {
         return runHistory.first { $0.id == selectedHistoryID }
     }
 
-    init() {
+    init(
+        cli: VeriformisCLI? = nil,
+        defaults: UserDefaults = .standard,
+        supportDirectory: URL? = nil
+    ) {
+        self.cli = cli
+        self.defaults = defaults
+        supportDirectoryOverride = supportDirectory
+        if let cli {
+            let prefix = cli.prefixArguments.isEmpty
+                ? ""
+                : " " + cli.prefixArguments.joined(separator: " ")
+            resolvedCLIDescription = "\(cli.executableURL.path)\(prefix)"
+            runStatusMessage = "CLI ready"
+        }
         loadSettings()
         loadHistory()
         applyDefaultOutputIfNeeded()
@@ -99,7 +119,7 @@ final class WorkbenchViewModel: ObservableObject {
             resolvedCLIDescription = "(missing)"
             lastError = error.localizedDescription
             appendLog("error: \(error.localizedDescription)")
-            appendLog("hint: use macos/scripts/run_workbench.sh from the repo so the Debug app is rebuilt and opened.")
+            appendLog("hint: use ./script/build_and_run.sh from the repo so the Debug app is rebuilt and opened.")
             runStatusMessage = "CLI missing"
         }
     }
@@ -191,6 +211,7 @@ final class WorkbenchViewModel: ObservableObject {
         applyDefaultOutputIfNeeded()
         lastError = nil
         lastFailure = nil
+        lastCancellation = nil
         lastResult = nil
         lastCopiedNotice = nil
         completedStages = []
@@ -226,12 +247,24 @@ final class WorkbenchViewModel: ObservableObject {
         let allowEmptySnapshot = allowEmptyEvaluation
         let handoffSnapshot = writeAptusHandoff
         let splitSnapshot = splitRatioPPM
+        let processController = CLIProcessController()
+        activeProcessController = processController
 
-        Task {
-            defer { isRunning = false }
+        compileTask = Task {
+            defer {
+                isRunning = false
+                activeProcessController = nil
+                compileTask = nil
+                cancellationRequestedAt = nil
+                let callbacks = runFinishedCallbacks
+                runFinishedCallbacks.removeAll()
+                callbacks.forEach { $0() }
+            }
             var combinedLog = ""
+            var outputWasTruncated = false
             var workspace = outputDirectory
             var bundle = outputDirectory
+            var transportArchive = outputDirectory
             var logFileURL: URL?
             do {
                 let cli = try self.cli ?? VeriformisCLI.resolve()
@@ -240,6 +273,7 @@ final class WorkbenchViewModel: ObservableObject {
                 let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
                 workspace = outputDirectory.appendingPathComponent("workspace-\(stamp)", isDirectory: true)
                 bundle = outputDirectory.appendingPathComponent("dataset-\(stamp).vfbundle", isDirectory: true)
+                transportArchive = URL(fileURLWithPath: bundle.path + ".zip")
                 try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
                 logFileURL = workspace.appendingPathComponent("run.log")
 
@@ -254,19 +288,39 @@ final class WorkbenchViewModel: ObservableObject {
                     includeHandoff: handoffSnapshot
                 )
 
-                let total = Double(WorkbenchStage.pipelineStages.count)
+                let total = Double(WorkbenchStage.workbenchRunStages.count)
                 for command in plan {
+                    if Task.isCancelled {
+                        throw WorkbenchError.cancelled(makeCancellationReceipt(
+                            stage: command.stage,
+                            processCancellation: nil,
+                            workspace: workspace,
+                            outputWasTruncated: outputWasTruncated
+                        ))
+                    }
                     currentStage = command.stage
                     runStatusMessage = "Running \(command.stage.title)…"
                     appendLog("→ \(command.stage.rawValue): veriformis \(command.arguments.joined(separator: " "))")
-                    let result = try cli.run(arguments: command.arguments) { [weak self] line in
+                    let result = try await cli.run(
+                        arguments: command.arguments,
+                        controller: processController
+                    ) { [weak self] line in
                         Task { @MainActor in
                             self?.appendLog(line)
                         }
                     }
                     combinedLog += result.combinedOutput
+                    outputWasTruncated = outputWasTruncated || result.outputTruncated
                     if let logFileURL {
                         appendToLogFile(logFileURL, text: result.combinedOutput)
+                    }
+                    if let cancellation = result.cancellation {
+                        throw WorkbenchError.cancelled(makeCancellationReceipt(
+                            stage: command.stage,
+                            processCancellation: cancellation,
+                            workspace: workspace,
+                            outputWasTruncated: outputWasTruncated
+                        ))
                     }
                     if result.exitCode != 0 {
                         throw WorkbenchError.processFailed(
@@ -280,6 +334,54 @@ final class WorkbenchViewModel: ObservableObject {
                 }
 
                 let manifest = Self.extractManifestSHA256(from: combinedLog)
+                guard let manifest else {
+                    throw WorkbenchError.processFailed(
+                        stage: WorkbenchStage.seal.rawValue,
+                        exitCode: 1,
+                        message: "Seal completed without reporting the manifest SHA-256 required for transport."
+                    )
+                }
+                currentStage = .package
+                runStatusMessage = "Creating verified transport archive…"
+                let packageArguments = [
+                    "package",
+                    bundle.path,
+                    "-o",
+                    transportArchive.path,
+                    "--manifest-sha256",
+                    manifest,
+                ]
+                appendLog("→ package: veriformis \(packageArguments.joined(separator: " "))")
+                let packageResult = try await cli.run(
+                    arguments: packageArguments,
+                    controller: processController
+                ) { [weak self] line in
+                    Task { @MainActor in self?.appendLog(line) }
+                }
+                combinedLog += packageResult.combinedOutput
+                outputWasTruncated = outputWasTruncated || packageResult.outputTruncated
+                if let logFileURL {
+                    appendToLogFile(logFileURL, text: packageResult.combinedOutput)
+                }
+                if let cancellation = packageResult.cancellation {
+                    throw WorkbenchError.cancelled(makeCancellationReceipt(
+                        stage: .package,
+                        processCancellation: cancellation,
+                        workspace: workspace,
+                        outputWasTruncated: outputWasTruncated
+                    ))
+                }
+                if packageResult.exitCode != 0 {
+                    throw WorkbenchError.processFailed(
+                        stage: WorkbenchStage.package.rawValue,
+                        exitCode: packageResult.exitCode,
+                        message: packageResult.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+                    )
+                }
+                completedStages.insert(.package)
+                progressPercent = 100
+
+                let archiveSHA256 = Self.extractArchiveSHA256(from: packageResult.combinedOutput)
                 let assignment = Self.extractAssignmentDigest(from: combinedLog)
                 let handoff = handoffSnapshot
                     ? URL(fileURLWithPath: bundle.path + ".aptus-handoff.json")
@@ -294,10 +396,12 @@ final class WorkbenchViewModel: ObservableObject {
                 lastResult = CompileResult(
                     workspaceURL: workspace,
                     bundleURL: bundle,
+                    transportArchiveURL: transportArchive,
                     handoffURL: handoff.flatMap {
                         FileManager.default.fileExists(atPath: $0.path) ? $0 : nil
                     },
                     manifestSHA256: manifest,
+                    transportArchiveSHA256: archiveSHA256,
                     assignmentDigest: assignment,
                     log: combinedLog,
                     logFileURL: logFileURL
@@ -324,7 +428,44 @@ final class WorkbenchViewModel: ObservableObject {
                     assignmentDigest: assignment,
                     error: nil,
                     failedStage: nil,
-                    exitCode: nil
+                    exitCode: nil,
+                    cancellationReceipt: nil,
+                    transportArchive: transportArchive,
+                    transportArchiveSHA256: archiveSHA256
+                )
+            } catch WorkbenchError.cancelled(let receipt) {
+                currentStage = nil
+                runStatusMessage = "Compile cancelled"
+                lastCancellation = receipt
+                lastError = nil
+                lastFailure = nil
+                logExpanded = true
+                let message = WorkbenchError.cancelled(receipt).localizedDescription
+                appendLog(message)
+                if let logFileURL {
+                    appendToLogFile(logFileURL, text: "\(message)\n")
+                }
+                recordHistory(
+                    startedAt: startedAt,
+                    status: .cancelled,
+                    sources: sourcesSnapshot,
+                    sourceRoot: sourceRootSnapshot,
+                    objective: objectiveSnapshot,
+                    allowEmptyEvaluation: allowEmptySnapshot,
+                    writeAptusHandoff: handoffSnapshot,
+                    splitRatioPPM: splitSnapshot,
+                    workspace: workspace,
+                    bundle: bundle,
+                    handoff: nil,
+                    logFile: logFileURL,
+                    manifest: nil,
+                    assignmentDigest: nil,
+                    error: message,
+                    failedStage: receipt.stage,
+                    exitCode: receipt.terminationStatus.map(Int.init),
+                    cancellationReceipt: receipt,
+                    transportArchive: nil,
+                    transportArchiveSHA256: nil
                 )
             } catch {
                 let failure = Self.makeFailure(
@@ -362,10 +503,33 @@ final class WorkbenchViewModel: ObservableObject {
                     assignmentDigest: nil,
                     error: failure.summary,
                     failedStage: failure.stage,
-                    exitCode: failure.exitCode.map { Int($0) }
+                    exitCode: failure.exitCode.map { Int($0) },
+                    cancellationReceipt: nil,
+                    transportArchive: nil,
+                    transportArchiveSHA256: nil
                 )
             }
         }
+    }
+
+    /// Cancel the active stage, retaining its workspace and recording how the
+    /// child process exited. Completion runs after TERM/KILL recovery is done.
+    func cancelCompile(onFinished: (() -> Void)? = nil) {
+        if let onFinished {
+            guard isRunning else {
+                onFinished()
+                return
+            }
+            runFinishedCallbacks.append(onFinished)
+        }
+        guard isRunning else { return }
+        if cancellationRequestedAt == nil {
+            cancellationRequestedAt = Date()
+            runStatusMessage = "Cancelling…"
+            appendLog("Cancellation requested; preserving the current workspace…")
+        }
+        compileTask?.cancel()
+        activeProcessController?.cancel()
     }
 
     /// Restore compile form from a history entry and start again.
@@ -446,6 +610,10 @@ final class WorkbenchViewModel: ObservableObject {
         extractLabeledDigest(from: log, label: "assignment digest")
     }
 
+    nonisolated static func extractArchiveSHA256(from log: String) -> String? {
+        extractLabeledDigest(from: log, label: "archive sha-256")
+    }
+
     nonisolated static func extractLabeledDigest(from log: String, label: String) -> String? {
         let needle = label.lowercased() + ":"
         for line in log.split(separator: "\n") {
@@ -487,6 +655,26 @@ final class WorkbenchViewModel: ObservableObject {
             lastLogLines: lastLines,
             workspaceURL: FileManager.default.fileExists(atPath: workspace.path) ? workspace : nil,
             logFileURL: logFile
+        )
+    }
+
+    private func makeCancellationReceipt(
+        stage: WorkbenchStage?,
+        processCancellation: CLIProcessCancellation?,
+        workspace: URL,
+        outputWasTruncated: Bool
+    ) -> RunCancellationReceipt {
+        RunCancellationReceipt(
+            requestedAt: cancellationRequestedAt ?? Date(),
+            stage: stage?.rawValue,
+            processIdentifier: processCancellation?.processIdentifier,
+            terminationStatus: processCancellation?.terminationStatus,
+            terminationEscalated: processCancellation?.terminationEscalated ?? false,
+            completedStages: WorkbenchStage.workbenchRunStages
+                .filter { completedStages.contains($0) }
+                .map(\.rawValue),
+            workspaceRetained: FileManager.default.fileExists(atPath: workspace.path),
+            outputWasTruncated: outputWasTruncated
         )
     }
 
@@ -549,6 +737,13 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     private func supportDirectory() -> URL {
+        if let supportDirectoryOverride {
+            try? FileManager.default.createDirectory(
+                at: supportDirectoryOverride,
+                withIntermediateDirectories: true
+            )
+            return supportDirectoryOverride
+        }
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSTemporaryDirectory())
         let dir = base.appendingPathComponent("com.veriformis.workbench", isDirectory: true)
@@ -596,7 +791,10 @@ final class WorkbenchViewModel: ObservableObject {
         assignmentDigest: String?,
         error: String?,
         failedStage: String?,
-        exitCode: Int?
+        exitCode: Int?,
+        cancellationReceipt: RunCancellationReceipt?,
+        transportArchive: URL?,
+        transportArchiveSHA256: String?
     ) {
         let entry = RunHistoryEntry(
             id: UUID(),
@@ -618,7 +816,10 @@ final class WorkbenchViewModel: ObservableObject {
             writeAptusHandoff: writeAptusHandoff,
             splitRatioPPM: splitRatioPPM,
             failedStage: failedStage,
-            exitCode: exitCode
+            exitCode: exitCode,
+            cancellationReceipt: cancellationReceipt,
+            transportArchivePath: transportArchive?.path,
+            transportArchiveSHA256: transportArchiveSHA256
         )
         runHistory.insert(entry, at: 0)
         if runHistory.count > historyLimit {

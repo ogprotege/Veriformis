@@ -8,10 +8,10 @@
 and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated)
 
-**Review date:** 2026-08-11 (independent-product analysis and authority pass;
-baseline `7d116e9`)
+**Review date:** 2026-08-11 (independent-product Phase 2 closeout;
+working tree based on `dd2fdb8`)
 
-**Next review:** Independent-roadmap Phase 2 start; beta label cut,
+**Next review:** Independent-roadmap Phase 3 start; beta label cut,
 public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -24,7 +24,7 @@ sources to a closed, independently verifiable training-dataset bundle:
 
 ```text
 parse -> clean -> chunk -> construct -> curate -> split
-      -> format -> validate -> seal -> verify
+      -> format -> validate -> seal -> verify -> package -> package-verify
 ```
 
 **Groups 1–3** deliver integrity, construction, and the finished-dataset
@@ -45,8 +45,10 @@ same CLI so digests match terminal runs. **Private beta workbench Phases 0–2**
 extend that surface: dogfood punch list; KISS sidebar (Home / Compile /
 History / Settings); run sheet with progress % and live log; history
 persistence; settings for CLI and default output; failure details; digest copy;
-artifact reveal; and rerun. Launch with
-`bash macos/scripts/run_workbench.sh`. Operator install:
+artifact reveal; and rerun. Independent-product Phase 2 adds asynchronous
+bounded process execution, accountable cancellation and quit recovery, and an
+externally verified deterministic transport archive. Launch with
+`./script/build_and_run.sh`. Operator install:
 [install.md](install.md). Vision/plan:
 [plans/2026-08-06-private-beta-workbench.md](plans/2026-08-06-private-beta-workbench.md).
 
@@ -106,6 +108,10 @@ final gates and limitations. Phase 1 completed standalone runtime and release
 defaults. Its completed packet pins default artifact absence,
 adapter import isolation, clean installed-wheel compilation, neutral release
 evidence, and workbench operation as measured acceptance gates.
+Phase 2 completed the reliability and artifact-boundary gate. Its packet records
+bounded asynchronous process execution, accountable cancellation and quit
+recovery, deterministic no-replace transport packaging, archive re-verification,
+and standalone Mac and Linux evidence.
 
 ## Implemented interfaces
 
@@ -124,6 +130,8 @@ The installed console entry point is `veriformis`.
 | `validate WORKSPACE` | Replays all semantics and validates one exact byte snapshot through 17 gates | `snapshot`, `report` |
 | `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle; writes only the canonical bundle by default | External six-file bundle; `manifest`, `attestation`; optional explicit `*.aptus-handoff.json` |
 | `verify BUNDLE` | Verifies the closed bundle without workspace access | Terminal verification result |
+| `package BUNDLE -o ARCHIVE --manifest-sha256 DIGEST` | Externally verifies and deterministically publishes the canonical six-file bundle as a no-replace transport archive | `*.vfbundle.zip`; archive and manifest digests |
+| `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
 | `list-recipes` | Lists named deterministic recipe library identifiers | Terminal output only |
@@ -141,7 +149,7 @@ Surfaces over the same composition root:
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
 | MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
-| macOS workbench | `macos/` | SwiftUI thin CLI adapter |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, and verified transport output |
 
 ## Workspace and identity status
 
@@ -442,6 +450,7 @@ See [docs/release.md](release.md).
 | Implemented Group 7 | SwiftUI workbench (CLI adapter) with digest parity |
 | Implemented private beta workbench Phases 0–2 | Dogfood; KISS shell; failure detail; digest copy; artifact reveal; rerun |
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
+| Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), beginning with standalone authority and defaults |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -474,7 +483,8 @@ Selected permanent locks:
 | Declared-format e2e | `tests/regressions/test_group5_declared_format_pipeline.py` |
 | MCP / service parity | `tests/mcp/test_mcp_pipeline_parity.py` |
 | Optional Aptus adapter | Marked `tests/handoff/test_aptus_handoff_v1.py`, `scripts/release/aptus_integration.sh`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
-| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/scripts/standalone_workbench_smoke.sh`, `macos/Tests/`, `macos/scripts/run_workbench.sh` |
+| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/scripts/standalone_workbench_smoke.sh`, `macos/Tests/`, `./script/build_and_run.sh` |
+| Deterministic transport | `tests/bundle/test_finished_bundle.py`, `scripts/release/golden_compile.sh`, [bundle transport contract](contracts/bundle-transport-v1.md), [ADR 0005](adr/0005-deterministic-bundle-transport.md) |
 | Group 9 golden + scripts | `tests/regressions/test_group9_release_gates.py`, `scripts/release/`, [release guide](release.md) |
 | Operator install | [install.md](install.md) |
 | Beta limitations | [beta-limitations.md](beta-limitations.md) |
@@ -494,7 +504,7 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0 and 1 are complete. The next authorized product
+Independent-product Phases 0, 1, and 2 are complete. The next authorized product
 work follows the ordered ledger in the
 [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md).
 A deliberate beta label and public Mac checklist remain separate decisions.

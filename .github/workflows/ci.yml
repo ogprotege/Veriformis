@@ -76,7 +76,7 @@ jobs:
         run: uv python install 3.12
       - name: Sync test extras
         run: uv sync --python 3.12 --extra test
-      - name: Standalone golden corpus seal + external_digest verify
+      - name: Standalone golden seal + verify + transport
         run: bash scripts/release/golden_compile.sh
         env:
           GOLDEN_EVIDENCE_DIR: ${{ runner.temp }}/golden-evidence

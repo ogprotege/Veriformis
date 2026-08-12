@@ -293,6 +293,38 @@ def verify_cmd(
     )
 
 
+@app.command(name="package")
+def package_cmd(
+    bundle: Path,
+    out: Path = typer.Option(..., "-o"),
+    manifest_sha256: str = typer.Option(..., "--manifest-sha256"),
+) -> None:
+    """Create a deterministic Finder-safe archive of an anchored bundle."""
+    _run(
+        lambda: _SERVICE.package(
+            bundle,
+            out,
+            manifest_sha256=manifest_sha256,
+        ),
+        status=1,
+    )
+
+
+@app.command(name="package-verify")
+def package_verify_cmd(
+    archive: Path,
+    manifest_sha256: str = typer.Option(..., "--manifest-sha256"),
+) -> None:
+    """Verify deterministic archive bytes and its externally anchored bundle."""
+    _run(
+        lambda: _SERVICE.package_verify(
+            archive,
+            manifest_sha256=manifest_sha256,
+        ),
+        status=1,
+    )
+
+
 @app.command()
 def preview(
     path: Path,

@@ -73,6 +73,7 @@ enum WorkbenchStage: String, CaseIterable, Identifiable {
     case validate
     case seal
     case verify
+    case package
 
     var id: String { rawValue }
 
@@ -81,6 +82,11 @@ enum WorkbenchStage: String, CaseIterable, Identifiable {
     /// Stages executed by the workbench compile plan (excludes verify).
     static var pipelineStages: [WorkbenchStage] {
         [.parse, .clean, .chunk, .construct, .curate, .split, .format, .validate, .seal]
+    }
+
+    /// Complete default workbench run, including immutable transport.
+    static var workbenchRunStages: [WorkbenchStage] {
+        pipelineStages + [.package]
     }
 }
 
@@ -92,8 +98,10 @@ struct StageCommand: Equatable {
 struct CompileResult: Equatable {
     let workspaceURL: URL
     let bundleURL: URL
+    let transportArchiveURL: URL
     let handoffURL: URL?
     let manifestSHA256: String?
+    let transportArchiveSHA256: String?
     let assignmentDigest: String?
     let log: String
     let logFileURL: URL?
@@ -119,6 +127,19 @@ struct CompileFailure: Equatable {
 enum RunStatus: String, Codable {
     case succeeded
     case failed
+    case cancelled
+}
+
+/// Durable, factual record of how an interrupted child process was stopped.
+struct RunCancellationReceipt: Codable, Equatable {
+    let requestedAt: Date
+    let stage: String?
+    let processIdentifier: Int32?
+    let terminationStatus: Int32?
+    let terminationEscalated: Bool
+    let completedStages: [String]
+    let workspaceRetained: Bool
+    let outputWasTruncated: Bool
 }
 
 struct RunHistoryEntry: Identifiable, Codable, Equatable {
@@ -143,6 +164,11 @@ struct RunHistoryEntry: Identifiable, Codable, Equatable {
     let splitRatioPPM: Int?
     let failedStage: String?
     let exitCode: Int?
+    /// Optional so pre-Phase-2 history remains decodable.
+    let cancellationReceipt: RunCancellationReceipt?
+    /// Optional so pre-Phase-2 history remains decodable.
+    let transportArchivePath: String?
+    let transportArchiveSHA256: String?
 
     /// Missing values belong to legacy history records and preserve the
     /// standalone default. Explicitly stored opt-ins remain true.
@@ -167,6 +193,7 @@ enum WorkbenchError: LocalizedError, Equatable {
     case missingCLI
     case noSources
     case processFailed(stage: String, exitCode: Int32, message: String)
+    case cancelled(RunCancellationReceipt)
     case invalidConfiguration(String)
 
     var errorDescription: String? {
@@ -184,13 +211,18 @@ enum WorkbenchError: LocalizedError, Equatable {
             • VERIFORMIS_CLI=/absolute/path/to/veriformis
             • VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT=/absolute/path/to/Veriformis
 
-            Preferred launch: bash macos/scripts/run_workbench.sh
+            Preferred launch: ./script/build_and_run.sh
             """
         case .noSources:
             return "Add at least one source file before compiling."
         case .processFailed(let stage, let exitCode, let message):
             let head = message.split(separator: "\n", omittingEmptySubsequences: true).prefix(3).joined(separator: "\n")
             return "Stage \(stage) failed (exit \(exitCode)): \(head)"
+        case .cancelled(let receipt):
+            let stage = receipt.stage.map { " during \($0)" } ?? ""
+            let stop = receipt.terminationEscalated ? "forced termination" : "graceful termination"
+            let recovery = receipt.workspaceRetained ? "workspace retained" : "no workspace was created"
+            return "Compile cancelled\(stage) (\(stop)); \(recovery)."
         case .invalidConfiguration(let message):
             return message
         }

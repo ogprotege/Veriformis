@@ -37,12 +37,12 @@
     {
       "number": 2,
       "title": "Close known reliability and artifact-boundary defects",
-      "status": "planned",
+      "status": "completed",
       "depends_on": [1],
-      "packet": null,
-      "started_on": null,
-      "completed_on": null,
-      "next_gate": "Begin after the standalone default and release boundary pass."
+      "packet": "dev/active/independent-product/phase-02-reliability-artifact-boundary",
+      "started_on": "2026-08-11",
+      "completed_on": "2026-08-11",
+      "next_gate": "Completed; Phase 3 may begin with a standard packet and versioned taxonomy proposals."
     },
     {
       "number": 3,
