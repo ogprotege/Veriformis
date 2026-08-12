@@ -34,6 +34,10 @@ struct RunSheetView: View {
                 failurePanel(failure)
             }
 
+            if let cancellation = workbench.lastCancellation, !workbench.isRunning {
+                cancellationPanel(cancellation)
+            }
+
             if let result = workbench.lastResult, !workbench.isRunning {
                 successDigestPanel(result)
             }
@@ -72,7 +76,12 @@ struct RunSheetView: View {
             }
 
             HStack {
-                if !workbench.isRunning {
+                if workbench.isRunning {
+                    Button("Cancel compile", role: .destructive) {
+                        workbench.cancelCompile()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                } else {
                     Button("Re-run") {
                         workbench.reRunLastConfiguration()
                     }
@@ -84,8 +93,8 @@ struct RunSheetView: View {
                         Button("Reveal workspace") {
                             workbench.reveal(result.workspaceURL)
                         }
-                        Button("Reveal bundle") {
-                            workbench.reveal(result.bundleURL)
+                        Button("Reveal transport archive") {
+                            workbench.reveal(result.transportArchiveURL)
                         }
                     } else if let workspace = workbench.lastFailure?.workspaceURL {
                         Button("Reveal workspace") {
@@ -104,9 +113,37 @@ struct RunSheetView: View {
 
     private var title: String {
         if workbench.isRunning { return "Compiling…" }
+        if workbench.lastCancellation != nil { return "Compile cancelled" }
         if workbench.lastFailure != nil { return "Compile failed" }
         if workbench.lastResult != nil { return "Compile complete" }
         return "Compile"
+    }
+
+    private func cancellationPanel(_ receipt: RunCancellationReceipt) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Compile cancelled safely")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.orange)
+            if let stage = receipt.stage {
+                Text("Interrupted stage: \(stage)")
+            }
+            Text(receipt.terminationEscalated
+                ? "The child ignored the graceful stop request and was force-terminated."
+                : "The child stopped after the graceful termination request.")
+            Text(receipt.workspaceRetained
+                ? "The workspace was retained for inspection or recovery."
+                : "No workspace had been created when cancellation completed.")
+            if !receipt.completedStages.isEmpty {
+                Text("Completed: \(receipt.completedStages.joined(separator: ", "))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .font(.caption)
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     private func failurePanel(_ failure: CompileFailure) -> some View {
@@ -187,6 +224,24 @@ struct RunSheetView: View {
                     .buttonStyle(.borderless)
                 }
                 Text(digest)
+                    .font(.system(.caption, design: .monospaced))
+                    .textSelection(.enabled)
+            }
+            if let archiveSHA256 = result.transportArchiveSHA256 {
+                HStack {
+                    Text("Transport archive SHA-256")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Copy") {
+                        workbench.copyToPasteboard(
+                            archiveSHA256,
+                            label: "transport archive SHA-256"
+                        )
+                    }
+                    .buttonStyle(.borderless)
+                }
+                Text(archiveSHA256)
                     .font(.system(.caption, design: .monospaced))
                     .textSelection(.enabled)
             }

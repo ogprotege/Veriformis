@@ -14,5 +14,10 @@ from veriformis.bundle.finished import (  # noqa: F401
     write_finished_bundle,
 )
 from veriformis.bundle.manifest import Manifest  # noqa: F401
+from veriformis.bundle.transport import (  # noqa: F401
+    BundleArchiveReceipt,
+    verify_bundle_archive,
+    write_bundle_archive,
+)
 from veriformis.bundle.verifier import verify_finished_bundle  # noqa: F401
 from veriformis.bundle.writer import verify_bundle, write_bundle  # noqa: F401

@@ -2,6 +2,260 @@ import XCTest
 @testable import Veriformis
 
 final class CLIBridgeTests: XCTestCase {
+    @MainActor
+    func testProcessRunnerSuspendsWithoutBlockingMainActor() async throws {
+        let cli = shellCLI()
+        let controller = CLIProcessController(terminationGrace: 0.1)
+        let started = Date()
+        let task = Task {
+            try await cli.run(
+                arguments: ["-c", "sleep 0.3; printf 'done\\n'"],
+                controller: controller
+            )
+        }
+
+        try await Task.sleep(nanoseconds: 50_000_000)
+        XCTAssertLessThan(Date().timeIntervalSince(started), 0.2)
+        let result = try await task.value
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertTrue(result.combinedOutput.contains("done"))
+    }
+
+    func testProcessRunnerDrainsHighVolumeOutputAndBoundsRetention() async throws {
+        let cli = shellCLI()
+        let controller = CLIProcessController(
+            terminationGrace: 0.1,
+            maxRetainedOutputBytes: 64 * 1024
+        )
+        let script = """
+        i=0
+        while [ "$i" -lt 5000 ]; do
+          printf 'out-%04d-abcdefghijklmnopqrstuvwxyz0123456789\\n' "$i"
+          printf 'err-%04d-abcdefghijklmnopqrstuvwxyz0123456789\\n' "$i" >&2
+          i=$((i + 1))
+        done
+        """
+
+        let result = try await cli.run(
+            arguments: ["-c", script],
+            controller: controller
+        )
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertTrue(result.outputTruncated)
+        XCTAssertLessThanOrEqual(result.combinedOutput.utf8.count, 64 * 1024)
+        XCTAssertTrue(result.combinedOutput.contains("out-4999"))
+        XCTAssertTrue(result.combinedOutput.contains("err-4999"))
+    }
+
+    func testProcessRunnerReplacesInvalidUTF8() async throws {
+        let result = try await shellCLI().run(
+            arguments: ["-c", "printf '\\377bad\\n'"],
+            controller: CLIProcessController()
+        )
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertTrue(result.combinedOutput.contains("\u{FFFD}bad"))
+    }
+
+    func testProcessRunnerCancellationTerminatesGracefulChild() async throws {
+        let controller = CLIProcessController(terminationGrace: 0.2)
+        let task = Task {
+            try await shellCLI().run(
+                arguments: ["-c", "trap 'exit 0' TERM; while :; do sleep 0.02; done"],
+                controller: controller
+            )
+        }
+        try await Task.sleep(nanoseconds: 80_000_000)
+        controller.cancel()
+
+        let result = try await task.value
+        let cancellation = try XCTUnwrap(result.cancellation)
+        XCTAssertNotNil(cancellation.processIdentifier)
+        XCTAssertFalse(cancellation.terminationEscalated)
+        XCTAssertFalse(controller.hasActiveProcess)
+    }
+
+    func testProcessRunnerCancellationBeforeLaunchReturnsReceipt() async throws {
+        let controller = CLIProcessController(terminationGrace: 0.05)
+        let task = Task {
+            try await shellCLI().run(
+                arguments: ["-c", "sleep 5"],
+                controller: controller
+            )
+        }
+        task.cancel()
+
+        let result = try await task.value
+        XCTAssertNotNil(result.cancellation)
+        XCTAssertFalse(controller.hasActiveProcess)
+    }
+
+    func testProcessControllerRecoversForAnotherRunAfterCancellation() async throws {
+        let controller = CLIProcessController(terminationGrace: 0.05)
+        let cancelledTask = Task {
+            try await shellCLI().run(
+                arguments: ["-c", "trap 'exit 0' TERM; while :; do sleep 0.02; done"],
+                controller: controller
+            )
+        }
+        try await Task.sleep(nanoseconds: 60_000_000)
+        controller.cancel()
+        let cancelled = try await cancelledTask.value
+        XCTAssertNotNil(cancelled.cancellation)
+
+        let recovered = try await shellCLI().run(
+            arguments: ["-c", "printf 'recovered\\n'"],
+            controller: controller
+        )
+        XCTAssertEqual(recovered.exitCode, 0)
+        XCTAssertTrue(recovered.combinedOutput.contains("recovered"))
+        XCTAssertNil(recovered.cancellation)
+    }
+
+    func testProcessRunnerCancellationEscalatesWhenTermIgnored() async throws {
+        let controller = CLIProcessController(terminationGrace: 0.05)
+        let task = Task {
+            try await shellCLI().run(
+                arguments: ["-c", "trap '' TERM; while :; do :; done"],
+                controller: controller
+            )
+        }
+        try await Task.sleep(nanoseconds: 80_000_000)
+        controller.cancel()
+
+        let result = try await task.value
+        let cancellation = try XCTUnwrap(result.cancellation)
+        XCTAssertTrue(cancellation.terminationEscalated)
+        XCTAssertFalse(controller.hasActiveProcess)
+    }
+
+    func testCancellationReceiptRoundTripsAndCarriesRecoveryFacts() throws {
+        let receipt = RunCancellationReceipt(
+            requestedAt: Date(timeIntervalSince1970: 42),
+            stage: WorkbenchStage.chunk.rawValue,
+            processIdentifier: 123,
+            terminationStatus: 15,
+            terminationEscalated: false,
+            completedStages: [WorkbenchStage.parse.rawValue, WorkbenchStage.clean.rawValue],
+            workspaceRetained: true,
+            outputWasTruncated: true
+        )
+        let encoded = try JSONEncoder().encode(receipt)
+        XCTAssertEqual(try JSONDecoder().decode(RunCancellationReceipt.self, from: encoded), receipt)
+        XCTAssertTrue(WorkbenchError.cancelled(receipt).localizedDescription.contains("workspace retained"))
+    }
+
+    func testLegacyHistoryWithoutCancellationReceiptStillDecodes() throws {
+        let encoded = try JSONEncoder().encode(historyEntry(writeAptusHandoff: nil))
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        json.removeValue(forKey: "cancellationReceipt")
+        let legacy = try JSONSerialization.data(withJSONObject: json)
+        let decoded = try JSONDecoder().decode(RunHistoryEntry.self, from: legacy)
+        XCTAssertNil(decoded.cancellationReceipt)
+    }
+
+    @MainActor
+    func testApplicationQuitWaitsForRunCancellationBeforeReplying() {
+        let coordinator = ApplicationTerminationCoordinator()
+        var finishCancellation: (() -> Void)?
+        var replied = false
+
+        let decision = coordinator.prepareForTermination(
+            isRunActive: true,
+            cancel: { finishCancellation = $0 },
+            reply: { replied = true }
+        )
+
+        XCTAssertEqual(decision, .terminateLater)
+        XCTAssertTrue(coordinator.awaitingCancellation)
+        XCTAssertFalse(replied)
+        finishCancellation?()
+        XCTAssertFalse(coordinator.awaitingCancellation)
+        XCTAssertTrue(replied)
+    }
+
+    @MainActor
+    func testApplicationQuitTerminatesImmediatelyWithoutActiveRun() {
+        let coordinator = ApplicationTerminationCoordinator()
+        let decision = coordinator.prepareForTermination(
+            isRunActive: false,
+            cancel: { _ in XCTFail("cancel should not be requested") },
+            reply: { XCTFail("deferred reply should not be used") }
+        )
+        XCTAssertEqual(decision, .terminateNow)
+    }
+
+    @MainActor
+    func testWorkbenchCancellationProducesAReceiptAtEveryExecutableStage() async throws {
+        for stage in WorkbenchStage.workbenchRunStages {
+            let root = FileManager.default.temporaryDirectory
+                .appendingPathComponent("veriformis-cancel-\(UUID().uuidString)")
+            let output = root.appendingPathComponent("output", isDirectory: true)
+            let support = root.appendingPathComponent("support", isDirectory: true)
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: root) }
+
+            let source = root.appendingPathComponent("source.txt")
+            try Data("source\n".utf8).write(to: source)
+            let executable = root.appendingPathComponent("fake-veriformis")
+            let script = """
+            #!/bin/sh
+            stage="$1"
+            if [ "$stage" = "seal" ]; then
+              printf 'manifest SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\n'
+            fi
+            if [ "$stage" = "\(stage.rawValue)" ]; then
+              trap 'exit 0' TERM INT
+              while :; do sleep 0.02; done
+            fi
+            exit 0
+            """
+            try Data(script.utf8).write(to: executable)
+            try FileManager.default.setAttributes(
+                [.posixPermissions: 0o755],
+                ofItemAtPath: executable.path
+            )
+
+            let suiteName = "veriformis-tests-\(UUID().uuidString)"
+            let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+            defaults.set(output.path, forKey: "veriformis.workbench.defaultOutput")
+            defer { defaults.removePersistentDomain(forName: suiteName) }
+            let workbench = WorkbenchViewModel(
+                cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+                defaults: defaults,
+                supportDirectory: support
+            )
+            workbench.sourceURLs = [source]
+            workbench.sourceRootURL = root
+            workbench.outputDirectoryURL = output
+            workbench.compile()
+
+            var reachedStage = false
+            for _ in 0 ..< 300 {
+                if workbench.isRunning, workbench.currentStage == stage {
+                    reachedStage = true
+                    break
+                }
+                try await Task.sleep(nanoseconds: 10_000_000)
+            }
+            XCTAssertTrue(reachedStage, "did not reach \(stage.rawValue)")
+            workbench.cancelCompile()
+
+            for _ in 0 ..< 300 where workbench.isRunning {
+                try await Task.sleep(nanoseconds: 10_000_000)
+            }
+            XCTAssertFalse(workbench.isRunning, "did not cancel \(stage.rawValue)")
+            XCTAssertEqual(workbench.lastCancellation?.stage, stage.rawValue)
+            XCTAssertEqual(workbench.runHistory.first?.status, .cancelled)
+            XCTAssertEqual(
+                workbench.runHistory.first?.cancellationReceipt,
+                workbench.lastCancellation
+            )
+            XCTAssertTrue(workbench.lastCancellation?.workspaceRetained == true)
+        }
+    }
+
     func testCompilePlanOrderAndArguments() {
         let sources = [
             URL(fileURLWithPath: "/data/raw/a.txt"),
@@ -96,6 +350,15 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testArchiveDigestExtraction() {
+        XCTAssertEqual(
+            WorkbenchViewModel.extractArchiveSHA256(
+                from: "archive SHA-256: 1234abcdef\nverification grade: external_digest"
+            ),
+            "1234abcdef"
+        )
+    }
+
     func testMakeFailureCapturesExitCodeAndStage() {
         let error = WorkbenchError.processFailed(
             stage: "construct",
@@ -129,6 +392,17 @@ final class CLIBridgeTests: XCTestCase {
         let message = WorkbenchError.missingCLI.localizedDescription
         XCTAssertTrue(message.contains("uv sync"))
         XCTAssertTrue(message.contains("VERIFORMIS_CLI"))
+    }
+
+    func testMissingCLIOverrideFailsWithTypedRecoveryError() {
+        XCTAssertThrowsError(
+            try VeriformisCLI.resolve(
+                repositoryRoot: URL(fileURLWithPath: "/definitely/not/a/repository"),
+                environment: ["VERIFORMIS_CLI": "/definitely/not/veriformis"]
+            )
+        ) { error in
+            XCTAssertEqual(error as? WorkbenchError, .missingCLI)
+        }
     }
 
     func testDefaultSourceRootForSingleFileIsParentDirectory() {
@@ -198,7 +472,17 @@ final class CLIBridgeTests: XCTestCase {
             writeAptusHandoff: writeAptusHandoff,
             splitRatioPPM: 400_000,
             failedStage: nil,
-            exitCode: nil
+            exitCode: nil,
+            cancellationReceipt: nil,
+            transportArchivePath: nil,
+            transportArchiveSHA256: nil
+        )
+    }
+
+    private func shellCLI() -> VeriformisCLI {
+        VeriformisCLI(
+            executableURL: URL(fileURLWithPath: "/bin/sh"),
+            prefixArguments: []
         )
     }
 }

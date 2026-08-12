@@ -15,12 +15,15 @@ from typing import Any, Literal
 
 import veriformis
 from veriformis.bundle import (
+    BundleArchiveReceipt,
     BundleAttestation,
     BundlePublicationReceipt,
     FinishedBundleManifest,
     VerificationResult,
     build_finished_bundle,
     verify_finished_bundle,
+    verify_bundle_archive,
+    write_bundle_archive,
     write_finished_bundle,
 )
 from veriformis.bundle.finished import FinishedBundleError
@@ -239,6 +242,11 @@ class SealOutcome(StageOutcome):
 @dataclass(frozen=True)
 class VerifyOutcome(StageOutcome):
     verification: VerificationResult | None = None
+
+
+@dataclass(frozen=True)
+class PackageOutcome(StageOutcome):
+    receipt: BundleArchiveReceipt | None = None
 
 
 class SealPartialPublicationError(Exception):
@@ -1931,6 +1939,57 @@ class PipelineService:
                 ServiceMessage(f"validation report: {result.validation_report_id}"),
                 ServiceMessage(f"manifest SHA-256: {result.manifest_sha256}"),
                 ServiceMessage(f"dataset rows: {result.declared_record_count}"),
+            ),
+        )
+
+    def package(
+        self,
+        bundle: Path,
+        out: Path,
+        *,
+        manifest_sha256: str,
+    ) -> PackageOutcome:
+        """Publish a deterministic transport archive of an anchored bundle."""
+        receipt = write_bundle_archive(
+            bundle,
+            out,
+            expected_manifest_sha256=manifest_sha256,
+        )
+        return PackageOutcome(
+            receipt=receipt,
+            durability_warning=receipt.durability_warning,
+            messages=(
+                ServiceMessage(f"transport archive: {receipt.archive_path}"),
+                ServiceMessage(f"archive SHA-256: {receipt.archive_sha256}"),
+                ServiceMessage(f"manifest SHA-256: {receipt.manifest_sha256}"),
+                ServiceMessage(
+                    f"verification grade: {receipt.verification.trust_grade}"
+                ),
+                ServiceMessage(f"archive members: {receipt.member_count}"),
+            ),
+        )
+
+    def package_verify(
+        self,
+        archive: Path,
+        *,
+        manifest_sha256: str,
+    ) -> PackageOutcome:
+        """Independently verify a deterministic transport archive."""
+        receipt = verify_bundle_archive(
+            archive,
+            expected_manifest_sha256=manifest_sha256,
+        )
+        return PackageOutcome(
+            receipt=receipt,
+            messages=(
+                ServiceMessage("transport archive status: accepted"),
+                ServiceMessage(f"archive SHA-256: {receipt.archive_sha256}"),
+                ServiceMessage(f"manifest SHA-256: {receipt.manifest_sha256}"),
+                ServiceMessage(
+                    f"verification grade: {receipt.verification.trust_grade}"
+                ),
+                ServiceMessage(f"archive members: {receipt.member_count}"),
             ),
         )
 

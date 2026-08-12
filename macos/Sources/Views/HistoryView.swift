@@ -39,7 +39,7 @@ struct HistoryView: View {
                 }
             }
             .font(.caption)
-            .foregroundStyle(entry.status == .succeeded ? Color.secondary : Color.red)
+            .foregroundStyle(statusColor(entry.status))
         }
         .tag(entry.id as UUID?)
     }
@@ -60,14 +60,36 @@ struct HistoryView: View {
                 if let digest = entry.assignmentDigest {
                     digestRow("Assignment digest", digest, copyLabel: "assignment digest")
                 }
+                if let digest = entry.transportArchiveSHA256 {
+                    digestRow(
+                        "Archive SHA-256",
+                        digest,
+                        copyLabel: "transport archive SHA-256"
+                    )
+                }
                 if let stage = entry.failedStage {
-                    row("Failed stage", stage)
+                    row(entry.status == .cancelled ? "Interrupted stage" : "Failed stage", stage)
                 }
                 if let code = entry.exitCode {
                     row("Exit code", String(code))
                 }
                 if let error = entry.errorSummary {
                     row("Error", error)
+                }
+                if let receipt = entry.cancellationReceipt {
+                    GroupBox("Cancellation receipt") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            row("Requested", receipt.requestedAt.formatted())
+                            if let stage = receipt.stage { row("Stage", stage) }
+                            if let pid = receipt.processIdentifier { row("Process ID", String(pid)) }
+                            if let status = receipt.terminationStatus { row("Termination", String(status)) }
+                            row("Escalated", receipt.terminationEscalated ? "yes" : "no")
+                            row("Workspace retained", receipt.workspaceRetained ? "yes" : "no")
+                            row("Output truncated", receipt.outputWasTruncated ? "yes" : "no")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 2)
+                    }
                 }
 
                 if let notice = workbench.lastCopiedNotice {
@@ -97,8 +119,10 @@ struct HistoryView: View {
                     Button("Reveal workspace") {
                         workbench.reveal(URL(fileURLWithPath: entry.workspacePath))
                     }
-                    Button("Reveal bundle") {
-                        workbench.reveal(URL(fileURLWithPath: entry.bundlePath))
+                    if let archive = entry.transportArchivePath {
+                        Button("Reveal transport archive") {
+                            workbench.reveal(URL(fileURLWithPath: archive))
+                        }
                     }
                     if let log = entry.logFilePath {
                         Button("Open log") {
@@ -110,6 +134,14 @@ struct HistoryView: View {
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func statusColor(_ status: RunStatus) -> Color {
+        switch status {
+        case .succeeded: return .secondary
+        case .failed: return .red
+        case .cancelled: return .orange
         }
     }
 

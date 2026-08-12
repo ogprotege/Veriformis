@@ -36,16 +36,19 @@ does **not** inject env into GUI apps on macOS):
 
 ```bash
 # From the repository root — on branch with the workbench fix:
-bash macos/scripts/run_workbench.sh
+uv sync
+./script/build_and_run.sh
 ```
+
+The compatibility path `bash macos/scripts/run_workbench.sh` delegates to that
+same script. Optional modes are `--verify`, `--debug`, `--logs`, and
+`--telemetry`.
 
 Manual equivalent:
 
 ```bash
 uv sync
-cd macos
-xcodegen generate
-xcodebuild -scheme Veriformis -configuration Debug \
+xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug \
   -derivedDataPath /tmp/veriformis-dd build
 killall Veriformis 2>/dev/null || true
 open --env "VERIFORMIS_CLI=$PWD/../.venv/bin/veriformis" \

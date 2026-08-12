@@ -704,6 +704,12 @@ The verifier MUST state the exact grade. It MUST NOT convert a co-located
 attestation into an external-trust claim. Source replay is a dataset validation
 responsibility and is not a third bundle trust grade in v1.
 
+The optional deterministic `.vfbundle.zip` companion does not change this
+closed directory contract. It packages these exact six files only after
+external-digest verification and reconstructs this directory for independent
+verification. Its byte rules are defined by
+[Deterministic Bundle Transport v1](bundle-transport-v1.md).
+
 ## Error and rejection semantics
 
 The stable Group 3 error codes are:

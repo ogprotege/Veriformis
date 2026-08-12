@@ -11,12 +11,20 @@ struct ResultView: View {
                 .font(.headline)
 
             gridRow("Workspace", result.workspaceURL.path)
-            gridRow("Bundle", result.bundleURL.path)
+            gridRow("Canonical bundle", result.bundleURL.path)
+            gridRow("Transport archive", result.transportArchiveURL.path)
             if let sha = result.manifestSHA256 {
                 digestRow(label: "Manifest SHA-256", value: sha, copyLabel: "manifest SHA-256")
             }
             if let digest = result.assignmentDigest {
                 digestRow(label: "Assignment digest", value: digest, copyLabel: "assignment digest")
+            }
+            if let digest = result.transportArchiveSHA256 {
+                digestRow(
+                    label: "Archive SHA-256",
+                    value: digest,
+                    copyLabel: "transport archive SHA-256"
+                )
             }
 
             if let notice = workbench.lastCopiedNotice {
@@ -42,8 +50,8 @@ struct ResultView: View {
                 Button("Reveal workspace") {
                     workbench.reveal(result.workspaceURL)
                 }
-                Button("Reveal bundle") {
-                    workbench.reveal(result.bundleURL)
+                Button("Reveal transport archive") {
+                    workbench.reveal(result.transportArchiveURL)
                 }
                 if let log = result.logFileURL {
                     Button("Open log") {

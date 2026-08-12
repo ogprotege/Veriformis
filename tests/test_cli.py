@@ -21,7 +21,7 @@ from veriformis.evidence import (
     edits_derivation,
     make_evidence,
 )
-from veriformis.identity import lossless_json_bytes
+from veriformis.identity import lossless_json_bytes, sha256_digest
 from veriformis.ir import document_from_dict, document_to_dict
 from veriformis.parsers.text import parse_text
 from veriformis.rules.cleaning import (
@@ -271,6 +271,31 @@ def test_full_pipeline_on_text_file(tmp_path):
     _assert_command_succeeded(result)
     assert "verification grade:" in result.output
     assert "dataset rows:" in result.output
+
+    manifest_sha256 = sha256_digest((bundle / "manifest.json").read_bytes())
+    archive = tmp_path / "out.vfbundle.zip"
+    result = runner.invoke(
+        app,
+        [
+            "package",
+            str(bundle),
+            "-o",
+            str(archive),
+            "--manifest-sha256",
+            manifest_sha256,
+        ],
+    )
+    _assert_command_succeeded(result)
+    assert archive.is_file()
+    assert "transport archive:" in result.output
+    assert "verification grade: external_digest" in result.output
+
+    result = runner.invoke(
+        app,
+        ["package-verify", str(archive), "--manifest-sha256", manifest_sha256],
+    )
+    _assert_command_succeeded(result)
+    assert "transport archive status: accepted" in result.output
 
 
 def test_chunk_commit_rejects_self_consistent_but_false_source_evidence(tmp_path):

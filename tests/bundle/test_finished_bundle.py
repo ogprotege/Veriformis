@@ -1,7 +1,11 @@
+import errno
 import json
 import os
+import stat
 import subprocess
 import sys
+import zipfile
+from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -9,6 +13,7 @@ from pydantic import ValidationError
 
 import veriformis.bundle.verifier as verifier_module
 import veriformis.bundle.finished as finished_module
+import veriformis.bundle.transport as transport_module
 from veriformis.chunkers.strategies import chunk_paragraph
 from veriformis.bundle.finished import (
     BundleAttestation,
@@ -25,6 +30,10 @@ from veriformis.bundle.finished import (
     write_finished_bundle,
 )
 from veriformis.bundle.verifier import verify_finished_bundle
+from veriformis.bundle.transport import (
+    verify_bundle_archive,
+    write_bundle_archive,
+)
 from veriformis.construction import (
     ConstructionInputs,
     DatasetRecipe,
@@ -1479,3 +1488,226 @@ def test_minimal_payload_roles_and_dataset_record_count_are_bound(tmp_path):
         PROVENANCE_PATH,
         VALIDATION_PATH,
     )
+
+
+def test_transport_archive_is_deterministic_and_externally_verified(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    manifest_sha256 = sha256_digest((bundle / "manifest.json").read_bytes())
+    first = tmp_path / "first.vfbundle.zip"
+    second = tmp_path / "second.vfbundle.zip"
+
+    first_receipt = write_bundle_archive(
+        bundle,
+        first,
+        expected_manifest_sha256=manifest_sha256,
+    )
+    second_receipt = write_bundle_archive(
+        bundle,
+        second,
+        expected_manifest_sha256=manifest_sha256,
+    )
+
+    assert first.read_bytes() == second.read_bytes()
+    assert first_receipt.archive_sha256 == second_receipt.archive_sha256
+    assert first_receipt.verification.trust_grade == "external_digest"
+    verified = verify_bundle_archive(
+        first,
+        expected_manifest_sha256=manifest_sha256,
+    )
+    assert verified.archive_sha256 == first_receipt.archive_sha256
+    assert verified.verification.manifest_sha256 == manifest_sha256
+
+
+def test_transport_archive_never_overwrites_an_existing_target(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    manifest_sha256 = sha256_digest((bundle / "manifest.json").read_bytes())
+    target = tmp_path / "existing.vfbundle.zip"
+    sentinel = b"owner-controlled existing bytes"
+    target.write_bytes(sentinel)
+
+    with pytest.raises(FileExistsError) as caught:
+        write_bundle_archive(
+            bundle,
+            target,
+            expected_manifest_sha256=manifest_sha256,
+        )
+
+    assert caught.value.errno == errno.EEXIST
+    assert caught.value.filename == target
+    assert target.read_bytes() == sentinel
+
+
+def test_transport_archive_extracts_to_the_exact_canonical_bundle(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    archive = tmp_path / "portable.vfbundle.zip"
+    write_bundle_archive(bundle, archive, expected_manifest_sha256=digest)
+
+    extracted = tmp_path / "extracted.vfbundle"
+    with zipfile.ZipFile(archive) as package:
+        package.extractall(extracted)
+
+    result = verify_finished_bundle(
+        extracted,
+        expected_manifest_sha256=digest,
+    )
+    assert result.trust_grade == "external_digest"
+
+
+def test_transport_packaging_never_ignores_finder_metadata(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    (bundle / ".DS_Store").write_bytes(b"finder mutation")
+
+    with pytest.raises(BundleVerificationError, match="file set is not closed"):
+        write_bundle_archive(
+            bundle,
+            tmp_path / "must-not-exist.vfbundle.zip",
+            expected_manifest_sha256=digest,
+        )
+
+
+def test_transport_verifier_rejects_noncanonical_or_tampered_archives(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    archive = tmp_path / "tampered.vfbundle.zip"
+    write_bundle_archive(bundle, archive, expected_manifest_sha256=digest)
+    with zipfile.ZipFile(archive, "a", compression=zipfile.ZIP_STORED) as package:
+        package.writestr(".DS_Store", b"finder mutation")
+
+    with pytest.raises(BundleVerificationError, match="transport archive"):
+        verify_bundle_archive(archive, expected_manifest_sha256=digest)
+
+
+@pytest.mark.parametrize("member_name", ("../escape", "attestation.json"))
+def test_transport_rejects_traversal_and_duplicate_members(tmp_path, member_name):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    archive = tmp_path / "unsafe.vfbundle.zip"
+    write_bundle_archive(bundle, archive, expected_manifest_sha256=digest)
+    with pytest.warns(UserWarning) if member_name == "attestation.json" else nullcontext():
+        with zipfile.ZipFile(archive, "a", compression=zipfile.ZIP_STORED) as package:
+            package.writestr(member_name, b"unsafe")
+
+    with pytest.raises(BundleVerificationError, match="member set or order"):
+        verify_bundle_archive(archive, expected_manifest_sha256=digest)
+
+
+def test_transport_rejects_link_members_before_extraction(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    valid = tmp_path / "valid.vfbundle.zip"
+    unsafe = tmp_path / "link.vfbundle.zip"
+    write_bundle_archive(bundle, valid, expected_manifest_sha256=digest)
+    with zipfile.ZipFile(valid) as source, zipfile.ZipFile(
+        unsafe,
+        "w",
+        compression=zipfile.ZIP_STORED,
+    ) as destination:
+        for source_info in source.infolist():
+            info = zipfile.ZipInfo(source_info.filename, source_info.date_time)
+            info.compress_type = zipfile.ZIP_STORED
+            info.create_system = 3
+            info.create_version = 45
+            info.extract_version = 45
+            info.external_attr = source_info.external_attr
+            if info.filename == TRAIN_PATH:
+                info.external_attr = (stat.S_IFLNK | 0o777) << 16
+            destination.writestr(info, source.read(source_info))
+
+    with pytest.raises(BundleVerificationError, match="not a regular file"):
+        verify_bundle_archive(unsafe, expected_manifest_sha256=digest)
+
+
+def test_transport_rejects_payload_mutation_with_canonical_zip_encoding(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    archive = tmp_path / "mutated.vfbundle.zip"
+    original = (bundle / TRAIN_PATH).read_bytes()
+    mutated = original.replace(b"alpha", b"omega", 1)
+    assert mutated != original
+    (bundle / TRAIN_PATH).write_bytes(mutated)
+    transport_module._write_deterministic_archive(bundle, archive)
+
+    with pytest.raises(BundleVerificationError, match="digest mismatch"):
+        verify_bundle_archive(archive, expected_manifest_sha256=digest)
+
+
+def test_transport_requires_the_externally_retained_manifest_digest(tmp_path):
+    bundle, _ = _write_valid(tmp_path)
+    wrong_digest = sha256_digest(b"a different manifest")
+
+    with pytest.raises(BundleVerificationError, match="external digest"):
+        write_bundle_archive(
+            bundle,
+            tmp_path / "must-not-exist.vfbundle.zip",
+            expected_manifest_sha256=wrong_digest,
+        )
+
+
+@pytest.mark.parametrize(
+    ("error_number", "message"),
+    (
+        (errno.ENOSPC, "No space left on device"),
+        (errno.EACCES, "Permission denied"),
+    ),
+)
+def test_transport_publication_failure_leaves_no_partial_target(
+    tmp_path,
+    monkeypatch,
+    error_number,
+    message,
+):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    target = tmp_path / "failed.vfbundle.zip"
+
+    def fail_write(bundle_path, archive_path):
+        raise OSError(error_number, message, archive_path)
+
+    monkeypatch.setattr(
+        transport_module,
+        "_write_deterministic_archive",
+        fail_write,
+    )
+    with pytest.raises(OSError) as caught:
+        write_bundle_archive(
+            bundle,
+            target,
+            expected_manifest_sha256=digest,
+        )
+
+    assert caught.value.errno == error_number
+    assert not target.exists()
+    assert not list(tmp_path.glob(".failed.vfbundle.zip.tmp-*"))
+
+
+def test_transport_reports_staging_cleanup_failure_after_valid_publication(
+    tmp_path,
+    monkeypatch,
+):
+    bundle, _ = _write_valid(tmp_path)
+    digest = sha256_digest((bundle / "manifest.json").read_bytes())
+    target = tmp_path / "cleanup-warning.vfbundle.zip"
+    original_unlink = Path.unlink
+
+    def fail_staging_unlink(path, *args, **kwargs):
+        if path.name.startswith(".cleanup-warning.vfbundle.zip.tmp-"):
+            raise OSError(errno.EACCES, "Permission denied", path)
+        return original_unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", fail_staging_unlink)
+    with pytest.warns(RuntimeWarning, match="staging link could not be removed"):
+        receipt = write_bundle_archive(
+            bundle,
+            target,
+            expected_manifest_sha256=digest,
+        )
+
+    assert target.is_file()
+    assert receipt.durability_warning is not None
+    assert "staging link could not be removed" in receipt.durability_warning
+    assert verify_bundle_archive(
+        target,
+        expected_manifest_sha256=digest,
+    ).archive_sha256 == receipt.archive_sha256

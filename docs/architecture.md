@@ -120,6 +120,11 @@ name.vfbundle/
   no-replace rename protects cooperating writers, not a hostile same-owner
   process renaming parent entries mid-rename (see the
   [contract](contracts/finished-dataset-v1.md)).
+- Finder-facing transport uses a deterministic `.vfbundle.zip` containing
+  those exact six paths. Packaging requires `external_digest` verification;
+  archive verification reconstructs the strict directory and reuses the same
+  canonical verifier. This is transport only, not a trainer export. See
+  [ADR 0005](adr/0005-deterministic-bundle-transport.md).
 
 ## Related documentation
 
