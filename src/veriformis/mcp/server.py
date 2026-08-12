@@ -9,7 +9,12 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from veriformis.pipeline.service import DEFAULT_PIPELINE_SERVICE, PipelineService
+from veriformis.errors import VeriformisError
+from veriformis.pipeline.service import (
+    DEFAULT_PIPELINE_SERVICE,
+    PipelineService,
+    SealPartialPublicationError,
+)
 from veriformis.recipes import list_named_recipes, load_pipeline_spec, run_pipeline_spec
 
 
@@ -37,6 +42,25 @@ def _jsonable(value: Any) -> Any:
 
 def _outcome_json(outcome: Any) -> str:
     return json.dumps(_jsonable(outcome), ensure_ascii=False, indent=2, sort_keys=True)
+
+
+def _partial_publication_payload(exc: SealPartialPublicationError) -> dict[str, Any]:
+    """Surface the publication receipt facts a client needs after a torn seal."""
+    publication = exc.publication
+    return {
+        "error": {
+            "code": "seal-partial-publication",
+            "message": str(exc.cause),
+            "bundle_path": str(publication.bundle_path),
+            "manifest_sha256": publication.manifest_sha256,
+            "explanation": (
+                f"published bundle remains visible at {publication.bundle_path}; "
+                f"manifest SHA-256 {publication.manifest_sha256}; workspace "
+                "receipt did not commit"
+            ),
+        },
+        "exit_status": 1,
+    }
 
 
 def create_mcp_server(
@@ -164,26 +188,47 @@ def create_mcp_server(
     @server.tool()
     def seal(workspace: str, out: str, write_handoff: bool = False) -> str:
         """Seal a bundle; optionally opt in to an Aptus handoff sibling."""
-        outcome = pipeline.seal(Path(workspace), Path(out))
+        try:
+            outcome = pipeline.seal(Path(workspace), Path(out))
+        except SealPartialPublicationError as exc:
+            return json.dumps(
+                _partial_publication_payload(exc),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+        # The seal outcome is secured first: a handoff failure must report
+        # alongside — never instead of — the successful seal result.
         payload = _jsonable(outcome)
         if write_handoff and outcome.publication is not None:
-            from veriformis.handoff import (
-                build_aptus_handoff,
-                handoff_path_for_bundle,
-                write_aptus_handoff,
-            )
+            import veriformis.handoff as handoff_module
 
-            handoff = build_aptus_handoff(
-                outcome.publication.bundle_path,
-                expected_manifest_sha256=outcome.publication.manifest_sha256,
-            )
-            path = write_aptus_handoff(
-                handoff,
-                handoff_path_for_bundle(outcome.publication.bundle_path),
-            )
-            payload["aptus_handoff_path"] = str(path)
-            payload["aptus_handoff_id"] = handoff.handoff_id
-            payload["assignment_digest"] = handoff.assignment_digest
+            try:
+                handoff = handoff_module.build_aptus_handoff(
+                    outcome.publication.bundle_path,
+                    expected_manifest_sha256=outcome.publication.manifest_sha256,
+                )
+                path = handoff_module.write_aptus_handoff(
+                    handoff,
+                    handoff_module.handoff_path_for_bundle(
+                        outcome.publication.bundle_path
+                    ),
+                )
+            except (
+                VeriformisError,
+                OSError,
+                UnicodeError,
+                ValueError,
+                TypeError,
+            ) as exc:
+                payload["aptus_handoff_error"] = {
+                    "code": getattr(exc, "code", "invalid-data"),
+                    "message": getattr(exc, "message", str(exc)),
+                }
+            else:
+                payload["aptus_handoff_path"] = str(path)
+                payload["aptus_handoff_id"] = handoff.handoff_id
+                payload["assignment_digest"] = handoff.assignment_digest
         return json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
 
     @server.tool()
@@ -215,7 +260,15 @@ def create_mcp_server(
     def run_pipeline(pipeline_path: str) -> str:
         """Execute one versioned YAML pipeline document."""
         spec = load_pipeline_spec(Path(pipeline_path))
-        result = run_pipeline_spec(spec, service=pipeline)
+        try:
+            result = run_pipeline_spec(spec, service=pipeline)
+        except SealPartialPublicationError as exc:
+            return json.dumps(
+                _partial_publication_payload(exc),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
         return json.dumps(_jsonable(result), ensure_ascii=False, indent=2, sort_keys=True)
 
     @server.tool()
