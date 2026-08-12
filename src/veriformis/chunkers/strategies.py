@@ -240,7 +240,19 @@ def _sentence_spans(text: str) -> list[tuple[int, int]]:
         spans.append((start, match.start()))
         start = match.end()
     spans.append((start, len(text)))
-    return [(begin, end) for begin, end in spans if begin < end]
+    # Exclude leading/trailing whitespace from every span: cleaning can leave
+    # edge whitespace inside a block (e.g. the urls rule deleting a trailing
+    # token), and buffered chunk text must equal the exact " ".join of its
+    # evidence slices by construction.
+    trimmed: list[tuple[int, int]] = []
+    for begin, end in spans:
+        while begin < end and text[begin].isspace():
+            begin += 1
+        while end > begin and text[end - 1].isspace():
+            end -= 1
+        if begin < end:
+            trimmed.append((begin, end))
+    return trimmed
 
 
 def chunk_sentence(
@@ -285,7 +297,7 @@ def chunk_sentence(
                 block_derivations,
                 region_id,
             )
-            candidate = (buf + " " + sent).strip() if buf else sent
+            candidate = buf + " " + sent if buf else sent
             if buf and len(candidate) > max_size:
                 emit()
                 buf, buf_blocks = sent, [block]
