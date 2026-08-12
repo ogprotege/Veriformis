@@ -6,6 +6,12 @@ import UniformTypeIdentifiers
 @MainActor
 final class WorkbenchViewModel: ObservableObject {
     nonisolated static let defaultWriteAptusHandoff = false
+    /// Match the CLI curate default (`--require-evaluation`): fail closed when
+    /// the evaluation partition would be empty. Empty-evaluation is an
+    /// explicit per-run opt-in, never a silent GUI default.
+    nonisolated static let defaultAllowEmptyEvaluation = false
+    /// Match the CLI construct default for `--split-ratio-ppm`.
+    nonisolated static let defaultSplitRatioPPM = 500_000
 
     // Navigation
     @Published var destination: SidebarDestination = .compile
@@ -16,8 +22,8 @@ final class WorkbenchViewModel: ObservableObject {
     private var userPinnedSourceRoot = false
     @Published var outputDirectoryURL: URL?
     @Published var objective: TrainingObjective = .fullText
-    @Published var allowEmptyEvaluation = true
-    @Published var splitRatioPPM = 400_000
+    @Published var allowEmptyEvaluation = defaultAllowEmptyEvaluation
+    @Published var splitRatioPPM = defaultSplitRatioPPM
     @Published var writeAptusHandoff = defaultWriteAptusHandoff
 
     // Run state
@@ -546,9 +552,11 @@ final class WorkbenchViewModel: ObservableObject {
         if let objective = TrainingObjective(rawValue: entry.objective) {
             self.objective = objective
         }
-        allowEmptyEvaluation = entry.allowEmptyEvaluation ?? true
+        // Legacy entries without recorded values fall back to the current
+        // fail-closed defaults; explicitly recorded opt-ins are preserved.
+        allowEmptyEvaluation = entry.allowEmptyEvaluation ?? Self.defaultAllowEmptyEvaluation
         writeAptusHandoff = entry.requestsAptusHandoff
-        splitRatioPPM = entry.splitRatioPPM ?? 400_000
+        splitRatioPPM = entry.splitRatioPPM ?? Self.defaultSplitRatioPPM
         let parent = URL(fileURLWithPath: entry.workspacePath).deletingLastPathComponent()
         if FileManager.default.fileExists(atPath: parent.path) {
             outputDirectoryURL = parent
