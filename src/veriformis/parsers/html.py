@@ -67,8 +67,8 @@ _HEADING_LEVEL = {
     "h5": 5,
     "h6": 6,
 }
+_PARAGRAPH_TAGS = frozenset({"p", "li", "blockquote", "pre", "td", "th"})
 _WS = re.compile(r"[ \t\f\v]+")
-_BLANK = re.compile(r"\n{3,}")
 
 
 def parse_html_file(
@@ -205,43 +205,75 @@ def parse_html_file(
             )
             break
 
-    for element in scope.iter():
-        if not isinstance(element.tag, str):
-            continue
+    # Walk the scope in document order. Heading and paragraph tags are
+    # captured whole via itertext without descending; every other text node
+    # (text directly in <div>, <span>, <body>, and tail text following a
+    # captured element) joins a pending loose-text run that is flushed as
+    # paragraph blocks at block-tag boundaries. Nothing visible may leave
+    # the canonical stream silently.
+    loose_parts: list[str] = []
+    captured_structured = False
+    recovered_loose = False
+
+    def flush_loose() -> None:
+        nonlocal recovered_loose
+        raw = "".join(loose_parts)
+        loose_parts.clear()
+        if not raw.strip():
+            return
+        for chunk in re.split(r"\n\s*\n", raw):
+            if chunk.strip():
+                recovered_loose = True
+                append_paragraph(chunk)
+
+    def enter(element) -> bool:
+        """Capture one element; return whether to walk its children."""
+        nonlocal captured_structured
         name = element.tag.lower()
         if name in _HEADING_LEVEL:
+            flush_loose()
             append_paragraph(
                 "".join(element.itertext()),
                 level=_HEADING_LEVEL[name],
             )
-            # Prevent nested text from double-counting: clear children text by
-            # not walking into them — iter() will still visit children, so mark
-            # processed via clearing text of descendants after capture.
-            for child in element.iter():
-                if child is element:
-                    continue
-                if isinstance(child.tag, str):
-                    child.text = None
-                    child.tail = None
-            element.text = None
-            element.tail = None
-            continue
-        if name in {"p", "li", "blockquote", "pre", "td", "th"}:
+            captured_structured = True
+            return False
+        if name in _PARAGRAPH_TAGS:
+            flush_loose()
             append_paragraph("".join(element.itertext()))
-            for child in element.iter():
-                if child is element:
-                    continue
-                if isinstance(child.tag, str):
-                    child.text = None
-                    child.tail = None
-            element.text = None
-            element.tail = None
+            captured_structured = True
+            return False
+        if name in _BLOCK_TAGS:
+            flush_loose()
+        if element.text:
+            loose_parts.append(element.text)
+        return True
 
-    # Fallback: residual visible text not captured as block tags.
-    residual = _BLANK.sub("\n\n", _WS.sub(" ", " ".join(scope.itertext()))).strip()
-    if not blocks and residual:
-        for chunk in re.split(r"\n\s*\n", residual):
-            append_paragraph(chunk)
+    stack: list = []
+    if enter(scope):
+        stack.append((scope, iter(scope)))
+    while stack:
+        element, children = stack[-1]
+        child = next(children, None)
+        if child is None:
+            stack.pop()
+            if element is not scope:
+                if element.tag.lower() in _BLOCK_TAGS:
+                    flush_loose()
+                if element.tail:
+                    loose_parts.append(element.tail)
+            continue
+        if not isinstance(child.tag, str):
+            if child.tail:
+                loose_parts.append(child.tail)
+            continue
+        if enter(child):
+            stack.append((child, iter(child)))
+        elif child.tail:
+            loose_parts.append(child.tail)
+    flush_loose()
+
+    if recovered_loose and not captured_structured:
         diagnostics.append(
             {
                 "code": "html.flat-text-fallback",
@@ -251,8 +283,19 @@ def parse_html_file(
                 "message": "HTML structure was weak; text was recovered as flat paragraphs.",
             }
         )
-    elif residual and not parts:
-        append_paragraph(residual)
+    elif recovered_loose:
+        diagnostics.append(
+            {
+                "code": "html.loose-text-recovered",
+                "severity": "info",
+                "disposition": "normalized",
+                "loss_kind": "structure",
+                "message": (
+                    "Visible text outside recognized block tags was recovered "
+                    "as paragraph blocks in document order."
+                ),
+            }
+        )
 
     stream = "\n\n".join(parts)
     source = register_source(

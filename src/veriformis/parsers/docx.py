@@ -658,7 +658,7 @@ def _inventory_table_boundaries(body: etree._Element, add) -> None:
                 ),
                 details={"contains_text": contains_text},
             )
-        rows = table.findall(_q("w:tr"))
+        rows = list(_iter_wrapped_children(table, {_q("w:tr")}))
         for row_index, row in enumerate(rows):
             if row_index == 0 or not _table_row_is_header(row):
                 continue
@@ -673,6 +673,26 @@ def _inventory_table_boundaries(body: etree._Element, add) -> None:
                     "single-header-row model."
                 ),
                 details={"row_index": row_index},
+            )
+        for wrapper in table.iter():
+            if wrapper.tag not in _BODY_WRAPPER_TAGS:
+                continue
+            if any(
+                ancestor.tag == _q("w:p") for ancestor in wrapper.iterancestors()
+            ):
+                # Wrappers inside cell paragraphs are inventoried by the
+                # paragraph boundary.
+                continue
+            add(
+                wrapper,
+                "docx.table-wrapper-normalized",
+                "info",
+                "normalized",
+                "structure",
+                (
+                    "A table-level OOXML wrapper was removed while its "
+                    "supported row, cell, or paragraph content was retained."
+                ),
             )
     for merge in body.iter():
         if merge.tag not in {_q("w:gridSpan"), _q("w:vMerge")}:
@@ -879,6 +899,7 @@ def _inventory_run_boundary(
         None,
     )
     is_toc = paragraph is not None and _paragraph_is_toc_field(paragraph)
+    in_code_block = paragraph is not None and _paragraph_is_code_block(paragraph)
     handled = {
         _q("w:rPr"),
         _q("w:t"),
@@ -895,6 +916,26 @@ def _inventory_run_boundary(
     }
     for child in run:
         if child.tag in handled:
+            if in_code_block and child.tag in {
+                _q("w:drawing"),
+                _q("w:footnoteReference"),
+                _q("w:endnoteReference"),
+            }:
+                # Code-block styled paragraphs lower to plain code text, which
+                # cannot carry drawings or note-reference markers.
+                add(
+                    child,
+                    "docx.code-block-inline-omitted",
+                    "warning",
+                    "omitted",
+                    "structure",
+                    (
+                        "A non-text inline construct inside a code-block "
+                        "paragraph cannot be represented in canonical code "
+                        "text and was omitted."
+                    ),
+                )
+                continue
             if child.tag == _q("w:drawing"):
                 blip = child.find(f".//{{{A_NS}}}blip")
                 rel_id = (
@@ -1158,13 +1199,18 @@ def _walk_body(
 
 def _iter_body_blocks(container: etree._Element):
     """Yield supported blocks in order through transparent body wrappers."""
+    yield from _iter_wrapped_children(container, {_q("w:p"), _q("w:tbl")})
+
+
+def _iter_wrapped_children(container: etree._Element, tags: set[str]):
+    """Yield matching children in order through transparent OOXML wrappers."""
     for child in container:
-        if child.tag in {_q("w:p"), _q("w:tbl")}:
+        if child.tag in tags:
             yield child
         elif child.tag in _BODY_WRAPPER_TAGS:
             content = _wrapper_content(child)
             if content is not None:
-                yield from _iter_body_blocks(content)
+                yield from _iter_wrapped_children(content, tags)
 
 
 # ---------------------------------------------------------------------------
@@ -1310,6 +1356,17 @@ def _paragraph_is_toc_field(p: etree._Element) -> bool:
     return False
 
 
+def _paragraph_is_code_block(p: etree._Element) -> bool:
+    """Return whether the paragraph's style lowers it to plain code text."""
+    ppr = p.find(_q("w:pPr"))
+    if ppr is None:
+        return False
+    pstyle = ppr.find(_q("w:pStyle"))
+    if pstyle is None:
+        return False
+    return style_map.is_code_block(pstyle.get(_q("w:val")) or "")
+
+
 def _paragraph_plain_text(p: etree._Element) -> str:
     parts: list[str] = []
 
@@ -1421,7 +1478,7 @@ def _parse_table(
     tbl: etree._Element,
     rels: dict,
 ) -> Table:
-    rows_el = tbl.findall(_q("w:tr"))
+    rows_el = list(_iter_wrapped_children(tbl, {_q("w:tr")}))
     if not rows_el:
         return Table()
 
@@ -1432,9 +1489,9 @@ def _parse_table(
     for idx, tr in enumerate(rows_el):
         cells = []
         cell_alignments = []
-        for tc in tr.findall(_q("w:tc")):
+        for tc in _iter_wrapped_children(tr, {_q("w:tc")}):
             cell_inlines: list[Inline] = []
-            paragraphs = tc.findall(_q("w:p"))
+            paragraphs = list(_iter_wrapped_children(tc, {_q("w:p")}))
             for p in paragraphs:
                 para_inlines = _paragraph_inlines(p, rels)
                 if cell_inlines and para_inlines:
@@ -1524,16 +1581,6 @@ def _run_inlines(
     vert_align: str | None = None  # "superscript" | "subscript" | None
     is_math = _is_cambria_math_run(rPr)
 
-    # If this run is marked as math, consume it wholesale as a Math node,
-    # taking the run's text as the source. ``display`` is False here; the
-    # standalone-paragraph detection in _paragraph_to_block promotes it.
-    if is_math:
-        text_parts = [(t.text or "") for t in r.iter(_q("w:t"))]
-        source = "".join(text_parts)
-        if source:
-            return [Math(source=source, display=False)]
-        return []
-
     if rPr is not None:
         if rPr.find(_q("w:b")) is not None and not _val_false(rPr.find(_q("w:b"))):
             bold = True
@@ -1568,19 +1615,15 @@ def _run_inlines(
             if any(m in fname for m in ("Mono", "Courier", "Consolas", "Menlo")):
                 is_code = True
 
-    # Collect text / break / image / footnote-ref content
+    # Collect text / break / image / footnote-ref content. Text pieces stay
+    # literal here; Pandoc-style citation splitting applies only on the
+    # plain-prose path below so math and code runs keep their exact text.
     pieces: list[Inline] = []
     for sub in r:
         if sub.tag == _q("w:t"):
             text = sub.text or ""
             if text:
-                # Split on Pandoc-style ``[@key]`` / ``[@key, loc]`` citations
-                # so they survive as Citation nodes rather than literal text.
-                split = _split_citations_in_text(text)
-                if split:
-                    pieces.extend(split)
-                else:
-                    pieces.append(Text(value=text))
+                pieces.append(Text(value=text))
         elif sub.tag == _q("w:tab"):
             pieces.append(Text(value="\t"))
         elif sub.tag == _q("w:br"):
@@ -1611,15 +1654,62 @@ def _run_inlines(
     if not pieces:
         return []
 
+    # A math-marked run is consumed as one Math node whose source is the
+    # run's text with breaks preserved; pieces a Math source cannot carry
+    # (note references, images) are emitted beside it, never discarded.
+    # ``display`` is False here; the standalone-paragraph detection in
+    # _paragraph_to_block promotes it.
+    if is_math:
+        source_parts: list[str] = []
+        extras: list[Inline] = []
+        for piece in pieces:
+            if isinstance(piece, Text):
+                source_parts.append(piece.value)
+            elif isinstance(piece, LineBreak):
+                source_parts.append("\n")
+            else:
+                extras.append(piece)
+        source = "".join(source_parts)
+        result = [Math(source=source, display=False)] if source else []
+        result.extend(extras)
+        return result
+
     # Apply formatting wrappers outside-in: code > strike > italic > bold
     # (code is terminal — if the run is code, don't also wrap in b/i.)
     if is_code:
-        joined = "".join(p.value if isinstance(p, Text) else "" for p in pieces)
-        if joined:
-            return [Code(value=joined)]
-        return []
+        # Line breaks survive inside the Code value; pieces a Code inline
+        # cannot carry (note references, images) are emitted in run order
+        # beside the code text, never discarded.
+        result = []
+        code_parts: list[str] = []
 
-    result: list[Inline] = pieces
+        def flush_code() -> None:
+            joined = "".join(code_parts)
+            code_parts.clear()
+            if joined:
+                result.append(Code(value=joined))
+
+        for piece in pieces:
+            if isinstance(piece, Text):
+                code_parts.append(piece.value)
+            elif isinstance(piece, LineBreak):
+                code_parts.append("\n")
+            else:
+                flush_code()
+                result.append(piece)
+        flush_code()
+        return result
+
+    expanded: list[Inline] = []
+    for piece in pieces:
+        if isinstance(piece, Text):
+            # Split on Pandoc-style ``[@key]`` / ``[@key, loc]`` citations
+            # so they survive as Citation nodes rather than literal text.
+            expanded.extend(_split_citations_in_text(piece.value))
+        else:
+            expanded.append(piece)
+
+    result = expanded
     # Vertical alignment (super/sub) wraps innermost before other emphasis,
     # so bold/italic/strike survive around a sup/sub run.
     if vert_align == "superscript":
