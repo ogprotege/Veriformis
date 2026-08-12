@@ -96,17 +96,22 @@ The app is still a **Debug build from the repo**, not a signed public installer.
 
 ```bash
 cd /path/to/Veriformis
-bash macos/scripts/run_workbench.sh
+uv sync
+./script/build_and_run.sh
 ```
 
 That script:
 
-1. Ensures `uv sync` / `.venv/bin/veriformis`
-2. Builds the Debug `.app`
+1. Requires the installed `.venv/bin/veriformis` or an explicit `VERIFORMIS_CLI`
+2. Builds the checked-in Xcode project into a deterministic DerivedData path
 3. Opens it with `open --env` so the GUI finds the CLI (plain `export` + `open`
    does **not** pass env into GUI apps)
 
-**Prerequisites for the GUI:** Xcode + [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+Use `--verify`, `--debug`, `--logs`, or `--telemetry` for the corresponding
+development mode. `macos/scripts/run_workbench.sh` remains a compatibility
+wrapper around the same entrypoint.
+
+**Prerequisite for the GUI:** Xcode.
 
 Details: [macos/README.md](../macos/README.md).
 
@@ -129,6 +134,8 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis validate WORKSPACE` | 17-gate validation |
 | `veriformis seal WORKSPACE -o BUNDLE.vfbundle` | Atomic canonical six-file bundle; no integration artifact by default |
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
+| `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
+| `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
 | `veriformis handoff BUNDLE --manifest-sha256 HEX` | Build/write Aptus handoff |
 | `veriformis handoff-verify HANDOFF --bundle BUNDLE` | Consumer check |
 | `veriformis list-recipes` | Named recipes |
@@ -150,7 +157,12 @@ veriformis split /tmp/ws
 veriformis format /tmp/ws
 veriformis validate /tmp/ws
 veriformis seal /tmp/ws -o /tmp/out.vfbundle
-veriformis verify /tmp/out.vfbundle
+MANIFEST_SHA256="$(shasum -a 256 /tmp/out.vfbundle/manifest.json | awk '{print $1}')"
+veriformis verify /tmp/out.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
+veriformis package /tmp/out.vfbundle -o /tmp/out.vfbundle.zip \
+  --manifest-sha256 "$MANIFEST_SHA256"
+veriformis package-verify /tmp/out.vfbundle.zip \
+  --manifest-sha256 "$MANIFEST_SHA256"
 ```
 
 Optional Aptus adapter use is explicit: pass `--aptus-handoff` to `seal`, or
@@ -162,8 +174,8 @@ accepts supervised row schemas such as `continuation` and rejects plain
 
 ## How the GUI related to “I never installed the CLI”
 
-If you used `bash macos/scripts/run_workbench.sh` (or a Debug build from this
-repo after `uv sync`):
+If you used `./script/build_and_run.sh` (or the compatibility wrapper, or a
+Debug build from this repo after `uv sync`):
 
 1. `uv sync` created `.venv/bin/veriformis`
 2. The app was pointed at that binary (or `uv run … veriformis`)
@@ -182,7 +194,7 @@ Debug workbench**.
 
 | Symptom | Fix |
 | --- | --- |
-| GUI: could not locate CLI | `bash macos/scripts/run_workbench.sh` after `uv sync` |
+| GUI: could not locate CLI | `uv sync`, then `./script/build_and_run.sh` |
 | `veriformis: command not found` | Use `uv run veriformis` or put `.venv/bin` on PATH / `uv tool install` |
 | `source root is not a directory` | Pass a directory to `--source-root`, not a file (fixed in recent workbench) |
 | Optional Aptus handoff rejected for `full_text` | Expected under the adapter policy: plain `text` schema; use a supported supervised objective only when that integration is your target |

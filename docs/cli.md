@@ -6,10 +6,11 @@ Veriformis ships one console entry point, `veriformis`
 (`parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`,
 `validate`, `seal`) advance one immutable, transactional workspace through
 the dataset pipeline. Additional commands cover maintenance
-(`upgrade-workspace`), read-only inspection (`verify`, `preview`), recipes
+(`upgrade-workspace`), immutable transport (`package`, `package-verify`),
+read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), local MCP (`mcp`), and `version`.
-The complete surface is 18 commands.
+The complete surface is 20 commands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
@@ -40,6 +41,7 @@ examples below use the installed name.
 | Maintenance | `upgrade-workspace` | Appends migration revisions when the workspace is behind |
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
+| Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Read-only | `verify`, `preview` | Nothing |
 | Meta | `version` | Nothing |
 
@@ -487,6 +489,40 @@ current workspace is a no-op and prints
 Failure modes (exit 2): `workspace-revision-conflict` when `HEAD` moved
 mid-migration; `unsupported-workspace-version` when the revision schema
 cannot be migrated; the standard workspace integrity errors below.
+
+## Transport commands
+
+### `package`
+
+Create the deterministic Finder-safe transport of an externally anchored
+canonical bundle.
+
+```text
+veriformis package BUNDLE -o OUTPUT.vfbundle.zip --manifest-sha256 EXPECTED_SHA256
+```
+
+The manifest digest is required and must have been retained outside the
+bundle. Packaging first runs canonical bundle verification at
+`external_digest` grade. It never ignores or removes unexpected files. The
+output contains the same six bundle members in fixed order with deterministic
+stored ZIP encoding; it is re-opened, reconstructed, and independently
+verified before no-replace publication.
+
+Success prints the archive path, archive SHA-256, manifest SHA-256,
+`external_digest` grade, and member count. The archive is a transport wrapper,
+not a trainer export and not another bundle profile.
+
+### `package-verify`
+
+```text
+veriformis package-verify ARCHIVE.vfbundle.zip --manifest-sha256 EXPECTED_SHA256
+```
+
+Verification requires canonical ZIP bytes and metadata, reconstructs only the
+six fixed destinations in private temporary storage, and runs the canonical
+bundle verifier with the caller's external digest. Traversal, links,
+duplicates, extra members, changed bytes, and noncanonical ZIP encodings fail.
+See [Deterministic Bundle Transport v1](contracts/bundle-transport-v1.md).
 
 ## Read-only commands
 

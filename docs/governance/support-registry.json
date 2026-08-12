@@ -94,6 +94,20 @@
         "evidence": "src/veriformis/bundle/finished.py"
       }
     ],
+    "implemented_transport_profiles": [
+      {
+        "profile": "deterministic-vfbundle-zip-v1",
+        "state": "implemented",
+        "product_role": "immutable-transport",
+        "requires_external_manifest_digest": true,
+        "is_trainer_export": false,
+        "evidence": [
+          "src/veriformis/bundle/transport.py",
+          "docs/contracts/bundle-transport-v1.md",
+          "tests/bundle/test_finished_bundle.py"
+        ]
+      }
+    ],
     "generic_export_containers": [
       {
         "container": "split-jsonl-directory",
@@ -187,16 +201,6 @@
     }
   ],
   "known_current_gaps": [
-    {
-      "id": "gap-workbench-main-actor-process",
-      "state": "verified-open",
-      "evidence": "macos/Sources/Services/VeriformisCLI.swift"
-    },
-    {
-      "id": "gap-finder-bundle-mutation",
-      "state": "verified-open",
-      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
-    },
     {
       "id": "gap-generic-export-service",
       "state": "verified-open",

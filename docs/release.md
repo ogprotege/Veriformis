@@ -23,7 +23,7 @@ Operator non-claims and any future **beta** cut criteria:
 | Lint | `uv run ruff check src tests` | CI `test` job |
 | Core suite | `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"` | Required CI matrix Python 3.11–3.13 (Ubuntu) + macOS 3.12; adapter-only modules are not collected |
 | Installable package and installed origin | `scripts/release/smoke_install.sh` | CI `install-smoke` job; wheel installed in an isolated environment, no external `aptus` distribution, full golden path through that CLI |
-| Golden standalone product path | `scripts/release/golden_compile.sh` | Required CI `golden-compile` job; both objectives, canonical seal, externally anchored verify, no handoff |
+| Golden standalone product path | `scripts/release/golden_compile.sh` | Required CI `golden-compile` job; both objectives, canonical seal, externally anchored verify, deterministic package + package verification, no handoff |
 | Workspace migration | Ordinary pytest under `tests/regressions/` | Full suite (not a separate silent skip) |
 
 The optional `aptus-integration` job runs marked tests and
@@ -101,17 +101,20 @@ covered by ordinary suite tests under `tests/regressions/`.
 
 The core script has no Aptus handoff step. It uses default seal behavior,
 asserts that no sibling descriptor appears, checks the closed canonical file
-set, retains the manifest SHA-256 outside the bundle, and requires
-`external_digest` verification.
+set, retains the manifest SHA-256 outside the bundle, requires
+`external_digest` verification, then creates and verifies the deterministic
+`.vfbundle.zip` transport.
 
 Source set: `tests/fixtures/acceptance/v1/raw/corpus/` (text, markdown, code).
 
 Objectives (M1.1 acceptance):
 
 1. `full_text` → default seal → `verify --manifest-sha256 …`
-   (`external_digest`) → no sibling descriptor.
+   (`external_digest`) → deterministic package + package verification → no
+   sibling descriptor.
 2. `continuation` (split ratio 400000 ppm) → default seal →
-   `external_digest` verify → no sibling descriptor.
+   `external_digest` verify → deterministic package + package verification →
+   no sibling descriptor.
 
 Adversarial fixtures under `raw/adversarial/` are not part of the golden
 release compile; they remain regression fixtures for cleaning and refusal paths.

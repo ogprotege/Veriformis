@@ -9,7 +9,7 @@ automated gates; beta-prep; private beta workbench Phases 0–2)
 
 **Last reviewed:** 2026-08-11 (independent-product authority pass)
 
-**Next review:** Independent-roadmap Phase 2 start; beta label cut, public Mac
+**Next review:** Independent-roadmap Phase 3 start; beta label cut, public Mac
 evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -69,7 +69,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | --- | --- | --- | --- |
 | 0 | Establish authority, baseline, and decision records | Completed | [Completed packet](dev/active/independent-product/phase-00-foundation/README.md) |
 | 1 | Enforce standalone independence | Completed | [Completed packet](dev/active/independent-product/phase-01-standalone-independence/README.md) |
-| 2 | Close known reliability and artifact-boundary defects | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 4 | Build the verified export foundation | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -112,6 +112,15 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
       evidence split into a non-blocking job and explicit script.
 - [x] Clean-wheel installed-CLI golden proof and standalone workbench smoke added.
 - [x] Integrated Phase 1 closeout gates and final evidence recording.
+
+### Completed Phase 2 status
+
+- [x] Standard Phase 2 packet created after the Phase 1 exit gate passed.
+- [x] Workbench process-concurrency, bounded-output, invalid-UTF-8, and cancellation regressions pinned.
+- [x] Main-actor waiting replaced by responsive asynchronous execution with TERM/KILL recovery receipts.
+- [x] Deterministic `.vfbundle.zip` selected and proved as the Finder-safe transport without weakening `minimal-v1`.
+- [x] Workbench creates and reveals only the externally verified transport artifact for Finder use.
+- [x] Mac, Linux, clean-wheel, golden, parity, launch, tracking, lint, and diff gates recorded.
 
 The current stage-command runtime is:
 
