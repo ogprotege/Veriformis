@@ -1,0 +1,440 @@
+{
+  "schema_version": "veriformis.corpus-demand-matrix/v1",
+  "last_reviewed": "2026-08-11",
+  "collection_policy": {
+    "scanner": "scripts/scan_corpus_metadata.py",
+    "allowed_metadata": [
+      "aggregate byte counts",
+      "aggregate file and directory counts",
+      "declared input suffix counts",
+      "hidden, symlink, and inaccessible entry counts",
+      "size-bucket counts"
+    ],
+    "prohibited_data": [
+      "content-derived classifications",
+      "content hashes",
+      "file contents",
+      "file names",
+      "source paths",
+      "timestamps",
+      "uncommon undeclared extension names"
+    ]
+  },
+  "inventory_observations": [
+    {
+      "schema_version": "veriformis.corpus-metadata-aggregate/v1",
+      "source_id": "repository-test-fixtures",
+      "evidence_grade": "test-verified",
+      "portability": "repository-tracked",
+      "observation_scope": "filesystem-metadata-only",
+      "aggregate": {
+        "file_count": 16,
+        "directory_count": 14,
+        "total_bytes": 13812,
+        "symlink_count": 0,
+        "other_entry_count": 0,
+        "inaccessible_entry_count": 0,
+        "hidden_entry_count": 0,
+        "bundle_directory_count": 0,
+        "bundle_context_file_count": 0,
+        "extensions": [
+          {
+            "extension": ".json",
+            "family": "structured-data",
+            "file_count": 4,
+            "total_bytes": 11631,
+            "declared_v1_input_suffix": true
+          },
+          {
+            "extension": ".md",
+            "family": "markup",
+            "file_count": 4,
+            "total_bytes": 682,
+            "declared_v1_input_suffix": true
+          },
+          {
+            "extension": ".pdf",
+            "family": "portable-document",
+            "file_count": 2,
+            "total_bytes": 986,
+            "declared_v1_input_suffix": true
+          },
+          {
+            "extension": ".py",
+            "family": "source-code",
+            "file_count": 3,
+            "total_bytes": 377,
+            "declared_v1_input_suffix": true
+          },
+          {
+            "extension": ".txt",
+            "family": "plain-text",
+            "file_count": 3,
+            "total_bytes": 136,
+            "declared_v1_input_suffix": true
+          }
+        ],
+        "families": [
+          {
+            "family": "markup",
+            "file_count": 4,
+            "total_bytes": 682
+          },
+          {
+            "family": "plain-text",
+            "file_count": 3,
+            "total_bytes": 136
+          },
+          {
+            "family": "portable-document",
+            "file_count": 2,
+            "total_bytes": 986
+          },
+          {
+            "family": "source-code",
+            "file_count": 3,
+            "total_bytes": 377
+          },
+          {
+            "family": "structured-data",
+            "file_count": 4,
+            "total_bytes": 11631
+          }
+        ],
+        "size_buckets": [
+          {
+            "bucket": "zero",
+            "file_count": 0,
+            "total_bytes": 0
+          },
+          {
+            "bucket": "1b_to_1kib",
+            "file_count": 12,
+            "total_bytes": 2181
+          },
+          {
+            "bucket": "over_1kib_to_1mib",
+            "file_count": 4,
+            "total_bytes": 11631
+          },
+          {
+            "bucket": "over_1mib_to_100mib",
+            "file_count": 0,
+            "total_bytes": 0
+          },
+          {
+            "bucket": "over_100mib",
+            "file_count": 0,
+            "total_bytes": 0
+          }
+        ]
+      },
+      "privacy": {
+        "file_content_read": false,
+        "file_names_emitted": false,
+        "source_paths_emitted": false,
+        "content_hashes_emitted": false,
+        "timestamps_emitted": false,
+        "undeclared_extensions_emitted": false
+      },
+      "limitations": [
+        "Suffix classification does not prove that a file is a user source or that parsing succeeds.",
+        "Counts establish the observed root's composition, not customer-corpus prevalence or product demand.",
+        "Undeclared suffixes are combined to avoid disclosing uncommon extension names.",
+        "Symlink targets and file content are never followed or read."
+      ]
+    },
+    {
+      "schema_version": "veriformis.corpus-metadata-aggregate/v1",
+      "source_id": "retained-gui-observations",
+      "evidence_grade": "recorded-local",
+      "portability": "local-only",
+      "observation_scope": "filesystem-metadata-only",
+      "aggregate": {
+        "file_count": 89,
+        "directory_count": 78,
+        "total_bytes": 2995574,
+        "symlink_count": 0,
+        "other_entry_count": 0,
+        "inaccessible_entry_count": 0,
+        "hidden_entry_count": 7,
+        "bundle_directory_count": 2,
+        "bundle_context_file_count": 13,
+        "extensions": [
+          {
+            "extension": ".json",
+            "family": "structured-data",
+            "file_count": 30,
+            "total_bytes": 322518,
+            "declared_v1_input_suffix": true
+          },
+          {
+            "extension": ".jsonl",
+            "family": "structured-data",
+            "file_count": 6,
+            "total_bytes": 431797,
+            "declared_v1_input_suffix": true
+          },
+          {
+            "extension": "[no-extension]",
+            "family": "no-extension",
+            "file_count": 53,
+            "total_bytes": 2241259,
+            "declared_v1_input_suffix": false
+          }
+        ],
+        "families": [
+          {
+            "family": "no-extension",
+            "file_count": 53,
+            "total_bytes": 2241259
+          },
+          {
+            "family": "structured-data",
+            "file_count": 36,
+            "total_bytes": 754315
+          }
+        ],
+        "size_buckets": [
+          {
+            "bucket": "zero",
+            "file_count": 6,
+            "total_bytes": 0
+          },
+          {
+            "bucket": "1b_to_1kib",
+            "file_count": 14,
+            "total_bytes": 4540
+          },
+          {
+            "bucket": "over_1kib_to_1mib",
+            "file_count": 69,
+            "total_bytes": 2991034
+          },
+          {
+            "bucket": "over_1mib_to_100mib",
+            "file_count": 0,
+            "total_bytes": 0
+          },
+          {
+            "bucket": "over_100mib",
+            "file_count": 0,
+            "total_bytes": 0
+          }
+        ]
+      },
+      "privacy": {
+        "file_content_read": false,
+        "file_names_emitted": false,
+        "source_paths_emitted": false,
+        "content_hashes_emitted": false,
+        "timestamps_emitted": false,
+        "undeclared_extensions_emitted": false
+      },
+      "limitations": [
+        "The source directory is untracked and unavailable to clean clones or CI, so this observation cannot be regenerated there.",
+        "The observation describes retained Veriformis output/workspace artifacts, not original user source corpora or trainer demand.",
+        "Suffix classification does not prove that a file is a user source or that parsing succeeds.",
+        "Symlink targets and file content are never followed or read."
+      ]
+    }
+  ],
+  "workflow_demands": [
+    {
+      "demand_id": "standalone-operation",
+      "state": "confirmed",
+      "claim": "Core Veriformis installation, compile, validation, sealing, verification, export, workbench operation, and release gates must not require Aptus or another trainer.",
+      "dimensions": {
+        "workflow": "standalone-dataset-compilation",
+        "output": "verified-consumer-neutral-bundle",
+        "trainer_profile": null
+      },
+      "evidence": {
+        "grade": "source-verified",
+        "sources": [
+          "docs/adr/0002-standalone-product-boundary.md",
+          "docs/product-contract.md"
+        ],
+        "limitation": "This is an accepted product requirement; Phase 1 must still prove the runtime behavior."
+      }
+    },
+    {
+      "demand_id": "heterogeneous-inputs",
+      "state": "confirmed",
+      "claim": "Veriformis must accept heterogeneous supported source families through one local compilation workflow.",
+      "dimensions": {
+        "workflow": "document-source-compilation",
+        "input": "heterogeneous-supported-sources",
+        "trainer_profile": null
+      },
+      "evidence": {
+        "grade": "source-verified",
+        "sources": [
+          "docs/product-contract.md",
+          "src/veriformis/parsers/dispatch.py"
+        ],
+        "limitation": "Declared suffix support and repository tests do not establish real-world corpus frequency, scale, or parse quality for private corpora."
+      }
+    },
+    {
+      "demand_id": "goal-dependent-outputs",
+      "state": "confirmed",
+      "claim": "Training goal, semantic row schema, physical container, and consumer profile must remain separate choices so output serves the training purpose rather than an ambiguous format label.",
+      "dimensions": {
+        "workflow": "goal-first-dataset-preparation",
+        "output": "training-ready-derived-export",
+        "trainer_profile": "versioned-optional-profile"
+      },
+      "evidence": {
+        "grade": "source-verified",
+        "sources": [
+          "docs/adr/0003-four-axis-dataset-model.md",
+          "docs/adr/0004-canonical-bundle-derived-exports.md"
+        ],
+        "limitation": "The exact container and consumer priorities are not established by this requirement."
+      }
+    },
+    {
+      "demand_id": "named-trainer-choice",
+      "state": "unresolved",
+      "claim": "No retained owner-corpus evidence currently establishes which named trainer profile should be implemented first.",
+      "dimensions": {
+        "workflow": "trainer-specific-export",
+        "output": null,
+        "trainer_profile": null
+      },
+      "evidence": {
+        "grade": "source-verified",
+        "sources": [
+          "docs/governance/support-registry.json",
+          "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md"
+        ],
+        "limitation": "Roadmap placement and ecosystem research identify candidates, not owner demand or implemented compatibility."
+      }
+    }
+  ],
+  "format_priorities": [
+    {
+      "work_item": "generic-jsonl-export-contract",
+      "state": "provisional",
+      "rank": 1,
+      "candidates": [
+        "split-jsonl-directory"
+      ],
+      "basis": [
+        {
+          "grade": "source-verified",
+          "sources": [
+            "src/veriformis/bundle/finished.py",
+            "docs/adr/0004-canonical-bundle-derived-exports.md"
+          ],
+          "limitation": "The canonical bundle already binds JSONL partitions, making a verified generic JSONL derivative the smallest evidenced container step; this does not prove downstream trainer compatibility."
+        },
+        {
+          "grade": "source-verified",
+          "sources": [
+            "docs/adr/0002-standalone-product-boundary.md"
+          ],
+          "limitation": "The independent export requirement establishes priority over optional trainer packs, not release readiness."
+        }
+      ],
+      "admission_gate": "Phase 4 must define export identity, receipts, membership preservation, atomic publication, and tamper verification before implementation claims."
+    },
+    {
+      "work_item": "additional-generic-containers",
+      "state": "unranked-insufficient-evidence",
+      "rank": null,
+      "candidates": [
+        "json",
+        "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset"
+      ],
+      "basis": [
+        {
+          "grade": "planned",
+          "sources": [
+            "docs/governance/support-registry.json",
+            "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md"
+          ],
+          "limitation": "These are roadmap candidates. Neither test-fixture counts nor retained GUI artifacts prove private-corpus or consumer demand for an ordering among them."
+        }
+      ],
+      "admission_gate": "Collect sanitized owner workflow counts naming required container, row semantics, corpus scale, and destination; then add primary consumer-contract evidence and losslessness tests."
+    },
+    {
+      "work_item": "new-input-formats-and-ocr",
+      "state": "unranked-insufficient-evidence",
+      "rank": null,
+      "candidates": [
+        "ocr-for-image-only-pdf",
+        "additional-source-suffixes"
+      ],
+      "basis": [
+        {
+          "grade": "test-verified",
+          "sources": [
+            "tests/fixtures/group5/empty-text.pdf",
+            "tests/fixtures/group5/minimal-text.pdf",
+            "docs/beta-limitations.md"
+          ],
+          "limitation": "Fixtures verify the current PDF boundary but cannot establish how often owner corpora contain scans or which new suffixes are needed."
+        }
+      ],
+      "admission_gate": "Collect aggregate owner-corpus counts for scanned versus digitally born documents and explicitly requested unsupported suffix families without storing names or contents."
+    }
+  ],
+  "trainer_priorities": [
+    {
+      "work_item": "named-consumer-profile-order",
+      "state": "unranked-insufficient-evidence",
+      "rank": null,
+      "candidates": [
+        "trl",
+        "mlx-lm",
+        "axolotl",
+        "llama-factory",
+        "unsloth",
+        "aptus"
+      ],
+      "basis": [
+        {
+          "grade": "planned",
+          "sources": [
+            "docs/governance/support-registry.json",
+            "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md"
+          ],
+          "limitation": "Named candidates and roadmap phases are not evidence of owner workflow frequency. Aptus has an implemented handoff but is explicitly optional and cannot determine the standalone product sequence."
+        }
+      ],
+      "admission_gate": "Record anonymized run counts and required versions for actual destinations, then verify each selected profile against its primary contract and conformance fixtures."
+    }
+  ],
+  "evidence_gaps": [
+    {
+      "gap_id": "owner-corpus-composition",
+      "missing_evidence": "No privacy-preserving aggregate describes actual owner corpus suffix families, file counts, size distribution, or scanned-document prevalence.",
+      "effect": "New input formats and OCR cannot be evidence-ranked.",
+      "collection_method": "Run the metadata-only scanner on owner-selected roots and retain only reviewed aggregate output."
+    },
+    {
+      "gap_id": "actual-training-destinations",
+      "missing_evidence": "No retained aggregate names the trainer, framework, or service used for actual fine-tuning runs and its frequency.",
+      "effect": "Consumer profiles remain unranked candidates.",
+      "collection_method": "Record destination name, version range, row family, and anonymized run count without source content or credentials."
+    },
+    {
+      "gap_id": "required-physical-containers",
+      "missing_evidence": "No retained owner workflow count identifies required JSON, CSV, Parquet, Arrow, or Hugging Face Dataset outputs.",
+      "effect": "Only the JSONL derivative has an implementation-proximity basis; additional containers remain unranked.",
+      "collection_method": "Record requested container, semantic row schema, split naming, and destination as structured non-content metadata."
+    },
+    {
+      "gap_id": "representative-scale",
+      "missing_evidence": "Repository fixtures are small test inputs and retained GUI artifacts are outputs, not representative private corpora.",
+      "effect": "They cannot define throughput, memory, sharding, or maximum-corpus acceptance targets.",
+      "collection_method": "Record aggregate file counts and size buckets from representative roots, then establish retained synthetic performance fixtures with the same scale shape."
+    }
+  ]
+}

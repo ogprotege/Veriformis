@@ -2,7 +2,7 @@
 
 **Status:** Active limitations register for any future **beta** cut of `0.1.0`
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (standalone defaults and release separation)
 
 **Maturity today:** Development **alpha** — this document exists so a beta cut
 can be honest. **Do not treat the current tag as beta** until the beta cut
@@ -23,7 +23,7 @@ When a CLI beta is declared, support means:
 | Python | 3.11, 3.12, 3.13 |
 | Host OS for CI-proven path | Ubuntu (matrix) and macOS (Python 3.12 job) |
 | Product path | Offline local compile: parse → … → seal → verify |
-| Aptus handoff | Sealed bundle + sibling descriptor; consumer verify for **accepted** row schemas |
+| Optional Aptus integration | Sibling descriptor and consumer check for accepted row schemas; not part of core beta readiness |
 | Determinism | Offline deterministic v1; no LLM generation in the pipeline |
 
 Default **beta packaging choice:** **CLI-first**. The SwiftUI workbench under
@@ -42,16 +42,20 @@ These are permanent or deferred product boundaries. Beta does not soft-pedal the
 4. **No “finished dataset” without seal + verify.** Intermediate clean state is
    not a handoff product unless a `full_text` recipe selects retained text as
    the construction target — and even then curation through seal still apply.
-5. **No silent rewrite of split or curation by Aptus.** Aptus consumes a sealed
-   Veriformis contract; it must not invent membership.
+5. **No silent rewrite of split or curation by a consumer integration.** A
+   consumer profile must not invent membership or replace Veriformis policy.
 6. **No public-ready or production claim** without the full public checklist
    (especially signed/notarized Mac install evidence when claiming a Mac app).
 
 ## Operator limitations (beta-critical)
 
-### Aptus row schemas
+### Optional Aptus row schemas
 
-Current Aptus handoff v1 backend capabilities:
+This section applies only when the Aptus integration is explicitly selected.
+It does not constrain standalone compile, seal, verification, or beta
+readiness.
+
+Current checked-in Aptus adapter policy:
 
 - **Accepts:** `prompt_completion`, `instruction_output`, `messages`
 - **Rejects:** plain `text`
@@ -65,8 +69,10 @@ Consequences:
   that yields an accepted supervised schema). See
   [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
 
-Seal success **never** alone means “Aptus will train this.” Always run
-`handoff-verify` (or consume) for the target backend policy.
+Seal success **never** alone means “Aptus will train this.” The repository's
+`handoff-verify` proves adapter self-conformance, not compatibility with a live
+named Aptus build. A compatibility claim also requires retained evidence from
+that exact external build.
 
 ### Inputs
 
@@ -103,8 +109,10 @@ of a minimal footprint today.
 ### Quality tooling not gated
 
 Beta does **not** require mypy, coverage thresholds, or dependency CVE gates in
-CI. Automated gates are lockfile, Ruff (selected rules), pytest matrix,
-install smoke, and golden compile. See [development.md](development.md).
+CI. Required automated gates are lockfile, Ruff (selected rules), core pytest
+matrix, clean-wheel installed-CLI smoke, and standalone golden compile.
+Optional adapter checks run separately and do not gate beta readiness. See
+[development.md](development.md).
 
 ## Failure posture
 

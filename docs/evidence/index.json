@@ -1,0 +1,113 @@
+{
+  "schema_version": "veriformis.evidence-index/v1",
+  "last_updated": "2026-08-11",
+  "evidence_grades": {
+    "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
+    "test-verified": "Claim is exercised by an automated passing test.",
+    "recorded-local": "A dated local run was observed and summarized, but raw external runner logs are not retained here.",
+    "retained-artifact": "Logs, digests, reports, or artifacts are retained at the referenced path.",
+    "external-primary": "Claim is supported by a linked primary or official external source.",
+    "planned": "The item is authorized work, not implementation evidence."
+  },
+  "records": [
+    {
+      "id": "independent-product-baseline-2026-08-11",
+      "date": "2026-08-11",
+      "commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+      "scope": "Pre-Phase-0.1 repository baseline",
+      "grade": "recorded-local",
+      "summary": "Lock, Ruff, 658 Python tests, CLI/workbench parity, and 12 Xcode tests passed during the independent-product analysis.",
+      "details": "dev/active/independent-product/phase-00-foundation/evidence.md",
+      "rerun": [
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "uv run pytest -q",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-roadmap-dd -destination platform=macOS test",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-0.1-tracking-2026-08-11",
+      "date": "2026-08-11",
+      "commit": "working-tree-on-7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+      "scope": "Phase 0.1 project tracking and claim-control implementation",
+      "grade": "recorded-local",
+      "summary": "Tracking check, lock, Ruff, 659 Python tests, CLI/workbench parity, 12 Xcode tests, changed/new local links, and git diff check passed.",
+      "details": "dev/active/independent-product/phase-00-foundation/evidence.md",
+      "rerun": [
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase0-dd -destination platform=macOS test",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-0-corpus-demand-2026-08-11",
+      "date": "2026-08-11",
+      "commit": "working-tree-on-7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+      "scope": "Privacy-preserving corpus metadata and workflow-demand governance",
+      "grade": "test-verified",
+      "summary": "Content-blind scanner reproduced the tracked fixture aggregate; matrix preserves local-only and unavailable owner-demand limitations.",
+      "details": "dev/active/independent-product/phase-00-foundation/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/regressions/test_corpus_demand_matrix.py",
+        "uv run ruff check scripts/scan_corpus_metadata.py tests/regressions/test_corpus_demand_matrix.py"
+      ]
+    },
+    {
+      "id": "phase-0-closeout-2026-08-11",
+      "date": "2026-08-11",
+      "commit": "working-tree-on-7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+      "scope": "Independent-product Phase 0 closeout",
+      "grade": "recorded-local",
+      "summary": "Lock, Ruff, tracking, 662 Python tests, CLI/workbench parity, 12 Xcode tests, active local links, and git diff check passed after corpus and documentation reconciliation.",
+      "details": "dev/active/independent-product/phase-00-foundation/evidence.md",
+      "rerun": [
+        "uv lock --check",
+        "uv run ruff check src tests scripts",
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase0-closeout-dd -destination platform=macOS test",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-1-standalone-independence-2026-08-11",
+      "date": "2026-08-11",
+      "commit": "working-tree-on-7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+      "scope": "Independent-product Phase 1 standalone defaults and release boundary",
+      "grade": "recorded-local",
+      "summary": "All CLI/MCP/workbench handoff defaults are false; core 662 tests, optional 4 tests, standalone golden, isolated-wheel installed golden, canonical parity, 14 Swift tests, fresh workbench launch, tracking, docs links, and diff checks passed. Optional adapter evidence is separate and does not prove a live Aptus build.",
+      "details": "dev/active/independent-product/phase-01-standalone-independence/evidence.md",
+      "rerun": [
+        "uv run pytest -q --ignore=tests/handoff -m 'not aptus_integration'",
+        "uv run pytest -q -m aptus_integration",
+        "bash scripts/release/golden_compile.sh",
+        "bash scripts/release/smoke_install.sh",
+        "bash scripts/release/aptus_integration.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase1-closeout-dd -destination platform=macOS test",
+        "VERIFORMIS_CLI=.venv/bin/veriformis bash macos/scripts/standalone_workbench_smoke.sh",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "group-9-clean-path-20260805",
+      "date": "2026-08-05",
+      "commit": "452b6e5",
+      "scope": "Wheel install and golden compile outside the repository virtual environment",
+      "grade": "retained-artifact",
+      "summary": "Existing Group 9 clean-path evidence pack.",
+      "details": "dev/active/group-9-public-release/evidence/README.md",
+      "rerun": [
+        "bash scripts/release/record_clean_path_evidence.sh"
+      ]
+    }
+  ]
+}

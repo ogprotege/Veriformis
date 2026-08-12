@@ -127,7 +127,7 @@ struct VeriformisCLI: Sendable {
         objective: TrainingObjective,
         allowEmptyEvaluation: Bool,
         splitRatioPPM: Int,
-        includeHandoff: Bool
+        includeHandoff: Bool = false
     ) -> [StageCommand] {
         var parseArgs = ["parse"]
         parseArgs.append(contentsOf: sources.map(\.path))
@@ -144,8 +144,8 @@ struct VeriformisCLI: Sendable {
         }
 
         var sealArgs = ["seal", workspace.path, "-o", bundle.path]
-        if !includeHandoff {
-            sealArgs.append("--no-aptus-handoff")
+        if includeHandoff {
+            sealArgs.append("--aptus-handoff")
         }
 
         return [

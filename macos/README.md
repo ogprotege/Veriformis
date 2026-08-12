@@ -1,4 +1,4 @@
-# Veriformis macOS Workbench (Group 7 + private beta Phases 0–1)
+# Veriformis macOS Workbench (Group 7 + private beta Phases 0–2)
 
 SwiftUI desktop adapter for the Veriformis dataset compiler. On `main` this is
 the **private beta** shell: compile (not convert) framing, KISS navigation, and
@@ -10,8 +10,8 @@ a run sheet with live log.
 - **Same digests as CLI.** Stage order and flags match
   `VeriformisCLI.compilePlan`.
 - **Sidebar:** Home / Compile / History / Settings.
-- **Compile:** drag-and-drop sources, objective picker, output folder, sealed
-  bundle + Aptus handoff.
+- **Compile:** drag-and-drop sources, objective picker, output folder, and
+  sealed bundle; an Aptus sibling is an optional integration artifact.
 - **Run sheet:** progress %, stage chips, expandable live log.
 
 ## Requirements
@@ -83,12 +83,25 @@ open /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
 ```
 
 Runs the workbench stage sequence twice and asserts identical content-root,
-assignment, partition digests, and manifest SHA-256.
+snapshot/report IDs, complete file bindings, and manifest SHA-256. It also
+asserts that the default path writes no Aptus sibling.
+
+The standalone launch smoke uses an explicit installed CLI path, builds the
+checked-in Xcode project, launches a fresh process, confirms its PID, and then
+cleans it up:
+
+```bash
+VERIFORMIS_CLI="$PWD/.venv/bin/veriformis" \
+  bash macos/scripts/standalone_workbench_smoke.sh
+```
+
+This is functional build/launch evidence, not signing or notarization evidence.
 
 ## Exit gate
 
-A user can complete raw sources → sealed `.vfbundle` (+ handoff) without the
-terminal; digests match CLI.
+A user can complete raw sources → sealed `.vfbundle` without the terminal;
+digests match CLI. Optional consumer-integration artifacts have separate
+evidence and do not define workbench success.
 
 ## Private beta vision
 

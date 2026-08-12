@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (Phase 0.1 tracking integration)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -37,7 +37,8 @@ Run these checks before submitting a change:
 ```bash
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q
+uv run python scripts/check_project_tracking.py
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
 git diff --check
 ```
 
@@ -111,10 +112,11 @@ and adapted by `cli.py`, with state in `workspace.py`. Domain packages:
 | Chunkers | `tests/chunkers/` |
 | Recipes / YAML | `tests/recipes/` |
 | MCP parity | `tests/mcp/` |
-| Aptus handoff | `tests/handoff/` |
+| Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
 | Finished seal / verifier | `tests/bundle/` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |
 | Group 9 release gates | `tests/regressions/test_group9_release_gates.py`, `scripts/release/` |
+| Program tracking and support claims | `tests/regressions/test_project_tracking.py`, `scripts/check_project_tracking.py` |
 | Fixtures | `tests/fixtures/` (support) |
 
 Add a regression test before repairing an integrity defect. Keep multi-source
@@ -128,9 +130,10 @@ GitHub Actions (`.github/workflows/ci.yml`) runs on pushes and pull requests.
 
 | Job | What it runs |
 | --- | --- |
-| `test` | Matrix: Python 3.11–3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, pytest |
-| `install-smoke` | `scripts/release/smoke_install.sh` (wheel build + clean-venv CLI smoke) |
-| `golden-compile` | `scripts/release/golden_compile.sh` (golden corpus → seal → external_digest → handoff-verify) |
+| `test` | Matrix: Python 3.11–3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, core pytest excluding `aptus_integration` |
+| `install-smoke` | `scripts/release/smoke_install.sh` (clean wheel origin + full installed-CLI golden path) |
+| `golden-compile` | `scripts/release/golden_compile.sh` (both objectives → canonical seal → `external_digest`; no handoff) |
+| `aptus-integration` | Non-blocking optional adapter self-conformance: marked tests + explicit handoff script |
 
 Local-only: `git diff --check`. Not yet hard gates: static type checking,
 coverage thresholds, dependency audit, signed/notarized Mac install.
@@ -224,13 +227,14 @@ Directory publication and workspace receipt commit are separate atomic
 operations. Tests and errors must report a visible publication honestly if a
 later receipt commit fails.
 
-### Keep Aptus claims accurate
+### Keep optional-integration claims accurate
 
-Group 3 proves Aptus row shape. Group 6 adds the versioned sibling handoff and
-fail-closed consumer verification (external digest, partition digests, row
-schema, masking expectations, assignment projection). Live training and
-backend enforcement inside Aptus remain outside this repository. Current Aptus
-MLX intake rejects plain `text` rows; the handoff records that capability.
+The legacy-named `aptus-row-shape` gate proves only generic product-row shape;
+it imports no Aptus code. Group 6 adds an explicitly invoked sibling descriptor
+and fail-closed adapter check (external digest, partition digests, row schema,
+masking expectations, assignment projection). Repository tests prove adapter
+self-conformance, not compatibility with a live named Aptus release. Live
+training and backend enforcement remain outside this repository.
 
 ## Adding a parser
 
@@ -293,7 +297,8 @@ not add a CLI switch that contradicts the bound plan.
 
 Row tests must cover all allowed objective-to-schema combinations, exact keys,
 target preservation, instruction constraints, messages ordering, provenance
-alignment, and Aptus row-shape limits.
+alignment, and generic row-shape limits. Preserve the legacy gate ID until a
+versioned report migration is designed.
 
 Bundle changes require closed-set path tests, canonical bytes, exact record
 counts, tamper cases, independent verification, and explicit trust-grade
@@ -301,10 +306,10 @@ behavior. Adding a file to `minimal-v1` is a contract change.
 
 ## Contribution flow
 
-1. Read the contract documents and current status listed under
+1. Read the contract documents, governance policy, active program ledger, and current status listed under
    [Related documentation](#related-documentation) before changing governed
-   behavior. The roadmap is ordered; do not implement a later group while an
-   earlier exit gate is open.
+   behavior. The roadmap is ordered; do not implement a later phase while an
+   earlier required exit gate is open.
 2. Keep each change focused on one behavior or one coherent roadmap step.
 3. For integrity or provenance repairs, write the failing regression test
    first, then implement the smallest complete repair.
@@ -316,16 +321,17 @@ behavior. Adding a file to `minimal-v1` is a contract change.
 
 ## Documentation discipline
 
-Use present tense only for tested behavior. Label Group 8/9 work as planned
-when it is not yet implemented. Update the CLI reference, architecture,
-status, product boundary, and tests in the same change. Preserve dated
-historical records and amend only their status notes when later implementation
-changes.
+Use present tense only for tested behavior. Use the exact phase states from the
+[tracking policy](governance/project-tracking.md). Update the active phase
+packet, program ledger, support registry, WIP, current status, evidence, and
+affected product documentation in the same change when truth moves. Preserve
+dated historical records and amend only their status notes when later
+implementation changes.
 
-Never describe a green build as release readiness. Aptus handoff is versioned;
-live training remains outside Veriformis. Aptus row-shape
-validation only. Do not claim external bundle trust without a retained
-manifest digest.
+Never describe a green build as release readiness. Optional handoffs are
+versioned; live training remains outside Veriformis. Do not claim live trainer
+compatibility from adapter-only tests, or external bundle trust without a
+retained manifest digest.
 
 ## Related documentation
 
@@ -334,7 +340,10 @@ manifest digest.
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Current implementation status](current-status.md)
+- [Project tracking and evidence policy](governance/project-tracking.md)
+- [Support registry](governance/support-registry.json)
+- [Evidence index](evidence/index.json)
 - [Architecture](architecture.md) and the [architecture tree](architecture/README.md)
 - [CLI reference](cli.md)
-- [Build roadmap](plans/2026-07-29-veriformis-roadmap.md)
+- [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md)
 - [Contributing](../CONTRIBUTING.md)

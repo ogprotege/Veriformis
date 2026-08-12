@@ -15,7 +15,7 @@
 **Implementation status:** Normative Group 2 contract. Current capability claims
 require the Group 2 exit gate in this document to pass.
 
-**Last reviewed:** 2026-07-29
+**Last reviewed:** 2026-08-11 (historical deferrals reconciled)
 
 **Next review:** Any construction-schema change or the Group 2 exit gate
 
@@ -626,7 +626,13 @@ Roadmap Steps 7 through 10 are complete only when all of these are true:
 - the complete repository checks pass with every Group 2-only defect as an
   ordinary passing test.
 
-## Exact Group 3 deferrals
+## Historical Group 3 deferrals
+
+The numbered items below preserve the allocation boundary at Group 2 closeout.
+They are not current missing-capability claims: Steps 11 through 24 were later
+implemented. Current maturity and remaining work are governed by
+[current status](../current-status.md) and the
+[independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md).
 
 Group 2 does not claim the following work:
 
@@ -650,16 +656,18 @@ Group 2 does not claim the following work:
    sealing, external trust evidence, path-safe independent verification, and
    mutation closure remain deferred.
 
-The `PipelineService`, thin CLI adapter, and dual-objective M1.1 end-to-end gate
-remain Steps 17 through 19. Broader ingest remains Step 20. Model-assisted
-construction remains optional Step 25 and requires a separate owner-approved
-contract and plan.
+At that historical boundary, `PipelineService`, the thin CLI adapter, the
+dual-objective M1.1 gate, broader ingest, YAML/MCP automation, the optional
+Aptus integration, and the workbench were later steps. Those deterministic
+capabilities are now implemented. Model-assisted construction remains outside
+the offline deterministic v1 contract and still requires a separate
+owner-approved contract and plan.
 
 ## Related documentation
 
 - [Product contract](../product-contract.md)
 - [Integrity Contract v1](integrity-v1.md)
-- [Authoritative build roadmap](../plans/2026-07-29-veriformis-roadmap.md)
+- [Authoritative independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)
 - [Current implementation status](../current-status.md)
 - [Architecture](../architecture.md)
 - [Group 2 implementation plan](../../dev/active/group-2-dataset-construction/plan.md)

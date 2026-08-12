@@ -130,4 +130,4 @@ name.vfbundle/
 - [Current implementation status](current-status.md)
 - [CLI reference](cli.md)
 - [Development guide](development.md)
-- [Build roadmap](plans/2026-07-29-veriformis-roadmap.md)
+- [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md)

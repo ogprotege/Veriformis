@@ -14,7 +14,7 @@ explicitly selects it as training content.
 
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
-> (Phases 0–1: KISS shell over the CLI). This is **not** a public beta or
+> (Phases 0–2: KISS shell and debugger tools over the CLI). This is **not** a public beta or
 > production label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 > Install: [docs/install.md](docs/install.md). Status:
 > [docs/current-status.md](docs/current-status.md).
@@ -62,8 +62,9 @@ The pipeline makes no LLM calls and sends no document to a network service.
 
 A SwiftUI adapter lives under [`macos/`](macos/README.md). It **compiles**
 sources into a sealed `.vfbundle` by shelling the same `veriformis` CLI as the
-terminal (thin adapter; digests match). Phases 0–1 on `main`: sidebar Home /
-Compile / History / Settings; run sheet with progress and live log.
+terminal (thin adapter; digests match). Phases 0–2 on `main`: sidebar Home /
+Compile / History / Settings; run sheet with progress and live log; failure
+detail; digest copy; artifact reveal; and rerun.
 
 ```bash
 # From the repo (preferred private-beta launch):
@@ -80,6 +81,9 @@ the [private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.m
 | Text | `.txt` |
 | Markdown | `.md`, `.markdown` |
 | Word | `.docx` |
+| Web | `.html`, `.htm` |
+| Digitally-born PDF | `.pdf` (image-only/OCR input fails closed) |
+| Structured data | `.csv`, `.json`, `.jsonl` |
 | Source code | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` |
 
 Other extensions fail with an `unsupported-input` error.
@@ -111,8 +115,11 @@ Mac workbench (Debug, private beta): `bash macos/scripts/run_workbench.sh`
 ```bash
 uv sync --extra test
 uv run ruff check src tests
-uv run pytest -q
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
 ```
+
+Optional Aptus adapter self-conformance is invoked separately with
+`uv run pytest -q -m aptus_integration`.
 
 ## Raw source to verified bundle
 
@@ -142,6 +149,11 @@ uv run veriformis verify build/example.vfbundle \
 
 Without the external digest, verification correctly reports
 `self_consistent`. With a matching digest, it reports `external_digest`.
+
+Default `seal` writes only the canonical six-file bundle. Optional consumer
+artifacts require an explicit flag or command; for the Aptus adapter, use
+`seal ... --aptus-handoff` or `handoff` after sealing. CLI/MCP/workbench startup
+and required release gates do not require Aptus.
 
 For a corpus with only one leakage group, the default split cannot create both
 partitions. Pass `--allow-empty-evaluation` to `curate` only when an empty
@@ -179,10 +191,13 @@ in its aligned metadata stream. The co-located attestation proves internal
 agreement, not external authenticity. The optional expected manifest digest
 provides the external binding.
 
-Group 3 validates Aptus row shape. Group 6 adds the versioned sibling Aptus
-handoff (`*.aptus-handoff.json`) and `handoff-verify` consumer checks. Live
-training remains Aptus's job. Current Aptus MLX intake still rejects plain
-`text` rows; the handoff records that limit.
+Group 3 includes the legacy-named `aptus-row-shape` validation gate; despite
+its persisted identifier, it validates the implemented generic row shape and
+does not prove compatibility with an Aptus release. Group 6 adds an optional
+versioned sibling Aptus handoff (`*.aptus-handoff.json`) and
+`handoff-verify` consumer checks. Training execution remains outside
+Veriformis. The handoff records that its current policy rejects plain `text`
+rows; it does not define core dataset correctness or release readiness.
 
 ## Workspace integrity
 
@@ -204,9 +219,9 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-and **private beta workbench Phases 0–1**. Maturity remains development
-**alpha** (not a public beta label). Next workbench step is Phase 2 debugger
-power. A future beta cut must follow
+and **private beta workbench Phases 0–2**. Maturity remains development
+**alpha** (not a public beta label). Future work follows the independent
+product roadmap. A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
 need owner signing/notarization per [docs/release.md](docs/release.md).
 **Group 8** model-assisted construction is optional and owner-gated.
@@ -235,8 +250,13 @@ reading paths. The map:
   - [Release guide](docs/release.md)
   - [Beta limitations](docs/beta-limitations.md)
   - [macOS workbench](macos/README.md)
-  - [Private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
-  - [Authoritative build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
+  - [Independent product analysis](docs/analysis/2026-08-11-independent-product-analysis.md)
+  - [Authoritative independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
+  - [Project tracking and evidence system](docs/governance/README.md)
+  - [Completed Phase 0 packet](dev/active/independent-product/phase-00-foundation/README.md)
+  - [Completed Phase 1 packet](dev/active/independent-product/phase-01-standalone-independence/README.md)
+  - [Historical private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
+  - [Historical build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)
 
 ## Development checks
@@ -244,13 +264,14 @@ reading paths. The map:
 ```bash
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
 git diff --check
 ```
 
 CI on `main` runs a Python 3.11–3.13 matrix (Ubuntu) plus Python 3.12 on
-macOS, `uv lock --check`, Ruff, pytest, wheel install-smoke, and golden-corpus
-compile. Local totals grow over time — re-run `uv run pytest -q` for current
+macOS, `uv lock --check`, Ruff, core pytest, clean-wheel installed-CLI smoke,
+and standalone golden-corpus compile. Aptus adapter checks are separate and
+non-blocking. Local totals grow over time — re-run the commands for current
 counts. Type-check, coverage thresholds, dependency audit, and signed/notarized
 Mac distribution are not automated release claims; see
 [docs/release.md](docs/release.md) and

@@ -5,14 +5,14 @@
 **Maturity:** Development alpha
 
 **Implementation state:** Groups 1–7 complete; Group 9 automated release gates
-and beta-prep on `main`; private beta Mac workbench Phases 0–1 on `main`
+and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated)
 
-**Review date:** 2026-08-06 (full documentation consistency pass; baseline
-`18d7541`)
+**Review date:** 2026-08-11 (independent-product analysis and authority pass;
+baseline `7d116e9`)
 
-**Next review:** Phase 2 workbench, beta label cut, public-ready checklist,
-optional Group 8, or any contract change
+**Next review:** Independent-roadmap Phase 2 start; beta label cut,
+public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -41,23 +41,31 @@ JSONL), named OCR refusal, the recipe library, statistics, and YAML pipelines.
 v1 with fail-closed consumer verification.
 
 **Group 7** adds the SwiftUI workbench under `macos/`, a thin shell over the
-same CLI so digests match terminal runs. **Private beta workbench Phases 0–1**
+same CLI so digests match terminal runs. **Private beta workbench Phases 0–2**
 extend that surface: dogfood punch list; KISS sidebar (Home / Compile /
 History / Settings); run sheet with progress % and live log; history
-persistence; settings for CLI and default output. Launch with
+persistence; settings for CLI and default output; failure details; digest copy;
+artifact reveal; and rerun. Launch with
 `bash macos/scripts/run_workbench.sh`. Operator install:
 [install.md](install.md). Vision/plan:
 [plans/2026-08-06-private-beta-workbench.md](plans/2026-08-06-private-beta-workbench.md).
 
 **Group 9 (automated subset)** expands CI to a Python 3.11–3.13 matrix plus
-macOS Python 3.12, lockfile check, wheel install smoke, golden-corpus
-compile through `external_digest` verify and Aptus handoff-verify, release
-scripts under `scripts/release/`, and [docs/release.md](release.md).
+macOS Python 3.12, lockfile check, wheel install smoke, golden-corpus compile,
+release scripts under `scripts/release/`, and [docs/release.md](release.md).
+Independent-product Phase 1 makes those required gates standalone: installed
+wheel origin, both objectives, default canonical seal, and
+`external_digest` verification. Aptus adapter self-conformance runs as a
+separate non-blocking job.
 **Beta-prep** on `main` adds [beta-limitations.md](beta-limitations.md) and
 retained clean-path evidence under
 `dev/active/group-9-public-release/evidence/`. Maturity remains **alpha** until
 a deliberate beta label cut. Signed and notarized Mac distribution remains an
 owner-executed checklist for any public Mac app claim.
+
+The historical Group 9 handoff coupling is no longer the product boundary.
+Aptus is an optional consumer integration: CLI, MCP, and workbench defaults do
+not write its sibling, and required release gates do not invoke its adapter.
 
 Raw source material remains the product entry. Clean corpus state is an
 accountable intermediate, except when a `full_text` recipe explicitly selects
@@ -68,6 +76,36 @@ Non-claims and operator limits live in [beta-limitations.md](beta-limitations.md
 A public-ready claim still requires the full checklist in
 [docs/release.md](release.md), including owner Mac signing, notarization,
 clean-Mac install, and recorded evidence when shipping a Mac app.
+
+## Independent-program tracking
+
+Phase 0 of the independent product roadmap is `completed`. It delivered the
+tracking and claim-control foundation:
+
+- `dev/active/independent-product/program.json` records every Phase 0–20 state,
+  dependency, packet, and next gate;
+- `docs/governance/support-registry.json` records current, planned, candidate,
+  and explicitly unsupported capabilities;
+- `docs/evidence/index.json` distinguishes source, test, local-run, retained,
+  external-primary, and planned evidence;
+- the completed Phase 0 packet records the checklist, append-only progress,
+  decisions, risks, evidence, and closeout; and
+- `scripts/check_project_tracking.py`, exercised by pytest, compares the
+  roadmap, program ledger, WIP table, support registry, package/parser/recipe/
+  row/bundle constants, all three handoff defaults, and adapter import
+  isolation.
+
+The phase also delivered accepted product-boundary ADRs, a privacy-preserving
+corpus/workflow-demand matrix, and semantic reconciliation of active
+architecture, contracts, status, release-boundary, and workbench documents.
+Tracked fixture counts are reproducible; the local retained-output observation
+is explicitly non-portable. Representative owner-corpus composition, trainer
+frequency, exact container demand, and scale targets remain evidence gaps and
+are not replaced with ecosystem assumptions. The completed packet records the
+final gates and limitations. Phase 1 completed standalone runtime and release
+defaults. Its completed packet pins default artifact absence,
+adapter import isolation, clean installed-wheel compilation, neutral release
+evidence, and workbench operation as measured acceptance gates.
 
 ## Implemented interfaces
 
@@ -84,7 +122,7 @@ The installed console entry point is `veriformis`.
 | `split WORKSPACE` | Assigns complete transitive leakage groups to train and evaluation | `result` |
 | `format WORKSPACE` | Lowers included records into the row schema bound by the plan | `row-set`, `train`, `evaluation`, `provenance` |
 | `validate WORKSPACE` | Replays all semantics and validates one exact byte snapshot through 17 gates | `snapshot`, `report` |
-| `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle; writes sibling Aptus handoff by default | External six-file bundle; `manifest`, `attestation`; optional `*.aptus-handoff.json` |
+| `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle; writes only the canonical bundle by default | External six-file bundle; `manifest`, `attestation`; optional explicit `*.aptus-handoff.json` |
 | `verify BUNDLE` | Verifies the closed bundle without workspace access | Terminal verification result |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
@@ -102,7 +140,7 @@ Surfaces over the same composition root:
 | CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
 | MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation |
-| Aptus handoff | `veriformis.handoff` | Sibling descriptor + consumer verify |
+| Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
 | macOS workbench | `macos/` | SwiftUI thin CLI adapter |
 
 ## Workspace and identity status
@@ -315,11 +353,12 @@ A valid failing report persists with failed stage status and retains all
 findings. Unreadable critical input blocks dependent gates rather than
 producing false passes. A failed or stale report cannot satisfy seal.
 
-The `aptus-row-shape` validation gate proves product-row shape only. Group 6
-adds the sibling Aptus handoff and consumer verification for sealed partitions
-and assignment projection. Live training and in-Aptus backend enforcement
-remain outside this repository. Current Aptus MLX intake rejects plain `text`
-rows.
+The `aptus-row-shape` validation gate proves generic product-row shape only.
+Its name is a persisted v1 report identifier retained for compatibility; it
+imports no Aptus code. Renaming it requires a versioned migration. Group 6 adds
+an optional sibling descriptor and consumer verification for sealed partitions
+and assignment projection. Repository checks prove adapter self-conformance,
+not live Aptus release compatibility. Training remains outside this repository.
 
 ## Bundle and verification boundary
 
@@ -363,12 +402,13 @@ not claim rollback.
 
 ## Remaining limitations
 
-### Aptus handoff is versioned; live Aptus training remains outside this repo
+### Optional Aptus handoff is versioned; live trainer compatibility is unproven
 
 Group 6 emits sibling `*.aptus-handoff.json` descriptors and a fail-closed
 consumer check (`handoff-verify`) that proves external-digest verification,
 partition digests, row schema, masking expectations, and assignment
-projection digests. Live training execution remains Aptus's responsibility.
+projection digests. It does not invoke or identify a live external Aptus build;
+any named-version compatibility claim requires separate retained evidence.
 
 ### Input and policy breadth remains limited
 
@@ -380,10 +420,12 @@ statistics, and versioned YAML pipelines executed only through
 
 ### Public release readiness remains incomplete
 
-Automated Group 9 gates are present (matrix CI, lock check, install smoke,
-golden compile). Still incomplete for a public-ready claim: type checking and
-coverage as hard gates, dependency audit, signed/notarized Mac distribution,
-and clean-Mac install plus Aptus handoff evidence under owner credentials.
+Automated Group 9 gates are present (matrix CI, lock check, clean-wheel
+installed-CLI smoke, standalone golden compile). Still incomplete for a
+public-ready claim: type checking and coverage as hard gates, dependency audit,
+signed/notarized Mac distribution, and clean-Mac installation under owner
+credentials. Aptus evidence is required only for a separately named Aptus
+compatibility claim.
 See [docs/release.md](release.md).
 
 ## Phase boundary
@@ -398,10 +440,10 @@ See [docs/release.md](release.md).
 | Implemented Group 5 | HTML/PDF/CSV/JSON/JSONL ingest, OCR refusal, recipe library, statistics, YAML pipelines |
 | Implemented Group 6 | Local MCP adapter, versioned Aptus handoff, consumer verification |
 | Implemented Group 7 | SwiftUI workbench (CLI adapter) with digest parity |
-| Implemented private beta workbench Phases 0–1 | Dogfood; KISS shell (sidebar, run sheet, history, settings) on `main` |
-| Implemented Group 9 (automated) | CI matrix, lock check, wheel smoke, golden compile/handoff scripts, release runbook |
+| Implemented private beta workbench Phases 0–2 | Dogfood; KISS shell; failure detail; digest copy; artifact reveal; rerun |
+| Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Next workbench | Phase 2 debugger power (failure detail, copy digests, re-run) |
+| Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), beginning with standalone authority and defaults |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -418,7 +460,7 @@ Group 9 automated gates (local or CI):
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 git diff --check
@@ -431,11 +473,12 @@ Selected permanent locks:
 | Dual-objective M1.1 | `tests/pipeline/test_pipeline_service.py` |
 | Declared-format e2e | `tests/regressions/test_group5_declared_format_pipeline.py` |
 | MCP / service parity | `tests/mcp/test_mcp_pipeline_parity.py` |
-| Aptus handoff | `tests/handoff/test_aptus_handoff_v1.py`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
-| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/Tests/`, `macos/scripts/run_workbench.sh` |
+| Optional Aptus adapter | Marked `tests/handoff/test_aptus_handoff_v1.py`, `scripts/release/aptus_integration.sh`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
+| Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/scripts/standalone_workbench_smoke.sh`, `macos/Tests/`, `macos/scripts/run_workbench.sh` |
 | Group 9 golden + scripts | `tests/regressions/test_group9_release_gates.py`, `scripts/release/`, [release guide](release.md) |
 | Operator install | [install.md](install.md) |
 | Beta limitations | [beta-limitations.md](beta-limitations.md) |
+| Program tracking | `tests/regressions/test_project_tracking.py`, [tracking policy](governance/project-tracking.md) |
 | Clean-path evidence pack | `dev/active/group-9-public-release/evidence/` |
 | Private beta workbench plan | [plans/2026-08-06-private-beta-workbench.md](plans/2026-08-06-private-beta-workbench.md) |
 
@@ -449,17 +492,16 @@ requires [docs/release.md](release.md) with retained evidence.
 ## Next authority
 
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
-private beta workbench Phases 0–1 are landed; maturity is still **alpha**.
+private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Suggested next product work (ordered for private use):
+Independent-product Phases 0 and 1 are complete. The next authorized product
+work follows the ordered ledger in the
+[Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md).
+A deliberate beta label and public Mac checklist remain separate decisions.
 
-1. Workbench **Phase 2** debugger power (failure detail, copy digests, re-run).
-2. Deliberate **beta label** cut if inviting others (see beta-limitations).
-3. Owner **public Mac** checklist only if shipping a signed app.
-4. Optional **Group 8** (model-assisted construction) under a separate plan.
-
-See the [Veriformis Build Roadmap](plans/2026-07-29-veriformis-roadmap.md),
-[private beta workbench plan](plans/2026-08-06-private-beta-workbench.md),
+See the [independent product analysis](analysis/2026-08-11-independent-product-analysis.md),
+[tracking and evidence policy](governance/project-tracking.md),
+[historical private beta workbench plan](plans/2026-08-06-private-beta-workbench.md),
 [install guide](install.md), [release guide](release.md),
 [beta limitations](beta-limitations.md), and
 [beta readiness audit](../dev/active/group-9-public-release/beta-readiness-audit.md).

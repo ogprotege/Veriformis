@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (active implementation reconciliation)
 
 **Next review:** Any architecture documentation change
 
@@ -24,15 +24,16 @@ owns and what it refuses to own. The ownership boundary runs from raw source
 capture through final seal: ingestion, canonical recovery, cleaning, evidence
 preservation, record construction, curation, leakage-safe splitting,
 formatting, validation, and bundle publication all live inside the system.
-Training itself does not. A downstream product named Aptus begins where a
-sealed Veriformis bundle ends, owning training planning and execution while
-consuming the dataset contract Veriformis publishes (see
-`docs/product-contract.md:52`). This division matters architecturally because
-it converts dataset preparation from a disposable preprocessing step into an
-artifact with its own integrity guarantees, a guarantee the design enforces
-through fail-closed sealing: a dataset is not considered finished because a
-JSONL file exists, but only when the exact validated snapshot, manifest, and
-attestation agree (see `docs/product-contract.md:159`).
+Training itself does not. Any trainer or training orchestrator begins where a
+sealed Veriformis bundle ends. Aptus is one optional consumer integration,
+implemented through a sibling handoff descriptor; it is not part of the
+canonical six-file bundle or the orchestration root. This division matters
+architecturally because it converts dataset preparation from a disposable
+preprocessing step into an artifact with its own integrity guarantees. The
+design enforces that boundary through fail-closed sealing: a dataset is not
+considered finished because a JSONL file exists, but only when the exact
+validated snapshot, manifest, and attestation agree (see
+`docs/product-contract.md:159`).
 
 The core problem the system addresses is accountability in dataset
 construction. Conventional dataset pipelines — shell scripts, notebooks,
@@ -99,8 +100,11 @@ locator fields — as a correctness mechanism, not a style preference.
 
 ```mermaid
 flowchart TB
-    subgraph entry["Composition and Infrastructure"]
-        CLI["cli.py — Typer composition root, 13 commands (9 stage-gated)"]
+    subgraph entry["Adapters and Composition"]
+        CLI["cli.py — thin Typer adapter, 18 commands"]
+        MCP["mcp/ — local stdio adapter"]
+        MAC["macOS workbench — shells the CLI"]
+        PIP["pipeline/ — PipelineService composition root"]
         WS["workspace.py — revision store, stage graph, replay-on-commit"]
     end
 
@@ -125,9 +129,13 @@ flowchart TB
         SRC["sources and diagnostics — ParseResult contract"]
     end
 
-    CLI --> WS
-    CLI --> P
-    CLI --> DS
+    CLI --> PIP
+    MCP --> PIP
+    MAC --> CLI
+    PIP --> WS
+    PIP --> P
+    PIP --> DS
+    PIP --> B
     WS -. "lazy import replay validation" .-> stages
     P --> IR
     R --> IR
@@ -148,11 +156,10 @@ The technology stack is small and each choice maps onto a non-functional
 requirement. Python 3.11+ is the substrate, chosen for ecosystem proximity to
 its problem domain — document processing and machine-learning tooling — and
 the modular-monolith organization keeps deployment to a single installed
-console script (see `pyproject.toml:34`). Typer provides the CLI surface; it
-is deliberately confined to exactly one module, `cli.py`, so the command
-surface can later become a thin adapter over a surface-neutral
-`PipelineService` (**planned**, Group 4) without touching domain code (see
-`src/veriformis/cli.py:143`). Pydantic serves as the persisted-contract
+console script (see `pyproject.toml`). Typer provides the CLI surface and is
+confined to `cli.py`. That module is a thin adapter over the implemented,
+surface-neutral `PipelineService`; the same service also backs local MCP tools,
+while the SwiftUI workbench invokes the CLI. Pydantic serves as the persisted-contract
 backbone: fourteen modules — precisely those that own on-disk schemas in
 construction, datasets, bundle, and the workspace revisions themselves —
 build strict, frozen, extra-forbidden models whose validators recompute
@@ -162,11 +169,11 @@ a defense-in-depth ladder that continues through stage-entry replay, snapshot
 gates, seal-time rebuild, and independent verification.
 
 External dependencies are contained with unusual discipline, which serves the
-correctness requirement by bounding blast radius. Format libraries never
-escape the ingestion layer: markdown-it-py appears only in
-`parsers/markdown.py`, python-docx and lxml only in the DOCX parser and
-diagnostics helpers, while jinja2's sole consumer is the retained legacy
-chat-preview module. The workspace revision store is a custom,
+correctness requirement by bounding blast radius. Format libraries remain at
+the ingestion edge: Markdown uses markdown-it-py and mdit-py-plugins, DOCX uses
+python-docx and lxml, and PDF uses pypdfium2. PyYAML is confined to versioned
+pipeline recipes, MCP to the local stdio adapter, Typer to the CLI, and
+jinja2 to the retained chat renderer. The workspace revision store is a custom,
 dependency-free persistence kernel — content-addressed objects under
 `objects/sha256/`, immutable revisions, an atomic `HEAD` pointer, and an
 exclusive-lock commit protocol (see `src/veriformis/workspace.py:1737`) —
@@ -192,11 +199,12 @@ owning one stage's pure, deterministic transformation: parsers recover, rules
 clean through plan/replay separation (see
 `src/veriformis/rules/cleaning.py:737`), chunkers segment, construction builds
 objective-driven records, datasets curate, split, format, and validate, and
-bundle seals and verifies. Two infrastructure units sit beside rather than
-inside this stack: `workspace.py`, the transactional kernel, and `cli.py`, the
-composition root whose thirteen commands funnel into that graph — nine stage
-commands gated by workspace revisions, plus maintenance, read-only inspection,
-and meta entries (see `src/veriformis/cli.py:820`).
+bundle seals and verifies. The axial units beside this stack are
+`workspace.py`, the transactional kernel; `pipeline/`, whose
+`PipelineService` composes stage behavior and transactions; and the thin
+`cli.py` and `mcp/` adapters. The CLI exposes eighteen commands: nine stage
+commands plus maintenance, inspection, recipe automation, MCP, optional Aptus
+handoff, and version surfaces.
 
 Collaboration between these units is governed by two mechanisms worth naming
 explicitly. The first is the strict acyclic import graph: no lower layer
@@ -224,7 +232,7 @@ code computes.
 | [Layers](layers.md) | The strict acyclic layer stack, responsibility allocation, the lazy-kernel and serde-membrane isolation techniques, and exception flow |
 | [Dependencies](dependencies.md) | The fan-in kernel, external-dependency containment, the pydantic posture, deferred imports, and versioning governance |
 | [Data flow](data-flow.md) | Shape evolution across the nine stages, the provenance backbone, egress separation, persistence, and defense in depth |
-| [Entry points](entry-points.md) | The single CLI surface, the stage-gated transaction template, the seal path, and the independent verifier |
+| [Entry points](entry-points.md) | The shared service root, CLI/MCP/workbench adapters, stage transactions, seal path, and independent verifier |
 
 ## Related documentation
 
@@ -237,4 +245,4 @@ code computes.
 - [Integrity Contract v1](../contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](../contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](../contracts/finished-dataset-v1.md)
-- [Build roadmap](../plans/2026-07-29-veriformis-roadmap.md)
+- [Independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Record clean-path (wheel install + golden compile via installed CLI) evidence.
+# Record standalone clean-path (wheel install + golden via installed CLI) evidence.
 # Writes only logs and digests under an evidence directory — not the wheel blob.
 set -euo pipefail
 
@@ -25,11 +25,7 @@ trap cleanup EXIT
   echo "python_resolved=$(uv run --python "$SMOKE_PYTHON" python -c 'import sys; print(sys.version)')"
 } | tee "$OUT/environment.txt"
 
-echo "==> record_clean_path: smoke_install log"
-SMOKE_PYTHON="$SMOKE_PYTHON" bash "$ROOT/scripts/release/smoke_install.sh" \
-  2>&1 | tee "$OUT/smoke_install.log"
-
-echo "==> record_clean_path: install wheel into retained workdir venv"
+echo "==> record_clean_path: build and install wheel into isolated venv"
 uv python install "$SMOKE_PYTHON"
 uv build --python "$SMOKE_PYTHON" --wheel --out-dir "$WORKDIR/dist"
 WHEEL="$(find "$WORKDIR/dist" -name 'veriformis-*.whl' | head -n 1)"
@@ -51,6 +47,21 @@ source "$WORKDIR/venv/bin/activate"
 uv pip install "$WHEEL"
 command -v veriformis
 veriformis version | tee "$OUT/installed_version.txt"
+PACKAGE_FILE="$(python -c 'import pathlib, veriformis; print(pathlib.Path(veriformis.__file__).resolve())')"
+SITE_PACKAGES="$(python -c 'import pathlib, sysconfig; print(pathlib.Path(sysconfig.get_paths()["purelib"]).resolve())')"
+{
+  echo "veriformis.__file__=$PACKAGE_FILE"
+  echo "site_packages=$SITE_PACKAGES"
+} | tee "$OUT/installed_origin.txt"
+case "$PACKAGE_FILE" in
+  "$SITE_PACKAGES"/veriformis/*) ;;
+  *)
+    echo "record_clean_path: imported Veriformis outside isolated site-packages" >&2
+    exit 1
+    ;;
+esac
+uv pip list --python "$WORKDIR/venv/bin/python" | tee "$OUT/installed_packages.txt"
+python -c 'import importlib.metadata as m; names={d.metadata["Name"].casefold() for d in m.distributions() if d.metadata.get("Name")}; assert "aptus" not in names, "unexpected external Aptus distribution installed"'
 
 echo "==> record_clean_path: golden_compile via installed CLI"
 export VERIFORMIS_USE_PATH=1
@@ -61,7 +72,7 @@ bash "$ROOT/scripts/release/golden_compile.sh" 2>&1 | tee "$OUT/golden_compile.l
 {
   echo "status=PASS"
   echo "evidence_dir=$OUT"
-  echo "notes=wheel install outside repo .venv; golden path used VERIFORMIS_USE_PATH=1"
+  echo "notes=isolated wheel install; package origin verified in venv site-packages; standalone golden path used installed CLI"
 } | tee "$OUT/SUMMARY.txt"
 
 echo "record_clean_path_evidence: PASS → $OUT"

@@ -1,0 +1,249 @@
+{
+  "schema_version": "veriformis.program-tracker/v1",
+  "program_id": "independent-product",
+  "title": "Veriformis Independent Product",
+  "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
+  "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+  "last_updated": "2026-08-11",
+  "status_values": [
+    "planned",
+    "in_progress",
+    "blocked",
+    "deferred",
+    "completed"
+  ],
+  "status_policy": "docs/governance/project-tracking.md",
+  "phases": [
+    {
+      "number": 0,
+      "title": "Establish authority, baseline, and decision records",
+      "status": "completed",
+      "depends_on": [],
+      "packet": "dev/active/independent-product/phase-00-foundation",
+      "started_on": "2026-08-11",
+      "completed_on": "2026-08-11",
+      "next_gate": "Completed; Phase 1 may begin with its standard packet and pinned acceptance tests."
+    },
+    {
+      "number": 1,
+      "title": "Enforce standalone independence",
+      "status": "completed",
+      "depends_on": [0],
+      "packet": "dev/active/independent-product/phase-01-standalone-independence",
+      "started_on": "2026-08-11",
+      "completed_on": "2026-08-11",
+      "next_gate": "Completed; Phase 2 may begin with its standard packet and pinned defect regressions."
+    },
+    {
+      "number": 2,
+      "title": "Close known reliability and artifact-boundary defects",
+      "status": "planned",
+      "depends_on": [1],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after the standalone default and release boundary pass."
+    },
+    {
+      "number": 3,
+      "title": "Formalize the goal, schema, container, and profile taxonomy",
+      "status": "planned",
+      "depends_on": [2],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after known foundation defects are closed."
+    },
+    {
+      "number": 4,
+      "title": "Build the verified export foundation",
+      "status": "planned",
+      "depends_on": [3],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after taxonomy contracts and migrations pass."
+    },
+    {
+      "number": 5,
+      "title": "Ship lossless generic local exports",
+      "status": "planned",
+      "depends_on": [4],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Implement only through the verified export service."
+    },
+    {
+      "number": 6,
+      "title": "Deliver goal-first recipes and previews",
+      "status": "planned",
+      "depends_on": [4],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after export contracts stabilize."
+    },
+    {
+      "number": 7,
+      "title": "Add first-class existing-dataset import and mapping",
+      "status": "planned",
+      "depends_on": [5, 6],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after generic export and goal semantics pass."
+    },
+    {
+      "number": 8,
+      "title": "Implement the first consumer profiles",
+      "status": "planned",
+      "depends_on": [3, 4, 5, 6],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Admit only profiles with official contracts and conformance fixtures."
+    },
+    {
+      "number": 9,
+      "title": "Add columnar and Hugging Face dataset containers",
+      "status": "planned",
+      "depends_on": [4],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after optional-dependency and export evidence rules pass."
+    },
+    {
+      "number": 10,
+      "title": "Expand consumer profiles under evidence gates",
+      "status": "planned",
+      "depends_on": [8, 9],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Admit each profile independently."
+    },
+    {
+      "number": 11,
+      "title": "Harden collection ingest and qualify additional formats",
+      "status": "planned",
+      "depends_on": [0, 3],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Use retained corpus evidence and parser threat analysis."
+    },
+    {
+      "number": 12,
+      "title": "Add optional local OCR with accountable recovery",
+      "status": "planned",
+      "depends_on": [11],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Proceed only if the OCR evaluation and ADR pass."
+    },
+    {
+      "number": 13,
+      "title": "Build dataset quality intelligence",
+      "status": "planned",
+      "depends_on": [3, 7],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Calibrate every blocking heuristic before enforcement."
+    },
+    {
+      "number": 14,
+      "title": "Deliver human review and correction workflows",
+      "status": "planned",
+      "depends_on": [13],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Begin after quality facts and review contracts stabilize."
+    },
+    {
+      "number": 15,
+      "title": "Measure and engineer scale, streaming, and sharding",
+      "status": "planned",
+      "depends_on": [4, 7, 9, 11],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Measure baseline behavior before setting targets."
+    },
+    {
+      "number": 16,
+      "title": "Establish a safe extension architecture",
+      "status": "planned",
+      "depends_on": [3, 4, 11, 13, 15],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Stabilize internal protocols before public plugin APIs."
+    },
+    {
+      "number": 17,
+      "title": "Add governed advanced dataset families",
+      "status": "planned",
+      "depends_on": [3, 7, 13, 14, 16],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Admit each semantic family separately."
+    },
+    {
+      "number": 18,
+      "title": "Complete the goal-first Mac workbench",
+      "status": "planned",
+      "depends_on": [6, 7, 8, 9, 10, 13, 14, 15],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Expose only capabilities already owned by shared services."
+    },
+    {
+      "number": 19,
+      "title": "Complete automation and optional publication boundaries",
+      "status": "planned",
+      "depends_on": [4, 7, 8, 9, 10, 15, 18],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Keep publication explicit and outside the default local path."
+    },
+    {
+      "number": 20,
+      "title": "Cut the stable independent 1.0 product",
+      "status": "planned",
+      "depends_on": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "packet": null,
+      "started_on": null,
+      "completed_on": null,
+      "next_gate": "Freeze only capabilities whose evidence gates passed."
+    }
+  ]
+}

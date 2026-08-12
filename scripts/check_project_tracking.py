@@ -1,0 +1,405 @@
+#!/usr/bin/env python3
+"""Fail when independent-product tracking records drift from code or each other."""
+
+from __future__ import annotations
+
+import inspect
+import json
+import re
+import sys
+import tomllib
+from pathlib import Path
+from typing import Any
+
+from typer.models import OptionInfo
+
+from veriformis import __version__
+from veriformis.bundle.finished import (
+    ATTESTATION_NAME,
+    EVALUATION_PATH,
+    MANIFEST_NAME,
+    PROVENANCE_PATH,
+    TRAIN_PATH,
+    VALIDATION_PATH,
+)
+from veriformis.cli import seal
+from veriformis.datasets.serialization import V1_ROW_SCHEMAS
+from veriformis.mcp.server import create_mcp_server
+from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
+from veriformis.recipes.library import list_named_recipes
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PROGRAM_PATH = ROOT / "dev/active/independent-product/program.json"
+SUPPORT_PATH = ROOT / "docs/governance/support-registry.json"
+EVIDENCE_PATH = ROOT / "docs/evidence/index.json"
+WIP_PATH = ROOT / "WIP.md"
+PHASE_PACKET_FILES = {
+    "README.md",
+    "plan.md",
+    "progress.md",
+    "decisions.md",
+    "risks.md",
+    "evidence.md",
+    "closeout.md",
+}
+PHASE_STATUS_DISPLAY = {
+    "planned": "Planned",
+    "in_progress": "In progress",
+    "blocked": "Blocked",
+    "deferred": "Deferred",
+    "completed": "Completed",
+}
+LOCAL_REFERENCE_KEYS = {
+    "claim_policy",
+    "details",
+    "evidence",
+    "packet",
+    "roadmap",
+    "status_policy",
+}
+
+
+class TrackingError(RuntimeError):
+    """One or more governance records are inconsistent."""
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise TrackingError(f"cannot load {path.relative_to(ROOT)}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise TrackingError(f"{path.relative_to(ROOT)} must contain a JSON object")
+    return value
+
+
+def _require(condition: bool, message: str, errors: list[str]) -> None:
+    if not condition:
+        errors.append(message)
+
+
+def _roadmap_phases(roadmap_path: Path) -> list[tuple[int, str]]:
+    text = roadmap_path.read_text(encoding="utf-8")
+    matches = re.findall(r"^## Phase (\d+) — (.+)$", text, flags=re.MULTILINE)
+    return [(int(number), title) for number, title in matches]
+
+
+def _check_program(program: dict[str, Any], errors: list[str]) -> None:
+    _require(
+        program.get("schema_version") == "veriformis.program-tracker/v1",
+        "program tracker schema_version is not veriformis.program-tracker/v1",
+        errors,
+    )
+    phases = program.get("phases")
+    if not isinstance(phases, list):
+        errors.append("program phases must be a list")
+        return
+
+    numbers = [phase.get("number") for phase in phases if isinstance(phase, dict)]
+    _require(numbers == list(range(21)), "program phases must be numbered 0 through 20", errors)
+
+    roadmap_value = program.get("roadmap")
+    if not isinstance(roadmap_value, str):
+        errors.append("program roadmap must be a repository-relative path")
+        return
+    roadmap_path = ROOT / roadmap_value
+    if not roadmap_path.is_file():
+        errors.append(f"program roadmap does not exist: {roadmap_value}")
+        return
+    roadmap_phases = _roadmap_phases(roadmap_path)
+    program_phases = [
+        (phase.get("number"), phase.get("title"))
+        for phase in phases
+        if isinstance(phase, dict)
+    ]
+    _require(
+        roadmap_phases == program_phases,
+        "program phase numbers/titles do not exactly match roadmap headings",
+        errors,
+    )
+
+    allowed = program.get("status_values")
+    if not isinstance(allowed, list) or set(allowed) != set(PHASE_STATUS_DISPLAY):
+        errors.append("program status_values do not match the tracking policy")
+        allowed_set = set(PHASE_STATUS_DISPLAY)
+    else:
+        allowed_set = set(allowed)
+
+    active_count = 0
+    for phase in phases:
+        if not isinstance(phase, dict):
+            errors.append("every program phase must be an object")
+            continue
+        number = phase.get("number")
+        status = phase.get("status")
+        _require(status in allowed_set, f"phase {number} has invalid status {status!r}", errors)
+        if status == "in_progress":
+            active_count += 1
+        dependencies = phase.get("depends_on")
+        if not isinstance(dependencies, list) or any(
+            type(item) is not int or item < 0 or item >= number
+            for item in dependencies
+        ):
+            errors.append(f"phase {number} has invalid predecessor dependencies")
+        packet = phase.get("packet")
+        if status in {"in_progress", "completed"}:
+            if not isinstance(packet, str):
+                errors.append(f"phase {number} must name a packet while {status}")
+                continue
+            packet_path = ROOT / packet
+            if not packet_path.is_dir():
+                errors.append(f"phase {number} packet does not exist: {packet}")
+                continue
+            missing = sorted(
+                name for name in PHASE_PACKET_FILES if not (packet_path / name).is_file()
+            )
+            if missing:
+                errors.append(f"phase {number} packet is missing {missing!r}")
+        if status == "completed":
+            _require(
+                isinstance(phase.get("completed_on"), str),
+                f"completed phase {number} must have completed_on",
+                errors,
+            )
+        elif phase.get("completed_on") is not None:
+            errors.append(f"non-completed phase {number} cannot have completed_on")
+
+    _require(active_count <= 1, "more than one critical-path phase is in progress", errors)
+    _check_wip_phase_table(phases, errors)
+
+
+def _check_wip_phase_table(phases: list[dict[str, Any]], errors: list[str]) -> None:
+    text = WIP_PATH.read_text(encoding="utf-8")
+    start = "<!-- INDEPENDENT-PROGRAM:START -->"
+    end = "<!-- INDEPENDENT-PROGRAM:END -->"
+    if start not in text or end not in text:
+        errors.append("WIP is missing the independent-program marker block")
+        return
+    block = text.split(start, 1)[1].split(end, 1)[0]
+    rows = re.findall(r"^\| (\d+) \| (.+?) \| (.+?) \|", block, flags=re.MULTILINE)
+    parsed = [(int(number), title, status) for number, title, status in rows]
+    expected = [
+        (phase["number"], phase["title"], PHASE_STATUS_DISPLAY[phase["status"]])
+        for phase in phases
+    ]
+    _require(parsed == expected, "WIP phase table does not match program.json", errors)
+
+
+def _check_support(support: dict[str, Any], errors: list[str]) -> None:
+    _require(
+        support.get("schema_version") == "veriformis.support-registry/v1",
+        "support registry schema_version is not veriformis.support-registry/v1",
+        errors,
+    )
+    product = support.get("product")
+    if not isinstance(product, dict):
+        errors.append("support registry product must be an object")
+        return
+    _require(product.get("version") == __version__, "support version differs from package", errors)
+    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    classifiers = pyproject["project"]["classifiers"]
+    _require(
+        ("Development Status :: 3 - Alpha" in classifiers)
+        == (product.get("maturity") == "development-alpha"),
+        "support maturity differs from pyproject classifier",
+        errors,
+    )
+
+    inputs = support.get("inputs")
+    training = support.get("training")
+    artifacts = support.get("artifacts")
+    if not all(isinstance(value, dict) for value in (inputs, training, artifacts)):
+        errors.append("support inputs, training, and artifacts must be objects")
+        return
+    _require(
+        inputs.get("implemented_extensions") == sorted(DECLARED_V1_EXTENSIONS),
+        "support input extensions differ from DECLARED_V1_EXTENSIONS",
+        errors,
+    )
+    objective_names = sorted(item["objective"] for item in list_named_recipes())
+    _require(
+        training.get("implemented_objectives") == objective_names,
+        "support objectives differ from the named recipe library",
+        errors,
+    )
+    _require(
+        training.get("implemented_row_schemas") == sorted(V1_ROW_SCHEMAS),
+        "support row schemas differ from V1_ROW_SCHEMAS",
+        errors,
+    )
+    profiles = artifacts.get("implemented_bundle_profiles")
+    if not isinstance(profiles, list) or len(profiles) != 1:
+        errors.append("support registry must contain exactly the implemented minimal-v1 bundle")
+    else:
+        expected_paths = sorted(
+            {
+                MANIFEST_NAME,
+                ATTESTATION_NAME,
+                TRAIN_PATH,
+                EVALUATION_PATH,
+                PROVENANCE_PATH,
+                VALIDATION_PATH,
+            }
+        )
+        _require(
+            profiles[0].get("profile") == "minimal-v1"
+            and profiles[0].get("state") == "implemented"
+            and profiles[0].get("paths") == expected_paths,
+            "minimal-v1 support entry differs from bundle constants",
+            errors,
+        )
+
+    aptus_profiles = [
+        profile
+        for profile in support.get("consumer_profiles", [])
+        if isinstance(profile, dict) and profile.get("profile") == "aptus-handoff-v1"
+    ]
+    if len(aptus_profiles) != 1:
+        errors.append("support registry must contain exactly one Aptus profile")
+    else:
+        aptus = aptus_profiles[0]
+        _require(
+            aptus.get("state") == "implemented"
+            and aptus.get("product_role") == "optional-integration",
+            "Aptus must be recorded as an implemented optional integration",
+            errors,
+        )
+        cli_default = inspect.signature(seal).parameters["aptus_handoff"].default
+        cli_current = (
+            cli_default.default if isinstance(cli_default, OptionInfo) else cli_default
+        )
+        server = create_mcp_server()
+        mcp_seal = next(
+            tool.fn for tool in server._tool_manager.list_tools() if tool.name == "seal"
+        )
+        mcp_current = inspect.signature(mcp_seal).parameters["write_handoff"].default
+        workbench_source = (
+            ROOT / "macos/Sources/ViewModels/WorkbenchViewModel.swift"
+        ).read_text(encoding="utf-8")
+        workbench_match = re.search(
+            r"defaultWriteAptusHandoff\s*=\s*(true|false)\b",
+            workbench_source,
+        )
+        workbench_current = (
+            workbench_match.group(1) == "true" if workbench_match is not None else None
+        )
+        defaults = aptus.get("default_handoff")
+        _require(
+            defaults
+            == {
+                "cli_seal": cli_current,
+                "mcp_seal": mcp_current,
+                "workbench": workbench_current,
+            },
+            "Aptus default_handoff differs from CLI, MCP, or workbench source",
+            errors,
+        )
+        _require(
+            cli_current is False
+            and mcp_current is False
+            and workbench_current is False,
+            "CLI, MCP, and workbench handoff defaults must remain false",
+            errors,
+        )
+        _require(
+            "veriformis.handoff" not in sys.modules,
+            "tracking imports and MCP server creation unexpectedly loaded handoff code",
+            errors,
+        )
+
+
+def _check_evidence_index(evidence: dict[str, Any], errors: list[str]) -> None:
+    _require(
+        evidence.get("schema_version") == "veriformis.evidence-index/v1",
+        "evidence index schema_version is not veriformis.evidence-index/v1",
+        errors,
+    )
+    grades = evidence.get("evidence_grades")
+    records = evidence.get("records")
+    if not isinstance(grades, dict) or not isinstance(records, list):
+        errors.append("evidence grades must be an object and records must be a list")
+        return
+    seen: set[str] = set()
+    for record in records:
+        if not isinstance(record, dict):
+            errors.append("every evidence record must be an object")
+            continue
+        record_id = record.get("id")
+        if not isinstance(record_id, str) or record_id in seen:
+            errors.append(f"invalid or duplicate evidence id {record_id!r}")
+        else:
+            seen.add(record_id)
+        _require(
+            record.get("grade") in grades,
+            f"evidence {record_id!r} uses an unknown grade",
+            errors,
+        )
+        details = record.get("details")
+        _require(
+            isinstance(details, str) and (ROOT / details).is_file(),
+            f"evidence {record_id!r} details path does not exist",
+            errors,
+        )
+
+
+def _iter_references(value: Any, *, key: str | None = None) -> list[str]:
+    found: list[str] = []
+    if isinstance(value, dict):
+        for child_key, child in value.items():
+            found.extend(_iter_references(child, key=child_key))
+    elif isinstance(value, list):
+        for child in value:
+            found.extend(_iter_references(child, key=key))
+    elif isinstance(value, str) and key in LOCAL_REFERENCE_KEYS:
+        found.append(value)
+    return found
+
+
+def _check_local_references(records: list[dict[str, Any]], errors: list[str]) -> None:
+    for record in records:
+        for reference in _iter_references(record):
+            if reference.startswith(("http://", "https://")):
+                continue
+            path_text = reference.split("#", 1)[0]
+            if not path_text:
+                continue
+            _require(
+                (ROOT / path_text).exists(),
+                f"tracked local reference does not exist: {reference}",
+                errors,
+            )
+
+
+def check() -> list[str]:
+    """Return all detected tracking inconsistencies."""
+    errors: list[str] = []
+    program = _load_json(PROGRAM_PATH)
+    support = _load_json(SUPPORT_PATH)
+    evidence = _load_json(EVIDENCE_PATH)
+    _check_program(program, errors)
+    _check_support(support, errors)
+    _check_evidence_index(evidence, errors)
+    _check_local_references([program, support, evidence], errors)
+    return errors
+
+
+def main() -> int:
+    try:
+        errors = check()
+    except TrackingError as exc:
+        errors = [str(exc)]
+    if errors:
+        print("Project tracking check: FAIL", file=sys.stderr)
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+    print("Project tracking check: PASS")
+    print("- 21 roadmap phases match program.json and WIP.md")
+    print("- implemented inputs, objectives, rows, bundle, and all handoff defaults match code")
+    print("- governed phase packets and evidence references are structurally complete")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

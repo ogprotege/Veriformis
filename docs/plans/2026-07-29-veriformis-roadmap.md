@@ -1,6 +1,7 @@
 # Veriformis Build Roadmap
 
-**Status:** Authoritative build roadmap
+**Status:** Historical implementation roadmap; superseded for future work by
+the [Independent Product Roadmap](2026-08-11-veriformis-independent-product-roadmap.md)
 
 **Created:** 2026-07-29
 
@@ -8,7 +9,7 @@
 
 **Current implementation:** M1 core plus Groups 1–7 at version `0.1.0`; Group 9
 automated release gates and beta-prep on `main`; private beta Mac workbench
-Phases 0–1 on `main`; maturity remains development alpha; owner Mac
+Phases 0–2 on `main`; maturity remains development alpha; owner Mac
 public-ready evidence open
 
 ## Product objective
@@ -20,7 +21,7 @@ Steps 1 through 6, Group 2 implemented Steps 7 through 10, Group 3
 implemented Steps 11 through 16, Group 4 implemented Steps 17 through 19, and
 Group 5 implemented Steps 20 through 21, and Group 6 implemented Steps 22 through 23, and Group 7 implemented Step 24.
 Group 9 automated release gates and beta-prep documentation are on `main`.
-Private beta workbench Phases 0–1 (dogfood + KISS shell) are on `main` as
+Private beta workbench Phases 0–2 (dogfood + KISS shell + debugger tools) are on `main` as
 Group 7 follow-on UI (see
 [private beta workbench plan](2026-08-06-private-beta-workbench.md)).
 Owner Mac signing/notarization evidence remains for a **public** Mac claim.
@@ -34,7 +35,8 @@ A **beta** product label is a separate deliberate cut (Group 8 is optional).
 - Step 26 automated subset (CI, install smoke, golden path, release runbook)
   and beta-prep limitations/evidence are implemented; Step 26 owner Mac
   public-ready remainder is open.
-- Private beta workbench Phases 0–1 are implemented; Phase 2+ remains open.
+- Private beta workbench Phases 0–2 are implemented. Future work is governed
+  by the independent product roadmap.
 - Later work must preserve the Groups 1 through 7 workspace, identity,
   diagnostics, evidence, lifecycle, exact-source, replay, curation, split,
   validation, sealing, verification, service, handoff, and workbench
@@ -198,16 +200,25 @@ external_digest verify and Aptus handoff-verify, release scripts under
 `scripts/release/`, and [docs/release.md](../release.md). Migration checks
 remain ordinary suite tests.
 
+**Later status amendment (2026-08-11):** Independent-product Phase 1 removed
+the historical handoff step from required release evidence. The required
+installed-wheel and golden paths now seal and externally verify standalone
+bundles; Aptus adapter self-conformance is an explicit optional job.
+
 **Beta-prep (landed on `main`, still alpha maturity):**
 [docs/beta-limitations.md](../beta-limitations.md), clean-path evidence
 recorder, and retained packs under
 `dev/active/group-9-public-release/evidence/`.
 
 **Owner remainder (open for public Mac claim):** Developer ID signing,
-notarization, staple, clean-Mac install of the signed product, and retained
-Aptus handoff evidence.
+notarization, staple, and clean-Mac install of the signed product. A retained
+Aptus proof is required only for a separately named Aptus compatibility claim.
 
-**Exit gate:** A clean supported Mac can install the signed and notarized product, compile the golden raw corpus, verify the final bundles, and hand them to a compatible Aptus release with independently recorded evidence.
+**Historical exit gate:** A clean supported Mac can install the signed and
+notarized product, compile the golden raw corpus, verify the final bundles, and
+hand them to a compatible Aptus release with independently recorded evidence.
+The active independent-product roadmap supersedes the final Aptus clause for
+core product readiness.
 
 ## Ordering rules
 

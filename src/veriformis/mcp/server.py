@@ -9,12 +9,6 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from veriformis.handoff import (
-    build_aptus_handoff,
-    consume_aptus_handoff,
-    handoff_path_for_bundle,
-    write_aptus_handoff,
-)
 from veriformis.pipeline.service import DEFAULT_PIPELINE_SERVICE, PipelineService
 from veriformis.recipes import list_named_recipes, load_pipeline_spec, run_pipeline_spec
 
@@ -168,11 +162,17 @@ def create_mcp_server(
         return _outcome_json(pipeline.validate(Path(workspace)))
 
     @server.tool()
-    def seal(workspace: str, out: str, write_handoff: bool = True) -> str:
-        """Seal a finished bundle and optionally emit the Aptus handoff sibling."""
+    def seal(workspace: str, out: str, write_handoff: bool = False) -> str:
+        """Seal a bundle; optionally opt in to an Aptus handoff sibling."""
         outcome = pipeline.seal(Path(workspace), Path(out))
         payload = _jsonable(outcome)
         if write_handoff and outcome.publication is not None:
+            from veriformis.handoff import (
+                build_aptus_handoff,
+                handoff_path_for_bundle,
+                write_aptus_handoff,
+            )
+
             handoff = build_aptus_handoff(
                 outcome.publication.bundle_path,
                 expected_manifest_sha256=outcome.publication.manifest_sha256,
@@ -221,6 +221,12 @@ def create_mcp_server(
     @server.tool()
     def build_handoff(bundle: str, manifest_sha256: str, out: str | None = None) -> str:
         """Build and write the versioned Aptus handoff for a sealed bundle."""
+        from veriformis.handoff import (
+            build_aptus_handoff,
+            handoff_path_for_bundle,
+            write_aptus_handoff,
+        )
+
         handoff = build_aptus_handoff(
             Path(bundle),
             expected_manifest_sha256=manifest_sha256,
@@ -240,6 +246,8 @@ def create_mcp_server(
     @server.tool()
     def consume_handoff(handoff_path: str, bundle: str) -> str:
         """Consume/verify an Aptus handoff against a sealed bundle."""
+        from veriformis.handoff import consume_aptus_handoff
+
         report = consume_aptus_handoff(
             Path(handoff_path),
             bundle=Path(bundle),

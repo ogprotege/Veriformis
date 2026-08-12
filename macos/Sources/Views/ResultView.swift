@@ -12,9 +12,6 @@ struct ResultView: View {
 
             gridRow("Workspace", result.workspaceURL.path)
             gridRow("Bundle", result.bundleURL.path)
-            if let handoff = result.handoffURL {
-                gridRow("Aptus handoff", handoff.path)
-            }
             if let sha = result.manifestSHA256 {
                 digestRow(label: "Manifest SHA-256", value: sha, copyLabel: "manifest SHA-256")
             }
@@ -28,17 +25,25 @@ struct ResultView: View {
                     .foregroundStyle(.green)
             }
 
+            if let handoff = result.handoffURL {
+                GroupBox("Optional integrations") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        gridRow("Aptus handoff", handoff.path)
+                        Button("Reveal handoff") {
+                            workbench.reveal(handoff)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 2)
+                }
+            }
+
             HStack {
                 Button("Reveal workspace") {
                     workbench.reveal(result.workspaceURL)
                 }
                 Button("Reveal bundle") {
                     workbench.reveal(result.bundleURL)
-                }
-                if let handoff = result.handoffURL {
-                    Button("Reveal handoff") {
-                        workbench.reveal(handoff)
-                    }
                 }
                 if let log = result.logFileURL {
                     Button("Open log") {

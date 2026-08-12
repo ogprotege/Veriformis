@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (active implementation reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -137,8 +137,8 @@ to immutable canonical ranges or the boundary raises an `EvidenceError`.
 
 The format stage is the only boundary that turns semantic state into trainer
 bytes, and it separates payload from provenance by construction.
-`train.jsonl` and `evaluation.jsonl` contain only the selected Aptus schema
-payload keys, while `metadata/row-provenance.jsonl` carries one
+`train.jsonl` and `evaluation.jsonl` contain only the selected declared product
+row-schema keys, while `metadata/row-provenance.jsonl` carries one
 `RowProvenance` per row binding row and payload digests to the record, both
 decisions, leakage group, assignment, partition, ordinal, and per-field value
 and evidence digests (`src/veriformis/datasets/serialization.py:499-508`,
@@ -192,9 +192,9 @@ any bytes are installed (`src/veriformis/workspace.py:2133-2144`,
 Only after objects and the revision manifest are durable is `HEAD` swapped,
 and the code explicitly forbids fallible work after that swap because
 replacing HEAD is the commit point (`src/veriformis/workspace.py:2263-2277`).
-The CLI acts as the composition root over this machinery: each stage command
-reloads the exact upstream artifacts, calls the pure domain function, and
-commits one revision (`src/veriformis/cli.py:821-1615`).
+`PipelineService` acts as the composition root over this machinery: each stage
+method reloads the exact upstream artifacts, calls the domain implementation,
+and commits one revision. CLI and MCP adapters delegate to that service.
 
 ## Consistency guarantees: defense in depth
 

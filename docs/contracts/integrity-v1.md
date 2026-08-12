@@ -12,6 +12,8 @@
 
 **Implementation status:** Implemented in Group 1
 
+**Last reviewed:** 2026-08-11 (historical scope reconciled with current runtime)
+
 ## Purpose
 
 This document translates the product contract into exact Group 1 guarantees.
@@ -47,14 +49,17 @@ Veriformis owns these ordered stages:
 8. `validation`
 9. `seal`
 
-Aptus begins only after Veriformis produces a finished dataset contract. Aptus
-owns training planning and execution. It does not silently replace Veriformis
-curation or split policy.
+Training systems begin only after Veriformis produces a finished dataset
+contract. Aptus is one optional downstream integration. Neither Aptus nor any
+other consumer may silently replace Veriformis curation or split policy.
 
 ## Declared deterministic v1 boundary
 
 The deterministic pipeline performs no network calls and no model generation.
-Its declared source kinds are `text`, `code`, `markdown`, and `docx`.
+The current declared suffix registry covers plain text, Markdown, DOCX, HTML,
+digitally-born PDF, CSV, JSON, JSONL, and the code suffixes `.py`, `.js`,
+`.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, and `.sh`. OCR-only PDFs
+remain a named refusal rather than an implied success.
 
 Its declared objective kinds are:
 
@@ -91,9 +96,9 @@ Parse cross-validates source descriptors, the registry, canonical text, strict
 IR, and parse reports before promotion. Clean cross-validates parsed and cleaned
 IR, replayed plans, block derivations, and transforms before promotion.
 
-Parse invalidates clean, chunk, format, validation, and seal state. Clean
-invalidates chunk, format, validation, and seal state. A command with a stale
-expected revision fails with `workspace-revision-conflict`.
+Changing a stage invalidates every descendant in the current nine-stage graph.
+A command with a stale expected revision fails with
+`workspace-revision-conflict`.
 
 ### Source-scoped identity
 
@@ -189,10 +194,10 @@ The corpus intentionally contains:
 - an unsupported Markdown HTML block requiring a diagnostic; and
 - text and code sources already supported by M1.
 
-The later M1.1 acceptance run must use one source inventory to produce both a
+The historical M1.1 acceptance requirement used one source inventory to produce both a
 `full_text` dataset with `text` rows and a `continuation` dataset with
-`prompt_completion` rows. Group 1 pins that requirement but does not implement
-construction or serialization work assigned to later groups.
+`prompt_completion` rows. Group 1 pinned that later requirement; it is now
+implemented and tracked by the current status and release evidence.
 
 ## Regression policy
 
@@ -224,7 +229,7 @@ Rerun the project checks for current Group 1 closeout evidence. Strict expected
 failures belong to later roadmap steps. Test totals are intentionally omitted
 because coverage grows and the count is not a permanent contract term.
 
-## Current implementation binding
+## Historical Group 1 implementation boundary
 
 The current CLI persists Group 1 state through immutable workspace revisions.
 Parse stores raw bytes, canonical text, canonical IR, and a mandatory parse
@@ -234,7 +239,10 @@ clean call the same planner and replay engine. Audit revision IDs may differ
 between equivalent histories, while portable state and per-source parse-input
 digests preserve semantic reproducibility.
 
-Group 1 does not implement dataset recipes, candidate records, curation,
+At Group 1 closeout, dataset recipes, candidate records, curation,
 authoritative splits, structured training rows, exact candidate-bundle
-validation, or atomic closed-set sealing. Those remain assigned to later
-roadmap groups.
+validation, and atomic closed-set sealing were intentionally assigned to later
+roadmap groups. Those deferrals are historical: the capabilities are now
+implemented. See [current status](../current-status.md) and the
+[independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)
+for current maturity and remaining work.

@@ -5,6 +5,8 @@ import UniformTypeIdentifiers
 
 @MainActor
 final class WorkbenchViewModel: ObservableObject {
+    nonisolated static let defaultWriteAptusHandoff = false
+
     // Navigation
     @Published var destination: SidebarDestination = .compile
 
@@ -16,7 +18,7 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var objective: TrainingObjective = .fullText
     @Published var allowEmptyEvaluation = true
     @Published var splitRatioPPM = 400_000
-    @Published var writeAptusHandoff = true
+    @Published var writeAptusHandoff = defaultWriteAptusHandoff
 
     // Run state
     @Published var isRunning = false
@@ -381,7 +383,7 @@ final class WorkbenchViewModel: ObservableObject {
             self.objective = objective
         }
         allowEmptyEvaluation = entry.allowEmptyEvaluation ?? true
-        writeAptusHandoff = entry.writeAptusHandoff ?? true
+        writeAptusHandoff = entry.requestsAptusHandoff
         splitRatioPPM = entry.splitRatioPPM ?? 400_000
         let parent = URL(fileURLWithPath: entry.workspacePath).deletingLastPathComponent()
         if FileManager.default.fileExists(atPath: parent.path) {

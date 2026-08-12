@@ -9,13 +9,14 @@ the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), local MCP (`mcp`), and `version`.
+The complete surface is 18 commands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-11 (active implementation reconciliation)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -35,7 +36,7 @@ examples below use the installed name.
 
 | Role | Commands | Writes state? |
 | --- | --- | --- |
-| Stage | `parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` also publishes a bundle and, by default, a sibling Aptus handoff |
+| Stage | `parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` publishes a canonical six-file bundle and currently offers a separately controllable Aptus sibling descriptor |
 | Maintenance | `upgrade-workspace` | Appends migration revisions when the workspace is behind |
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
@@ -191,8 +192,8 @@ veriformis chunk WORKSPACE [--strategy STRATEGY] [--size N] [--overlap N]
 | `--overlap` | `100` | Overlap in characters; used only by `fixed` and `sliding` |
 
 `size` must be at least 1 and `overlap` must satisfy `0 <= overlap < size`;
-violations print a plain stderr message and exit 2 outside the `error[code]`
-funnel (`src/veriformis/cli.py:1069-1079`).
+violations pass through the shared CLI error funnel as
+`error[invalid-data]: ...` and exit 2.
 
 - `paragraph` groups blocks without exceeding `size` when possible.
 - `fixed` creates fixed character windows with optional overlap.
@@ -203,7 +204,7 @@ funnel (`src/veriformis/cli.py:1069-1079`).
 Requires `clean` complete. Every chunk carries a source-scoped identity and
 reconstructible `SourceEvidence`; chunks never cross body, footnote, or
 endnote regions, and chunk text is checked against resolved evidence on every
-load (`src/veriformis/cli.py:573-579`).
+load by the `PipelineService` artifact loaders.
 
 - **Reads:** cleaned documents, sources, transform records, block derivations,
   cleaning plans.
@@ -390,10 +391,11 @@ Requires every stage from `parse` through `format` complete.
 The command prints every gate status and finding, then the snapshot and
 revision IDs. A failing report is still committed — with failed stage status —
 and the command exits 1 without printing an error line. Every typed error from
-this command also exits 1 (`src/veriformis/cli.py:1602`).
+this command also exits 1.
 
-`aptus-row-shape` proves only current schema shape; it does not prove Aptus
-bundle intake or backend partition enforcement.
+`aptus-row-shape` is a legacy gate ID retained for contract compatibility. It
+proves the generic declared product-row shape only; it does not require Aptus
+or prove handoff intake or backend partition enforcement.
 
 ### `seal`
 
@@ -406,11 +408,12 @@ veriformis seal WORKSPACE -o OUTPUT.vfbundle
 | Option | Default | Effect |
 | --- | --- | --- |
 | `-o PATH` | (required) | Bundle destination; for a fresh publication it must not exist |
+| `--aptus-handoff` / `--no-aptus-handoff` | off | Explicitly opt in to the optional sibling Aptus descriptor; it is not part of the six-file bundle |
 
 Requires all stages through `validate` complete, with a passing validation
 report. Seal reloads the current revision, rebuilds the exact validation
-report, and requires equality with the saved passing report
-(`src/veriformis/cli.py:1644-1649`). It publishes exactly:
+report, and requires equality with the saved passing report. It publishes
+exactly:
 
 ```text
 OUTPUT.vfbundle/
@@ -430,7 +433,7 @@ then commits the exact manifest and attestation bytes as workspace receipts.
 It never overwrites the destination: if an earlier attempt published the exact
 bundle but failed before committing receipts, a retry recovers only after
 external-digest verification and byte-for-byte comparison
-(`src/veriformis/cli.py:211-288`).
+(see `_recover_exact_finished_bundle` in `pipeline/service.py`).
 
 - **Reads:** every upstream artifact, plus the saved validation report.
 - **Writes:** the six-file bundle at `-o`, and a seal revision committing
@@ -450,8 +453,7 @@ claim rollback. A bundle whose final directory sync is unconfirmed produces
 
 Failure modes (exit 1): `missing-stage-input` / `stale-stage` when any
 upstream stage is not complete; `error[invalid-data]` when the saved
-validation report does not exactly match a fresh replay
-(`src/veriformis/cli.py:1646-1649`); `seal-invalid` — including every
+validation report does not exactly match a fresh replay; `seal-invalid` — including every
 `FinishedBundleError`, which subclasses `SealError`
 (`src/veriformis/bundle/finished.py:86`) — for an existing non-matching
 destination or a publication failure.
@@ -541,8 +543,7 @@ Options match `clean`. `PATH` may be one raw source file or one workspace:
 Given identical locator, bytes, parser, rules, and configuration, raw preview,
 workspace preview, and clean produce the same plan ID. The command prints
 per-rule edit and removed-byte counts, plan warnings, the plan ID, and before
-and after text samples (each truncated to 400 characters,
-`src/veriformis/cli.py:1924-1926`). It writes nothing.
+and after text samples (each truncated to 400 characters). It writes nothing.
 
 Failure modes (exit 2): the same `unsupported-input`, `parse-error`,
 `invalid-source-locator`, and `rule-error` cases as `parse` and `clean`.
@@ -633,7 +634,8 @@ sequenceDiagram
 
 ## Error surface
 
-All typed failures pass through one funnel (`src/veriformis/cli.py:198-202`):
+All typed failures pass through the `_run` / `_echo_error` funnel in
+`src/veriformis/cli.py`:
 the exception's stable `code` and message render on stderr as
 
 ```text
@@ -650,7 +652,7 @@ and the process exits with a non-zero status. Exceptions without a typed code
 | --- | --- |
 | `0` | Command completed; `validate` exits 0 only when the report passes |
 | `1` | `validate`, `seal`, or `verify` failed — either a typed error (rendered with `error[code]`) or, for `validate`, a committed failing report (no error line) |
-| `2` | Any typed error from the remaining commands; untyped validation errors (`error[invalid-data]`); `chunk` option-constraint violations (plain message); Typer usage errors such as a missing required option (Click usage message) |
+| `2` | Any typed error from the remaining commands; untyped validation errors and `chunk` option-constraint violations (`error[invalid-data]`); Typer usage errors such as a missing required option (Click usage message) |
 
 Warnings never change the exit status: `warning[commit-durability]` (any
 mutating command), `warning[bundle-durability]` (`seal`),
@@ -692,7 +694,7 @@ not call), and `legacy-workspace-ambiguous` / `legacy-source-unavailable`
 (reserved in `errors.py`). The base-class fallback `veriformis-error` is never
 raised directly.
 
-## Additional Group 5–6 commands (summary)
+## Automation and optional-integration commands
 
 | Command | Purpose |
 | --- | --- |
@@ -701,9 +703,12 @@ raised directly.
 | `mcp` | Run the constrained local MCP server on stdio |
 | `handoff BUNDLE --manifest-sha256 DIGEST` | Write sibling Aptus handoff descriptor |
 | `handoff-verify HANDOFF --bundle BUNDLE` | Fail-closed consumer verification |
-| `seal ... --aptus-handoff` / `--no-aptus-handoff` | Control sibling handoff write (default: on) |
+| `seal ... --aptus-handoff` / `--no-aptus-handoff` | Control sibling handoff write (default: off) |
 
-See [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) and
+The handoff commands are optional Aptus integration surfaces. Default `seal`
+does not import the adapter or write its sibling. These commands do not change
+the canonical bundle or replace `verify`. See
+[Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) and
 [current status](current-status.md) for full semantics.
 
 ## Deferred CLI work
@@ -728,4 +733,4 @@ stage-command redesign is planned solely for packaging.
 - [Development guide](development.md)
 - [Release guide](release.md)
 - [macOS workbench](../macos/README.md)
-- [Build roadmap](plans/2026-07-29-veriformis-roadmap.md)
+- [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Compile the acceptance golden corpus through seal, external_digest verify,
-# and Aptus handoff-verify for both M1.1 acceptance objectives.
-# Group 9 release gate: reproducible product-path evidence from raw sources.
+# Compile the acceptance corpus from raw sources through seal and independent
+# external-digest verification for both supported acceptance objectives.
+# This core release gate has no integration dependency or generated handoff.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -58,29 +58,25 @@ compile_objective() {
   local manifest
   manifest="$(printf '%s\n' "$seal_out" | awk -F': ' 'tolower($0) ~ /manifest sha-256/ {print $2; exit}')"
   test -n "$manifest"
-  test -f "$bundle/manifest.json"
+  test "${#manifest}" -eq 64
 
-  local handoff="${bundle}.aptus-handoff.json"
-  test -f "$handoff"
+  # Canonical standalone bundle files must all be published.
+  test -f "$bundle/manifest.json"
+  test -f "$bundle/attestation.json"
+  test -f "$bundle/data/train.jsonl"
+  test -f "$bundle/data/evaluation.jsonl"
+  test -f "$bundle/metadata/row-provenance.jsonl"
+  test -f "$bundle/validation.json"
+
+  # Default seal must not publish an automatic integration descriptor.
+  local automatic_handoff="${bundle}.aptus-handoff.json"
+  test ! -e "$automatic_handoff"
 
   echo "==> golden_compile: $objective external_digest verify"
-  vf verify "$bundle" --manifest-sha256 "$manifest"
-
-  # Aptus v1 backend rejects plain text rows (full_text). Continuation must
-  # handoff-verify as accepted. See docs/contracts/aptus-handoff-v1.md.
-  local hv_out=""
-  if [[ "$objective" == "continuation" ]]; then
-    echo "==> golden_compile: $objective handoff-verify (must accept)"
-    hv_out="$(vf handoff-verify "$handoff" --bundle "$bundle" 2>&1)"
-    printf '%s\n' "$hv_out"
-    printf '%s\n' "$hv_out" | grep -q "status: accepted"
-  else
-    echo "==> golden_compile: $objective handoff present (Aptus rejects text schema by contract)"
-    test -f "$handoff"
-    hv_out="$(vf handoff-verify "$handoff" --bundle "$bundle" 2>&1 || true)"
-    printf '%s\n' "$hv_out"
-    printf '%s\n' "$hv_out" | grep -q "backend-rejects-row-schema:text"
-  fi
+  local verify_out
+  verify_out="$(vf verify "$bundle" --manifest-sha256 "$manifest" 2>&1)"
+  printf '%s\n' "$verify_out"
+  printf '%s\n' "$verify_out" | grep -q "verification grade: external_digest"
 
   if [[ -n "${GOLDEN_EVIDENCE_DIR:-}" ]]; then
     mkdir -p "$GOLDEN_EVIDENCE_DIR"
@@ -88,8 +84,9 @@ compile_objective() {
       echo "objective=$objective"
       echo "manifest_sha256=$manifest"
       echo "bundle=$bundle"
-      echo "handoff=$handoff"
-      printf '%s\n' "$hv_out"
+      echo "canonical_bundle=present"
+      echo "automatic_handoff=absent"
+      printf '%s\n' "$verify_out"
     } >"$GOLDEN_EVIDENCE_DIR/${objective}.evidence.txt"
   fi
 
@@ -99,4 +96,4 @@ compile_objective() {
 compile_objective full_text
 compile_objective continuation
 
-echo "golden_compile: PASS (full_text + continuation external_digest; continuation handoff accepted)"
+echo "golden_compile: PASS (standalone full_text + continuation external_digest)"

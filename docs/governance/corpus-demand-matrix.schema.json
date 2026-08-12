@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veriformis.local/schemas/corpus-demand-matrix-v1.json",
+  "title": "Veriformis privacy-preserving corpus and workflow demand matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "last_reviewed",
+    "collection_policy",
+    "inventory_observations",
+    "workflow_demands",
+    "format_priorities",
+    "trainer_priorities",
+    "evidence_gaps"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "veriformis.corpus-demand-matrix/v1"
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date"
+    },
+    "collection_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scanner", "allowed_metadata", "prohibited_data"],
+      "properties": {
+        "scanner": {"type": "string"},
+        "allowed_metadata": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "prohibited_data": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "inventory_observations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/inventoryObservation"},
+      "minItems": 1
+    },
+    "workflow_demands": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/workflowDemand"},
+      "minItems": 1
+    },
+    "format_priorities": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/priority"},
+      "minItems": 1
+    },
+    "trainer_priorities": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/priority"},
+      "minItems": 1
+    },
+    "evidence_gaps": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidenceGap"},
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "evidenceGrade": {
+      "enum": [
+        "source-verified",
+        "test-verified",
+        "recorded-local",
+        "retained-artifact",
+        "external-primary",
+        "planned"
+      ]
+    },
+    "aggregateItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_count", "total_bytes"],
+      "properties": {
+        "file_count": {"type": "integer", "minimum": 0},
+        "total_bytes": {"type": "integer", "minimum": 0},
+        "extension": {"type": "string"},
+        "family": {"type": "string"},
+        "bucket": {"type": "string"},
+        "declared_v1_input_suffix": {"type": "boolean"}
+      },
+      "oneOf": [
+        {"required": ["extension", "family", "declared_v1_input_suffix"]},
+        {"required": ["family"], "not": {"required": ["extension"]}},
+        {"required": ["bucket"]}
+      ]
+    },
+    "inventoryAggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_count",
+        "directory_count",
+        "total_bytes",
+        "symlink_count",
+        "other_entry_count",
+        "inaccessible_entry_count",
+        "hidden_entry_count",
+        "bundle_directory_count",
+        "bundle_context_file_count",
+        "extensions",
+        "families",
+        "size_buckets"
+      ],
+      "properties": {
+        "file_count": {"type": "integer", "minimum": 0},
+        "directory_count": {"type": "integer", "minimum": 0},
+        "total_bytes": {"type": "integer", "minimum": 0},
+        "symlink_count": {"type": "integer", "minimum": 0},
+        "other_entry_count": {"type": "integer", "minimum": 0},
+        "inaccessible_entry_count": {"type": "integer", "minimum": 0},
+        "hidden_entry_count": {"type": "integer", "minimum": 0},
+        "bundle_directory_count": {"type": "integer", "minimum": 0},
+        "bundle_context_file_count": {"type": "integer", "minimum": 0},
+        "extensions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/aggregateItem"}
+        },
+        "families": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/aggregateItem"}
+        },
+        "size_buckets": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/aggregateItem"}
+        }
+      }
+    },
+    "inventoryObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "source_id",
+        "evidence_grade",
+        "portability",
+        "observation_scope",
+        "aggregate",
+        "privacy",
+        "limitations"
+      ],
+      "properties": {
+        "schema_version": {"const": "veriformis.corpus-metadata-aggregate/v1"},
+        "source_id": {"type": "string"},
+        "evidence_grade": {"$ref": "#/$defs/evidenceGrade"},
+        "portability": {
+          "enum": ["repository-tracked", "local-only", "external"]
+        },
+        "observation_scope": {"const": "filesystem-metadata-only"},
+        "aggregate": {"$ref": "#/$defs/inventoryAggregate"},
+        "privacy": {
+          "type": "object",
+          "additionalProperties": {"type": "boolean"}
+        },
+        "limitations": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grade", "sources", "limitation"],
+      "properties": {
+        "grade": {"$ref": "#/$defs/evidenceGrade"},
+        "sources": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "limitation": {"type": "string"}
+      }
+    },
+    "workflowDemand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["demand_id", "state", "claim", "dimensions", "evidence"],
+      "properties": {
+        "demand_id": {"type": "string"},
+        "state": {"enum": ["confirmed", "unresolved"]},
+        "claim": {"type": "string"},
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "null"]
+          }
+        },
+        "evidence": {"$ref": "#/$defs/evidence"}
+      }
+    },
+    "priority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "work_item",
+        "state",
+        "rank",
+        "candidates",
+        "basis",
+        "admission_gate"
+      ],
+      "properties": {
+        "work_item": {"type": "string"},
+        "state": {
+          "enum": ["ranked", "provisional", "unranked-insufficient-evidence"]
+        },
+        "rank": {"type": ["integer", "null"], "minimum": 1},
+        "candidates": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "basis": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/evidence"},
+          "minItems": 1
+        },
+        "admission_gate": {"type": "string"}
+      }
+    },
+    "evidenceGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gap_id", "missing_evidence", "effect", "collection_method"],
+      "properties": {
+        "gap_id": {"type": "string"},
+        "missing_evidence": {"type": "string"},
+        "effect": {"type": "string"},
+        "collection_method": {"type": "string"}
+      }
+    }
+  }
+}
