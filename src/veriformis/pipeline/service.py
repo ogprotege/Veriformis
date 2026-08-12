@@ -1480,7 +1480,11 @@ class PipelineService:
             raise ValueError("--instruction is valid only for instruction_output rows")
         curation_policy = CurationPolicy.create(
             minimum_target_characters=minimum_target_characters,
-            balance_mode=balance_mode,
+            balance_mode=(
+                "primary_source_cap"
+                if balance_mode == "primary-source-cap"
+                else "none"
+            ),
             maximum_records_per_primary_source=(maximum_records_per_primary_source),
         )
         split_policy = SplitPolicy.create(
