@@ -122,12 +122,20 @@ def _canonical_json_object_from_bytes(data: bytes, *, label: str) -> dict[str, A
         )
     except BundleVerificationError:
         raise
+    except RecursionError as exc:
+        raise BundleVerificationError(
+            f"invalid {label} JSON: nesting too deep"
+        ) from exc
     except (UnicodeError, ValueError) as exc:
         raise BundleVerificationError(f"invalid {label} JSON: {exc}") from exc
     if not isinstance(value, dict):
         raise BundleVerificationError(f"{label} JSON root must be an object")
     try:
         canonical = lossless_json_bytes(value)
+    except RecursionError as exc:
+        raise BundleVerificationError(
+            f"invalid {label} JSON: nesting too deep"
+        ) from exc
     except (TypeError, UnicodeError, ValueError) as exc:
         raise BundleVerificationError(f"invalid {label} JSON: {exc}") from exc
     if canonical != data:

@@ -937,6 +937,7 @@ def validate_dataset_snapshot(
         )
     except (
         AttributeError,
+        RecursionError,
         TypeError,
         UnicodeError,
         ValueError,
@@ -973,6 +974,7 @@ def validate_dataset_snapshot(
                 raise ValueError("construction identities differ from the snapshot")
         except (
             AttributeError,
+            RecursionError,
             TypeError,
             UnicodeError,
             ValueError,
@@ -1012,6 +1014,7 @@ def validate_dataset_snapshot(
             )
         except (
             AttributeError,
+            RecursionError,
             TypeError,
             UnicodeError,
             ValueError,
@@ -1037,6 +1040,7 @@ def validate_dataset_snapshot(
                     raise ValueError("curation identity differs from snapshot")
             except (
                 AttributeError,
+                RecursionError,
                 TypeError,
                 UnicodeError,
                 ValueError,
@@ -1093,6 +1097,7 @@ def validate_dataset_snapshot(
             checked_split = split_result_from_json_bytes(artifact_bytes["split-result"])
         except (
             AttributeError,
+            RecursionError,
             TypeError,
             UnicodeError,
             ValueError,
@@ -1117,6 +1122,7 @@ def validate_dataset_snapshot(
                     raise ValueError("split identity differs from snapshot")
             except (
                 AttributeError,
+                RecursionError,
                 TypeError,
                 UnicodeError,
                 ValueError,
@@ -1158,6 +1164,7 @@ def validate_dataset_snapshot(
             checked_row_set = row_set_from_json_bytes(artifact_bytes["row-set"])
         except (
             AttributeError,
+            RecursionError,
             TypeError,
             UnicodeError,
             ValueError,
@@ -1184,6 +1191,7 @@ def validate_dataset_snapshot(
                     raise ValueError("row-set identity differs from snapshot")
             except (
                 AttributeError,
+                RecursionError,
                 TypeError,
                 UnicodeError,
                 ValueError,
