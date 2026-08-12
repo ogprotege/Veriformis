@@ -89,22 +89,23 @@ struct CompileView: View {
                 HStack {
                     Text("Train share (ppm)")
                     TextField(
-                        "400000",
+                        "500000",
                         value: $workbench.splitRatioPPM,
                         format: .number
                     )
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 100)
                 }
-                Text("Parts per million of rows for train (400000 ≈ 40% train).")
+                Text("Parts per million of rows for train (500000 ≈ 50% train, the CLI default).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             Toggle("Allow empty evaluation partition", isOn: $workbench.allowEmptyEvaluation)
-            Text("Needed when a single leakage group leaves evaluation empty.")
+            Text("Off by default: compiles fail closed when evaluation would be empty, matching the CLI. Enable only when a single leakage group leaves evaluation empty.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             HStack {
                 Button("Output folder…") { workbench.chooseOutputDirectory() }
