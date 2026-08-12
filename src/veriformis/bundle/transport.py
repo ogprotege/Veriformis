@@ -12,7 +12,6 @@ import hashlib
 import os
 import stat
 import tempfile
-import warnings
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -27,6 +26,7 @@ from veriformis.bundle.finished import (
     BundleVerificationError,
     FinishedBundleManifest,
     VerificationResult,
+    _emit_runtime_warning,
 )
 from veriformis.bundle.verifier import verify_finished_bundle
 from veriformis.identity import sha256_digest, validate_sha256
@@ -320,7 +320,9 @@ def write_bundle_archive(
 
     durability_warning = "; ".join(publication_warnings) or None
     if durability_warning is not None:
-        warnings.warn(durability_warning, RuntimeWarning, stacklevel=2)
+        # The archive is already visible: durability notes are advisory and
+        # must never let a warnings filter unwind the successful publication.
+        _emit_runtime_warning(durability_warning, stacklevel=2)
 
     return BundleArchiveReceipt(
         archive_path=target,

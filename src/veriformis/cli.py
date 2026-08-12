@@ -376,6 +376,15 @@ def run_pipeline(pipeline: Path) -> None:
     try:
         spec = load_pipeline_spec(pipeline)
         result = run_pipeline_spec(spec, service=_SERVICE)
+    except SealPartialPublicationError as exc:
+        publication = exc.publication
+        typer.echo(
+            f"published bundle remains visible at {publication.bundle_path}; "
+            f"manifest SHA-256 {publication.manifest_sha256}; workspace receipt "
+            "did not commit",
+            err=True,
+        )
+        _echo_error(exc.cause if isinstance(exc.cause, Exception) else exc, status=1)
     except (
         VeriformisError,
         EvidenceError,

@@ -61,17 +61,20 @@ def canonical_json_object_from_bytes(data: bytes, *, label: str) -> dict[str, An
         raise ValueError(f"floating-point JSON number {value!r}")
 
     decoded = data.decode("utf-8")
-    value = json.loads(
-        decoded,
-        object_pairs_hook=unique_object,
-        parse_constant=reject_constant,
-        parse_float=reject_float,
-    )
-    if not isinstance(value, dict):
-        raise ValueError(f"{label} JSON root must be an object")
-    reject_floats(value)
-    if lossless_json_bytes(value) != data:
-        raise ValueError(f"{label} JSON bytes are not canonical")
+    try:
+        value = json.loads(
+            decoded,
+            object_pairs_hook=unique_object,
+            parse_constant=reject_constant,
+            parse_float=reject_float,
+        )
+        if not isinstance(value, dict):
+            raise ValueError(f"{label} JSON root must be an object")
+        reject_floats(value)
+        if lossless_json_bytes(value) != data:
+            raise ValueError(f"{label} JSON bytes are not canonical")
+    except RecursionError as exc:
+        raise ValueError(f"{label} JSON nesting too deep") from exc
     return value
 
 

@@ -464,7 +464,7 @@ def _row_contract(
             row_schema=row_schema,
             payload=payload,
         )
-    except (TypeError, UnicodeError, ValueError, VeriformisError) as exc:
+    except (RecursionError, TypeError, UnicodeError, ValueError, VeriformisError) as exc:
         raise BundleVerificationError(f"invalid product row contract: {exc}") from exc
     if provenance.serialization_plan_id != serialization_plan.serialization_plan_id:
         raise BundleVerificationError(
@@ -551,7 +551,13 @@ def _verify_row_provenance_alignment(
                     provenance = row_provenance_from_json_bytes(
                         lossless_json_bytes(raw_provenance)
                     )
-                except (TypeError, UnicodeError, ValueError, VeriformisError) as exc:
+                except (
+                    RecursionError,
+                    TypeError,
+                    UnicodeError,
+                    ValueError,
+                    VeriformisError,
+                ) as exc:
                     raise BundleVerificationError(
                         f"invalid row provenance contract: {exc}"
                     ) from exc
@@ -745,7 +751,13 @@ def _verify_row_provenance_alignment(
                 evaluation_rows=evaluation_rows,
                 provenance=provenance_values,
             )
-        except (TypeError, UnicodeError, ValueError, VeriformisError) as exc:
+        except (
+            RecursionError,
+            TypeError,
+            UnicodeError,
+            ValueError,
+            VeriformisError,
+        ) as exc:
             raise BundleVerificationError(
                 f"cannot reconstruct the exact dataset row set: {exc}"
             ) from exc
@@ -960,7 +972,7 @@ def verify_finished_bundle(
         )
     except BundleVerificationError:
         raise
-    except (OSError, TypeError, UnicodeError, ValueError) as exc:
+    except (OSError, RecursionError, TypeError, UnicodeError, ValueError) as exc:
         raise BundleVerificationError(
             f"finished bundle verification failed: {exc}"
         ) from exc
