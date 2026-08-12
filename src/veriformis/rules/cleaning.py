@@ -208,7 +208,7 @@ def _rule_spec(rule: Rule) -> RuleSpec:
         )
     return RuleSpec(
         name=name,
-        version=1,
+        version=int(getattr(rule, "version", 1)),
         scope="source-structure"
         if name in {"page-numbers", "headers-footers"}
         else "text-leaf",
