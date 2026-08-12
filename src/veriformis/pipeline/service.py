@@ -41,6 +41,7 @@ from veriformis.construction import (
     ConstructionPass,
     DatasetRecipe,
     IRArtifactInput,
+    ReviewEvidence,
     SegmentationPolicy,
     TrainingObjective,
     construct_dataset,
@@ -770,6 +771,8 @@ def _load_construction_inputs(
     workspace: Workspace,
     revision: WorkspaceRevision,
     source_ids: tuple[str, ...],
+    *,
+    reviews: tuple[ReviewEvidence, ...] = (),
 ) -> ConstructionInputs:
     """Load the exact verified upstream state consumed by construction."""
     selected = set(source_ids)
@@ -810,6 +813,7 @@ def _load_construction_inputs(
         chunks=chunks,
         transforms=transforms,
         ir_artifacts=ir_artifacts,
+        reviews=reviews,
     )
 
 
@@ -836,7 +840,19 @@ def _load_constructed_dataset(
     result = construction_result_from_json_bytes(
         _output_bytes(workspace, revision, "construct", "result")
     )
-    inputs = _load_construction_inputs(workspace, revision, recipe.source_ids)
+    # Replay with the review evidence carried on the persisted decisions,
+    # exactly as the workspace construct commit gate reconstructs it.
+    reviews = tuple(
+        decision.review
+        for decision in result.decisions
+        if decision.review is not None
+    )
+    inputs = _load_construction_inputs(
+        workspace,
+        revision,
+        recipe.source_ids,
+        reviews=reviews,
+    )
     validate_construction_result(recipe, inputs, result)
     return recipe, result, inputs
 
