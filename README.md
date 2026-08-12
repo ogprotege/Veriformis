@@ -30,6 +30,7 @@ flowchart LR
     chunk --> construct[construct] --> curate[curate] --> split[split]
     split --> format[format] --> validate[validate] --> seal[seal]
     seal --> bundle[Sealed .vfbundle] --> verify[verify]
+    verify --> package[deterministic .vfbundle.zip] --> packageVerify[package-verify]
 ```
 
 Version `0.1.0` provides:
@@ -48,6 +49,8 @@ Version `0.1.0` provides:
 - deterministic curation with target-length filtering, conflict quarantine,
   exact deduplication, optional primary-source caps, and coverage accounting;
 - authoritative train and evaluation assignment by complete transitive leakage groups;
+- deterministic, externally anchored `.vfbundle.zip` transport that preserves
+  the strict six-file canonical bundle without becoming a trainer export;
 - one-to-one lowering into `text`, `prompt_completion`,
   `instruction_output`, or structured `messages` rows;
 - payload-only partition JSONL plus an aligned provenance stream;
@@ -61,14 +64,15 @@ The pipeline makes no LLM calls and sends no document to a network service.
 ## macOS workbench (private beta)
 
 A SwiftUI adapter lives under [`macos/`](macos/README.md). It **compiles**
-sources into a sealed `.vfbundle` by shelling the same `veriformis` CLI as the
-terminal (thin adapter; digests match). Phases 0–2 on `main`: sidebar Home /
-Compile / History / Settings; run sheet with progress and live log; failure
-detail; digest copy; artifact reveal; and rerun.
+sources into a sealed `.vfbundle` and verified Finder-safe `.vfbundle.zip` by
+shelling the same `veriformis` CLI as the terminal. It keeps process work off
+the main actor, bounds displayed/output retention, supports accountable
+cancellation, and records manifest and transport digests in history.
 
 ```bash
 # From the repo (preferred private-beta launch):
-bash macos/scripts/run_workbench.sh
+uv sync
+./script/build_and_run.sh
 ```
 
 See [docs/install.md](docs/install.md), [macos/README.md](macos/README.md), and
@@ -107,7 +111,7 @@ export PATH="$PWD/.venv/bin:$PATH"
 veriformis version
 ```
 
-Mac workbench (Debug, private beta): `bash macos/scripts/run_workbench.sh`  
+Mac workbench (Debug, private beta): `./script/build_and_run.sh`
 (see [docs/install.md](docs/install.md) and [macos/README.md](macos/README.md)).
 
 ### Development / contributor setup
@@ -144,6 +148,11 @@ independent trust anchor matters, then verify with:
 
 ```bash
 uv run veriformis verify build/example.vfbundle \
+  --manifest-sha256 EXPECTED_MANIFEST_SHA256
+uv run veriformis package build/example.vfbundle \
+  -o build/example.vfbundle.zip \
+  --manifest-sha256 EXPECTED_MANIFEST_SHA256
+uv run veriformis package-verify build/example.vfbundle.zip \
   --manifest-sha256 EXPECTED_MANIFEST_SHA256
 ```
 

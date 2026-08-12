@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Compile the acceptance corpus from raw sources through seal and independent
-# external-digest verification for both supported acceptance objectives.
+# external-digest verification and deterministic transport packaging for both
+# supported acceptance objectives.
 # This core release gate has no integration dependency or generated handoff.
 set -euo pipefail
 
@@ -41,6 +42,7 @@ compile_objective() {
 
   local ws="$TMP/ws-$objective"
   local bundle="$TMP/$objective.vfbundle"
+  local archive="$TMP/$objective.vfbundle.zip"
 
   echo "==> golden_compile: $objective (parse → seal)"
   vf parse "${SOURCES[@]}" -o "$ws" --source-root "$CORPUS_ROOT"
@@ -78,6 +80,21 @@ compile_objective() {
   printf '%s\n' "$verify_out"
   printf '%s\n' "$verify_out" | grep -q "verification grade: external_digest"
 
+  echo "==> golden_compile: $objective deterministic transport"
+  local package_out
+  package_out="$(vf package "$bundle" -o "$archive" --manifest-sha256 "$manifest" 2>&1)"
+  printf '%s\n' "$package_out"
+  test -f "$archive"
+  printf '%s\n' "$package_out" | grep -q "verification grade: external_digest"
+  local archive_sha256
+  archive_sha256="$(printf '%s\n' "$package_out" | awk -F': ' 'tolower($0) ~ /archive sha-256/ {print $2; exit}')"
+  test "${#archive_sha256}" -eq 64
+
+  local package_verify_out
+  package_verify_out="$(vf package-verify "$archive" --manifest-sha256 "$manifest" 2>&1)"
+  printf '%s\n' "$package_verify_out"
+  printf '%s\n' "$package_verify_out" | grep -q "transport archive status: accepted"
+
   if [[ -n "${GOLDEN_EVIDENCE_DIR:-}" ]]; then
     mkdir -p "$GOLDEN_EVIDENCE_DIR"
     {
@@ -86,14 +103,17 @@ compile_objective() {
       echo "bundle=$bundle"
       echo "canonical_bundle=present"
       echo "automatic_handoff=absent"
+      echo "transport_archive=$archive"
+      echo "transport_archive_sha256=$archive_sha256"
       printf '%s\n' "$verify_out"
+      printf '%s\n' "$package_verify_out"
     } >"$GOLDEN_EVIDENCE_DIR/${objective}.evidence.txt"
   fi
 
-  echo "golden_compile: $objective PASS (manifest=$manifest)"
+  echo "golden_compile: $objective PASS (manifest=$manifest archive=$archive_sha256)"
 }
 
 compile_objective full_text
 compile_objective continuation
 
-echo "golden_compile: PASS (standalone full_text + continuation external_digest)"
+echo "golden_compile: PASS (standalone compile + external_digest + transport)"

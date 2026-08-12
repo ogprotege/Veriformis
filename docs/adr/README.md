@@ -26,6 +26,7 @@ not substitutes for implementation or tests.
 | [0002](0002-standalone-product-boundary.md) | Standalone Veriformis product boundary | Accepted | Any proposal to require a downstream trainer |
 | [0003](0003-four-axis-dataset-model.md) | Four-axis dataset model | Accepted | Persisted taxonomy or loss-policy design |
 | [0004](0004-canonical-bundle-derived-exports.md) | Canonical bundle and derived exports | Accepted | Export contract or bundle-profile implementation |
+| [0005](0005-deterministic-bundle-transport.md) | Deterministic immutable bundle transport | Accepted | Bundle profile, packaging, compression, or trust-envelope change |
 
 ## ADR template
 
