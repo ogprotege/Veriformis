@@ -2193,12 +2193,26 @@ class WorkspaceTransaction:
                 )
 
             states = dict(actual.stages)
+            states[self.stage] = stage_state
+
+            active_artifact_ids = _referenced_artifact_ids(self.sources, states)
+            artifacts = {
+                artifact_id: artifact
+                for artifact_id, artifact in self.artifacts.items()
+                if artifact_id in active_artifact_ids
+            }
+            if active_artifact_ids - set(artifacts):
+                raise WorkspaceCorruptError(
+                    "revision references artifacts not present in transaction"
+                )
+            # Decide the no-op question on the artifacts the candidate would
+            # actually carry, so a staged-but-unreferenced artifact cannot
+            # defeat no-op detection.
             exact_noop = (
                 self.sources == actual.sources
-                and self.artifacts == actual.artifacts
+                and artifacts == actual.artifacts
                 and stage_state == actual.stages[self.stage]
             )
-            states[self.stage] = stage_state
             if not exact_noop:
                 for descendant in _descendants_for_revision(
                     actual.schema_version, self.stage
@@ -2209,30 +2223,12 @@ class WorkspaceTransaction:
                             invalidated_by=self.stage,
                             prior_revision_id=actual.revision_id,
                         )
-
-            active_artifact_ids: set[str] = set()
-            for source in self.sources.values():
-                active_artifact_ids.update(
-                    artifact_id
-                    for artifact_id in (
-                        source.raw_artifact_id,
-                        source.extracted_artifact_id,
-                        source.document_artifact_id,
-                    )
-                    if artifact_id is not None
-                )
-            for state in states.values():
-                active_artifact_ids.update(state.input_artifact_ids)
-                active_artifact_ids.update(state.outputs.values())
-            artifacts = {
-                artifact_id: artifact
-                for artifact_id, artifact in self.artifacts.items()
-                if artifact_id in active_artifact_ids
-            }
-            if active_artifact_ids - set(artifacts):
-                raise WorkspaceCorruptError(
-                    "revision references artifacts not present in transaction"
-                )
+                active_artifact_ids = _referenced_artifact_ids(self.sources, states)
+                artifacts = {
+                    artifact_id: artifact
+                    for artifact_id, artifact in artifacts.items()
+                    if artifact_id in active_artifact_ids
+                }
 
             if exact_noop:
                 candidate = actual
@@ -2246,6 +2242,7 @@ class WorkspaceTransaction:
                     artifacts=artifacts,
                     stages=states,
                 )
+                _validate_revision_transition(candidate, actual)
             if exact_noop:
                 self.workspace._verify_objects(actual)
                 self._run_seal_publication_action()
