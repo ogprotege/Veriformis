@@ -122,8 +122,8 @@
       "date": "2026-08-20",
       "commit": "working-tree-on-f8dd1bfd49abd4e1b8746a3060eef75bf2ed5004",
       "scope": "Independent-product Phase 3 start: packet and taxonomy definition",
-      "grade": "source-verified",
-      "summary": "Phase 3 opened after Phase 2 and pre-Phase-3 defect closure. The packet, program ledger, and WIP agree that taxonomy work is in progress; capability claims remain the Phase 2 boundary until the registry and contract are test-verified.",
+      "grade": "test-verified",
+      "summary": "Phase 3 opened after Phase 2 and pre-Phase-3 defect closure. Tracking, Ruff, 24 taxonomy/contract tests, and 740 core tests passed. Capability claims remain the Phase 2 boundary except for the new taxonomy catalog, which is not yet a compile-surface API.",
       "details": "dev/active/independent-product/phase-03-taxonomy/evidence.md",
       "rerun": [
         "uv run python scripts/check_project_tracking.py",

@@ -29,3 +29,16 @@
 - Tracking, status, support, evidence, and diff checks.
 
 Exact results are appended only after observation.
+
+## Observed opening results — 2026-08-20
+
+| Gate | Result | Grade / limitation |
+| --- | --- | --- |
+| Project tracking | PASS | Test-verified; Phase 3 packet and WIP table agree |
+| Ruff | All checks passed | Recorded local |
+| Taxonomy and contract tests | 24 passed | Test-verified |
+| Core pytest | 740 passed, 1 deselected | Test-verified; +12 taxonomy tests over the 728 defect-closure baseline |
+| `git diff --check` | Clean | Recorded local |
+
+Surface discovery, compile-path wiring, and the public “format” inventory are
+not claimed by this observation.

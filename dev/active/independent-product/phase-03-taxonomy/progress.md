@@ -45,3 +45,11 @@ public “format” inventory remain open.
 
 **Next action:** Wire `assert_compile_combination` through `PipelineService`
 and the remaining surfaces, then expose one discovery listing.
+
+## 2026-08-20 — Opening verification observed
+
+**Status:** In progress
+
+Tracking PASS; Ruff clean; 24 taxonomy/contract tests passed; core suite 740
+passed, 1 deselected; `git diff --check` clean. The catalog is test-verified.
+Compile-surface wiring and discovery remain open.
