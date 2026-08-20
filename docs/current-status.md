@@ -11,7 +11,7 @@ and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 **Review date:** 2026-08-11 (independent-product Phase 2 closeout;
 working tree based on `dd2fdb8`)
 
-**Next review:** Independent-roadmap Phase 3 start; beta label cut,
+**Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
 public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -112,6 +112,9 @@ Phase 2 completed the reliability and artifact-boundary gate. Its packet records
 bounded asynchronous process execution, accountable cancellation and quit
 recovery, deterministic no-replace transport packaging, archive re-verification,
 and standalone Mac and Linux evidence.
+The pre-Phase-3 defect-closure packet is completed on `main`. Phase 3 is
+`in_progress` under its standard packet; taxonomy contracts are not yet an
+implemented capability claim.
 
 ## Implemented interfaces
 
@@ -504,9 +507,8 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0, 1, and 2 are complete. The next authorized product
-work follows the ordered ledger in the
-[Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md).
+Independent-product Phases 0, 1, and 2 are complete. Phase 3 is in progress:
+[taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md).
 A deliberate beta label and public Mac checklist remain separate decisions.
 
 See the [independent product analysis](analysis/2026-08-11-independent-product-analysis.md),

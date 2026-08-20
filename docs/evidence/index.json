@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.evidence-index/v1",
-  "last_updated": "2026-08-11",
+  "last_updated": "2026-08-20",
   "evidence_grades": {
     "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
     "test-verified": "Claim is exercised by an automated passing test.",
@@ -115,6 +115,19 @@
         "./script/build_and_run.sh --verify",
         "uv run python scripts/check_project_tracking.py",
         "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-3-taxonomy-start-2026-08-20",
+      "date": "2026-08-20",
+      "commit": "working-tree-on-f8dd1bfd49abd4e1b8746a3060eef75bf2ed5004",
+      "scope": "Independent-product Phase 3 start: packet and taxonomy definition",
+      "grade": "source-verified",
+      "summary": "Phase 3 opened after Phase 2 and pre-Phase-3 defect closure. The packet, program ledger, and WIP agree that taxonomy work is in progress; capability claims remain the Phase 2 boundary until the registry and contract are test-verified.",
+      "details": "dev/active/independent-product/phase-03-taxonomy/evidence.md",
+      "rerun": [
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q tests/contracts/test_taxonomy_contract.py tests/regressions/test_project_tracking.py"
       ]
     },
     {

@@ -7,7 +7,7 @@
 **Repository baseline:** Working tree based on
 `7d116e9c09fb4c64f38b2db2572f820a83c53dba`
 
-**Next review:** Phase 2 start
+**Next review:** Phase 3 closeout
 
 ## Scope examined
 
@@ -84,7 +84,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Create the standard Phase 2 packet and pin defect regressions before Phase 2 implementation.
+1. Complete the Phase 3 taxonomy contract, compatibility registry, and
+   discovery surfaces; do not claim new families or containers as implemented.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a

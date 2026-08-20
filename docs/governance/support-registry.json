@@ -1,7 +1,7 @@
 {
   "schema_version": "veriformis.support-registry/v1",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-11",
+  "last_reviewed": "2026-08-20",
   "claim_policy": "docs/governance/project-tracking.md",
   "product": {
     "name": "Veriformis",
@@ -53,6 +53,10 @@
     ]
   },
   "training": {
+    "implemented_families": [
+      "source-grounded-language-modeling",
+      "source-grounded-supervised-fine-tuning"
+    ],
     "implemented_objectives": [
       "before_after_transformation",
       "continuation",
@@ -68,14 +72,25 @@
     ],
     "planned_families": [
       "preference-and-ranking",
+      "explicit-label-classification",
       "tool-call-conversations",
       "stepwise-supervision",
+      "pre-tokenized-training",
       "governed-generated-candidates"
+    ],
+    "explicitly_unsupported_families": [
+      {
+        "family": "multimodal-training",
+        "reason": "No multimodal recovery or row contract exists.",
+        "evidence": "docs/contracts/taxonomy-v1.md"
+      }
     ],
     "evidence": [
       "src/veriformis/recipes/library.py",
       "src/veriformis/datasets/serialization.py",
-      "docs/contracts/dataset-construction-v1.md"
+      "src/veriformis/taxonomy.py",
+      "docs/contracts/dataset-construction-v1.md",
+      "docs/contracts/taxonomy-v1.md"
     ]
   },
   "artifacts": {

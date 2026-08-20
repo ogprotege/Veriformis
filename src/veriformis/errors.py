@@ -138,3 +138,9 @@ class LegacySourceUnavailableError(VeriformisError):
 
 class GateFailure(VeriformisError):
     code = "gate-failure"
+
+
+class TaxonomyError(VeriformisError):
+    """A taxonomy identifier or axis combination is unknown or incompatible."""
+
+    code = "taxonomy-invalid"

@@ -15,7 +15,7 @@ alpha; public Mac claim still owner-gated
 
 **Last reviewed:** 2026-08-11 (independent-product authority pass)
 
-**Next review:** Independent-roadmap Phase 2 start; beta label cut,
+**Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
 public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)

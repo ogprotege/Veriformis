@@ -17,7 +17,7 @@ require the Group 2 exit gate in this document to pass.
 
 **Last reviewed:** 2026-08-11 (historical deferrals reconciled)
 
-**Next review:** Any construction-schema change or the Group 2 exit gate
+**Next review:** Any construction-schema change or taxonomy compatibility change
 
 ## Purpose
 
@@ -148,7 +148,9 @@ partitioning cannot mutate an accepted record.
 ## TrainingObjective
 
 A `TrainingObjective` states what the model should learn. It is not a row shape,
-a serializer name, or a model-family template.
+a serializer name, or a model-family template. Family, container, consumer
+profile, and loss policy are separate axes in
+[Dataset Taxonomy Contract v1](taxonomy-v1.md).
 
 Each value contains exactly:
 

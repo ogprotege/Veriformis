@@ -8,7 +8,7 @@ gates, workbench Phases 0–2).
 **Last reviewed:** 2026-08-12 (roadmap amendment and index refresh;
 Phases 0–2 completed on `main`)
 
-**Next review:** Independent-roadmap Phase 3 start; beta label cut,
+**Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
 public-ready checklist, or any contract change
 
 ## Start here
@@ -51,6 +51,7 @@ public-ready checklist, or any contract change
 | [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) | Curation, split, rows, validation, seal, verify | Implemented contract |
 | [Bundle Transport Contract v1](contracts/bundle-transport-v1.md) | Deterministic `.vfbundle.zip` transport and archive verification | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
+| [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Phase 3 in-progress contract |
 | [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0005) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
@@ -67,6 +68,7 @@ public-ready checklist, or any contract change
 | [Phase 0 packet](../dev/active/independent-product/phase-00-foundation/README.md) | Foundation plan, progress, decisions, risks, evidence, and closeout | Completed implementation record |
 | [Phase 1 packet](../dev/active/independent-product/phase-01-standalone-independence/README.md) | Standalone-independence packet and closeout | Completed implementation record |
 | [Phase 2 packet](../dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) | Reliability and artifact-boundary packet and closeout | Completed implementation record |
+| [Phase 3 packet](../dev/active/independent-product/phase-03-taxonomy/README.md) | Taxonomy contract, registry, and discovery work | Active implementation record |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |
