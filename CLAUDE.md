@@ -17,16 +17,17 @@ Read these current authorities before changing code:
 3. `docs/contracts/integrity-v1.md`
 4. `docs/contracts/dataset-construction-v1.md`
 5. `docs/contracts/finished-dataset-v1.md`
-6. `docs/architecture.md`
-7. `docs/analysis/2026-08-11-independent-product-analysis.md`
-8. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
-9. `docs/governance/project-tracking.md`,
+6. `docs/contracts/taxonomy-v1.md`
+7. `docs/architecture.md`
+8. `docs/analysis/2026-08-11-independent-product-analysis.md`
+9. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+10. `docs/governance/project-tracking.md`,
    `dev/active/independent-product/program.json`, and the active phase packet
-10. `docs/governance/support-registry.json` and `docs/evidence/index.json`
-11. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
-12. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+11. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+12. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+13. `docs/plans/2026-07-29-veriformis-roadmap.md` and
     `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
-13. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+14. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.

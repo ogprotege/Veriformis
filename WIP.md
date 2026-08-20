@@ -7,10 +7,10 @@ automated gates; beta-prep; private beta workbench Phases 0–2)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-11 (independent-product authority pass)
+**Last reviewed:** 2026-08-20 (independent-product Phase 3 start)
 
-**Next review:** Independent-roadmap Phase 3 start; beta label cut, public Mac
-evidence, or any listed-item status change
+**Next review:** Independent-roadmap Phase 3 closeout; beta label cut, public
+Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -70,7 +70,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 0 | Establish authority, baseline, and decision records | Completed | [Completed packet](dev/active/independent-product/phase-00-foundation/README.md) |
 | 1 | Enforce standalone independence | Completed | [Completed packet](dev/active/independent-product/phase-01-standalone-independence/README.md) |
 | 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
-| 3 | Formalize the goal, schema, container, and profile taxonomy | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 3 | Formalize the goal, schema, container, and profile taxonomy | In progress | [Active packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
 | 4 | Build the verified export foundation | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -121,6 +121,17 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Deterministic `.vfbundle.zip` selected and proved as the Finder-safe transport without weakening `minimal-v1`.
 - [x] Workbench creates and reveals only the externally verified transport artifact for Finder use.
 - [x] Mac, Linux, clean-wheel, golden, parity, launch, tracking, lint, and diff gates recorded.
+
+### Active Phase 3 status
+
+- [x] Standard Phase 3 packet created after Phase 2 and pre-Phase-3 defect closure.
+- [x] Versioned taxonomy contract and machine registry.
+- [x] Current names reviewed; UI aliases recorded separately from persisted IDs.
+- [x] Current and future-only families declared without false implementation claims.
+- [x] Loss/masking described for every implemented semantic row.
+- [ ] Compatibility checks wired to fail before compile on every surface.
+- [ ] One registry exposed through PipelineService, CLI, MCP, and workbench help.
+- [ ] Public “format” language inventory and rewrite; closeout.
 
 The current stage-command runtime is:
 
