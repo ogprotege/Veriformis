@@ -1,6 +1,6 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phases 4.1–4.3 merged; Phase 4.4 local gates passed
+**Evidence status:** In progress — Phases 4.1–4.4 merged; Phase 4.5 local gates passed and pull-request review is pending
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -22,7 +22,7 @@
 - [x] Complete source, split, row, profile, dependency, and output-plan bindings.
 - [x] Complete immutable source membership baseline derived from aligned rows and
       provenance.
-- [ ] No-membership-change proof.
+- [x] Normalized semantic candidate no-membership-change proof.
 - [ ] Atomic, path-safe, cancelable, no-replace publication.
 - [ ] Exact-byte and semantic-only evidence limits.
 - [ ] Discovery, dry run, inspect, execute, and verify parity across surfaces.
@@ -138,3 +138,44 @@ PR #45 passed every required GitHub check and merged as `159fcce4`. Local
   gap. Fresh strict source-model replay plus manifest/snapshot/report/row-set
   byte-edge closure corrected it; the reproducer and adjacent forged-graph
   cases now fail closed, and re-review found no remaining blocker.
+
+PR #46 passed every required GitHub check and merged as
+`3ba83aeb3164d72d1aa14100637272a141f580c9`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.5 branch was created.
+
+## 2026-08-21 — Phase 4.5 derivative-only semantic membership
+
+- `ExportService.validate_derivative_membership` fresh-loads the plan and
+  normalized candidate train rows, evaluation rows, and aligned provenance.
+- It reconstructs a candidate `RowSet` using only plan-bound identities,
+  requires the exact planned row-set identity, derives the complete candidate
+  projection, and requires exact object and canonical-byte equality with the
+  source membership baseline.
+- Separate logical partition sequences prevent repartitioning from being hidden
+  in claimed provenance. Counts and assignment-projection digest alone never
+  constitute success.
+- Omission, addition, duplication, reordering, coherent target mutation,
+  assignment and leakage-group substitution, objective/source-scope drift,
+  balancing, repartitioning, and resplitting fail closed.
+- The operation exposes no membership-changing or destination control, performs
+  no filesystem write, and creates no destination binding or receipt.
+- Focused export-service tests: 59 passed; combined export and verified-export
+  contract tests: 114 passed.
+- Full Python suite: 878 passed with the expected exercised transport
+  durability-warning regression warning.
+- Exact standalone release gate: 866 passed, 1 deselected, the same expected
+  warning; clean-wheel install, both objective goldens, external-digest checks,
+  and deterministic transports passed.
+- Ruff, project tracking, CLI/workbench parity, JSON and shell structure, 329
+  changed-document local links, and `git diff --check` passed.
+- macOS XCTest: 38 passed.
+- Independent adversarial review found that the first implementation validated
+  but retained caller-owned candidate models and their mutable payload mapping.
+  The service now strict-serializes and reloads every candidate row and
+  provenance value before row-set construction. An identity-separation
+  regression proves those fresh snapshots, and re-review found no remaining
+  blocker.
+
+This evidence proves normalized in-memory semantic membership preservation. It
+does not prove that produced destination bytes encode those semantics; writing
+remains Phase 4.6 and exact-byte or semantic replay remains Phase 4.7.

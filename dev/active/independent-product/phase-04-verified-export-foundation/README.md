@@ -47,5 +47,7 @@ trusted-by-default source admission and requires an explicit policy for lower
 self-consistent trust. The fourth adds read-only plan population: every source,
 objective, split, row, and membership-baseline fact comes from one admitted
 bundle view, while callers supply only strict profile, dependency, and file-plan
-evidence. Destination membership comparison, writing, public export commands,
-generic containers, and new consumer profiles remain unimplemented.
+evidence. The fifth fresh-reconstructs normalized candidate semantic rows,
+provenance, row-set identity, and membership, then requires exact equality with
+the plan baseline. Destination-byte verification, writing, public export
+commands, generic containers, and new consumer profiles remain unimplemented.

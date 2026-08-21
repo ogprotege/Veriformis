@@ -4,7 +4,7 @@
 
 | ID | State | Likelihood | Impact | Risk | Control |
 | --- | --- | --- | --- | --- | --- |
-| P4-R1 | Active | High | High | An exporter becomes a second construction, curation, or split pipeline. | No membership-changing plan fields; bind and independently compare complete membership projections |
+| P4-R1 | Active | High | High | An exporter becomes a second construction, curation, or split pipeline. | Phase 4.5 exposes no mutation controls and fresh-reconstructs normalized candidate row-set and membership evidence for exact comparison with the plan baseline; produced destination-byte replay still must close in later increments |
 | P4-R2 | Mitigated | Medium | High | Self-consistency is misreported as trusted source identity. | Phase 4.3 defaults export admission to retained expected manifest SHA-256, requires explicit lower trust, and rejects evidence drift without fallback |
 | P4-R3 | Mitigated | Medium | High | Verify-then-read races allow source substitution. | Phase 4.4 derives every plan source fact and membership baseline from the immutable row and provenance semantics captured during descriptor-anchored verification; it does not reopen source paths |
 | P4-R4 | Active | High | High | Traversal, links, aliases, or races escape the destination. | Reuse strict portable-path policy, descriptor anchoring, closed trees, and adversarial tests |

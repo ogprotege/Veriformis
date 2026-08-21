@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.4 plan population)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
 
-**Next review:** Independent-product Phase 4.4 state transition, any later phase
+**Next review:** Independent-product Phase 4.5 state transition, any later phase
 closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability

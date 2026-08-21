@@ -234,7 +234,7 @@
     {
       "id": "phase-4-plan-population-local-2026-08-21",
       "date": "2026-08-21",
-      "commit": "working-tree-on-159fcce46059b1becad5664046331d44980d0f14",
+      "commit": "3ba83aeb3164d72d1aa14100637272a141f580c9",
       "scope": "Independent-product Phase 4.4 source-derived export-plan population",
       "grade": "recorded-local",
       "summary": "Read-only ExportService.create_plan passed 99 focused export/model/contract tests, 863 full Python tests, 851 standalone core tests with 1 deselected, clean-wheel and both golden compile/transport flows, 38 XCTest tests, parity, tracking, Ruff, structured-file, shell, 329 changed-document local-link, and diff checks. Only the expected transport durability-warning regression warning was emitted. Adversarial review found and verified correction of coherent stale source-identity substitution and incomplete source byte-edge closure; no writer, public surface, or supported container was added.",
@@ -245,6 +245,25 @@
         "bash scripts/release/check_local.sh",
         "bash macos/scripts/parity_check.sh",
         "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase4-pr4-dd -destination platform=macOS test",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-4-membership-enforcement-local-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-3ba83aeb3164d72d1aa14100637272a141f580c9",
+      "scope": "Independent-product Phase 4.5 derivative-only normalized semantic membership enforcement",
+      "grade": "recorded-local",
+      "summary": "Read-only ExportService.validate_derivative_membership passed 59 focused export-service tests and 114 combined export/contract tests covering exact success, omission, coherent addition, duplication, reorder, target mutation, assignment and leakage-group substitution, objective/source-scope drift, repartitioning, resplitting, stale models, fresh caller-independent snapshots, API controls, and write absence. Full Python passed 878; standalone release passed 866 with 1 deselected; clean wheel, both goldens, external-digest verification, deterministic transport, 38 XCTest tests, parity, tracking, Ruff, JSON, shell, 329 changed-document local links, and diff checks passed. Only the expected durability-warning regression warning was emitted. Independent review found and verified correction of retained caller-owned candidate models. This evidence does not cover produced destination bytes or filesystem publication.",
+      "details": "dev/active/independent-product/phase-04-verified-export-foundation/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_service.py",
+        "uv run pytest -q tests/exports tests/contracts/test_verified_export_contract.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase4-pr5-dd -destination platform=macOS test",
         "uv run python scripts/check_project_tracking.py",
         "git diff --check"
       ]

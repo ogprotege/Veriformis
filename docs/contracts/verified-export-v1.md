@@ -11,14 +11,15 @@
 **Implementation status:** Phase 4.2 implements the strict persisted models in
 this contract, Phase 4.3 implements fail-closed read-only source-trust
 admission, and Phase 4.4 implements read-only source-derived plan population.
-It does not implement destination-membership comparison, an export writer,
-publisher, independent export verifier, CLI or MCP export commands, workbench
-export controls, or a supported product export container.
+Phase 4.5 implements read-only normalized semantic membership reconstruction
+and exact comparison with the plan baseline. It does not implement destination-
+byte verification, an export writer, publisher, independent export verifier,
+CLI or MCP export commands, workbench export controls, or a supported product
+export container.
 
-**Last reviewed:** 2026-08-21 (Phase 4.4 source-derived plan population)
+**Last reviewed:** 2026-08-21 (Phase 4.5 derivative-only membership enforcement)
 
-**Next review:** Phase 4.5 derivative-only enforcement or any export schema
-change
+**Next review:** Phase 4.6 atomic publication or any export schema change
 
 ## Purpose
 
@@ -35,7 +36,9 @@ implement one shared service without inventing incompatible persistence.
 Phase 4.3 adds only the read-only source admission policy described below; it
 does not create derivative files. Phase 4.4 adds read-only plan population from
 one admitted source and binds the source membership baseline; it does not
-render, compare, or publish destination content.
+render, compare, or publish destination content. Phase 4.5 reconstructs
+normalized candidate semantic rows and provenance in memory and requires exact
+equality with that baseline; it does not inspect or publish destination bytes.
 
 ## Normative language
 
@@ -50,6 +53,7 @@ The governed relationship is:
 ```text
 verified minimal-v1 bundle + explicit source-trust policy
   -> immutable export plan
+  -> normalized candidate semantic membership check
   -> planned derivative files
   -> receipt-bound closed derivative tree
   -> independent export verification
@@ -286,9 +290,11 @@ leakage_group_id, partition, ordinal)` sequence.
 Every occurrence of one `leakage_group_id` MUST remain in one partition. A
 leakage group that appears in both train and evaluation fails closed.
 
-The projection models the complete derivative-only boundary. Phase 4.2 makes
-that boundary representable and identity-checked; Phase 4.5 will reconstruct it
-from source and destination content and reject every membership mutation.
+The projection models the complete derivative-only boundary. Phase 4.4 derives
+the source baseline from the verified row set. Phase 4.5 reconstructs a
+candidate row set and projection from normalized semantic rows plus aligned
+provenance and rejects every mismatch with that baseline. Actual destination-
+byte reconstruction remains a later evidence boundary.
 
 ## Source-trust admission
 
@@ -379,10 +385,10 @@ evidence. Missing, inconsistent, or substituted verified-source facts fail as
 `export-verification-invalid`; invalid caller-supplied profile, dependency, or
 file-plan evidence fails as `export-contract-invalid`.
 
-This source projection is the immutable comparison baseline only. Phase 4.4
-does not render or reconstruct destination membership and therefore does not
-prove that an exporter preserved membership. Phase 4.5 independently
-reconstructs destination membership and compares it with this baseline.
+This source projection is the immutable comparison baseline. Phase 4.5
+independently reconstructs normalized candidate semantic membership and
+compares it with this baseline. It does not claim that produced destination
+bytes have been parsed or independently replayed.
 
 For `portable_exact_bytes`, each populated file plan binds its expected byte
 SHA-256 and byte size. For `semantic_content_only`, each populated file plan
@@ -391,6 +397,45 @@ actual produced-instance SHA-256 and byte size belong to the destination
 binding and receipt after writing. Plan population accepts no absolute
 destination root and performs no filesystem write, staging, promotion, receipt,
 or destination verification operation.
+
+### Read-only derivative membership enforcement
+
+`ExportService.validate_derivative_membership` accepts exactly one strict
+`ExportPlan`, candidate train rows, candidate evaluation rows, and one aligned
+candidate provenance sequence. It returns an `ExportMembershipProjection` only
+after exact validation succeeds. It accepts no membership projection, include,
+exclude, filter, balance, ratio, seed, partition, resplit, target, destination-
+root, overwrite, writer, or publication argument.
+
+The candidate train and evaluation sequences define the logical partitions.
+The provenance sequence MUST contain the train entries followed by the
+evaluation entries and MUST agree with each sequence-derived partition and
+zero-based ordinal. This rule remains exact when a later physical container
+combines both logical partitions into one file.
+
+The service MUST fresh-strict-load the plan and every candidate `ProductRow` and
+`RowProvenance`. Using only identities already bound by the plan, it MUST build a
+candidate `RowSet` whose canonical row and provenance bytes, counts, digests,
+ordering, and identity close. The candidate objective and complete source-ID
+scope MUST equal the plan. The computed candidate `row_set_id` MUST equal the
+plan's `row_set_id`.
+
+The service then MUST derive a complete candidate membership projection from
+that checked row set. The candidate projection and its canonical bytes MUST
+equal the plan's complete source membership projection. Counts or
+`assignment_projection_sha256` alone are insufficient because the complete
+comparison also binds row, provenance, and payload identities. Omission,
+addition, duplication, reordering, filtering, coherent target mutation,
+assignment or leakage-group substitution, balancing, repartitioning, and
+resplitting all fail as `export-verification-invalid`; failure never returns a
+persisted false result or a partial projection.
+
+Candidate rows and provenance are normalized in-memory semantic evidence, not
+caller selection controls and not produced-file evidence. Phase 4.5 performs no
+filesystem read or write, creates no destination binding or receipt, and does
+not prove that arbitrary destination bytes encode the checked semantics. Phase
+4.6 owns filesystem publication and Phase 4.7 owns exact-byte rerendering or
+semantic reconstruction of actual destination content.
 
 ## `ExportReceipt`
 
@@ -430,7 +475,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2–4.4 implementation boundary
+## Phase 4.2–4.5 implementation boundary
 
 Phase 4.2 implements:
 
@@ -461,11 +506,19 @@ Phase 4.4 additionally implements:
   planning evidence under the strict persisted models; and
 - plan identity replay without destination-root or filesystem state.
 
-Phase 4.2–4.4 do **not** implement:
+Phase 4.5 additionally implements:
+
+- one read-only normalized semantic membership operation in `ExportService`;
+- fresh strict candidate row, provenance, row-set, and projection
+  reconstruction;
+- exact candidate row-set and complete projection comparison with the plan
+  baseline; and
+- fail-closed omission, addition, duplication, reordering, target mutation,
+  assignment, leakage-group, partition, ordinal, balancing, and resplit tests.
+
+Phase 4.2–4.5 do **not** implement:
 
 - selecting or registering an export implementation;
-- renderer or destination membership reconstruction, comparison, or mutation
-  rejection (Phase 4.5);
 - filesystem staging, writing, cancellation, promotion, cleanup, or independent
   export verification (Phase 4.6);
 - deterministic rerendering or semantic-content replay (Phase 4.7);
@@ -477,7 +530,7 @@ Phase 4.2–4.4 do **not** implement:
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2–4.4 MUST NOT add a generic export container or
+not support claims. Phase 4.2–4.5 MUST NOT add a generic export container or
 consumer profile to taxonomy discovery or the support registry. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;

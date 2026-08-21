@@ -171,3 +171,59 @@ remaining blocker.
 
 **Next action:** Open the Phase 4.4 PR, require every GitHub check to pass,
 merge, and synchronize clean local `main` before Phase 4.5 begins.
+
+## 2026-08-21 — Phase 4.4 merged and synchronized
+
+**Status:** Complete
+
+PR #46 passed every required GitHub check and was squash-merged as
+`3ba83aeb3164d72d1aa14100637272a141f580c9`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.5 branch was created.
+
+## 2026-08-21 — Phase 4.5 derivative-only membership implemented
+
+**Status:** Focused tests passed; remaining local gates in progress
+
+`ExportService.validate_derivative_membership` now fresh-reconstructs one
+candidate `RowSet` from separate normalized train/evaluation `ProductRow`
+sequences and their aligned `RowProvenance`. It uses only plan-bound identities,
+requires the exact planned row-set identity, derives the complete candidate
+membership projection, and requires exact object and canonical-byte equality
+with the source baseline. The service returns the checked projection on success
+and raises `export-verification-invalid` for every mismatch.
+
+Focused export-service tests passed 59 tests, including omission, coherent
+addition, duplication, reorder, target mutation, assignment and leakage-group
+substitution, objective/source-scope drift, repartitioning, stale-model,
+read-only, and API-control cases. Remaining full, release, parity, tracking,
+Mac, Ruff, structure, link, diff, and independent-review gates are in progress.
+
+This increment performs no filesystem or destination-byte verification, creates
+no destination binding or receipt, exposes no public surface, and registers no
+container or consumer profile. Phase 4.6 may begin only after the Phase 4.5 PR
+passes every GitHub check, merges, and clean local `main` equals `origin/main`.
+
+**Next action:** Complete the remaining Phase 4.5 local gates and independent
+review, then open the Phase 4.5 PR.
+
+## 2026-08-21 — Phase 4.5 local gates complete
+
+**Status:** Ready for pull-request review
+
+Focused export-service tests passed 59 tests and the combined export/contract
+selection passed 114. The full Python suite passed 878 tests; the standalone
+release gate passed 866 with 1 deselected. Both emitted only the expected
+transport durability-warning regression warning. Clean-wheel installation,
+both objective goldens, external-digest verification, deterministic transport,
+38 XCTest tests, CLI/workbench parity, tracking, Ruff, JSON and shell structure,
+329 changed-document local links, and diff checks passed.
+
+Independent review found that the initial candidate boundary validated but
+retained caller-owned models, including a mutable payload mapping. The service
+now strict-serializes and reloads every candidate row and provenance value
+before constructing the row set. A regression proves the checked row, nested
+payload, and provenance objects are fresh snapshots; re-review found no
+remaining blocker.
+
+**Next action:** Open the Phase 4.5 PR, require every GitHub check to pass,
+merge, and synchronize clean local `main` before Phase 4.6 begins.

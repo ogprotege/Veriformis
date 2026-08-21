@@ -19,6 +19,11 @@ from veriformis.bundle import (
     VerifiedFinishedBundle,
 )
 from veriformis.bundle import verifier as verifier_module
+from veriformis.datasets import (
+    ProductRow,
+    RowProvenance,
+    row_provenance_from_json_bytes,
+)
 from veriformis.errors import ExportContractError, ExportVerificationError
 from veriformis.exports import (
     DEFAULT_EXPORT_SERVICE,
@@ -26,13 +31,15 @@ from veriformis.exports import (
     ExportContainerProfile,
     ExportDependencyBinding,
     ExportFilePlan,
+    ExportMembershipEntry,
+    ExportMembershipProjection,
     ExportPlan,
     ExportService,
     SourceTrustGrade,
     SourceTrustPolicy,
 )
 from veriformis.exports import service as service_module
-from veriformis.identity import derive_id, sha256_digest
+from veriformis.identity import derive_id, lossless_json_bytes, sha256_digest
 from veriformis.pipeline import PipelineService
 from veriformis.taxonomy import loss_policy_for_row
 
@@ -183,6 +190,17 @@ def _create_exact_plan(
         file_plans=file_plans,
         source_trust_policy=source_trust_policy,
         expected_manifest_sha256=expected_manifest_sha256,
+    )
+
+
+def _reidentified_provenance(
+    provenance: RowProvenance,
+    **updates: object,
+) -> RowProvenance:
+    body = provenance.model_dump(mode="json", exclude={"provenance_id"})
+    body.update(updates)
+    return row_provenance_from_json_bytes(
+        lossless_json_bytes({"provenance_id": derive_id("prv", body), **body})
     )
 
 
@@ -955,6 +973,434 @@ def test_create_plan_is_read_only_and_admits_the_source_once(
         for path in sorted(tmp_path.rglob("*"))
     ) == before_paths
     assert not (bundle / "export-receipt.json").exists()
+
+
+def test_derivative_membership_accepts_only_the_complete_source_semantics(
+    tmp_path: Path,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+
+    projection = ExportService().validate_derivative_membership(
+        plan,
+        candidate_train_rows=source.row_set.train_rows,
+        candidate_evaluation_rows=source.row_set.evaluation_rows,
+        candidate_provenance=source.row_set.provenance,
+    )
+
+    assert projection == plan.membership_projection
+    assert projection.canonical_bytes() == plan.membership_projection.canonical_bytes()
+    assert projection.row_set_id == source.row_set.row_set_id
+    assert projection.total_record_count == source.row_set.total_row_count
+
+
+@pytest.mark.parametrize("mutation", ("omission", "duplicate", "reorder"))
+def test_derivative_membership_rejects_structural_membership_mutation(
+    tmp_path: Path,
+    mutation: str,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    train_rows = source.row_set.train_rows
+    evaluation_rows = source.row_set.evaluation_rows
+    provenance = source.row_set.provenance
+    if mutation == "omission":
+        evaluation_rows = evaluation_rows[:-1]
+        provenance = provenance[:-1]
+    elif mutation == "duplicate":
+        evaluation_rows = (*evaluation_rows, evaluation_rows[-1])
+        provenance = (*provenance, provenance[-1])
+    else:
+        evaluation_rows = tuple(reversed(evaluation_rows))
+        provenance = (provenance[0], *reversed(provenance[1:]))
+
+    with pytest.raises(ExportVerificationError) as caught:
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=train_rows,
+            candidate_evaluation_rows=evaluation_rows,
+            candidate_provenance=provenance,
+        )
+
+    assert caught.value.code == "export-verification-invalid"
+
+
+def test_derivative_membership_rejects_a_coherent_addition(tmp_path: Path):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    evaluation_rows = source.row_set.evaluation_rows
+    existing_ids = {row.record_id for row in evaluation_rows}
+    final_id = max(existing_ids)
+    added_record_id = next(
+        candidate
+        for index in range(10_000)
+        if (candidate := derive_id("rec", {"phase4-addition": index}))
+        not in existing_ids
+        and candidate > final_id
+    )
+    added_row = ProductRow.create(
+        record_id=added_record_id,
+        row_schema=plan.row_schema,
+        payload={"text": "coherently added derivative target"},
+    )
+    added_provenance = _reidentified_provenance(
+        source.row_set.provenance[-1],
+        ordinal=len(evaluation_rows),
+        row_id=added_row.row_id,
+        payload_sha256=added_row.payload_sha256,
+        record_id=added_record_id,
+        assignment_id=derive_id("asg", {"phase4-addition": added_record_id}),
+    )
+
+    with pytest.raises(ExportVerificationError, match="changes the source row set"):
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=(*evaluation_rows, added_row),
+            candidate_provenance=(*source.row_set.provenance, added_provenance),
+        )
+
+
+def test_derivative_membership_rejects_a_coherently_reidentified_target_mutation(
+    tmp_path: Path,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    original = source.row_set.evaluation_rows[0]
+    altered = ProductRow.create(
+        record_id=original.record_id,
+        row_schema=original.row_schema,
+        payload={"text": f"{original.payload['text']} — altered"},
+    )
+    altered_provenance = _reidentified_provenance(
+        source.row_set.provenance[1],
+        row_id=altered.row_id,
+        payload_sha256=altered.payload_sha256,
+    )
+
+    with pytest.raises(ExportVerificationError, match="changes the source row set"):
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=(
+                altered,
+                *source.row_set.evaluation_rows[1:],
+            ),
+            candidate_provenance=(
+                source.row_set.provenance[0],
+                altered_provenance,
+                *source.row_set.provenance[2:],
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    ("field_name", "replacement"),
+    (
+        ("assignment_id", derive_id("asg", {"phase4": "another-assignment"})),
+        ("leakage_group_id", derive_id("lkg", {"phase4": "another-group"})),
+    ),
+)
+def test_derivative_membership_rejects_coherent_assignment_or_group_substitution(
+    tmp_path: Path,
+    field_name: str,
+    replacement: str,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    changed = _reidentified_provenance(
+        source.row_set.provenance[-1],
+        **{field_name: replacement},
+    )
+
+    with pytest.raises(ExportVerificationError, match="changes the source row set"):
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=source.row_set.evaluation_rows,
+            candidate_provenance=(*source.row_set.provenance[:-1], changed),
+        )
+
+
+def test_derivative_membership_rejects_coherent_repartitioning(tmp_path: Path):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    moved = source.row_set.evaluation_rows[0]
+    train_rows = tuple(
+        sorted((*source.row_set.train_rows, moved), key=lambda row: row.record_id)
+    )
+    evaluation_rows = source.row_set.evaluation_rows[1:]
+    by_record_id = {item.record_id: item for item in source.row_set.provenance}
+    provenance = tuple(
+        _reidentified_provenance(
+            by_record_id[row.record_id],
+            partition=partition,
+            ordinal=ordinal,
+        )
+        for partition, rows in (
+            ("train", train_rows),
+            ("evaluation", evaluation_rows),
+        )
+        for ordinal, row in enumerate(rows)
+    )
+
+    with pytest.raises(ExportVerificationError, match="changes the source row set"):
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=train_rows,
+            candidate_evaluation_rows=evaluation_rows,
+            candidate_provenance=provenance,
+        )
+
+
+def test_derivative_membership_rejects_resplit_provenance(tmp_path: Path):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    replacement_split_id = derive_id("spt", {"phase4": "another-split"})
+    provenance = tuple(
+        _reidentified_provenance(item, split_result_id=replacement_split_id)
+        for item in source.row_set.provenance
+    )
+
+    with pytest.raises(ExportVerificationError) as caught:
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=source.row_set.evaluation_rows,
+            candidate_provenance=provenance,
+        )
+
+    assert caught.value.code == "export-verification-invalid"
+
+
+def test_derivative_membership_compares_the_complete_projection(tmp_path: Path):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    final = plan.membership_projection.entries[-1]
+    altered_final = ExportMembershipEntry.create(
+        record_id=final.record_id,
+        row_id=final.row_id,
+        provenance_id=final.provenance_id,
+        assignment_id=derive_id("asg", {"phase4": "forged-plan-assignment"}),
+        leakage_group_id=final.leakage_group_id,
+        partition=final.partition,
+        ordinal=final.ordinal,
+        payload_sha256=final.payload_sha256,
+    )
+    altered_projection = ExportMembershipProjection.create(
+        split_result_id=plan.split_result_id,
+        row_set_id=plan.row_set_id,
+        row_schema=plan.row_schema,
+        entries=(*plan.membership_projection.entries[:-1], altered_final),
+    )
+    plan_body = plan.model_dump(mode="json", exclude={"export_plan_id"})
+    plan_body["membership_projection"] = altered_projection.model_dump(mode="json")
+    altered_plan = ExportPlan.from_json_bytes(
+        lossless_json_bytes(
+            {
+                "export_plan_id": derive_id("export-plan", plan_body),
+                **plan_body,
+            }
+        )
+    )
+
+    with pytest.raises(
+        ExportVerificationError,
+        match="changes source membership or semantics",
+    ):
+        ExportService().validate_derivative_membership(
+            altered_plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=source.row_set.evaluation_rows,
+            candidate_provenance=source.row_set.provenance,
+        )
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    (
+        "objective_id",
+        "source_ids",
+    ),
+)
+def test_derivative_membership_rejects_changed_semantic_scope(
+    tmp_path: Path,
+    field_name: str,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    original = source.row_set.provenance[-1]
+    replacement: object = derive_id("obj", {"phase4": "another-objective"})
+    if field_name == "source_ids":
+        replacement = tuple(
+            sorted(
+                (
+                    *original.source_ids,
+                    derive_id("src", {"phase4": "another-source"}),
+                )
+            )
+        )
+    changed = _reidentified_provenance(
+        original,
+        **{field_name: replacement},
+    )
+
+    with pytest.raises(ExportVerificationError) as caught:
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=source.row_set.evaluation_rows,
+            candidate_provenance=(*source.row_set.provenance[:-1], changed),
+        )
+
+    assert caught.value.code == "export-verification-invalid"
+
+
+def test_derivative_membership_fresh_loads_plan_and_candidate_models(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    original_projection_helper = service_module._membership_projection_from_row_set
+    observed_fresh_models = False
+
+    def capture_fresh_models(row_set):
+        nonlocal observed_fresh_models
+        observed_fresh_models = True
+        assert row_set.train_rows[0] is not source.row_set.train_rows[0]
+        assert row_set.train_rows[0].payload is not source.row_set.train_rows[0].payload
+        assert row_set.provenance[0] is not source.row_set.provenance[0]
+        return original_projection_helper(row_set)
+
+    monkeypatch.setattr(
+        service_module,
+        "_membership_projection_from_row_set",
+        capture_fresh_models,
+    )
+    ExportService().validate_derivative_membership(
+        plan,
+        candidate_train_rows=source.row_set.train_rows,
+        candidate_evaluation_rows=source.row_set.evaluation_rows,
+        candidate_provenance=source.row_set.provenance,
+    )
+    assert observed_fresh_models is True
+
+    stale_plan = plan.model_copy(update={"row_set_id": derive_id("rws", {"stale": 1})})
+    stale_row = source.row_set.train_rows[0].model_copy(
+        update={"payload_sha256": "0" * 64}
+    )
+
+    with pytest.raises(ExportVerificationError):
+        ExportService().validate_derivative_membership(
+            stale_plan,
+            candidate_train_rows=source.row_set.train_rows,
+            candidate_evaluation_rows=source.row_set.evaluation_rows,
+            candidate_provenance=source.row_set.provenance,
+        )
+    with pytest.raises(ExportVerificationError):
+        ExportService().validate_derivative_membership(
+            plan,
+            candidate_train_rows=(stale_row,),
+            candidate_evaluation_rows=source.row_set.evaluation_rows,
+            candidate_provenance=source.row_set.provenance,
+        )
+
+
+def test_derivative_membership_is_read_only_and_has_no_mutation_controls(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    plan = _create_exact_plan(ExportService(), bundle)
+    before = _bundle_file_bytes(bundle)
+
+    def reject_write(*args: object, **kwargs: object) -> None:
+        raise AssertionError("membership validation must not write")
+
+    monkeypatch.setattr(Path, "mkdir", reject_write)
+    monkeypatch.setattr(Path, "write_bytes", reject_write)
+    monkeypatch.setattr(service_module.os, "replace", reject_write)
+
+    result = ExportService().validate_derivative_membership(
+        plan,
+        candidate_train_rows=source.row_set.train_rows,
+        candidate_evaluation_rows=source.row_set.evaluation_rows,
+        candidate_provenance=source.row_set.provenance,
+    )
+    parameters = set(
+        inspect.signature(ExportService.validate_derivative_membership).parameters
+    )
+
+    assert result == plan.membership_projection
+    assert _bundle_file_bytes(bundle) == before
+    assert parameters == {
+        "self",
+        "plan",
+        "candidate_train_rows",
+        "candidate_evaluation_rows",
+        "candidate_provenance",
+    }
+    assert parameters.isdisjoint(
+        {
+            "include",
+            "exclude",
+            "filter",
+            "balance",
+            "ratio",
+            "seed",
+            "partition",
+            "resplit",
+            "target",
+            "membership_projection",
+            "destination_root",
+            "overwrite_policy",
+        }
+    )
 
 
 def test_pipeline_composition_root_owns_the_injected_export_service():

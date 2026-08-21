@@ -29,8 +29,11 @@ verified source inspection and merged as PR #43. Item 4.2 defines strict
 verified-export v1 models and merged as PR #44. Item 4.3 enforces
 trusted-by-default source admission with an explicit lower-trust policy and
 merged as PR #45. Item 4.4 adds read-only plan population from one immutable
-verified source view. Destination membership comparison, an export writer,
-public export commands, and generic export containers are not implemented yet.
+verified source view and merged as PR #46. Item 4.5 fresh-reconstructs
+normalized candidate semantic rows and provenance and requires their row-set
+and complete membership projection to equal the plan baseline. Destination-byte
+verification, an export writer, public export commands, and generic export
+containers are not implemented yet.
 
 ## State change procedure
 
