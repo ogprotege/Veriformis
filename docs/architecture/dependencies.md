@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
 
 **Next review:** Any architecture or dependency change
 
@@ -40,7 +40,7 @@ abstraction layer.
 
 ```mermaid
 flowchart TD
-    CLI["cli.py — thin Typer adapter, 18 commands"]
+    CLI["cli.py — thin Typer adapter, 23 commands"]
     MCP["mcp/ — thin local stdio adapter"]
     PIP["pipeline/service.py — composition root"]
     EXP["exports/ — verified derivative-source service"]
@@ -190,13 +190,19 @@ export models and foundation utilities and owns descriptor-anchored exact-byte
 publication. It adds no workspace, renderer-registry, `PipelineService`
 operation, or adapter dependency edge. `cli.py` and
 `mcp/server.py` translate their respective protocols into pipeline methods;
-the SwiftUI workbench shells the CLI. No adapter exposes export operations yet.
+the SwiftUI workbench shells the CLI.
 Phase 4.7 composes only existing export models, dataset row/provenance loaders,
 identity hashing, and the exports-internal publication helper. Its private
 renderer/replayer hooks add no workspace, third-party, discovery-registry,
 `PipelineService`, adapter, taxonomy, or support dependency edge. Semantic
 replay currently retains complete produced files in memory; the statically
 bounded conformance fixture is not a scalable dependency claim.
+Phase 4.8 adds a private default-empty implementation catalog inside
+`exports/`, typed export methods on `PipelineService`, and thin CLI/MCP/Mac
+adapters over one strict request/response protocol. The Mac process bridge
+retains stdout and stderr separately so it decodes only canonical stdout. No
+adapter adds a registry, renderer, filesystem verifier, taxonomy edge, or
+support claim.
 This arrangement needs no dependency injection container because the contracts
 passed between stages are stable, low-level data values. `workspace.py` keeps
 its module-level domain coupling narrow and uses function-level imports for

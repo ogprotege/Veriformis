@@ -36,12 +36,16 @@ complete membership projection to equal the plan baseline, and merged as PR
 `portable_exact_bytes` publication: source and plan re-verification, private
 descriptor-anchored staging, canonical receipt replay, independent closed-tree
 verification, cancellation, and one atomic no-replace promotion, and merged as
-PR #48 at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Item 4.7 locally implements
+PR #48 at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Item 4.7 implements
 private two-render exact-byte and semantic-content evidence plus descriptor-
-reread staged semantic replay. Its required local gates pass; GitHub review and
-merge remain pending. It ships no renderer or semantic replayer, public export
-command, generic export container, or trainer-specific profile. Phase 4.8
-public surfaces, Phase 4.9 closeout, and Phase 5 generic exports remain open.
+reread staged semantic replay and merged as PR #49 at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Item 4.8 locally implements a
+production-empty private catalog and strict discovery, dry run, inspect,
+execute, and verify operations through `PipelineService`, CLI, MCP, and the
+CLI-backed Mac bridge, with every required local gate passing and pull-request
+review pending. It ships no production renderer or semantic replayer, generic
+export container, or trainer-specific profile. Phase 4.9 closeout and Phase 5
+generic exports remain open.
 
 ## State change procedure
 

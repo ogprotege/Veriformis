@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
 
-**Next review:** Independent-product Phase 4.7 merge or Phase 4.8 start, any
+**Next review:** Independent-product Phase 4.8 merge or Phase 4.9 closeout, any
 later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -41,11 +41,12 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, Phase 4 items 4.1–4.6 are merged at
-`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 private two-render
-exact-byte and semantic-content conformance has green focused, full Python,
-standalone release, parity, Mac, Ruff, lock, and diff gates; GitHub review
-remains pending. Because no renderer/replayer, public surface, supported
-container, or consumer profile was added, the support registry and taxonomy do
-not change. Phase 4.8 may begin only after the Phase 4.7 PR passes every GitHub
-check, merges, and clean local `main` equals `origin/main`.
+At this review, Phase 4 items 4.1–4.7 are merged at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 locally adds the strict
+verified-export surface boundary through `PipelineService`, CLI, MCP, and the
+CLI-backed Mac bridge; every required local gate passes and GitHub review
+remains pending. Because production discovery is empty and no renderer,
+replayer, supported container, or consumer profile was added, the support
+registry and taxonomy do not change. Phase 4.9 may begin only after the Phase
+4.8 PR passes every GitHub check, merges, and clean local `main` equals
+`origin/main`.

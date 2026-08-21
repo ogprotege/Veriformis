@@ -58,16 +58,25 @@ one atomic no-replace promotion. It passed every required check and merged as
 PR #48 at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`; clean local `main` was
 synchronized before Phase 4.7 began.
 
-The seventh increment is locally implemented and its required implementation
-and release gates pass; packet-hygiene checks and pull-request review remain
-pending. It invokes the private conformance renderer twice from independent
-strict inputs. Exact profiles require identical normalized byte trees;
-semantic-only profiles require identical versioned canonical semantic
+The seventh increment invokes the private conformance renderer twice from
+independent strict inputs. Exact profiles require identical normalized byte
+trees; semantic-only profiles require identical versioned canonical semantic
 preimages, complete reconstructed membership, and descriptor-reread staged
-replay before promotion. These runtime checks add no persisted field to the ten
-v1 schemas.
+replay before promotion. It passed every GitHub check and merged as PR #49 at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`; clean local `main` was synchronized
+before Phase 4.8 began.
 
-The default service still has no renderer or semantic replayer, and no
-renderer-selection or public adapter surface exists. Public export commands,
-generic containers, new consumer profiles, the Phase 4.9 closeout harness, and
-support promotion remain unimplemented.
+The eighth increment is locally implemented and every required local gate
+passes; pull-request review remains pending. A private exact-selector catalog
+remains production-empty and test-injected. `PipelineService`, CLI, MCP, and
+the CLI-backed Mac bridge now expose truthful discovery, destination-free dry
+run, self-described inspect, operator-confirmed no-replace execute, and source-
+bound verify through one strict canonical protocol. The Mac runner retains
+stdout and stderr separately, and cancellation races preserve complete
+successful or visible-partial outcomes without claiming rollback after
+ambiguous forced termination.
+
+The default service still has no renderer or semantic replayer. There is no
+public registration API, generic container, new consumer profile, force or
+replacement control, or support promotion. The Phase 4.9 closeout harness and
+reconciliation remain open.

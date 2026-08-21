@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
 
 **Next review:** Any layering or architecture change
 
@@ -29,7 +29,7 @@ the module dependency graph two expressions of the same acyclic order.
 
 ```mermaid
 flowchart TD
-    CLI["cli.py — thin Typer adapter, 18 commands"]
+    CLI["cli.py — thin Typer adapter, 23 commands"]
     MCP["mcp/ — thin local stdio adapter"]
     MAC["macOS workbench — CLI shell"]
     PIP["pipeline/ — PipelineService composition root"]
@@ -207,7 +207,10 @@ strict inputs, compares exact byte trees or private replayed canonical semantic
 preimages, validates complete membership, and replay-checks descriptor-read
 staging. It adds no workspace stage, adapter policy, renderer/replayer registry,
 or new persisted model. The default service has no renderer or semantic
-replayer; no public export command or generic container belongs to this layer.
+replayer. Phase 4.8 adds a private production-empty implementation catalog,
+typed `PipelineService` operations, and thin CLI/MCP/Mac adapters without a
+second registry or filesystem implementation. No generic container belongs to
+this layer.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
+import threading
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any
@@ -10,6 +12,18 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 
 from veriformis.errors import VeriformisError
+from veriformis.exports.api import (
+    ExportOperationCancelled,
+    ExportPartialPublicationError,
+    export_discovery_response,
+    export_dry_run_response,
+    export_error_response,
+    export_execution_response,
+    export_inspection_response,
+    export_request_from_json_bytes,
+    export_response_json,
+    export_verify_response,
+)
 from veriformis.pipeline.service import (
     DEFAULT_PIPELINE_SERVICE,
     PipelineService,
@@ -43,6 +57,70 @@ def _jsonable(value: Any) -> Any:
 
 def _outcome_json(outcome: Any) -> str:
     return json.dumps(_jsonable(outcome), ensure_ascii=False, indent=2, sort_keys=True)
+
+
+_EXPORT_SURFACE_EXCEPTIONS = (
+    ExportPartialPublicationError,
+    ExportOperationCancelled,
+    VeriformisError,
+    OSError,
+    RecursionError,
+    UnicodeError,
+    ValueError,
+    TypeError,
+)
+
+
+def _export_tool_response(operation: str, response_builder, call) -> str:
+    """Return the same canonical export envelope as the CLI adapter."""
+    try:
+        payload = response_builder(call())
+    except _EXPORT_SURFACE_EXCEPTIONS as exc:
+        payload = export_error_response(operation, exc)
+    try:
+        return export_response_json(payload)
+    except _EXPORT_SURFACE_EXCEPTIONS as exc:
+        return export_response_json(export_error_response(operation, exc))
+
+
+async def _export_tool_response_async(operation: str, response_builder, call) -> str:
+    """Run a blocking export call with cooperative MCP-task cancellation."""
+    cancellation_requested = threading.Event()
+
+    def cancellation_check() -> None:
+        if cancellation_requested.is_set():
+            raise ExportOperationCancelled("export operation cancelled")
+
+    worker = asyncio.create_task(asyncio.to_thread(call, cancellation_check))
+    try:
+        payload = response_builder(await asyncio.shield(worker))
+    except asyncio.CancelledError as cancelled:
+        cancellation_requested.set()
+        while not worker.done():
+            try:
+                await asyncio.shield(worker)
+            except asyncio.CancelledError:
+                # Repeated task cancellation must not abandon the worker's
+                # service-owned cleanup.
+                cancellation_requested.set()
+            except Exception:
+                break
+        if worker.cancelled():
+            raise cancelled
+        try:
+            completed = worker.result()
+        except ExportPartialPublicationError as exc:
+            payload = export_error_response(operation, exc)
+        except Exception:
+            raise cancelled
+        else:
+            payload = response_builder(completed)
+    except _EXPORT_SURFACE_EXCEPTIONS as exc:
+        payload = export_error_response(operation, exc)
+    try:
+        return export_response_json(payload)
+    except _EXPORT_SURFACE_EXCEPTIONS as exc:
+        return export_response_json(export_error_response(operation, exc))
 
 
 def _partial_publication_payload(exc: SealPartialPublicationError) -> dict[str, Any]:
@@ -96,6 +174,102 @@ def create_mcp_server(
             ensure_ascii=False,
             indent=2,
             sort_keys=True,
+        )
+
+    @server.tool()
+    def export_discover() -> str:
+        """Discover executable export profiles from PipelineService."""
+
+        def run():
+            outcome = pipeline.discover_exports()
+            assert outcome.discovery is not None
+            return outcome.discovery
+
+        return _export_tool_response(
+            "discover",
+            export_discovery_response,
+            run,
+        )
+
+    @server.tool()
+    def export_dry_run(request_json: str) -> str:
+        """Derive an export plan without destination access."""
+
+        def run():
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="dry_run",
+            )
+            outcome = pipeline.dry_run_export(request)
+            assert outcome.plan is not None
+            return outcome.plan
+
+        return _export_tool_response("dry_run", export_dry_run_response, run)
+
+    @server.tool()
+    async def export_inspect(request_json: str) -> str:
+        """Inspect self-described export bytes without asserting source trust."""
+
+        def run(cancellation_check):
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="inspect",
+            )
+            outcome = pipeline.inspect_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+            assert outcome.inspection is not None
+            return outcome.inspection
+
+        return await _export_tool_response_async(
+            "inspect",
+            export_inspection_response,
+            run,
+        )
+
+    @server.tool()
+    async def export_execute(request_json: str) -> str:
+        """Atomically publish one operator-confirmed export plan."""
+
+        def run(cancellation_check):
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="execute",
+            )
+            outcome = pipeline.execute_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+            assert outcome.publication is not None
+            return outcome.publication
+
+        return await _export_tool_response_async(
+            "execute",
+            export_execution_response,
+            run,
+        )
+
+    @server.tool()
+    async def export_verify(request_json: str) -> str:
+        """Source-bind and independently verify one visible export tree."""
+
+        def run(cancellation_check):
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="verify",
+            )
+            outcome = pipeline.verify_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+            assert outcome.verified is not None
+            return outcome.verified
+
+        return await _export_tool_response_async(
+            "verify",
+            export_verify_response,
+            run,
         )
 
     @server.tool()

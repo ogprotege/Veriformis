@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -221,11 +221,20 @@ verification and promotion. The receipt binds the actual bytes of the published
 first render. The persisted verification binds that instance and the profile
 claim, not a cross-render transcript.
 
-The private render/replay hooks are trusted conformance code, and semantic
-replay currently retains each complete file in memory. No renderer or replayer,
-public command, or generic container exists. The export boundary therefore
-changes neither the canonical six-file bundle nor the nine-stage workspace
-graph. Phase 4.8 owns public surfaces, Phase 4.9 closeout, and Phase 5 generic
+Phase 4.8 places a private exact-selector implementation catalog inside the
+same export boundary. Dry run verifies the source and derives a plan without a
+destination. Execute re-derives that plan and requires its operator-confirmed
+identity before rendering or destination access. Inspect proves only that a
+self-described receipt matches the closed physical tree. Verify separately
+re-verifies the source, re-derives the plan, and checks the destination against
+that external authority. CLI, MCP, and Mac use bounded canonical surface
+envelopes over those `PipelineService` operations.
+
+The private render/replay hooks remain trusted conformance code, and semantic
+replay currently retains each complete file in memory. No production renderer,
+replayer, or generic container exists; shipped discovery is empty. The export
+boundary therefore changes neither the canonical six-file bundle nor the nine-
+stage workspace graph. Phase 4.9 owns closeout, and Phase 5 owns generic
 containers.
 
 ## Persistence: the workspace revision store

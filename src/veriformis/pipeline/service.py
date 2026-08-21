@@ -88,7 +88,20 @@ from veriformis.errors import (
     TaxonomyError,
     UnsupportedWorkspaceVersionError,
 )
-from veriformis.exports import DEFAULT_EXPORT_SERVICE, ExportService
+from veriformis.exports import (
+    DEFAULT_EXPORT_SERVICE,
+    ExportDiscovery,
+    ExportDryRunRequest,
+    ExportExecuteRequest,
+    ExportInspectRequest,
+    ExportInspection,
+    ExportPublicationOutcome,
+    ExportPlan,
+    ExportService,
+    ExportVerifiedOutcome,
+    ExportVerifyRequest,
+)
+from veriformis.exports._publication import CancellationCheck
 from veriformis.diagnostics import (
     parse_report_from_dict,
     parse_report_to_dict,
@@ -288,6 +301,31 @@ class PreviewOutcome(StageOutcome):
 @dataclass(frozen=True)
 class VersionOutcome(StageOutcome):
     version: str = ""
+
+
+@dataclass(frozen=True)
+class ExportDiscoveryOutcome(StageOutcome):
+    discovery: ExportDiscovery | None = None
+
+
+@dataclass(frozen=True)
+class ExportPlanOutcome(StageOutcome):
+    plan: ExportPlan | None = None
+
+
+@dataclass(frozen=True)
+class ExportInspectionOutcome(StageOutcome):
+    inspection: ExportInspection | None = None
+
+
+@dataclass(frozen=True)
+class ExportExecutionOutcome(StageOutcome):
+    publication: ExportPublicationOutcome | None = None
+
+
+@dataclass(frozen=True)
+class ExportVerifyOutcome(StageOutcome):
+    verified: ExportVerifiedOutcome | None = None
 
 
 
@@ -974,6 +1012,58 @@ class PipelineService:
     def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
         """Return a fresh, adapter-safe copy of implemented taxonomy discovery."""
         return dict(implemented_discovery())
+
+    def discover_exports(self) -> ExportDiscoveryOutcome:
+        """Discover only executable export implementations in the service."""
+        return ExportDiscoveryOutcome(
+            discovery=self.export_service.discover_exports()
+        )
+
+    def dry_run_export(self, request: ExportDryRunRequest) -> ExportPlanOutcome:
+        """Derive a source-anchored export plan without destination access."""
+        return ExportPlanOutcome(plan=self.export_service.dry_run_export(request))
+
+    def inspect_export(
+        self,
+        request: ExportInspectRequest,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportInspectionOutcome:
+        """Inspect self-described physical output without asserting source trust."""
+        return ExportInspectionOutcome(
+            inspection=self.export_service.inspect_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+        )
+
+    def execute_export(
+        self,
+        request: ExportExecuteRequest,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportExecutionOutcome:
+        """Re-derive and publish an operator-confirmed export plan."""
+        return ExportExecutionOutcome(
+            publication=self.export_service.execute_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+        )
+
+    def verify_export(
+        self,
+        request: ExportVerifyRequest,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportVerifyOutcome:
+        """Verify destination bytes against re-derived source authority."""
+        return ExportVerifyOutcome(
+            verified=self.export_service.verify_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+        )
 
     def parse(
         self,

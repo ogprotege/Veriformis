@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`
+**Implementation baseline reviewed:** `6c3f0aff2e35edaa7920a0964270c410bf53f47b`
 on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
 workbench Phases 0–2; independent-product Phases 0–3 complete; Phase 4 items
-4.1–4.6 merged), plus the current Phase 4.7 deterministic-evidence branch
+4.1–4.7 merged), plus the current Phase 4.8 export-surfaces branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
 
-**Next review:** Independent-roadmap Phase 4.7 GitHub review and merge; Phase 4.8
-start; beta label cut, public Mac evidence, or any
+**Next review:** Independent-roadmap Phase 4.8 GitHub review and merge; Phase 4.9
+closeout; beta label cut, public Mac evidence, or any
 listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -58,11 +58,11 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [ ] Independent product Phase 4 is in progress; items 4.1–4.6 are merged at
-      `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Item 4.7 locally implements
-      two-render exact-byte and semantic-content conformance plus staged
-      descriptor replay; all required local gates pass, while GitHub review and
-      merge remain pending.
+- [ ] Independent product Phase 4 is in progress; items 4.1–4.7 are merged at
+      `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Item 4.8 locally implements
+      strict discovery, dry-run, inspect, execute, and verify operations across
+      Python, CLI, MCP, and the CLI-backed Mac bridge; every required local gate
+      passes and GitHub review remains pending.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -165,17 +165,20 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
       strict inputs. Exact profiles require identical normalized byte trees;
       semantic profiles require equal versioned canonical semantic preimages,
       complete plan-equal membership, service-computed digests, and staged
-      descriptor replay. Local gates pass: 14 determinism tests, 158 export
-      tests, 163 combined export/contract tests, 927 full Python tests, 915
-      standalone-release tests with 1 deselected, parity, and 38 Mac tests;
-      GitHub review remains pending.
-- [ ] Phase 4.8–4.9 — public surfaces and adversarial closeout remain open in the
+      descriptor replay. PR #49 passed all 14 GitHub checks and merged at
+      `6c3f0aff2e35edaa7920a0964270c410bf53f47b`.
+- [ ] Phase 4.8 — a private production-empty implementation catalog and strict
+      cross-surface discovery, dry-run, inspect, execute, and verify operations
+      are locally implemented; every required local gate passes and GitHub
+      review remains.
+- [ ] Phase 4.9 — adversarial closeout remains open in the
       [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-Phase 4.7 supplies private conformance evidence only. The default service ships
-no renderer or semantic replayer, public export command, supported generic
-export container, or trainer-specific profile. The ten persisted v1 schemas and
-the `ExportService.publish` call signature remain unchanged.
+Phase 4.8 exposes the foundation without shipping an implementation: production
+discovery is empty and tests alone inject the conformance exporter. The default
+service ships no renderer or semantic replayer, supported generic export
+container, or trainer-specific profile. The ten persisted v1 schemas, taxonomy,
+and support registry remain unchanged.
 
 The current stage-command runtime is:
 

@@ -982,12 +982,15 @@ def test_determinism_runtime_does_not_leak_to_public_or_support_surfaces() -> No
     for name in (
         "_RenderedDerivative",
         "_ReplayedDerivative",
-        "ExportPublicationOutcome",
         "publish_semantic_export",
         "semantic_replay",
     ):
         assert name not in exports.__all__
         assert not hasattr(exports, name)
+    assert "ExportPublicationOutcome" in exports.__all__
+    assert hasattr(exports, "ExportPublicationOutcome")
+    assert "ExportPartialPublicationError" in exports.__all__
+    assert hasattr(exports, "ExportPartialPublicationError")
 
     runtime_names = {
         "destination_root",
@@ -998,7 +1001,11 @@ def test_determinism_runtime_does_not_leak_to_public_or_support_surfaces() -> No
     }
     assert runtime_names.isdisjoint(ExportPlan.model_fields)
     assert not hasattr(PipelineService, "publish_export")
-    assert not hasattr(PipelineService, "verify_export")
+    assert list(inspect.signature(PipelineService.verify_export).parameters) == [
+        "self",
+        "request",
+        "cancellation_check",
+    ]
 
     catalog = json.loads(
         (

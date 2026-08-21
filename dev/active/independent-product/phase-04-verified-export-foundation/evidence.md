@@ -1,6 +1,8 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phases 4.1–4.6 merged; Phase 4.7 is locally implemented with every required local gate complete and pull-request review pending
+**Evidence status:** In progress — Phases 4.1–4.7 merged; Phase 4.8 is locally
+implemented with every required local gate passing and pull-request review
+pending
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -25,7 +27,7 @@
 - [x] Normalized semantic candidate no-membership-change proof.
 - [x] Atomic, path-safe, cancelable, no-replace publication.
 - [x] Exact-byte and semantic-only evidence limits.
-- [ ] Discovery, dry run, inspect, execute, and verify parity across surfaces.
+- [x] Discovery, dry run, inspect, execute, and verify parity across surfaces.
 - [ ] Contract/property, tamper, path, race, and partial-publication harness.
 - [ ] Full Phase 4 exit and reconciliation gates.
 
@@ -268,4 +270,59 @@ Observed results:
   statically bounded; every future shipped semantic profile must enforce
   explicit resource limits.
 
-Phase 4.7 is not merged, and this is not completed Phase 4 exit evidence.
+PR #49 passed all 14 GitHub checks and merged at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. This is not completed Phase 4
+exit evidence; Phase 4.8 surfaces and Phase 4.9 closeout remain separate.
+
+## 2026-08-21 — Phase 4.8 strict cross-surface export operations
+
+- A private immutable exact-selector implementation catalog backs discovery,
+  dry run, inspect, execute, and verify. The production catalog is empty; only
+  tests inject the conformance renderer and semantic replayer.
+- Dry run derives its plan from one admitted source without destination access.
+  Execute re-derives the plan and requires its operator-confirmed identity
+  before rendering or destination access. Inspect proves only self-described
+  physical closure; source-bound verify separately re-verifies the source and
+  re-derives the plan.
+- `PipelineService`, CLI, MCP, and the CLI-backed Mac bridge use the same three
+  strict canonical surface schemas. Frozen cross-surface evidence proves the
+  same plan, receipt, verification, and file digests.
+- Python publicly exports the frozen publication outcome and visible-partial
+  exception so callers can handle both honest runtime results without importing
+  an underscore module; render, replay, and filesystem hooks remain private.
+- Requests cannot supply a plan, profile, dependency graph, file plan,
+  membership projection, renderer, semantic replayer, registry entry, force,
+  or replacement control. Overwrite policy is exactly `refuse`.
+- Admission bounds requests and responses at 1 MiB, runtime paths at 32 KiB,
+  executable dry-run responses at 256 KiB, and directory depth at 128 before
+  rendering. The Mac bridge independently bounds each process stream at 2 MiB
+  and validates canonical stdout without treating stderr as protocol data.
+- Cancellation preserves a complete successful or visible-partial response;
+  forced termination without a complete response is reported as ambiguous,
+  never as a proven rollback.
+
+Observed results:
+
+- Focused API and adapter suite: 27 passed.
+- Complete export suite: 185 passed.
+- Combined export and verified-export contract suite: 190 passed.
+- Full Python suite: 954 passed with the expected exercised transport
+  durability-warning regression warning.
+- Standalone release gate: 942 passed, 1 deselected, with the same expected
+  warning; clean-wheel installation, both objective goldens, external-digest
+  verification, and deterministic transports passed.
+- macOS XCTest: 52 passed.
+- CLI/workbench parity and project tracking passed.
+- Ruff, lock integrity, 15 JSON files, 10 shell files, 373 changed-document
+  local links, and `git diff --check` passed.
+- Independent adversarial review found and verified corrections for invalid-
+  Unicode error serialization and recursion failure on deeply nested trees.
+  Iterative descriptor traversal, bounded depth, canonical adapter failures,
+  pre-render depth admission, and regression tests leave no known Phase 4.8
+  blocker.
+
+This evidence does not ship or advertise a renderer, semantic replayer,
+generic export container, or consumer profile and changes none of the ten
+persisted verified-export v1 schemas, the taxonomy, or the support registry.
+It is not Phase 4 exit evidence; the complete adversarial closeout harness and
+reconciliation remain Phase 4.9.

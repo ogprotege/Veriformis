@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -12,8 +12,8 @@ root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 `veriformis.pipeline.PipelineService` owns stage policy, verified artifact
 loading, workspace transactions, sealing, independent verification, and
 read-only preview behavior. It also injects and owns the consumer-neutral
-`exports.ExportService`; that service is currently a Python composition
-boundary, not an adapter-visible command.
+`exports.ExportService`; adapters reach its Phase 4.8 operations only through
+typed `PipelineService` methods and never call or reimplement it directly.
 
 | Surface | How it enters |
 | --- | --- |
@@ -28,16 +28,17 @@ transition regardless of the adapter that initiated it.
 
 ## CLI command surface
 
-The CLI exposes 18 commands. Nine map one-to-one onto the workspace stages:
+The CLI exposes 23 root commands. Nine map one-to-one onto the workspace stages:
 `parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`,
 `validate`, and `seal`. The remaining commands are `upgrade-workspace`,
-`verify`, `preview`, `run`, `list-recipes`, `mcp`, `handoff`,
-`handoff-verify`, and `version`. Ordering is enforced by the workspace
-dependency table, not by Typer.
+`verify`, `preview`, `package`, `package-verify`, `taxonomy`, the `export` group
+with four subcommands, `export-verify`, `run`, `list-recipes`, `mcp`, `handoff`,
+`handoff-verify`, and `version`. Ordering is enforced by the workspace dependency
+table, not by Typer.
 
 ```mermaid
 flowchart TD
-    script["console script: veriformis"] --> cli["cli.py: 18-command Typer adapter"]
+    script["console script: veriformis"] --> cli["cli.py: 23-command Typer adapter"]
     mcp["mcp/server.py: local stdio adapter"] --> service["PipelineService composition root"]
     cli --> service
     mac["SwiftUI workbench"] --> cli
@@ -98,7 +99,7 @@ the sealed directory and optional expected manifest digest to
 trusted channel. The optional Aptus handoff is a separate adapter artifact and
 is not required for core bundle verification.
 
-## Phase 4 export composition, model, and private publication boundary
+## Phase 4 export composition, publication, and surface boundary
 
 `PipelineService.export_service` exposes the injected `ExportService` to
 Python composition. Its `verified_source` method calls
@@ -142,12 +143,28 @@ membership from private replay; the service computes their digests and replays
 descriptor-reread staged bytes before one atomic no-replace promotion. The call
 signature and ten persisted v1 schemas remain unchanged.
 
-There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
-in these increments. There is also no shipped renderer or semantic replayer and
-no generic derivative container. The private hooks are trusted conformance
-code, not an untrusted plugin boundary; semantic replay retains complete files
-in memory and its fixture is statically bounded. Public surfaces remain Phase
-4.8, closeout remains Phase 4.9, and generic containers remain Phase 5.
+Phase 4.8 adds five typed operations through `PipelineService`: executable-
+profile discovery, destination-free dry run, self-described physical
+inspection, operator-confirmed execution, and source-bound verification. A
+private exact-selector catalog owns planners, renderers, and semantic
+replayers. Its production instance is empty; tests alone inject the conformance
+implementation, so discovery makes no new product support claim.
+
+`veriformis export discover`, `export dry-run`, `export inspect`,
+`export execute`, and top-level `export-verify` are thin adapters. The latter four take
+one strict canonical request through `--request-json`. MCP exposes the same five
+operations and canonical response envelope. The Mac bridge shells those CLI
+commands, decodes stdout separately from diagnostics, and does not enumerate,
+rewrite, or verify destination files itself. No surface accepts a plan,
+profile, renderer, replayer, membership projection, replacement mode, or force
+flag. Python callers import the frozen publication outcome and visible-partial
+exception from `veriformis.exports`; publication hooks remain private.
+
+There is still no shipped renderer or semantic replayer and no generic
+derivative container. The private hooks are trusted conformance code, not an
+untrusted plugin boundary; semantic replay retains complete files in memory and
+its fixture is statically bounded. Adversarial closeout remains Phase 4.9, and
+generic containers remain Phase 5.
 
 ## Preview, recipes, and optional integrations
 
@@ -167,9 +184,11 @@ report is committed for inspection and still exits 1. Partial publication is
 surfaced explicitly through `SealPartialPublicationError`, and uncertain final
 syncs are warnings rather than silent success claims.
 
-MCP serializes the same typed service outcomes as JSON. The SwiftUI workbench
-records the generated CLI plan and process result, so it inherits CLI exit and
-error semantics rather than implementing a second pipeline.
+Ordinary MCP stages serialize the same typed service outcomes as JSON. Export
+MCP tools use the canonical export-surface envelope shared with the CLI. The
+SwiftUI workbench records the generated CLI plan and process result, so it
+inherits CLI exit and error semantics rather than implementing a second
+pipeline.
 
 ## Related documentation
 

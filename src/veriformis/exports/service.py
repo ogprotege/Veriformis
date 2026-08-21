@@ -9,8 +9,9 @@ publication conformance without promoting Phase 5 containers.
 from __future__ import annotations
 
 import os
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 
 from veriformis.bundle import (
     VALIDATION_PATH,
@@ -45,11 +46,24 @@ from veriformis.exports.models import (
     SourceTrustGrade,
     SourceTrustPolicy,
 )
+from veriformis.exports.api import (
+    ExportDiscovery,
+    ExportDryRunRequest,
+    ExportExecuteRequest,
+    ExportInspectRequest,
+    ExportInspection,
+    ExportProfileDescriptor,
+    ExportVerifiedOutcome,
+    ExportVerifyRequest,
+    _validate_executable_plan_response_budget,
+)
 from veriformis.exports._publication import (
     CancellationCheck,
     ExportPublicationOutcome,
+    _inspect_export_directory,
     _publish_exact_export,
     _publish_semantic_export,
+    _verify_export_directory,
 )
 from veriformis.exports.paths import validate_export_relative_path
 from veriformis.identity import lossless_json_bytes, sha256_digest
@@ -86,6 +100,49 @@ class _ReplayedDerivative:
     provenance: tuple[RowProvenance, ...]
 
 
+_FilePlanner = Callable[
+    [ExportProfileDescriptor, RowSet],
+    Sequence[ExportFilePlan],
+]
+_Renderer = Callable[[ExportPlan, RowSet], _RenderedDerivative]
+_SemanticReplayer = Callable[
+    [ExportPlan, tuple[tuple[str, bytes], ...]],
+    _ReplayedDerivative,
+]
+
+
+@dataclass(frozen=True, slots=True)
+class _ExportImplementation:
+    """Private executable half of one discoverable profile selector."""
+
+    descriptor: ExportProfileDescriptor
+    file_planner: _FilePlanner
+    renderer: _Renderer
+    semantic_replayer: _SemanticReplayer | None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.descriptor, ExportProfileDescriptor):
+            raise ExportContractError(
+                "export implementation descriptor has the wrong runtime type"
+            )
+        if not callable(self.file_planner) or not callable(self.renderer):
+            raise ExportContractError(
+                "export implementation planner and renderer must be callable"
+            )
+        semantic = (
+            self.descriptor.container_profile.determinism_claim
+            == "semantic_content_only"
+        )
+        if semantic and not callable(self.semantic_replayer):
+            raise ExportContractError(
+                "semantic export implementation requires a semantic replayer"
+            )
+        if not semantic and self.semantic_replayer is not None:
+            raise ExportContractError(
+                "portable exact implementation cannot install a semantic replayer"
+            )
+
+
 class ExportService:
     """Own export policy beneath :class:`PipelineService`.
 
@@ -93,8 +150,200 @@ class ExportService:
     rewrite bundle files directly. Phase 4.6 adds private destination
     enforcement, receipts, publication, and verification. Phase 4.7 adds
     private two-render exact comparison and semantic reconstruction without
-    changing that boundary; public adapters remain later work.
+    changing that boundary. Phase 4.8 exposes only the typed operations through
+    the composition root and a private, production-empty implementation catalog.
     """
+
+    def __init__(
+        self,
+        *,
+        _implementations: Sequence[_ExportImplementation] = (),
+    ) -> None:
+        """Build one immutable private catalog; production defaults to empty."""
+        implementations = tuple(_implementations)
+        if any(not isinstance(item, _ExportImplementation) for item in implementations):
+            raise ExportContractError(
+                "export implementations must use the private implementation type"
+            )
+        selectors = tuple(item.descriptor.selector for item in implementations)
+        if len(selectors) != len(set(selectors)):
+            raise ExportContractError("export implementation selectors must be unique")
+        self._implementations = tuple(
+            sorted(
+                implementations,
+                key=lambda item: (
+                    item.descriptor.selector[0],
+                    item.descriptor.selector[1],
+                    item.descriptor.selector[2] or "",
+                    item.descriptor.selector[3] or 0,
+                ),
+            )
+        )
+
+    def discover_exports(self) -> ExportDiscovery:
+        """Return truthful, deterministic executable-profile discovery."""
+        return ExportDiscovery.create(
+            tuple(item.descriptor for item in self._catalog())
+        )
+
+    def dry_run_export(self, request: ExportDryRunRequest) -> ExportPlan:
+        """Derive one exact plan without touching a destination or rendering."""
+        checked = ExportDryRunRequest.from_json_bytes(request.canonical_bytes())
+        implementation = self._resolve_implementation(checked)
+        return self._plan_registered_export(checked, implementation)
+
+    def inspect_export(
+        self,
+        request: ExportInspectRequest,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportInspection:
+        """Inspect self-described physical bytes without asserting source trust."""
+        checked = ExportInspectRequest.from_json_bytes(request.canonical_bytes())
+        receipt = _inspect_export_directory(
+            checked.destination_root,
+            cancellation_check=cancellation_check,
+        )
+        return ExportInspection(
+            destination_root=Path(os.path.abspath(checked.destination_root)),
+            inspection_scope="self_described_physical",
+            receipt=receipt,
+        )
+
+    def execute_export(
+        self,
+        request: ExportExecuteRequest,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportPublicationOutcome:
+        """Re-derive, anchor, render twice, and atomically publish one profile."""
+        checked = ExportExecuteRequest.from_json_bytes(request.canonical_bytes())
+        implementation = self._resolve_implementation(checked)
+        plan = self._plan_registered_export(checked, implementation)
+        if plan.export_plan_id != checked.expected_export_plan_id:
+            raise ExportVerificationError(
+                "execution plan differs from the operator-confirmed dry run"
+            )
+        bound = _ImplementationBoundExportService(self, implementation)
+        return bound.publish(
+            plan,
+            checked.bundle,
+            checked.destination_root,
+            expected_manifest_sha256=checked.expected_manifest_sha256,
+            cancellation_check=cancellation_check,
+        )
+
+    def verify_export(
+        self,
+        request: ExportVerifyRequest,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportVerifiedOutcome:
+        """Re-derive the expected plan from source, then verify visible bytes."""
+        checked = ExportVerifyRequest.from_json_bytes(request.canonical_bytes())
+        implementation = self._resolve_implementation(checked)
+        plan = self._plan_registered_export(checked, implementation)
+        if plan.export_plan_id != checked.expected_export_plan_id:
+            raise ExportVerificationError(
+                "verification plan differs from the operator-confirmed dry run"
+            )
+        bound = _ImplementationBoundExportService(self, implementation)
+        replay_callback = None
+        if plan.container_profile.determinism_claim == "semantic_content_only":
+            plan_bytes = plan.canonical_bytes()
+
+            def replay_callback(
+                files: tuple[tuple[str, bytes], ...],
+            ) -> tuple[tuple[str, bytes], ...]:
+                return bound._replay_and_validate(
+                    plan_bytes,
+                    files,
+                    cancellation_check=cancellation_check,
+                )
+
+        receipt, verification = _verify_export_directory(
+            checked.destination_root,
+            expected_plan=plan,
+            cancellation_check=cancellation_check,
+            semantic_replay=replay_callback,
+        )
+        return ExportVerifiedOutcome(
+            destination_root=Path(os.path.abspath(checked.destination_root)),
+            receipt=receipt,
+            verification=verification,
+        )
+
+    def _catalog(self) -> tuple[_ExportImplementation, ...]:
+        """Support pre-4.8 test subclasses that did not call ``super().__init__``."""
+        return getattr(self, "_implementations", ())
+
+    def _resolve_implementation(
+        self,
+        request: ExportDryRunRequest | ExportExecuteRequest | ExportVerifyRequest,
+    ) -> _ExportImplementation:
+        selector = (
+            request.container_id,
+            request.container_version,
+            request.consumer_id,
+            request.consumer_profile_version,
+        )
+        for implementation in self._catalog():
+            if implementation.descriptor.selector == selector:
+                return implementation
+        raise ExportContractError(
+            "no executable export implementation matches the exact selector"
+        )
+
+    def _plan_registered_export(
+        self,
+        request: ExportDryRunRequest | ExportExecuteRequest | ExportVerifyRequest,
+        implementation: _ExportImplementation,
+    ) -> ExportPlan:
+        source = self.verified_source(
+            request.bundle,
+            source_trust_policy=request.source_trust_policy,
+            expected_manifest_sha256=request.expected_manifest_sha256,
+        )
+        descriptor = implementation.descriptor
+        try:
+            source_row_set = _source_plan_evidence(source)[1]
+            planner_row_set = row_set_from_json_bytes(
+                lossless_json_bytes(source_row_set.model_dump(mode="json"))
+            )
+            if planner_row_set.row_schema not in descriptor.supported_row_schemas:
+                raise ExportContractError(
+                    "selected export implementation does not support the source row schema"
+                )
+            file_plans = tuple(
+                implementation.file_planner(descriptor, planner_row_set)
+            )
+            plan, _ = _plan_from_verified_source(
+                source,
+                source_trust_policy=request.source_trust_policy,
+                container_profile=descriptor.container_profile,
+                consumer_profile=descriptor.consumer_profile,
+                dependencies=descriptor.dependencies,
+                file_plans=file_plans,
+            )
+            if plan.overwrite_policy != request.overwrite_policy:
+                raise ExportContractError(
+                    "requested overwrite policy differs from the export contract"
+                )
+            _validate_executable_plan_response_budget(plan)
+            return plan
+        except (ExportContractError, ExportVerificationError):
+            raise
+        except (
+            AttributeError,
+            RecursionError,
+            TypeError,
+            UnicodeError,
+            ValueError,
+            VeriformisError,
+        ) as exc:
+            raise ExportContractError(
+                f"invalid registered export planning evidence: {exc}"
+            ) from exc
 
     def verified_source(
         self,
@@ -301,10 +550,10 @@ class ExportService:
     ) -> ExportPublicationOutcome:
         """Atomically publish one test-injected deterministic derivative.
 
-        Phase 4.7 intentionally has no renderer-selection argument or shipped
-        implementation.  A conformance-only subclass may override the private
-        render and semantic-replay hooks; product discovery and public surfaces
-        remain later Phase 4 work.
+        This lower-level operation intentionally has no renderer-selection
+        argument or shipped implementation. A conformance-only subclass may
+        override the private render and semantic-replay hooks; Phase 4.8
+        surfaces reach it only through an exact private catalog selection.
         """
         if cancellation_check is not None and not callable(cancellation_check):
             raise ExportContractError("cancellation_check must be callable")
@@ -526,6 +775,65 @@ class ExportService:
             "no verified export semantic replayer is installed; Phase 4 "
             "conformance replay is test-injected only"
         )
+
+
+class _ImplementationBoundExportService(ExportService):
+    """Bind one private catalog implementation to the hardened publisher."""
+
+    def __init__(
+        self,
+        owner: ExportService,
+        implementation: _ExportImplementation,
+    ) -> None:
+        self._owner = owner
+        self._implementation = implementation
+
+    def verified_source(
+        self,
+        bundle: str | os.PathLike[str],
+        *,
+        source_trust_policy: SourceTrustPolicy = "require_external_digest",
+        expected_manifest_sha256: str | None = None,
+    ) -> VerifiedFinishedBundle:
+        return self._owner.verified_source(
+            bundle,
+            source_trust_policy=source_trust_policy,
+            expected_manifest_sha256=expected_manifest_sha256,
+        )
+
+    def validate_derivative_membership(
+        self,
+        plan: ExportPlan,
+        *,
+        candidate_train_rows: Sequence[ProductRow],
+        candidate_evaluation_rows: Sequence[ProductRow],
+        candidate_provenance: Sequence[RowProvenance],
+    ) -> ExportMembershipProjection:
+        return self._owner.validate_derivative_membership(
+            plan,
+            candidate_train_rows=candidate_train_rows,
+            candidate_evaluation_rows=candidate_evaluation_rows,
+            candidate_provenance=candidate_provenance,
+        )
+
+    def _render_derivative(
+        self,
+        plan: ExportPlan,
+        source_row_set: RowSet,
+    ) -> _RenderedDerivative:
+        return self._implementation.renderer(plan, source_row_set)
+
+    def _replay_derivative(
+        self,
+        plan: ExportPlan,
+        files: tuple[tuple[str, bytes], ...],
+    ) -> _ReplayedDerivative:
+        replayer = self._implementation.semantic_replayer
+        if replayer is None:
+            raise ExportContractError(
+                "portable exact export implementation has no semantic replayer"
+            )
+        return replayer(plan, files)
 
 
 def _run_cancellation_check(check: CancellationCheck | None) -> None:

@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
 
 **Next review:** Any architecture documentation change
 
@@ -101,7 +101,7 @@ locator fields — as a correctness mechanism, not a style preference.
 ```mermaid
 flowchart TB
     subgraph entry["Adapters and Composition"]
-        CLI["cli.py — thin Typer adapter, 18 commands"]
+        CLI["cli.py — thin Typer adapter, 23 commands"]
         MCP["mcp/ — local stdio adapter"]
         MAC["macOS workbench — shells the CLI"]
         PIP["pipeline/ — PipelineService composition root"]
@@ -222,11 +222,12 @@ projection equality with the plan. Its internal publication operation then re-
 verifies the source and plan and renders twice from independent strict inputs.
 Exact profiles require identical normalized byte trees; semantic-only profiles
 require equal versioned canonical semantic preimages and reconstructed
-membership from both renders plus descriptor-reread staged replay. The default
-service has no renderer or semantic replayer, and no public export command or
-generic container ships. The CLI exposes eighteen commands: nine stage
-commands plus maintenance, inspection, recipe automation, MCP, optional Aptus
-handoff, and version surfaces.
+membership from both renders plus descriptor-reread staged replay. Phase 4.8
+adds a private production-empty implementation catalog and thin Python, CLI,
+MCP, and CLI-backed Mac export operations. The default service has no renderer
+or semantic replayer, and no generic container ships. The CLI exposes the nine
+stage commands plus maintenance, inspection, recipe automation, MCP, optional
+Aptus handoff, version, and verified-export surfaces.
 
 Collaboration between these units is governed by two mechanisms worth naming
 explicitly. The first is the strict acyclic import graph: no lower layer

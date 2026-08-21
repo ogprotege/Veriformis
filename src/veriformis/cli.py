@@ -6,6 +6,10 @@ and workspace orchestration live in ``veriformis.pipeline``.
 
 from __future__ import annotations
 
+import signal
+import threading
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 import json
 from pathlib import Path
 
@@ -13,6 +17,18 @@ import typer
 
 from veriformis.errors import VeriformisError
 from veriformis.evidence import EvidenceError
+from veriformis.exports.api import (
+    ExportOperationCancelled,
+    ExportPartialPublicationError,
+    export_discovery_response,
+    export_dry_run_response,
+    export_error_response,
+    export_execution_response,
+    export_inspection_response,
+    export_request_from_json_bytes,
+    export_response_json,
+    export_verify_response,
+)
 from veriformis.pipeline.service import (
     DEFAULT_PIPELINE_SERVICE,
     PipelineService,
@@ -39,6 +55,11 @@ __all__ = [
 ]
 
 app = typer.Typer(help="Veriformis: local-first dataset compiler.")
+export_app = typer.Typer(
+    help="Derive and verify exports through PipelineService.",
+    no_args_is_help=True,
+)
+app.add_typer(export_app, name="export")
 _SERVICE: PipelineService = DEFAULT_PIPELINE_SERVICE
 
 
@@ -84,6 +105,83 @@ def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], 
     ) as exc:
         _echo_error(exc, status=status)
     _emit_outcome(outcome)
+
+
+_EXPORT_SURFACE_EXCEPTIONS = (
+    ExportPartialPublicationError,
+    ExportOperationCancelled,
+    VeriformisError,
+    OSError,
+    RecursionError,
+    UnicodeError,
+    ValueError,
+    TypeError,
+)
+
+
+class _ExportCancellationToken:
+    """Signal-safe state observed only at service-owned checkpoints."""
+
+    def __init__(self) -> None:
+        self._event = threading.Event()
+
+    def request(self, _signum: int, _frame: object) -> None:
+        self._event.set()
+
+    def check(self) -> None:
+        if self._event.is_set():
+            raise ExportOperationCancelled("export operation cancelled")
+
+
+@contextmanager
+def _export_cancellation_check() -> Iterator[Callable[[], None]]:
+    """Translate SIGINT/SIGTERM into cooperative service cancellation."""
+    token = _ExportCancellationToken()
+    installed: dict[int, signal.Handlers] = {}
+    if threading.current_thread() is threading.main_thread():
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            installed[signum] = signal.getsignal(signum)
+            signal.signal(signum, token.request)
+    try:
+        yield token.check
+    finally:
+        for signum, handler in installed.items():
+            signal.signal(signum, handler)
+
+
+def _export_exit_status(payload: dict[str, object]) -> int:
+    status = payload["status"]
+    if status == "ok":
+        return 0
+    if status == "cancelled":
+        return 130
+    if status == "visible_partial":
+        return 1
+    error = payload.get("error")
+    if isinstance(error, dict) and error.get("code") == "export-contract-invalid":
+        return 2
+    return 1
+
+
+def _emit_export_response(payload: dict[str, object], response_json: str) -> None:
+    """Emit exactly one canonical JSON object on stdout."""
+    typer.echo(response_json)
+    status = _export_exit_status(payload)
+    if status != 0:
+        raise typer.Exit(code=status)
+
+
+def _run_export_operation(operation: str, response_builder, call) -> None:
+    try:
+        payload = response_builder(call())
+    except _EXPORT_SURFACE_EXCEPTIONS as exc:
+        payload = export_error_response(operation, exc)
+    try:
+        response_json = export_response_json(payload)
+    except _EXPORT_SURFACE_EXCEPTIONS as exc:
+        payload = export_error_response(operation, exc)
+        response_json = export_response_json(payload)
+    _emit_export_response(payload, response_json)
 
 
 @app.command()
@@ -356,6 +454,109 @@ def preview(
         ),
         extra_exceptions=(re.error,),
     )
+
+
+@export_app.command(name="discover")
+def export_discover() -> None:
+    """Discover executable export profiles from the shared service."""
+
+    def run():
+        outcome = _SERVICE.discover_exports()
+        assert outcome.discovery is not None
+        return outcome.discovery
+
+    _run_export_operation(
+        "discover",
+        export_discovery_response,
+        run,
+    )
+
+
+@export_app.command(name="dry-run")
+def export_dry_run(
+    request_json: str = typer.Option(..., "--request-json"),
+) -> None:
+    """Derive and summarize an export plan without destination access."""
+
+    def run():
+        request = export_request_from_json_bytes(
+            request_json.encode("utf-8"),
+            expected_operation="dry_run",
+        )
+        outcome = _SERVICE.dry_run_export(request)
+        assert outcome.plan is not None
+        return outcome.plan
+
+    _run_export_operation("dry_run", export_dry_run_response, run)
+
+
+@export_app.command(name="inspect")
+def export_inspect(
+    request_json: str = typer.Option(..., "--request-json"),
+) -> None:
+    """Inspect one self-described export tree without asserting source trust."""
+
+    with _export_cancellation_check() as cancellation_check:
+
+        def run():
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="inspect",
+            )
+            outcome = _SERVICE.inspect_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+            assert outcome.inspection is not None
+            return outcome.inspection
+
+        _run_export_operation("inspect", export_inspection_response, run)
+
+
+@export_app.command(name="execute")
+def export_execute(
+    request_json: str = typer.Option(..., "--request-json"),
+) -> None:
+    """Atomically publish one operator-confirmed export plan."""
+
+    with _export_cancellation_check() as cancellation_check:
+
+        def run():
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="execute",
+            )
+            outcome = _SERVICE.execute_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+            assert outcome.publication is not None
+            return outcome.publication
+
+        _run_export_operation("execute", export_execution_response, run)
+
+
+@app.command(name="export-verify")
+def export_verify(
+    request_json: str = typer.Option(..., "--request-json"),
+) -> None:
+    """Source-bind and independently verify one visible export tree."""
+
+    with _export_cancellation_check() as cancellation_check:
+
+        def run():
+            request = export_request_from_json_bytes(
+                request_json.encode("utf-8"),
+                expected_operation="verify",
+            )
+            outcome = _SERVICE.verify_export(
+                request,
+                cancellation_check=cancellation_check,
+            )
+            assert outcome.verified is not None
+            return outcome.verified
+
+        _run_export_operation("verify", export_verify_response, run)
 
 
 @app.command()

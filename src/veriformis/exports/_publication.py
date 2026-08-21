@@ -50,6 +50,8 @@ _FILE_READ_FLAGS = (
     | getattr(os, "O_NOFOLLOW", 0)
     | getattr(os, "O_CLOEXEC", 0)
 )
+_MAX_INSPECTION_RECEIPT_BYTES = 64 * 1024 * 1024
+_MAX_EXPORT_TREE_DEPTH = 128
 _EntryFacts = tuple[int, int, int, int, int, int, int]
 CancellationCheck = Callable[[], None]
 _FileTree = tuple[tuple[str, bytes], ...]
@@ -650,15 +652,40 @@ def _collect_tree(
     portable_paths: dict[str, str] = {}
     file_inodes: dict[tuple[int, int], str] = {}
 
-    def visit(directory_descriptor: int, prefix: str) -> None:
+    def names_for(directory_descriptor: int, prefix: str) -> tuple[str, ...]:
         _check_cancellation(cancellation_check)
         try:
-            names = sorted(os.listdir(directory_descriptor))
+            return tuple(sorted(os.listdir(directory_descriptor)))
         except OSError as exc:
             raise ExportVerificationError(
                 f"cannot enumerate export directory {prefix or '.'}: {exc}"
             ) from exc
-        for name in names:
+
+    # Each frame is descriptor, prefix, sorted names, next index, owns descriptor.
+    # The explicit stack keeps hostile depth out of Python recursion and the
+    # depth cap bounds live descriptors during the anchored walk.
+    stack: list[tuple[int, str, tuple[str, ...], int, bool]] = [
+        (root_descriptor, "", names_for(root_descriptor, ""), 0, False)
+    ]
+    try:
+        while stack:
+            directory_descriptor, prefix, names, index, owned = stack[-1]
+            if index == len(names):
+                stack.pop()
+                if owned:
+                    _safe_close(
+                        directory_descriptor,
+                        label="verified export directory",
+                    )
+                continue
+            name = names[index]
+            stack[-1] = (
+                directory_descriptor,
+                prefix,
+                names,
+                index + 1,
+                owned,
+            )
             _check_cancellation(cancellation_check)
             relative_path = f"{prefix}/{name}" if prefix else name
             _register_path(portable_paths, relative_path)
@@ -677,6 +704,11 @@ def _collect_tree(
                     f"export tree cannot contain symlink {relative_path!r}"
                 )
             if stat.S_ISDIR(status.st_mode):
+                depth = relative_path.count("/") + 1
+                if depth > _MAX_EXPORT_TREE_DEPTH:
+                    raise ExportVerificationError(
+                        "export tree exceeds the maximum directory depth"
+                    )
                 directories[relative_path] = _entry_facts(status)
                 try:
                     child = os.open(
@@ -693,9 +725,11 @@ def _collect_tree(
                         raise ExportVerificationError(
                             f"export directory {relative_path!r} changed while opening"
                         )
-                    visit(child, relative_path)
-                finally:
+                    child_names = names_for(child, relative_path)
+                except BaseException:
                     _safe_close(child, label="verified export directory")
+                    raise
+                stack.append((child, relative_path, child_names, 0, True))
                 continue
             if not stat.S_ISREG(status.st_mode):
                 raise ExportVerificationError(
@@ -713,8 +747,10 @@ def _collect_tree(
                 )
             file_inodes[inode] = relative_path
             files[relative_path] = _entry_facts(status)
-
-    visit(root_descriptor, "")
+    finally:
+        for descriptor, _prefix, _names, _index, owned in reversed(stack):
+            if owned:
+                _safe_close(descriptor, label="verified export directory")
     return files, directories
 
 
@@ -1145,6 +1181,119 @@ def _verify_export_directory(
         return receipt, verification
     finally:
         _safe_close(descriptor, label="verified export root")
+
+
+def _inspect_export_directory(
+    destination_root: str | os.PathLike[str],
+    *,
+    cancellation_check: CancellationCheck | None = None,
+) -> ExportReceipt:
+    """Inspect one self-described physical tree without claiming source trust.
+
+    Inspection strict-loads the canonical embedded receipt and proves that its
+    declared physical file digests, sizes, and closed path set match the
+    descriptor-read directory.  It intentionally does not construct
+    :class:`ExportVerification`: the embedded plan is not its own external
+    authority, and semantic preimages are not replayed here.
+    """
+    if cancellation_check is not None and not callable(cancellation_check):
+        raise ExportContractError("cancellation_check must be callable")
+    _check_cancellation(cancellation_check)
+    try:
+        root = Path(os.path.abspath(os.fspath(destination_root)))
+        before = root.lstat()
+    except (OSError, TypeError, ValueError) as exc:
+        raise ExportVerificationError(
+            f"cannot inspect export directory root: {exc}"
+        ) from exc
+    if stat.S_ISLNK(before.st_mode) or not stat.S_ISDIR(before.st_mode):
+        raise ExportVerificationError(
+            "export directory root must be a real directory, not a symlink"
+        )
+    try:
+        descriptor = os.open(root, _DIRECTORY_FLAGS)
+    except OSError as exc:
+        raise ExportVerificationError(
+            f"cannot open export directory root {root}: {exc}"
+        ) from exc
+    try:
+        try:
+            after = os.fstat(descriptor)
+        except OSError as exc:
+            raise ExportVerificationError(
+                f"cannot inspect opened export directory root: {exc}"
+            ) from exc
+        if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
+            raise ExportVerificationError("export directory root changed while opening")
+
+        files, directories = _collect_tree(
+            descriptor,
+            cancellation_check=cancellation_check,
+        )
+        receipt_facts = files.get(EXPORT_RECEIPT_PATH)
+        if receipt_facts is None:
+            raise ExportVerificationError("export tree is missing export-receipt.json")
+        receipt_size = receipt_facts[3]
+        if receipt_size > _MAX_INSPECTION_RECEIPT_BYTES:
+            raise ExportVerificationError(
+                "export receipt exceeds the public inspection size limit"
+            )
+        _, observed_receipt_size, receipt_bytes = _read_and_hash(
+            descriptor,
+            EXPORT_RECEIPT_PATH,
+            expected_facts=receipt_facts,
+            cancellation_check=cancellation_check,
+            retain_bytes=True,
+            retain_limit=_MAX_INSPECTION_RECEIPT_BYTES,
+        )
+        assert receipt_bytes is not None
+        if observed_receipt_size != receipt_size:
+            raise ExportVerificationError("export receipt changed while reading")
+        receipt = ExportReceipt.from_json_bytes(receipt_bytes)
+
+        expected_files = {item.path for item in receipt.files} | {
+            EXPORT_RECEIPT_PATH
+        }
+        expected_directories = _expected_directories(tuple(expected_files))
+        if set(files) != expected_files:
+            raise ExportVerificationError(
+                "self-described export file set is not closed; "
+                f"missing={sorted(expected_files - set(files))!r}, "
+                f"extra={sorted(set(files) - expected_files)!r}"
+            )
+        if set(directories) != expected_directories:
+            raise ExportVerificationError(
+                "self-described export directory set is not closed; "
+                f"missing={sorted(expected_directories - set(directories))!r}, "
+                f"extra={sorted(set(directories) - expected_directories)!r}"
+            )
+
+        for binding in receipt.files:
+            digest, size, _ = _read_and_hash(
+                descriptor,
+                binding.path,
+                expected_facts=files[binding.path],
+                cancellation_check=cancellation_check,
+            )
+            if digest != binding.sha256 or size != binding.byte_size:
+                raise ExportVerificationError(
+                    "destination bytes differ from the self-described receipt for "
+                    f"{binding.path!r}"
+                )
+
+        final_files, final_directories = _collect_tree(
+            descriptor,
+            cancellation_check=cancellation_check,
+        )
+        if final_files != files or final_directories != directories:
+            raise ExportVerificationError("export tree changed during inspection")
+        if not _path_matches_descriptor(root, descriptor):
+            raise ExportVerificationError(
+                "export directory root changed during inspection"
+            )
+        return receipt
+    finally:
+        _safe_close(descriptor, label="inspected export root")
 
 
 def _rename_no_replace(

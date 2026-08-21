@@ -4,10 +4,10 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
 
-**Next review:** Independent-product Phase 4.7 merge or any program-state,
-evidence-grade, or completion-rule change
+**Next review:** Independent-product Phase 4.8 merge, Phase 4.9 closeout, or any
+program-state, evidence-grade, or completion-rule change
 
 ## Purpose
 

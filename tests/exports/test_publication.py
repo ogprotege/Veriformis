@@ -21,16 +21,14 @@ from veriformis.exports import (
     ExportContainerProfile,
     ExportDependencyBinding,
     ExportFilePlan,
+    ExportPartialPublicationError,
     ExportPlan,
     ExportService,
 )
 from veriformis.exports import _publication as publication_module
 from veriformis.exports import service as service_module
 from veriformis.exports.models import EXPORT_RECEIPT_PATH
-from veriformis.exports._publication import (
-    ExportPartialPublicationError,
-    _verify_export_directory,
-)
+from veriformis.exports._publication import _verify_export_directory
 from veriformis.identity import sha256_digest
 
 FIXTURE = (
@@ -227,13 +225,14 @@ def test_default_service_has_no_shipped_renderer(tmp_path: Path):
     assert not destination.exists()
 
 
-def test_phase_4_6_publication_runtime_stays_private():
+def test_phase_4_8_publication_runtime_is_public_without_publication_hooks():
     import veriformis.exports as exports
 
     assert importlib.util.find_spec("veriformis.exports.publication") is None
+    for name in ("ExportPublicationOutcome", "ExportPartialPublicationError"):
+        assert name in exports.__all__
+        assert hasattr(exports, name)
     for name in (
-        "ExportPublicationOutcome",
-        "ExportPartialPublicationError",
         "publish_exact_export",
         "verify_export_directory",
     ):

@@ -9,15 +9,16 @@ the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
-`handoff-verify`), taxonomy discovery (`taxonomy`), local MCP (`mcp`), and
-`version`. The complete surface is 21 commands.
+`handoff-verify`), taxonomy discovery (`taxonomy`), local MCP (`mcp`), verified
+exports (`export`, `export-verify`), and `version`. The complete root surface is
+23 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-21 (Phase 3 taxonomy discovery)
+**Last reviewed:** 2026-08-21 (Phase 4.8 verified-export surfaces)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -42,6 +43,7 @@ examples below use the installed name.
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
+| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; production discovery is empty |
 | Read-only | `verify`, `preview`, `taxonomy` | Nothing |
 | Meta | `version` | Nothing |
 
@@ -527,6 +529,45 @@ six fixed destinations in private temporary storage, and runs the canonical
 bundle verifier with the caller's external digest. Traversal, links,
 duplicates, extra members, changed bytes, and noncanonical ZIP encodings fail.
 See [Deterministic Bundle Transport v1](contracts/bundle-transport-v1.md).
+
+## Verified-export commands
+
+These commands are thin adapters over the same `PipelineService` operations as
+Python, MCP, and the CLI-backed Mac bridge:
+
+```text
+veriformis export discover
+veriformis export dry-run --request-json JSON
+veriformis export inspect --request-json JSON
+veriformis export execute --request-json JSON
+veriformis export-verify --request-json JSON
+```
+
+`discover` accepts no request and lists only executable implementations from the
+private service catalog. The production catalog is empty in Phase 4.8, so no
+generic container or consumer profile is advertised. Tests inject the bounded
+conformance implementation used for cross-surface evidence.
+
+The other operations accept exactly one canonical
+`veriformis.export-surface-request/v1` object. Dry run verifies the selected
+source and derives a plan without destination access. Execute re-derives that
+plan, requires the operator-confirmed `expected_export_plan_id`, and publishes
+with the only overwrite policy, `refuse`. Inspect accepts only a destination and
+returns `self_described_physical` evidence; it does not assert source authority.
+`export-verify` separately re-verifies the selected source, re-derives the
+confirmed plan, and independently verifies the destination.
+
+Requests are limited to 1 MiB of canonical UTF-8 JSON, and each runtime path is
+limited to 32 KiB of UTF-8. Responses are one canonical
+`veriformis.export-surface-response/v1` object with exactly `error`, `operation`,
+`result`, `schema_version`, and `status`, limited to 1 MiB before framing. The
+CLI writes that object to stdout followed by one LF; diagnostics use stderr.
+Statuses are `ok`, `error`, `cancelled`, or `visible_partial`. Their exit codes
+are respectively 0, generally 1, 130, and 1; malformed request contracts exit
+2. Public export-tree walks refuse directory depth greater than 128. No command
+accepts a caller-built plan, profile, dependency graph, file plan,
+membership projection, renderer, semantic replayer, force, or replacement
+control.
 
 ## Read-only commands
 

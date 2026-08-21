@@ -1,14 +1,14 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 4.7 deterministic evidence reconciled;
-all required local gates passed, with GitHub review pending
+**Status:** Independent-product Phase 4.8 export surfaces reconciled; every
+required local gate passes and GitHub review remains pending
 
 **Review date:** 2026-08-21
 
 **Repository baseline:** Working tree based on
-`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`
 
-**Next review:** Independent-product Phase 4.7 merge, Phase 4.8 start, or the
+**Next review:** Independent-product Phase 4.8 merge, Phase 4.9 closeout, or the
 next active-document behavior change
 
 ## Scope examined
@@ -73,6 +73,7 @@ deprecated document must link its replacement and removal/review trigger.
 | Phase 4 opened while active governance indexes still described it as planned and without a packet | Phase 4 program transition and `phase-04-verified-export-foundation` packet | Reconciled program, WIP, program index, and governance language to Phase 4 in progress; 4.1–4.5 are merged at `1675c1a22830d506bdf27e45150170befc984bdf`, 4.6 implements internal exact-byte publication with green focused and full Python suites, and later/public capabilities remain unclaimed |
 | Active docs still said no derivative writer or destination verifier existed after Phase 4.6 landed locally | `ExportService.publish`, private publication helper, verified-export contract, focused Python suite (150 tests), full Python suite (914 tests) | Reconciled the internal exact-byte publisher and independent closed-tree verifier while preserving the no-renderer, no-public-surface, no-supported-container, and Phase 4.7 semantic/rerender boundaries |
 | Active docs still described Phase 4.6 as pending and Phase 4.7 rerender/semantic replay as absent | PR #48 merge at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`; private two-render service path; 14 determinism, 158 export, 163 combined export/contract, and 927 full Python tests | Reconciled current status, product, architecture, development, governance, program, WIP, and evidence records to Phase 4.7 locally green/PR pending while retaining the trusted-private-hook, whole-file-memory, no-public-surface, no-supported-container, and unchanged-schema limits |
+| Active docs still described Phase 4.7 as local and export surfaces as absent after its merge | PR #49 merge at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`; strict production-empty discovery and Python/CLI/MCP/Mac adapters | Reconciled the merged Phase 4.7 baseline and locally implemented Phase 4.8 surfaces while preserving the no-shipped-implementation, no-supported-container/profile, unchanged-taxonomy, and unchanged-persisted-schema limits |
 
 ## Current health assessment
 
@@ -80,7 +81,7 @@ deprecated document must link its replacement and removal/review trigger.
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
 | Current capability accuracy | Good within audited active scope | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, release boundary, and Mac guide |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–3 packets, and active Phase 4 packet with items 4.1–4.6 merged, 4.7 locally implemented with every required local gate green, and GitHub review plus later items open |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–3 packets, and active Phase 4 packet with items 4.1–4.7 merged, 4.8 locally implemented with every required local gate passing, and GitHub review plus 4.9 open |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -89,22 +90,21 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Open the Phase 4.7 pull request, merge only when every GitHub check is green,
-   synchronize local `main`, and begin Phase 4.8 only afterward.
+1. Open the Phase 4.8 pull request, merge only when every GitHub check is green,
+   synchronize local `main`, and begin Phase 4.9 only afterward.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
    historical subtree; propose moves before execution.
 4. Add pinned offline Mermaid validation only after dependency review.
 
-Phase 4.7 implements only private two-render exact-byte and semantic-content
-conformance plus staged replay. The private hooks are trusted code, not an
-untrusted plugin boundary, and semantic replay retains complete files in memory;
-the fixture is statically bounded. A shipped renderer/replayer, public export
-commands, supported generic export containers, and trainer profiles remain
-outside the current claim. Any future shipped semantic profile must enforce
-explicit resource limits. Phase 4.8, Phase 4.9, and Phase 5 retain their public-
-surface, closeout, and generic-container boundaries respectively.
+Phase 4.8 exposes strict export operations across Python, CLI, MCP, and the
+CLI-backed Mac bridge, but production discovery is empty and the conformance
+implementation remains test-injected private code. A shipped renderer/replayer,
+supported generic export container, and trainer profile remain outside the
+current claim. Any future shipped semantic profile must enforce explicit
+resource limits. Phase 4.9 and Phase 5 retain their closeout and generic-
+container boundaries respectively.
 
 The detailed open list is maintained in
 [Documentation Debt](documentation-debt.md). This report summarizes health; it

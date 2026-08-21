@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
 
-**Next review:** Independent-product Phase 4.7 merge, Phase 4.8 start, or any
+**Next review:** Independent-product Phase 4.8 merge, Phase 4.9 closeout, or any
 active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
