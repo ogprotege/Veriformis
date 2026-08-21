@@ -33,7 +33,7 @@ struct HistoryView: View {
                 Text(entry.status.rawValue)
                 Text("·")
                 Text(entry.objective)
-                if let stage = entry.failedStage {
+                if let stage = entry.failedStageTitle {
                     Text("·")
                     Text(stage)
                 }
@@ -67,7 +67,7 @@ struct HistoryView: View {
                         copyLabel: "transport archive SHA-256"
                     )
                 }
-                if let stage = entry.failedStage {
+                if let stage = entry.failedStageTitle {
                     row(entry.status == .cancelled ? "Interrupted stage" : "Failed stage", stage)
                 }
                 if let code = entry.exitCode {
@@ -80,7 +80,7 @@ struct HistoryView: View {
                     GroupBox("Cancellation receipt") {
                         VStack(alignment: .leading, spacing: 6) {
                             row("Requested", receipt.requestedAt.formatted())
-                            if let stage = receipt.stage { row("Stage", stage) }
+                            if let stage = receipt.stageTitle { row("Stage", stage) }
                             if let pid = receipt.processIdentifier { row("Process ID", String(pid)) }
                             if let status = receipt.terminationStatus { row("Termination", String(status)) }
                             row("Escalated", receipt.terminationEscalated ? "yes" : "no")

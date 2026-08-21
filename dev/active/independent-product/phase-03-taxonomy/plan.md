@@ -12,7 +12,7 @@
 - [x] Mark Phase 3 `in_progress` in the program ledger and WIP table.
 - [x] Record existing objective, row-schema, container, and profile constants in one registry.
 - [x] Pin the already implemented objective/row compatibility rules without changing persisted IDs.
-- [ ] Identify public “format” uses that collapse more than one axis.
+- [x] Identify public “format” uses that collapse more than one axis.
 
 ### 3.2 Define the versioned taxonomy contract
 
@@ -63,7 +63,7 @@
 - [x] Add CLI discovery that names each axis separately.
 - [x] Add MCP resources or tools over the same registry.
 - [x] Add workbench help copy from the same registry.
-- [ ] Remove or rewrite public “format” language that can mean more than one
+- [x] Remove or rewrite public “format” language that can mean more than one
       axis.
 
 ### 3.8 Migration tests and closeout

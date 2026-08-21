@@ -34,6 +34,7 @@ sealed artifacts.
 
 ## Current outcome
 
-Phase 3 is open. The first work item is the versioned taxonomy contract and
-the machine registry that binds current objectives, rows, containers,
-profiles, and loss policies without changing durable identities.
+Phase 3 is open. The versioned contract, machine registry, compile checks,
+cross-surface discovery, and public vocabulary cleanup are implemented without
+changing durable identities. Golden catalog round-trip and existing
+workspace/bundle compatibility proof remain before closeout.

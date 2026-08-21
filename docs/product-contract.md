@@ -33,7 +33,7 @@ heterogeneous raw sources
   -> objective-driven record construction
   -> curation and quality control
   -> leakage-safe balancing and splitting
-  -> target-schema formatting
+  -> target-row-schema lowering
   -> exact-snapshot validation
   -> atomic, provenance-sealed training datasets
 ```
@@ -41,7 +41,7 @@ heterogeneous raw sources
 A cleaned corpus is an internal compiler state. When a recipe selects
 `full_text`, cleaned text supplies the exact target content for constructed
 records. Those records become a finished dataset only after the declared
-curation, split, formatting, validation, and sealing lifecycle. Clean state is
+curation, split, row lowering, validation, and sealing lifecycle. Clean state is
 not a handoff for another product because Veriformis owns that downstream work.
 
 This document establishes the product-level scope. Roadmap Step 1 translated it
@@ -53,7 +53,7 @@ Steps 11 through 16 are governed by
 
 ## Ownership boundary
 
-Veriformis owns the dataset from raw source capture through final seal. Its responsibility includes ingestion, faithful extraction, normalization, cleaning, source-evidence preservation, training-objective selection, deterministic record construction, curation, quality measurement, balancing, leakage-safe splitting, target formatting, validation, and bundle verification.
+Veriformis owns the dataset from raw source capture through final seal. Its responsibility includes ingestion, faithful extraction, normalization, cleaning, source-evidence preservation, training-objective selection, deterministic record construction, curation, quality measurement, balancing, leakage-safe splitting, target-row-schema lowering, validation, and bundle verification.
 
 Downstream training systems begin with a finished Veriformis dataset contract.
 They own training planning, runtime selection, artifact compilation, and
@@ -116,7 +116,7 @@ Optional Group 8 (model-assisted construction) remains owner-gated.
 | Dataset construction and promotion | Build candidates for a declared `TrainingObjective`, apply construction integrity and any required review, then create immutable records | Versioned `DatasetRecipe`, field-level evidence, constructor identity and version, review evidence, promotion decision, deterministic derivation |
 | Dataset curation | Measure, exclude, quarantine, deduplicate, balance, and account for accepted records | `FinishedDatasetPlan`, quality facts, curation reasons and decisions, coverage ledger |
 | Balancing and splitting | Produce authoritative train and evaluation partitions without related-record leakage | Leakage groups, balancing decisions, final membership, assignment digest, realized split statistics |
-| Formatting and compatibility | Lower accepted records into the selected training schema without inventing a task | Row-schema version, masking expectation, preserved metadata, generic row-shape result (currently persisted under the legacy ID `aptus-row-shape`) |
+| Row lowering and compatibility | Lower accepted records into the selected training row schema without inventing a task | Row-schema version, masking expectation, preserved metadata, generic row-shape result (currently persisted under the legacy ID `aptus-row-shape`) |
 | Validation and seal | Validate the exact snapshot, write a closed file set, and make later mutation detectable | Gate versions and results, input and output digests, bundle manifest, co-located attestation, separately retained manifest digest when external binding is required, independent verification result |
 
 ## Training objective, recipe, and record states
@@ -129,7 +129,7 @@ explicitly deferred. Group 3 `FinishedDatasetPlan` binds one exact recipe and
 construction result to executable curation, balancing, split, serialization,
 validation-gate, partition, and bundle-retention policy.
 
-A deterministic `ConstructionPass` emits an append-only `CandidateRecord` with its proposed payload and field-level source evidence. Construction-integrity checks and any required review create an explicit `PromotionDecision`. Promotion creates an immutable `DatasetRecord`. Group 3 then applies deterministic curation and authoritative split assignment before formatting. It derives emitted rows and manifest entries from unchanged accepted records. Rejected, pending-review, excluded, and quarantined values remain auditable.
+A deterministic `ConstructionPass` emits an append-only `CandidateRecord` with its proposed payload and field-level source evidence. Construction-integrity checks and any required review create an explicit `PromotionDecision`. Promotion creates an immutable `DatasetRecord`. Group 3 then applies deterministic curation and authoritative split assignment before lowering to the target row schema. It derives emitted rows and manifest entries from unchanged accepted records. Rejected, pending-review, excluded, and quarantined values remain auditable.
 
 Human review is a recipe or project policy, not a universal prerequisite. A deterministic recipe with no review gate may seal when all declared gates pass. A recipe that requires approval must refuse promotion or seal until approval evidence exists.
 
@@ -158,7 +158,7 @@ The product may describe this as faithful, source-grounded, loss-accounted, or p
 
 The v1 dataset pipeline makes no LLM calls and performs no remote model generation. The implemented deterministic builders create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field candidates when the recipe states a truthful task and every constructed field has evidence. Structured-field construction binds each selected strict-IR scalar to its immutable artifact, RFC 6901 pointer, exact value digest, encoding, output digest, and construction context.
 
-The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, formatting, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
+The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, row-lowering, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 
 ## Trainer-facing semantics and optional Aptus integration
 
@@ -188,7 +188,7 @@ contract and versioned optional trainer profiles.
 
 ## Fail-closed seal
 
-A dataset is not finished because a JSONL file exists. Seal must validate the exact recipe, sources, edit plans, candidates, accepted records, split assignment, formatted rows, and file set that it publishes. Missing evidence, stale validation, empty required output, path escape, unexpected files outside policy, digest mismatch, or post-validation mutation must prevent sealing or make verification fail.
+A dataset is not finished because a JSONL file exists. Seal must validate the exact recipe, sources, edit plans, candidates, accepted records, split assignment, emitted product rows, and file set that it publishes. Missing evidence, stale validation, empty required output, path escape, unexpected files outside policy, digest mismatch, or post-validation mutation must prevent sealing or make verification fail.
 
 The implemented `minimal-v1` seal contains exactly train and evaluation JSONL,
 one aligned provenance stream, the validation report, the manifest, and the

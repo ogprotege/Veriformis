@@ -83,3 +83,24 @@ Phase 3 closeout remain open.
 
 The ambiguous public “format” inventory and rewrite, migration fixtures,
 backward-compatibility proof, and final Phase 3 closeout remain open.
+
+## Observed public-vocabulary results — 2026-08-21
+
+| Gate | Result | Grade / limitation |
+| --- | --- | --- |
+| Public docs inventory | PASS | Active product, CLI, install, status, roadmap, tracking, and Mac copy classified; historical records and deliberate warnings retained |
+| Axis-specific product copy | PASS | Objective, semantic row, physical container, consumer profile, input type, and row lowering are named separately |
+| Workbench stage presentation | PASS | Persisted `format` renders as `Lower rows` in pipeline, failure, cancellation, and history UI |
+| Persisted/raw compatibility | PASS | Enum raw value, CLI argv, workspace stages, logs, Codable fields, bundle schemas, legacy keywords, and migrations unchanged |
+| Unknown stage compatibility | PASS | Presentation resolver preserves an unknown persisted raw stage string verbatim |
+| Lock / Ruff | PASS | Lockfile current; Python lint clean |
+| Focused taxonomy/tracking | 13 passed | Contract and governed tracking synchronization |
+| Full Python suite | 761 passed | One expected transport durability `RuntimeWarning` |
+| Full macOS XCTest | 38 passed | Raw-ID, exact argv, display alias, error, cancellation, history, and unknown-stage coverage |
+| Clean-wheel / installed CLI / golden compile | PASS | Standalone full-text and continuation compiles succeeded from the installed wheel |
+| Golden `full_text` unchanged | PASS | Manifest `2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733`; archive `d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980` |
+| Golden `continuation` unchanged | PASS | Manifest `58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b`; archive `d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b` |
+| Project tracking / diff | PASS | 21 roadmap phases agree; `git diff --check` clean |
+
+Taxonomy catalog round-trip, existing workspace/bundle backward-compatibility
+proof, support/evidence reconciliation, and final Phase 3 closeout remain open.

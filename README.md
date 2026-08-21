@@ -178,7 +178,7 @@ uv run veriformis construct build/workspace \
 ```
 
 The later commands infer the row schema from the bound recipe and plan. They do
-not accept a second format label that could contradict it. Only
+not accept a second row-schema selector that could contradict it. Only
 `instruction_output` requires `curate --instruction TEXT`.
 
 ## Finished bundle

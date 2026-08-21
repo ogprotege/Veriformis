@@ -168,8 +168,9 @@ veriformis package-verify /tmp/out.vfbundle.zip \
 
 Optional Aptus adapter use is explicit: pass `--aptus-handoff` to `seal`, or
 run `handoff` after retaining the manifest digest. The adapter's current policy
-accepts supervised row schemas such as `continuation` and rejects plain
-`full_text` rows; this does not constrain standalone Veriformis output.
+accepts the supervised row schemas `prompt_completion`, `instruction_output`,
+and `messages`, and rejects the `text` row schema required by the `full_text`
+objective; this does not constrain standalone Veriformis output.
 
 ---
 
