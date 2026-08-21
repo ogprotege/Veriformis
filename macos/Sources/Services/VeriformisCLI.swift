@@ -217,6 +217,9 @@ struct VeriformisCLI: Sendable {
         parseArgs.append(contentsOf: ["-o", workspace.path, "--source-root", sourceRoot.path])
 
         var constructArgs = ["construct", workspace.path, "--objective", objective.rawValue]
+        if includeHandoff {
+            constructArgs.append(contentsOf: ["--consumer-profile", "aptus-handoff-v1"])
+        }
         if objective == .continuation {
             constructArgs.append(contentsOf: ["--split-ratio-ppm", String(splitRatioPPM)])
         }

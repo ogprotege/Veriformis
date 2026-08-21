@@ -2,7 +2,7 @@
 
 **Status:** In progress
 
-**Last updated:** 2026-08-20
+**Last updated:** 2026-08-21
 
 ## Checklist
 
@@ -53,7 +53,7 @@
 ### 3.6 Add the compatibility matrix and fail-closed checks
 
 - [x] Encode valid objective/row/profile combinations in the registry.
-- [ ] Fail unknown or impossible combinations before compile on every surface.
+- [x] Fail unknown or impossible combinations before compile on every surface.
 - [x] Keep Aptus `text` refusal as an optional profile constraint, not a core
       product ban.
 

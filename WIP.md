@@ -129,7 +129,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Current names reviewed; UI aliases recorded separately from persisted IDs.
 - [x] Current and future-only families declared without false implementation claims.
 - [x] Loss/masking described for every implemented semantic row.
-- [ ] Compatibility checks wired to fail before compile on every surface.
+- [x] Compatibility checks wired to fail before compile on every surface.
 - [ ] One registry exposed through PipelineService, CLI, MCP, and workbench help.
 - [ ] Public “format” language inventory and rewrite; closeout.
 

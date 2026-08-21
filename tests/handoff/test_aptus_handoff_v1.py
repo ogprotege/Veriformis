@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 
 from veriformis.cli import app
 from veriformis.handoff import (
+    AptusHandoffError,
     build_aptus_handoff,
     consume_aptus_handoff,
     handoff_path_for_bundle,
@@ -57,6 +58,33 @@ def test_build_and_consume_aptus_handoff_accepts_supervised_bundle(tmp_path):
     assert report.verified_grade == "external_digest"
     assert report.assignment_digest == handoff.assignment_digest
     assert not report.findings
+
+
+def test_handoff_builder_refuses_profile_incompatible_text_bundle(tmp_path):
+    source = tmp_path / "source.txt"
+    source.write_text("Canonical full-text training source.", encoding="utf-8")
+    workspace = tmp_path / "workspace"
+    bundle = tmp_path / "text.vfbundle"
+    service = PipelineService()
+    service.parse([source], workspace, source_root=tmp_path)
+    service.clean(workspace)
+    service.chunk(workspace)
+    service.construct(workspace, objective="full_text")
+    service.curate(workspace, evaluation_required=False)
+    service.split(workspace)
+    service.format(workspace)
+    assert service.validate(workspace).exit_status == 0
+    sealed = service.seal(workspace, bundle)
+    assert sealed.publication is not None
+
+    with pytest.raises(
+        AptusHandoffError,
+        match="aptus-handoff-v1.*does not accept row schema 'text'",
+    ):
+        build_aptus_handoff(
+            bundle,
+            expected_manifest_sha256=sealed.publication.manifest_sha256,
+        )
 
 
 def test_handoff_detects_partition_tamper(tmp_path):

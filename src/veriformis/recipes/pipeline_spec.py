@@ -49,6 +49,7 @@ _STAGE_CONFIG_KEYS: dict[str, frozenset[str]] = {
             "target_row_schema",
             "split_ratio_ppm",
             "require_review",
+            "consumer_profile",
         }
     ),
     "curate": frozenset(

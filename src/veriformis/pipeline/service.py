@@ -53,12 +53,10 @@ from veriformis.construction import (
 )
 from veriformis.contracts import (
     CURATION_STAGE_SCHEMA_ID,
-    DETERMINISTIC_V1_OBJECTIVE_KINDS,
     FORMAT_STAGE_SCHEMA_ID,
     SEAL_STAGE_SCHEMA_ID,
     SPLIT_STAGE_SCHEMA_ID,
     VALIDATION_STAGE_SCHEMA_ID,
-    V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.datasets import (
     CurationPolicy,
@@ -87,6 +85,7 @@ from veriformis.errors import (
     ConstructionError,
     InvalidSourceLocatorError,
     ParseError,
+    TaxonomyError,
     UnsupportedWorkspaceVersionError,
 )
 from veriformis.diagnostics import (
@@ -134,6 +133,11 @@ from veriformis.rules.derivations import (
 )
 from veriformis.rules.library import rules_from_clean_config, select_rules
 from veriformis.sources import ParseResult, SourceRef
+from veriformis.taxonomy import (
+    CANONICAL_CONSUMER_PROFILE,
+    assert_compile_combination,
+    default_row_schema,
+)
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
     WORKSPACE_REVISION_SCHEMA_VERSION,
@@ -1335,29 +1339,22 @@ class PipelineService:
         target_row_schema: str | None = None,
         split_ratio_ppm: int = 500_000,
         require_review: bool = False,
+        consumer_profile: str = CANONICAL_CONSUMER_PROFILE,
     ) -> ConstructOutcome:
         """Construct evidence-bearing candidates and immutable accepted records."""
-        if objective not in DETERMINISTIC_V1_OBJECTIVE_KINDS:
-            raise ConstructionError(
-                f"unsupported deterministic objective {objective!r}; "
-                f"expected one of {sorted(DETERMINISTIC_V1_OBJECTIVE_KINDS)!r}"
+        try:
+            row_schema = (
+                default_row_schema(objective)
+                if target_row_schema is None
+                else target_row_schema
             )
-        row_schema = target_row_schema or (
-            "text" if objective == "full_text" else "prompt_completion"
-        )
-        if row_schema not in V1_ROW_SCHEMA_KINDS:
-            raise ConstructionError(
-                f"unsupported target row schema {row_schema!r}; "
-                f"expected one of {sorted(V1_ROW_SCHEMA_KINDS)!r}"
+            assert_compile_combination(
+                objective,
+                row_schema,
+                profile=consumer_profile,
             )
-        if objective == "full_text" and row_schema != "text":
-            raise ConstructionError(
-                "full_text recipes require the product 'text' row schema"
-            )
-        if objective != "full_text" and row_schema == "text":
-            raise ConstructionError(
-                f"objective {objective!r} requires a supervised row schema"
-            )
+        except TaxonomyError as exc:
+            raise ConstructionError(exc.message) from exc
         if not 1 <= split_ratio_ppm <= 999_999:
             raise ConstructionError("split ratio must be from 1 to 999999 ppm")
 

@@ -95,6 +95,32 @@ def test_construct_cli_commits_real_full_text_result_and_repeats_as_noop(tmp_pat
     assert workspace.head().revision_id == constructed.revision_id
 
 
+def test_construct_cli_refuses_incompatible_consumer_profile_before_commit(tmp_path):
+    root, workspace = _workspace_with_sources(
+        tmp_path,
+        [("source.txt", "Full-text source that Aptus MLX must reject.")],
+    )
+    before = workspace.head().revision_id
+
+    result = runner.invoke(
+        app,
+        [
+            "construct",
+            str(root),
+            "--objective",
+            "full_text",
+            "--consumer-profile",
+            "aptus-handoff-v1",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "error[construction-invalid]" in result.output
+    assert "does not accept row schema 'text'" in result.output
+    assert workspace.head().revision_id == before
+    assert workspace.head().stages["construct"].status == "absent"
+
+
 def test_construct_cli_selects_exact_source_subset(tmp_path):
     root, workspace = _workspace_with_sources(
         tmp_path,

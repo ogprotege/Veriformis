@@ -42,3 +42,22 @@ Exact results are appended only after observation.
 
 Surface discovery, compile-path wiring, and the public “format” inventory are
 not claimed by this observation.
+
+## Observed compile-compatibility results — 2026-08-21
+
+| Gate | Result | Grade / limitation |
+| --- | --- | --- |
+| Shared compile validator | PASS | Service, CLI, MCP, YAML, named recipes, and workbench compile plan covered |
+| Pre-compile refusal | PASS | Invalid objective/row/profile combinations do not open or advance a workspace |
+| Aptus profile boundary | PASS | `text` refused at compile selection and descriptor construction; canonical `text` remains supported |
+| Persisted construction error code | PASS | Public construction surfaces retain `construction-invalid` |
+| Focused Python tests | 55 passed | Taxonomy, service, CLI, recipe/YAML, MCP, model replay, and handoff |
+| Full Python suite | 758 passed | One expected durability-warning test warning |
+| macOS XCTest | 29 passed | Workbench standalone and Aptus compile plans covered |
+| Clean-wheel install smoke | PASS | Installed wheel repeated standalone full-text and continuation golden compiles |
+| Golden `full_text` | PASS | Manifest `2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733`; archive `d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980` |
+| Golden `continuation` | PASS | Manifest `58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b`; archive `d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b` |
+| Ruff / diff | PASS | All checks passed; `git diff --check` clean |
+
+Discovery parity, public vocabulary cleanup, migration fixtures, and final
+Phase 3 closeout remain open.
