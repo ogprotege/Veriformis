@@ -11,11 +11,12 @@ independent-product Phase 3 completed with taxonomy discovery, public
 vocabulary cleanup, and persisted-v1 compatibility proof;
 independent-product Phase 4 verified export foundation in progress with its
 typed internal service boundary, descriptor-anchored source view, and strict
-versioned persisted export models
+versioned persisted export models, plus trusted-by-default source admission
+with explicit lower-trust policy
 
-**Review date:** 2026-08-21 (independent-product Phase 4.2 model contract)
+**Review date:** 2026-08-21 (independent-product Phase 4.3 source trust)
 
-**Next review:** Phase 4 source-trust enforcement; beta label cut, public-ready
+**Next review:** Phase 4 source/output binding; beta label cut, public-ready
 checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -128,8 +129,11 @@ descriptor-anchored verified source view that returns the already checked
 manifest, validation report, row set, and verification result from one pass.
 Its second slice defines strict v1 plan, profile, dependency, membership,
 file-binding, receipt, and verification models with canonical identity replay.
-Plan construction, publication, public export commands, generic export
-containers, and planned trainer-specific profiles remain unimplemented.
+Its third slice makes export-source admission require a retained manifest
+digest by default and permits self-consistent trust only through an explicit
+lower-trust policy. Plan construction, publication, public export commands,
+generic export containers, and planned trainer-specific profiles remain
+unimplemented.
 
 ## Implemented interfaces
 
@@ -471,7 +475,7 @@ See [docs/release.md](release.md).
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
-| Independent Phase 4 in progress | Typed internal `ExportService`, descriptor-anchored source inspection, and strict verified-export v1 models; no plan builder, writer, public export command, or production container yet |
+| Independent Phase 4 in progress | Typed internal `ExportService`, descriptor-anchored source inspection, strict verified-export v1 models, and fail-closed source-trust admission; no plan builder, writer, public export command, or production container yet |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation in progress and later phases planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -532,8 +536,8 @@ records the contract, compile compatibility, cross-surface discovery, public
 vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
 export foundation is in progress under its
 [active packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
-The opening service/source-view and model slices do not yet implement export
-plan construction, publication, commands, or a production export container. Generic
+The opening service/source-view, model, and source-trust slices do not yet
+implement export plan construction, publication, commands, or a production export container. Generic
 export containers and any new trainer-specific profiles are not current
 capabilities; the canonical and optional Aptus profiles remain the implemented
 profile set. A deliberate beta label and public Mac checklist remain separate

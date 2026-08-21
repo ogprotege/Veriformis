@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -106,7 +106,10 @@ Python composition. Its `verified_source` method calls
 `VerifiedFinishedBundle` containing the manifest, validation report,
 reconstructed row set, and existing verification result from the same
 descriptor-anchored pass. The ordinary `verify_finished_bundle` return type is
-unchanged.
+unchanged. Export-source admission defaults to `require_external_digest`; a
+caller must explicitly request `allow_self_consistent` to proceed without a
+retained expected digest. Any supplied digest remains authoritative and a
+mismatch never downgrades to self-consistent trust.
 
 There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
 in these opening increments. Strict v1 plan, profile, membership, binding,

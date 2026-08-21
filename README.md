@@ -238,8 +238,10 @@ Phase 4 verified export foundation is in progress. Its opening slice adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
 versioned export plan, profile, membership, file-binding, receipt, and
-verification models. It does not yet add a plan builder, export writer, public
-export commands, generic export containers, or trainer-specific profiles.
+verification models. Its third slice enforces trusted-by-default export-source
+admission and explicit lower self-consistent trust. It does not yet add a plan
+builder, export writer, public export commands, generic export containers, or
+trainer-specific profiles.
 Maturity remains development **alpha** (not a
 public beta label). A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims

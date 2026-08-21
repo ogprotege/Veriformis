@@ -233,7 +233,7 @@ def test_verified_export_persisted_field_graph_is_exact() -> None:
     }
 
 
-def test_normative_contract_names_every_schema_identity_and_phase2_boundary() -> None:
+def test_normative_contract_names_every_schema_identity_and_current_boundary() -> None:
     contract = CONTRACT_PATH.read_text(encoding="utf-8")
 
     assert f"**Contract ID:** `{VERIFIED_EXPORT_CONTRACT_ID}`" in contract
@@ -255,6 +255,10 @@ def test_normative_contract_names_every_schema_identity_and_phase2_boundary() ->
         assert f"`{identity_kind}`" in contract
 
     assert "The Phase 4.2 implementation is models only." in contract
+    assert "default `source_trust_policy` is exactly" in contract
+    assert "absence fails before the source" in contract
+    assert "fails without retry, downgrade, trimming, or coercion" in contract
+    assert "records the observed grade, not the requested policy" in contract
     assert "does not implement an export writer" in contract
     assert "is not a supported product container" in contract
     assert "MUST NOT add a generic export container" in contract

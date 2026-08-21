@@ -17,3 +17,4 @@
 | Receipt identity excludes its own bytes and binds every other planned destination file | Accepted | Avoid self-hashing while preserving a closed derivative tree |
 | Every plan binds at least one exact dependency | Accepted | Empty cannot distinguish dependency-free rendering from omitted evidence |
 | Exact-byte and semantic-content-only claims are distinct closed literals | Accepted | Dependency-sensitive renderings cannot overclaim portable bytes |
+| Export-source admission defaults to `require_external_digest`; `allow_self_consistent` must be explicit, and supplied evidence never falls back | Accepted | Phase 4.3 source-trust contract and fail-closed service tests |

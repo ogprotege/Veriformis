@@ -12,6 +12,8 @@ from veriformis.exports.models import (
     ExportPlan,
     ExportReceipt,
     ExportVerification,
+    SourceTrustGrade,
+    SourceTrustPolicy,
 )
 from veriformis.exports.service import DEFAULT_EXPORT_SERVICE, ExportService
 
@@ -29,4 +31,6 @@ __all__ = [
     "ExportReceipt",
     "ExportService",
     "ExportVerification",
+    "SourceTrustGrade",
+    "SourceTrustPolicy",
 ]

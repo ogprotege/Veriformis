@@ -62,7 +62,7 @@
       "packet": "dev/active/independent-product/phase-04-verified-export-foundation",
       "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Complete and merge Phase 4.2 strict versioned export models with green gates; then begin Phase 4.3 source-trust enforcement."
+      "next_gate": "Complete and merge Phase 4.3 source-trust enforcement with green gates; synchronize local main, then begin Phase 4.4 source/output binding."
     },
     {
       "number": 5,

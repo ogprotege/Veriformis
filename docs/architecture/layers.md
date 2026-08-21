@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
 
 **Next review:** Any layering or architecture change
 
@@ -189,7 +189,9 @@ load–run–commit ceremony, and injects/owns `exports.ExportService`. The expo
 service depends downward on the bundle verifier and returns an immutable
 `VerifiedFinishedBundle` reconstructed by that verifier. Strict Phase 4.2
 export models depend downward on bundle verification evidence, identity, and
-taxonomy semantics; neither service nor models enter the workspace stage graph.
+taxonomy semantics. Phase 4.3 keeps source-trust admission inside that service,
+requiring retained external evidence by default without entering the workspace
+stage graph.
 No plan builder, derivative writer, public export command, or generic container
 belongs to this layer yet.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,

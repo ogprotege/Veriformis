@@ -33,10 +33,10 @@ branch is created.
 
 ### 4.3 Enforce source trust
 
-- [ ] Require a retained expected manifest digest for a trusted export.
-- [ ] Permit self-consistent input only through an explicit lower-trust policy.
-- [ ] Record the exact source trust grade; never silently upgrade it.
-- [ ] Refuse absent or mismatched trust evidence before any destination write.
+- [x] Require a retained expected manifest digest for a trusted export.
+- [x] Permit self-consistent input only through an explicit lower-trust policy.
+- [x] Record the exact source trust grade; never silently upgrade it.
+- [x] Refuse absent or mismatched trust evidence before any destination write.
 
 ### 4.4 Bind complete source and output evidence
 

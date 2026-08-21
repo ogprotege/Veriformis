@@ -11,9 +11,10 @@ automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
 implemented taxonomy contract and discovery surfaces. Phase 4 verified export
 foundation is in progress. Its opening slice introduces the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
-view. Strict verified-export v1 models are implemented; plan construction,
-writers, public export commands, generic export containers, and planned
-trainer-specific profiles are not implemented. Do not claim public
+view. Strict verified-export v1 models and trusted-by-default source admission
+with explicit lower trust are implemented. Plan construction, writers, public
+export commands, generic export containers, and planned trainer-specific
+profiles are not implemented. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

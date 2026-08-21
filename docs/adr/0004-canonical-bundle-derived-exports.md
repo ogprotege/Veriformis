@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.2 model contract remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 4.3 source trust remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -52,7 +52,8 @@ The Phase 4 opening composes a typed export service beneath `PipelineService`
 and captures source semantics in the finished-bundle verifier's existing
 descriptor-anchored pass. It does not add an export writer, mutate the bundle,
 or establish a second compiler stage. Phase 4.2 adds the exact persisted export
-models while retaining that boundary; source admission, planning, writing, and
+models while retaining that boundary. Phase 4.3 adds trusted-by-default,
+read-only source admission with explicit lower trust; planning, writing, and
 independent derivative verification remain later increments.
 
 ## Review triggers
