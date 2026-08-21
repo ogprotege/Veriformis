@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.2 model contract)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.3 source trust)
 
-**Next review:** Independent-product Phase 4.2 state transition, any later phase
+**Next review:** Independent-product Phase 4.3 state transition, any later phase
 closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability

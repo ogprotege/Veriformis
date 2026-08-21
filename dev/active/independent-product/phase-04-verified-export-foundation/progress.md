@@ -73,3 +73,49 @@ found no remaining Phase 4.2 blocker.
 
 **Next action:** Open the Phase 4.2 PR, require all GitHub checks to pass,
 merge, and synchronize clean local `main` before Phase 4.3 begins.
+
+## 2026-08-21 — Phase 4.2 merged and synchronized
+
+**Status:** Complete
+
+PR #44 passed all 14 GitHub checks and was squash-merged as
+`8d9ab90448b70b7d6673dd187754156c450fde7a`. Local `main` was clean and
+exactly equal to `origin/main` before the Phase 4.3 branch was created.
+
+## 2026-08-21 — Phase 4.3 source-trust enforcement started
+
+**Status:** In progress
+
+Export-source admission now defaults to `require_external_digest`; a retained
+expected manifest SHA-256 is required before source inspection. The existing
+lower trust grade is admitted only through explicit `allow_self_consistent`.
+Any supplied digest remains authoritative, and the service rejects mismatched
+or impossible observed evidence without retrying or relabeling it. This
+increment remains read-only and adds no plan builder, destination writer,
+surface method, generic container, or trainer profile.
+
+**Next action:** Complete focused, full, release, parity, tracking, Mac, Ruff,
+diff, and independent review gates before opening the Phase 4.3 PR.
+
+## 2026-08-21 — Phase 4.3 local implementation complete
+
+**Status:** Ready for pull-request review
+
+The export service now makes externally anchored trust the secure default,
+requires explicit policy for self-consistent admission, preserves every
+supplied digest as authoritative evidence, and rejects impossible observed
+grades or digests. Validation occurs before source-path resolution, one
+descriptor-anchored inspector pass performs all bundle reads, and failure
+tests prove source bytes remain unchanged. No writer or destination operation
+exists in this increment.
+
+Focused service/model/contract tests passed 83 tests. The full Python suite
+passed 847 tests; the standalone release gate passed 835 with 1 deselected;
+both emitted only the expected transport durability warning. Clean wheel,
+both objective goldens, deterministic transport, 38 XCTest tests, parity,
+tracking, Ruff, and diff checks passed. Independent adversarial review found
+the pre-path digest-ordering defect, confirmed its correction under both trust
+policies, and found no remaining implementation blocker.
+
+**Next action:** Open the Phase 4.3 PR, require every GitHub check to pass,
+merge, and synchronize clean local `main` before Phase 4.4 begins.

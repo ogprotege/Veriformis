@@ -15,9 +15,9 @@ and beta-prep landed; private beta workbench Phases 0–2 and independent-produc
 Phases 0–3 on `main`; Phase 4 in progress; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.2 model contract)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.3 source trust)
 
-**Next review:** Phase 4 source-trust enforcement; beta label cut, public-ready
+**Next review:** Phase 4 source/output binding; beta label cut, public-ready
 checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -121,7 +121,9 @@ opening implementation adds a typed internal service boundary and a
 descriptor-anchored view of an independently verified finished bundle without
 changing existing persisted meanings. Its second increment adds strict
 verified-export v1 plan, profile, membership, binding, receipt, and verification
-models. Plan construction, publication, public export commands, generic export
+models. The third increment enforces trusted-by-default source admission and an
+explicit lower-trust policy without changing ordinary bundle verification.
+Plan construction, publication, public export commands, generic export
 containers, and new trainer profiles remain unimplemented.
 
 ## End-to-end compiler contract

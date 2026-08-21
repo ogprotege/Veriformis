@@ -1,6 +1,6 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phase 4.1 merged; Phase 4.2 local gates passed
+**Evidence status:** In progress — Phases 4.1–4.2 merged; Phase 4.3 local gates passed
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -18,7 +18,7 @@
 ## Required final evidence
 
 - [x] Strict export contract models and canonical identity replay.
-- [ ] Explicit trusted and lower-trust source policy.
+- [x] Explicit trusted and lower-trust source policy.
 - [ ] Complete source, split, row, profile, dependency, and destination bindings.
 - [ ] No-membership-change proof.
 - [ ] Atomic, path-safe, cancelable, no-replace publication.
@@ -70,6 +70,35 @@ or a trainer profile.
   after source-verification, dependency, path, Unicode, zero-byte, and digest-
   preimage closure fixes.
 
-GitHub evidence remains pending. This increment does not implement source
+PR #44 passed all 14 GitHub checks and merged as `8d9ab904`. This increment did not implement source
 admission, plan population, writing, commands, a production container, or a
 trainer profile.
+
+## 2026-08-21 — Phase 4.3 source-trust enforcement
+
+- Export admission defaults to `require_external_digest` and refuses a missing
+  retained expected manifest SHA-256 before resolving the source path.
+- `allow_self_consistent` must be selected explicitly. With no digest it
+  records `self_consistent`; with matching evidence it records
+  `external_digest` rather than forcing a downgrade.
+- Malformed, mismatched, and tampered evidence fails without retry or fallback
+  under both policies. Impossible inspector grade or digest drift fails under
+  the verified-export error envelope instead of being relabeled.
+- Adversarial path-like probes prove malformed evidence is rejected before
+  `__fspath__`; mismatch and tamper regressions prove source bytes remain
+  unchanged. This increment has no destination or writer surface.
+- Focused export-service, model, and contract suite: 83 passed.
+- Full Python suite: 847 passed with the expected exercised transport
+  durability-warning regression warning.
+- Exact standalone release gate: 835 passed, 1 deselected, the same expected
+  warning; clean-wheel install, both objective goldens, external-digest checks,
+  and deterministic transports passed with retained digests unchanged.
+- Ruff, project tracking, CLI/workbench parity, and `git diff --check` passed.
+- macOS XCTest: 38 passed.
+- Independent adversarial review found and the implementation corrected
+  digest-validation-before-path ordering and one overbroad dependency claim;
+  focused tests and release/full gates were rerun after the code fix.
+
+This evidence proves only source-trust admission. It does not claim plan
+population, destination binding, writing, public commands, a production
+container, or a trainer profile.

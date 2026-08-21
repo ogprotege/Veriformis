@@ -9,13 +9,15 @@
 **Roadmap scope:** Independent-product Phase 4
 
 **Implementation status:** Phase 4.2 implements the strict persisted models in
-this contract. It does not implement an export writer, publisher, independent
+this contract, and Phase 4.3 implements fail-closed read-only source-trust
+admission. It does not implement an export writer, publisher, independent
 export verifier, CLI or MCP export commands, workbench export controls, or a
-supported product export container.
+supported product export container. Plan population also remains deferred.
 
-**Last reviewed:** 2026-08-21 (Phase 4.2 contract definition)
+**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust admission)
 
-**Next review:** Phase 4.3 source-trust enforcement or any export schema change
+**Next review:** Phase 4.4 complete source/output binding or any export schema
+change
 
 ## Purpose
 
@@ -29,6 +31,8 @@ The Phase 4.2 implementation is models only. It establishes exact plans,
 profiles, dependency bindings, file expectations, membership projections,
 receipts, and successful-verification evidence so later Phase 4 increments can
 implement one shared service without inventing incompatible persistence.
+Phase 4.3 adds only the read-only source admission policy described below; it
+does not populate a plan or create derivative files.
 
 ## Normative language
 
@@ -129,11 +133,14 @@ Public byte loaders MUST reject:
 `from_json_bytes()` MUST accept only the one canonical representation and MUST
 report malformed persisted evidence as `export-verification-invalid`.
 Strict constructors reject invalid in-memory values with validation failure.
-`export-contract-invalid` is currently the typed envelope for canonical
-serialization failure; later service operations reserve the same code for
-their contract boundary.
+`export-contract-invalid` is the typed envelope for canonical serialization
+failure and for an invalid or unsatisfied source-trust policy.
+`export-verification-invalid` covers an impossible mismatch between the
+inspector result and the evidence supplied to the export service. Malformed,
+mismatched, or tampered bundle evidence preserves the existing
+`bundle-invalid` envelope; the service never retries without supplied evidence.
 
-The closed Phase 4.2 error-code registry is exactly:
+The closed verified-export v1 error-code registry is exactly:
 
 - `export-contract-invalid`; and
 - `export-verification-invalid`.
@@ -280,6 +287,32 @@ The projection models the complete derivative-only boundary. Phase 4.2 makes
 that boundary representable and identity-checked; Phase 4.5 will reconstruct it
 from source and destination content and reject every membership mutation.
 
+## Source-trust admission
+
+`ExportService.verified_source` is the only implemented export-source
+admission operation. Its default `source_trust_policy` is exactly
+`require_external_digest`. Under that policy, the caller MUST supply the
+separately retained expected manifest SHA-256; absence fails before the source
+path is resolved or inspected.
+
+Self-consistent admission requires the caller to select exactly
+`allow_self_consistent`. With no expected digest, successful inspection records
+the exact `self_consistent` grade in the returned `VerifiedFinishedBundle`.
+Supplying an expected digest under either policy keeps that evidence
+authoritative: a match records `external_digest`, while malformed or mismatched
+evidence fails without retry, downgrade, trimming, or coercion.
+
+The returned grade MUST correspond exactly to whether external evidence was
+supplied. When a digest was supplied, the returned manifest digest MUST equal
+it. Any impossible inspector result that violates either postcondition fails
+as `export-verification-invalid`; the service never relabels the result.
+
+The verified source records the observed grade, not the requested policy.
+Phase 4.4 plan population will persist both the caller's exact policy and the
+observed grade in `ExportPlan`. Ordinary bundle inspection and verification
+remain capable of explicitly graded self-consistent operation; the secure
+default here applies only to export-source admission.
+
 ## `ExportPlan`
 
 An export plan contains exactly:
@@ -315,8 +348,8 @@ unrelated but well-formed verification ID fails closed.
 `source_trust_policy` is exactly `require_external_digest` or
 `allow_self_consistent`; `source_trust_grade` is exactly `external_digest` or
 `self_consistent`. A plan requiring an external digest MUST already name an
-`external_digest` verification grade. The service-level rule that lower trust
-must be intentionally requested before planning remains Phase 4.3 work.
+`external_digest` verification grade. The service-level admission rule requires
+lower trust to be intentionally requested before Phase 4.4 plan population.
 
 The membership-bearing file layout is closed: it is either one `all` file, or
 exactly one `train` file plus one `evaluation` file. Each planned record count
@@ -361,7 +394,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2 implementation boundary
+## Phase 4.2–4.3 implementation boundary
 
 Phase 4.2 implements:
 
@@ -374,10 +407,17 @@ Phase 4.2 implements:
 - malformed, unsupported-version, duplicate-key, float, Unicode, identity,
   ordering, and canonical round-trip contract tests.
 
-Phase 4.2 does **not** implement:
+Phase 4.3 additionally implements:
+
+- trusted-by-default export-source admission in `ExportService`;
+- an explicit `allow_self_consistent` lower-trust policy;
+- exact observed trust-grade and retained-digest postcondition checks; and
+- fail-closed missing, malformed, mismatched, tampered, and impossible trust
+  evidence tests before any destination operation exists.
+
+Phase 4.2–4.3 do **not** implement:
 
 - selecting or registering an export implementation;
-- source-trust admission policy in `ExportService` (Phase 4.3);
 - verified-source-to-plan population and complete runtime binding checks
   (Phase 4.4);
 - destination membership reconstruction (Phase 4.5);
@@ -392,7 +432,7 @@ Phase 4.2 does **not** implement:
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2 MUST NOT add a generic export container or
+not support claims. Phase 4.2–4.3 MUST NOT add a generic export container or
 consumer profile to taxonomy discovery or the support registry. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;

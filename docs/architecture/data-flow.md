@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -187,8 +187,11 @@ preserving its distinct verification-error envelope.
 to that semantic state, and `PipelineService` injects and owns the export
 service. Phase 4.2 adds strict persisted models for the later plan, profile,
 membership projection, file evidence, receipt, and verification graph. These
-models publish no derivative bytes: planning from a source, writing, public
-commands, and generic containers remain absent. The verified source object therefore closes the
+models publish no derivative bytes. Phase 4.3 makes this export-source entry
+trusted by default: a retained expected manifest digest is required unless the
+caller explicitly selects lower self-consistent trust, and supplied evidence
+never falls back on mismatch. Planning from a source, writing, public commands,
+and generic containers remain absent. The verified source object therefore closes the
 verify-then-read gap for later derivative work without changing the canonical
 six-file bundle or the nine-stage workspace graph.
 
@@ -217,7 +220,7 @@ method reloads the exact upstream artifacts, calls the domain implementation,
 and commits one revision. It also owns the separate read-only `ExportService`,
 which consumes sealed bundles without opening or mutating a workspace. CLI and
 MCP adapters delegate to the pipeline service, but do not expose export
-operations in the first two Phase 4 increments.
+operations in the first three Phase 4 increments.
 
 ## Consistency guarantees: defense in depth
 

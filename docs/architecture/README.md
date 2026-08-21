@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
 
 **Next review:** Any architecture documentation change
 
@@ -211,9 +211,10 @@ boundary over a verified finished bundle. It obtains the manifest, validation
 report, reconstructed row set, and ordinary `VerificationResult` from one
 descriptor-anchored verification pass. It is not a workspace stage, and it
 now shares strict persisted export plan, profile, membership, file-binding,
-receipt, and verification models from `exports/models.py`. It does not yet
-build plans, write derivatives, expose a public export command, or ship a
-generic container. The CLI exposes eighteen commands: nine stage
+receipt, and verification models from `exports/models.py`. Its source admission
+defaults to retained external-digest evidence and requires an explicit policy
+for lower self-consistent trust. It does not yet build plans, write derivatives,
+expose a public export command, or ship a generic container. The CLI exposes eighteen commands: nine stage
 commands plus maintenance, inspection, recipe automation, MCP, optional Aptus
 handoff, and version surfaces.
 

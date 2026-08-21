@@ -4,9 +4,9 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.2 model contract)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.3 source trust)
 
-**Next review:** Independent-product Phase 4.2 state transition or any
+**Next review:** Independent-product Phase 4.3 state transition or any
 program-state, evidence-grade, or completion-rule change
 
 ## Purpose

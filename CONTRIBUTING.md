@@ -32,8 +32,8 @@ product Phases 0–3 are complete. Phase 4, verified export foundation, is
 `in_progress`; consult its
 [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing that boundary. The typed service,
-verified source view, and strict v1 model contracts do not yet authorize
-generic export containers or trainer-specific profiles. Maturity remains
+verified source view, strict v1 model contracts, and source-trust admission do
+not yet authorize generic export containers or trainer-specific profiles. Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)
 and [docs/release.md](docs/release.md).
