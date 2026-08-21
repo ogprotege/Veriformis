@@ -9,8 +9,10 @@ tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
 (thin SwiftUI over CLI); and independent-product Phases 0–3, including the
 implemented taxonomy contract and discovery surfaces. Phase 4 verified export
-foundation is next but remains planned and unopened; generic export containers
-and planned trainer-specific profiles are not implemented. Do not claim public
+foundation is in progress. Its opening slice introduces the typed internal
+`ExportService` composition boundary and a descriptor-anchored verified source
+view; persisted export models, writers, public export commands, generic export
+containers, and planned trainer-specific profiles are not implemented. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

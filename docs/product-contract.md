@@ -7,15 +7,17 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus independent-product Phases 0–3, version `0.1.0` development alpha
+plus independent-product Phases 0–3 and Phase 4 verified-export foundation in
+progress, version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–3 on `main`; maturity alpha; public Mac claim still owner-gated
+Phases 0–3 on `main`; Phase 4 in progress; maturity alpha; public Mac claim
+still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 start)
 
-**Next review:** Independent-roadmap Phase 4 start; beta label cut, public-ready
+**Next review:** Phase 4 export-model contract; beta label cut, public-ready
 checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -111,8 +113,11 @@ Optional Group 8 (model-assisted construction) remains owner-gated.
 Independent-product Phases 0–3 add the tracking and claim-control foundation,
 standalone defaults, deterministic bundle transport, reliability controls, and
 the implemented taxonomy and discovery registry without changing existing v1
-persisted meanings. Phase 4 verified export foundation is the next planned
-roadmap work and has not started. Generic export containers and new trainer
+persisted meanings. Phase 4 verified export foundation is in progress. Its
+opening implementation adds a typed internal service boundary and a
+descriptor-anchored view of an independently verified finished bundle without
+changing existing persisted meanings. Persisted export plans and receipts,
+publication, public export commands, generic export containers, and new trainer
 profiles remain unimplemented.
 
 ## End-to-end compiler contract

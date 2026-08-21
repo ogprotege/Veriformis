@@ -19,5 +19,9 @@ from veriformis.bundle.transport import (  # noqa: F401
     verify_bundle_archive,
     write_bundle_archive,
 )
-from veriformis.bundle.verifier import verify_finished_bundle  # noqa: F401
+from veriformis.bundle.verifier import (  # noqa: F401
+    VerifiedFinishedBundle,
+    inspect_finished_bundle,
+    verify_finished_bundle,
+)
 from veriformis.bundle.writer import verify_bundle, write_bundle  # noqa: F401

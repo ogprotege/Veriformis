@@ -5,10 +5,10 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout;
-Phases 0–3 completed on `main`)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 start;
+Phases 0–3 completed and Phase 4 in progress)
 
-**Next review:** Independent-roadmap Phase 4 start; beta label cut, public-ready
+**Next review:** Phase 4 export-model contract; beta label cut, public-ready
 checklist, or any contract change
 
 ## Start here

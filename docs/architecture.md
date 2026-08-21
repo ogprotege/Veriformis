@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-06 (full documentation consistency pass)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 service boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -39,7 +39,10 @@ provenance model. Above it sit `ir/` (the canonical document model) and six
 stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `construction/`, `datasets/`, `bundle/` — flanked by axial modules:
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
-`handoff/`; `mcp/`; and `cli.py` (Typer adapter). The macOS workbench lives
+`exports/` (consumer-neutral verified-derivative composition boundary);
+`handoff/`; `mcp/`; and `cli.py` (Typer adapter). The Phase 4 opening adds only
+the typed export service and a descriptor-anchored verified source view; no
+export plan, writer, container, or public command exists yet. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -125,6 +128,10 @@ name.vfbundle/
   archive verification reconstructs the strict directory and reuses the same
   canonical verifier. This is transport only, not a trainer export. See
   [ADR 0005](adr/0005-deterministic-bundle-transport.md).
+- Phase 4 derivatives start from `ExportService`, which obtains manifest,
+  validation, row-set, and verification facts in the bundle verifier's same
+  descriptor-anchored pass. The service is composed by `PipelineService`; it
+  is not a workspace stage and does not mutate `minimal-v1`.
 
 ## Related documentation
 

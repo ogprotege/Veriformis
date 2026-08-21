@@ -1,0 +1,19 @@
+# Phase 4 Decision Index
+
+**Status:** Active
+
+| Decision | State | Basis |
+| --- | --- | --- |
+| The verified `minimal-v1` bundle remains canonical; exports are derivatives | Accepted | ADR-0004; roadmap Phase 4 |
+| Phase 4 executes as nine sequential green PRs matching roadmap items 1–9 | Accepted | Owner direction on 2026-08-21 |
+| `PipelineService` owns an injected `ExportService`; adapters call only the composition root | Accepted | Existing service architecture and roadmap item 1 |
+| Source semantics are captured during descriptor-anchored verification, not by re-reading paths after verification | Accepted | Existing bundle verifier race boundary |
+| Existing finished-bundle schemas and the six-file closed set remain unchanged | Accepted | Finished Dataset Contract v1 and Phase 3 compatibility proof |
+| Export receipts live with the derivative, never inside the source bundle or workspace | Accepted | ADR-0004 |
+| Portable identities exclude absolute paths, clocks, process IDs, temporary names, and durability warnings | Accepted | Cross-surface determinism requirement |
+| The v1 overwrite policy begins with no-replace/refuse only | Accepted | Phase 4 safety requirement; replacement is not required |
+| The Phase 4 conformance exporter is injected by tests and is absent from product taxonomy/support discovery | Accepted | Phase 4 exit gate versus Phase 5 scope |
+
+Exact persisted schema identifiers are intentionally deferred to the Phase 4.2
+contract review. The opening service increment adds no provisional persisted
+export model.

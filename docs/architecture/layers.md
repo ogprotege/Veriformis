@@ -4,14 +4,15 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
 
 **Next review:** Any layering or architecture change
 
 Veriformis is organized as a strict, acyclically ordered stack of logical
 layers, above which sit axial modules: `workspace.py` (persistence kernel),
-`pipeline/` (typed composition root), `recipes/`, `handoff/`, `mcp/`, and
-`cli.py` (Typer adapter). The SwiftUI workbench under `macos/` is outside the
+`pipeline/` (typed composition root), `exports/` (verified derivative-source
+service), `recipes/`, `handoff/`, `mcp/`, and `cli.py` (Typer adapter). The
+SwiftUI workbench under `macos/` is outside the
 Python package and shells the CLI. From the bottom up,
 the stack comprises a foundation kernel (`errors.py`, `contracts.py`,
 `identity.py`, `diagnostics.py`, `sources.py`, `evidence.py`), the canonical
@@ -32,6 +33,7 @@ flowchart TD
     MCP["mcp/ — thin local stdio adapter"]
     MAC["macOS workbench — CLI shell"]
     PIP["pipeline/ — PipelineService composition root"]
+    EXP["exports/ — verified derivative-source service"]
     WS["workspace.py — revision & stage-graph kernel"]
     BUN["bundle/ — seal + independent verifier"]
     DAT["datasets/ — curate, split, format, validate"]
@@ -46,12 +48,14 @@ flowchart TD
     MCP --> PIP
     MAC --> CLI
     PIP --> WS
+    PIP --> EXP
     PIP --> BUN
     PIP --> DAT
     PIP --> CON
     PIP --> CHK
     PIP --> RUL
     PIP --> PAR
+    EXP --> BUN
     WS -. "function-level lazy imports only" .-> BUN
     WS -.-> DAT
     WS -.-> CON
@@ -164,9 +168,10 @@ that lets a 3,541-line god-module sit above the stack without collapsing its
 acyclicity. The same pattern recurs wherever a hub would otherwise form:
 `bundle/finished.py` keeps only `errors`/`identity` at module scope and lazily
 imports `datasets.validation` (see `src/veriformis/bundle/finished.py:181`),
-`bundle/verifier.py` lazily imports `construction` and
-`datasets.serialization` to re-derive rows (see
-`src/veriformis/bundle/verifier.py:389-390`), and even within `rules/`,
+`bundle/verifier.py` keeps construction replay imports local while Phase 4.1
+adds safe downward module-load edges to `datasets.serialization` and
+`datasets.validation` so the public `VerifiedFinishedBundle` annotations are
+runtime-resolvable; neither dataset module imports `bundle`. Even within `rules/`,
 `engine.py` defers its import of `cleaning.plan_cleaning` into a function body
 to break an intra-layer cycle (see `src/veriformis/rules/engine.py:282`).
 
@@ -179,11 +184,15 @@ objects of the producing layer — are the authoritative interface.
 payloads, meaning a consumer never observes a producer's internals, only its
 registered schema. Each domain package additionally curates its public surface
 through `__init__.py` re-exports. `pipeline/service.py` is the intentional
-exception: as the composition root it imports domain implementations and owns
-the load–run–commit ceremony. `cli.py` imports the service and translates
-Typer arguments, outcomes, and failures; `mcp/server.py` exposes the same
-service as local stdio tools. The workbench remains outside the Python graph
-and shells the CLI.
+exception: as the composition root it imports domain implementations, owns the
+load–run–commit ceremony, and injects/owns `exports.ExportService`. The export
+service depends downward on the bundle verifier and returns an immutable
+`VerifiedFinishedBundle` reconstructed by that verifier; it does not enter the
+workspace stage graph. No persisted export plan or receipt, derivative writer,
+public export command, or generic container belongs to this Phase 4.1 layer.
+`cli.py` imports the pipeline service and translates Typer arguments, outcomes,
+and failures; `mcp/server.py` exposes the same service as local stdio tools.
+The workbench remains outside the Python graph and shells the CLI.
 
 ## Exception handling flow
 

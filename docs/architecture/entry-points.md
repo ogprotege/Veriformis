@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -11,7 +11,9 @@ root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
 `veriformis.pipeline.PipelineService` owns stage policy, verified artifact
 loading, workspace transactions, sealing, independent verification, and
-read-only preview behavior.
+read-only preview behavior. It also injects and owns the consumer-neutral
+`exports.ExportService`; that service is currently a Python composition
+boundary, not an adapter-visible command.
 
 | Surface | How it enters |
 | --- | --- |
@@ -41,6 +43,8 @@ flowchart TD
     mac["SwiftUI workbench"] --> cli
     service --> workspace["workspace revisions and transactions"]
     service --> domains["parsers, rules, chunkers, construction, datasets, bundle"]
+    service --> exports["ExportService — verified derivative source"]
+    exports --> verifier
     service --> verifier["workspace-independent bundle verifier"]
 ```
 
@@ -93,6 +97,21 @@ the sealed directory and optional expected manifest digest to
 `external_digest` additionally requires a matching digest from a separate
 trusted channel. The optional Aptus handoff is a separate adapter artifact and
 is not required for core bundle verification.
+
+## Phase 4.1 export composition boundary
+
+`PipelineService.export_service` exposes the injected `ExportService` to
+Python composition. Its `verified_source` method calls
+`inspect_finished_bundle`, which returns an immutable
+`VerifiedFinishedBundle` containing the manifest, validation report,
+reconstructed row set, and existing verification result from the same
+descriptor-anchored pass. The ordinary `verify_finished_bundle` return type is
+unchanged.
+
+There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
+in this increment. There is likewise no persisted export plan or receipt,
+writer, or generic derivative container; those are later Phase 4 contracts and
+surfaces, not implied by the service boundary.
 
 ## Preview, recipes, and optional integrations
 

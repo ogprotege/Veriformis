@@ -175,6 +175,24 @@
         "uv run python scripts/check_project_tracking.py",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-4-export-service-start-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-db9d93ef88e273e3727e1ba85841589530d59da3",
+      "scope": "Independent-product Phase 4 start and typed verified export-service boundary",
+      "grade": "recorded-local",
+      "summary": "The standard Phase 4 packet opened; a typed ExportService and descriptor-anchored VerifiedFinishedBundle view were added without changing existing bundle contracts. Focused 77, full 772, standalone core 760 with 1 deselected, 38 XCTest tests, clean-wheel, both goldens, parity, tracking, Ruff, and diff checks passed; only the expected transport durability-warning regression warning was emitted.",
+      "details": "dev/active/independent-product/phase-04-verified-export-foundation/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_service.py tests/regressions/test_phase3_bundle_compatibility.py tests/bundle/test_finished_bundle.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase4-pr1-dd -destination platform=macOS test",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
+      ]
     }
   ]
 }

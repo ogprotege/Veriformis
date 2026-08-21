@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
 
 **Next review:** Any architecture or dependency change
 
@@ -13,10 +13,11 @@ The dependency architecture of Veriformis is organized as a strict,
 downward-pointing directed acyclic graph. It runs from a dependency-light
 foundation (`errors`, `contracts`, `identity`) through the canonical model and
 pipeline domains (`ir`, `sources`, `evidence`, `parsers`, `rules`, `chunkers`,
-`construction`, `datasets`, `bundle`) to the `PipelineService` composition
-root. CLI and MCP are adapters over that root; recipes and the optional Aptus
-handoff are bounded integration modules. The SwiftUI workbench is outside the
-Python graph and shells the CLI.
+`construction`, `datasets`, `bundle`) through `exports.ExportService` to the
+`PipelineService` composition root. `exports/` depends on the bundle verifier
+but is not a tenth workspace stage. CLI and MCP are adapters over the pipeline
+root; recipes and the optional Aptus handoff are bounded integration modules.
+The SwiftUI workbench is outside the Python graph and shells the CLI.
 No lower layer imports a higher one, and every cross-package edge targets
 either a layer below or a sibling within the same layer. This shape is not
 enforced by tooling — no import-linter configuration exists in the repository
@@ -42,6 +43,7 @@ flowchart TD
     CLI["cli.py — thin Typer adapter, 18 commands"]
     MCP["mcp/ — thin local stdio adapter"]
     PIP["pipeline/service.py — composition root"]
+    EXP["exports/ — verified derivative-source service"]
     WKS["workspace.py — revision infrastructure"]
     BUN["bundle/ — sealing and verification"]
     DST["datasets/"]
@@ -60,12 +62,14 @@ flowchart TD
     CLI --> PIP
     MCP --> PIP
     PIP --> WKS
+    PIP --> EXP
     PIP --> BUN
     PIP --> DST
     PIP --> CHK
     PIP --> RUL
     PIP --> PRS
     PIP --> IR
+    EXP --> BUN
     WKS -.->|"deferred function-level imports"| CHK
     WKS -.-> CST
     WKS -.-> DST
@@ -164,13 +168,18 @@ identities, and the error taxonomy intact.
 
 Cross-layer wiring is concentrated in `pipeline/service.py`, the implemented
 surface-neutral composition root. Its methods own stage policy, verified input
-loading, deterministic domain calls, and workspace transactions. `cli.py` and
-`mcp/server.py` translate their respective protocols into those methods; the
-SwiftUI workbench shells the CLI. This arrangement needs no dependency
-injection container because the contracts passed between stages are stable,
-low-level data values. `workspace.py` keeps its module-level domain coupling
-narrow and uses function-level imports for semantic replay, so service and
-workspace orchestration do not create a module-load cycle.
+loading, deterministic domain calls, and workspace transactions. It now also
+injects and owns `exports.ExportService`, whose Phase 4.1 dependency points
+only to the bundle facade. That service calls the descriptor-anchored finished-
+bundle inspector and returns the immutable semantic result; it does not add a
+workspace dependency or persisted pydantic contract. `cli.py` and
+`mcp/server.py` translate their respective protocols into pipeline methods;
+the SwiftUI workbench shells the CLI. No adapter exposes export operations yet.
+This arrangement needs no dependency injection container because the contracts
+passed between stages are stable, low-level data values. `workspace.py` keeps
+its module-level domain coupling narrow and uses function-level imports for
+semantic replay, so service and workspace orchestration do not create a
+module-load cycle.
 
 That narrowness comes with a caveat the static graph hides. `workspace.py`
 reaches back up into the domain pipeline through function-level deferred
@@ -178,12 +187,14 @@ imports — `chunkers.base`, `construction`, `rules.engine`, and `sources`
 inside one loader (`src/veriformis/workspace.py:2339-2348`), `datasets` and
 `bundle` at `src/veriformis/workspace.py:2467` and `:2688`, and the full
 parse-and-clean replay set at `src/veriformis/workspace.py:3007-3028` and
-`:3408-3412`. `bundle/verifier.py` applies the same idiom for `construction`
-and `datasets` types (`src/veriformis/bundle/verifier.py:389-390,483-485`).
-The pattern serves two purposes: it keeps the module-load graph acyclic and
-import cheap — the 3.5k-line infrastructure module loads without dragging in
-the entire pipeline — and it structurally prevents any future cycle between
-infrastructure and domain, since the edge materializes only at call time. The
+`:3408-3412`. `bundle/verifier.py` still defers construction replay imports,
+but Phase 4.1 intentionally imports `RowSet` and `DatasetValidationReport` at
+module load so the public `VerifiedFinishedBundle` type is introspectable.
+Those are downward edges and neither target module imports `bundle`, so the
+graph remains acyclic. The deferred-import pattern keeps the workspace kernel
+cheap and structurally prevents cycles between infrastructure and domain; the
+verifier's narrow public-type edge is not required to share that kernel-only
+constraint. The
 cost is real but bounded: static analysis, including the fan-in figures above,
 understates runtime coupling, and an import linter would see none of these
 edges.
