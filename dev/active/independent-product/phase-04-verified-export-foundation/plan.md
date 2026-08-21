@@ -58,8 +58,8 @@ branch is created.
 
 ### 4.6 Publish atomically and safely
 
-- **Implementation state:** Implemented with every local gate green; GitHub
-  review remains pending.
+- **Implementation state:** Complete; PR #48 passed every required check and
+  merged at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`.
 - [x] Use private sibling staging and one no-replace atomic promotion.
 - [x] Enforce portable path safety and closed file/directory sets.
 - [x] Add explicit cancellation checkpoints and cleanup.
@@ -68,17 +68,31 @@ branch is created.
 - [x] Report visibility honestly if publication succeeds but later bookkeeping
       fails; no normal receipt write occurs after promotion.
 
-Phase 4.6 publishes only `portable_exact_bytes` conformance output. Successful
-`semantic_content_only` publication, exact-byte rerender proof, and semantic
-reconstruction of produced bytes remain Phase 4.7.
+The Phase 4.6 merge publishes only `portable_exact_bytes` conformance output;
+successful `semantic_content_only` publication, exact-byte rerender proof, and
+semantic reconstruction of produced bytes enter only through the private Phase
+4.7 conformance boundary below.
 
 ### 4.7 Define deterministic evidence limits
 
-- [ ] Distinguish portable exact-byte claims from semantic-content-only claims.
-- [ ] Re-render and compare exact-byte profiles.
-- [ ] Reconstruct and verify semantic content for semantic-only profiles.
-- [ ] Freeze deterministic plan, receipt, and conformance-tree fixtures without
+- **Implementation state:** Locally implemented; every required local gate
+  passes. Pull-request review is pending.
+- [x] Distinguish portable exact-byte claims from semantic-content-only claims.
+- [x] Render twice from independent strict inputs and compare normalized exact-
+      byte trees for exact profiles before destination access.
+- [x] Render twice, reconstruct versioned canonical semantic preimages and
+      complete membership from both outputs, and replay descriptor-reread
+      staged bytes for semantic-only profiles.
+- [x] Require the service to hash semantic preimages; private hooks cannot
+      supply digests or bypass complete membership validation.
+- [x] Freeze deterministic plan, receipt, verification, and conformance-tree
+      fixtures without changing the ten persisted v1 schemas or
       advertising the injected test exporter as a supported container.
+
+Phase 4.7 changes no public `ExportService.publish` arguments and adds no
+renderer/replayer registry. Its rerender evidence is a runtime admission
+procedure, not a persisted v1 attestation. Phase 4.8 owns public surfaces and
+Phase 4.9 owns the complete adversarial closeout harness.
 
 ### 4.8 Expose export APIs on every surface
 

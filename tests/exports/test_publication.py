@@ -260,47 +260,6 @@ def test_publication_requires_the_separately_retained_source_digest(tmp_path: Pa
     assert not (tmp_path / "wrong-evidence").exists()
 
 
-def test_semantic_only_plan_is_not_published_before_phase_4_7(tmp_path: Path):
-    bundle = _materialize_bundle(tmp_path)
-    service = _ConformanceExportService()
-    plan = service.create_plan(
-        bundle,
-        container_profile=ExportContainerProfile.create(
-            container_id="phase4-semantic-conformance",
-            container_version=1,
-            determinism_claim="semantic_content_only",
-        ),
-        dependencies=(
-            ExportDependencyBinding.create(
-                dependency_name="phase4-semantic-renderer",
-                dependency_version="1.0.0",
-                dependency_role="renderer",
-            ),
-        ),
-        file_plans=(
-            ExportFilePlan.create(
-                path="records/all.rows",
-                role="complete-dataset",
-                media_type="application/json",
-                membership_scope="all",
-                record_count=3,
-                semantic_content_sha256=sha256_digest(b"semantic rows"),
-                expected_sha256=None,
-                expected_byte_size=None,
-            ),
-        ),
-        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
-    )
-
-    with pytest.raises(ExportContractError, match="portable_exact_bytes"):
-        service.publish(
-            plan,
-            bundle,
-            tmp_path / "semantic",
-            expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
-        )
-
-
 @pytest.mark.parametrize(
     "files, message",
     (

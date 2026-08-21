@@ -62,7 +62,7 @@
       "packet": "dev/active/independent-product/phase-04-verified-export-foundation",
       "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Open the Phase 4.6 pull request, require every GitHub check to pass, merge, and synchronize clean local main before beginning Phase 4.7 deterministic evidence limits."
+      "next_gate": "Open the Phase 4.7 pull request, require every GitHub check to pass, merge, and synchronize clean local main before beginning Phase 4.8 public export surfaces."
     },
     {
       "number": 5,

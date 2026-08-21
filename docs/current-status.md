@@ -14,12 +14,13 @@ typed internal service boundary, descriptor-anchored source view, and strict
 versioned persisted export models, plus trusted-by-default source admission
 with explicit lower-trust policy, read-only source-derived plan population, and
 normalized semantic membership enforcement, plus internal exact-byte atomic
-publication and independent closed-tree verification
+publication and independent closed-tree verification, plus private two-render
+exact-byte and semantic-content conformance with staged descriptor replay
 
-**Review date:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
+**Review date:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
 
-**Next review:** Phase 4.6 GitHub gates or merge; Phase 4.7
-deterministic-evidence work; beta label cut, public-ready checklist, or any
+**Next review:** Phase 4.7 GitHub review or merge; Phase 4.8 public-surface work;
+beta label cut, public-ready checklist, or any
 contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -146,13 +147,21 @@ Python-composition-only `portable_exact_bytes` publisher. It re-verifies the
 source and complete plan, checks the renderer's normalized semantic membership
 and exact bytes, writes a canonical receipt in private descriptor-anchored
 staging, independently verifies the closed tree, and performs one atomic
-no-replace promotion with explicit cancellation and visible-outcome reporting.
-The default service has no renderer. All local gates pass: 150 focused tests,
-914 full Python tests, 902 standalone-release tests with 1 deselected,
-deterministic parity, and 38 Mac tests. GitHub review remains pending.
-Semantic-only
-publication, deterministic rerender proof, public export commands, generic
-export containers, and planned trainer-specific profiles remain unimplemented.
+no-replace promotion with explicit cancellation and visible-outcome reporting;
+it merged as PR #48 at
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The seventh slice locally invokes
+the private conformance renderer twice from independent strict plan and row-set
+reloads. Exact profiles require identical normalized byte trees. Semantic-only
+profiles permit different physical bytes but require equal profile-versioned
+canonical semantic preimages, complete plan-equal reconstructed membership,
+service-computed digests, and descriptor-reread staged replay before promotion.
+Local gates pass: 14 determinism tests, 158 export tests, 163 combined
+export/contract tests, 927 full Python tests, 915 standalone-release tests with
+1 deselected, deterministic parity, and 38 Mac tests. GitHub review remains
+pending. The default service has no renderer or semantic replayer. The ten v1
+schemas record the profile claim and one published instance, not a rerender
+transcript. Public export commands, generic export containers, and planned
+trainer-specific profiles remain unimplemented.
 
 ## Implemented interfaces
 
@@ -494,7 +503,7 @@ See [docs/release.md](release.md).
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
-| Independent Phase 4 in progress | Items 4.1–4.5 merged at `1675c1a22830d506bdf27e45150170befc984bdf`; internal exact-byte publication now adds source/plan reverification, semantic-membership and exact-byte checks, descriptor-anchored staging, canonical receipt replay, independent closed-tree verification, cancellation, and atomic no-replace promotion; no shipped renderer, public export command, semantic-only replay, or production container |
+| Independent Phase 4 in progress | Items 4.1–4.6 merged at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`; Phase 4.7 locally adds private two-render exact-byte and semantic-content conformance plus descriptor-reread staged replay; no shipped renderer/replayer, public export command, production container, or support promotion |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation in progress and later phases planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -549,18 +558,21 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–3 are complete. Phase 4 items 4.1–4.5 are merged
-at `1675c1a22830d506bdf27e45150170befc984bdf`. The completed
+Independent-product Phases 0–3 are complete. Phase 4 items 4.1–4.6 are merged
+at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The completed
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
 records the contract, compile compatibility, cross-surface discovery, public
 vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
 export foundation is in progress under its
 [active packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
-The current Phase 4.6 branch implements internal exact-byte publication and
-independent closed-tree verification with every local gate green. GitHub review
-remains pending. The default
-service still has no renderer, and no public command, supported derivative
-container, semantic-content replay, or deterministic rerender proof exists.
+The current Phase 4.7 branch implements private two-render exact-byte and
+semantic-content conformance with every required local gate green. GitHub
+review remains pending. The private hooks are trusted conformance code, not an
+untrusted plugin boundary, and semantic replay currently retains each complete
+produced file in memory. The statically bounded fixture does not establish a
+scalable public parser; any future shipped semantic profile must enforce
+explicit resource limits. The default service still has no renderer or semantic
+replayer, and no public command or supported derivative container exists.
 Generic export containers and any new trainer-specific profiles are not current
 capabilities; the canonical and optional Aptus profiles remain the implemented
 profile set. A deliberate beta label and public Mac checklist remain separate

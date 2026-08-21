@@ -286,6 +286,28 @@
         "uv run python scripts/check_project_tracking.py",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-4-deterministic-evidence-local-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af",
+      "scope": "Independent-product Phase 4.7 two-render exact-byte and semantic-content conformance",
+      "grade": "recorded-local",
+      "summary": "Private Phase 4.7 deterministic evidence passed 14 determinism tests, 158 export tests, and 163 combined export/verified-contract tests covering independent strict render inputs, direct normalized byte-tree equality, semantically equivalent physical encodings, service-computed versioned canonical semantic preimages, complete replay-derived membership, descriptor-reread staged replay, fail-closed missing hooks, tampering, and frozen plan/receipt/verification/tree evidence. Full Python passed 927; standalone release passed 915 with 1 deselected; clean wheel, both goldens, external-digest verification, deterministic transport, 38 XCTest tests, parity, project tracking, Ruff, lock, 14 JSON files, 10 shell files, 345 changed-document local links, and diff checks passed. Only the expected transport durability-warning regression warning was emitted. Independent source review found no blocker after documenting that private render/replay hooks are trusted conformance code and semantic replay retains each complete produced file in memory. The fixture is statically bounded; any future shipped semantic profile requires enforced resource limits. No persisted schema, public surface, supported container/profile, taxonomy, or support-registry change was added.",
+      "details": "dev/active/independent-product/phase-04-verified-export-foundation/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_determinism.py",
+        "uv run pytest -q tests/exports",
+        "uv run pytest -q tests/exports tests/contracts/test_verified_export_contract.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase4-pr7-dd -destination platform=macOS test",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "git diff --check"
+      ]
     }
   ]
 }

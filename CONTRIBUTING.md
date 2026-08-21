@@ -34,12 +34,14 @@ product Phases 0–3 are complete. Phase 4, verified export foundation, is
 and the machine ledger before changing that boundary. The typed service,
 verified source view, strict v1 model contracts, source-trust admission, and
 read-only source-derived plan population and semantic-membership enforcement are
-merged through item 4.5 at `1675c1a22830d506bdf27e45150170befc984bdf`.
-Phase 4.6 adds an internal exact-byte publisher and independent closed-tree
-verifier. Its focused, full Python, standalone release, parity, and Mac gates
-are green; GitHub review remains pending. It does not authorize a shipped
-renderer, public export surface,
-semantic-only replay, generic export container, or trainer-specific profile.
+merged through item 4.6 at
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 locally adds private
+two-render exact-byte and semantic-content conformance with descriptor-reread
+staged replay. Its focused, full Python, standalone release, parity, and Mac
+gates are green; GitHub review remains pending. This does not authorize a
+shipped renderer or semantic replayer, public export surface, generic export
+container, or trainer-specific profile. Public surfaces remain Phase 4.8,
+closeout remains Phase 4.9, and generic exports remain Phase 5.
 Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)

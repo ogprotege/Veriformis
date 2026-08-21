@@ -1,0 +1,18 @@
+{
+  "exact": {
+    "plan_canonical_sha256": "eb6f14b26f7e751208b931a8a1b4c998687c58fad1fec2ecf50d79672c5d3e1b",
+    "receipt_canonical_sha256": "41d76e5a47c677d057a93db15b93e03725773eb5a9a419a7d74f224bb34efe90",
+    "tree_sha256": "795c5e9920f79c7b53a59e4eacac61fc521ec38c33b146530e8066d7a423f610",
+    "verification_canonical_sha256": "843ae46b518380a3f4a42a6ad3323bd21282636ae20b14faaaa28989014a507b"
+  },
+  "fixture_version": 1,
+  "profile_scope": "phase4-test-conformance-only",
+  "semantic": {
+    "plan_canonical_sha256": "796c0a4c6e1240e1679b50ed16e9bed8c83d99d105d486e43172cb8a62c99dd4",
+    "receipt_canonical_sha256": "f7a87622d0800a3845029116bc117ce79d27ceb43be3844f3250926a5250884d",
+    "tree_sha256": "21f0576abc862f48bfaddb6bff91d7ae0a170c3391fa510c7931850648e1a318",
+    "verification_canonical_sha256": "4feef88dfc029e0e5cb73b4e9466aca8843a4c5897580bdacc39a9453ccde7b4"
+  },
+  "source_fixture": "tests/regressions/fixtures/phase3/pre-taxonomy-full-text.vfbundle.json",
+  "source_manifest_sha256": "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
+}

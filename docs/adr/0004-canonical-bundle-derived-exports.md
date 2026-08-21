@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.6 exact-byte publication remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic evidence remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -13,8 +13,9 @@
 Veriformis already seals a strict six-file `minimal-v1` directory whose
 manifest binds the exact dataset snapshot, partitions, provenance, validation,
 and attestation. Generic external exports and named trainer packs still have no
-shipped renderer or supported product container. Phase 4.6 now supplies only an
-internal exact-byte conformance publisher and receipt verifier.
+shipped renderer or supported product container. Phase 4.6 supplies an internal
+atomic publisher and receipt verifier; Phase 4.7 adds only private two-render
+exact-byte and semantic-content conformance evidence.
 
 ## Decision
 
@@ -32,9 +33,10 @@ plan and bundle, not an export option.
 One canonical lineage prevents each exporter from becoming a second pipeline.
 Users eventually receive both a trainer-friendly artifact and a verifiable
 relationship to the source bundle. Exact-byte destination enforcement, receipt
-replay, and atomic publication are implemented internally in Phase 4.6;
-deterministic rerendering, semantic replay, public surfaces, and supported
-containers remain later work.
+replay, and atomic publication are implemented internally in Phase 4.6. Phase
+4.7 privately compares two exact byte trees or two reconstructed canonical
+semantic-preimage trees and replays staged semantic bytes. Public surfaces and
+supported containers remain later work.
 
 ## Alternatives considered
 
@@ -65,8 +67,15 @@ verification and writing arrive in Phase 4.6 for exact-byte plans only. The
 service re-verifies source and plan, checks semantic membership and planned
 bytes separately, writes and independently reloads a canonical receipt inside
 a closed private staging tree, and performs one atomic no-replace promotion.
-The default service has no renderer; deterministic rerendering and semantic
-replay remain Phase 4.7, and public surfaces remain Phase 4.8.
+Phase 4.7 invokes the private renderer twice from independent strict inputs.
+Exact profiles require identical normalized byte trees; semantic-only profiles
+require equal versioned canonical semantic preimages and complete reconstructed
+membership, with service-computed digests and descriptor-reread staged replay.
+This adds no persisted rerender transcript or new schema. The private hooks are
+trusted conformance code, semantic replay currently retains complete files in
+memory, and the fixture is statically bounded. The default service has no
+renderer or semantic replayer; public surfaces remain Phase 4.8, closeout
+remains Phase 4.9, and generic containers remain Phase 5.
 
 ## Review triggers
 

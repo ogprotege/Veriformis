@@ -12,17 +12,19 @@
 this contract, Phase 4.3 implements fail-closed read-only source-trust
 admission, and Phase 4.4 implements read-only source-derived plan population.
 Phase 4.5 implements read-only normalized semantic membership reconstruction
-and exact comparison with the plan baseline. Phase 4.6 locally implements
+and exact comparison with the plan baseline. Phase 4.6 implemented
 exact-byte-only atomic publication and descriptor-anchored independent tree
-verification. Its required local gates pass and pull-request review is pending.
-It does not implement deterministic rerendering, semantic-content replay, CLI or
-MCP export commands, workbench export controls, or a supported product export
-container.
+verification and merged as PR #48 at
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 locally implements
+private two-render evidence for both determinism claims and descriptor-anchored
+semantic replay. Its required local gates and pull-request review are pending.
+It does not implement CLI or MCP export commands, workbench export controls, a
+public renderer or replayer registry, or a supported product export container.
 
-**Last reviewed:** 2026-08-21 (Phase 4.6 exact-byte atomic publication)
+**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic evidence)
 
-**Next review:** Phase 4.6 gate completion, Phase 4.7 deterministic evidence,
-or any export schema change
+**Next review:** Phase 4.7 gate completion, Phase 4.8 public surfaces, or any
+export schema change
 
 ## Purpose
 
@@ -45,8 +47,11 @@ equality with that baseline; it does not inspect or publish destination bytes.
 Phase 4.6 re-verifies the source and plan, accepts bytes only from a private
 test-injected conformance renderer, repeats the semantic membership check,
 independently verifies a staged exact-byte tree, and publishes it with one
-no-replace atomic promotion. It does not prove a second render or reconstruct
-semantics from produced bytes.
+no-replace atomic promotion. Phase 4.7 invokes that private renderer twice from
+fresh strict inputs. Exact-byte profiles require equal normalized byte trees;
+semantic-only profiles require equal profile-versioned canonical semantic
+preimages reconstructed by a private replayer. Semantic publication replays
+the descriptor-reread staged bytes again before promotion.
 
 ## Normative language
 
@@ -62,7 +67,8 @@ The governed relationship is:
 verified minimal-v1 bundle + explicit source-trust policy
   -> immutable export plan
   -> normalized candidate semantic membership check
-  -> planned derivative files
+  -> two-render deterministic evidence
+  -> planned and replayed derivative files
   -> receipt-bound closed derivative tree
   -> independent export verification
 ```
@@ -272,12 +278,41 @@ zero bytes.
 Generic filesystem verification directly observes file type, path, SHA-256,
 and byte size. Role, media type, membership scope, and record count remain
 logical plan-and-receipt facts until a container-specific semantic replay can
-derive them from produced bytes. Phase 4.6 MUST NOT describe those logical
-facts as independently counted or parsed destination evidence.
+derive them from produced bytes. Exact-byte publication MUST NOT describe those
+logical facts as independently counted or parsed destination evidence.
 
 File plans and destination bindings are sorted by exact path. Their complete
 path set MUST be portable and collision-free. `export-receipt.json` is reserved
 and cannot collide with a planned output.
+
+### Canonical semantic preimages
+
+For `semantic_content_only`, `semantic_content_sha256` is exactly the SHA-256
+of the canonical semantic preimage reconstructed for one planned file. It is
+not a digest supplied by a renderer or replayer and MUST NOT be copied from the
+plan into a destination binding without replaying the produced bytes. The
+export service computes the digest from the returned preimage bytes.
+
+Every semantic-capable container profile MUST define a versioned, independently
+reproducible preimage format for every planned file. That definition MUST bind
+the exact container profile and dependencies, path, role, media type,
+membership scope, record count, row schema, logical partition interpretation,
+sequence order, and canonical file content. It MUST also define exact Unicode,
+duplicate-value, number, key-order, list-order, and invalid-input behavior. A
+`membership_scope=none` file still requires a canonical profile-defined
+preimage and matching digest; it contributes no row membership. The Phase 4.7
+conformance fixture is statically bounded. Before any semantic profile is
+shipped or publicly exposed, its versioned contract MUST define and enforce
+explicit byte, record, nesting, and other applicable resource limits and fail
+closed when content cannot be reconstructed uniquely. The private Phase 4.7
+callback does not expose a configurable resource-limit argument.
+
+The Phase 4 conformance profile uses a versioned lossless canonical JSON
+preimage. A profile MAY use another canonical byte representation only when its
+container version and exact renderer/replayer dependency bindings define that
+representation without ambiguity. Changing canonicalization requires a new
+container version or dependency identity. No unversioned, host-dependent, or
+library-default serialization is semantic evidence under this contract.
 
 ## Complete membership projection
 
@@ -313,7 +348,9 @@ The projection models the complete derivative-only boundary. Phase 4.4 derives
 the source baseline from the verified row set. Phase 4.5 reconstructs a
 candidate row set and projection from normalized semantic rows plus aligned
 provenance and rejects every mismatch with that baseline. Actual destination-
-byte reconstruction remains a later evidence boundary.
+byte reconstruction is a separate Phase 4.7 replay boundary; a semantic
+replayer's reconstructed rows and provenance are candidate evidence and MUST
+pass the same complete membership comparison.
 
 ## Source-trust admission
 
@@ -456,16 +493,18 @@ not prove that arbitrary destination bytes encode the checked semantics. Phase
 4.6 owns filesystem publication and Phase 4.7 owns exact-byte rerendering or
 semantic reconstruction of actual destination content.
 
-## Atomic exact-byte publication
+## Deterministic publication evidence
 
 `ExportService.publish` accepts one strict `ExportPlan`, the source bundle
 locator, one runtime destination root, an optional separately retained expected
 source-manifest SHA-256, and an optional cancellation checkpoint callable. It
 has no renderer-selection, overwrite, filter, membership, resplit, or semantic-
 mapping argument. The default service has no installed renderer. Only a private
-test conformance subclass may override the internal rendering hook in Phase
-4.6; that hook receives the strict plan and freshly reverified source row set,
-not a destination or staging path.
+test conformance subclass may override the internal rendering and semantic-
+replay hooks. The renderer receives a strict plan and freshly reconstructed
+source row set, not a destination or staging path. The semantic replayer
+receives a strict plan and one immutable complete `(path, bytes)` tree, not a
+destination path, separately supplied digest, or caller-selected membership.
 
 Before rendering or destination creation, the service MUST fresh-strict-load
 the plan and reverify the named source bundle under the plan's exact trust
@@ -476,20 +515,44 @@ MUST NOT be used as its own external trust anchor. Supplying external evidence f
 plan. Every reconstructed source, profile, dependency, file-plan, and complete
 membership fact MUST equal the supplied plan exactly.
 
-The Phase 4.6 publisher supports only `portable_exact_bytes` plans. A
-`semantic_content_only` plan fails as `export-contract-invalid` because no
-generic verifier can derive its semantic-content digest from arbitrary
-destination bytes. Enabling semantic-only publication remains Phase 4.7 work.
-This restriction does not change the persisted profile or receipt schemas.
-
 The internal renderer returns exact `(path, bytes)` pairs plus normalized train
 rows, evaluation rows, and aligned provenance. The service MUST snapshot and
 validate the complete renderer file set before creating staging: paths are
-exact strings, contents are exact bytes, every planned path appears once, no
-other path appears, and every SHA-256 and byte size equals its exact file plan.
-It MUST run the Phase 4.5 membership operation over the returned semantic
-evidence before staging. These are two separate checks; Phase 4.6 MUST NOT claim
-that generic destination bytes have been decoded into the checked rows.
+exact strings, contents are exact bytes, every planned path appears once, and
+no other path appears. It MUST run the Phase 4.5 membership operation over the
+returned semantic evidence. Renderer-supplied rows and provenance remain
+separate from the byte tree and do not prove that arbitrary bytes encode them.
+
+The service MUST invoke the renderer twice before destination access. Each
+invocation receives independently strict-reloaded plan and source-row-set
+objects reconstructed from the same canonical bytes. It MUST normalize both
+complete trees into exact plan-path order and validate the returned membership
+from each invocation. Renderer sequence order is not meaningful after path
+normalization; path identity and file contents remain exact.
+
+For `portable_exact_bytes`, every rendered file MUST match its planned SHA-256
+and byte size, and the two normalized `(path, bytes)` trees MUST be identical.
+Only the first tree proceeds to staging. A second-render difference fails as
+`export-verification-invalid` before destination access and MUST NOT downgrade
+to semantic-only evidence. This proves repeatable bytes under the bound profile
+and dependencies; it does not independently decode those bytes into rows.
+
+For `semantic_content_only`, exact bytes, SHA-256 values, and sizes MAY differ
+between the two renders. The private profile-specific replayer MUST reconstruct
+the complete canonical semantic-preimage tree and normalized train rows,
+evaluation rows, and aligned provenance from each produced byte tree. Each
+reconstructed membership view MUST pass the Phase 4.5 comparison, every
+service-computed preimage digest MUST equal its file plan, and the two complete
+canonical semantic-preimage trees MUST be identical. Only the first physical
+tree proceeds to staging. Missing replay support, an incomplete or ambiguous
+replay, or any semantic, membership, path, or digest difference fails closed.
+
+Semantic publication MUST replay independently reread staged bytes through the
+same profile-bound private replayer before receipt verification and promotion.
+The staged replay MUST reproduce the complete preflight semantic-preimage tree
+and membership evidence. A hook cannot attest success by returning a digest:
+the service hashes its canonical preimage bytes. The exact renderer and
+replayer dependencies MUST remain bound by the plan.
 
 Publication MUST:
 
@@ -501,7 +564,9 @@ Publication MUST:
 4. write and fsync every planned file and the canonical
    `export-receipt.json`, then fsync every staged directory;
 5. independently enumerate the staged tree through its root descriptor and
-   require the exact planned directories and files plus the receipt;
+   require the exact planned directories and files plus the receipt, and for a
+   semantic-only plan replay descriptor-reread staged bytes before constructing
+   successful verification evidence;
 6. reject aliases, collisions, symlinks, hard links, shared inodes, special
    files, substitutions, noncanonical receipt bytes, or any observed
    digest/size/plan/receipt mismatch;
@@ -544,9 +609,12 @@ The independently callable filesystem verifier requires an out-of-band
 expected plan. It opens the visible root without following links, enforces the
 same closed-tree rules, reloads canonical receipt bytes, recomputes every
 actual file digest and size, and returns the matching receipt and verification.
-It does not re-open the source bundle or rerender container bytes. Source
+For semantic-only output, the private conformance verifier additionally
+requires the exact profile-bound replayer and recomputes canonical semantic
+preimages from descriptor-read bytes; absent replay support fails closed. It
+does not re-open the source bundle or rerender container bytes. Source
 reverification is part of publication; source-bound standalone verification
-and public inspect/verify surfaces remain later work.
+and public inspect/verify surfaces remain Phase 4.8.
 
 ## `ExportReceipt`
 
@@ -562,8 +630,9 @@ domain-separated digest over the complete ordered destination bindings.
 The receipt does not bind its own bytes. The closed derivative tree is
 the exact destination file set plus one canonical `export-receipt.json`; this
 avoids an impossible self-hash while keeping the receipt inside the portable
-wrapper. Phase 4.6 writes and independently reloads this receipt inside staging
-before the atomic promotion. No normal receipt-writing step follows visibility.
+wrapper. Publication writes and independently reloads this receipt inside
+staging before the atomic promotion. No normal receipt-writing step follows
+visibility.
 
 ## `ExportVerification`
 
@@ -577,15 +646,26 @@ declared record count.
 It represents successful verification evidence only. A failed, malformed,
 altered, incomplete, unexpected, or untrusted derivative raises a typed error
 instead of producing a persisted `verified=false` object. Phase 4.2 defines and
-strictly loads this evidence model. Phase 4.6 creates it only after independent
-filesystem enumeration, canonical receipt reload, closed-tree enforcement, and
-actual exact-file digest and size replay. Creating the model from an in-memory
+strictly loads this evidence model. Publication creates it only after
+independent filesystem enumeration, canonical receipt reload, closed-tree
+enforcement, and actual file digest and size replay. Semantic-only publication
+additionally requires descriptor-read semantic replay and comparison with the
+planned and preflight canonical preimages. Creating the model from an in-memory
 receipt alone is not evidence that a filesystem tree was inspected.
 
-Phase 4.6 re-verifies the source while publishing, but the standalone
+The service re-verifies the source while publishing, but the standalone
 filesystem verifier accepts an independently supplied plan and does not reopen
-the source bundle. Exact-byte rerender comparison and semantic-content replay
-remain Phase 4.7; public source-bound verification remains Phase 4.8.
+the source bundle. Public source-bound verification remains Phase 4.8.
+
+The persisted `determinism_claim` binds the container profile's claim; it is not
+a persisted attestation that two renderer invocations occurred. The ten v1
+schemas contain no rerender count, cross-render digest, or replay transcript.
+Phase 4.7's two-render and staged-replay evidence is a runtime publication
+admission procedure. Adding a durable rerender attestation would require a new
+contract version. For semantic-only output, differing physical encodings can
+therefore share one plan and semantic-content digests while producing different
+actual file digests, output content roots, receipt identities, and verification
+identities.
 
 Successful verification requires positive `output_file_count` and
 `declared_record_count` values. Counts of zero do not describe a successful v1
@@ -593,7 +673,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2–4.6 implementation boundary
+## Phase 4.2–4.7 implementation boundary
 
 Phase 4.2 implements:
 
@@ -634,8 +714,8 @@ Phase 4.5 additionally implements:
 - fail-closed omission, addition, duplication, reordering, target mutation,
   assignment, leakage-group, partition, ordinal, balancing, and resplit tests.
 
-Phase 4.6 additionally implements, with required local gates passed and
-pull-request review pending:
+Phase 4.6 was additionally implemented and merged as PR #48 at
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`:
 
 - one Python-composition-only exact-byte publication operation with no shipped
   renderer or renderer-selection argument;
@@ -648,10 +728,24 @@ pull-request review pending:
   exact-byte directory verifier, and honest visible-publication outcomes; and
 - fail-closed deferral of `semantic_content_only` publication to Phase 4.7.
 
-Phase 4.2–4.6 do **not** implement:
+Phase 4.7 additionally implements locally, with required gates and pull-request
+review pending:
+
+- two private renderer invocations from independent strict plan and source-row-
+  set reconstructions, with complete membership validation for each;
+- normalized complete-tree byte equality for `portable_exact_bytes` plans;
+- private profile-versioned semantic replay for both independently rendered
+  `semantic_content_only` trees, with service-computed digests and exact
+  canonical-preimage and membership equality;
+- descriptor-reread staged semantic replay before verification and promotion;
+- deterministic plan, receipt, verification, and closed-tree conformance
+  fixtures without a product renderer or support claim; and
+- explicit persisted-evidence limits: v1 verification binds the profile claim
+  and one published instance, not a durable rerender transcript.
+
+Phase 4.2–4.7 do **not** implement:
 
 - selecting or registering an export implementation;
-- deterministic rerendering or semantic-content replay (Phase 4.7);
 - `PipelineService` export operations, discovery, dry run, public inspection or
   verification, CLI, MCP, or Mac surfaces (Phase 4.8); or
 - the complete tamper, traversal, race, cancellation, and partial-publication
@@ -660,7 +754,7 @@ Phase 4.2–4.6 do **not** implement:
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2–4.6 MUST NOT add a generic export container or
+not support claims. Phase 4.2–4.7 MUST NOT add a generic export container or
 consumer profile to taxonomy discovery or the support registry. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;

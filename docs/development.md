@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-21 (Phase 4.6 export-development boundary)
+**Last reviewed:** 2026-08-21 (Phase 4.7 export-development boundary)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -233,16 +233,23 @@ later receipt commit fails.
 
 `ExportService` derives from an already verified finished bundle; it must not
 construct targets, curate, balance, resplit, or accept caller-selected
-membership. Its Phase 4.6 publisher supports exact-byte plans only. It
-re-verifies source and plan, validates candidate semantics separately from
-planned bytes, writes and reloads the canonical receipt inside private staging,
-and promotes once without replacement.
+membership. Its private publication boundary re-verifies source and plan and
+renders twice from independently strict-reloaded inputs. Every result must pass
+the complete membership comparison. Exact profiles require identical normalized
+path-to-bytes trees. Semantic-only profiles may produce different physical
+bytes, but their private replayer must return equal versioned canonical semantic
+preimages and plan-equal normalized membership; the service computes each
+digest and replays descriptor-reread staged bytes before promotion.
 
-The default service intentionally has no renderer. Tests may inject the private
-conformance hook, but contributors must not infer a supported container or add
-adapter-specific publication policy. Semantic-content replay and deterministic
-rerender proof belong to Phase 4.7; discovery and public CLI, MCP, Mac, inspect,
-or verify operations belong to Phase 4.8.
+The default service intentionally has no renderer or semantic replayer. Tests
+may inject the private trusted conformance hooks, but those hooks are not an
+untrusted plugin boundary and contributors must not infer a supported container
+or add adapter-specific publication policy. Semantic replay currently retains
+each complete produced file in memory; the Phase 4.7 fixture is statically
+bounded. Any future shipped semantic profile must define and enforce explicit
+byte, record, nesting, and other applicable resource limits. Discovery and
+public CLI, MCP, Mac, inspect, or verify operations belong to Phase 4.8;
+adversarial closeout remains Phase 4.9 and generic containers remain Phase 5.
 
 ### Keep optional-integration claims accurate
 

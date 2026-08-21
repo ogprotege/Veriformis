@@ -1,4 +1,4 @@
-"""Private descriptor-anchored publication for verified exact-byte exports.
+"""Private descriptor-anchored publication for verified exports.
 
 This module owns runtime filesystem state only.  Portable identities remain in
 ``veriformis.exports.models`` and never include destination paths, temporary
@@ -19,7 +19,11 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-from veriformis.errors import ExportContractError, ExportVerificationError
+from veriformis.errors import (
+    ExportContractError,
+    ExportVerificationError,
+    VeriformisError,
+)
 from veriformis.exports.models import (
     EXPORT_RECEIPT_PATH,
     ExportDestinationFileBinding,
@@ -48,6 +52,8 @@ _FILE_READ_FLAGS = (
 )
 _EntryFacts = tuple[int, int, int, int, int, int, int]
 CancellationCheck = Callable[[], None]
+_FileTree = tuple[tuple[str, bytes], ...]
+_SemanticReplay = Callable[[_FileTree], Sequence[tuple[str, bytes]]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -798,7 +804,7 @@ def _read_and_hash(
             if chunks is not None:
                 if retain_limit is not None and size > retain_limit:
                     raise ExportVerificationError(
-                        "export receipt exceeds its independently expected size"
+                        "retained export file exceeds its independently expected size"
                     )
                 chunks.append(chunk)
         try:
@@ -820,18 +826,140 @@ def _expected_directories(paths: Sequence[str]) -> set[str]:
     return set(_parent_directories(paths))
 
 
+def _normalize_planned_file_tree(
+    plan: ExportPlan,
+    entries: Sequence[tuple[str, bytes]],
+    *,
+    label: str,
+) -> _FileTree:
+    """Return one strict complete file tree in canonical plan-path order."""
+    try:
+        supplied = tuple(entries)
+    except (AttributeError, RecursionError, TypeError, ValueError) as exc:
+        raise ExportVerificationError(f"invalid {label} file tree: {exc}") from exc
+
+    copied: dict[str, bytes] = {}
+    for entry in supplied:
+        if type(entry) is not tuple or len(entry) != 2:
+            raise ExportVerificationError(
+                f"{label} entries must be exact (path, bytes) tuples"
+            )
+        path, data = entry
+        if type(path) is not str or type(data) is not bytes:
+            raise ExportVerificationError(
+                f"{label} entries must contain an exact string and bytes"
+            )
+        try:
+            validate_export_relative_path(path)
+        except ValueError as exc:
+            raise ExportVerificationError(
+                f"{label} contains unsafe export path {path!r}: {exc}"
+            ) from exc
+        if path in copied:
+            raise ExportVerificationError(
+                f"{label} contains duplicate export path {path!r}"
+            )
+        copied[path] = data
+
+    expected_paths = {item.path for item in plan.file_plans}
+    if set(copied) != expected_paths:
+        raise ExportVerificationError(
+            f"{label} does not match the complete planned file set; "
+            f"missing={sorted(expected_paths - set(copied))!r}, "
+            f"extra={sorted(set(copied) - expected_paths)!r}"
+        )
+    return tuple((file_plan.path, copied[file_plan.path]) for file_plan in plan.file_plans)
+
+
+def _replay_semantic_preimages(
+    plan: ExportPlan,
+    files: _FileTree,
+    *,
+    semantic_replay: _SemanticReplay | None,
+    cancellation_check: CancellationCheck | None,
+) -> _FileTree:
+    """Reconstruct canonical per-file semantic bytes from exact produced bytes."""
+    if semantic_replay is None or not callable(semantic_replay):
+        raise ExportContractError(
+            "semantic-content verification requires a semantic replay callback"
+        )
+    _check_cancellation(cancellation_check)
+    try:
+        replayed = semantic_replay(files)
+        normalized = _normalize_planned_file_tree(
+            plan,
+            replayed,
+            label="semantic replay",
+        )
+    except (ExportContractError, ExportVerificationError):
+        raise
+    except (
+        AttributeError,
+        RecursionError,
+        TypeError,
+        UnicodeError,
+        ValueError,
+        VeriformisError,
+    ) as exc:
+        raise ExportVerificationError(
+            f"invalid semantic replay evidence: {exc}"
+        ) from exc
+    _check_cancellation(cancellation_check)
+    return normalized
+
+
+def _validate_semantic_preimages(
+    plan: ExportPlan,
+    semantic_preimages: _FileTree,
+) -> None:
+    """Require every reconstructed semantic preimage to match its file plan."""
+    preimages_by_path = dict(semantic_preimages)
+    for file_plan in plan.file_plans:
+        observed = sha256_digest(preimages_by_path[file_plan.path])
+        if observed != file_plan.semantic_content_sha256:
+            raise ExportVerificationError(
+                "replayed semantic content differs from the plan for "
+                f"{file_plan.path!r}"
+            )
+
+
 def _verify_staged_export(
     root_descriptor: int,
     *,
     expected_plan: ExportPlan,
     cancellation_check: CancellationCheck | None,
-) -> tuple[ExportReceipt, ExportVerification, tuple[dict[str, _EntryFacts], dict[str, _EntryFacts]]]:
-    """Independently verify one staged exact-byte export through its root fd."""
+    semantic_replay: _SemanticReplay | None = None,
+    expected_semantic_preimages: Sequence[tuple[str, bytes]] | None = None,
+) -> tuple[
+    ExportReceipt,
+    ExportVerification,
+    tuple[dict[str, _EntryFacts], dict[str, _EntryFacts]],
+]:
+    """Independently verify one staged export through its anchored root fd."""
     checked_plan = ExportPlan.from_json_bytes(expected_plan.canonical_bytes())
-    if checked_plan.container_profile.determinism_claim != "portable_exact_bytes":
+    exact = (
+        checked_plan.container_profile.determinism_claim == "portable_exact_bytes"
+    )
+    if exact and (
+        semantic_replay is not None or expected_semantic_preimages is not None
+    ):
         raise ExportContractError(
-            "Phase 4.6 publication supports portable_exact_bytes plans only"
+            "portable exact verification cannot accept semantic replay evidence"
         )
+    if not exact and (semantic_replay is None or not callable(semantic_replay)):
+        raise ExportContractError(
+            "semantic-content verification requires a semantic replay callback"
+        )
+
+    expected_preimages: _FileTree | None = None
+    if expected_semantic_preimages is not None:
+        expected_preimages = _normalize_planned_file_tree(
+            checked_plan,
+            expected_semantic_preimages,
+            label="expected semantic preimage",
+        )
+        _validate_semantic_preimages(checked_plan, expected_preimages)
+
     files, directories = _collect_tree(
         root_descriptor,
         cancellation_check=cancellation_check,
@@ -853,14 +981,60 @@ def _verify_staged_export(
             f"extra={sorted(set(directories) - expected_directories)!r}"
         )
 
-    bindings: list[ExportDestinationFileBinding] = []
+    observations: dict[str, tuple[str, int]] = {}
+    observed_tree: list[tuple[str, bytes]] = []
     for file_plan in checked_plan.file_plans:
-        digest, size, _ = _read_and_hash(
+        digest, size, data = _read_and_hash(
             root_descriptor,
             file_plan.path,
             expected_facts=files[file_plan.path],
             cancellation_check=cancellation_check,
+            retain_bytes=not exact,
+            retain_limit=files[file_plan.path][3] if not exact else None,
         )
+        observations[file_plan.path] = (digest, size)
+        if size == 0 and file_plan.record_count not in (None, 0):
+            raise ExportVerificationError(
+                "a destination file with records cannot be empty: "
+                f"{file_plan.path!r}"
+            )
+        if exact:
+            if (
+                digest != file_plan.expected_sha256
+                or size != file_plan.expected_byte_size
+            ):
+                raise ExportVerificationError(
+                    "destination bytes differ from the exact plan for "
+                    f"{file_plan.path!r}"
+                )
+        else:
+            assert data is not None
+            observed_tree.append((file_plan.path, data))
+
+    semantic_preimages: _FileTree | None = None
+    if not exact:
+        semantic_preimages = _replay_semantic_preimages(
+            checked_plan,
+            tuple(observed_tree),
+            semantic_replay=semantic_replay,
+            cancellation_check=cancellation_check,
+        )
+        _validate_semantic_preimages(checked_plan, semantic_preimages)
+        if (
+            expected_preimages is not None
+            and semantic_preimages != expected_preimages
+        ):
+            raise ExportVerificationError(
+                "staged semantic replay differs from the expected preflight "
+                "semantic content"
+            )
+
+    semantic_by_path = (
+        dict(semantic_preimages) if semantic_preimages is not None else {}
+    )
+    bindings: list[ExportDestinationFileBinding] = []
+    for file_plan in checked_plan.file_plans:
+        digest, size = observations[file_plan.path]
         bindings.append(
             ExportDestinationFileBinding.create(
                 file_plan_id=file_plan.file_plan_id,
@@ -869,7 +1043,11 @@ def _verify_staged_export(
                 media_type=file_plan.media_type,
                 membership_scope=file_plan.membership_scope,
                 record_count=file_plan.record_count,
-                semantic_content_sha256=None,
+                semantic_content_sha256=(
+                    sha256_digest(semantic_by_path[file_plan.path])
+                    if not exact
+                    else None
+                ),
                 sha256=digest,
                 byte_size=size,
             )
@@ -923,6 +1101,7 @@ def _verify_export_directory(
     *,
     expected_plan: ExportPlan,
     cancellation_check: CancellationCheck | None = None,
+    semantic_replay: _SemanticReplay | None = None,
 ) -> tuple[ExportReceipt, ExportVerification]:
     """Independently inspect one already visible derivative directory."""
     if cancellation_check is not None and not callable(cancellation_check):
@@ -957,6 +1136,7 @@ def _verify_export_directory(
             descriptor,
             expected_plan=expected_plan,
             cancellation_check=cancellation_check,
+            semantic_replay=semantic_replay,
         )
         if not _path_matches_descriptor(root, descriptor):
             raise ExportVerificationError(
@@ -1085,61 +1265,72 @@ def _rename_no_replace(
         )
 
 
-def _publish_exact_export(
+def _publish_verified_export(
     destination_root: str | os.PathLike[str],
     *,
     source_root: Path,
     plan: ExportPlan,
     files: Sequence[tuple[str, bytes]],
     cancellation_check: CancellationCheck | None,
+    semantic_replay: _SemanticReplay | None = None,
+    expected_semantic_preimages: Sequence[tuple[str, bytes]] | None = None,
 ) -> ExportPublicationOutcome:
-    """Write, verify, and atomically publish one exact-byte export tree."""
+    """Write, verify, and atomically publish one exact or semantic export."""
     if cancellation_check is not None and not callable(cancellation_check):
         raise ExportContractError("cancellation_check must be callable")
     checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
-    if checked_plan.container_profile.determinism_claim != "portable_exact_bytes":
+    exact = (
+        checked_plan.container_profile.determinism_claim == "portable_exact_bytes"
+    )
+    if exact and (
+        semantic_replay is not None or expected_semantic_preimages is not None
+    ):
         raise ExportContractError(
-            "Phase 4.6 publication supports portable_exact_bytes plans only"
+            "portable exact publication cannot accept semantic replay evidence"
         )
-    supplied = tuple(files)
-    copied: dict[str, bytes] = {}
-    for entry in supplied:
-        _check_cancellation(cancellation_check)
-        if type(entry) is not tuple or len(entry) != 2:
-            raise ExportVerificationError(
-                "renderer output entries must be exact (path, bytes) tuples"
-            )
-        path, data = entry
-        if type(path) is not str or type(data) is not bytes:
-            raise ExportVerificationError(
-                "renderer output entries must contain an exact string and bytes"
-            )
-        try:
-            validate_export_relative_path(path)
-        except ValueError as exc:
-            raise ExportVerificationError(
-                f"renderer produced unsafe export path {path!r}: {exc}"
-            ) from exc
-        if path in copied:
-            raise ExportVerificationError(
-                f"renderer produced duplicate export path {path!r}"
-            )
-        copied[path] = data
-    expected_paths = {item.path for item in checked_plan.file_plans}
-    if set(copied) != expected_paths:
-        raise ExportVerificationError(
-            "renderer output does not match the complete planned file set; "
-            f"missing={sorted(expected_paths - set(copied))!r}, "
-            f"extra={sorted(set(copied) - expected_paths)!r}"
+    if not exact and (
+        semantic_replay is None
+        or not callable(semantic_replay)
+        or expected_semantic_preimages is None
+    ):
+        raise ExportContractError(
+            "semantic-content publication requires replay and expected preflight "
+            "semantic content"
         )
 
+    copied_tree = _normalize_planned_file_tree(
+        checked_plan,
+        files,
+        label="renderer output",
+    )
+    copied = dict(copied_tree)
+    expected_preimages: _FileTree | None = None
+    if expected_semantic_preimages is not None:
+        expected_preimages = _normalize_planned_file_tree(
+            checked_plan,
+            expected_semantic_preimages,
+            label="expected semantic preimage",
+        )
+        _validate_semantic_preimages(checked_plan, expected_preimages)
+
+    semantic_by_path = (
+        dict(expected_preimages) if expected_preimages is not None else {}
+    )
     bindings: list[ExportDestinationFileBinding] = []
     for file_plan in checked_plan.file_plans:
         _check_cancellation(cancellation_check)
         data = copied[file_plan.path]
         digest = sha256_digest(data)
         size = len(data)
-        if digest != file_plan.expected_sha256 or size != file_plan.expected_byte_size:
+        if size == 0 and file_plan.record_count not in (None, 0):
+            raise ExportVerificationError(
+                "a renderer file with records cannot be empty: "
+                f"{file_plan.path!r}"
+            )
+        if exact and (
+            digest != file_plan.expected_sha256
+            or size != file_plan.expected_byte_size
+        ):
             raise ExportVerificationError(
                 f"renderer bytes differ from the exact plan for {file_plan.path!r}"
             )
@@ -1151,7 +1342,11 @@ def _publish_exact_export(
                 media_type=file_plan.media_type,
                 membership_scope=file_plan.membership_scope,
                 record_count=file_plan.record_count,
-                semantic_content_sha256=None,
+                semantic_content_sha256=(
+                    sha256_digest(semantic_by_path[file_plan.path])
+                    if not exact
+                    else None
+                ),
                 sha256=digest,
                 byte_size=size,
             )
@@ -1212,6 +1407,8 @@ def _publish_exact_export(
             staging.descriptor,
             expected_plan=checked_plan,
             cancellation_check=cancellation_check,
+            semantic_replay=semantic_replay,
+            expected_semantic_preimages=expected_preimages,
         )
         observed_receipt, observed_verification, verified_tree = independently_observed
         if (
@@ -1300,3 +1497,53 @@ def _publish_exact_export(
             label="export destination parent",
         )
     return result
+
+
+def _publish_exact_export(
+    destination_root: str | os.PathLike[str],
+    *,
+    source_root: Path,
+    plan: ExportPlan,
+    files: Sequence[tuple[str, bytes]],
+    cancellation_check: CancellationCheck | None,
+) -> ExportPublicationOutcome:
+    """Compatibility wrapper for exact-byte publication."""
+    checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
+    if checked_plan.container_profile.determinism_claim != "portable_exact_bytes":
+        raise ExportContractError(
+            "exact publication requires a portable_exact_bytes plan"
+        )
+    return _publish_verified_export(
+        destination_root,
+        source_root=source_root,
+        plan=checked_plan,
+        files=files,
+        cancellation_check=cancellation_check,
+    )
+
+
+def _publish_semantic_export(
+    destination_root: str | os.PathLike[str],
+    *,
+    source_root: Path,
+    plan: ExportPlan,
+    files: Sequence[tuple[str, bytes]],
+    semantic_replay: _SemanticReplay,
+    expected_semantic_preimages: Sequence[tuple[str, bytes]],
+    cancellation_check: CancellationCheck | None,
+) -> ExportPublicationOutcome:
+    """Compatibility wrapper for semantic-content-only publication."""
+    checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
+    if checked_plan.container_profile.determinism_claim != "semantic_content_only":
+        raise ExportContractError(
+            "semantic publication requires a semantic_content_only plan"
+        )
+    return _publish_verified_export(
+        destination_root,
+        source_root=source_root,
+        plan=checked_plan,
+        files=files,
+        cancellation_check=cancellation_check,
+        semantic_replay=semantic_replay,
+        expected_semantic_preimages=expected_semantic_preimages,
+    )

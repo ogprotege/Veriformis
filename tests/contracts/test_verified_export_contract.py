@@ -265,10 +265,12 @@ def test_normative_contract_names_every_schema_identity_and_current_boundary() -
     assert "normalized in-memory semantic evidence" in contract
     assert "arbitrary destination bytes encode the checked semantics" in contract
     assert "`ExportService.publish` accepts one strict" in contract
-    assert "supports only `portable_exact_bytes` plans" in contract
+    assert "invoke the renderer twice before destination access" in contract
+    assert "For `semantic_content_only`, exact bytes" in contract
+    assert "descriptor-reread staged bytes" in contract
     assert "MUST NOT be used as its own external trust anchor" in contract
     assert "There is no cancellation checkpoint after promotion" in contract
-    assert "deterministic rerendering or semantic-content replay (Phase 4.7)" in contract
+    assert "schemas contain no rerender count" in contract
     assert "`PipelineService` export operations" in contract
     assert "is not a supported product container" in contract
     assert "MUST NOT add a generic export container" in contract

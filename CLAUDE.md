@@ -17,16 +17,19 @@ derives all source identities and the source membership baseline from that
 immutable view; callers provide only strict profile, dependency, and file-plan
 evidence. Read-only derivative enforcement fresh-reconstructs normalized
 candidate semantic rows, provenance, row-set identity, and membership and
-requires exact plan-baseline equality. Items 4.1–4.5 are merged at
-`1675c1a22830d506bdf27e45150170befc984bdf`. On the current Phase 4.6 branch,
-internal exact-byte publication adds source and plan re-verification, private
-descriptor-anchored staging, canonical receipt replay, independent closed-tree
-verification, cancellation, and atomic no-replace promotion. Its local gates
-pass: 150 focused tests, 914 full Python tests, 902 standalone-release tests
-with 1 deselected, and 38 Mac tests; GitHub review remains pending. No renderer,
-public export command, semantic-only
-replay, generic export container, or planned trainer-specific profile is
-implemented. Do not claim public
+requires exact plan-baseline equality. Items 4.1–4.6 are merged at
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. On the current Phase 4.7 branch,
+private deterministic evidence renders twice from independent strict inputs.
+Exact profiles compare normalized byte trees; semantic-only profiles compare
+versioned canonical semantic preimages and reconstructed membership, with
+service-computed digests and descriptor-reread staged replay. Its local gates
+pass: 14 determinism tests, 158 export tests, 163 combined export/contract
+tests, 927 full Python tests, 915 standalone-release tests with 1 deselected,
+and 38 Mac tests; GitHub review remains pending. Private render/replay hooks are
+trusted conformance code, not a plugin boundary, and semantic replay currently
+retains each complete produced file in memory. No renderer or semantic replayer,
+public export command, generic export container, or planned trainer-specific
+profile is shipped. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

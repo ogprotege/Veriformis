@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -126,22 +126,28 @@ candidate row set and complete projection and succeeds only when both equal the
 plan baseline. Its signature contains no selection, mutation, destination,
 overwrite, writer, or publication control.
 
-`ExportService.publish` is the Phase 4.6 Python-composition-only publication
-boundary. It accepts a strict exact-byte plan, source bundle locator,
-destination root, separately retained source digest when required, and optional
-cancellation callback. It exposes no renderer-selection, overwrite, filtering,
-or membership controls. A private conformance subclass supplies exact bytes and
-normalized candidate semantics; the default service fails because no renderer
-is installed. Publication re-verifies source and plan, repeats semantic
-membership validation, checks every planned byte digest and size, writes and
-independently reloads the canonical receipt inside descriptor-anchored staging,
-and performs one atomic no-replace promotion.
+`ExportService.publish` is the Python-composition-only publication boundary. Its
+existing arguments accept a strict exact-byte or semantic-content plan, source
+bundle locator, destination root, separately retained source digest when
+required, and optional cancellation callback. It exposes no renderer/replayer
+selection, overwrite, filtering, or membership controls. A private conformance
+subclass supplies bytes and normalized candidates; the default service fails
+closed because no renderer or semantic replayer is installed.
+
+Publication re-verifies source and plan, invokes the renderer twice from
+independent strict inputs, and repeats complete membership validation. Exact
+profiles require identical normalized byte trees. Semantic-only profiles permit
+different physical bytes but require equal versioned canonical preimages and
+membership from private replay; the service computes their digests and replays
+descriptor-reread staged bytes before one atomic no-replace promotion. The call
+signature and ten persisted v1 schemas remain unchanged.
 
 There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
-in these increments. There is also no shipped renderer, semantic-only
-publication, deterministic rerender proof, or generic derivative container.
-Those are Phase 4.7–4.8 or later services and surfaces, not implied by the
-internal exact-byte publisher.
+in these increments. There is also no shipped renderer or semantic replayer and
+no generic derivative container. The private hooks are trusted conformance
+code, not an untrusted plugin boundary; semantic replay retains complete files
+in memory and its fixture is statically bounded. Public surfaces remain Phase
+4.8, closeout remains Phase 4.9, and generic containers remain Phase 5.
 
 ## Preview, recipes, and optional integrations
 

@@ -50,14 +50,24 @@ bundle view, while callers supply only strict profile, dependency, and file-plan
 evidence. The fifth fresh-reconstructs normalized candidate semantic rows,
 provenance, row-set identity, and membership, then requires exact equality with
 the plan baseline and merged as PR #47 at
-`1675c1a22830d506bdf27e45150170befc984bdf`. The sixth increment implements
+`1675c1a22830d506bdf27e45150170befc984bdf`. The sixth increment implemented
 Python-composition-only, exact-byte conformance publication with source
 and plan re-verification, private descriptor-anchored staging, canonical
 receipt construction, independent closed-tree verification, cancellation, and
-one atomic no-replace promotion. All local gates pass; GitHub review remains
-pending.
+one atomic no-replace promotion. It passed every required check and merged as
+PR #48 at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`; clean local `main` was
+synchronized before Phase 4.7 began.
 
-The default service still has no renderer, and no renderer-selection or public
-adapter surface exists. Semantic-only publication, deterministic rerendering,
-semantic reconstruction of produced bytes, public export commands, generic
-containers, and new consumer profiles remain unimplemented.
+The seventh increment is locally implemented and its required implementation
+and release gates pass; packet-hygiene checks and pull-request review remain
+pending. It invokes the private conformance renderer twice from independent
+strict inputs. Exact profiles require identical normalized byte trees;
+semantic-only profiles require identical versioned canonical semantic
+preimages, complete reconstructed membership, and descriptor-reread staged
+replay before promotion. These runtime checks add no persisted field to the ten
+v1 schemas.
+
+The default service still has no renderer or semantic replayer, and no
+renderer-selection or public adapter surface exists. Public export commands,
+generic containers, new consumer profiles, the Phase 4.9 closeout harness, and
+support promotion remain unimplemented.

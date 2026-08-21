@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 publication boundary)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -45,8 +45,11 @@ typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
 source-derived plan population and normalized semantic membership enforcement,
 plus internal exact-byte atomic publication and independent closed-tree
-verification. No renderer, supported derivative container, or public export
-command ships, and semantic replay remains deferred. The macOS workbench lives
+verification. Phase 4.7 adds private two-render evidence: exact profiles compare
+normalized byte trees, while semantic profiles compare versioned canonical
+preimages and reconstructed membership and replay descriptor-reread staged
+bytes. No renderer or semantic replayer, supported derivative container, or
+public export command ships. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -146,13 +149,15 @@ name.vfbundle/
   candidate `RowSet` from normalized train/evaluation rows and aligned
   provenance, then requires exact planned row-set and complete projection
   equality. It does not inspect produced destination bytes.
-- Its internal `publish` operation supports only exact-byte plans and is
-  reachable through Python composition. It re-verifies the source and plan,
-  checks normalized membership and planned bytes, writes a canonical receipt in
-  descriptor-anchored private staging, independently rewalks the closed tree,
-  and uses one atomic no-replace promotion. The default service has no renderer;
-  no adapter exposes publication, and no generic container or semantic replay is
-  supported.
+- Its internal `publish` operation is reachable through Python composition and
+  supports private exact-byte and semantic-content conformance. It re-verifies
+  the source and plan, renders twice from independent strict inputs, validates
+  normalized membership for both results, compares either complete byte trees
+  or versioned canonical semantic preimages, and uses descriptor-anchored
+  staging plus one atomic no-replace promotion. Semantic output is replayed from
+  staged descriptors before verification. The default service has no renderer
+  or semantic replayer; no adapter exposes publication, and no generic container
+  is supported.
 
 ## Related documentation
 
