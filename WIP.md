@@ -7,7 +7,7 @@ automated gates; beta-prep; private beta workbench Phases 0–2)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 vocabulary cleanup)
+**Last reviewed:** 2026-08-21 (independent-product Phase 3 compatibility proof)
 
 **Next review:** Independent-roadmap Phase 3 closeout; beta label cut, public
 Mac evidence, or any listed-item status change
@@ -132,7 +132,8 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Compatibility checks wired to fail before compile on every surface.
 - [x] One registry exposed through PipelineService, CLI, MCP, and workbench help.
 - [x] Public “format” language inventory and rewrite without persisted-ID changes.
-- [ ] Taxonomy golden round-trip, backward-compatibility proof, and closeout.
+- [x] Taxonomy golden round-trip and pre-taxonomy workspace/bundle compatibility proof.
+- [ ] Full Phase 3 closeout gates and status/support/evidence reconciliation.
 
 The current stage-command runtime is:
 

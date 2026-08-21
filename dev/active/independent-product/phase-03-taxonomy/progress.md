@@ -140,3 +140,41 @@ digests remained unchanged.
 
 **Next action:** Add taxonomy catalog golden round-trip coverage and prove
 existing workspace and bundle backward compatibility before closeout.
+
+## 2026-08-21 — Taxonomy and persisted-v1 compatibility frozen
+
+**Status:** In progress
+
+The shipped nine-key discovery catalog now has a canonical v1 golden. Its
+exact schema metadata, six axes, ordering, absence of a collapsed `format`
+key, and canonical SHA-256 are pinned against the shared registry. The test
+does not create a second serialization envelope for the internal catalog.
+
+A complete schema-v3 parse-to-clean workspace was generated on 2026-08-21
+with pre-taxonomy source revision `f8dd1bf` and is retained as exact bytes.
+Current `Workspace.open` verifies its three-revision history and every
+content-addressed object. Replaying the default `page-numbers` and `whitespace`
+cleaning rules returns unchanged and preserves the exact HEAD, state digest,
+and clean configuration digest.
+
+The pre-taxonomy Group 9 `full_text` bundle is also retained as exact bytes.
+The current strict manifest, attestation, validation, and bundle readers load
+its v1 schemas, and verification reaches `external_digest` against the
+historical manifest SHA-256. Test-only Base64 wrappers preserve metadata files
+whose canonical bytes intentionally have no trailing newline; production
+readers and artifact schemas are unchanged.
+
+Two locally excluded August 6 workspaces also opened with their full
+ten-revision histories, and two locally excluded sealed bundles verified on
+current HEAD. This recorded-local check did not copy owner data into Git.
+
+**Observed verification:** 15 focused taxonomy and compatibility tests passed;
+the full Python suite passed with 764 tests and the one expected transport
+durability warning. The exact local release gate passed with 752 core tests,
+one deselected optional test, Ruff, lock validation, and clean-wheel install.
+Both installed-CLI golden compiles retained their manifest and transport
+digests. Project tracking and the governed corpus-fixture aggregate passed,
+and `git diff --check` was clean.
+
+**Next action:** Run the full Phase 3 exit gates, reconcile support/status and
+the evidence index, then complete closeout only if every gate passes.

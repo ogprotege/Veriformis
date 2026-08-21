@@ -68,8 +68,8 @@
 
 ### 3.8 Migration tests and closeout
 
-- [ ] Add schema/version and golden round-trip tests for the taxonomy catalog.
-- [ ] Prove existing default-rule workspaces and sealed bundles still load.
+- [x] Add schema/version and golden round-trip tests for the taxonomy catalog.
+- [x] Prove existing default-rule workspaces and sealed bundles still load.
 - [ ] Update current status, support registry, evidence index, WIP, and docs.
 - [ ] Complete `closeout.md` and mark Phase 3 completed only if every exit
       gate passes.
