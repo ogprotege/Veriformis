@@ -79,6 +79,13 @@ _PANDOC_TRAILING_ATTR_RE = re.compile(rf"\{{{_PANDOC_ATTR_BODY}\}}(?=[ \t]*$)")
 
 _FOOTNOTE_DEFINITION_RE = re.compile(r"^[ \t]{0,3}\[\^([^\] \r\n]+)\]:")
 
+# The footnote plugin recognizes definitions inside blockquotes and list
+# items (verified empirically), so the raw pre-pass must see through leading
+# container markers to inventory the same definitions the plugin resolves.
+_CONTAINER_MARKER_RE = re.compile(
+    r"[ \t]{0,3}(?:>[ \t]?|[-*+][ \t]+|\d{1,9}[.)][ \t]+)"
+)
+
 _SUPPORTED_TOKEN_TYPES = {
     "blockquote_close",
     "blockquote_open",
@@ -385,8 +392,9 @@ def _source_definition_diagnostic_specs(
     """
     specs: list[dict] = []
     seen_footnotes: dict[str, int] = {}
-    footnote_definitions: dict[str, tuple[int, re.Match[str]]] = {}
+    footnote_definitions: dict[str, tuple[int, int, int]] = {}
     duplicate_footnotes: set[str] = set()
+    duplicate_specs: list[tuple[str, dict]] = []
     literal_lines = {
         line_index
         for token in tokens
@@ -398,35 +406,53 @@ def _source_definition_diagnostic_specs(
         content = line.rstrip("\r\n")
         if line_number - 1 in literal_lines:
             continue
+        offset = 0
         footnote = _FOOTNOTE_DEFINITION_RE.match(content)
+        if footnote is None:
+            offset = _container_marker_offset(content)
+            if offset:
+                footnote = _FOOTNOTE_DEFINITION_RE.match(content[offset:])
         if footnote:
             raw_label = footnote.group(1)
             # The footnote plugin treats labels as case-sensitive identities,
             # unlike CommonMark link-reference labels.
             label = raw_label
+            column_start = offset + footnote.start() + 1
+            column_end = offset + footnote.end() + 1
             first_line = seen_footnotes.get(label)
             if first_line is not None:
                 duplicate_footnotes.add(label)
-                specs.append(
-                    _definition_spec(
-                        code="markdown.duplicate-footnote-definition",
-                        line_number=line_number,
-                        match=footnote,
-                        label=raw_label,
-                        first_line=first_line,
-                        loss_kind="text",
-                        message=(
-                            "A duplicate Markdown footnote definition would replace "
-                            "or discard note text, so canonical recovery was refused."
+                duplicate_specs.append(
+                    (
+                        label,
+                        _definition_spec(
+                            code="markdown.duplicate-footnote-definition",
+                            line_number=line_number,
+                            column_start=column_start,
+                            column_end=column_end,
+                            label=raw_label,
+                            first_line=first_line,
+                            loss_kind="text",
+                            message=(
+                                "A duplicate Markdown footnote definition would "
+                                "replace or discard note text, so canonical "
+                                "recovery was refused."
+                            ),
                         ),
                     )
                 )
             else:
                 seen_footnotes[label] = line_number
-                footnote_definitions[label] = (line_number, footnote)
+                footnote_definitions[label] = (line_number, column_start, column_end)
 
     footnote_refs = environment.get("footnotes", {}).get("refs", {})
-    for label, (line_number, match) in footnote_definitions.items():
+    # A duplicate sighting is only a definition loss when the plugin itself
+    # resolved the label as a definition; raw sightings the tokenizer treated
+    # as ordinary text must not refuse recovery.
+    for label, spec in duplicate_specs:
+        if f":{label}" in footnote_refs:
+            specs.append(spec)
+    for label, (line_number, column_start, column_end) in footnote_definitions.items():
         if label in duplicate_footnotes or footnote_refs.get(f":{label}") != -1:
             continue
         specs.append(
@@ -439,8 +465,8 @@ def _source_definition_diagnostic_specs(
                     kind="text",
                     line_start=line_number,
                     line_end=line_number,
-                    column_start=match.start() + 1,
-                    column_end=match.end() + 1,
+                    column_start=column_start,
+                    column_end=column_end,
                 ),
                 "message": (
                     "An unreferenced Markdown footnote body is absent from the "
@@ -505,11 +531,22 @@ def _source_definition_diagnostic_specs(
     return specs
 
 
+def _container_marker_offset(content: str) -> int:
+    """Return the offset after leading blockquote and list-item markers."""
+    offset = 0
+    while True:
+        marker = _CONTAINER_MARKER_RE.match(content, offset)
+        if marker is None:
+            return offset
+        offset = marker.end()
+
+
 def _definition_spec(
     *,
     code: str,
     line_number: int,
-    match: re.Match[str],
+    column_start: int,
+    column_end: int,
     label: str,
     first_line: int,
     loss_kind: str,
@@ -524,8 +561,8 @@ def _definition_spec(
             kind="text",
             line_start=line_number,
             line_end=line_number,
-            column_start=match.start() + 1,
-            column_end=match.end() + 1,
+            column_start=column_start,
+            column_end=column_end,
         ),
         "message": message,
         "details": {"label": label, "first_definition_line": first_line},

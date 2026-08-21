@@ -9,6 +9,7 @@ from typing import Any
 import yaml
 
 from veriformis.errors import VeriformisError
+from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 
 PIPELINE_SCHEMA_VERSION = "veriformis.pipeline/v1"
 _STAGE_ORDER = (
@@ -23,9 +24,78 @@ _STAGE_ORDER = (
     "seal",
 )
 
+_TOP_LEVEL_KEYS = frozenset(
+    {
+        "schema_version",
+        "workspace",
+        "source_root",
+        "sources",
+        "stages",
+        "recipe_library_id",
+    }
+)
+
+# The exact per-stage config keys veriformis.recipes.runner reads. Anything
+# else is a silent no-op (e.g. a `siz:` typo sealing a dataset with defaults),
+# so unknown keys fail closed here.
+_STAGE_CONFIG_KEYS: dict[str, frozenset[str]] = {
+    "parse": frozenset(),
+    "clean": frozenset({"rules", "custom"}),
+    "chunk": frozenset({"strategy", "size", "overlap"}),
+    "construct": frozenset(
+        {
+            "objective",
+            "source",
+            "target_row_schema",
+            "split_ratio_ppm",
+            "require_review",
+        }
+    ),
+    "curate": frozenset(
+        {
+            "evaluation_required",
+            "allow_empty_evaluation",
+            "minimum_target_characters",
+            "balance_mode",
+            "maximum_records_per_primary_source",
+            "evaluation_ratio_ppm",
+            "split_seed",
+            "instruction",
+        }
+    ),
+    "split": frozenset(),
+    "format": frozenset(),
+    "validate": frozenset(),
+    "seal": frozenset({"out"}),
+}
+
 
 class PipelineSpecError(VeriformisError):
     code = "pipeline-spec-invalid"
+
+
+class _StrictSafeLoader(yaml.SafeLoader):
+    """SafeLoader that fails closed on duplicate mapping keys.
+
+    ``yaml.safe_load`` accepts duplicates last-one-wins, which silently drops
+    an earlier value from a pipeline document.
+    """
+
+    def construct_mapping(self, node, deep=False):
+        seen: set[Any] = set()
+        for key_node, _value_node in node.value:
+            key = self.construct_object(key_node, deep=True)
+            try:
+                duplicate = key in seen
+            except TypeError:
+                # Unhashable keys are rejected by SafeLoader itself below.
+                continue
+            if duplicate:
+                raise PipelineSpecError(
+                    f"pipeline document contains duplicate mapping key {key!r}"
+                )
+            seen.add(key)
+        return super().construct_mapping(node, deep=deep)
 
 
 @dataclass(frozen=True)
@@ -48,7 +118,7 @@ def load_pipeline_spec(path: Path) -> PipelineSpec:
     except UnicodeDecodeError as exc:
         raise PipelineSpecError(f"pipeline document is not UTF-8: {exc}") from exc
     try:
-        value = yaml.safe_load(text)
+        value = yaml.load(text, Loader=_StrictSafeLoader)  # noqa: S506 - SafeLoader subclass
     except yaml.YAMLError as exc:
         raise PipelineSpecError(f"pipeline document is not valid YAML: {exc}") from exc
     if not isinstance(value, dict):
@@ -66,6 +136,11 @@ def pipeline_spec_from_dict(
         raise PipelineSpecError(
             f"unsupported pipeline schema {value.get('schema_version')!r}; "
             f"expected {PIPELINE_SCHEMA_VERSION!r}"
+        )
+    unknown_top = sorted(set(value) - _TOP_LEVEL_KEYS)
+    if unknown_top:
+        raise PipelineSpecError(
+            f"pipeline document contains unknown top-level key(s): {unknown_top}"
         )
     workspace = _resolve_path(value.get("workspace"), base_dir=base_dir, field="workspace")
     source_root = value.get("source_root")
@@ -108,6 +183,11 @@ def pipeline_spec_from_dict(
         if config is None:
             normalized_stages[name] = {}
         elif isinstance(config, dict):
+            unknown_keys = sorted(set(config) - _STAGE_CONFIG_KEYS[name])
+            if unknown_keys:
+                raise PipelineSpecError(
+                    f"stage {name!r} config contains unknown key(s): {unknown_keys}"
+                )
             normalized_stages[name] = dict(config)
         else:
             raise PipelineSpecError(f"stage {name!r} config must be a mapping")
@@ -116,8 +196,14 @@ def pipeline_spec_from_dict(
         for required in ("clean", "chunk", "construct", "curate", "split", "format", "validate"):
             normalized_stages.setdefault(required, {})
     recipe_library_id = value.get("recipe_library_id")
-    if recipe_library_id is not None and not isinstance(recipe_library_id, str):
-        raise PipelineSpecError("recipe_library_id must be a string when provided")
+    if recipe_library_id is not None:
+        if not isinstance(recipe_library_id, str):
+            raise PipelineSpecError("recipe_library_id must be a string when provided")
+        if recipe_library_id not in RECIPE_LIBRARY_IDS:
+            raise PipelineSpecError(
+                f"unknown recipe_library_id {recipe_library_id!r}; "
+                f"expected one of {list(RECIPE_LIBRARY_IDS)!r}"
+            )
     return PipelineSpec(
         schema_version=PIPELINE_SCHEMA_VERSION,
         workspace=workspace,

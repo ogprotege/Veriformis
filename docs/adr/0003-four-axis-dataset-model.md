@@ -44,7 +44,9 @@ planned until versioned contracts and tests exist.
 ## Verification
 
 Phase 3 defines persisted contracts, compatibility matrices, migrations,
-discovery APIs, and invalid-combination tests.
+discovery APIs, and invalid-combination tests. The Phase 3 packet opened
+2026-08-20; `veriformis.taxonomy/v1` is the catalog schema and does not
+change existing construction or row identities.
 
 ## Review triggers
 

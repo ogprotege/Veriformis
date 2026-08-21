@@ -16,6 +16,14 @@ from typing import Any, Literal, Mapping
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from veriformis.bundle import verify_finished_bundle
+from veriformis.bundle.finished import (
+    EVALUATION_PATH,
+    MANIFEST_NAME,
+    PROVENANCE_PATH,
+    TRAIN_PATH,
+    VALIDATION_PATH,
+    FinishedBundleManifest,
+)
 from veriformis.datasets.serialization import _payload_contract
 from veriformis.errors import VeriformisError
 from veriformis.identity import (
@@ -122,6 +130,22 @@ class AptusHandoffDescriptor(_Strict):
 
     @model_validator(mode="after")
     def _identity(self) -> AptusHandoffDescriptor:
+        # The four bound paths are contract constants of the closed minimal-v1
+        # bundle. Anything else (absolute paths, parent traversal, aliases)
+        # is rejected before any consumer touches the filesystem. This is
+        # value validation only: descriptor identity derivation is unchanged.
+        for field_name, expected_path in (
+            ("train", TRAIN_PATH),
+            ("evaluation", EVALUATION_PATH),
+            ("provenance", PROVENANCE_PATH),
+            ("validation", VALIDATION_PATH),
+        ):
+            observed_path = getattr(self, field_name).path
+            if observed_path != expected_path:
+                raise AptusHandoffError(
+                    f"aptus handoff {field_name} path must be the contract "
+                    f"path {expected_path!r}, observed {observed_path!r}"
+                )
         validate_id(self.handoff_id, kind="ahd")
         validate_id(self.bundle_id, kind="bundle")
         validate_sha256(self.manifest_sha256)
@@ -329,27 +353,65 @@ def consume_aptus_handoff(
     if verification.validation_report_id != descriptor.validation_report_id:
         findings.append("validation-report-id-mismatch")
 
+    def _rejected(verified_grade: str) -> AptusConsumptionReport:
+        return AptusConsumptionReport(
+            status="rejected",
+            handoff_id=descriptor.handoff_id,
+            bundle_id=descriptor.bundle_id,
+            assignment_digest=descriptor.assignment_digest,
+            verified_grade=verified_grade,
+            findings=tuple(findings),
+        )
+
+    # Cross-check every binding against the externally anchored manifest the
+    # verification just proved, then read each bound file exactly once. Any
+    # missing or mismatched binding rejects with findings instead of raising.
+    try:
+        manifest_bytes = (bundle_path / MANIFEST_NAME).read_bytes()
+        if sha256_digest(manifest_bytes) != descriptor.manifest_sha256:
+            raise AptusHandoffError(
+                "sealed manifest bytes changed after verification"
+            )
+        manifest = FinishedBundleManifest.from_json_bytes(manifest_bytes)
+    except Exception as exc:  # noqa: BLE001 - reject, never crash post-verify
+        findings.append(f"manifest-read-failed:{exc}")
+        return _rejected(verification.trust_grade)
+    manifest_entries = {file.path: (file.sha256, file.size) for file in manifest.files}
+
+    payloads: dict[str, bytes] = {}
+    binding_failed = False
     for binding in (
         descriptor.train,
         descriptor.evaluation,
         descriptor.provenance,
         descriptor.validation,
     ):
+        manifest_entry = manifest_entries.get(binding.path)
+        if manifest_entry is None:
+            findings.append(f"manifest-binding-missing:{binding.path}")
+            binding_failed = True
+        elif manifest_entry != (binding.sha256, binding.byte_size):
+            findings.append(f"manifest-binding-mismatch:{binding.path}")
+            binding_failed = True
         path = bundle_path / binding.path
         try:
             data = path.read_bytes()
         except OSError as exc:
             findings.append(f"missing-file:{binding.path}:{exc}")
+            binding_failed = True
             continue
         if sha256_digest(data) != binding.sha256:
             findings.append(f"digest-mismatch:{binding.path}")
+            binding_failed = True
         if len(data) != binding.byte_size:
             findings.append(f"byte-size-mismatch:{binding.path}")
+            binding_failed = True
+        payloads[binding.path] = data
+    if binding_failed:
+        return _rejected(verification.trust_grade)
 
-    train_rows = _load_jsonl_objects((bundle_path / descriptor.train.path).read_bytes())
-    evaluation_rows = _load_jsonl_objects(
-        (bundle_path / descriptor.evaluation.path).read_bytes()
-    )
+    train_rows = _load_jsonl_objects(payloads[descriptor.train.path])
+    evaluation_rows = _load_jsonl_objects(payloads[descriptor.evaluation.path])
     if len(train_rows) != descriptor.train.record_count:
         findings.append("train-record-count-mismatch")
     if len(evaluation_rows) != descriptor.evaluation.record_count:
@@ -373,9 +435,7 @@ def consume_aptus_handoff(
         if descriptor.row_schema not in descriptor.backend_capabilities.rejects_row_schemas:
             findings.append(f"backend-unknown-row-schema:{descriptor.row_schema}")
 
-    provenance_rows = _load_jsonl_objects(
-        (bundle_path / descriptor.provenance.path).read_bytes()
-    )
+    provenance_rows = _load_jsonl_objects(payloads[descriptor.provenance.path])
     recomputed = portable_assignment_digest(provenance_rows)
     if recomputed != descriptor.assignment_digest:
         findings.append("assignment-digest-mismatch")
@@ -471,7 +531,10 @@ def _load_jsonl_objects(data: bytes) -> list[dict[str, Any]]:
     if not data:
         return []
     rows: list[dict[str, Any]] = []
-    for line_number, line in enumerate(data.decode("utf-8").splitlines(), start=1):
+    # Sealed JSONL frames records on the single byte b"\n" only. splitlines()
+    # would also break on U+2028/U+2029/U+0085, which row text legitimately
+    # preserves raw (ensure_ascii=False escapes only characters below 0x20).
+    for line_number, line in enumerate(data.decode("utf-8").split("\n"), start=1):
         if not line.strip():
             continue
         try:

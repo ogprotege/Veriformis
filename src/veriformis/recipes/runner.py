@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from veriformis.pipeline.service import PipelineService, StageOutcome
+from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.recipes.pipeline_spec import PipelineSpec, PipelineSpecError
 from veriformis.workspace import Workspace
 
@@ -56,6 +57,11 @@ def run_pipeline_spec(
         elif stage == "construct":
             objective = config.get("objective")
             if objective is None and spec.recipe_library_id:
+                if spec.recipe_library_id not in RECIPE_LIBRARY_IDS:
+                    raise PipelineSpecError(
+                        f"unknown recipe_library_id {spec.recipe_library_id!r}; "
+                        f"expected one of {list(RECIPE_LIBRARY_IDS)!r}"
+                    )
                 objective = spec.recipe_library_id.split(".", 1)[0]
             if not isinstance(objective, str) or not objective:
                 raise PipelineSpecError(

@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-11
+**Last reviewed:** 2026-08-20
 
 **Next review:** Every material architecture or product-boundary decision
 

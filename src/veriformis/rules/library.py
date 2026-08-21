@@ -3,6 +3,7 @@ never delete inline content that merely *looks* structural."""
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -56,6 +57,51 @@ class _LowercaseRule:
         return RuleResult(text=lowered, edits=_diff_edits(text, lowered))
 
 
+class _SpecialCharsRule:
+    """Removes symbol noise (©, •, ★, …) while never deleting Unicode marks.
+
+    Version 2 of 'special-chars'. Version 1 was the regex
+    ``[^\\w\\s.,!?;:'"()/-]``, which deleted combining marks (general
+    categories Mn/Mc/Me) because ``\\w`` does not match them: NFD text lost
+    its accents while NFC survived, and Arabic harakat and Indic matras were
+    destroyed. Marks are structural parts of the letters they follow and are
+    always kept.
+    """
+
+    name = "special-chars"
+    version = 2
+
+    _KEEP = re.compile(r"[\w\s.,!?;:'\"()/-]")
+
+    def __init__(self) -> None:
+        self.params = {
+            "keep_pattern": self._KEEP.pattern,
+            "keep_categories": ["M"],
+        }
+
+    @classmethod
+    def _keeps(cls, char: str) -> bool:
+        return bool(cls._KEEP.match(char)) or unicodedata.category(char).startswith("M")
+
+    def apply(self, text: str):
+        from veriformis.rules.engine import Edit, RuleResult
+
+        kept: list[str] = []
+        edits: list[Edit] = []
+        run_start: int | None = None
+        for index, char in enumerate(text):
+            if self._keeps(char):
+                kept.append(char)
+                if run_start is not None:
+                    edits.append(Edit(run_start, index))
+                    run_start = None
+            elif run_start is None:
+                run_start = index
+        if run_start is not None:
+            edits.append(Edit(run_start, len(text)))
+        return RuleResult(text="".join(kept), edits=edits)
+
+
 def _diff_edits(before: str, after: str):
     """Return deterministic, non-overlapping edits that exactly make `after`."""
     from difflib import SequenceMatcher
@@ -81,7 +127,7 @@ RULES: dict[str, Callable[[], Rule]] = {
     "whitespace": lambda: RegexRule("whitespace", r"[ \t]+", " ", flags=re.MULTILINE),
     "urls": lambda: RegexRule("urls", r"https?://[^\s]+"),
     "emails": lambda: RegexRule("emails", r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"),
-    "special-chars": lambda: RegexRule("special-chars", r"[^\w\s.,!?;:'\"()/-]"),
+    "special-chars": lambda: _SpecialCharsRule(),
     "lowercase": lambda: _LowercaseRule(),
 }
 

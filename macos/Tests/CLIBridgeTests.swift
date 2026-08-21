@@ -306,6 +306,50 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertFalse(plan.last!.arguments.contains { $0.lowercased().contains("aptus") })
     }
 
+    @MainActor
+    func testDefaultCompileFailsClosedAndMatchesCLISplitDefault() throws {
+        XCTAssertFalse(WorkbenchViewModel.defaultAllowEmptyEvaluation)
+        XCTAssertEqual(WorkbenchViewModel.defaultSplitRatioPPM, 500_000)
+
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-defaults-\(UUID().uuidString)")
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defaults.set(output.path, forKey: "veriformis.workbench.defaultOutput")
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        // A fresh workbench must start from the CLI's fail-closed defaults.
+        let workbench = WorkbenchViewModel(defaults: defaults, supportDirectory: support)
+        XCTAssertFalse(workbench.allowEmptyEvaluation)
+        XCTAssertEqual(workbench.splitRatioPPM, 500_000)
+
+        // The default compile plan must never weaken the curate gate…
+        let workspace = URL(fileURLWithPath: "/tmp/ws")
+        let plan = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data"),
+            workspace: workspace,
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            objective: .continuation,
+            allowEmptyEvaluation: workbench.allowEmptyEvaluation,
+            splitRatioPPM: workbench.splitRatioPPM
+        )
+        XCTAssertFalse(
+            plan.flatMap(\.arguments).contains("--allow-empty-evaluation"),
+            "default GUI compile must match the CLI --require-evaluation default"
+        )
+        // …and a continuation plan must carry the CLI's split-ratio default.
+        let construct = try XCTUnwrap(plan.first { $0.stage == .construct })
+        guard let flagIndex = construct.arguments.firstIndex(of: "--split-ratio-ppm") else {
+            return XCTFail("continuation plan must pass --split-ratio-ppm")
+        }
+        XCTAssertEqual(construct.arguments[construct.arguments.index(after: flagIndex)], "500000")
+    }
+
     func testWorkbenchAndLegacyHistoryDefaultToStandalone() throws {
         XCTAssertFalse(WorkbenchViewModel.defaultWriteAptusHandoff)
         let data = try JSONEncoder().encode(historyEntry(writeAptusHandoff: nil))

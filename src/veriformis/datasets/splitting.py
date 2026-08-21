@@ -885,10 +885,12 @@ class _DisjointSet:
         self._parents = list(range(size))
 
     def find(self, item: int) -> int:
-        parent = self._parents[item]
-        if parent != item:
-            self._parents[item] = self.find(parent)
-        return self._parents[item]
+        root = item
+        while self._parents[root] != root:
+            root = self._parents[root]
+        while self._parents[item] != root:
+            self._parents[item], item = root, self._parents[item]
+        return root
 
     def union(self, left: int, right: int) -> None:
         left_root = self.find(left)

@@ -2,6 +2,12 @@
 
 **Status:** Authoritative roadmap for new product work
 
+**Per-phase execution state:**
+[`dev/active/independent-product/program.json`](../../dev/active/independent-product/program.json)
+(Phases 0–2 completed 2026-08-11). Per-phase "Current evidence" blocks record
+facts at the implementation baseline below, not live status; the program
+ledger is the execution authority.
+
 **Created:** 2026-08-11
 
 **Implementation baseline:** `7d116e9c09fb4c64f38b2db2572f820a83c53dba`,
@@ -140,9 +146,9 @@ claim.
 | --- | --- | --- |
 | A — Independent foundation | 0–3 | Product authority, defaults, reliability, and semantic model are trainer-neutral |
 | B — Standalone useful beta | 4–7 | Verified generic exports, goal-first workflows, and existing-dataset mapping work without Aptus |
-| C — Interchange beta | 8–11 | First trainer profiles, columnar outputs, hardened collection ingest, and evidence-qualified OCR |
-| D — Quality and scale candidate | 12–16 | Decision support, review, benchmarked scale, extension boundary, and governed advanced data |
-| E — Product release candidate | 17–19 | Cohesive workbench, automation/publishing boundary, and clean-machine release evidence |
+| C — Interchange beta | 8–11 | First trainer profiles, columnar outputs, expanded evidence-gated profiles, and hardened collection ingest |
+| D — Quality and scale candidate | 12–16 | Evidence-qualified OCR, decision support, review, benchmarked scale, and extension boundary |
+| E — Product release candidate | 17–19 | Governed advanced data, cohesive workbench, and automation/publishing boundary |
 | F — Stable independent product | 20 | Version 1.0 support matrix and maintenance policy pass |
 
 No date is assigned until Phase 0 records capacity and a phase-sized delivery
@@ -155,7 +161,8 @@ estimate. Unmeasured calendar promises would not be evidence-based.
 **Goal:** Make current truth and the independent destination unambiguous before
 behavior changes.
 
-**Current evidence:** The current-status and documentation index still report
+**Current evidence (at baseline `7d116e9`; phase completed — see program
+ledger):** The current-status and documentation index still report
 private workbench Phases 0–1 even though the Phase 2 plan says implemented.
 The old roadmap makes Aptus part of integration and public-release gates. The
 repository remains version `0.1.0` development alpha.
@@ -198,7 +205,8 @@ destination.
 **Goal:** Make the default product behavior and required release path fully
 independent of Aptus.
 
-**Current evidence:** CLI `seal`, MCP `seal`, and the workbench currently default
+**Current evidence (at baseline `7d116e9`; phase completed — see program
+ledger):** CLI `seal`, MCP `seal`, and the workbench currently default
 to emitting an Aptus handoff. Workbench copy recommends Aptus-friendly
 objectives. Existing `PipelineService.seal` itself is neutral.
 
@@ -238,7 +246,8 @@ beyond its separately tested versions.
 **Goal:** Stabilize the existing independent compile path before adding output
 formats.
 
-**Current evidence:** The main-actor workbench calls synchronous
+**Current evidence (at baseline `7d116e9`; phase completed — see program
+ledger):** The main-actor workbench calls synchronous
 `waitUntilExit()`. Finder has added `.DS_Store` inside a retained `.vfbundle`,
 violating the strict closed file set. Phase 2 workbench functionality is
 implemented but status documentation is stale.
@@ -378,7 +387,11 @@ choosing a trainer.
 3. Implement CSV only for mappings that remain structurally lossless. Define
    quoting, encoding, newline, null, empty-string, and Unicode rules. Refuse
    nested values by default.
-4. Implement deterministic archive packaging if selected in Phase 2.
+4. Integrate the deterministic archive transport that Phase 2 already shipped
+   (ADR 0005, [bundle transport contract](../contracts/bundle-transport-v1.md),
+   `veriformis package` / `package-verify`) into the export plan and receipt
+   model. The remaining new scope is deterministic archiving of generic export
+   packs; do not design a second bundle-archive format.
 5. Add import-round-trip fixtures to prove semantic preservation.
 6. Expose exact sample rows and destination tree in dry-run preview.
 7. Document when to use JSONL, JSON, or CSV and why they do not determine the
@@ -461,8 +474,8 @@ training datasets.
 7. Define whether imported train/evaluation/test membership is authoritative,
    advisory, or replaced. Never silently resplit. Imported partitions that
    violate leakage policy must fail or require an explicit new plan.
-8. Support generic JSONL, JSON, and compatible CSV inputs first. Add Parquet and
-   Arrow after Phase 10.
+8. Support generic JSONL, JSON, and compatible CSV inputs first. Add Parquet
+   and Arrow in Phase 9, which extends these mapping flows.
 9. Add row-level rejection exports so users can correct source data without
    losing the audit trail.
 10. Add schema mapping templates as shareable, versioned project artifacts.
@@ -568,7 +581,8 @@ must preserve the offline-default and opt-in network boundary.
 
 **Work for every admitted profile:**
 
-1. Complete the Phase 5 admission record and pin a tested consumer version.
+1. Complete the section 5 admission-gate record and pin a tested consumer
+   version.
 2. Map supported goals and semantic rows to filenames, column/role mappings,
    sidecars, templates, masking, empty-split rules, and loader configuration.
 3. Refuse unsupported preference, tools, multimodal, reasoning, or ranking
@@ -636,7 +650,10 @@ fail safely; documentation exactly matches dispatch and tests.
 
 **Goal:** Recover image-only and mixed PDFs without weakening source evidence.
 
-**Dependencies:** Phase 11 parser hardening and an approved OCR ADR.
+**Dependencies:** Phase 11 parser hardening. Work items 1–2 of this phase
+produce the OCR evaluation evidence and the owner-approved OCR ADR; work
+items 3–8 may begin only after that ADR is accepted, or the phase is
+deferred under work item 2.
 
 **Work:**
 
@@ -789,7 +806,9 @@ evidence.
 **Goal:** Let the supported matrix grow without hard-coding every parser,
 objective, validator, exporter, and consumer into central conditionals.
 
-**Dependencies:** Stable contracts from Phases 3–15.
+**Dependencies:** Stable contracts from the completed phases among 3–15;
+deferred optional phases (for example Phase 12) are excluded, matching the
+program ledger's dependency graph.
 
 **Work:**
 
