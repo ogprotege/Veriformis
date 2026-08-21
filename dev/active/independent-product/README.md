@@ -27,9 +27,10 @@ implementation. Phase 4 opened on 2026-08-21 from baseline `db9d93ef`; item
 4.1 implemented the typed `ExportService` boundary and descriptor-anchored
 verified source inspection and merged as PR #43. Item 4.2 defines strict
 verified-export v1 models and merged as PR #44. Item 4.3 enforces
-trusted-by-default source admission with an explicit lower-trust policy. Plan
-construction, an export writer, public export commands, and generic export
-containers are not implemented yet.
+trusted-by-default source admission with an explicit lower-trust policy and
+merged as PR #45. Item 4.4 adds read-only plan population from one immutable
+verified source view. Destination membership comparison, an export writer,
+public export commands, and generic export containers are not implemented yet.
 
 ## State change procedure
 

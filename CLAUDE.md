@@ -12,9 +12,12 @@ implemented taxonomy contract and discovery surfaces. Phase 4 verified export
 foundation is in progress. Its opening slice introduces the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
 view. Strict verified-export v1 models and trusted-by-default source admission
-with explicit lower trust are implemented. Plan construction, writers, public
-export commands, generic export containers, and planned trainer-specific
-profiles are not implemented. Do not claim public
+with explicit lower trust are implemented. Read-only plan population now
+derives all source identities and the source membership baseline from that
+immutable view; callers provide only strict profile, dependency, and file-plan
+evidence. Destination membership enforcement, writers, public export commands,
+generic export containers, and planned trainer-specific profiles are not
+implemented. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

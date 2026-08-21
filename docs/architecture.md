@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.3 trust boundary)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.4 plan boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -40,10 +40,11 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `construction/`, `datasets/`, `bundle/` — flanked by axial modules:
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
 `exports/` (consumer-neutral verified-derivative composition boundary);
-`handoff/`; `mcp/`; and `cli.py` (Typer adapter). The Phase 4 opening adds only
-the typed export service, descriptor-anchored verified source view, strict
-persisted export models, and fail-closed source-trust admission; no plan
-builder, writer, container, or public export command exists yet. The macOS workbench lives
+`handoff/`; `mcp/`; and `cli.py` (Typer adapter). Phase 4 currently adds the
+typed export service, descriptor-anchored verified source view, strict
+persisted export models, fail-closed source-trust admission, and read-only
+source-derived plan population. No destination renderer, writer, supported
+container, or public export command exists yet. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -133,9 +134,12 @@ name.vfbundle/
   validation, row-set, and verification facts in the bundle verifier's same
   descriptor-anchored pass. Export-source admission requires a retained
   expected manifest digest by default; lower self-consistent trust must be
-  selected explicitly, and supplied evidence never falls back. The service is
-  composed by `PipelineService`; it is not a workspace stage and does not
-  mutate `minimal-v1`.
+  selected explicitly, and supplied evidence never falls back. Its read-only
+  `create_plan` operation derives every source identity and the complete source
+  membership baseline from that immutable pass; callers provide only profile,
+  dependency, and file-plan evidence. The service is composed by
+  `PipelineService`; it is not a workspace stage, does not reopen source paths,
+  and does not mutate `minimal-v1` or write destination content.
 
 ## Related documentation
 

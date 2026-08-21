@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
 
 **Next review:** Any architecture documentation change
 
@@ -105,7 +105,7 @@ flowchart TB
         MCP["mcp/ — local stdio adapter"]
         MAC["macOS workbench — shells the CLI"]
         PIP["pipeline/ — PipelineService composition root"]
-        EXP["exports/ — verified derivative-source service"]
+        EXP["exports/ — verified derivative-plan service"]
         WS["workspace.py — revision store, stage graph, replay-on-commit"]
     end
 
@@ -206,15 +206,18 @@ bundle seals and verifies. The axial units beside this stack are
 `workspace.py`, the transactional kernel; `pipeline/`, whose
 `PipelineService` composes stage behavior and transactions and owns the
 injected `exports.ExportService`; plus the thin `cli.py` and `mcp/` adapters.
-The export service currently establishes only a typed, consumer-neutral source
-boundary over a verified finished bundle. It obtains the manifest, validation
-report, reconstructed row set, and ordinary `VerificationResult` from one
+The export service establishes a typed, consumer-neutral derivative boundary
+over a verified finished bundle. It obtains the manifest, validation report,
+reconstructed row set, and ordinary `VerificationResult` from one
 descriptor-anchored verification pass. It is not a workspace stage, and it
-now shares strict persisted export plan, profile, membership, file-binding,
+shares strict persisted export plan, profile, membership, file-binding,
 receipt, and verification models from `exports/models.py`. Its source admission
 defaults to retained external-digest evidence and requires an explicit policy
-for lower self-consistent trust. It does not yet build plans, write derivatives,
-expose a public export command, or ship a generic container. The CLI exposes eighteen commands: nine stage
+for lower self-consistent trust. Its read-only `create_plan` derives all source
+identities and the complete source membership baseline from that immutable
+view; caller input is limited to strict profiles, dependencies, and file plans.
+It does not compare destination membership, write derivatives, expose a public
+export command, or ship a generic container. The CLI exposes eighteen commands: nine stage
 commands plus maintenance, inspection, recipe automation, MCP, optional Aptus
 handoff, and version surfaces.
 

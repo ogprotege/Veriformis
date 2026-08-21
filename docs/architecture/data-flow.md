@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -190,10 +190,17 @@ membership projection, file evidence, receipt, and verification graph. These
 models publish no derivative bytes. Phase 4.3 makes this export-source entry
 trusted by default: a retained expected manifest digest is required unless the
 caller explicitly selects lower self-consistent trust, and supplied evidence
-never falls back on mismatch. Planning from a source, writing, public commands,
-and generic containers remain absent. The verified source object therefore closes the
-verify-then-read gap for later derivative work without changing the canonical
-six-file bundle or the nine-stage workspace graph.
+never falls back on mismatch. Phase 4.4 adds read-only `create_plan`. It derives
+all source identities, the one objective and source scope, and a complete
+record/row/provenance/assignment/leakage-group/partition/ordinal/payload-digest
+membership baseline from the aligned verified row set and provenance. Callers
+supply only strict profile, dependency, and file-plan evidence.
+
+That projection is the immutable source baseline, not proof that a renderer
+preserved it. Destination reconstruction and comparison remain Phase 4.5;
+writing remains Phase 4.6. No public command or generic container exists. The
+verified source object therefore closes the verify-then-read gap without
+changing the canonical six-file bundle or the nine-stage workspace graph.
 
 ## Persistence: the workspace revision store
 

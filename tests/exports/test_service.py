@@ -3,24 +3,38 @@
 from __future__ import annotations
 
 import base64
+import inspect
 import json
 import typing
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from veriformis.bundle import BundleVerificationError, VerifiedFinishedBundle
+from veriformis.bundle import (
+    BundleFile,
+    BundleVerificationError,
+    FinishedBundleManifest,
+    VerificationResult,
+    VerifiedFinishedBundle,
+)
 from veriformis.bundle import verifier as verifier_module
 from veriformis.errors import ExportContractError, ExportVerificationError
 from veriformis.exports import (
     DEFAULT_EXPORT_SERVICE,
+    ExportConsumerProfile,
+    ExportContainerProfile,
+    ExportDependencyBinding,
+    ExportFilePlan,
+    ExportPlan,
     ExportService,
     SourceTrustGrade,
     SourceTrustPolicy,
 )
 from veriformis.exports import service as service_module
-from veriformis.identity import sha256_digest
+from veriformis.identity import derive_id, sha256_digest
 from veriformis.pipeline import PipelineService
+from veriformis.taxonomy import loss_policy_for_row
 
 FIXTURE = (
     Path(__file__).resolve().parents[1]
@@ -52,6 +66,124 @@ def _bundle_file_bytes(bundle: Path) -> dict[str, bytes]:
         for path in sorted(bundle.rglob("*"))
         if path.is_file()
     }
+
+
+def _exact_plan_evidence() -> tuple[
+    ExportContainerProfile,
+    ExportConsumerProfile,
+    tuple[ExportDependencyBinding, ...],
+    tuple[ExportFilePlan, ...],
+]:
+    container = ExportContainerProfile.create(
+        container_id="phase4-conformance-directory",
+        container_version=7,
+        determinism_claim="portable_exact_bytes",
+    )
+    consumer = ExportConsumerProfile.create(
+        consumer_id="phase4-conformance-consumer",
+        profile_version=3,
+        accepted_row_schemas=("text", "messages"),
+    )
+    dependencies = (
+        ExportDependencyBinding.create(
+            dependency_name="phase4-renderer",
+            dependency_version="rélease-2",
+            dependency_role="renderer",
+        ),
+        ExportDependencyBinding.create(
+            dependency_name="canonical-json",
+            dependency_version="1.0.0",
+            dependency_role="runtime",
+        ),
+    )
+    file_bytes = {
+        "data/train.jsonl": b'{"text":"train"}\n',
+        "data/evaluation.jsonl": (
+            b'{"text":"evaluation-a"}\n'
+            b'{"text":"evaluation-b"}\n'
+        ),
+        "metadata/schema.json": b'{"row_schema":"text"}',
+    }
+    files = (
+        ExportFilePlan.create(
+            path="metadata/schema.json",
+            role="schema-metadata",
+            media_type="application/json",
+            membership_scope="none",
+            record_count=None,
+            semantic_content_sha256=None,
+            expected_sha256=sha256_digest(file_bytes["metadata/schema.json"]),
+            expected_byte_size=len(file_bytes["metadata/schema.json"]),
+        ),
+        ExportFilePlan.create(
+            path="data/train.jsonl",
+            role="training-partition",
+            media_type="application/jsonl",
+            membership_scope="train",
+            record_count=1,
+            semantic_content_sha256=None,
+            expected_sha256=sha256_digest(file_bytes["data/train.jsonl"]),
+            expected_byte_size=len(file_bytes["data/train.jsonl"]),
+        ),
+        ExportFilePlan.create(
+            path="data/evaluation.jsonl",
+            role="evaluation-partition",
+            media_type="application/jsonl",
+            membership_scope="evaluation",
+            record_count=2,
+            semantic_content_sha256=None,
+            expected_sha256=sha256_digest(file_bytes["data/evaluation.jsonl"]),
+            expected_byte_size=len(file_bytes["data/evaluation.jsonl"]),
+        ),
+    )
+    return container, consumer, dependencies, files
+
+
+def _semantic_plan_evidence() -> tuple[
+    ExportContainerProfile,
+    tuple[ExportDependencyBinding, ...],
+    tuple[ExportFilePlan, ...],
+]:
+    container = ExportContainerProfile.create(
+        container_id="phase4-semantic-conformance",
+        container_version=2,
+        determinism_claim="semantic_content_only",
+    )
+    dependency = ExportDependencyBinding.create(
+        dependency_name="semantic-renderer",
+        dependency_version="2.1.0",
+        dependency_role="renderer",
+    )
+    file_plan = ExportFilePlan.create(
+        path="records/all.rows",
+        role="complete-dataset",
+        media_type="application/json",
+        membership_scope="all",
+        record_count=3,
+        semantic_content_sha256=sha256_digest(b"three canonical semantic rows"),
+        expected_sha256=None,
+        expected_byte_size=None,
+    )
+    return container, (dependency,), (file_plan,)
+
+
+def _create_exact_plan(
+    service: ExportService,
+    bundle: Path,
+    *,
+    source_trust_policy: SourceTrustPolicy = "require_external_digest",
+    expected_manifest_sha256: str | None = EXPECTED_MANIFEST_SHA256,
+) -> ExportPlan:
+    container, consumer, dependencies, file_plans = _exact_plan_evidence()
+    return service.create_plan(
+        bundle,
+        container_profile=container,
+        consumer_profile=consumer,
+        dependencies=dependencies,
+        file_plans=file_plans,
+        source_trust_policy=source_trust_policy,
+        expected_manifest_sha256=expected_manifest_sha256,
+    )
 
 
 def test_export_service_reconstructs_one_anchored_immutable_source(tmp_path: Path):
@@ -286,6 +418,543 @@ def test_export_source_fails_closed_on_post_fixture_tampering(
         )
 
     assert _bundle_file_bytes(bundle) == before
+
+
+def test_create_plan_binds_the_complete_verified_source_and_output_evidence(
+    tmp_path: Path,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    container, consumer, dependencies, file_plans = _exact_plan_evidence()
+
+    plan = ExportService().create_plan(
+        bundle,
+        container_profile=container,
+        consumer_profile=consumer,
+        dependencies=dependencies,
+        file_plans=file_plans,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+
+    snapshot = source.validation_report.snapshot
+    row_set = source.row_set
+    assert plan.source_bundle_id == source.manifest.bundle_id
+    assert plan.source_manifest_sha256 == source.verification.manifest_sha256
+    assert plan.source_content_root_sha256 == source.manifest.content_root_sha256
+    assert plan.source_verification_id == source.verification.verification_id
+    assert plan.source_trust_policy == "require_external_digest"
+    assert plan.source_trust_grade == "external_digest"
+    assert plan.dataset_snapshot_id == snapshot.snapshot_id
+    assert plan.validation_report_id == source.validation_report.report_id
+    assert plan.finished_dataset_plan_id == snapshot.plan_id
+    assert plan.recipe_id == snapshot.recipe_id
+    assert plan.construction_result_id == snapshot.construction_result_id
+    assert plan.curation_result_id == snapshot.curation_result_id
+    assert plan.serialization_plan_id == row_set.serialization_plan_id
+    assert plan.split_result_id == snapshot.split_result_id
+    assert plan.row_set_id == snapshot.row_set_id
+    assert plan.source_ids == snapshot.source_ids
+    assert plan.row_schema == row_set.row_schema == "text"
+    assert plan.loss_policy == loss_policy_for_row(row_set.row_schema)
+    assert plan.objective_id == row_set.provenance[0].objective_id
+    assert {item.objective_id for item in row_set.provenance} == {
+        plan.objective_id
+    }
+    assert plan.derivative_policy == "preserve_membership_and_semantics"
+    assert plan.overwrite_policy == "refuse"
+
+    projection = plan.membership_projection
+    rows = (*row_set.train_rows, *row_set.evaluation_rows)
+    assert projection.split_result_id == row_set.split_result_id
+    assert projection.row_set_id == row_set.row_set_id
+    assert projection.row_schema == row_set.row_schema
+    assert projection.train_record_count == row_set.train_row_count == 1
+    assert projection.evaluation_record_count == row_set.evaluation_row_count == 2
+    assert projection.total_record_count == row_set.total_row_count == 3
+    assert len(projection.entries) == len(rows) == len(row_set.provenance)
+    for entry, row, provenance in zip(
+        projection.entries,
+        rows,
+        row_set.provenance,
+        strict=True,
+    ):
+        assert (
+            entry.record_id,
+            entry.row_id,
+            entry.provenance_id,
+            entry.assignment_id,
+            entry.leakage_group_id,
+            entry.partition,
+            entry.ordinal,
+            entry.payload_sha256,
+        ) == (
+            row.record_id,
+            row.row_id,
+            provenance.provenance_id,
+            provenance.assignment_id,
+            provenance.leakage_group_id,
+            provenance.partition,
+            provenance.ordinal,
+            row.payload_sha256,
+        )
+
+    assert plan.container_profile == container
+    assert plan.container_profile.container_version == 7
+    assert plan.consumer_profile == consumer
+    assert plan.consumer_profile.profile_version == 3
+    assert plan.dependencies == tuple(
+        sorted(dependencies, key=lambda item: item.dependency_id)
+    )
+    assert any(
+        dependency.dependency_version == "rélease-2"
+        for dependency in plan.dependencies
+    )
+    assert plan.file_plans == tuple(sorted(file_plans, key=lambda item: item.path))
+    assert tuple(item.path for item in plan.file_plans) == (
+        "data/evaluation.jsonl",
+        "data/train.jsonl",
+        "metadata/schema.json",
+    )
+    for file_plan in plan.file_plans:
+        assert file_plan.media_type in {"application/json", "application/jsonl"}
+        assert file_plan.expected_sha256 is not None
+        assert file_plan.expected_byte_size is not None
+        assert file_plan.semantic_content_sha256 is None
+
+
+def test_create_plan_binds_semantic_only_evidence_without_overclaiming_bytes(
+    tmp_path: Path,
+):
+    bundle = _materialize_bundle(tmp_path)
+    container, dependencies, file_plans = _semantic_plan_evidence()
+
+    plan = ExportService().create_plan(
+        bundle,
+        container_profile=container,
+        consumer_profile=None,
+        dependencies=dependencies,
+        file_plans=file_plans,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+
+    assert plan.consumer_profile is None
+    assert plan.container_profile.determinism_claim == "semantic_content_only"
+    assert len(plan.file_plans) == 1
+    planned = plan.file_plans[0]
+    assert planned.path == "records/all.rows"
+    assert planned.membership_scope == "all"
+    assert planned.record_count == 3
+    assert planned.semantic_content_sha256 == file_plans[0].semantic_content_sha256
+    assert planned.expected_sha256 is None
+    assert planned.expected_byte_size is None
+
+
+@pytest.mark.parametrize(
+    ("source_trust_policy", "expected_manifest_sha256", "expected_grade"),
+    [
+        ("require_external_digest", EXPECTED_MANIFEST_SHA256, "external_digest"),
+        ("allow_self_consistent", None, "self_consistent"),
+        ("allow_self_consistent", EXPECTED_MANIFEST_SHA256, "external_digest"),
+    ],
+)
+def test_create_plan_persists_requested_policy_and_observed_grade_exactly(
+    tmp_path: Path,
+    source_trust_policy: SourceTrustPolicy,
+    expected_manifest_sha256: str | None,
+    expected_grade: SourceTrustGrade,
+):
+    bundle = _materialize_bundle(tmp_path)
+
+    plan = _create_exact_plan(
+        ExportService(),
+        bundle,
+        source_trust_policy=source_trust_policy,
+        expected_manifest_sha256=expected_manifest_sha256,
+    )
+
+    assert plan.source_trust_policy == source_trust_policy
+    assert plan.source_trust_grade == expected_grade
+
+
+def test_create_plan_is_order_and_portable_root_independent(tmp_path: Path):
+    first_bundle = _materialize_bundle(tmp_path / "first-root")
+    second_bundle = _materialize_bundle(tmp_path / "second-root")
+    container, consumer, dependencies, file_plans = _exact_plan_evidence()
+    service = ExportService()
+
+    first = service.create_plan(
+        first_bundle,
+        container_profile=container,
+        consumer_profile=consumer,
+        dependencies=dependencies,
+        file_plans=file_plans,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    second = service.create_plan(
+        second_bundle,
+        container_profile=container,
+        consumer_profile=consumer,
+        dependencies=tuple(reversed(dependencies)),
+        file_plans=tuple(reversed(file_plans)),
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+
+    assert first.export_plan_id == second.export_plan_id
+    assert first.canonical_bytes() == second.canonical_bytes()
+    portable = first.canonical_bytes()
+    assert str(first_bundle).encode() not in portable
+    assert str(second_bundle).encode() not in portable
+    for forbidden_runtime_field in (
+        b'"bundle_path"',
+        b'"destination_root"',
+        b'"created_at"',
+        b'"process_id"',
+        b'"temporary_path"',
+        b'"warning"',
+    ):
+        assert forbidden_runtime_field not in portable
+
+
+def test_create_plan_identity_binds_profile_and_dependency_versions(tmp_path: Path):
+    bundle = _materialize_bundle(tmp_path)
+    container, consumer, dependencies, file_plans = _exact_plan_evidence()
+    service = ExportService()
+    common = {
+        "bundle": bundle,
+        "consumer_profile": consumer,
+        "dependencies": dependencies,
+        "file_plans": file_plans,
+        "expected_manifest_sha256": EXPECTED_MANIFEST_SHA256,
+    }
+    baseline = service.create_plan(container_profile=container, **common)
+    changed_container = service.create_plan(
+        container_profile=ExportContainerProfile.create(
+            container_id=container.container_id,
+            container_version=container.container_version + 1,
+            determinism_claim=container.determinism_claim,
+        ),
+        **common,
+    )
+    changed_consumer = service.create_plan(
+        container_profile=container,
+        **{
+            **common,
+            "consumer_profile": ExportConsumerProfile.create(
+                consumer_id=consumer.consumer_id,
+                profile_version=consumer.profile_version + 1,
+                accepted_row_schemas=consumer.accepted_row_schemas,
+            ),
+        },
+    )
+    changed_dependency = service.create_plan(
+        container_profile=container,
+        **{
+            **common,
+            "dependencies": (
+                ExportDependencyBinding.create(
+                    dependency_name=dependencies[0].dependency_name,
+                    dependency_version="rélease-3",
+                    dependency_role=dependencies[0].dependency_role,
+                ),
+                dependencies[1],
+            ),
+        },
+    )
+
+    assert len(
+        {
+            baseline.export_plan_id,
+            changed_container.export_plan_id,
+            changed_consumer.export_plan_id,
+            changed_dependency.export_plan_id,
+        }
+    ) == 4
+
+
+@pytest.mark.parametrize(
+    "mismatch",
+    (
+        "verification-content-root",
+        "snapshot-row-set",
+        "mixed-objective",
+        "coherent-stale-plan",
+        "manifest-snapshot-file",
+    ),
+)
+def test_create_plan_rejects_impossible_verified_source_graphs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mismatch: str,
+):
+    bundle = _materialize_bundle(tmp_path)
+    source = verifier_module.inspect_finished_bundle(
+        bundle,
+        expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+    )
+    if mismatch == "verification-content-root":
+        impossible = replace(
+            source,
+            verification=source.verification.model_copy(
+                update={"content_root_sha256": "0" * 64}
+            ),
+        )
+    elif mismatch == "snapshot-row-set":
+        impossible = replace(
+            source,
+            row_set=source.row_set.model_copy(
+                update={
+                    "split_result_id": derive_id(
+                        "spt",
+                        {"fixture": "another-split"},
+                    )
+                }
+            ),
+        )
+    elif mismatch == "mixed-objective":
+        provenance = source.row_set.provenance
+        impossible = replace(
+            source,
+            row_set=source.row_set.model_copy(
+                update={
+                    "provenance": (
+                        provenance[0].model_copy(
+                            update={
+                                "objective_id": derive_id(
+                                    "obj",
+                                    {"fixture": "another-objective"},
+                                )
+                            }
+                        ),
+                        *provenance[1:],
+                    )
+                }
+            ),
+        )
+    elif mismatch == "coherent-stale-plan":
+        alternate_plan_id = derive_id("fdp", {"fixture": "substituted-plan"})
+        substituted_provenance = tuple(
+            item.model_copy(update={"plan_id": alternate_plan_id})
+            for item in source.row_set.provenance
+        )
+        substituted_row_set = source.row_set.model_copy(
+            update={
+                "plan_id": alternate_plan_id,
+                "provenance": substituted_provenance,
+            }
+        )
+        substituted_snapshot = source.validation_report.snapshot.model_copy(
+            update={"plan_id": alternate_plan_id}
+        )
+        substituted_report = source.validation_report.model_copy(
+            update={"snapshot": substituted_snapshot}
+        )
+        impossible = replace(
+            source,
+            validation_report=substituted_report,
+            row_set=substituted_row_set,
+        )
+    else:
+        train_descriptor = next(
+            item for item in source.manifest.files if item.path == "data/train.jsonl"
+        )
+        substituted_train = BundleFile.create(
+            path=train_descriptor.path,
+            data=b'{"text":"substituted"}\n',
+            role=train_descriptor.role,
+            media_type=train_descriptor.media_type,
+            record_count=train_descriptor.record_count,
+        )
+        substituted_files = tuple(
+            substituted_train if item.path == substituted_train.path else item
+            for item in source.manifest.files
+        )
+        substituted_manifest = FinishedBundleManifest.create(
+            dataset_snapshot_id=source.manifest.dataset_snapshot_id,
+            validation_report_id=source.manifest.validation_report_id,
+            files=substituted_files,
+        )
+        substituted_manifest_sha256 = sha256_digest(
+            substituted_manifest.canonical_bytes()
+        )
+        substituted_verification = VerificationResult.create(
+            bundle_id=substituted_manifest.bundle_id,
+            dataset_snapshot_id=substituted_manifest.dataset_snapshot_id,
+            validation_report_id=substituted_manifest.validation_report_id,
+            manifest_sha256=substituted_manifest_sha256,
+            content_root_sha256=substituted_manifest.content_root_sha256,
+            trust_grade=source.verification.trust_grade,
+            payload_file_count=source.verification.payload_file_count,
+            declared_record_count=source.verification.declared_record_count,
+        )
+        impossible = replace(
+            source,
+            manifest=substituted_manifest,
+            verification=substituted_verification,
+        )
+    service = ExportService()
+    monkeypatch.setattr(
+        service,
+        "verified_source",
+        lambda *args, **kwargs: impossible,
+    )
+
+    with pytest.raises(ExportVerificationError) as caught:
+        _create_exact_plan(service, bundle)
+
+    assert caught.value.code == "export-verification-invalid"
+
+
+def test_create_plan_wraps_invalid_caller_evidence_in_contract_error(tmp_path: Path):
+    bundle = _materialize_bundle(tmp_path)
+    container, consumer, dependencies, file_plans = _exact_plan_evidence()
+    refusing_consumer = ExportConsumerProfile.create(
+        consumer_id="refusing-consumer",
+        profile_version=1,
+        accepted_row_schemas=("prompt_completion",),
+    )
+    invalid_cases = (
+        {
+            "container_profile": container.model_copy(
+                update={"container_version": 0}
+            ),
+            "consumer_profile": consumer,
+            "dependencies": dependencies,
+            "file_plans": file_plans,
+        },
+        {
+            "container_profile": container,
+            "consumer_profile": refusing_consumer,
+            "dependencies": dependencies,
+            "file_plans": file_plans,
+        },
+        {
+            "container_profile": container,
+            "consumer_profile": consumer,
+            "dependencies": (
+                dependencies[0].model_copy(update={"dependency_version": ""}),
+                dependencies[1],
+            ),
+            "file_plans": file_plans,
+        },
+        {
+            "container_profile": container,
+            "consumer_profile": consumer,
+            "dependencies": dependencies,
+            "file_plans": (
+                file_plans[0].model_copy(update={"path": "/private/output.json"}),
+                *file_plans[1:],
+            ),
+        },
+        {
+            "container_profile": container,
+            "consumer_profile": consumer,
+            "dependencies": dependencies,
+            "file_plans": (
+                file_plans[0],
+                file_plans[1].model_copy(update={"record_count": 99}),
+                file_plans[2],
+            ),
+        },
+    )
+
+    for evidence in invalid_cases:
+        with pytest.raises(ExportContractError) as caught:
+            ExportService().create_plan(
+                bundle,
+                **evidence,  # type: ignore[arg-type]
+                expected_manifest_sha256=EXPECTED_MANIFEST_SHA256,
+            )
+        assert caught.value.code == "export-contract-invalid"
+
+
+def test_create_plan_rejects_a_non_source_admission_result(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    bundle = _materialize_bundle(tmp_path)
+    service = ExportService()
+    monkeypatch.setattr(
+        service,
+        "verified_source",
+        lambda *args, **kwargs: object(),
+    )
+
+    with pytest.raises(ExportVerificationError, match="source model evidence"):
+        _create_exact_plan(service, bundle)
+
+
+def test_create_plan_exposes_no_membership_or_runtime_destination_controls():
+    parameters = set(inspect.signature(ExportService.create_plan).parameters)
+
+    assert {
+        "bundle",
+        "container_profile",
+        "consumer_profile",
+        "dependencies",
+        "file_plans",
+        "source_trust_policy",
+        "expected_manifest_sha256",
+    } <= parameters
+    assert parameters.isdisjoint(
+        {
+            "source_ids",
+            "row_schema",
+            "objective_id",
+            "membership_projection",
+            "entries",
+            "include",
+            "exclude",
+            "filter",
+            "balance",
+            "partition",
+            "resplit",
+            "target",
+            "destination_root",
+            "overwrite_policy",
+        }
+    )
+
+
+def test_create_plan_is_read_only_and_admits_the_source_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    bundle = _materialize_bundle(tmp_path)
+    before = _bundle_file_bytes(bundle)
+    before_paths = tuple(
+        path.relative_to(tmp_path).as_posix()
+        for path in sorted(tmp_path.rglob("*"))
+    )
+    service = ExportService()
+    original_verified_source = service.verified_source
+    admission_count = 0
+
+    def tracked_verified_source(*args: object, **kwargs: object):
+        nonlocal admission_count
+        admission_count += 1
+        return original_verified_source(*args, **kwargs)
+
+    def reject_write(*args: object, **kwargs: object) -> None:
+        raise AssertionError("plan population must not write")
+
+    monkeypatch.setattr(service, "verified_source", tracked_verified_source)
+    monkeypatch.setattr(Path, "mkdir", reject_write)
+    monkeypatch.setattr(Path, "write_bytes", reject_write)
+    monkeypatch.setattr(service_module.os, "replace", reject_write)
+
+    plan = _create_exact_plan(service, bundle)
+
+    assert isinstance(plan, ExportPlan)
+    assert admission_count == 1
+    assert _bundle_file_bytes(bundle) == before
+    assert tuple(
+        path.relative_to(tmp_path).as_posix()
+        for path in sorted(tmp_path.rglob("*"))
+    ) == before_paths
+    assert not (bundle / "export-receipt.json").exists()
 
 
 def test_pipeline_composition_root_owns_the_injected_export_service():

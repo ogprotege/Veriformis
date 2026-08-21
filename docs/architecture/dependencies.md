@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
 
 **Next review:** Any architecture or dependency change
 
@@ -176,7 +176,11 @@ strict export models below that service; they depend on the finished-bundle
 verification value, contract registry, identity substrate, and taxonomy loss
 mapping without adding a workspace dependency. Phase 4.3 adds only
 service-local trust-policy validation around that same inspector and those
-model aliases, so it adds no new layer or workspace dependency edge. `cli.py` and
+model aliases. Phase 4.4 adds a read-only service composition from that
+immutable bundle view into the existing strict export models. It derives the
+source membership baseline from the already reconstructed row set and
+provenance and adds no source reread, workspace dependency, destination I/O, or
+new layer edge. `cli.py` and
 `mcp/server.py` translate their respective protocols into pipeline methods;
 the SwiftUI workbench shells the CLI. No adapter exposes export operations yet.
 This arrangement needs no dependency injection container because the contracts

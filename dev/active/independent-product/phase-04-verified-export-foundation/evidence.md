@@ -1,6 +1,6 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phases 4.1–4.2 merged; Phase 4.3 local gates passed
+**Evidence status:** In progress — Phases 4.1–4.3 merged; Phase 4.4 local gates passed
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -19,7 +19,9 @@
 
 - [x] Strict export contract models and canonical identity replay.
 - [x] Explicit trusted and lower-trust source policy.
-- [ ] Complete source, split, row, profile, dependency, and destination bindings.
+- [x] Complete source, split, row, profile, dependency, and output-plan bindings.
+- [x] Complete immutable source membership baseline derived from aligned rows and
+      provenance.
 - [ ] No-membership-change proof.
 - [ ] Atomic, path-safe, cancelable, no-replace publication.
 - [ ] Exact-byte and semantic-only evidence limits.
@@ -102,3 +104,37 @@ trainer profile.
 This evidence proves only source-trust admission. It does not claim plan
 population, destination binding, writing, public commands, a production
 container, or a trainer profile.
+
+PR #45 passed every required GitHub check and merged as `159fcce4`. Local
+`main` was clean and synchronized to that commit before Phase 4.4 began.
+
+## 2026-08-21 — Phase 4.4 source-derived plan population
+
+- `ExportService.create_plan` performs one trusted source admission and derives
+  every source identity, objective identity, source-ID scope, and complete
+  source membership baseline from the returned immutable bundle view.
+- The membership baseline binds record, row, provenance, assignment,
+  leakage-group, partition, ordinal, and payload-digest facts in authoritative
+  source order. It is not accepted from the caller.
+- Caller-controlled inputs are limited to the strict container profile,
+  optional consumer profile, dependencies, file plans, and source-trust
+  policy/evidence. Invalid or cross-source evidence fails before any write.
+- Exact-byte file plans bind expected SHA-256 and size; semantic-only file plans
+  bind semantic content and intentionally defer actual instance SHA-256 and
+  size to later destination evidence.
+- No destination membership reconstruction or comparison, writer, receipt,
+  public surface, supported container, or trainer profile is claimed.
+
+- Focused export-service, model, and contract suite: 99 passed.
+- Full Python suite: 863 passed with the expected exercised transport
+  durability-warning regression warning.
+- Exact standalone release gate: 851 passed, 1 deselected, the same expected
+  warning; clean-wheel install, both objective goldens, external-digest checks,
+  and deterministic transports passed with retained digests unchanged.
+- Ruff, project tracking, CLI/workbench parity, JSON and shell structure, 329
+  changed-document local links, and `git diff --check` passed.
+- macOS XCTest: 38 passed.
+- Independent adversarial review found a coherent stale-identity substitution
+  gap. Fresh strict source-model replay plus manifest/snapshot/report/row-set
+  byte-edge closure corrected it; the reproducer and adjacent forged-graph
+  cases now fail closed, and re-review found no remaining blocker.

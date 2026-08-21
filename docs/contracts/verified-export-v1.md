@@ -9,14 +9,15 @@
 **Roadmap scope:** Independent-product Phase 4
 
 **Implementation status:** Phase 4.2 implements the strict persisted models in
-this contract, and Phase 4.3 implements fail-closed read-only source-trust
-admission. It does not implement an export writer, publisher, independent
-export verifier, CLI or MCP export commands, workbench export controls, or a
-supported product export container. Plan population also remains deferred.
+this contract, Phase 4.3 implements fail-closed read-only source-trust
+admission, and Phase 4.4 implements read-only source-derived plan population.
+It does not implement destination-membership comparison, an export writer,
+publisher, independent export verifier, CLI or MCP export commands, workbench
+export controls, or a supported product export container.
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust admission)
+**Last reviewed:** 2026-08-21 (Phase 4.4 source-derived plan population)
 
-**Next review:** Phase 4.4 complete source/output binding or any export schema
+**Next review:** Phase 4.5 derivative-only enforcement or any export schema
 change
 
 ## Purpose
@@ -27,12 +28,14 @@ derivatives of one verified Veriformis finished bundle. The sealed
 receipt-bound derivative; it is not a second construction, curation,
 balancing, splitting, or validation pipeline.
 
-The Phase 4.2 implementation is models only. It establishes exact plans,
+The Phase 4.2 implementation establishes exact models for plans,
 profiles, dependency bindings, file expectations, membership projections,
 receipts, and successful-verification evidence so later Phase 4 increments can
 implement one shared service without inventing incompatible persistence.
 Phase 4.3 adds only the read-only source admission policy described below; it
-does not populate a plan or create derivative files.
+does not create derivative files. Phase 4.4 adds read-only plan population from
+one admitted source and binds the source membership baseline; it does not
+render, compare, or publish destination content.
 
 ## Normative language
 
@@ -308,7 +311,7 @@ it. Any impossible inspector result that violates either postcondition fails
 as `export-verification-invalid`; the service never relabels the result.
 
 The verified source records the observed grade, not the requested policy.
-Phase 4.4 plan population will persist both the caller's exact policy and the
+Phase 4.4 plan population persists both the caller's exact policy and the
 observed grade in `ExportPlan`. Ordinary bundle inspection and verification
 remain capable of explicitly graded self-consistent operation; the secure
 default here applies only to export-source admission.
@@ -356,6 +359,39 @@ exactly one `train` file plus one `evaluation` file. Each planned record count
 MUST equal the corresponding complete membership count. No plan field permits
 filtering, balancing, target construction, partition selection, or resplitting.
 
+### Read-only plan population
+
+`ExportService.create_plan` is the only implemented plan-population operation.
+It MUST call `verified_source` exactly once and MUST derive every source fact
+from the returned immutable `VerifiedFinishedBundle`. Beyond the source bundle
+locator, callers supply only the container profile, optional consumer profile,
+dependency bindings, file plans, and the source trust policy and evidence used
+for admission. They MUST NOT supply or override source identities, row or
+objective facts, split facts, or membership entries.
+
+The service MUST re-close the manifest, verification result, validation report,
+dataset snapshot, row set, and aligned provenance before creating a plan. It
+derives the complete source membership baseline in authoritative partition and
+ordinal order. Each entry binds the source record, row, provenance, assignment,
+leakage group, partition, ordinal, and payload digest. The service also derives
+the one objective identity and complete source-ID scope from that aligned
+evidence. Missing, inconsistent, or substituted verified-source facts fail as
+`export-verification-invalid`; invalid caller-supplied profile, dependency, or
+file-plan evidence fails as `export-contract-invalid`.
+
+This source projection is the immutable comparison baseline only. Phase 4.4
+does not render or reconstruct destination membership and therefore does not
+prove that an exporter preserved membership. Phase 4.5 independently
+reconstructs destination membership and compares it with this baseline.
+
+For `portable_exact_bytes`, each populated file plan binds its expected byte
+SHA-256 and byte size. For `semantic_content_only`, each populated file plan
+binds the semantic-content SHA-256 and leaves exact-byte expectations null; the
+actual produced-instance SHA-256 and byte size belong to the destination
+binding and receipt after writing. Plan population accepts no absolute
+destination root and performs no filesystem write, staging, promotion, receipt,
+or destination verification operation.
+
 ## `ExportReceipt`
 
 An export receipt contains exactly `schema_version`, `export_receipt_id`,
@@ -394,7 +430,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2–4.3 implementation boundary
+## Phase 4.2–4.4 implementation boundary
 
 Phase 4.2 implements:
 
@@ -415,12 +451,21 @@ Phase 4.3 additionally implements:
 - fail-closed missing, malformed, mismatched, tampered, and impossible trust
   evidence tests before any destination operation exists.
 
-Phase 4.2–4.3 do **not** implement:
+Phase 4.4 additionally implements:
+
+- one read-only `ExportService.create_plan` operation over the existing trusted
+  source-admission boundary;
+- internally derived source, objective, row, split, and complete source
+  membership-baseline bindings;
+- caller-supplied container, optional consumer, dependency, and output-file
+  planning evidence under the strict persisted models; and
+- plan identity replay without destination-root or filesystem state.
+
+Phase 4.2–4.4 do **not** implement:
 
 - selecting or registering an export implementation;
-- verified-source-to-plan population and complete runtime binding checks
-  (Phase 4.4);
-- destination membership reconstruction (Phase 4.5);
+- renderer or destination membership reconstruction, comparison, or mutation
+  rejection (Phase 4.5);
 - filesystem staging, writing, cancellation, promotion, cleanup, or independent
   export verification (Phase 4.6);
 - deterministic rerendering or semantic-content replay (Phase 4.7);
@@ -432,7 +477,7 @@ Phase 4.2–4.3 do **not** implement:
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2–4.3 MUST NOT add a generic export container or
+not support claims. Phase 4.2–4.4 MUST NOT add a generic export container or
 consumer profile to taxonomy discovery or the support registry. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;

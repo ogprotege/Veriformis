@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source trust remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 4.4 plan population remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -13,7 +13,7 @@
 Veriformis already seals a strict six-file `minimal-v1` directory whose
 manifest binds the exact dataset snapshot, partitions, provenance, validation,
 and attestation. Generic external exports and named trainer packs do not yet
-have a shared service or receipt.
+have a writer, receipt, or supported product container.
 
 ## Decision
 
@@ -30,8 +30,8 @@ plan and bundle, not an export option.
 
 One canonical lineage prevents each exporter from becoming a second pipeline.
 Users receive both a trainer-friendly artifact and a verifiable relationship to
-the source bundle. The exact export contract, receipts, and deterministic-byte
-claims remain Phase 4 implementation work.
+the source bundle. Destination enforcement, receipts, publication, and
+deterministic rerendering remain Phase 4 implementation work.
 
 ## Alternatives considered
 
@@ -53,8 +53,11 @@ and captures source semantics in the finished-bundle verifier's existing
 descriptor-anchored pass. It does not add an export writer, mutate the bundle,
 or establish a second compiler stage. Phase 4.2 adds the exact persisted export
 models while retaining that boundary. Phase 4.3 adds trusted-by-default,
-read-only source admission with explicit lower trust; planning, writing, and
-independent derivative verification remain later increments.
+read-only source admission with explicit lower trust. Phase 4.4 adds read-only
+plan population, deriving all source identities and the complete source
+membership baseline from the admitted immutable bundle view. Destination
+membership comparison, writing, and independent derivative verification remain
+later increments.
 
 ## Review triggers
 

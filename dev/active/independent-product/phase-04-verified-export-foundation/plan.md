@@ -40,11 +40,12 @@ branch is created.
 
 ### 4.4 Bind complete source and output evidence
 
-- [ ] Bind bundle, manifest, snapshot, validation, split, row-set, and row-schema
+- [x] Bind bundle, manifest, snapshot, validation, split, row-set, and row-schema
       identities.
-- [ ] Bind container/profile versions, dependencies, normalized output paths,
-      media types, sizes, row counts, and SHA-256 values.
-- [ ] Keep absolute destination roots, clocks, temporary names, and warnings out
+- [x] Bind container/profile versions, dependencies, normalized output paths,
+      media types, row counts, and the profile's exact-byte or semantic digest
+      evidence.
+- [x] Keep absolute destination roots, clocks, temporary names, and warnings out
       of portable identities.
 
 ### 4.5 Enforce the derivative-only boundary

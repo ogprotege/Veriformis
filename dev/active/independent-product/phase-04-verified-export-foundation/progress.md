@@ -119,3 +119,55 @@ policies, and found no remaining implementation blocker.
 
 **Next action:** Open the Phase 4.3 PR, require every GitHub check to pass,
 merge, and synchronize clean local `main` before Phase 4.4 begins.
+
+## 2026-08-21 — Phase 4.3 merged and synchronized
+
+**Status:** Complete
+
+PR #45 passed every required GitHub check and was squash-merged as
+`159fcce46059b1becad5664046331d44980d0f14`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.4 branch was created.
+
+## 2026-08-21 — Phase 4.4 source-derived plan population complete
+
+**Status:** Implementation complete; local gates pending
+
+`ExportService.create_plan` now admits one source through the existing trust
+boundary and derives every bundle, manifest, validation, snapshot, objective,
+split, row-set, row-schema, source-scope, and source-membership-baseline fact
+from that immutable verified view. Callers provide only strict container and
+optional consumer profiles, exact dependency bindings, and file-plan evidence.
+The resulting portable plan excludes destination roots and runtime state.
+
+This increment does not render or compare destination membership, write or
+publish files, create a receipt, expose a public surface, or register a
+supported container or consumer profile. Phase 4.5 owns destination membership
+reconstruction and comparison; Phase 4.6 owns filesystem operations.
+
+Focused, full, release, parity, tracking, Mac, Ruff, and diff gates have not yet
+been recorded for this increment.
+
+**Next action:** Complete every required local gate and independent review,
+then open the Phase 4.4 PR. Require every GitHub check to pass, merge, and
+synchronize clean local `main` before Phase 4.5 begins.
+
+## 2026-08-21 — Phase 4.4 local gates complete
+
+**Status:** Ready for pull-request review
+
+Focused service/model/contract tests passed 99 tests. The full Python suite
+passed 863 tests; the standalone release gate passed 851 with 1 deselected;
+both emitted only the expected transport durability warning. Clean-wheel
+install, both objective goldens, external-digest verification, deterministic
+transport, 38 XCTest tests, CLI/workbench parity, tracking, Ruff, structured
+files, shell syntax, 329 changed-document local links, and diff checks passed.
+
+Independent adversarial review reproduced a coherent stale-identity source
+substitution across snapshot, row set, and provenance. The service now fresh-
+validates every admitted source model and closes manifest-to-snapshot,
+manifest-to-report, and snapshot-to-row-set byte edges before plan creation.
+The exploit and adjacent forged-graph cases fail closed; re-review found no
+remaining blocker.
+
+**Next action:** Open the Phase 4.4 PR, require every GitHub check to pass,
+merge, and synchronize clean local `main` before Phase 4.5 begins.

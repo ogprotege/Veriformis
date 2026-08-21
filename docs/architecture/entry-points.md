@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -111,11 +111,20 @@ caller must explicitly request `allow_self_consistent` to proceed without a
 retained expected digest. Any supplied digest remains authoritative and a
 mismatch never downgrades to self-consistent trust.
 
+The service's read-only `create_plan` method performs that admission once and
+derives every source, objective, row, split, and source-membership-baseline fact
+from the returned immutable view. Beyond the bundle locator and trust-admission
+inputs, Python callers provide only a strict container profile, optional
+consumer profile, dependency bindings, and output file plans. They cannot
+provide membership, filtering, resplitting, destination root, or publication
+arguments.
+
 There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
-in these opening increments. Strict v1 plan, profile, membership, binding,
-receipt, and verification models now exist, but there is no public plan builder,
-writer, or generic derivative container; those are later Phase 4 services and
-surfaces, not implied by the model boundary.
+in these increments. Strict v1 plan, profile, membership, binding, receipt, and
+verification models and internal read-only plan population now exist, but there
+is no destination membership comparison, writer, or generic derivative
+container. Those are later Phase 4 services and surfaces, not implied by the
+plan boundary.
 
 ## Preview, recipes, and optional integrations
 
