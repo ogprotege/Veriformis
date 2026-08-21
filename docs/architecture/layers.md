@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
 
 **Next review:** Any layering or architecture change
 
@@ -187,9 +187,11 @@ through `__init__.py` re-exports. `pipeline/service.py` is the intentional
 exception: as the composition root it imports domain implementations, owns the
 load–run–commit ceremony, and injects/owns `exports.ExportService`. The export
 service depends downward on the bundle verifier and returns an immutable
-`VerifiedFinishedBundle` reconstructed by that verifier; it does not enter the
-workspace stage graph. No persisted export plan or receipt, derivative writer,
-public export command, or generic container belongs to this Phase 4.1 layer.
+`VerifiedFinishedBundle` reconstructed by that verifier. Strict Phase 4.2
+export models depend downward on bundle verification evidence, identity, and
+taxonomy semantics; neither service nor models enter the workspace stage graph.
+No plan builder, derivative writer, public export command, or generic container
+belongs to this layer yet.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

@@ -44,3 +44,32 @@ durability-warning regression.
 
 **Next action:** Open Phase 4.1 PR, require every GitHub check to pass, merge,
 and synchronize clean local `main` to `origin/main` before Phase 4.2 begins.
+
+## 2026-08-21 — Phase 4.1 merged and synchronized
+
+**Status:** Complete
+
+PR #43 passed every GitHub check and was squash-merged as
+`494fb3b2f4083b17392763258f905af8bd539da0`. Local `main` was fetched, clean,
+and exactly equal to `origin/main` before the Phase 4.2 branch was created.
+
+## 2026-08-21 — Phase 4.2 local implementation complete
+
+**Status:** Ready for pull-request review
+
+Verified Export Contract v1 and ten strict persisted models now close the
+portable plan/profile/dependency/membership/file/receipt/verification graph.
+Every identity is replayed from canonical exact fields; nested source,
+membership, evidence-mode, path, and receipt relationships fail closed. The
+support registry and taxonomy remain unchanged: no generic container or
+trainer profile is promoted.
+
+Focused model/contract (55) and combined export (63) tests pass. The full
+Python suite passed 827 tests; the standalone release gate passed 815 with 1
+deselected; both emitted only the expected transport durability warning. Clean
+wheel, both objective goldens, deterministic transport, 38 XCTest tests,
+parity, tracking, Ruff, and diff checks passed. Independent adversarial review
+found no remaining Phase 4.2 blocker.
+
+**Next action:** Open the Phase 4.2 PR, require all GitHub checks to pass,
+merge, and synchronize clean local `main` before Phase 4.3 begins.

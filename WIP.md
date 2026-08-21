@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `db9d93ef` on `main` (Groups 1–7; Group 9
+**Implementation baseline reviewed:** `494fb3b2` on `main` (Groups 1–7; Group 9
 automated gates; beta-prep; private beta workbench Phases 0–2; independent
 product Phases 0–3 complete; Phase 4 opening baseline)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 start)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.2 model contract)
 
-**Next review:** Independent-roadmap Phase 4.1 merge and Phase 4.2 contract-model
-start; beta label cut, public Mac evidence, or any listed-item status change
+**Next review:** Independent-roadmap Phase 4.2 merge and Phase 4.3 source-trust
+enforcement; beta label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -56,8 +56,8 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [ ] Independent product Phase 4 is in progress; item 4.1 is establishing the
-      typed `ExportService` and descriptor-anchored verified source inspection.
+- [ ] Independent product Phase 4 is in progress; item 4.1 is merged and item
+      4.2 is defining strict verified-export v1 models.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -140,15 +140,17 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 
 ### Active Phase 4 status
 
-- [ ] Phase 4.1 — typed `ExportService` and descriptor-anchored verified source
-      inspection are under implementation.
-- [ ] Phase 4.2–4.9 — versioned persisted models, trust and destination
+- [x] Phase 4.1 — typed `ExportService` and descriptor-anchored verified source
+      inspection are implemented.
+- [ ] Phase 4.2 — strict versioned export contracts and persisted models are
+      under implementation.
+- [ ] Phase 4.3–4.9 — trust and destination
       bindings, derivative-only enforcement, publication guarantees,
       deterministic claims, public surfaces, and adversarial closeout remain
       open in the [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-No persisted export models, export writer, public export commands, or generic
-export containers are claimed by this Phase 4.1 opening change.
+No export plan builder, writer, public export commands, or generic export
+containers are claimed by the first two Phase 4 increments.
 
 The current stage-command runtime is:
 

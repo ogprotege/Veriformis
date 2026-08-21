@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -98,7 +98,7 @@ the sealed directory and optional expected manifest digest to
 trusted channel. The optional Aptus handoff is a separate adapter artifact and
 is not required for core bundle verification.
 
-## Phase 4.1 export composition boundary
+## Phase 4 export composition and model boundary
 
 `PipelineService.export_service` exposes the injected `ExportService` to
 Python composition. Its `verified_source` method calls
@@ -109,9 +109,10 @@ descriptor-anchored pass. The ordinary `verify_finished_bundle` return type is
 unchanged.
 
 There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
-in this increment. There is likewise no persisted export plan or receipt,
-writer, or generic derivative container; those are later Phase 4 contracts and
-surfaces, not implied by the service boundary.
+in these opening increments. Strict v1 plan, profile, membership, binding,
+receipt, and verification models now exist, but there is no public plan builder,
+writer, or generic derivative container; those are later Phase 4 services and
+surfaces, not implied by the model boundary.
 
 ## Preview, recipes, and optional integrations
 

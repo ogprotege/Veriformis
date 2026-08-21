@@ -39,7 +39,9 @@ trainer-specific profiles remain later work.
 
 ## Current state
 
-The packet is open. The first increment establishes the typed `ExportService`
-beneath `PipelineService` and a descriptor-anchored verified source view. No
-export plan, receipt, writer, public export command, generic container, or new
-consumer profile is claimed by that opening increment.
+The packet is open. The first increment established the typed `ExportService`
+beneath `PipelineService` and a descriptor-anchored verified source view. The
+second defines the strict verified-export v1 plan, profile, dependency,
+membership, binding, receipt, and verification models. No plan builder, writer,
+public export command, generic container, or new consumer profile is claimed by
+these increments.

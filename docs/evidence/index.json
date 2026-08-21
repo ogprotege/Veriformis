@@ -179,7 +179,7 @@
     {
       "id": "phase-4-export-service-start-2026-08-21",
       "date": "2026-08-21",
-      "commit": "working-tree-on-db9d93ef88e273e3727e1ba85841589530d59da3",
+      "commit": "494fb3b2f4083b17392763258f905af8bd539da0",
       "scope": "Independent-product Phase 4 start and typed verified export-service boundary",
       "grade": "recorded-local",
       "summary": "The standard Phase 4 packet opened; a typed ExportService and descriptor-anchored VerifiedFinishedBundle view were added without changing existing bundle contracts. Focused 77, full 772, standalone core 760 with 1 deselected, 38 XCTest tests, clean-wheel, both goldens, parity, tracking, Ruff, and diff checks passed; only the expected transport durability-warning regression warning was emitted.",
@@ -190,6 +190,25 @@
         "bash scripts/release/check_local.sh",
         "bash macos/scripts/parity_check.sh",
         "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase4-pr1-dd -destination platform=macOS test",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-4-export-models-local-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-494fb3b2f4083b17392763258f905af8bd539da0",
+      "scope": "Independent-product Phase 4.2 verified export v1 models",
+      "grade": "recorded-local",
+      "summary": "Ten strict persisted export models and their normative contract passed 55 focused model/contract tests, 63 combined export tests, 827 full Python tests, 815 standalone core tests with 1 deselected, clean-wheel and both golden compile/transport flows, 38 XCTest tests, parity, tracking, Ruff, and diff checks. Only the expected transport durability-warning regression warning was emitted; independent adversarial review found no remaining Phase 4.2 blocker.",
+      "details": "dev/active/independent-product/phase-04-verified-export-foundation/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_models.py tests/contracts/test_verified_export_contract.py",
+        "uv run pytest -q tests/exports tests/contracts/test_verified_export_contract.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase4-pr2-dd -destination platform=macOS test",
         "uv run python scripts/check_project_tracking.py",
         "git diff --check"
       ]

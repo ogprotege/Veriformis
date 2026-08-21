@@ -11,8 +11,9 @@ automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
 implemented taxonomy contract and discovery surfaces. Phase 4 verified export
 foundation is in progress. Its opening slice introduces the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
-view; persisted export models, writers, public export commands, generic export
-containers, and planned trainer-specific profiles are not implemented. Do not claim public
+view. Strict verified-export v1 models are implemented; plan construction,
+writers, public export commands, generic export containers, and planned
+trainer-specific profiles are not implemented. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 
@@ -24,17 +25,18 @@ Read these current authorities before changing code:
 4. `docs/contracts/dataset-construction-v1.md`
 5. `docs/contracts/finished-dataset-v1.md`
 6. `docs/contracts/taxonomy-v1.md`
-7. `docs/architecture.md`
-8. `docs/analysis/2026-08-11-independent-product-analysis.md`
-9. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
-10. `docs/governance/project-tracking.md`,
+7. `docs/contracts/verified-export-v1.md`
+8. `docs/architecture.md`
+9. `docs/analysis/2026-08-11-independent-product-analysis.md`
+10. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+11. `docs/governance/project-tracking.md`,
    `dev/active/independent-product/program.json`, and the current or most
    recently completed phase packet
-11. `docs/governance/support-registry.json` and `docs/evidence/index.json`
-12. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
-13. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+12. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+13. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+14. `docs/plans/2026-07-29-veriformis-roadmap.md` and
     `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
-14. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+15. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.

@@ -4,8 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4 start; opening implementation remains
-faithful to this decision)
+**Last reviewed:** 2026-08-21 (Phase 4.2 model contract remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -52,8 +51,9 @@ receipts, tamper checks, parity, and no-membership-change tests.
 The Phase 4 opening composes a typed export service beneath `PipelineService`
 and captures source semantics in the finished-bundle verifier's existing
 descriptor-anchored pass. It does not add an export writer, mutate the bundle,
-or establish a second compiler stage. Exact persisted export models remain the
-next contract step.
+or establish a second compiler stage. Phase 4.2 adds the exact persisted export
+models while retaining that boundary; source admission, planning, writing, and
+independent derivative verification remain later increments.
 
 ## Review triggers
 

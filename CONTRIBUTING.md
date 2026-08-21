@@ -11,6 +11,7 @@ Before changing code, read:
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
+- [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -30,9 +31,9 @@ beta-prep, and private beta workbench Phases 0–2 are implemented. Independent
 product Phases 0–3 are complete. Phase 4, verified export foundation, is
 `in_progress`; consult its
 [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
-and the machine ledger before changing that boundary. The opening service and
-verified source-view work does not yet authorize generic export containers or
-trainer-specific profiles. Maturity remains
+and the machine ledger before changing that boundary. The typed service,
+verified source view, and strict v1 model contracts do not yet authorize
+generic export containers or trainer-specific profiles. Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)
 and [docs/release.md](docs/release.md).

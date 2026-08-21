@@ -24,6 +24,27 @@ TAXONOMY_CONTRACT_ID: Final = "veriformis.taxonomy"
 TAXONOMY_CONTRACT_VERSION: Final = 1
 TAXONOMY_SCHEMA_ID: Final = "veriformis.taxonomy/v1"
 
+VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
+VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
+
+VERIFIED_EXPORT_SCHEMA_IDS: Final = (
+    "veriformis.export-container-profile/v1",
+    "veriformis.export-consumer-profile/v1",
+    "veriformis.export-dependency-binding/v1",
+    "veriformis.export-file-plan/v1",
+    "veriformis.export-destination-file-binding/v1",
+    "veriformis.export-membership-entry/v1",
+    "veriformis.export-membership-projection/v1",
+    "veriformis.export-plan/v1",
+    "veriformis.export-receipt/v1",
+    "veriformis.export-verification/v1",
+)
+
+VERIFIED_EXPORT_ERROR_CODES: Final = (
+    "export-contract-invalid",
+    "export-verification-invalid",
+)
+
 CANONICAL_STREAM_CONTRACT_ID: Final = "veriformis.canonical-stream"
 CANONICAL_STREAM_CONTRACT_VERSION: Final = 1
 
@@ -350,5 +371,9 @@ __all__ = [
     "V1_PROMOTION_REASON_CODES",
     "V1_QUALITY_FINDING_CODES",
     "V1_ROW_SCHEMA_KINDS",
+    "VERIFIED_EXPORT_CONTRACT_ID",
+    "VERIFIED_EXPORT_CONTRACT_VERSION",
+    "VERIFIED_EXPORT_ERROR_CODES",
+    "VERIFIED_EXPORT_SCHEMA_IDS",
     "VERIFORMIS_OWNED_STAGES",
 ]

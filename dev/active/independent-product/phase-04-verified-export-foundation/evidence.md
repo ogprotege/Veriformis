@@ -1,6 +1,6 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phase 4.1 local gates passed
+**Evidence status:** In progress — Phase 4.1 merged; Phase 4.2 local gates passed
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -17,7 +17,7 @@
 
 ## Required final evidence
 
-- [ ] Strict export contract models and canonical identity replay.
+- [x] Strict export contract models and canonical identity replay.
 - [ ] Explicit trusted and lower-trust source policy.
 - [ ] Complete source, split, row, profile, dependency, and destination bindings.
 - [ ] No-membership-change proof.
@@ -47,3 +47,29 @@ Observed results are appended only after the commands complete.
 This evidence proves only the Phase 4.1 service/source boundary. It does not
 claim persisted export models, a writer, public commands, a generic container,
 or a trainer profile.
+
+## 2026-08-21 — Phase 4.2 versioned export models
+
+- Verified Export Contract v1 fixes ten exact schemas and identity domains.
+- All models are strict, frozen, exactly fielded, canonically serialized, and
+  independently reload every nested identity and cross-reference.
+- Adversarial coverage rejects malformed versions, duplicate keys, floats,
+  noncanonical bytes, Boolean/integer coercion, Unicode/path aliases,
+  cross-partition leakage groups, forged source-verification identities,
+  zero-count success evidence, and mismatched plan/receipt graphs.
+- Focused model and contract suite: 55 passed.
+- Combined export-service, model, and contract suite: 63 passed.
+- Full Python suite: 827 passed with the expected exercised transport
+  durability-warning regression warning.
+- Exact standalone release gate: 815 passed, 1 deselected, the same expected
+  warning; clean-wheel install, both objective goldens, external-digest checks,
+  and deterministic transports passed with retained digests unchanged.
+- Ruff, project tracking, CLI/workbench parity, and `git diff --check` passed.
+- macOS XCTest: 38 passed.
+- A fresh independent adversarial review found no remaining Phase 4.2 blocker
+  after source-verification, dependency, path, Unicode, zero-byte, and digest-
+  preimage closure fixes.
+
+GitHub evidence remains pending. This increment does not implement source
+admission, plan population, writing, commands, a production container, or a
+trainer profile.

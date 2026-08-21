@@ -15,9 +15,9 @@ and beta-prep landed; private beta workbench Phases 0–2 and independent-produc
 Phases 0–3 on `main`; Phase 4 in progress; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 start)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.2 model contract)
 
-**Next review:** Phase 4 export-model contract; beta label cut, public-ready
+**Next review:** Phase 4 source-trust enforcement; beta label cut, public-ready
 checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -54,6 +54,9 @@ Steps 11 through 16 are governed by
 [Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
 The six-axis product vocabulary and compile compatibility are governed by
 [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md).
+Consumer-neutral derivative evidence is governed by
+[Verified Export Contract v1](contracts/verified-export-v1.md); its execution
+service remains under Phase 4 implementation.
 
 ## Ownership boundary
 
@@ -116,9 +119,10 @@ the implemented taxonomy and discovery registry without changing existing v1
 persisted meanings. Phase 4 verified export foundation is in progress. Its
 opening implementation adds a typed internal service boundary and a
 descriptor-anchored view of an independently verified finished bundle without
-changing existing persisted meanings. Persisted export plans and receipts,
-publication, public export commands, generic export containers, and new trainer
-profiles remain unimplemented.
+changing existing persisted meanings. Its second increment adds strict
+verified-export v1 plan, profile, membership, binding, receipt, and verification
+models. Plan construction, publication, public export commands, generic export
+containers, and new trainer profiles remain unimplemented.
 
 ## End-to-end compiler contract
 
@@ -227,6 +231,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Dataset Construction Contract v1](./contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](./contracts/finished-dataset-v1.md)
 - [Dataset Taxonomy Contract v1](./contracts/taxonomy-v1.md)
+- [Verified Export Contract v1](./contracts/verified-export-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)
