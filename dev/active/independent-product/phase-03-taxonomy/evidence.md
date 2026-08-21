@@ -1,6 +1,6 @@
 # Phase 3 Evidence
 
-**Evidence status:** Compatibility evidence recorded; final closeout not yet observed
+**Evidence status:** Complete — Phase 3 exit gates observed
 
 **Predecessor:** [Phase 2 closeout](../phase-02-reliability-artifact-boundary/closeout.md);
 [pre-Phase-3 defect closure](../defect-closure-pre-phase-03/closeout.md)
@@ -21,12 +21,12 @@
 
 ## Required final evidence
 
-- Taxonomy contract with explicit axis, family, loss, and compatibility rules.
-- Machine registry bound to existing objective, row, container, and profile IDs.
-- Invalid-combination tests that fail before compile.
-- Discovery parity across `PipelineService`, CLI, MCP, and workbench help.
-- Proof that existing workspaces and sealed bundles still load.
-- Tracking, status, support, evidence, and diff checks.
+- [x] Taxonomy contract with explicit axis, family, loss, and compatibility rules.
+- [x] Machine registry bound to existing objective, row, container, and profile IDs.
+- [x] Invalid-combination tests that fail before compile.
+- [x] Discovery parity across `PipelineService`, CLI, MCP, and workbench help.
+- [x] Proof that existing workspaces and sealed bundles still load.
+- [x] Tracking, status, support, evidence, and diff checks.
 
 Exact results are appended only after observation.
 
@@ -125,3 +125,28 @@ proof, support/evidence reconciliation, and final Phase 3 closeout remain open.
 
 No taxonomy, recipe, workspace, finished-dataset, bundle, or transport schema
 was bumped or rewritten. Final cross-surface closeout evidence remains open.
+
+## Observed Phase 3 closeout gates — 2026-08-21
+
+| Gate | Result | Grade / limitation |
+| --- | --- | --- |
+| Roadmap taxonomy semantics | PASS | Six axes remain separate; every implemented objective/row pair has one family and loss meaning |
+| Compile refusal | PASS | Invalid objective, row, and profile selections fail before workspace mutation |
+| Physical-container boundary | PASS | Current compile surface exposes no container selector; only the fixed implemented canonical and transport containers are published |
+| Taxonomy and persisted-v1 compatibility | PASS | Canonical discovery golden, frozen workspace, and frozen bundle pass without changing an existing persisted workspace/artifact schema or identifier |
+| Full Python suite | 764 passed | One expected transport durability `RuntimeWarning` |
+| Exact local release gate | PASS | 752 core tests passed, one optional test deselected, one expected warning; lock, Ruff, clean-wheel install, and golden compiles passed |
+| Full macOS XCTest | 38 passed | Complete checked-in test target |
+| Workbench parity | PASS | CLI/workbench canonical stage and taxonomy expectations agree |
+| Project tracking | PASS | Final reconciled tree matches all 21 roadmap phases and the code-bound support registry |
+| Structured-file and shell checks | PASS | All 13 tracked JSON files, 2 tracked YAML files, and 10 tracked shell scripts loaded or passed syntax checks |
+| Active local Markdown targets | PASS | 485 checked targets; zero broken |
+| Checked-in workbench build/launch | PASS | Fresh Debug build launched with the repository CLI |
+| Golden `full_text` unchanged | PASS | Manifest `2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733`; archive `d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980` |
+| Golden `continuation` unchanged | PASS | Manifest `58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b`; archive `d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b` |
+
+The full suite, exact local release gate, complete macOS target, parity,
+tracking, structured-file, shell, active-link, diff, and build/launch checks
+were repeated after the documentation and tracking reconciliation. This packet
+does not fabricate or claim a GitHub CI result; remote checks are evaluated on
+the closeout pull request.

@@ -14,8 +14,9 @@ explicitly selects it as training content.
 
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
-> (Phases 0–2: KISS shell and debugger tools over the CLI). This is **not** a public beta or
-> production label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
+> (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
+> independent-product Phases 0–3. This is **not** a public beta or production
+> label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 > Install: [docs/install.md](docs/install.md). Status:
 > [docs/current-status.md](docs/current-status.md).
 
@@ -44,6 +45,9 @@ Version `0.1.0` provides:
 - five deterministic training objectives: `full_text`, `continuation`,
   `section_reconstruction`, `before_after_transformation`, and
   `structured_field`;
+- a versioned six-axis dataset taxonomy, shared compile-compatibility policy,
+  and read-only discovery through `PipelineService`, CLI, MCP, and workbench
+  help;
 - field-level evidence, candidate decisions, optional review evidence, and
   immutable accepted records;
 - deterministic curation with target-length filtering, conflict quarantine,
@@ -228,9 +232,11 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-and **private beta workbench Phases 0–2**. Maturity remains development
-**alpha** (not a public beta label). Future work follows the independent
-product roadmap. A future beta cut must follow
+**private beta workbench Phases 0–2**, and **independent-product Phases 0–3**.
+Maturity remains development **alpha** (not a public beta label). Phase 4,
+verified export foundation, is the next planned independent-roadmap phase; it
+has not started, and generic export containers and planned trainer-specific
+profiles remain unimplemented. A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
 need owner signing/notarization per [docs/release.md](docs/release.md).
 **Group 8** model-assisted construction is optional and owner-gated.
@@ -251,6 +257,7 @@ reading paths. The map:
   - [Integrity Contract v1](docs/contracts/integrity-v1.md)
   - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
   - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+  - [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
   - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
   - [Install guide](docs/install.md)
@@ -264,6 +271,8 @@ reading paths. The map:
   - [Project tracking and evidence system](docs/governance/README.md)
   - [Completed Phase 0 packet](dev/active/independent-product/phase-00-foundation/README.md)
   - [Completed Phase 1 packet](dev/active/independent-product/phase-01-standalone-independence/README.md)
+  - [Completed Phase 2 packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md)
+  - [Completed Phase 3 packet](dev/active/independent-product/phase-03-taxonomy/README.md)
   - [Historical private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
   - [Historical build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)

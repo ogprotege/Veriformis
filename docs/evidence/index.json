@@ -157,6 +157,24 @@
       "rerun": [
         "bash scripts/release/record_clean_path_evidence.sh"
       ]
+    },
+    {
+      "id": "phase-3-taxonomy-closeout-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-6973e6379a650f1edeb358c713f0c4768da1d12d",
+      "scope": "Independent-product Phase 3 taxonomy closeout",
+      "grade": "recorded-local",
+      "summary": "Final reconciled-tree local gates passed on the Phase 3 closeout working tree based on the PR 4 merge commit: 764 full Python tests with the expected transport durability warning; 752 core tests with 1 deselected and the same expected warning; 38 XCTest tests; exact check_local, clean-wheel install and both golden compiles, CLI/workbench parity, project tracking, structured-file and shell checks, 485 active local Markdown targets, and checked-in workbench build/launch. The retained full_text and continuation manifest/archive digests were unchanged. This record does not claim a GitHub run.",
+      "details": "dev/active/independent-product/phase-03-taxonomy/evidence.md",
+      "rerun": [
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -derivedDataPath /tmp/veriformis-phase3-closeout-dd -destination platform=macOS test",
+        "./script/build_and_run.sh --verify",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
+      ]
     }
   ]
 }

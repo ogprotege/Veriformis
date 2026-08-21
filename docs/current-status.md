@@ -7,13 +7,13 @@
 **Implementation state:** Groups 1–7 complete; Group 9 automated release gates
 and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated);
-independent-product Phase 3 taxonomy discovery, public vocabulary cleanup, and
-persisted-v1 compatibility proof implemented while the phase remains in progress
+independent-product Phase 3 completed with taxonomy discovery, public
+vocabulary cleanup, and persisted-v1 compatibility proof
 
-**Review date:** 2026-08-21 (independent-product Phase 3 compatibility proof)
+**Review date:** 2026-08-21 (independent-product Phase 3 closeout)
 
-**Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
-public-ready checklist, or any contract change
+**Next review:** Independent-roadmap Phase 4 start; beta label cut, public-ready
+checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -113,13 +113,15 @@ Phase 2 completed the reliability and artifact-boundary gate. Its packet records
 bounded asynchronous process execution, accountable cancellation and quit
 recovery, deterministic no-replace transport packaging, archive re-verification,
 and standalone Mac and Linux evidence.
-The pre-Phase-3 defect-closure packet is completed on `main`. Phase 3 is
-`in_progress` under its standard packet. Its versioned taxonomy contract,
-shared compile-compatibility checks, and read-only discovery are implemented
-through `PipelineService`, CLI, MCP, and CLI-backed workbench help. Ambiguous
-public taxonomy wording is reconciled without changing persisted stage IDs;
-taxonomy golden and persisted-v1 workspace/bundle compatibility proofs pass;
-final Phase 3 closeout remains open.
+The pre-Phase-3 defect-closure packet and Phase 3 are completed on `main`.
+Phase 3 delivered the versioned taxonomy contract, shared
+compile-compatibility checks, and read-only discovery through
+`PipelineService`, CLI, MCP, and CLI-backed workbench help. Ambiguous public
+taxonomy wording is reconciled without changing persisted stage IDs; the
+taxonomy golden and persisted-v1 workspace/bundle compatibility proofs pass.
+Phase 4, verified export foundation, is the next planned phase. It has not
+started; generic export containers and planned trainer-specific profiles remain
+unimplemented.
 
 ## Implemented interfaces
 
@@ -460,9 +462,9 @@ See [docs/release.md](release.md).
 | Implemented private beta workbench Phases 0–2 | Dogfood; KISS shell; failure detail; digest copy; artifact reveal; rerun |
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
-| Implemented independent Phase 3 to date | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof; closeout remains open |
+| Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), beginning with standalone authority and defaults |
+| Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation next and still planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -515,12 +517,15 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0, 1, and 2 are complete. Phase 3 is in progress;
-its taxonomy contract, compile compatibility, cross-surface discovery, and
-public vocabulary cleanup are implemented. Taxonomy and persisted-v1
-compatibility evidence passes; final closeout remains:
-[taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md).
-A deliberate beta label and public Mac checklist remain separate decisions.
+Independent-product Phases 0–3 are complete. The completed
+[taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
+records the contract, compile compatibility, cross-surface discovery, public
+vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
+export foundation is next in the roadmap but remains planned and has no active
+packet. Generic export containers and any new trainer-specific profiles are not
+current capabilities; the canonical and optional Aptus profiles remain the
+implemented profile set. A deliberate beta label and public Mac checklist
+remain separate decisions.
 
 See the [independent product analysis](analysis/2026-08-11-independent-product-analysis.md),
 [tracking and evidence policy](governance/project-tracking.md),

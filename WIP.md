@@ -2,15 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `7d116e9` on `main` (Groups 1–7; Group 9
-automated gates; beta-prep; private beta workbench Phases 0–2)
+**Implementation baseline reviewed:** `6973e637` on `main` (Groups 1–7; Group 9
+automated gates; beta-prep; private beta workbench Phases 0–2; independent
+product Phase 3 through the compatibility proof)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 compatibility proof)
+**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
 
-**Next review:** Independent-roadmap Phase 3 closeout; beta label cut, public
-Mac evidence, or any listed-item status change
+**Next review:** Independent-roadmap Phase 4 packet and export-service contract
+tests; beta label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -70,7 +71,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 0 | Establish authority, baseline, and decision records | Completed | [Completed packet](dev/active/independent-product/phase-00-foundation/README.md) |
 | 1 | Enforce standalone independence | Completed | [Completed packet](dev/active/independent-product/phase-01-standalone-independence/README.md) |
 | 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
-| 3 | Formalize the goal, schema, container, and profile taxonomy | In progress | [Active packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
+| 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
 | 4 | Build the verified export foundation | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -122,7 +123,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Workbench creates and reveals only the externally verified transport artifact for Finder use.
 - [x] Mac, Linux, clean-wheel, golden, parity, launch, tracking, lint, and diff gates recorded.
 
-### Active Phase 3 status
+### Completed Phase 3 status
 
 - [x] Standard Phase 3 packet created after Phase 2 and pre-Phase-3 defect closure.
 - [x] Versioned taxonomy contract and machine registry.
@@ -133,7 +134,13 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] One registry exposed through PipelineService, CLI, MCP, and workbench help.
 - [x] Public “format” language inventory and rewrite without persisted-ID changes.
 - [x] Taxonomy golden round-trip and pre-taxonomy workspace/bundle compatibility proof.
-- [ ] Full Phase 3 closeout gates and status/support/evidence reconciliation.
+- [x] Full Phase 3 closeout gates and status/support/evidence reconciliation.
+
+### Next authorized phase
+
+Phase 4 remains planned. Its next action is to create the standard phase packet
+and pin verified export-service contract tests. No generic export capability is
+claimed by the Phase 3 closeout.
 
 The current stage-command runtime is:
 

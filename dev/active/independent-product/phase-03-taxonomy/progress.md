@@ -178,3 +178,45 @@ and `git diff --check` was clean.
 
 **Next action:** Run the full Phase 3 exit gates, reconcile support/status and
 the evidence index, then complete closeout only if every gate passes.
+
+## 2026-08-21 — Phase 3 operational closeout
+
+**Status:** Complete
+
+Closeout began from the merged compatibility baseline `6973e63`. The roadmap
+exit gate passed. Public discovery and presentation name all six taxonomy axes
+independently. Implemented objectives and semantic rows each have one
+training-family and loss interpretation, and invalid objective/row/profile
+selections fail before compile. The current compile surface exposes no
+physical-container selector; callers therefore cannot select an unknown or
+planned container there, and publication remains limited to the fixed
+implemented containers.
+
+The taxonomy v1 golden, frozen pre-taxonomy workspace, and frozen historical
+bundle prove that the shared registry did not reinterpret existing persisted
+v1 identities. Phase 3 did not change or reinterpret an existing persisted
+workspace or artifact schema or identifier. The new family labels and
+canonical profile classify existing behavior; no planned learning behavior,
+export adaptation or container, trainer-specific destination profile, or
+maturity state was promoted.
+
+**Observed proof before closeout reconciliation:** the full Python suite passed
+with 764 tests and the one expected transport durability warning; the exact
+local release gate passed with 752 core tests, one optional test deselected,
+the expected warning, lock validation, Ruff, clean-wheel installation, and
+both golden compiles; all 38 macOS tests passed; workbench parity and project
+tracking passed. The `full_text` and `continuation` manifest and transport
+digests remained unchanged.
+
+The program ledger, WIP, current status, support registry, evidence index, and
+packet records are reconciled as the closeout change. The scheduled
+pre-Phase-3 defect list remains carried forward rather than absorbed into this
+phase.
+
+**Next action:** Open Phase 4 only under its own standard packet.
+
+**Final reconciled-tree confirmation:** the full Python and exact local release
+gates repeated with the same 764/full and 752/core results; all 38 macOS tests,
+CLI/workbench parity, tracking, structured-file, shell-syntax, active-link,
+diff, and checked-in workbench build/launch checks passed. Both golden identity
+pairs remained unchanged. GitHub status is not claimed by this local record.

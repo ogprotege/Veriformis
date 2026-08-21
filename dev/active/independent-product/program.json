@@ -47,12 +47,12 @@
     {
       "number": 3,
       "title": "Formalize the goal, schema, container, and profile taxonomy",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [2],
       "packet": "dev/active/independent-product/phase-03-taxonomy",
       "started_on": "2026-08-20",
-      "completed_on": null,
-      "next_gate": "Run full Phase 3 closeout gates and reconcile status, support, evidence, WIP, and docs."
+      "completed_on": "2026-08-21",
+      "next_gate": "Completed; Phase 4 may begin with a standard packet and verified export-service contract tests."
     },
     {
       "number": 4,
@@ -62,7 +62,7 @@
       "packet": null,
       "started_on": null,
       "completed_on": null,
-      "next_gate": "Begin after taxonomy contracts and migrations pass."
+      "next_gate": "Create the standard Phase 4 packet and pin verified export-service contract tests."
     },
     {
       "number": 5,

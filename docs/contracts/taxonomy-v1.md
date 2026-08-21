@@ -8,11 +8,13 @@
 
 **Execution profile:** `offline-deterministic-v1`
 
-**Implementation status:** Phase 3 in progress. This contract defines vocabulary
-and compatibility. It does not add families, containers, or consumer profiles
-beyond those already implemented by other versioned contracts.
+**Implementation status:** Implemented in completed independent-product Phase 3.
+This contract defines vocabulary and compatibility. Its family labels and
+canonical profile classify behavior already shipped under the construction and
+finished-dataset contracts; it adds no new learning behavior, export adaptation
+or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-20
+**Last reviewed:** 2026-08-21 (Phase 3 closeout)
 
 **Next review:** Any taxonomy, loss-policy, or compatibility-matrix change
 

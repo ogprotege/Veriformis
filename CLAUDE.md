@@ -7,8 +7,12 @@ This file gives coding-agent guidance for the current Veriformis repository.
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
-(thin SwiftUI over CLI). Do not claim public beta or production readiness
-without the checklists in `docs/beta-limitations.md` and `docs/release.md`.
+(thin SwiftUI over CLI); and independent-product Phases 0–3, including the
+implemented taxonomy contract and discovery surfaces. Phase 4 verified export
+foundation is next but remains planned and unopened; generic export containers
+and planned trainer-specific profiles are not implemented. Do not claim public
+beta or production readiness without the checklists in
+`docs/beta-limitations.md` and `docs/release.md`.
 
 Read these current authorities before changing code:
 
@@ -22,7 +26,8 @@ Read these current authorities before changing code:
 8. `docs/analysis/2026-08-11-independent-product-analysis.md`
 9. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
 10. `docs/governance/project-tracking.md`,
-   `dev/active/independent-product/program.json`, and the active phase packet
+   `dev/active/independent-product/program.json`, and the current or most
+   recently completed phase packet
 11. `docs/governance/support-registry.json` and `docs/evidence/index.json`
 12. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
 13. `docs/plans/2026-07-29-veriformis-roadmap.md` and
@@ -75,6 +80,8 @@ Key modules under `src/veriformis/` are:
 - `construction/` for objectives, recipes, constructors, lifecycle, and replay;
 - `datasets/` for curation, leakage-safe splitting, product rows, and exact
   dataset validation;
+- `taxonomy.py` for the versioned registry, compatibility policy, and read-only
+  discovery catalog;
 - `bundle/` for atomic finished-bundle publication and independent verification;
 - `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `recipes/` for named recipe builders, statistics, and YAML pipeline specs;

@@ -27,6 +27,18 @@ from veriformis.datasets.serialization import V1_ROW_SCHEMAS
 from veriformis.mcp.server import create_mcp_server
 from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
 from veriformis.recipes.library import list_named_recipes
+from veriformis.taxonomy import (
+    CANONICAL_CONSUMER_PROFILE,
+    CANDIDATE_CONSUMER_PROFILES,
+    EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES,
+    IMPLEMENTED_CONSUMER_PROFILES,
+    IMPLEMENTED_PHYSICAL_CONTAINERS,
+    IMPLEMENTED_TRAINING_FAMILIES,
+    LOSS_POLICY_IDS,
+    PLANNED_CONSUMER_PROFILES,
+    PLANNED_PHYSICAL_CONTAINERS,
+    PLANNED_TRAINING_FAMILIES,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -228,6 +240,45 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         "support row schemas differ from V1_ROW_SCHEMAS",
         errors,
     )
+    _require(
+        training.get("implemented_families")
+        == list(IMPLEMENTED_TRAINING_FAMILIES),
+        "support training families differ from IMPLEMENTED_TRAINING_FAMILIES",
+        errors,
+    )
+    _require(
+        training.get("planned_families") == list(PLANNED_TRAINING_FAMILIES),
+        "support planned families differ from PLANNED_TRAINING_FAMILIES",
+        errors,
+    )
+    unsupported_families = training.get("explicitly_unsupported_families")
+    if not isinstance(unsupported_families, list):
+        errors.append("support explicitly_unsupported_families must be a list")
+    else:
+        unsupported_ids = [
+            entry.get("family")
+            for entry in unsupported_families
+            if isinstance(entry, dict)
+        ]
+        _require(
+            len(unsupported_ids) == len(unsupported_families)
+            and unsupported_ids
+            == list(EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES),
+            "support unsupported families differ from "
+            "EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES",
+            errors,
+        )
+    _require(
+        training.get("implemented_loss_policies") == list(LOSS_POLICY_IDS),
+        "support loss policies differ from LOSS_POLICY_IDS",
+        errors,
+    )
+    _require(
+        artifacts.get("implemented_physical_containers")
+        == list(IMPLEMENTED_PHYSICAL_CONTAINERS),
+        "support physical containers differ from IMPLEMENTED_PHYSICAL_CONTAINERS",
+        errors,
+    )
     profiles = artifacts.get("implemented_bundle_profiles")
     if not isinstance(profiles, list) or len(profiles) != 1:
         errors.append("support registry must contain exactly the implemented minimal-v1 bundle")
@@ -250,9 +301,82 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
             errors,
         )
 
+    transport_profiles = artifacts.get("implemented_transport_profiles")
+    if not isinstance(transport_profiles, list) or len(transport_profiles) != 1:
+        errors.append(
+            "support registry must contain exactly the implemented deterministic transport"
+        )
+    else:
+        transport = transport_profiles[0]
+        _require(
+            transport.get("profile") == "deterministic-vfbundle-zip-v1"
+            and transport.get("state") == "implemented"
+            and transport.get("product_role") == "immutable-transport"
+            and transport.get("is_trainer_export") is False,
+            "deterministic transport support entry differs from the taxonomy boundary",
+            errors,
+        )
+
+    generic_containers = artifacts.get("generic_export_containers")
+    expected_generic_containers = [
+        (container, "planned") for container in PLANNED_PHYSICAL_CONTAINERS
+    ]
+    if not isinstance(generic_containers, list):
+        errors.append("support generic_export_containers must be a list")
+    else:
+        current_generic_containers = [
+            (entry.get("container"), entry.get("state"))
+            for entry in generic_containers
+            if isinstance(entry, dict)
+        ]
+        _require(
+            len(current_generic_containers) == len(generic_containers)
+            and current_generic_containers == expected_generic_containers,
+            "generic export containers differ from planned taxonomy containers",
+            errors,
+        )
+
+    consumer_profiles = support.get("consumer_profiles")
+    if not isinstance(consumer_profiles, list):
+        errors.append("support consumer_profiles must be a list")
+        consumer_profiles = []
+    profile_states = {
+        profile.get("profile"): profile.get("state")
+        for profile in consumer_profiles
+        if isinstance(profile, dict) and isinstance(profile.get("profile"), str)
+    }
+    expected_profile_states = {
+        **{profile: "implemented" for profile in IMPLEMENTED_CONSUMER_PROFILES},
+        **{profile: "planned" for profile in PLANNED_CONSUMER_PROFILES},
+        **{profile: "candidate" for profile in CANDIDATE_CONSUMER_PROFILES},
+    }
+    _require(
+        len(profile_states) == len(consumer_profiles)
+        and profile_states == expected_profile_states,
+        "support consumer profile states differ from the taxonomy registry",
+        errors,
+    )
+
+    canonical_profiles = [
+        profile
+        for profile in consumer_profiles
+        if isinstance(profile, dict)
+        and profile.get("profile") == CANONICAL_CONSUMER_PROFILE
+    ]
+    if len(canonical_profiles) != 1:
+        errors.append("support registry must contain exactly one canonical profile")
+    else:
+        canonical = canonical_profiles[0]
+        _require(
+            canonical.get("state") == "implemented"
+            and canonical.get("product_role") == "canonical-product",
+            "canonical profile must be recorded as the implemented product boundary",
+            errors,
+        )
+
     aptus_profiles = [
         profile
-        for profile in support.get("consumer_profiles", [])
+        for profile in consumer_profiles
         if isinstance(profile, dict) and profile.get("profile") == "aptus-handoff-v1"
     ]
     if len(aptus_profiles) != 1:
@@ -307,6 +431,18 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
             "tracking imports and MCP server creation unexpectedly loaded handoff code",
             errors,
         )
+
+    generic_export_gaps = [
+        gap
+        for gap in support.get("known_current_gaps", [])
+        if isinstance(gap, dict) and gap.get("id") == "gap-generic-export-service"
+    ]
+    _require(
+        len(generic_export_gaps) == 1
+        and generic_export_gaps[0].get("state") == "verified-open",
+        "generic export service gap must remain verified-open before Phase 4",
+        errors,
+    )
 
 
 def _check_evidence_index(evidence: dict[str, Any], errors: list[str]) -> None:
@@ -396,7 +532,10 @@ def main() -> int:
         return 1
     print("Project tracking check: PASS")
     print("- 21 roadmap phases match program.json and WIP.md")
-    print("- implemented inputs, objectives, rows, bundle, and all handoff defaults match code")
+    print(
+        "- implemented inputs, taxonomy families, objectives, rows, loss policies, "
+        "containers, profiles, and handoff defaults match code"
+    )
     print("- governed phase packets and evidence references are structurally complete")
     return 0
 
