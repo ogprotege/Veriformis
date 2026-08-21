@@ -5,6 +5,7 @@ from dataclasses import replace
 import pytest
 from typer.testing import CliRunner
 
+import veriformis.cli as cli_module
 from veriformis.chunkers.base import (
     chunk_from_dict,
     chunk_to_dict,
@@ -24,6 +25,7 @@ from veriformis.evidence import (
 from veriformis.identity import lossless_json_bytes, sha256_digest
 from veriformis.ir import document_from_dict, document_to_dict
 from veriformis.parsers.text import parse_text
+from veriformis.pipeline import PipelineService
 from veriformis.rules.cleaning import (
     cleaning_input_digest,
     cleaning_plan_from_dict,
@@ -37,6 +39,7 @@ from veriformis.rules.derivations import (
 )
 from veriformis.rules.engine import transform_record_to_dict
 from veriformis.rules.library import custom_regex, default_rules
+from veriformis.taxonomy import implemented_discovery
 from veriformis.workspace import Workspace, WorkspaceTransaction
 
 runner = CliRunner()
@@ -1321,3 +1324,32 @@ def test_reconfigured_cleaning_converges_to_fresh_semantic_outputs(tmp_path):
 def test_version():
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0 and "0.1.0" in result.output
+
+
+def test_taxonomy_cli_is_deterministic_json_from_pipeline_service(monkeypatch):
+    class TrackingPipelineService(PipelineService):
+        def __init__(self) -> None:
+            self.discovery_calls = 0
+
+        def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
+            self.discovery_calls += 1
+            return super().discover_taxonomy()
+
+    service = TrackingPipelineService()
+    monkeypatch.setattr(cli_module, "_SERVICE", service)
+    expected = json.dumps(
+        dict(implemented_discovery()),
+        ensure_ascii=False,
+        indent=2,
+        sort_keys=True,
+    ) + "\n"
+
+    first = runner.invoke(app, ["taxonomy"])
+    second = runner.invoke(app, ["taxonomy"])
+
+    assert first.exit_code == 0, first.output
+    assert second.exit_code == 0, second.output
+    assert first.output == expected
+    assert second.output == expected
+    assert service.discovery_calls == 2
+    assert "format" not in json.loads(first.output)

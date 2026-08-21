@@ -52,7 +52,7 @@
       "packet": "dev/active/independent-product/phase-03-taxonomy",
       "started_on": "2026-08-20",
       "completed_on": null,
-      "next_gate": "Expose one implemented taxonomy registry through PipelineService, CLI, MCP, and workbench help; then reconcile ambiguous public format language."
+      "next_gate": "Inventory and rewrite ambiguous public format language without changing persisted identifiers; then prove migration and backward compatibility before Phase 3 closeout."
     },
     {
       "number": 4,

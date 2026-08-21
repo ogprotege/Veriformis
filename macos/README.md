@@ -12,6 +12,8 @@ a run sheet with live log.
 - **Sidebar:** Home / Compile / History / Settings.
 - **Compile:** drag-and-drop sources, objective picker, output folder, and
   sealed bundle; an Aptus sibling is an optional integration artifact.
+- **Taxonomy help:** asynchronously loaded from `veriformis taxonomy`; the app
+  does not maintain a second taxonomy help catalog.
 - **Run sheet:** progress %, stage chips, expandable live log.
 
 ## Requirements
@@ -78,6 +80,15 @@ export VERIFORMIS_CLI="$PWD/.venv/bin/veriformis"
 export VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT="$PWD"
 open /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
 ```
+
+### CLI-backed taxonomy help
+
+The workbench invokes the read-only `veriformis taxonomy` command
+asynchronously and renders the returned implemented training families,
+objectives, semantic rows, physical containers, consumer profiles, and loss
+policies. Loading and unavailable states stay explicit; the app does not fall
+back to a stale Swift taxonomy catalog. Run `veriformis taxonomy` in Terminal
+to inspect the same JSON used by the help surface.
 
 ## Parity check
 

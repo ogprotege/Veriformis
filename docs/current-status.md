@@ -6,10 +6,11 @@
 
 **Implementation state:** Groups 1–7 complete; Group 9 automated release gates
 and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
-(maturity remains development alpha; public Mac readiness still owner-gated)
+(maturity remains development alpha; public Mac readiness still owner-gated);
+independent-product Phase 3 taxonomy discovery implemented while the phase
+remains in progress
 
-**Review date:** 2026-08-11 (independent-product Phase 2 closeout;
-working tree based on `dd2fdb8`)
+**Review date:** 2026-08-21 (independent-product Phase 3 discovery)
 
 **Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
 public-ready checklist, or any contract change
@@ -113,8 +114,11 @@ bounded asynchronous process execution, accountable cancellation and quit
 recovery, deterministic no-replace transport packaging, archive re-verification,
 and standalone Mac and Linux evidence.
 The pre-Phase-3 defect-closure packet is completed on `main`. Phase 3 is
-`in_progress` under its standard packet; taxonomy contracts are not yet an
-implemented capability claim.
+`in_progress` under its standard packet. Its versioned taxonomy contract,
+shared compile-compatibility checks, and read-only discovery are implemented
+through `PipelineService`, CLI, MCP, and CLI-backed workbench help. Public
+vocabulary cleanup, migration compatibility proof, and Phase 3 closeout remain
+open.
 
 ## Implemented interfaces
 
@@ -135,6 +139,7 @@ The installed console entry point is `veriformis`.
 | `verify BUNDLE` | Verifies the closed bundle without workspace access | Terminal verification result |
 | `package BUNDLE -o ARCHIVE --manifest-sha256 DIGEST` | Externally verifies and deterministically publishes the canonical six-file bundle as a no-replace transport archive | `*.vfbundle.zip`; archive and manifest digests |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
+| `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
 | `list-recipes` | Lists named deterministic recipe library identifiers | Terminal output only |
@@ -147,12 +152,12 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration |
-| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration and read-only taxonomy discovery |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including read-only taxonomy JSON |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
-| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy discovery registry |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
-| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, and verified transport output |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, and CLI-backed taxonomy help |
 
 ## Workspace and identity status
 
@@ -454,6 +459,7 @@ See [docs/release.md](release.md).
 | Implemented private beta workbench Phases 0–2 | Dogfood; KISS shell; failure detail; digest copy; artifact reveal; rerun |
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
+| Implemented independent Phase 3 to date | Versioned taxonomy, shared compile compatibility, and read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help; vocabulary cleanup, migration proof, and closeout remain open |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), beginning with standalone authority and defaults |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -488,6 +494,7 @@ Selected permanent locks:
 | Optional Aptus adapter | Marked `tests/handoff/test_aptus_handoff_v1.py`, `scripts/release/aptus_integration.sh`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
 | Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/scripts/standalone_workbench_smoke.sh`, `macos/Tests/`, `./script/build_and_run.sh` |
 | Deterministic transport | `tests/bundle/test_finished_bundle.py`, `scripts/release/golden_compile.sh`, [bundle transport contract](contracts/bundle-transport-v1.md), [ADR 0005](adr/0005-deterministic-bundle-transport.md) |
+| Taxonomy discovery | `tests/test_cli.py`, `tests/pipeline/test_pipeline_service.py`, `tests/mcp/test_mcp_pipeline_parity.py`, `macos/Tests/` |
 | Group 9 golden + scripts | `tests/regressions/test_group9_release_gates.py`, `scripts/release/`, [release guide](release.md) |
 | Operator install | [install.md](install.md) |
 | Beta limitations | [beta-limitations.md](beta-limitations.md) |
@@ -507,7 +514,9 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0, 1, and 2 are complete. Phase 3 is in progress:
+Independent-product Phases 0, 1, and 2 are complete. Phase 3 is in progress;
+its taxonomy contract, compile compatibility, and cross-surface discovery are
+implemented, while vocabulary cleanup and migration/closeout evidence remain:
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md).
 A deliberate beta label and public Mac checklist remain separate decisions.
 

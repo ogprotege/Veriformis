@@ -80,3 +80,31 @@ golden compiles successfully; `git diff --check` passed.
 
 **Next action:** Expose implemented taxonomy discovery from `PipelineService`
 through CLI, MCP, and workbench help.
+
+## 2026-08-21 — One taxonomy discovery source exposed on every surface
+
+**Status:** In progress
+
+`PipelineService.discover_taxonomy()` now returns a fresh adapter-safe copy of
+the implemented registry. The read-only `veriformis taxonomy` command prints
+that value as deterministic JSON, with contract metadata and all six taxonomy
+axes named separately. The MCP `taxonomy` tool delegates to the same service
+method and returns the same JSON semantics.
+
+The workbench invokes that CLI command asynchronously. It accepts only the
+complete nine-key v1 discovery object, renders all six axes in the Compile
+view, cancels and replaces stale discovery requests, and shows loading or
+unavailable state without falling back to a second taxonomy catalog.
+
+This step did not rewrite the public uses of “format,” add migration fixtures,
+or close Phase 3.
+
+**Observed verification:** lock check, Ruff, and project tracking passed; 5
+focused discovery-parity tests and the full 761-test Python suite passed (with
+the one expected transport durability warning); all 37 macOS tests passed;
+the clean-wheel install, installed CLI, and standalone full-text/continuation
+golden compile passed; `git diff --check` was clean. Both golden manifest and
+transport digests remained unchanged.
+
+**Next action:** Inventory and rewrite only ambiguous public “format” language,
+then add migration and backward-compatibility proof before closeout.

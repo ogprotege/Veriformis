@@ -61,3 +61,25 @@ not claimed by this observation.
 
 Discovery parity, public vocabulary cleanup, migration fixtures, and final
 Phase 3 closeout remain open.
+
+## Observed taxonomy-discovery results — 2026-08-21
+
+| Gate | Result | Grade / limitation |
+| --- | --- | --- |
+| `PipelineService` discovery | PASS | Returns a fresh adapter-safe copy with the exact nine-key implemented registry |
+| CLI discovery | PASS | `veriformis taxonomy` emits deterministic sorted JSON only; no `format` key |
+| MCP discovery | PASS | `taxonomy` tool delegates to `PipelineService` with exact JSON parity |
+| Workbench help | PASS | Strict nine-key decoder, async CLI invocation, cancel-and-replace state, six-axis disclosure, and explicit unavailable state |
+| Lock / Ruff | PASS | Lockfile current; Python lint clean |
+| Focused discovery parity | 5 passed | Registry, service, deterministic CLI, MCP registration, delegation, and parity |
+| Full Python suite | 761 passed | One expected transport durability `RuntimeWarning` |
+| Full macOS XCTest | 37 passed | Includes strict decoder, exact CLI argument, ready/unavailable, and stale-request replacement coverage |
+| Live CLI payload | PASS | Exact contract metadata and six axes accepted by the workbench decoder |
+| Clean-wheel / installed CLI / golden compile | PASS | Standalone full-text and continuation compiles succeeded from the installed wheel |
+| Golden `full_text` unchanged | PASS | Manifest `2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733`; archive `d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980` |
+| Golden `continuation` unchanged | PASS | Manifest `58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b`; archive `d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b` |
+| Project tracking | PASS | 21 roadmap phases and governed packet structure agree |
+| `git diff --check` | Clean | Recorded local |
+
+The ambiguous public “format” inventory and rewrite, migration fixtures,
+backward-compatibility proof, and final Phase 3 closeout remain open.

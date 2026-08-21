@@ -4,6 +4,7 @@ struct CompileView: View {
     @EnvironmentObject private var workbench: WorkbenchViewModel
     @State private var showAdvanced = false
     @State private var showIntegrations = false
+    @State private var showTaxonomy = false
 
     var body: some View {
         HSplitView {
@@ -85,6 +86,11 @@ struct CompileView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
+            DisclosureGroup("Dataset taxonomy", isExpanded: $showTaxonomy) {
+                taxonomyHelpContent
+                    .padding(.top, 4)
+            }
+
             if workbench.objective == .continuation {
                 HStack {
                     Text("Train share (ppm)")
@@ -147,6 +153,64 @@ struct CompileView: View {
                 }
                 .padding(.top, 4)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var taxonomyHelpContent: some View {
+        switch workbench.taxonomyHelpState {
+        case .idle:
+            HStack(spacing: 8) {
+                Text("Taxonomy has not been loaded.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Load") { workbench.refreshTaxonomyHelp() }
+                    .controlSize(.small)
+            }
+        case .loading:
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Loading taxonomy from Veriformis…")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        case .ready(let discovery):
+            VStack(alignment: .leading, spacing: 6) {
+                Text(discovery.schemaID)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+                taxonomyAxis("Training families", values: discovery.trainingFamilies)
+                taxonomyAxis("Objectives", values: discovery.objectives)
+                taxonomyAxis("Semantic rows", values: discovery.semanticRows)
+                taxonomyAxis("Physical containers", values: discovery.physicalContainers)
+                taxonomyAxis("Consumer profiles", values: discovery.consumerProfiles)
+                taxonomyAxis("Loss policies", values: discovery.lossPolicies)
+            }
+        case .unavailable(let message):
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Taxonomy unavailable")
+                    .font(.caption.weight(.semibold))
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Retry") { workbench.refreshTaxonomyHelp() }
+                    .controlSize(.small)
+            }
+        }
+    }
+
+    private func taxonomyAxis(_ title: String, values: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+            Text(values.joined(separator: ", "))
+                .font(.caption.monospaced())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
         }
     }
 }

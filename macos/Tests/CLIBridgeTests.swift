@@ -256,6 +256,232 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
+    func testTaxonomyDiscoveryDecodesExactRegistryPayload() throws {
+        let discovery = try JSONDecoder().decode(
+            TaxonomyDiscovery.self,
+            from: taxonomyData()
+        )
+
+        XCTAssertEqual(discovery.contractID, "veriformis.taxonomy")
+        XCTAssertEqual(discovery.contractVersion, "1")
+        XCTAssertEqual(discovery.schemaID, "veriformis.taxonomy/v1")
+        XCTAssertEqual(
+            discovery.objectives,
+            [
+                "full_text",
+                "continuation",
+                "section_reconstruction",
+                "before_after_transformation",
+                "structured_field",
+            ]
+        )
+        XCTAssertEqual(discovery.semanticRows.first, "text")
+        XCTAssertFalse(discovery.trainingFamilies.isEmpty)
+        XCTAssertFalse(discovery.physicalContainers.isEmpty)
+        XCTAssertFalse(discovery.consumerProfiles.isEmpty)
+        XCTAssertFalse(discovery.lossPolicies.isEmpty)
+        XCTAssertFalse(TaxonomyDiscovery.expectedKeys.contains("format"))
+    }
+
+    func testTaxonomyDiscoveryRejectsMissingAndExtraKeys() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                TaxonomyDiscovery.self,
+                from: taxonomyData { payload in
+                    payload.removeValue(forKey: "contract_version")
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? TaxonomyDiscoveryError,
+                .invalidKeySet(missing: ["contract_version"], unexpected: [])
+            )
+        }
+
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                TaxonomyDiscovery.self,
+                from: taxonomyData { payload in
+                    payload["format"] = ["jsonl"]
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? TaxonomyDiscoveryError,
+                .invalidKeySet(missing: [], unexpected: ["format"])
+            )
+        }
+    }
+
+    func testTaxonomyDiscoveryRejectsWrongSchemaEmptyAxisAndWrongObjectives() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                TaxonomyDiscovery.self,
+                from: taxonomyData { $0["schema_id"] = ["veriformis.taxonomy/v2"] }
+            )
+        ) { error in
+            XCTAssertEqual(error as? TaxonomyDiscoveryError, .invalidMetadata("schema_id"))
+        }
+
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                TaxonomyDiscovery.self,
+                from: taxonomyData { $0["semantic_row"] = [] }
+            )
+        ) { error in
+            XCTAssertEqual(error as? TaxonomyDiscoveryError, .invalidAxis("semantic_row"))
+        }
+
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                TaxonomyDiscovery.self,
+                from: taxonomyData { $0["objective"] = ["full_text", "summary"] }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? TaxonomyDiscoveryError,
+                .invalidObjectives(["full_text", "summary"])
+            )
+        }
+    }
+
+    func testTaxonomyDiscoveryRejectsMalformedPayload() {
+        let malformed = Data(#"{"schema_id":"veriformis.taxonomy/v1"}"#.utf8)
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(TaxonomyDiscovery.self, from: malformed)
+        )
+    }
+
+    func testDiscoverTaxonomyInvokesExactCLIArgument() async throws {
+        let root = temporaryTestDirectory("taxonomy-argv")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let arguments = root.appendingPathComponent("arguments.txt")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf '%s\\n' "$@" > "\(arguments.path)"
+            \(taxonomyHeredoc())
+            """
+        )
+
+        let discovery = try await VeriformisCLI(
+            executableURL: executable,
+            prefixArguments: []
+        ).discoverTaxonomy()
+
+        XCTAssertEqual(discovery.schemaID, "veriformis.taxonomy/v1")
+        XCTAssertEqual(
+            try String(contentsOf: arguments, encoding: .utf8),
+            "taxonomy\n"
+        )
+    }
+
+    @MainActor
+    func testWorkbenchTaxonomyHelpBecomesReadyWithoutBlocking() async throws {
+        let root = temporaryTestDirectory("taxonomy-ready")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            \(taxonomyHeredoc())
+            """
+        )
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: defaults,
+            supportDirectory: root.appendingPathComponent("support")
+        )
+
+        workbench.refreshTaxonomyHelp()
+        XCTAssertEqual(workbench.taxonomyHelpState, .loading)
+        let state = try await waitForTerminalTaxonomyState(workbench)
+        guard case .ready(let discovery) = state else {
+            return XCTFail("expected ready taxonomy state, observed \(state)")
+        }
+        XCTAssertEqual(discovery.consumerProfiles.last, "aptus-handoff-v1")
+    }
+
+    @MainActor
+    func testWorkbenchTaxonomyHelpReportsUnavailablePayload() async throws {
+        let root = temporaryTestDirectory("taxonomy-unavailable")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf 'not-json\\n'
+            """
+        )
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: defaults,
+            supportDirectory: root.appendingPathComponent("support")
+        )
+
+        workbench.refreshTaxonomyHelp()
+        let state = try await waitForTerminalTaxonomyState(workbench)
+        guard case .unavailable(let message) = state else {
+            return XCTFail("expected unavailable taxonomy state, observed \(state)")
+        }
+        XCTAssertTrue(message.contains("invalid JSON"), message)
+    }
+
+    @MainActor
+    func testWorkbenchTaxonomyHelpCancelsAndReplacesStaleRequest() async throws {
+        let root = temporaryTestDirectory("taxonomy-replace")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let firstStarted = root.appendingPathComponent("first-started")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            if [ ! -e "\(firstStarted.path)" ]; then
+              : > "\(firstStarted.path)"
+              trap 'exit 0' TERM INT
+              while :; do :; done
+            fi
+            \(taxonomyHeredoc())
+            """
+        )
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: defaults,
+            supportDirectory: root.appendingPathComponent("support")
+        )
+
+        workbench.refreshTaxonomyHelp()
+        for _ in 0 ..< 100 where !FileManager.default.fileExists(atPath: firstStarted.path) {
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertTrue(FileManager.default.fileExists(atPath: firstStarted.path))
+
+        workbench.refreshTaxonomyHelp()
+        let state = try await waitForTerminalTaxonomyState(workbench)
+        guard case .ready(let discovery) = state else {
+            return XCTFail("replacement request did not win: \(state)")
+        }
+        XCTAssertEqual(discovery.contractID, "veriformis.taxonomy")
+    }
+
     func testCompilePlanOrderAndArguments() {
         let sources = [
             URL(fileURLWithPath: "/data/raw/a.txt"),
@@ -536,5 +762,90 @@ final class CLIBridgeTests: XCTestCase {
             executableURL: URL(fileURLWithPath: "/bin/sh"),
             prefixArguments: []
         )
+    }
+
+    private func taxonomyPayload() -> [String: [String]] {
+        [
+            "contract_id": ["veriformis.taxonomy"],
+            "contract_version": ["1"],
+            "schema_id": ["veriformis.taxonomy/v1"],
+            "training_family": [
+                "source-grounded-language-modeling",
+                "source-grounded-supervised-fine-tuning",
+            ],
+            "objective": [
+                "full_text",
+                "continuation",
+                "section_reconstruction",
+                "before_after_transformation",
+                "structured_field",
+            ],
+            "semantic_row": [
+                "text",
+                "prompt_completion",
+                "instruction_output",
+                "messages",
+            ],
+            "physical_container": [
+                "minimal-v1",
+                "deterministic-vfbundle-zip-v1",
+            ],
+            "consumer_profile": [
+                "veriformis-canonical-v1",
+                "aptus-handoff-v1",
+            ],
+            "loss_policy": [
+                "full-sequence",
+                "completion-only",
+                "output-only",
+                "final-assistant-suffix",
+            ],
+        ]
+    }
+
+    private func taxonomyData(
+        mutating mutation: ((inout [String: [String]]) -> Void)? = nil
+    ) throws -> Data {
+        var payload = taxonomyPayload()
+        mutation?(&payload)
+        return try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+    }
+
+    private func taxonomyHeredoc() throws -> String {
+        let payload = String(decoding: try taxonomyData(), as: UTF8.self)
+        return """
+        cat <<'VERIFORMIS_TAXONOMY_JSON'
+        \(payload)
+        VERIFORMIS_TAXONOMY_JSON
+        """
+    }
+
+    private func temporaryTestDirectory(_ label: String) -> URL {
+        FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-\(label)-\(UUID().uuidString)")
+    }
+
+    private func writeExecutable(_ url: URL, script: String) throws {
+        try Data(script.utf8).write(to: url)
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o755],
+            ofItemAtPath: url.path
+        )
+    }
+
+    @MainActor
+    private func waitForTerminalTaxonomyState(
+        _ workbench: WorkbenchViewModel
+    ) async throws -> TaxonomyHelpState {
+        for _ in 0 ..< 200 {
+            switch workbench.taxonomyHelpState {
+            case .ready, .unavailable:
+                return workbench.taxonomyHelpState
+            case .idle, .loading:
+                try await Task.sleep(nanoseconds: 10_000_000)
+            }
+        }
+        XCTFail("taxonomy discovery did not reach a terminal state")
+        return workbench.taxonomyHelpState
     }
 }

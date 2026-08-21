@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-11 (workbench Phases 0–2 on `main`; independent-product authority pass)
+**Last reviewed:** 2026-08-21 (Phase 3 taxonomy discovery)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -124,6 +124,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | Command | Purpose |
 | --- | --- |
 | `veriformis version` | Print package version |
+| `veriformis taxonomy` | Print the implemented training taxonomy as read-only JSON |
 | `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |
 | `veriformis clean WORKSPACE` | Cleaning plan + apply |
 | `veriformis chunk WORKSPACE` | Evidence-bearing chunks |
