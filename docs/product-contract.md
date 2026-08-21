@@ -7,16 +7,16 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-version `0.1.0` development alpha
+plus independent-product Phases 0–3, version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
-and beta-prep landed; private beta workbench Phases 0–2 on `main`; maturity
-alpha; public Mac claim still owner-gated
+and beta-prep landed; private beta workbench Phases 0–2 and independent-product
+Phases 0–3 on `main`; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-11 (independent-product authority pass)
+**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
 
-**Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
-public-ready checklist, or any product-contract change
+**Next review:** Independent-roadmap Phase 4 start; beta label cut, public-ready
+checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -50,6 +50,8 @@ constants, and executable acceptance fixtures. Steps 7 through 10 are governed
 by [Dataset Construction Contract v1](contracts/dataset-construction-v1.md).
 Steps 11 through 16 are governed by
 [Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
+The six-axis product vocabulary and compile compatibility are governed by
+[Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md).
 
 ## Ownership boundary
 
@@ -105,6 +107,13 @@ corpus compile evidence, and the packaging runbook. Beta-prep and
 rebranding the product as beta. Owner-executed signing, notarization, and
 clean-Mac install evidence remain required for a **public Mac app** claim.
 Optional Group 8 (model-assisted construction) remains owner-gated.
+
+Independent-product Phases 0–3 add the tracking and claim-control foundation,
+standalone defaults, deterministic bundle transport, reliability controls, and
+the implemented taxonomy and discovery registry without changing existing v1
+persisted meanings. Phase 4 verified export foundation is the next planned
+roadmap work and has not started. Generic export containers and new trainer
+profiles remain unimplemented.
 
 ## End-to-end compiler contract
 
@@ -183,8 +192,9 @@ expectations, and the portable assignment projection. The adapter policy
 currently rejects plain `text` rows. Its repository checks prove descriptor
 self-conformance, not compatibility with a live named Aptus build. Live
 training execution remains outside Veriformis. The independent product roadmap
-replaces this one-off destination emphasis with a consumer-neutral export
-contract and versioned optional trainer profiles.
+plans a consumer-neutral export contract and versioned optional trainer
+profiles; those capabilities are not implemented by the completed taxonomy
+phase.
 
 ## Fail-closed seal
 
@@ -211,6 +221,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Integrity Contract v1](./contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](./contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](./contracts/finished-dataset-v1.md)
+- [Dataset Taxonomy Contract v1](./contracts/taxonomy-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

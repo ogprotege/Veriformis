@@ -2,9 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-11
+**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
 
-**Next review:** Every program phase closeout or governance-schema change
+**Next review:** Independent-product Phase 4 start, any later phase closeout, or
+governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

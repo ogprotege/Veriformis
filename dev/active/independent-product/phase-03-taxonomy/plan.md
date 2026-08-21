@@ -1,6 +1,6 @@
 # Phase 3 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-21
 
@@ -70,17 +70,18 @@
 
 - [x] Add schema/version and golden round-trip tests for the taxonomy catalog.
 - [x] Prove existing default-rule workspaces and sealed bundles still load.
-- [ ] Update current status, support registry, evidence index, WIP, and docs.
-- [ ] Complete `closeout.md` and mark Phase 3 completed only if every exit
+- [x] Update current status, support registry, evidence index, WIP, and docs.
+- [x] Complete `closeout.md` and mark Phase 3 completed only if every exit
       gate passes.
 
 ## Exit gate
 
 No public API or screen uses “format” where it could mean more than one axis.
 Every implemented recipe and row schema has one explicit training-family and
-loss interpretation. Invalid objective, row, container, or profile
-combinations fail before compile. Existing persisted v1 identifiers remain
-readable without reinterpretation.
+loss interpretation. Invalid objective, row, or profile combinations fail
+before compile. The current compile surface exposes no container selector;
+publication uses only the fixed implemented containers. Existing persisted
+v1 identifiers remain readable without reinterpretation.
 
 ## Non-goals
 

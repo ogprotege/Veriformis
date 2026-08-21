@@ -1,13 +1,14 @@
 # Documentation Health Report
 
-**Status:** Phase 1 standalone-boundary reconciliation completed
+**Status:** Independent-product Phase 3 taxonomy reconciliation completed
 
-**Review date:** 2026-08-11
+**Review date:** 2026-08-21
 
 **Repository baseline:** Working tree based on
-`7d116e9c09fb4c64f38b2db2572f820a83c53dba`
+`6973e6379a650f1edeb358c713f0c4768da1d12d`
 
-**Next review:** Phase 3 closeout
+**Next review:** Independent-product Phase 4 start or the next active-document
+behavior change
 
 ## Scope examined
 
@@ -28,9 +29,9 @@
   release, and beta-limitations documents.
 - Independent product analysis and roadmap.
 - Project governance, support registry, evidence index, ADRs, documentation
-  debt, WIP, and the completed Phase 0 and Phase 1 packets.
+  debt, WIP, and the completed Phase 0–3 packets.
 - Versioned integrity, construction, finished-dataset, and optional Aptus
-  handoff contracts.
+  handoff contracts, plus the implemented taxonomy contract.
 
 These documents govern current behavior, future work, or active execution and
 must be updated when their scope changes.
@@ -68,6 +69,7 @@ deprecated document must link its replacement and removal/review trigger.
 | Active architecture described CLI-owned orchestration and obsolete dependency counts | Semantic audit against `PipelineService`, adapters, source tree, and `pyproject.toml` | Reconciled across the architecture tree and versioned contracts; obsolete CLI citations removed |
 | Group 2/3 contracts described already implemented work as future deferrals | Current source/status versus contract closeout prose | Historical deferrals labeled as such and linked to current status |
 | No privacy-safe demand evidence constrained roadmap ranking | Phase 0 corpus gate | Added a content-blind scanner, schema, matrix, and test-verified fixture aggregate; unavailable owner evidence remains explicit |
+| Phase 3 taxonomy work was implemented while active indexes still described it as in progress | Taxonomy registry and discovery tests, compatibility goldens, completed Phase 3 packet | Reconciled active status, contract, contributor, agent, program-index, and governance language; Phase 4 remains planned and unopened |
 
 ## Current health assessment
 
@@ -75,7 +77,7 @@ deprecated document must link its replacement and removal/review trigger.
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
 | Current capability accuracy | Good within audited active scope | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, release boundary, and Mac guide |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0 and Phase 1 packets, next gates |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–3 packets, and Phase 4 as the next planned gate |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -84,8 +86,9 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Complete the Phase 3 taxonomy contract, compatibility registry, and
-   discovery surfaces; do not claim new families or containers as implemented.
+1. Open Phase 4 verified export foundation only through the standard program
+   state transition; generic export containers and planned trainer-specific
+   profiles remain planned until their own gates pass.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a

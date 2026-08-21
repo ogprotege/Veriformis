@@ -10,6 +10,7 @@ Before changing code, read:
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+- [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -26,8 +27,9 @@ Before changing code, read:
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented. Independent
-product Phases 0 and 1 are complete; consult the machine ledger before creating
-the Phase 2 packet or starting later work. Maturity remains
+product Phases 0–3 are complete. Phase 4, verified export foundation, is next
+but remains `planned`; consult the machine ledger and follow the standard state
+transition before creating its packet or starting that work. Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)
 and [docs/release.md](docs/release.md).
@@ -136,5 +138,7 @@ four row schemas, exact 17-gate validation, expanded declared ingest, YAML,
 local MCP, optional Aptus handoff, and the SwiftUI workbench. It remains a
 development alpha. Follow the current state and exit gates in the
 [independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md),
-[program ledger](dev/active/independent-product/program.json), and active phase
-packet.
+[program ledger](dev/active/independent-product/program.json), and the current
+phase packet when one is active. Generic export containers and new
+trainer-specific profiles remain planned until their own roadmap gates pass;
+this does not erase the existing canonical or optional Aptus profiles.

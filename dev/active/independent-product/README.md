@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phase 3 in progress
+**Status:** Active program — Phases 0–3 complete; Phase 4 next and planned
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -18,11 +18,12 @@ with roadmap headings.
 - [Phase 0 — Authority and evidence foundation](phase-00-foundation/README.md) — completed
 - [Phase 1 — Standalone independence](phase-01-standalone-independence/README.md) — completed
 - [Phase 2 — Reliability and artifact boundary](phase-02-reliability-artifact-boundary/README.md) — completed
-- [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — in progress
+- [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
-implementation.
+implementation. Phase 4, verified export foundation, remains planned and has no
+packet yet.
 
 ## State change procedure
 

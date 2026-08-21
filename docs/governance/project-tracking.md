@@ -4,9 +4,10 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-11
+**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
 
-**Next review:** Any program-state, evidence-grade, or completion-rule change
+**Next review:** Independent-product Phase 4 start or any program-state,
+evidence-grade, or completion-rule change
 
 ## Purpose
 

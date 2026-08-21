@@ -12,6 +12,7 @@
 | Aptus `text` refusal is a profile constraint, not a core row ban | Accepted | Finished-dataset generic row-shape boundary; Aptus handoff v1 |
 | Future families may be named but MUST NOT be advertised as implemented | Accepted | Roadmap Phase 3 non-goals and claim discipline |
 | No persisted identity or workspace revision change in the opening increment | Accepted | Defect-closure invariant; existing sealed bundles must keep loading |
+| Current compile surfaces expose no physical-container selector; publication uses only the fixed implemented containers | Accepted | Taxonomy v1 registry; current service and CLI surface |
 
-No new export container, trainer profile, or maturity claim is authorized by
-opening this phase.
+Phase 3 closed without authorizing a new export container, trainer profile, or
+maturity claim.

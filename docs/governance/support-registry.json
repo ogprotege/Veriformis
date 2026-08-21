@@ -1,7 +1,7 @@
 {
   "schema_version": "veriformis.support-registry/v1",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-20",
+  "last_reviewed": "2026-08-21",
   "claim_policy": "docs/governance/project-tracking.md",
   "product": {
     "name": "Veriformis",
@@ -70,6 +70,12 @@
       "prompt_completion",
       "text"
     ],
+    "implemented_loss_policies": [
+      "full-sequence",
+      "completion-only",
+      "output-only",
+      "final-assistant-suffix"
+    ],
     "planned_families": [
       "preference-and-ranking",
       "explicit-label-classification",
@@ -94,6 +100,10 @@
     ]
   },
   "artifacts": {
+    "implemented_physical_containers": [
+      "minimal-v1",
+      "deterministic-vfbundle-zip-v1"
+    ],
     "implemented_bundle_profiles": [
       {
         "profile": "minimal-v1",
@@ -171,6 +181,16 @@
     ]
   },
   "consumer_profiles": [
+    {
+      "profile": "veriformis-canonical-v1",
+      "state": "implemented",
+      "product_role": "canonical-product",
+      "evidence": [
+        "src/veriformis/taxonomy.py",
+        "docs/contracts/taxonomy-v1.md",
+        "tests/contracts/test_taxonomy_contract.py"
+      ]
+    },
     {
       "profile": "aptus-handoff-v1",
       "state": "implemented",
