@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -204,19 +204,29 @@ projection and canonical bytes with the baseline. Counts or assignment digest
 alone cannot pass.
 
 This is an in-memory semantic proof, not evidence about produced destination
-bytes. Phase 4.6 adds a separate internal exact-byte path: `publish` re-verifies
-the source and plan, receives exact bytes and normalized candidate semantics
-from a private test-injected renderer, repeats the membership check, and checks
-the bytes against every exact file plan. It writes a canonical receipt in a
-private descriptor-anchored sibling, independently rewalks the closed staged
-tree, and makes it visible with one atomic no-replace promotion. The receipt and
-actual byte digests prove one produced exact instance; they do not decode those
-bytes into semantic rows or prove a second deterministic render.
+bytes. Phase 4.6 adds the internal publication path: `publish` re-verifies the
+source and plan, validates private renderer bytes and normalized candidates,
+writes a canonical receipt in a descriptor-anchored sibling, independently
+rewalks the closed staged tree, and makes it visible with one atomic no-replace
+promotion.
 
-Exact-byte rerender or semantic replay of actual destination content remains
-Phase 4.7. No renderer, public command, or generic container exists. The export
-boundary therefore changes neither the canonical six-file bundle nor the
-nine-stage workspace graph.
+Phase 4.7 invokes the private renderer twice from independent strict plan and
+row-set reloads and repeats complete membership validation for each result. An
+exact profile requires identical normalized path-to-bytes trees. A semantic-
+only profile permits distinct physical encodings, then privately reconstructs
+versioned canonical semantic preimages and normalized membership from both
+trees. The service computes each semantic digest, requires both preimage trees
+to equal the plan, and replays independently descriptor-read staged bytes before
+verification and promotion. The receipt binds the actual bytes of the published
+first render. The persisted verification binds that instance and the profile
+claim, not a cross-render transcript.
+
+The private render/replay hooks are trusted conformance code, and semantic
+replay currently retains each complete file in memory. No renderer or replayer,
+public command, or generic container exists. The export boundary therefore
+changes neither the canonical six-file bundle nor the nine-stage workspace
+graph. Phase 4.8 owns public surfaces, Phase 4.9 closeout, and Phase 5 generic
+containers.
 
 ## Persistence: the workspace revision store
 

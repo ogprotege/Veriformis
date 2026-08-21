@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic-evidence reconciliation)
 
 **Next review:** Any architecture documentation change
 
@@ -218,12 +218,13 @@ identities and the complete source membership baseline from that immutable
 view; caller input is limited to strict profiles, dependencies, and file plans.
 Its read-only membership operation fresh-reconstructs normalized candidate
 train/evaluation rows and provenance, then requires exact row-set and complete
-projection equality with the plan. Its internal exact-byte publication
-operation then re-verifies the source and plan, checks the candidate semantics
-and exact planned bytes separately, writes and independently verifies a closed
-receipt-bearing staging tree, and atomically promotes without replacement. The
-default service has no renderer, and no public export command, semantic replay,
-or generic container ships. The CLI exposes eighteen commands: nine stage
+projection equality with the plan. Its internal publication operation then re-
+verifies the source and plan and renders twice from independent strict inputs.
+Exact profiles require identical normalized byte trees; semantic-only profiles
+require equal versioned canonical semantic preimages and reconstructed
+membership from both renders plus descriptor-reread staged replay. The default
+service has no renderer or semantic replayer, and no public export command or
+generic container ships. The CLI exposes eighteen commands: nine stage
 commands plus maintenance, inspection, recipe automation, MCP, optional Aptus
 handoff, and version surfaces.
 

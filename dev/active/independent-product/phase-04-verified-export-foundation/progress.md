@@ -293,3 +293,59 @@ surfaces remain Phase 4.8; the exhaustive closeout harness remains Phase 4.9.
 
 **Next action:** Open the Phase 4.6 PR, require every GitHub check to pass,
 merge, and synchronize clean local `main` before Phase 4.7 begins.
+
+## 2026-08-21 — Phase 4.6 merged and synchronized
+
+**Status:** Complete
+
+PR #48 passed every required GitHub check and was squash-merged as
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.7 branch was created.
+
+## 2026-08-21 — Phase 4.7 deterministic evidence implemented
+
+**Status:** Implementation complete; every required local gate passes;
+pull-request review pending
+
+Publication now invokes the private conformance renderer twice from independent
+strict reloads of the same plan and source row set, validating complete
+membership for each result. `portable_exact_bytes` requires identical
+normalized path-to-bytes trees before destination access and publishes only the
+first result.
+
+`semantic_content_only` permits different physical encodings but privately
+replays both byte trees into complete profile-versioned canonical semantic
+preimages and normalized membership evidence. The service computes every
+semantic digest, requires both preimage trees and both memberships to match the
+plan, publishes only the first physical tree, and replays descriptor-reread
+staged bytes again before verification and promotion. Missing private render or
+replay support and every byte, preimage, digest, membership, or staged-replay
+mismatch fail closed.
+
+The conformance fixtures freeze deterministic plan, receipt, verification, and
+closed-tree evidence. This increment changes none of the ten persisted v1
+schemas or public `publish` arguments, records no durable rerender transcript,
+and adds no renderer/replayer registry, taxonomy or support-registry entry,
+public surface, generic container, or consumer profile.
+
+Observed implementation and release evidence:
+
+- Focused deterministic-evidence suite: 14 passed.
+- Complete export suite: 158 passed.
+- Combined export and verified-export contract suite: 163 passed.
+- Full Python suite: 927 passed with the expected exercised transport
+  durability-warning regression warning.
+- Standalone release gate: 915 passed, 1 deselected, with the same expected
+  warning; clean-wheel install and golden compile checks passed.
+- macOS XCTest: 38 passed.
+- CLI/workbench parity passed.
+- Project tracking passed for all 21 roadmap phases and governed packets.
+- Ruff, lock integrity, 14 JSON files, 10 shell files, 345 changed-document
+  local links, and `git diff --check` passed.
+- Independent source review found no blocker after confirming the trusted
+  private-hook boundary and documenting whole-file semantic replay plus the
+  resource limits required before a semantic profile can ship.
+
+**Next action:** Open the Phase 4.7 pull request. Phase 4.8 may begin only after
+every GitHub check passes, the PR merges, and clean local `main` equals
+`origin/main`.

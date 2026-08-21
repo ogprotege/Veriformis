@@ -1,6 +1,6 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phases 4.1–4.5 merged; Phase 4.6 local gates passed and pull-request review is pending
+**Evidence status:** In progress — Phases 4.1–4.6 merged; Phase 4.7 is locally implemented with every required local gate complete and pull-request review pending
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -23,8 +23,8 @@
 - [x] Complete immutable source membership baseline derived from aligned rows and
       provenance.
 - [x] Normalized semantic candidate no-membership-change proof.
-- [ ] Atomic, path-safe, cancelable, no-replace publication.
-- [ ] Exact-byte and semantic-only evidence limits.
+- [x] Atomic, path-safe, cancelable, no-replace publication.
+- [x] Exact-byte and semantic-only evidence limits.
 - [ ] Discovery, dry run, inspect, execute, and verify parity across surfaces.
 - [ ] Contract/property, tamper, path, race, and partial-publication harness.
 - [ ] Full Phase 4 exit and reconciliation gates.
@@ -220,3 +220,52 @@ This increment does not prove a second exact render, reconstruct semantic
 content from produced bytes, publish `semantic_content_only`, install or select
 a product renderer, expose `PipelineService`/CLI/MCP/Mac operations, or promote
 a container or consumer profile.
+
+PR #48 passed every required GitHub check and merged as
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.7 branch was created.
+
+## 2026-08-21 — Phase 4.7 deterministic evidence implementation
+
+- Both determinism claims invoke the private renderer twice from independent
+  strict plan and source-row-set reloads and validate complete membership for
+  each result before destination access.
+- `portable_exact_bytes` normalizes by exact planned path and requires complete
+  byte-tree equality. Only the first identical tree is published.
+- `semantic_content_only` permits physical byte differences but privately
+  reconstructs complete profile-versioned canonical semantic preimages and
+  normalized membership from both trees. The service computes the digests and
+  requires both results to match each other and the plan.
+- Semantic publication replays descriptor-reread staged bytes again and
+  requires the complete preflight semantic evidence before verification and
+  promotion.
+- Deterministic plan, receipt, verification, and closed-tree fixtures exercise
+  the private conformance profile without registering or advertising it.
+- The public `publish` signature and all ten persisted v1 schemas remain
+  unchanged. `ExportVerification` binds one published instance and its profile
+  claim, not a durable rerender transcript.
+- The default service still has no renderer or semantic replayer. No public
+  surface, discovery entry, generic container, consumer profile, taxonomy
+  change, or support-registry change is part of this increment.
+
+Observed results:
+
+- Focused deterministic-evidence suite: 14 passed.
+- Complete export suite: 158 passed.
+- Combined export and verified-export contract suite: 163 passed.
+- Full Python suite: 927 passed with the expected exercised transport
+  durability-warning regression warning.
+- Standalone release gate: 915 passed, 1 deselected, with the same expected
+  warning; clean-wheel install and golden compile checks passed.
+- macOS XCTest: 38 passed.
+- CLI/workbench parity passed.
+- Project tracking passed for all 21 roadmap phases and governed packets.
+- Ruff, lock integrity, 14 JSON files, 10 shell files, 345 changed-document
+  local links, and `git diff --check` passed.
+- Independent source review found no blocker after confirming the private
+  render/replay hooks are trusted conformance code and documenting that semantic
+  replay retains each complete produced file in memory. The fixture is
+  statically bounded; every future shipped semantic profile must enforce
+  explicit resource limits.
+
+Phase 4.7 is not merged, and this is not completed Phase 4 exit evidence.

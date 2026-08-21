@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
 
-**Next review:** Independent-product Phase 4.6 merge or Phase 4.7 start, any
+**Next review:** Independent-product Phase 4.7 merge or Phase 4.8 start, any
 later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -41,9 +41,11 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, Phase 4 items 4.1–4.5 are merged at
-`1675c1a22830d506bdf27e45150170befc984bdf`. Phase 4.6 internal exact-byte
-publication has green focused, full Python, standalone release, parity, Mac,
-tracking, structure, link, and diff gates; GitHub review remains pending.
-Because no renderer, public surface, or supported
-container was added, the support registry does not change.
+At this review, Phase 4 items 4.1–4.6 are merged at
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 private two-render
+exact-byte and semantic-content conformance has green focused, full Python,
+standalone release, parity, Mac, Ruff, lock, and diff gates; GitHub review
+remains pending. Because no renderer/replayer, public surface, supported
+container, or consumer profile was added, the support registry and taxonomy do
+not change. Phase 4.8 may begin only after the Phase 4.7 PR passes every GitHub
+check, merges, and clean local `main` equals `origin/main`.

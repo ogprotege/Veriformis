@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `1675c1a22830d506bdf27e45150170befc984bdf`
+**Implementation baseline reviewed:** `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`
 on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
 workbench Phases 0–2; independent-product Phases 0–3 complete; Phase 4 items
-4.1–4.5 merged), plus the current Phase 4.6 exact-byte publication branch
+4.1–4.6 merged), plus the current Phase 4.7 deterministic-evidence branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
 
-**Next review:** Independent-roadmap Phase 4.6 GitHub gates and merge; Phase 4.7
+**Next review:** Independent-roadmap Phase 4.7 GitHub review and merge; Phase 4.8
 start; beta label cut, public Mac evidence, or any
 listed-item status change
 
@@ -58,11 +58,11 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [ ] Independent product Phase 4 is in progress; items 4.1–4.5 are merged at
-      `1675c1a22830d506bdf27e45150170befc984bdf`. Item 4.6 implements internal
-      exact-byte atomic publication; all focused, full Python, standalone
-      release, parity, Mac, tracking, structure, link, and diff gates pass,
-      while GitHub review remains pending.
+- [ ] Independent product Phase 4 is in progress; items 4.1–4.6 are merged at
+      `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Item 4.7 locally implements
+      two-render exact-byte and semantic-content conformance plus staged
+      descriptor replay; all required local gates pass, while GitHub review and
+      merge remain pending.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -159,16 +159,23 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Phase 4.6 — internal `portable_exact_bytes` publication re-verifies the
       source and plan, checks normalized membership, writes and independently
       verifies a closed receipt-bearing staging tree, and performs one atomic
-      no-replace promotion. All local gates pass: 150 focused tests, 914 full
-      Python tests, 902 standalone-release tests with 1 deselected,
-      deterministic parity, and 38 Mac tests; GitHub review remains pending.
-- [ ] Phase 4.7–4.9 — deterministic rerender and semantic replay, public
-      surfaces, and adversarial closeout remain open in the
+      no-replace promotion; merged at
+      `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`.
+- [x] Phase 4.7 — the private conformance path renders twice from independent
+      strict inputs. Exact profiles require identical normalized byte trees;
+      semantic profiles require equal versioned canonical semantic preimages,
+      complete plan-equal membership, service-computed digests, and staged
+      descriptor replay. Local gates pass: 14 determinism tests, 158 export
+      tests, 163 combined export/contract tests, 927 full Python tests, 915
+      standalone-release tests with 1 deselected, parity, and 38 Mac tests;
+      GitHub review remains pending.
+- [ ] Phase 4.8–4.9 — public surfaces and adversarial closeout remain open in the
       [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-Phase 4.6 supplies an internal exact-byte publisher and verifier only. It ships
-no renderer, public export command, supported generic export container, or
-semantic-only publication path.
+Phase 4.7 supplies private conformance evidence only. The default service ships
+no renderer or semantic replayer, public export command, supported generic
+export container, or trainer-specific profile. The ten persisted v1 schemas and
+the `ExportService.publish` call signature remain unchanged.
 
 The current stage-command runtime is:
 

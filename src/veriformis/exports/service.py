@@ -2,8 +2,8 @@
 
 Phase 4 builds every export operation through this service. The current
 increments establish a typed, descriptor-anchored source boundary, fail-closed
-trust admission, source-derived plan population, and private atomic exact-byte
-publication without promoting Phase 5 containers.
+trust admission, source-derived plan population, and private deterministic
+publication conformance without promoting Phase 5 containers.
 """
 
 from __future__ import annotations
@@ -49,7 +49,9 @@ from veriformis.exports._publication import (
     CancellationCheck,
     ExportPublicationOutcome,
     _publish_exact_export,
+    _publish_semantic_export,
 )
+from veriformis.exports.paths import validate_export_relative_path
 from veriformis.identity import lossless_json_bytes, sha256_digest
 
 
@@ -68,13 +70,30 @@ class _RenderedDerivative:
     provenance: tuple[RowProvenance, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class _ReplayedDerivative:
+    """Test-injected reconstruction of semantics from produced file bytes.
+
+    ``semantic_contents`` contains the canonical, profile-versioned semantic
+    preimage for every planned file.  The service hashes these bytes itself;
+    an injected implementation cannot assert a digest without supplying the
+    evidence that produced it.
+    """
+
+    semantic_contents: tuple[tuple[str, bytes], ...]
+    train_rows: tuple[ProductRow, ...]
+    evaluation_rows: tuple[ProductRow, ...]
+    provenance: tuple[RowProvenance, ...]
+
+
 class ExportService:
     """Own export policy beneath :class:`PipelineService`.
 
     Adapters must call the Python composition root. They must never copy or
-    rewrite bundle files directly. Phase 4.6 adds private exact-byte destination
-    enforcement, receipts, publication, and verification here without changing
-    that boundary; public adapters remain later work.
+    rewrite bundle files directly. Phase 4.6 adds private destination
+    enforcement, receipts, publication, and verification. Phase 4.7 adds
+    private two-render exact comparison and semantic reconstruction without
+    changing that boundary; public adapters remain later work.
     """
 
     def verified_source(
@@ -280,12 +299,12 @@ class ExportService:
         expected_manifest_sha256: str | None = None,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportPublicationOutcome:
-        """Atomically publish one test-injected exact-byte derivative.
+        """Atomically publish one test-injected deterministic derivative.
 
-        Phase 4.6 intentionally has no renderer-selection argument or shipped
-        implementation.  A conformance-only subclass may override
-        :meth:`_render_derivative`; product discovery and public surfaces remain
-        later Phase 4 work.
+        Phase 4.7 intentionally has no renderer-selection argument or shipped
+        implementation.  A conformance-only subclass may override the private
+        render and semantic-replay hooks; product discovery and public surfaces
+        remain later Phase 4 work.
         """
         if cancellation_check is not None and not callable(cancellation_check):
             raise ExportContractError("cancellation_check must be callable")
@@ -299,13 +318,9 @@ class ExportService:
             ValueError,
             VeriformisError,
         ) as exc:
-            if isinstance(exc, ExportVerificationError):
+            if isinstance(exc, (ExportContractError, ExportVerificationError)):
                 raise
             raise ExportContractError(f"invalid export publication plan: {exc}") from exc
-        if checked_plan.container_profile.determinism_claim != "portable_exact_bytes":
-            raise ExportContractError(
-                "Phase 4.6 publication supports portable_exact_bytes plans only"
-            )
         if checked_plan.source_trust_grade == "external_digest":
             if expected_manifest_sha256 is None:
                 raise ExportContractError(
@@ -344,32 +359,149 @@ class ExportService:
                 "reverified export source differs from the supplied export plan"
             )
 
+        plan_bytes = checked_plan.canonical_bytes()
+        row_set_bytes = lossless_json_bytes(source_row_set.model_dump(mode="json"))
+        first_files = self._render_and_validate(
+            plan_bytes,
+            row_set_bytes,
+            cancellation_check=cancellation_check,
+        )
+        second_files = self._render_and_validate(
+            plan_bytes,
+            row_set_bytes,
+            cancellation_check=cancellation_check,
+        )
+
+        if checked_plan.container_profile.determinism_claim == "portable_exact_bytes":
+            if first_files != second_files:
+                raise ExportVerificationError(
+                    "portable exact renderer executions produced different byte trees"
+                )
+            _run_cancellation_check(cancellation_check)
+            return _publish_exact_export(
+                destination_root,
+                source_root=source.bundle_path,
+                plan=checked_plan,
+                files=first_files,
+                cancellation_check=cancellation_check,
+            )
+
+        first_semantics = self._replay_and_validate(
+            plan_bytes,
+            first_files,
+            cancellation_check=cancellation_check,
+        )
+        second_semantics = self._replay_and_validate(
+            plan_bytes,
+            second_files,
+            cancellation_check=cancellation_check,
+        )
+        if first_semantics != second_semantics:
+            raise ExportVerificationError(
+                "semantic renderer executions produced different canonical content"
+            )
+        _run_cancellation_check(cancellation_check)
+
+        def replay_staged(
+            replay_files: tuple[tuple[str, bytes], ...],
+        ) -> tuple[tuple[str, bytes], ...]:
+            return self._replay_and_validate(
+                plan_bytes,
+                replay_files,
+                cancellation_check=cancellation_check,
+            )
+
+        return _publish_semantic_export(
+            destination_root,
+            source_root=source.bundle_path,
+            plan=checked_plan,
+            files=first_files,
+            expected_semantic_preimages=first_semantics,
+            semantic_replay=replay_staged,
+            cancellation_check=cancellation_check,
+        )
+
+    def _render_and_validate(
+        self,
+        plan_bytes: bytes,
+        source_row_set_bytes: bytes,
+        *,
+        cancellation_check: CancellationCheck | None,
+    ) -> tuple[tuple[str, bytes], ...]:
+        """Run one renderer against fresh strict inputs and freeze its result."""
         _run_cancellation_check(cancellation_check)
         try:
-            rendered = self._render_derivative(checked_plan, source_row_set)
-            files = tuple(rendered.files)
+            plan = ExportPlan.from_json_bytes(plan_bytes)
+            source_row_set = row_set_from_json_bytes(source_row_set_bytes)
+            rendered = self._render_derivative(plan, source_row_set)
+            files = _normalize_file_bytes(
+                plan,
+                rendered.files,
+                evidence_label="renderer output",
+                require_exact_plan_bytes=(
+                    plan.container_profile.determinism_claim
+                    == "portable_exact_bytes"
+                ),
+            )
             train_rows = tuple(rendered.train_rows)
             evaluation_rows = tuple(rendered.evaluation_rows)
             provenance = tuple(rendered.provenance)
-        except (AttributeError, TypeError, ValueError) as exc:
+        except (AttributeError, TypeError, UnicodeError, ValueError, VeriformisError) as exc:
+            if isinstance(exc, (ExportContractError, ExportVerificationError)):
+                raise
             raise ExportVerificationError(
                 f"invalid injected renderer result: {exc}"
             ) from exc
         _run_cancellation_check(cancellation_check)
         self.validate_derivative_membership(
-            checked_plan,
+            plan,
             candidate_train_rows=train_rows,
             candidate_evaluation_rows=evaluation_rows,
             candidate_provenance=provenance,
         )
         _run_cancellation_check(cancellation_check)
-        return _publish_exact_export(
-            destination_root,
-            source_root=source.bundle_path,
-            plan=checked_plan,
-            files=files,
-            cancellation_check=cancellation_check,
+        return files
+
+    def _replay_and_validate(
+        self,
+        plan_bytes: bytes,
+        files: Sequence[tuple[str, bytes]],
+        *,
+        cancellation_check: CancellationCheck | None,
+    ) -> tuple[tuple[str, bytes], ...]:
+        """Reconstruct and validate canonical semantics from one byte tree."""
+        _run_cancellation_check(cancellation_check)
+        try:
+            plan = ExportPlan.from_json_bytes(plan_bytes)
+            frozen_files = _normalize_file_bytes(
+                plan,
+                files,
+                evidence_label="semantic replay input",
+                require_exact_plan_bytes=False,
+            )
+            replayed = self._replay_derivative(plan, frozen_files)
+            semantic_contents = _normalize_semantic_contents(
+                plan,
+                replayed.semantic_contents,
+            )
+            train_rows = tuple(replayed.train_rows)
+            evaluation_rows = tuple(replayed.evaluation_rows)
+            provenance = tuple(replayed.provenance)
+        except (AttributeError, TypeError, UnicodeError, ValueError, VeriformisError) as exc:
+            if isinstance(exc, (ExportContractError, ExportVerificationError)):
+                raise
+            raise ExportVerificationError(
+                f"invalid injected semantic replay result: {exc}"
+            ) from exc
+        _run_cancellation_check(cancellation_check)
+        self.validate_derivative_membership(
+            plan,
+            candidate_train_rows=train_rows,
+            candidate_evaluation_rows=evaluation_rows,
+            candidate_provenance=provenance,
         )
+        _run_cancellation_check(cancellation_check)
+        return semantic_contents
 
     def _render_derivative(
         self,
@@ -383,10 +515,111 @@ class ExportService:
             "rendering is test-injected only"
         )
 
+    def _replay_derivative(
+        self,
+        plan: ExportPlan,
+        files: tuple[tuple[str, bytes], ...],
+    ) -> _ReplayedDerivative:
+        """Resolve no semantic decoder; test-only subclasses may override it."""
+        del plan, files
+        raise ExportContractError(
+            "no verified export semantic replayer is installed; Phase 4 "
+            "conformance replay is test-injected only"
+        )
+
 
 def _run_cancellation_check(check: CancellationCheck | None) -> None:
     if check is not None:
         check()
+
+
+def _normalize_file_bytes(
+    plan: ExportPlan,
+    entries: Sequence[tuple[str, bytes]],
+    *,
+    evidence_label: str,
+    require_exact_plan_bytes: bool,
+) -> tuple[tuple[str, bytes], ...]:
+    """Freeze one complete path-to-bytes tree in canonical plan order."""
+    try:
+        supplied = tuple(entries)
+    except (TypeError, ValueError) as exc:
+        raise ExportVerificationError(
+            f"{evidence_label} must be a finite sequence: {exc}"
+        ) from exc
+    copied: dict[str, bytes] = {}
+    for entry in supplied:
+        if type(entry) is not tuple or len(entry) != 2:
+            raise ExportVerificationError(
+                f"{evidence_label} entries must be exact (path, bytes) tuples"
+            )
+        path, data = entry
+        if type(path) is not str or type(data) is not bytes:
+            raise ExportVerificationError(
+                f"{evidence_label} entries must contain an exact string and bytes"
+            )
+        try:
+            validate_export_relative_path(path)
+        except ValueError as exc:
+            raise ExportVerificationError(
+                f"{evidence_label} contains unsafe export path {path!r}: {exc}"
+            ) from exc
+        if path in copied:
+            raise ExportVerificationError(
+                f"{evidence_label} contains duplicate export path {path!r}"
+            )
+        copied[path] = data
+    expected_paths = {item.path for item in plan.file_plans}
+    if set(copied) != expected_paths:
+        raise ExportVerificationError(
+            f"{evidence_label} does not match the complete planned file set; "
+            f"missing={sorted(expected_paths - set(copied))!r}, "
+            f"extra={sorted(set(copied) - expected_paths)!r}"
+        )
+    normalized = tuple((item.path, copied[item.path]) for item in plan.file_plans)
+    if require_exact_plan_bytes:
+        for file_plan, (_, data) in zip(
+            plan.file_plans,
+            normalized,
+            strict=True,
+        ):
+            if (
+                sha256_digest(data) != file_plan.expected_sha256
+                or len(data) != file_plan.expected_byte_size
+            ):
+                raise ExportVerificationError(
+                    "renderer bytes differ from the exact plan for "
+                    f"{file_plan.path!r}"
+                )
+    return normalized
+
+
+def _normalize_semantic_contents(
+    plan: ExportPlan,
+    entries: Sequence[tuple[str, bytes]],
+) -> tuple[tuple[str, bytes], ...]:
+    """Freeze and verify canonical semantic preimages in plan-path order."""
+    if plan.container_profile.determinism_claim != "semantic_content_only":
+        raise ExportContractError(
+            "semantic replay requires a semantic_content_only export plan"
+        )
+    normalized = _normalize_file_bytes(
+        plan,
+        entries,
+        evidence_label="semantic replay output",
+        require_exact_plan_bytes=False,
+    )
+    for file_plan, (_, canonical_content) in zip(
+        plan.file_plans,
+        normalized,
+        strict=True,
+    ):
+        if sha256_digest(canonical_content) != file_plan.semantic_content_sha256:
+            raise ExportVerificationError(
+                "replayed semantic content differs from the plan for "
+                f"{file_plan.path!r}"
+            )
+    return normalized
 
 
 def _plan_from_verified_source(
