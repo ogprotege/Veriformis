@@ -10,6 +10,7 @@ import pytest
 from veriformis.errors import ConstructionError
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
+from veriformis.taxonomy import implemented_discovery
 
 
 def _tool_map(server):
@@ -167,6 +168,7 @@ def test_mcp_server_registers_required_tools():
     tools = _tool_map(server)
     required = {
         "version",
+        "taxonomy",
         "list_recipes",
         "parse",
         "clean",
@@ -184,6 +186,31 @@ def test_mcp_server_registers_required_tools():
         "consume_handoff",
     }
     assert required <= set(tools)
+
+
+def test_mcp_taxonomy_delegates_to_service_with_exact_json_parity():
+    class TrackingPipelineService(PipelineService):
+        def __init__(self) -> None:
+            self.discovery_calls = 0
+
+        def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
+            self.discovery_calls += 1
+            return super().discover_taxonomy()
+
+    service = TrackingPipelineService()
+    taxonomy = _tool_map(create_mcp_server(service))["taxonomy"]
+    expected = json.dumps(
+        dict(implemented_discovery()),
+        ensure_ascii=False,
+        indent=2,
+        sort_keys=True,
+    )
+
+    payload = _call(taxonomy)
+
+    assert payload == expected
+    assert service.discovery_calls == 1
+    assert "format" not in json.loads(payload)
 
 
 def test_mcp_construct_refuses_incompatible_profile_before_workspace_open(tmp_path):

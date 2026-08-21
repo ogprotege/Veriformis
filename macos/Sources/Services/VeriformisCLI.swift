@@ -262,6 +262,38 @@ struct VeriformisCLI: Sendable {
         )
     }
 
+    /// Load the implemented taxonomy from the CLI without blocking the main actor.
+    func discoverTaxonomy(
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> TaxonomyDiscovery {
+        let result = try await run(
+            arguments: ["taxonomy"],
+            controller: controller
+        )
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard result.exitCode == 0 else {
+            throw TaxonomyDiscoveryError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        guard !result.outputTruncated else {
+            throw TaxonomyDiscoveryError.outputTruncated
+        }
+        do {
+            return try JSONDecoder().decode(
+                TaxonomyDiscovery.self,
+                from: Data(result.combinedOutput.utf8)
+            )
+        } catch let error as TaxonomyDiscoveryError {
+            throw error
+        } catch {
+            throw TaxonomyDiscoveryError.invalidPayload(error.localizedDescription)
+        }
+    }
+
     private static func looksLikeRepoRoot(_ url: URL, fileManager: FileManager) -> Bool {
         let pyproject = url.appendingPathComponent("pyproject.toml")
         let src = url.appendingPathComponent("src/veriformis")

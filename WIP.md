@@ -130,7 +130,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Current and future-only families declared without false implementation claims.
 - [x] Loss/masking described for every implemented semantic row.
 - [x] Compatibility checks wired to fail before compile on every surface.
-- [ ] One registry exposed through PipelineService, CLI, MCP, and workbench help.
+- [x] One registry exposed through PipelineService, CLI, MCP, and workbench help.
 - [ ] Public “format” language inventory and rewrite; closeout.
 
 The current stage-command runtime is:

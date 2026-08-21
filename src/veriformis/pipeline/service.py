@@ -137,6 +137,7 @@ from veriformis.taxonomy import (
     CANONICAL_CONSUMER_PROFILE,
     assert_compile_combination,
     default_row_schema,
+    implemented_discovery,
 )
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
@@ -958,6 +959,10 @@ def _validated_block_derivations(
 
 class PipelineService:
     """Typed, surface-neutral orchestration over workspace stages."""
+
+    def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
+        """Return a fresh, adapter-safe copy of implemented taxonomy discovery."""
+        return dict(implemented_discovery())
 
     def parse(
         self,

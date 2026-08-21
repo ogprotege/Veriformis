@@ -9,15 +9,15 @@ the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
-`handoff-verify`), local MCP (`mcp`), and `version`.
-The complete surface is 20 commands.
+`handoff-verify`), taxonomy discovery (`taxonomy`), local MCP (`mcp`), and
+`version`. The complete surface is 21 commands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 3 taxonomy discovery)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -42,7 +42,7 @@ examples below use the installed name.
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
-| Read-only | `verify`, `preview` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy` | Nothing |
 | Meta | `version` | Nothing |
 
 ## Supported inputs
@@ -528,6 +528,21 @@ duplicates, extra members, changed bytes, and noncanonical ZIP encodings fail.
 See [Deterministic Bundle Transport v1](contracts/bundle-transport-v1.md).
 
 ## Read-only commands
+
+### `taxonomy`
+
+Print the implemented product taxonomy as read-only JSON.
+
+```text
+veriformis taxonomy
+```
+
+The JSON comes from the same registry used by `PipelineService`, MCP, compile
+compatibility checks, and workbench help. It reports contract metadata plus
+the six axes separately: `training_family`, `objective`, `semantic_row`,
+`physical_container`, `consumer_profile`, and `loss_policy`. It lists only
+implemented identifiers and does not emit an ambiguous `format` field. The
+command accepts no workspace and writes no state.
 
 ### `verify`
 

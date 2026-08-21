@@ -89,6 +89,16 @@ def create_mcp_server(
         return _outcome_json(pipeline.version())
 
     @server.tool()
+    def taxonomy() -> str:
+        """Return implemented taxonomy discovery from PipelineService."""
+        return json.dumps(
+            pipeline.discover_taxonomy(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def list_recipes() -> str:
         """List named deterministic recipe library identifiers."""
         return json.dumps(list(list_named_recipes()), ensure_ascii=False, indent=2)

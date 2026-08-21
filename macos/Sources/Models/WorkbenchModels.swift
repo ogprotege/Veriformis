@@ -62,6 +62,151 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+enum TaxonomyDiscoveryError: LocalizedError, Equatable, Sendable {
+    case invalidKeySet(missing: [String], unexpected: [String])
+    case invalidMetadata(String)
+    case invalidAxis(String)
+    case invalidObjectives([String])
+    case commandFailed(exitCode: Int32, message: String)
+    case outputTruncated
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidKeySet(let missing, let unexpected):
+            return "Taxonomy discovery keys are invalid (missing: \(missing); unexpected: \(unexpected))."
+        case .invalidMetadata(let key):
+            return "Taxonomy discovery metadata \(key) is invalid."
+        case .invalidAxis(let key):
+            return "Taxonomy discovery axis \(key) must contain unique, non-empty identifiers."
+        case .invalidObjectives(let objectives):
+            return "Taxonomy discovery objectives are unsupported: \(objectives)."
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "No diagnostic was returned." : message
+            return "Taxonomy discovery failed (exit \(exitCode)): \(detail)"
+        case .outputTruncated:
+            return "Taxonomy discovery output was truncated."
+        case .invalidPayload(let message):
+            return "Taxonomy discovery returned invalid JSON: \(message)"
+        }
+    }
+}
+
+/// Strict workbench view of `veriformis taxonomy` discovery.
+///
+/// The Python registry is authoritative. The workbench accepts the complete v1
+/// shape or shows taxonomy help as unavailable; it never fills missing axes
+/// from Swift constants or treats an ambiguous `format` value as taxonomy.
+struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "contract_id",
+        "contract_version",
+        "schema_id",
+        "training_family",
+        "objective",
+        "semantic_row",
+        "physical_container",
+        "consumer_profile",
+        "loss_policy",
+    ]
+
+    let contractID: String
+    let contractVersion: String
+    let schemaID: String
+    let trainingFamilies: [String]
+    let objectives: [String]
+    let semanticRows: [String]
+    let physicalContainers: [String]
+    let consumerProfiles: [String]
+    let lossPolicies: [String]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let payload = try container.decode([String: [String]].self)
+        let observedKeys = Set(payload.keys)
+        guard observedKeys == Self.expectedKeys else {
+            throw TaxonomyDiscoveryError.invalidKeySet(
+                missing: Array(Self.expectedKeys.subtracting(observedKeys)).sorted(),
+                unexpected: Array(observedKeys.subtracting(Self.expectedKeys)).sorted()
+            )
+        }
+
+        let contractID = try Self.requireSingleton(
+            "contract_id",
+            expected: "veriformis.taxonomy",
+            in: payload
+        )
+        let contractVersion = try Self.requireSingleton(
+            "contract_version",
+            expected: "1",
+            in: payload
+        )
+        let schemaID = try Self.requireSingleton(
+            "schema_id",
+            expected: "veriformis.taxonomy/v1",
+            in: payload
+        )
+        let trainingFamilies = try Self.requireAxis("training_family", in: payload)
+        let objectives = try Self.requireAxis("objective", in: payload)
+        let semanticRows = try Self.requireAxis("semantic_row", in: payload)
+        let physicalContainers = try Self.requireAxis("physical_container", in: payload)
+        let consumerProfiles = try Self.requireAxis("consumer_profile", in: payload)
+        let lossPolicies = try Self.requireAxis("loss_policy", in: payload)
+
+        let expectedObjectives = Set(TrainingObjective.allCases.map(\.rawValue))
+        guard objectives.count == expectedObjectives.count,
+              Set(objectives) == expectedObjectives
+        else {
+            throw TaxonomyDiscoveryError.invalidObjectives(objectives)
+        }
+
+        self.contractID = contractID
+        self.contractVersion = contractVersion
+        self.schemaID = schemaID
+        self.trainingFamilies = trainingFamilies
+        self.objectives = objectives
+        self.semanticRows = semanticRows
+        self.physicalContainers = physicalContainers
+        self.consumerProfiles = consumerProfiles
+        self.lossPolicies = lossPolicies
+    }
+
+    private static func requireSingleton(
+        _ key: String,
+        expected: String,
+        in payload: [String: [String]]
+    ) throws -> String {
+        guard payload[key] == [expected] else {
+            throw TaxonomyDiscoveryError.invalidMetadata(key)
+        }
+        return expected
+    }
+
+    private static func requireAxis(
+        _ key: String,
+        in payload: [String: [String]]
+    ) throws -> [String] {
+        guard let identifiers = payload[key],
+              !identifiers.isEmpty,
+              identifiers.count == Set(identifiers).count,
+              identifiers.allSatisfy({ identifier in
+                  !identifier.isEmpty
+                      && identifier == identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+              })
+        else {
+            throw TaxonomyDiscoveryError.invalidAxis(key)
+        }
+        return identifiers
+    }
+}
+
+enum TaxonomyHelpState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(TaxonomyDiscovery)
+    case unavailable(String)
+}
+
 enum WorkbenchStage: String, CaseIterable, Identifiable {
     case parse
     case clean

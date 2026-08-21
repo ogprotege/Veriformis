@@ -6,6 +6,7 @@ and workspace orchestration live in ``veriformis.pipeline``.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import typer
@@ -360,6 +361,19 @@ def preview(
 @app.command()
 def version() -> None:
     _emit_outcome(_SERVICE.version())
+
+
+@app.command(name="taxonomy")
+def taxonomy() -> None:
+    """Print implemented taxonomy discovery as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_taxonomy(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
 
 @app.command(name="list-recipes")

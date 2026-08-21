@@ -16,6 +16,7 @@ from veriformis.datasets import (
 )
 from veriformis.errors import ConstructionError
 from veriformis.pipeline import PipelineService
+from veriformis.taxonomy import implemented_discovery
 from veriformis.workspace import Workspace
 
 FIXTURE_ROOT = Path(__file__).parents[1] / "fixtures" / "acceptance" / "v1"
@@ -252,6 +253,20 @@ def test_pipeline_service_parse_clean_chunk_are_typed(tmp_path):
     chunked = service.chunk(workspace)
     assert chunked.chunk_count >= 1
     assert Workspace.open(workspace).head().committed_stage == "chunk"
+
+
+def test_pipeline_service_taxonomy_discovery_is_exact_fresh_and_mutable():
+    service = PipelineService()
+    expected = dict(implemented_discovery())
+
+    first = service.discover_taxonomy()
+    assert first == expected
+    assert "format" not in first
+
+    first["objective"] = ("tampered",)
+    second = service.discover_taxonomy()
+    assert second == expected
+    assert second is not first
 
 
 def test_cli_and_service_dual_objective_m1_1_acceptance(tmp_path):

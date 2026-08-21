@@ -59,10 +59,10 @@
 
 ### 3.7 Expose one registry on every surface
 
-- [ ] Add discovery through `PipelineService`.
-- [ ] Add CLI discovery that names each axis separately.
-- [ ] Add MCP resources or tools over the same registry.
-- [ ] Add workbench help copy from the same registry.
+- [x] Add discovery through `PipelineService`.
+- [x] Add CLI discovery that names each axis separately.
+- [x] Add MCP resources or tools over the same registry.
+- [x] Add workbench help copy from the same registry.
 - [ ] Remove or rewrite public “format” language that can mean more than one
       axis.
 

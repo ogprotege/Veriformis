@@ -25,6 +25,7 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var allowEmptyEvaluation = defaultAllowEmptyEvaluation
     @Published var splitRatioPPM = defaultSplitRatioPPM
     @Published var writeAptusHandoff = defaultWriteAptusHandoff
+    @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
 
     // Run state
     @Published var isRunning = false
@@ -59,6 +60,8 @@ final class WorkbenchViewModel: ObservableObject {
     private var compileTask: Task<Void, Never>?
     private var cancellationRequestedAt: Date?
     private var runFinishedCallbacks: [() -> Void] = []
+    private var taxonomyHelpTask: Task<Void, Never>?
+    private var taxonomyHelpController: CLIProcessController?
 
     var canCompile: Bool {
         !isRunning
@@ -120,13 +123,52 @@ final class WorkbenchViewModel: ObservableObject {
             resolvedCLIDescription = "\(cli!.executableURL.path)\(prefix)"
             appendLog("CLI ready: \(resolvedCLIDescription)")
             runStatusMessage = "CLI ready"
+            refreshTaxonomyHelp()
         } catch {
             cli = nil
+            refreshTaxonomyHelp()
             resolvedCLIDescription = "(missing)"
             lastError = error.localizedDescription
             appendLog("error: \(error.localizedDescription)")
             appendLog("hint: use ./script/build_and_run.sh from the repo so the Debug app is rebuilt and opened.")
             runStatusMessage = "CLI missing"
+        }
+    }
+
+    /// Cancel any stale request and replace it with discovery from the current CLI.
+    /// Process execution suspends this main-actor task instead of blocking the UI.
+    func refreshTaxonomyHelp() {
+        taxonomyHelpTask?.cancel()
+        taxonomyHelpController?.cancel()
+        taxonomyHelpTask = nil
+        taxonomyHelpController = nil
+
+        guard let cli else {
+            taxonomyHelpState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+
+        let controller = CLIProcessController()
+        taxonomyHelpController = controller
+        taxonomyHelpState = .loading
+        taxonomyHelpTask = Task { [weak self] in
+            let nextState: TaxonomyHelpState
+            do {
+                let discovery = try await cli.discoverTaxonomy(controller: controller)
+                try Task.checkCancellation()
+                nextState = .ready(discovery)
+            } catch is CancellationError {
+                nextState = .unavailable("Taxonomy discovery was cancelled.")
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+
+            guard let self, self.taxonomyHelpController === controller else {
+                return
+            }
+            self.taxonomyHelpState = nextState
+            self.taxonomyHelpController = nil
+            self.taxonomyHelpTask = nil
         }
     }
 
