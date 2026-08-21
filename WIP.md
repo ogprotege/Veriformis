@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `159fcce4` on `main` (Groups 1–7; Group 9
+**Implementation baseline reviewed:** `3ba83ae` on `main` (Groups 1–7; Group 9
 automated gates; beta-prep; private beta workbench Phases 0–2; independent
-product Phases 0–3 complete; Phase 4 items 4.1–4.3 merged)
+product Phases 0–3 complete; Phase 4 items 4.1–4.4 merged)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.4 source/output-plan binding)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
 
-**Next review:** Independent-roadmap Phase 4.4 merge and Phase 4.5
-derivative-only enforcement; beta label cut, public Mac evidence, or any
-listed-item status change
+**Next review:** Independent-roadmap Phase 4.5 merge and Phase 4.6 atomic
+publication; beta label cut, public Mac evidence, or any listed-item status
+change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -57,8 +57,8 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [ ] Independent product Phase 4 is in progress; items 4.1–4.3 are merged and
-      item 4.4 implements read-only source-derived export-plan population.
+- [ ] Independent product Phase 4 is in progress; items 4.1–4.4 are merged and
+      item 4.5 implements read-only normalized semantic membership enforcement.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -149,12 +149,15 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
       policy are implemented and merged.
 - [x] Phase 4.4 — source-derived plan population binds immutable source,
       membership-baseline, profile, dependency, and output-plan evidence.
-- [ ] Phase 4.5–4.9 — derivative-only destination comparison, publication guarantees,
+- [x] Phase 4.5 — normalized semantic candidates are fresh-reconstructed and
+      required to match the exact plan row-set and membership baseline; local
+      gates passed and pull-request review is pending.
+- [ ] Phase 4.6–4.9 — destination-byte publication guarantees,
       deterministic claims, public surfaces, and adversarial closeout remain
       open in the [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-No destination renderer or writer, public export commands, or generic export
-containers are claimed by the first four Phase 4 increments.
+No destination-byte verifier or writer, public export commands, or generic
+export containers are claimed by the first five Phase 4 increments.
 
 The current stage-command runtime is:
 

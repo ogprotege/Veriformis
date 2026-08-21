@@ -261,7 +261,9 @@ def test_normative_contract_names_every_schema_identity_and_current_boundary() -
     assert "records the observed grade, not the requested policy" in contract
     assert "`ExportService.create_plan` is the only implemented" in contract
     assert "derive every source fact" in contract
-    assert "does not render or reconstruct destination membership" in contract
+    assert "`ExportService.validate_derivative_membership` accepts exactly" in contract
+    assert "normalized in-memory semantic evidence" in contract
+    assert "arbitrary destination bytes encode the checked semantics" in contract
     assert "an export writer" in contract
     assert "is not a supported product container" in contract
     assert "MUST NOT add a generic export container" in contract

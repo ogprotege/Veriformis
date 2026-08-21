@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.4 plan boundary)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 membership boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -43,8 +43,9 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `handoff/`; `mcp/`; and `cli.py` (Typer adapter). Phase 4 currently adds the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
-source-derived plan population. No destination renderer, writer, supported
-container, or public export command exists yet. The macOS workbench lives
+source-derived plan population and normalized semantic membership enforcement.
+No destination-byte verifier, writer, supported container, or public export
+command exists yet. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -140,6 +141,10 @@ name.vfbundle/
   dependency, and file-plan evidence. The service is composed by
   `PipelineService`; it is not a workspace stage, does not reopen source paths,
   and does not mutate `minimal-v1` or write destination content.
+- Its read-only `validate_derivative_membership` operation fresh-reconstructs a
+  candidate `RowSet` from normalized train/evaluation rows and aligned
+  provenance, then requires exact planned row-set and complete projection
+  equality. It does not inspect produced destination bytes.
 
 ## Related documentation
 

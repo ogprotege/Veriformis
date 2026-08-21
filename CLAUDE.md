@@ -15,9 +15,11 @@ view. Strict verified-export v1 models and trusted-by-default source admission
 with explicit lower trust are implemented. Read-only plan population now
 derives all source identities and the source membership baseline from that
 immutable view; callers provide only strict profile, dependency, and file-plan
-evidence. Destination membership enforcement, writers, public export commands,
-generic export containers, and planned trainer-specific profiles are not
-implemented. Do not claim public
+evidence. Read-only derivative enforcement fresh-reconstructs normalized
+candidate semantic rows, provenance, row-set identity, and membership and
+requires exact plan-baseline equality. Destination-byte verification, writers,
+public export commands, generic export containers, and planned trainer-specific
+profiles are not implemented. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

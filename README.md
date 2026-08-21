@@ -242,9 +242,11 @@ verification models. Its third slice enforces trusted-by-default export-source
 admission and explicit lower self-consistent trust. Its fourth slice adds
 read-only `create_plan`: source identities and the complete source membership
 baseline are derived from one admitted bundle view, while callers provide only
-strict profile, dependency, and file-plan evidence. It does not yet compare
-destination membership, write exports, expose public export commands, or add
-generic export containers or trainer-specific profiles.
+strict profile, dependency, and file-plan evidence. Its fifth slice fresh-
+reconstructs normalized candidate semantic rows and provenance and requires
+their row-set and complete membership projection to match that baseline. It
+does not yet verify or write destination bytes, expose public export commands,
+or add generic export containers or trainer-specific profiles.
 Maturity remains development **alpha** (not a
 public beta label). A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims

@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
 
 **Next review:** Any architecture or dependency change
 
@@ -180,7 +180,11 @@ model aliases. Phase 4.4 adds a read-only service composition from that
 immutable bundle view into the existing strict export models. It derives the
 source membership baseline from the already reconstructed row set and
 provenance and adds no source reread, workspace dependency, destination I/O, or
-new layer edge. `cli.py` and
+new layer edge. Phase 4.5 composes the existing dataset `ProductRow`,
+`RowProvenance`, and `RowSet` contracts with the existing export plan and
+projection models inside the same service. It fresh-reconstructs normalized
+semantic evidence in memory and likewise adds no workspace, filesystem,
+renderer-registry, or adapter dependency edge. `cli.py` and
 `mcp/server.py` translate their respective protocols into pipeline methods;
 the SwiftUI workbench shells the CLI. No adapter exposes export operations yet.
 This arrangement needs no dependency injection container because the contracts

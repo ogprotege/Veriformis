@@ -20,8 +20,12 @@ from veriformis.bundle import (
 )
 from veriformis.datasets import (
     DatasetValidationReport,
+    ProductRow,
+    RowProvenance,
     RowSet,
     dataset_validation_report_from_json_bytes,
+    product_row_from_json_bytes,
+    row_provenance_from_json_bytes,
     row_set_from_json_bytes,
 )
 from veriformis.errors import (
@@ -182,6 +186,99 @@ class ExportService:
                 raise
             raise ExportContractError(f"invalid export plan evidence: {exc}") from exc
 
+    def validate_derivative_membership(
+        self,
+        plan: ExportPlan,
+        *,
+        candidate_train_rows: Sequence[ProductRow],
+        candidate_evaluation_rows: Sequence[ProductRow],
+        candidate_provenance: Sequence[RowProvenance],
+    ) -> ExportMembershipProjection:
+        """Require candidate semantic rows to preserve the planned source exactly.
+
+        The candidate row sequences retain the source's logical train and
+        evaluation partitions even when a later physical container combines
+        them. This operation validates normalized in-memory evidence only;
+        filesystem publication and independent replay of produced bytes are
+        later Phase 4 boundaries.
+        """
+        try:
+            checked_plan = ExportPlan.from_json_bytes(
+                lossless_json_bytes(plan.model_dump(mode="json"))
+            )
+            supplied_train_rows = tuple(candidate_train_rows)
+            supplied_evaluation_rows = tuple(candidate_evaluation_rows)
+            supplied_provenance = tuple(candidate_provenance)
+            train_rows = tuple(
+                product_row_from_json_bytes(
+                    lossless_json_bytes(item.model_dump(mode="json"))
+                )
+                for item in supplied_train_rows
+            )
+            evaluation_rows = tuple(
+                product_row_from_json_bytes(
+                    lossless_json_bytes(item.model_dump(mode="json"))
+                )
+                for item in supplied_evaluation_rows
+            )
+            provenance = tuple(
+                row_provenance_from_json_bytes(
+                    lossless_json_bytes(item.model_dump(mode="json"))
+                )
+                for item in supplied_provenance
+            )
+            candidate_row_set = RowSet.create(
+                plan_id=checked_plan.finished_dataset_plan_id,
+                serialization_plan_id=checked_plan.serialization_plan_id,
+                recipe_id=checked_plan.recipe_id,
+                construction_result_id=checked_plan.construction_result_id,
+                curation_result_id=checked_plan.curation_result_id,
+                split_result_id=checked_plan.split_result_id,
+                row_schema=checked_plan.row_schema,
+                train_rows=train_rows,
+                evaluation_rows=evaluation_rows,
+                provenance=provenance,
+            )
+            objective_ids = {item.objective_id for item in provenance}
+            emitted_source_ids = {
+                source_id for item in provenance for source_id in item.source_ids
+            }
+            if objective_ids != {checked_plan.objective_id}:
+                raise ExportVerificationError(
+                    "candidate derivative objective differs from its export plan"
+                )
+            if emitted_source_ids != set(checked_plan.source_ids):
+                raise ExportVerificationError(
+                    "candidate derivative source scope differs from its export plan"
+                )
+            if candidate_row_set.row_set_id != checked_plan.row_set_id:
+                raise ExportVerificationError(
+                    "candidate derivative changes the source row set"
+                )
+            projection = _membership_projection_from_row_set(candidate_row_set)
+            if (
+                projection != checked_plan.membership_projection
+                or projection.canonical_bytes()
+                != checked_plan.membership_projection.canonical_bytes()
+            ):
+                raise ExportVerificationError(
+                    "candidate derivative changes source membership or semantics"
+                )
+            return projection
+        except ExportVerificationError:
+            raise
+        except (
+            AttributeError,
+            RecursionError,
+            TypeError,
+            UnicodeError,
+            ValueError,
+            VeriformisError,
+        ) as exc:
+            raise ExportVerificationError(
+                f"invalid candidate derivative membership evidence: {exc}"
+            ) from exc
+
 
 def _source_plan_evidence(
     source: VerifiedFinishedBundle,
@@ -333,7 +430,6 @@ def _source_plan_evidence(
         )
     objective_ids: set[str] = set()
     emitted_source_ids: set[str] = set()
-    entries: list[ExportMembershipEntry] = []
     try:
         for row, provenance in zip(rows, row_set.provenance, strict=True):
             objective_ids.add(provenance.objective_id)
@@ -354,18 +450,6 @@ def _source_plan_evidence(
                 raise ExportVerificationError(
                     "verified export provenance differs from its source row"
                 )
-            entries.append(
-                ExportMembershipEntry.create(
-                    record_id=provenance.record_id,
-                    row_id=provenance.row_id,
-                    provenance_id=provenance.provenance_id,
-                    assignment_id=provenance.assignment_id,
-                    leakage_group_id=provenance.leakage_group_id,
-                    partition=provenance.partition,
-                    ordinal=provenance.ordinal,
-                    payload_sha256=provenance.payload_sha256,
-                )
-            )
         if len(objective_ids) != 1:
             raise ExportVerificationError(
                 "verified export source must bind one training objective"
@@ -374,12 +458,7 @@ def _source_plan_evidence(
             raise ExportVerificationError(
                 "verified export rows do not cover the dataset source scope"
             )
-        projection = ExportMembershipProjection.create(
-            split_result_id=row_set.split_result_id,
-            row_set_id=row_set.row_set_id,
-            row_schema=row_set.row_schema,
-            entries=entries,
-        )
+        projection = _membership_projection_from_row_set(row_set)
     except ExportVerificationError:
         raise
     except (
@@ -399,6 +478,32 @@ def _source_plan_evidence(
         verification,
         next(iter(objective_ids)),
         projection,
+    )
+
+
+def _membership_projection_from_row_set(
+    row_set: RowSet,
+) -> ExportMembershipProjection:
+    """Derive one complete ordered membership projection from aligned rows."""
+    rows = (*row_set.train_rows, *row_set.evaluation_rows)
+    entries = tuple(
+        ExportMembershipEntry.create(
+            record_id=row.record_id,
+            row_id=row.row_id,
+            provenance_id=provenance.provenance_id,
+            assignment_id=provenance.assignment_id,
+            leakage_group_id=provenance.leakage_group_id,
+            partition=provenance.partition,
+            ordinal=provenance.ordinal,
+            payload_sha256=row.payload_sha256,
+        )
+        for row, provenance in zip(rows, row_set.provenance, strict=True)
+    )
+    return ExportMembershipProjection.create(
+        split_result_id=row_set.split_result_id,
+        row_set_id=row_set.row_set_id,
+        row_schema=row_set.row_schema,
+        entries=entries,
     )
 
 

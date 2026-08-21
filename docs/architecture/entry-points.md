@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -119,12 +119,19 @@ consumer profile, dependency bindings, and output file plans. They cannot
 provide membership, filtering, resplitting, destination root, or publication
 arguments.
 
+`ExportService.validate_derivative_membership` is also Python-composition-only.
+It accepts one strict plan, normalized logical train rows, normalized logical
+evaluation rows, and their aligned provenance. It fresh-reconstructs the
+candidate row set and complete projection and succeeds only when both equal the
+plan baseline. Its signature contains no selection, mutation, destination,
+overwrite, writer, or publication control.
+
 There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
 in these increments. Strict v1 plan, profile, membership, binding, receipt, and
-verification models and internal read-only plan population now exist, but there
-is no destination membership comparison, writer, or generic derivative
-container. Those are later Phase 4 services and surfaces, not implied by the
-plan boundary.
+verification models, internal read-only plan population, and normalized
+semantic membership enforcement now exist, but there is no destination-byte
+verification, writer, or generic derivative container. Those are later Phase 4
+services and surfaces, not implied by the semantic boundary.
 
 ## Preview, recipes, and optional integrations
 

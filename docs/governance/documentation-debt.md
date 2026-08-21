@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.4 plan population)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
 
-**Next review:** Independent-product Phase 4.4 state transition or any
+**Next review:** Independent-product Phase 4.5 state transition or any
 active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |

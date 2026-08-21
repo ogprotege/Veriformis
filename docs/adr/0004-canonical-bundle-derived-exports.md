@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.4 plan population remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 4.5 membership enforcement remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -55,9 +55,11 @@ or establish a second compiler stage. Phase 4.2 adds the exact persisted export
 models while retaining that boundary. Phase 4.3 adds trusted-by-default,
 read-only source admission with explicit lower trust. Phase 4.4 adds read-only
 plan population, deriving all source identities and the complete source
-membership baseline from the admitted immutable bundle view. Destination
-membership comparison, writing, and independent derivative verification remain
-later increments.
+membership baseline from the admitted immutable bundle view. Phase 4.5 fresh-
+reconstructs normalized candidate semantic rows and provenance and requires the
+exact planned row set and complete membership projection. Destination-byte
+verification, writing, and independent derivative verification remain later
+increments.
 
 ## Review triggers
 

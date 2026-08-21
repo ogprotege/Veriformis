@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -196,11 +196,18 @@ record/row/provenance/assignment/leakage-group/partition/ordinal/payload-digest
 membership baseline from the aligned verified row set and provenance. Callers
 supply only strict profile, dependency, and file-plan evidence.
 
-That projection is the immutable source baseline, not proof that a renderer
-preserved it. Destination reconstruction and comparison remain Phase 4.5;
-writing remains Phase 4.6. No public command or generic container exists. The
-verified source object therefore closes the verify-then-read gap without
-changing the canonical six-file bundle or the nine-stage workspace graph.
+That projection is the immutable source baseline. Phase 4.5 accepts separate
+normalized candidate train/evaluation `ProductRow` sequences and aligned
+`RowProvenance`, fresh-reconstructs their plan-bound `RowSet`, requires the exact
+planned row-set identity, and compares the complete derived membership
+projection and canonical bytes with the baseline. Counts or assignment digest
+alone cannot pass.
+
+This is an in-memory semantic proof, not evidence about produced destination
+bytes. Writing remains Phase 4.6 and exact-byte rerender or semantic replay of
+actual destination content remains Phase 4.7. No public command or generic
+container exists. The export boundary therefore changes neither the canonical
+six-file bundle nor the nine-stage workspace graph.
 
 ## Persistence: the workspace revision store
 

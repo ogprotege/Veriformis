@@ -50,11 +50,11 @@ branch is created.
 
 ### 4.5 Enforce the derivative-only boundary
 
-- [ ] Bind complete record, assignment, leakage-group, partition, and ordinal
+- [x] Bind complete record, assignment, leakage-group, partition, and ordinal
       membership projections.
-- [ ] Reject omission, addition, duplication, filtering, target mutation,
+- [x] Reject omission, addition, duplication, filtering, target mutation,
       balancing, repartitioning, and resplitting.
-- [ ] Expose no public plan flag capable of changing dataset membership.
+- [x] Expose no public plan flag capable of changing dataset membership.
 
 ### 4.6 Publish atomically and safely
 
