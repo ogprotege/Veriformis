@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from types import MappingProxyType
 
 import pytest
@@ -10,6 +12,7 @@ from veriformis.contracts import (
     V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import TaxonomyError
+from veriformis.identity import lossless_json_bytes, sha256_digest
 from veriformis.taxonomy import (
     CANONICAL_CONSUMER_PROFILE,
     EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES,
@@ -35,6 +38,14 @@ from veriformis.taxonomy import (
 )
 
 
+TAXONOMY_V1_CATALOG = (
+    Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
+)
+TAXONOMY_V1_CATALOG_SHA256 = (
+    "4a5a7b6fbd00b2b07ac38cd84817bbde87d54af32844e331dc5a65770954aeac"
+)
+
+
 def test_taxonomy_contract_constants_are_exact() -> None:
     assert TAXONOMY_CONTRACT_ID == "veriformis.taxonomy"
     assert TAXONOMY_CONTRACT_VERSION == 1
@@ -48,6 +59,34 @@ def test_taxonomy_contract_constants_are_exact() -> None:
         "loss_policy",
     )
     assert "format" not in TAXONOMY_AXES
+
+
+def test_taxonomy_catalog_v1_golden_canonical_json_round_trip() -> None:
+    stored = TAXONOMY_V1_CATALOG.read_bytes()
+    assert stored.endswith(b"\n")
+    canonical = stored.removesuffix(b"\n")
+
+    assert sha256_digest(canonical) == TAXONOMY_V1_CATALOG_SHA256
+    payload = json.loads(canonical)
+    assert lossless_json_bytes(payload) == canonical
+    assert payload == {
+        key: list(values) for key, values in implemented_discovery().items()
+    }
+    assert payload["contract_id"] == [TAXONOMY_CONTRACT_ID]
+    assert payload["contract_version"] == [str(TAXONOMY_CONTRACT_VERSION)]
+    assert payload["schema_id"] == [TAXONOMY_SCHEMA_ID]
+    assert set(payload) == {
+        "consumer_profile",
+        "contract_id",
+        "contract_version",
+        "loss_policy",
+        "objective",
+        "physical_container",
+        "schema_id",
+        "semantic_row",
+        "training_family",
+    }
+    assert "format" not in payload
 
 
 def test_registry_reuses_existing_objective_and_row_identifiers() -> None:

@@ -4,7 +4,7 @@
 
 | ID | State | Likelihood | Impact | Risk | Control |
 | --- | --- | --- | --- | --- | --- |
-| P3-R1 | Active | Medium | High | A new taxonomy identifier silently reinterprets sealed recipes or rows. | Reuse persisted v1 IDs; identity payloads stay unchanged; load existing fixtures |
+| P3-R1 | Mitigated | Medium | High | A new taxonomy identifier silently reinterprets sealed recipes or rows. | Persisted v1 IDs and schemas stayed exact; frozen pre-taxonomy workspace and bundle bytes load and verify on current HEAD |
 | P3-R2 | Mitigated | High | High | Public copy keeps using “format” for goal, row, container, or profile. | Public inventory completed; discovery names every axis; workbench uses display-only `Lower rows`; persisted stage IDs remain unchanged |
 | P3-R3 | Active | Medium | High | Future families appear implemented because they are named in the contract. | Explicit `planned` / `explicitly_unsupported` states; support registry and tests |
 | P3-R4 | Active | Medium | Medium | Aptus `text` refusal is mistaken for a core product rule. | Profile constraints stay separate from objective/row compatibility |

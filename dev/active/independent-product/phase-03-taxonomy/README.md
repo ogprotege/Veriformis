@@ -36,5 +36,6 @@ sealed artifacts.
 
 Phase 3 is open. The versioned contract, machine registry, compile checks,
 cross-surface discovery, and public vocabulary cleanup are implemented without
-changing durable identities. Golden catalog round-trip and existing
-workspace/bundle compatibility proof remain before closeout.
+changing durable identities. The taxonomy golden and frozen pre-taxonomy
+workspace/bundle compatibility proofs now pass. Final support, evidence,
+status, and closeout reconciliation remain.

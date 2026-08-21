@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.evidence-index/v1",
-  "last_updated": "2026-08-20",
+  "last_updated": "2026-08-21",
   "evidence_grades": {
     "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
     "test-verified": "Claim is exercised by an automated passing test.",
@@ -128,6 +128,22 @@
       "rerun": [
         "uv run python scripts/check_project_tracking.py",
         "uv run pytest -q tests/contracts/test_taxonomy_contract.py tests/regressions/test_project_tracking.py"
+      ]
+    },
+    {
+      "id": "phase-3-taxonomy-compatibility-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-592c145228f559958d1fd2f18d5658124c57affc",
+      "scope": "Independent-product Phase 3 taxonomy golden and persisted-v1 compatibility proof",
+      "grade": "test-verified",
+      "summary": "Canonical taxonomy discovery bytes are pinned; a workspace generated with pre-taxonomy revision f8dd1bf opens and replays default cleaning unchanged; the retained pre-taxonomy Group 9 bundle verifies at external_digest. Full Python, exact local release, clean-wheel golden, tracking, Ruff, inventory, and diff gates passed without schema or digest drift.",
+      "details": "dev/active/independent-product/phase-03-taxonomy/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/contracts/test_taxonomy_contract.py tests/regressions/test_phase3_workspace_compatibility.py tests/regressions/test_phase3_bundle_compatibility.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
       ]
     },
     {

@@ -52,7 +52,7 @@
       "packet": "dev/active/independent-product/phase-03-taxonomy",
       "started_on": "2026-08-20",
       "completed_on": null,
-      "next_gate": "Add taxonomy golden round-trip coverage and prove existing workspace and bundle backward compatibility before Phase 3 closeout."
+      "next_gate": "Run full Phase 3 closeout gates and reconcile status, support, evidence, WIP, and docs."
     },
     {
       "number": 4,
