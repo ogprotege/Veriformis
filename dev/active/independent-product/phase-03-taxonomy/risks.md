@@ -1,11 +1,11 @@
 # Phase 3 Risk Register
 
-**Last reviewed:** 2026-08-20
+**Last reviewed:** 2026-08-21
 
 | ID | State | Likelihood | Impact | Risk | Control |
 | --- | --- | --- | --- | --- | --- |
 | P3-R1 | Active | Medium | High | A new taxonomy identifier silently reinterprets sealed recipes or rows. | Reuse persisted v1 IDs; identity payloads stay unchanged; load existing fixtures |
-| P3-R2 | Active | High | High | Public copy keeps using “format” for goal, row, container, or profile. | Inventory surfaces; discovery APIs name each axis; exit gate forbids the collapse |
+| P3-R2 | Mitigated | High | High | Public copy keeps using “format” for goal, row, container, or profile. | Public inventory completed; discovery names every axis; workbench uses display-only `Lower rows`; persisted stage IDs remain unchanged |
 | P3-R3 | Active | Medium | High | Future families appear implemented because they are named in the contract. | Explicit `planned` / `explicitly_unsupported` states; support registry and tests |
 | P3-R4 | Active | Medium | Medium | Aptus `text` refusal is mistaken for a core product rule. | Profile constraints stay separate from objective/row compatibility |
 | P3-R5 | Active | Medium | Medium | Loss notes in the Aptus adapter become a second source of truth. | One registry; adapter must read or match the shared loss policy |

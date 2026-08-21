@@ -138,7 +138,7 @@ artifacts, re-run from History/last settings:
 Operator install (CLI + workbench): [docs/install.md](../docs/install.md)
 
 The workbench remains a thin CLI adapter. Success is a sealed dataset product,
-not a multi-format file converter.
+not a general-purpose file converter.
 
 ## Packaging and release
 

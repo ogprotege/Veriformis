@@ -30,7 +30,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("• Start with one source file on Compile.")
                         Text("• Output defaults to Documents/Veriformis (change in Settings).")
-                        Text("• Success means a sealed .vfbundle — not a format converter.")
+                        Text("• Success means a sealed .vfbundle — not general-purpose file conversion.")
                         Text("• Choose the training objective that matches the rows your trainer expects.")
                         Text("• Install / CLI help: docs/install.md in the repo.")
                     }

@@ -52,8 +52,9 @@ through both CLI and Mac workbench, with the same domain contracts:
    infers a materially ambiguous goal without confirmation.
 4. Preview recovered content, mapped fields, sample training rows, exclusions,
    split facts, and loss/masking semantics before publication.
-5. Compile through construction or normalization, curation, split, formatting,
-   exact validation, seal, and independent verification.
+5. Compile through construction or normalization, curation, split,
+   target-row-schema lowering, exact validation, seal, and independent
+   verification.
 6. Export the verified result in a generic supported container or a versioned
    named consumer profile.
 7. Verify the export receipt and reproduce the same semantic dataset and
@@ -75,8 +76,8 @@ Every phase must preserve these rules:
    release gates contain no required downstream trainer.
 2. **One composition root.** `PipelineService` and its domain services own
    policy. CLI, MCP, GUI, and integrations are adapters.
-3. **Goal before format.** Training meaning and loss boundaries are selected
-   before physical container or consumer profile.
+3. **Goal before container and profile.** Training meaning and loss boundaries
+   are selected before physical container or consumer profile.
 4. **Canonical before convenient.** The verified Veriformis bundle is the
    source of truth. Exports are bound derivatives, never an alternate hidden
    pipeline.
@@ -91,9 +92,9 @@ Every phase must preserve these rules:
 8. **Offline default.** Core compilation and local export make no network call.
    Hub publication, remote generation, and hosted-trainer adapters are
    explicit opt-ins.
-9. **Evidence over popularity.** A format or profile is supported only after
-   official-contract research, fixtures, negative tests, and conformance
-   evidence.
+9. **Evidence over popularity.** An input type, physical container, or consumer
+   profile is supported only after official-contract research, fixtures,
+   negative tests, and conformance evidence.
 10. **Version everything that changes meaning.** Inputs, objectives, mappings,
     row schemas, profile behavior, templates, validators, receipts, and
     migrations are versioned.
@@ -114,9 +115,9 @@ Pre-tokenized rows are both tokenizer/model-bound and loss-policy-bound. They
 must be emitted only by an explicit consumer/model profile that records the
 tokenizer identity and immutable revision, template, maximum length,
 truncation, packing, label/mask construction, and special-token policy. They
-are not a generic format.
+are not a consumer-neutral row schema or physical container.
 
-## 5. Format and profile admission gate
+## 5. Input, container, and profile admission gate
 
 Candidate inputs, containers, and trainer profiles do not become commitments
 merely by appearing in this roadmap. Each must pass all of the following:
@@ -129,7 +130,7 @@ merely by appearing in this roadmap. Each must pass all of the following:
 4. A documented loss and refusal model.
 5. Deterministic golden fixtures, malformed inputs, boundary cases, and
    property tests where appropriate.
-6. Round-trip validation when the format permits it.
+6. Round-trip validation when the candidate representation permits it.
 7. Actual consumer-loader or schema conformance in an isolated integration
    environment.
 8. Dependency, license, security, maintenance, versioning, and deprecation
@@ -185,7 +186,7 @@ repository remains version `0.1.0` development alpha.
    verification.
 6. Inventory representative owner corpora without committing private content;
    retain sanitized structural fixtures and frequency facts needed to rank
-   future format work.
+   future input, container, and consumer-profile work.
 7. Create a phase evidence template covering contract, implementation, tests,
    performance, security, docs, migration, and release effects.
 
@@ -243,8 +244,8 @@ beyond its separately tested versions.
 
 ## Phase 2 — Close known reliability and artifact-boundary defects
 
-**Goal:** Stabilize the existing independent compile path before adding output
-formats.
+**Goal:** Stabilize the existing independent compile path before adding export
+containers.
 
 **Current evidence (at baseline `7d116e9`; phase completed — see program
 ledger):** The main-actor workbench calls synchronous
@@ -391,7 +392,7 @@ choosing a trainer.
    (ADR 0005, [bundle transport contract](../contracts/bundle-transport-v1.md),
    `veriformis package` / `package-verify`) into the export plan and receipt
    model. The remaining new scope is deterministic archiving of generic export
-   packs; do not design a second bundle-archive format.
+   packs; do not design a second bundle-transport contract.
 5. Add import-round-trip fixtures to prove semantic preservation.
 6. Expose exact sample rows and destination tree in dry-run preview.
 7. Document when to use JSONL, JSON, or CSV and why they do not determine the
@@ -439,7 +440,7 @@ developer-oriented and the workbench offers only limited objective controls.
    source-derived task.
 
 **Deliverables:** Goal catalog, versioned presets, preflight, row/loss preview,
-and cross-format acceptance fixtures.
+and cross-input-and-row-schema acceptance fixtures.
 
 **Exit evidence:** A non-developer can select each supported goal from plain
 language and inspect exactly what receives training loss; all surfaces resolve
@@ -607,10 +608,10 @@ compile, generic export, or another profile.
 **Non-goals:** A fixed promise that all candidates must ship or remain supported
 forever.
 
-## Phase 11 — Harden collection ingest and qualify additional formats
+## Phase 11 — Harden collection ingest and qualify additional input types
 
 **Goal:** Make heterogeneous input practical at project scale without claiming
-unsupported “any format” behavior.
+unsupported “any input” behavior.
 
 **Current evidence:** Single-file dispatch supports a defined suffix set. The
 workbench can collect multiple files, but collection policy and safety are not
@@ -630,15 +631,16 @@ a first-class contract.
 5. Isolate crash-prone or high-risk parser execution if risk analysis shows a
    process boundary is needed.
 6. Record parser versions and recovery quality facts in portable evidence.
-7. Use the Phase 0 corpus matrix and support requests to rank new formats.
+7. Use the Phase 0 corpus matrix and support requests to rank new input types.
    EPUB, spreadsheets, presentations, emails, notebooks, XML, subtitle, or
    additional code suffixes remain candidates until each passes the admission
    gate.
-8. Add format-specific structure and loss contracts before implementation.
+8. Add input-type-specific structure and recovery contracts before
+   implementation. Any new objective or row requires its own loss contract.
 
 **Deliverables:** Collection contract, batch preflight, safety limits, parser
 hardening suite, input admission records, and only evidence-qualified new
-formats.
+input types.
 
 **Exit evidence:** A mixed directory fixture produces a deterministic inventory
 and source order across supported platforms; malicious collection fixtures
@@ -753,7 +755,7 @@ resolvable without editing content-addressed files by hand.
    meaning that has not been designed.
 
 **Deliverables:** Review queues, correction plans, sampling, review exchange
-format, GUI, and audit trail.
+contract, GUI, and audit trail.
 
 **Exit evidence:** Required-review fixtures cannot seal until resolved; every
 correction replays from immutable inputs; old decisions remain auditable after
@@ -956,9 +958,9 @@ upload.
 **Goal:** Release a supportable product whose claims are bounded by retained
 evidence.
 
-**Dependencies:** Required work from Phases 0–19; optional candidate formats,
-profiles, OCR, generation, and publishing may remain excluded if their gates
-do not pass.
+**Dependencies:** Required work from Phases 0–19; optional candidate input
+types, containers, consumer profiles, OCR, generation, and publishing may
+remain excluded if their gates do not pass.
 
 **Work:**
 
@@ -1032,8 +1034,9 @@ At every merge:
    execution order.
 6. External official documentation review dates are recorded because trainer
    contracts can change.
-7. No “any format,” “lossless,” “production-ready,” “private,” “safe,” or
-   “compatible” claim appears without its bounded definition and evidence.
+7. No universal input/output, “lossless,” “production-ready,” “private,”
+   “safe,” or “compatible” claim appears without its bounded definition and
+   evidence.
 
 ## 9. Dependency and ordering rules
 
@@ -1043,7 +1046,7 @@ At every merge:
 3. Phase 8 depends on generic export and taxonomy, not columnar output.
 4. Phase 9 depends on the export foundation and optional-dependency policy.
 5. Each Phase 10 profile is independently admitted and may ship separately.
-6. Phase 11 precedes OCR and broad format expansion.
+6. Phase 11 precedes OCR and broad input-type expansion.
 7. Phase 13 quality facts precede Phase 14 review gates that act on them.
 8. Phase 15 measures before setting scale targets or accepting optimizations.
 9. Phase 16 follows stable internal contracts; premature public plugin APIs are
@@ -1060,9 +1063,9 @@ At every merge:
 | Risk | Evidence or cause | Control |
 | --- | --- | --- |
 | Aptus remains de facto product center | Current defaults and release copy | Phase 1 standalone defaults and release job |
-| “Format” hides training semantics | Ecosystems reuse JSONL for different tasks/loss | Phase 3 taxonomy and compatibility validation |
+| A collapsed selector hides training semantics | Ecosystems reuse JSONL for different tasks/loss | Phase 3 taxonomy and compatibility validation |
 | Exporters become a second pipeline | Convenience pressure | Verified-bundle-only export contract; no membership mutation |
-| Upstream trainer formats drift | Current external projects evolve | Version-pinned profiles, review dates, conformance CI, deprecation |
+| Upstream consumer profiles drift | Current external projects evolve | Version-pinned profiles, review dates, conformance CI, deprecation |
 | Optional features bloat install | Current base already includes MCP/PDF/YAML | Extras, lazy discovery, core-no-extra CI |
 | Finder mutates strict bundles | Retained `.DS_Store` evidence | Phase 2 immutable/package boundary; never ignore unknown files silently |
 | UI freezes or loses process output | Synchronous `waitUntilExit()` on main-actor path | Background process actor, cancellation and volume tests |
@@ -1072,17 +1075,17 @@ At every merge:
 | Scale rewrite breaks determinism | In-memory architecture and no benchmark | Measure first; oracle comparison; semantic fingerprints |
 | Plugins execute untrusted code | Extensibility pressure | Internal registries first; threat model and isolation before public plugins |
 | Generated data appears authoritative | Model output uncertainty | Separate governed family, lineage, required review, offline core unchanged |
-| Roadmap scope becomes endless | Many candidate formats/trainers | Admission gates, frozen milestone matrices, optional deferral |
+| Roadmap scope becomes endless | Many candidate inputs, containers, and profiles | Admission gates, frozen milestone matrices, optional deferral |
 
 ## 11. Explicit exclusions from the committed path
 
-The roadmap does not commit to HDF5, WARC, every office format, every trainer,
-multimodal training, cloud collaboration, model training, job orchestration,
-accounts, billing, telemetry, or distributed execution. Any may be researched
-later, but none is supported without the admission and phase evidence required
-above. This protects the core goal: a trustworthy independent tool that turns
-real source material and existing rows into useful, verifiable training
-datasets.
+The roadmap does not commit to HDF5, WARC, every office input type, every
+consumer profile, multimodal training, cloud collaboration, model training,
+job orchestration, accounts, billing, telemetry, or distributed execution. Any
+may be researched later, but none is supported without the admission and phase
+evidence required above. This protects the core goal: a trustworthy independent
+tool that turns real source material and existing rows into useful, verifiable
+training datasets.
 
 ## 12. Immediate execution packet
 

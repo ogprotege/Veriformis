@@ -108,3 +108,35 @@ transport digests remained unchanged.
 
 **Next action:** Inventory and rewrite only ambiguous public “format” language,
 then add migration and backward-compatibility proof before closeout.
+
+## 2026-08-21 — Public taxonomy vocabulary reconciled
+
+**Status:** In progress
+
+The active product contract, README, CLI guide, install guide, current status,
+roadmap, phase tracking, and workbench presentation now name objective, semantic
+row, physical container, consumer profile, input type, and row lowering
+separately. Generic target “formatting” prose is now target-row-schema lowering.
+The workbench presents the persisted `format` stage as `Lower rows` in pipeline,
+failure, cancellation, and history UI.
+
+Compatibility names did not change. `WorkbenchStage.format.rawValue`, CLI argv,
+workspace stages/config, raw diagnostic logs, Codable history/receipts, bundle
+schemas, taxonomy identifiers, legacy M1 `format` fields/keywords, migration
+fixtures, and deliberate contract warnings remain exact. Known persisted stage
+IDs receive a display alias only at presentation boundaries; unknown future
+stage strings pass through unchanged. Historical dated plans were not rewritten.
+
+An adjacent install-guide error was corrected: `continuation` is an objective,
+not a row schema; the supervised rows accepted by the Aptus profile are
+`prompt_completion`, `instruction_output`, and `messages`.
+
+**Observed verification:** lock check, Ruff, and project tracking passed; 13
+focused taxonomy/tracking tests and the full 761-test Python suite passed (with
+the one expected transport durability warning); all 38 macOS tests passed; the
+clean-wheel install and both standalone golden compiles passed. The
+`git diff --check` result was clean, and both golden manifest and transport
+digests remained unchanged.
+
+**Next action:** Add taxonomy catalog golden round-trip coverage and prove
+existing workspace and bundle backward compatibility before closeout.

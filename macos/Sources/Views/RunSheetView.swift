@@ -124,7 +124,7 @@ struct RunSheetView: View {
             Text("Compile cancelled safely")
                 .font(.body.weight(.semibold))
                 .foregroundStyle(.orange)
-            if let stage = receipt.stage {
+            if let stage = receipt.stageTitle {
                 Text("Interrupted stage: \(stage)")
             }
             Text(receipt.terminationEscalated
@@ -134,7 +134,7 @@ struct RunSheetView: View {
                 ? "The workspace was retained for inspection or recovery."
                 : "No workspace had been created when cancellation completed.")
             if !receipt.completedStages.isEmpty {
-                Text("Completed: \(receipt.completedStages.joined(separator: ", "))")
+                Text("Completed: \(receipt.completedStageTitles.joined(separator: ", "))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -155,7 +155,7 @@ struct RunSheetView: View {
                 Text("Exit code: \(code)")
                     .font(.caption.monospaced())
             }
-            Text("Stage: \(failure.stage)")
+            Text("Stage: \(failure.stageTitle)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 

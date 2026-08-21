@@ -133,17 +133,24 @@ final class CLIBridgeTests: XCTestCase {
     func testCancellationReceiptRoundTripsAndCarriesRecoveryFacts() throws {
         let receipt = RunCancellationReceipt(
             requestedAt: Date(timeIntervalSince1970: 42),
-            stage: WorkbenchStage.chunk.rawValue,
+            stage: WorkbenchStage.format.rawValue,
             processIdentifier: 123,
             terminationStatus: 15,
             terminationEscalated: false,
-            completedStages: [WorkbenchStage.parse.rawValue, WorkbenchStage.clean.rawValue],
+            completedStages: [WorkbenchStage.split.rawValue, WorkbenchStage.format.rawValue],
             workspaceRetained: true,
             outputWasTruncated: true
         )
         let encoded = try JSONEncoder().encode(receipt)
-        XCTAssertEqual(try JSONDecoder().decode(RunCancellationReceipt.self, from: encoded), receipt)
-        XCTAssertTrue(WorkbenchError.cancelled(receipt).localizedDescription.contains("workspace retained"))
+        let decoded = try JSONDecoder().decode(RunCancellationReceipt.self, from: encoded)
+        XCTAssertEqual(decoded, receipt)
+        XCTAssertEqual(decoded.stage, "format")
+        XCTAssertEqual(decoded.stageTitle, "Lower rows")
+        XCTAssertEqual(decoded.completedStages, ["split", "format"])
+        XCTAssertEqual(decoded.completedStageTitles, ["Split", "Lower rows"])
+        let description = WorkbenchError.cancelled(decoded).localizedDescription
+        XCTAssertTrue(description.contains("Lower rows"))
+        XCTAssertTrue(description.contains("workspace retained"))
     }
 
     func testLegacyHistoryWithoutCancellationReceiptStillDecodes() throws {
@@ -516,6 +523,8 @@ final class CLIBridgeTests: XCTestCase {
             ]
         )
         XCTAssertTrue(plan[4].arguments.contains("--allow-empty-evaluation"))
+        XCTAssertEqual(plan[6].stage.rawValue, "format")
+        XCTAssertEqual(plan[6].arguments, ["format", workspace.path])
         XCTAssertEqual(
             plan[8].arguments,
             ["seal", workspace.path, "-o", bundle.path, "--aptus-handoff"]
@@ -639,7 +648,7 @@ final class CLIBridgeTests: XCTestCase {
 
     func testMakeFailureCapturesExitCodeAndStage() {
         let error = WorkbenchError.processFailed(
-            stage: "construct",
+            stage: WorkbenchStage.format.rawValue,
             exitCode: 2,
             message: "boom\nline2"
         )
@@ -649,15 +658,42 @@ final class CLIBridgeTests: XCTestCase {
             workspace: URL(fileURLWithPath: "/tmp/ws"),
             logFile: nil
         )
-        XCTAssertEqual(failure.stage, "construct")
+        XCTAssertEqual(failure.stage, "format")
+        XCTAssertEqual(failure.stageTitle, "Lower rows")
         XCTAssertEqual(failure.exitCode, 2)
+        XCTAssertTrue(failure.summary.contains("Stage Lower rows failed"))
         XCTAssertTrue(failure.summary.contains("exit 2"))
         XCTAssertEqual(failure.lastLogLines, ["a", "b", "c"])
+        XCTAssertTrue(error.localizedDescription.contains("Stage Lower rows failed"))
     }
 
     func testPipelineStageCountIsNine() {
         XCTAssertEqual(WorkbenchStage.pipelineStages.count, 9)
         XCTAssertFalse(WorkbenchStage.pipelineStages.contains(.verify))
+    }
+
+    func testFormatStageAliasIsDisplayOnlyAndUnknownStagesPassThrough() throws {
+        XCTAssertEqual(WorkbenchStage.format.rawValue, "format")
+        XCTAssertEqual(WorkbenchStage.format.title, "Lower rows")
+        XCTAssertEqual(
+            WorkbenchStage.displayTitle(forRawValue: WorkbenchStage.format.rawValue),
+            "Lower rows"
+        )
+        XCTAssertEqual(
+            WorkbenchStage.displayTitle(forRawValue: "future_stage"),
+            "future_stage"
+        )
+
+        let entry = historyEntry(
+            writeAptusHandoff: false,
+            failedStage: WorkbenchStage.format.rawValue
+        )
+        let decoded = try JSONDecoder().decode(
+            RunHistoryEntry.self,
+            from: JSONEncoder().encode(entry)
+        )
+        XCTAssertEqual(decoded.failedStage, "format")
+        XCTAssertEqual(decoded.failedStageTitle, "Lower rows")
     }
 
     func testObjectiveSubtitlesAreNonEmpty() {
@@ -727,7 +763,10 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
-    private func historyEntry(writeAptusHandoff: Bool?) -> RunHistoryEntry {
+    private func historyEntry(
+        writeAptusHandoff: Bool?,
+        failedStage: String? = nil
+    ) -> RunHistoryEntry {
         RunHistoryEntry(
             id: UUID(),
             startedAt: Date(timeIntervalSince1970: 0),
@@ -749,7 +788,7 @@ final class CLIBridgeTests: XCTestCase {
             allowEmptyEvaluation: true,
             writeAptusHandoff: writeAptusHandoff,
             splitRatioPPM: 400_000,
-            failedStage: nil,
+            failedStage: failedStage,
             exitCode: nil,
             cancellationReceipt: nil,
             transportArchivePath: nil,

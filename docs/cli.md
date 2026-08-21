@@ -336,9 +336,10 @@ Lower curated records into the row schema fixed by their dataset plan.
 veriformis format WORKSPACE
 ```
 
-Format has no `--format` option: it reads the row schema from the bound recipe
-and finished plan. It consumes construction records, curation decisions, and
-authoritative assignments — never raw chunks. One included record produces
+The persisted `format` stage is row lowering, not a taxonomy selector. It has
+no row-schema override or `--format` option: it reads the row schema from the
+bound recipe and finished plan. It consumes construction records, curation
+decisions, and authoritative assignments — never raw chunks. One included record produces
 exactly one payload row and one provenance row.
 
 Payload rows contain only their schema keys: `text` rows contain only `text`;

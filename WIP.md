@@ -7,7 +7,7 @@ automated gates; beta-prep; private beta workbench Phases 0–2)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-20 (independent-product Phase 3 start)
+**Last reviewed:** 2026-08-21 (independent-product Phase 3 vocabulary cleanup)
 
 **Next review:** Independent-roadmap Phase 3 closeout; beta label cut, public
 Mac evidence, or any listed-item status change
@@ -34,7 +34,7 @@ raw source capture
 
 Canonical IR and cleaned text are accountable intermediate states. A
 `full_text` recipe may select cleaned text as exact target content. It becomes
-a finished dataset only after construction, curation, splitting, formatting,
+a finished dataset only after construction, curation, splitting, row lowering,
 validation, sealing, and verification. The deterministic pipeline remains
 local, offline, and free of LLM generation.
 
@@ -78,7 +78,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 9 | Add columnar and Hugging Face dataset containers | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 10 | Expand consumer profiles under evidence gates | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
-| 11 | Harden collection ingest and qualify additional formats | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 11 | Harden collection ingest and qualify additional input types | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 12 | Add optional local OCR with accountable recovery | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 13 | Build dataset quality intelligence | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 14 | Deliver human review and correction workflows | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -131,7 +131,8 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Loss/masking described for every implemented semantic row.
 - [x] Compatibility checks wired to fail before compile on every surface.
 - [x] One registry exposed through PipelineService, CLI, MCP, and workbench help.
-- [ ] Public “format” language inventory and rewrite; closeout.
+- [x] Public “format” language inventory and rewrite without persisted-ID changes.
+- [ ] Taxonomy golden round-trip, backward-compatibility proof, and closeout.
 
 The current stage-command runtime is:
 
@@ -452,7 +453,7 @@ Current CI definition: Python 3.11–3.13 Ubuntu + 3.12 macOS; Ruff; core
 pytest; clean-wheel installed-CLI smoke; standalone golden compile; optional
 non-blocking Aptus adapter self-conformance.
 
-Additional permanent locks: Group 5 declared-format e2e, MCP/service parity,
+Additional permanent locks: Group 5 declared-input-type e2e, MCP/service parity,
 optional Aptus adapter, Group 9 release-gate regressions, workbench Swift tests,
 `macos/scripts/parity_check.sh`, clean-path evidence under
 `dev/active/group-9-public-release/evidence/`.

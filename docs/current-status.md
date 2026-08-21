@@ -7,10 +7,10 @@
 **Implementation state:** Groups 1–7 complete; Group 9 automated release gates
 and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated);
-independent-product Phase 3 taxonomy discovery implemented while the phase
-remains in progress
+independent-product Phase 3 taxonomy discovery and public vocabulary cleanup
+implemented while the phase remains in progress
 
-**Review date:** 2026-08-21 (independent-product Phase 3 discovery)
+**Review date:** 2026-08-21 (independent-product Phase 3 vocabulary cleanup)
 
 **Next review:** Independent-roadmap Phase 3 closeout; beta label cut,
 public-ready checklist, or any contract change
@@ -116,9 +116,9 @@ and standalone Mac and Linux evidence.
 The pre-Phase-3 defect-closure packet is completed on `main`. Phase 3 is
 `in_progress` under its standard packet. Its versioned taxonomy contract,
 shared compile-compatibility checks, and read-only discovery are implemented
-through `PipelineService`, CLI, MCP, and CLI-backed workbench help. Public
-vocabulary cleanup, migration compatibility proof, and Phase 3 closeout remain
-open.
+through `PipelineService`, CLI, MCP, and CLI-backed workbench help. Ambiguous
+public taxonomy wording is reconciled without changing persisted stage IDs;
+migration compatibility proof and Phase 3 closeout remain open.
 
 ## Implemented interfaces
 
@@ -459,7 +459,7 @@ See [docs/release.md](release.md).
 | Implemented private beta workbench Phases 0–2 | Dogfood; KISS shell; failure detail; digest copy; artifact reveal; rerun |
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
-| Implemented independent Phase 3 to date | Versioned taxonomy, shared compile compatibility, and read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help; vocabulary cleanup, migration proof, and closeout remain open |
+| Implemented independent Phase 3 to date | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, plus axis-specific public copy and a display-only `Lower rows` stage alias; migration proof and closeout remain open |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), beginning with standalone authority and defaults |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -489,7 +489,7 @@ Selected permanent locks:
 | Area | Evidence |
 | --- | --- |
 | Dual-objective M1.1 | `tests/pipeline/test_pipeline_service.py` |
-| Declared-format e2e | `tests/regressions/test_group5_declared_format_pipeline.py` |
+| Declared input-type e2e | `tests/regressions/test_group5_declared_format_pipeline.py` |
 | MCP / service parity | `tests/mcp/test_mcp_pipeline_parity.py` |
 | Optional Aptus adapter | Marked `tests/handoff/test_aptus_handoff_v1.py`, `scripts/release/aptus_integration.sh`, [Aptus Handoff v1](contracts/aptus-handoff-v1.md) |
 | Workbench CLI sequence | `macos/scripts/parity_check.sh`, `macos/scripts/standalone_workbench_smoke.sh`, `macos/Tests/`, `./script/build_and_run.sh` |
@@ -515,8 +515,9 @@ On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
 Independent-product Phases 0, 1, and 2 are complete. Phase 3 is in progress;
-its taxonomy contract, compile compatibility, and cross-surface discovery are
-implemented, while vocabulary cleanup and migration/closeout evidence remain:
+its taxonomy contract, compile compatibility, cross-surface discovery, and
+public vocabulary cleanup are implemented, while migration/closeout evidence
+remains:
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md).
 A deliberate beta label and public Mac checklist remain separate decisions.
 

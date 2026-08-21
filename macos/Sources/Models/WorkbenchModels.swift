@@ -222,7 +222,22 @@ enum WorkbenchStage: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String { rawValue.capitalized }
+    /// Presentation-only title. Persisted identifiers and CLI arguments remain
+    /// the raw values above.
+    var title: String {
+        switch self {
+        case .format:
+            return "Lower rows"
+        default:
+            return rawValue.capitalized
+        }
+    }
+
+    /// Resolve a persisted stage identifier for presentation without changing
+    /// or guessing unknown identifiers from newer workbench versions.
+    static func displayTitle(forRawValue rawValue: String) -> String {
+        WorkbenchStage(rawValue: rawValue)?.title ?? rawValue
+    }
 
     /// Stages executed by the workbench compile plan (excludes verify).
     static var pipelineStages: [WorkbenchStage] {
@@ -261,11 +276,15 @@ struct CompileFailure: Equatable {
     let workspaceURL: URL?
     let logFileURL: URL?
 
+    var stageTitle: String {
+        WorkbenchStage.displayTitle(forRawValue: stage)
+    }
+
     var summary: String {
         if let exitCode {
-            return "Stage \(stage) failed (exit \(exitCode))"
+            return "Stage \(stageTitle) failed (exit \(exitCode))"
         }
-        return "Stage \(stage) failed"
+        return "Stage \(stageTitle) failed"
     }
 }
 
@@ -285,6 +304,14 @@ struct RunCancellationReceipt: Codable, Equatable {
     let completedStages: [String]
     let workspaceRetained: Bool
     let outputWasTruncated: Bool
+
+    var stageTitle: String? {
+        stage.map(WorkbenchStage.displayTitle(forRawValue:))
+    }
+
+    var completedStageTitles: [String] {
+        completedStages.map(WorkbenchStage.displayTitle(forRawValue:))
+    }
 }
 
 struct RunHistoryEntry: Identifiable, Codable, Equatable {
@@ -326,6 +353,10 @@ struct RunHistoryEntry: Identifiable, Codable, Equatable {
         return "\(stamp) · \(primarySourceName)"
     }
 
+    var failedStageTitle: String? {
+        failedStage.map(WorkbenchStage.displayTitle(forRawValue:))
+    }
+
     private static let shortDate: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -362,9 +393,10 @@ enum WorkbenchError: LocalizedError, Equatable {
             return "Add at least one source file before compiling."
         case .processFailed(let stage, let exitCode, let message):
             let head = message.split(separator: "\n", omittingEmptySubsequences: true).prefix(3).joined(separator: "\n")
-            return "Stage \(stage) failed (exit \(exitCode)): \(head)"
+            let stageTitle = WorkbenchStage.displayTitle(forRawValue: stage)
+            return "Stage \(stageTitle) failed (exit \(exitCode)): \(head)"
         case .cancelled(let receipt):
-            let stage = receipt.stage.map { " during \($0)" } ?? ""
+            let stage = receipt.stageTitle.map { " during \($0)" } ?? ""
             let stop = receipt.terminationEscalated ? "forced termination" : "graceful termination"
             let recovery = receipt.workspaceRetained ? "workspace retained" : "no workspace was created"
             return "Compile cancelled\(stage) (\(stop)); \(recovery)."
