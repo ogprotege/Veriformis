@@ -2,17 +2,18 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `3ba83ae` on `main` (Groups 1–7; Group 9
-automated gates; beta-prep; private beta workbench Phases 0–2; independent
-product Phases 0–3 complete; Phase 4 items 4.1–4.4 merged)
+**Implementation baseline reviewed:** `1675c1a22830d506bdf27e45150170befc984bdf`
+on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
+workbench Phases 0–2; independent-product Phases 0–3 complete; Phase 4 items
+4.1–4.5 merged), plus the current Phase 4.6 exact-byte publication branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
 
-**Next review:** Independent-roadmap Phase 4.5 merge and Phase 4.6 atomic
-publication; beta label cut, public Mac evidence, or any listed-item status
-change
+**Next review:** Independent-roadmap Phase 4.6 GitHub gates and merge; Phase 4.7
+start; beta label cut, public Mac evidence, or any
+listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -57,8 +58,11 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [ ] Independent product Phase 4 is in progress; items 4.1–4.4 are merged and
-      item 4.5 implements read-only normalized semantic membership enforcement.
+- [ ] Independent product Phase 4 is in progress; items 4.1–4.5 are merged at
+      `1675c1a22830d506bdf27e45150170befc984bdf`. Item 4.6 implements internal
+      exact-byte atomic publication; all focused, full Python, standalone
+      release, parity, Mac, tracking, structure, link, and diff gates pass,
+      while GitHub review remains pending.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -150,14 +154,21 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Phase 4.4 — source-derived plan population binds immutable source,
       membership-baseline, profile, dependency, and output-plan evidence.
 - [x] Phase 4.5 — normalized semantic candidates are fresh-reconstructed and
-      required to match the exact plan row-set and membership baseline; local
-      gates passed and pull-request review is pending.
-- [ ] Phase 4.6–4.9 — destination-byte publication guarantees,
-      deterministic claims, public surfaces, and adversarial closeout remain
-      open in the [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
+      required to match the exact plan row-set and membership baseline; merged
+      at `1675c1a22830d506bdf27e45150170befc984bdf`.
+- [x] Phase 4.6 — internal `portable_exact_bytes` publication re-verifies the
+      source and plan, checks normalized membership, writes and independently
+      verifies a closed receipt-bearing staging tree, and performs one atomic
+      no-replace promotion. All local gates pass: 150 focused tests, 914 full
+      Python tests, 902 standalone-release tests with 1 deselected,
+      deterministic parity, and 38 Mac tests; GitHub review remains pending.
+- [ ] Phase 4.7–4.9 — deterministic rerender and semantic replay, public
+      surfaces, and adversarial closeout remain open in the
+      [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-No destination-byte verifier or writer, public export commands, or generic
-export containers are claimed by the first five Phase 4 increments.
+Phase 4.6 supplies an internal exact-byte publisher and verifier only. It ships
+no renderer, public export command, supported generic export container, or
+semantic-only publication path.
 
 The current stage-command runtime is:
 

@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -204,10 +204,19 @@ projection and canonical bytes with the baseline. Counts or assignment digest
 alone cannot pass.
 
 This is an in-memory semantic proof, not evidence about produced destination
-bytes. Writing remains Phase 4.6 and exact-byte rerender or semantic replay of
-actual destination content remains Phase 4.7. No public command or generic
-container exists. The export boundary therefore changes neither the canonical
-six-file bundle nor the nine-stage workspace graph.
+bytes. Phase 4.6 adds a separate internal exact-byte path: `publish` re-verifies
+the source and plan, receives exact bytes and normalized candidate semantics
+from a private test-injected renderer, repeats the membership check, and checks
+the bytes against every exact file plan. It writes a canonical receipt in a
+private descriptor-anchored sibling, independently rewalks the closed staged
+tree, and makes it visible with one atomic no-replace promotion. The receipt and
+actual byte digests prove one produced exact instance; they do not decode those
+bytes into semantic rows or prove a second deterministic render.
+
+Exact-byte rerender or semantic replay of actual destination content remains
+Phase 4.7. No renderer, public command, or generic container exists. The export
+boundary therefore changes neither the canonical six-file bundle nor the
+nine-stage workspace graph.
 
 ## Persistence: the workspace revision store
 

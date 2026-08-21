@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -98,7 +98,7 @@ the sealed directory and optional expected manifest digest to
 trusted channel. The optional Aptus handoff is a separate adapter artifact and
 is not required for core bundle verification.
 
-## Phase 4 export composition and model boundary
+## Phase 4 export composition, model, and private publication boundary
 
 `PipelineService.export_service` exposes the injected `ExportService` to
 Python composition. Its `verified_source` method calls
@@ -126,12 +126,22 @@ candidate row set and complete projection and succeeds only when both equal the
 plan baseline. Its signature contains no selection, mutation, destination,
 overwrite, writer, or publication control.
 
+`ExportService.publish` is the Phase 4.6 Python-composition-only publication
+boundary. It accepts a strict exact-byte plan, source bundle locator,
+destination root, separately retained source digest when required, and optional
+cancellation callback. It exposes no renderer-selection, overwrite, filtering,
+or membership controls. A private conformance subclass supplies exact bytes and
+normalized candidate semantics; the default service fails because no renderer
+is installed. Publication re-verifies source and plan, repeats semantic
+membership validation, checks every planned byte digest and size, writes and
+independently reloads the canonical receipt inside descriptor-anchored staging,
+and performs one atomic no-replace promotion.
+
 There is no `export` or `export-verify` CLI command, MCP tool, or macOS action
-in these increments. Strict v1 plan, profile, membership, binding, receipt, and
-verification models, internal read-only plan population, and normalized
-semantic membership enforcement now exist, but there is no destination-byte
-verification, writer, or generic derivative container. Those are later Phase 4
-services and surfaces, not implied by the semantic boundary.
+in these increments. There is also no shipped renderer, semantic-only
+publication, deterministic rerender proof, or generic derivative container.
+Those are Phase 4.7–4.8 or later services and surfaces, not implied by the
+internal exact-byte publisher.
 
 ## Preview, recipes, and optional integrations
 

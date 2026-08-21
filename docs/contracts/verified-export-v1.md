@@ -12,14 +12,17 @@
 this contract, Phase 4.3 implements fail-closed read-only source-trust
 admission, and Phase 4.4 implements read-only source-derived plan population.
 Phase 4.5 implements read-only normalized semantic membership reconstruction
-and exact comparison with the plan baseline. It does not implement destination-
-byte verification, an export writer, publisher, independent export verifier,
-CLI or MCP export commands, workbench export controls, or a supported product
-export container.
+and exact comparison with the plan baseline. Phase 4.6 locally implements
+exact-byte-only atomic publication and descriptor-anchored independent tree
+verification. Its required local gates pass and pull-request review is pending.
+It does not implement deterministic rerendering, semantic-content replay, CLI or
+MCP export commands, workbench export controls, or a supported product export
+container.
 
-**Last reviewed:** 2026-08-21 (Phase 4.5 derivative-only membership enforcement)
+**Last reviewed:** 2026-08-21 (Phase 4.6 exact-byte atomic publication)
 
-**Next review:** Phase 4.6 atomic publication or any export schema change
+**Next review:** Phase 4.6 gate completion, Phase 4.7 deterministic evidence,
+or any export schema change
 
 ## Purpose
 
@@ -39,6 +42,11 @@ one admitted source and binds the source membership baseline; it does not
 render, compare, or publish destination content. Phase 4.5 reconstructs
 normalized candidate semantic rows and provenance in memory and requires exact
 equality with that baseline; it does not inspect or publish destination bytes.
+Phase 4.6 re-verifies the source and plan, accepts bytes only from a private
+test-injected conformance renderer, repeats the semantic membership check,
+independently verifies a staged exact-byte tree, and publishes it with one
+no-replace atomic promotion. It does not prove a second render or reconstruct
+semantics from produced bytes.
 
 ## Normative language
 
@@ -141,11 +149,16 @@ Public byte loaders MUST reject:
 report malformed persisted evidence as `export-verification-invalid`.
 Strict constructors reject invalid in-memory values with validation failure.
 `export-contract-invalid` is the typed envelope for canonical serialization
-failure and for an invalid or unsatisfied source-trust policy.
-`export-verification-invalid` covers an impossible mismatch between the
-inspector result and the evidence supplied to the export service. Malformed,
-mismatched, or tampered bundle evidence preserves the existing
+failure, an invalid or unsatisfied source-trust policy, invalid publication
+arguments, an unsupported publication evidence mode, or a destination already
+present before staging. `export-verification-invalid` covers an impossible
+mismatch between the inspector result and supplied evidence, invalid renderer
+evidence, or a malformed, altered, incomplete, or substituted derivative tree.
+Malformed, mismatched, or tampered bundle evidence preserves the existing
 `bundle-invalid` envelope; the service never retries without supplied evidence.
+An atomic no-replace race may preserve the platform `FileExistsError`.
+Cancellation-check exceptions propagate before visibility, and the runtime
+partial-publication exception is outside this persisted error-code registry.
 
 The closed verified-export v1 error-code registry is exactly:
 
@@ -255,6 +268,12 @@ the planned semantic-content digest; the actual instance byte digest remains
 bound without being called portably reproducible. An observed zero-byte file
 MUST bind the SHA-256 of empty bytes, and a positive record count cannot occupy
 zero bytes.
+
+Generic filesystem verification directly observes file type, path, SHA-256,
+and byte size. Role, media type, membership scope, and record count remain
+logical plan-and-receipt facts until a container-specific semantic replay can
+derive them from produced bytes. Phase 4.6 MUST NOT describe those logical
+facts as independently counted or parsed destination evidence.
 
 File plans and destination bindings are sorted by exact path. Their complete
 path set MUST be portable and collision-free. `export-receipt.json` is reserved
@@ -437,6 +456,98 @@ not prove that arbitrary destination bytes encode the checked semantics. Phase
 4.6 owns filesystem publication and Phase 4.7 owns exact-byte rerendering or
 semantic reconstruction of actual destination content.
 
+## Atomic exact-byte publication
+
+`ExportService.publish` accepts one strict `ExportPlan`, the source bundle
+locator, one runtime destination root, an optional separately retained expected
+source-manifest SHA-256, and an optional cancellation checkpoint callable. It
+has no renderer-selection, overwrite, filter, membership, resplit, or semantic-
+mapping argument. The default service has no installed renderer. Only a private
+test conformance subclass may override the internal rendering hook in Phase
+4.6; that hook receives the strict plan and freshly reverified source row set,
+not a destination or staging path.
+
+Before rendering or destination creation, the service MUST fresh-strict-load
+the plan and reverify the named source bundle under the plan's exact trust
+policy. An `external_digest` plan requires the caller to supply the separately
+retained matching manifest digest again. The digest copied into the plan
+MUST NOT be used as its own external trust anchor. Supplying external evidence for a
+`self_consistent` plan cannot silently upgrade it; the caller must create a new
+plan. Every reconstructed source, profile, dependency, file-plan, and complete
+membership fact MUST equal the supplied plan exactly.
+
+The Phase 4.6 publisher supports only `portable_exact_bytes` plans. A
+`semantic_content_only` plan fails as `export-contract-invalid` because no
+generic verifier can derive its semantic-content digest from arbitrary
+destination bytes. Enabling semantic-only publication remains Phase 4.7 work.
+This restriction does not change the persisted profile or receipt schemas.
+
+The internal renderer returns exact `(path, bytes)` pairs plus normalized train
+rows, evaluation rows, and aligned provenance. The service MUST snapshot and
+validate the complete renderer file set before creating staging: paths are
+exact strings, contents are exact bytes, every planned path appears once, no
+other path appears, and every SHA-256 and byte size equals its exact file plan.
+It MUST run the Phase 4.5 membership operation over the returned semantic
+evidence before staging. These are two separate checks; Phase 4.6 MUST NOT claim
+that generic destination bytes have been decoded into the checked rows.
+
+Publication MUST:
+
+1. reject an invalid destination, a symlink parent, a destination inside the
+   source bundle, and every pre-existing destination object;
+2. create one private mode-0700 sibling on the destination filesystem;
+3. create directories and files through anchored descriptors with exclusive,
+   no-follow writes, checking cancellation before and during fallible work;
+4. write and fsync every planned file and the canonical
+   `export-receipt.json`, then fsync every staged directory;
+5. independently enumerate the staged tree through its root descriptor and
+   require the exact planned directories and files plus the receipt;
+6. reject aliases, collisions, symlinks, hard links, shared inodes, special
+   files, substitutions, noncanonical receipt bytes, or any observed
+   digest/size/plan/receipt mismatch;
+7. construct successful `ExportVerification` evidence only from that
+   independently reloaded receipt and observed byte bindings;
+8. repeat the closed-tree check and cancellation checkpoint immediately before
+   publication; and
+9. use one platform atomic no-replace directory promotion, with no unsafe
+   fallback and no adoption or overwrite of an existing target.
+
+These atomicity and cleanup guarantees assume that the destination parent is
+an integrity-controlled namespace. No uncooperative process with the same
+owner privileges may continuously rename or replace entries in that parent
+during publication. Veriformis anchors work to directory descriptors, checks
+name-to-inode identity, promotes with no-replace semantics, and removes only
+objects whose identities it recorded as service-owned. If a name is replaced,
+cleanup fails closed and may preserve staging residue rather than adopting or
+recursively deleting the replacement. OS permission isolation defines this
+security boundary; a separately retained source-manifest digest and the
+out-of-band expected export plan detect later source or derivative
+substitution.
+
+A cancellation-check exception before promotion propagates after cleanup of
+only the descriptor-anchored staging tree. The destination remains absent
+unless another process won the no-replace race.
+There is no cancellation checkpoint after promotion, and visible output MUST
+NOT be deleted or reported as rolled back. Cleanup refuses a replaced staging
+name rather than following or recursively deleting it.
+
+`ExportPublicationOutcome` is a frozen runtime value containing the absolute
+destination root, strict receipt, strict verification, and an optional
+durability warning. The absolute path and warning are not persisted identity.
+If parent-directory fsync fails after promotion, publication remains successful
+and visible; the outcome carries a warning that warning filters cannot turn
+into false rollback. `ExportPartialPublicationError` is a runtime exception
+carrying the visible outcome and original cause if later bookkeeping fails. It
+is not a persisted model or an additional verified-export v1 error code.
+
+The independently callable filesystem verifier requires an out-of-band
+expected plan. It opens the visible root without following links, enforces the
+same closed-tree rules, reloads canonical receipt bytes, recomputes every
+actual file digest and size, and returns the matching receipt and verification.
+It does not re-open the source bundle or rerender container bytes. Source
+reverification is part of publication; source-bound standalone verification
+and public inspect/verify surfaces remain later work.
+
 ## `ExportReceipt`
 
 An export receipt contains exactly `schema_version`, `export_receipt_id`,
@@ -448,10 +559,11 @@ bindings MUST cover the complete planned file set exactly once and match every
 logical and evidence expectation. The output content root is a
 domain-separated digest over the complete ordered destination bindings.
 
-The receipt does not bind its own bytes. The intended closed derivative tree is
+The receipt does not bind its own bytes. The closed derivative tree is
 the exact destination file set plus one canonical `export-receipt.json`; this
 avoids an impossible self-hash while keeping the receipt inside the portable
-wrapper.
+wrapper. Phase 4.6 writes and independently reloads this receipt inside staging
+before the atomic promotion. No normal receipt-writing step follows visibility.
 
 ## `ExportVerification`
 
@@ -465,9 +577,15 @@ declared record count.
 It represents successful verification evidence only. A failed, malformed,
 altered, incomplete, unexpected, or untrusted derivative raises a typed error
 instead of producing a persisted `verified=false` object. Phase 4.2 defines and
-strictly loads this evidence model. Independent filesystem verification,
-source re-verification, closed-tree enforcement, and exact/semantic replay are
-implemented in later Phase 4 increments.
+strictly loads this evidence model. Phase 4.6 creates it only after independent
+filesystem enumeration, canonical receipt reload, closed-tree enforcement, and
+actual exact-file digest and size replay. Creating the model from an in-memory
+receipt alone is not evidence that a filesystem tree was inspected.
+
+Phase 4.6 re-verifies the source while publishing, but the standalone
+filesystem verifier accepts an independently supplied plan and does not reopen
+the source bundle. Exact-byte rerender comparison and semantic-content replay
+remain Phase 4.7; public source-bound verification remains Phase 4.8.
 
 Successful verification requires positive `output_file_count` and
 `declared_record_count` values. Counts of zero do not describe a successful v1
@@ -475,7 +593,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2–4.5 implementation boundary
+## Phase 4.2–4.6 implementation boundary
 
 Phase 4.2 implements:
 
@@ -516,21 +634,33 @@ Phase 4.5 additionally implements:
 - fail-closed omission, addition, duplication, reordering, target mutation,
   assignment, leakage-group, partition, ordinal, balancing, and resplit tests.
 
-Phase 4.2–4.5 do **not** implement:
+Phase 4.6 additionally implements, with required local gates passed and
+pull-request review pending:
+
+- one Python-composition-only exact-byte publication operation with no shipped
+  renderer or renderer-selection argument;
+- source and plan re-verification before renderer or destination mutation;
+- renderer file-set and normalized semantic membership validation before
+  staging;
+- descriptor-anchored private staging, cancellation, cleanup, fsync, exact
+  closed-tree verification, and one atomic no-replace promotion;
+- canonical in-tree receipts, successful verification evidence, an independent
+  exact-byte directory verifier, and honest visible-publication outcomes; and
+- fail-closed deferral of `semantic_content_only` publication to Phase 4.7.
+
+Phase 4.2–4.6 do **not** implement:
 
 - selecting or registering an export implementation;
-- filesystem staging, writing, cancellation, promotion, cleanup, or independent
-  export verification (Phase 4.6);
 - deterministic rerendering or semantic-content replay (Phase 4.7);
-- Python composition-root export operations, discovery, dry run, inspection,
-  CLI, MCP, or Mac surfaces (Phase 4.8); or
+- `PipelineService` export operations, discovery, dry run, public inspection or
+  verification, CLI, MCP, or Mac surfaces (Phase 4.8); or
 - the complete tamper, traversal, race, cancellation, and partial-publication
   harness or Phase 4 closeout (Phase 4.9).
 
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2–4.5 MUST NOT add a generic export container or
+not support claims. Phase 4.2–4.6 MUST NOT add a generic export container or
 consumer profile to taxonomy discovery or the support registry. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;

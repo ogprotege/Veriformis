@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
 
 **Next review:** Any layering or architecture change
 
@@ -197,8 +197,12 @@ set and provenance, creates an existing strict `ExportPlan`, and adds neither a
 workspace edge nor destination I/O. Phase 4.5 fresh-reconstructs normalized
 candidate semantic rows and provenance through the existing `RowSet` contract
 and requires exact plan-baseline membership equality in the same service.
-No destination-byte verifier, derivative writer, public export command, or
-generic container belongs to this layer yet.
+Phase 4.6 keeps exact-byte publication in that same `exports/` axial layer. Its
+private filesystem helper performs descriptor-anchored staging, canonical
+receipt writing, independent closed-tree verification, cancellation, cleanup,
+and atomic no-replace promotion without adding a workspace stage or adapter
+policy. The default service has no renderer; no public export command, semantic
+replay, or generic container belongs to this layer yet.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

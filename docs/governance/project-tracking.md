@@ -4,10 +4,10 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
 
-**Next review:** Independent-product Phase 4.5 state transition or any
-program-state, evidence-grade, or completion-rule change
+**Next review:** Independent-product Phase 4.6 merge or any program-state,
+evidence-grade, or completion-rule change
 
 ## Purpose
 

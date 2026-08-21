@@ -1,15 +1,16 @@
 """Verified-bundle-only composition service for derived exports.
 
 Phase 4 builds every export operation through this service. The current
-read-only increments establish a typed, descriptor-anchored source boundary,
-fail-closed trust admission, and source-derived plan population without
-promoting Phase 5 containers.
+increments establish a typed, descriptor-anchored source boundary, fail-closed
+trust admission, source-derived plan population, and private atomic exact-byte
+publication without promoting Phase 5 containers.
 """
 
 from __future__ import annotations
 
 import os
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from veriformis.bundle import (
     VALIDATION_PATH,
@@ -44,6 +45,11 @@ from veriformis.exports.models import (
     SourceTrustGrade,
     SourceTrustPolicy,
 )
+from veriformis.exports._publication import (
+    CancellationCheck,
+    ExportPublicationOutcome,
+    _publish_exact_export,
+)
 from veriformis.identity import lossless_json_bytes, sha256_digest
 
 
@@ -52,13 +58,23 @@ _SOURCE_TRUST_POLICIES = frozenset(
 )
 
 
+@dataclass(frozen=True, slots=True)
+class _RenderedDerivative:
+    """Test-injected renderer output before service-owned publication."""
+
+    files: tuple[tuple[str, bytes], ...]
+    train_rows: tuple[ProductRow, ...]
+    evaluation_rows: tuple[ProductRow, ...]
+    provenance: tuple[RowProvenance, ...]
+
+
 class ExportService:
     """Own export policy beneath :class:`PipelineService`.
 
     Adapters must call the Python composition root. They must never copy or
-    rewrite bundle files directly. Later Phase 4 increments add destination
+    rewrite bundle files directly. Phase 4.6 adds private exact-byte destination
     enforcement, receipts, publication, and verification here without changing
-    that boundary.
+    that boundary; public adapters remain later work.
     """
 
     def verified_source(
@@ -141,40 +157,16 @@ class ExportService:
             source_trust_policy=source_trust_policy,
             expected_manifest_sha256=expected_manifest_sha256,
         )
-        (
-            report,
-            row_set,
-            verification,
-            objective_id,
-            membership_projection,
-        ) = _source_plan_evidence(source)
-        snapshot = report.snapshot
         try:
-            return ExportPlan.create(
-                source_bundle_id=verification.bundle_id,
-                source_manifest_sha256=verification.manifest_sha256,
-                source_content_root_sha256=verification.content_root_sha256,
-                source_verification_id=verification.verification_id,
+            plan, _ = _plan_from_verified_source(
+                source,
                 source_trust_policy=source_trust_policy,
-                source_trust_grade=verification.trust_grade,
-                dataset_snapshot_id=snapshot.snapshot_id,
-                validation_report_id=report.report_id,
-                finished_dataset_plan_id=snapshot.plan_id,
-                recipe_id=snapshot.recipe_id,
-                objective_id=objective_id,
-                construction_result_id=snapshot.construction_result_id,
-                curation_result_id=snapshot.curation_result_id,
-                serialization_plan_id=row_set.serialization_plan_id,
-                split_result_id=snapshot.split_result_id,
-                row_set_id=snapshot.row_set_id,
-                source_ids=snapshot.source_ids,
-                row_schema=row_set.row_schema,
                 container_profile=container_profile,
                 consumer_profile=consumer_profile,
                 dependencies=dependencies,
-                membership_projection=membership_projection,
                 file_plans=file_plans,
             )
+            return plan
         except (
             AttributeError,
             RecursionError,
@@ -278,6 +270,169 @@ class ExportService:
             raise ExportVerificationError(
                 f"invalid candidate derivative membership evidence: {exc}"
             ) from exc
+
+    def publish(
+        self,
+        plan: ExportPlan,
+        bundle: str | os.PathLike[str],
+        destination_root: str | os.PathLike[str],
+        *,
+        expected_manifest_sha256: str | None = None,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> ExportPublicationOutcome:
+        """Atomically publish one test-injected exact-byte derivative.
+
+        Phase 4.6 intentionally has no renderer-selection argument or shipped
+        implementation.  A conformance-only subclass may override
+        :meth:`_render_derivative`; product discovery and public surfaces remain
+        later Phase 4 work.
+        """
+        if cancellation_check is not None and not callable(cancellation_check):
+            raise ExportContractError("cancellation_check must be callable")
+        try:
+            checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
+        except (
+            AttributeError,
+            RecursionError,
+            TypeError,
+            UnicodeError,
+            ValueError,
+            VeriformisError,
+        ) as exc:
+            if isinstance(exc, ExportVerificationError):
+                raise
+            raise ExportContractError(f"invalid export publication plan: {exc}") from exc
+        if checked_plan.container_profile.determinism_claim != "portable_exact_bytes":
+            raise ExportContractError(
+                "Phase 4.6 publication supports portable_exact_bytes plans only"
+            )
+        if checked_plan.source_trust_grade == "external_digest":
+            if expected_manifest_sha256 is None:
+                raise ExportContractError(
+                    "external_digest publication requires separately retained "
+                    "expected_manifest_sha256"
+                )
+            if expected_manifest_sha256 != checked_plan.source_manifest_sha256:
+                raise ExportContractError(
+                    "publication trust evidence differs from the export plan"
+                )
+        elif expected_manifest_sha256 is not None:
+            raise ExportContractError(
+                "self_consistent publication cannot silently change its trust grade; "
+                "create a new export plan with the retained digest"
+            )
+
+        _run_cancellation_check(cancellation_check)
+        source = self.verified_source(
+            bundle,
+            source_trust_policy=checked_plan.source_trust_policy,
+            expected_manifest_sha256=expected_manifest_sha256,
+        )
+        rebuilt_plan, source_row_set = _plan_from_verified_source(
+            source,
+            source_trust_policy=checked_plan.source_trust_policy,
+            container_profile=checked_plan.container_profile,
+            consumer_profile=checked_plan.consumer_profile,
+            dependencies=checked_plan.dependencies,
+            file_plans=checked_plan.file_plans,
+        )
+        if (
+            rebuilt_plan != checked_plan
+            or rebuilt_plan.canonical_bytes() != checked_plan.canonical_bytes()
+        ):
+            raise ExportVerificationError(
+                "reverified export source differs from the supplied export plan"
+            )
+
+        _run_cancellation_check(cancellation_check)
+        try:
+            rendered = self._render_derivative(checked_plan, source_row_set)
+            files = tuple(rendered.files)
+            train_rows = tuple(rendered.train_rows)
+            evaluation_rows = tuple(rendered.evaluation_rows)
+            provenance = tuple(rendered.provenance)
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ExportVerificationError(
+                f"invalid injected renderer result: {exc}"
+            ) from exc
+        _run_cancellation_check(cancellation_check)
+        self.validate_derivative_membership(
+            checked_plan,
+            candidate_train_rows=train_rows,
+            candidate_evaluation_rows=evaluation_rows,
+            candidate_provenance=provenance,
+        )
+        _run_cancellation_check(cancellation_check)
+        return _publish_exact_export(
+            destination_root,
+            source_root=source.bundle_path,
+            plan=checked_plan,
+            files=files,
+            cancellation_check=cancellation_check,
+        )
+
+    def _render_derivative(
+        self,
+        plan: ExportPlan,
+        source_row_set: RowSet,
+    ) -> _RenderedDerivative:
+        """Resolve no product renderer; test-only subclasses may override it."""
+        del plan, source_row_set
+        raise ExportContractError(
+            "no verified export renderer is installed; Phase 4 conformance "
+            "rendering is test-injected only"
+        )
+
+
+def _run_cancellation_check(check: CancellationCheck | None) -> None:
+    if check is not None:
+        check()
+
+
+def _plan_from_verified_source(
+    source: VerifiedFinishedBundle,
+    *,
+    source_trust_policy: SourceTrustPolicy,
+    container_profile: ExportContainerProfile,
+    consumer_profile: ExportConsumerProfile | None,
+    dependencies: Sequence[ExportDependencyBinding],
+    file_plans: Sequence[ExportFilePlan],
+) -> tuple[ExportPlan, RowSet]:
+    """Build a plan and return the same freshly closed source row set."""
+    (
+        report,
+        row_set,
+        verification,
+        objective_id,
+        membership_projection,
+    ) = _source_plan_evidence(source)
+    snapshot = report.snapshot
+    plan = ExportPlan.create(
+        source_bundle_id=verification.bundle_id,
+        source_manifest_sha256=verification.manifest_sha256,
+        source_content_root_sha256=verification.content_root_sha256,
+        source_verification_id=verification.verification_id,
+        source_trust_policy=source_trust_policy,
+        source_trust_grade=verification.trust_grade,
+        dataset_snapshot_id=snapshot.snapshot_id,
+        validation_report_id=report.report_id,
+        finished_dataset_plan_id=snapshot.plan_id,
+        recipe_id=snapshot.recipe_id,
+        objective_id=objective_id,
+        construction_result_id=snapshot.construction_result_id,
+        curation_result_id=snapshot.curation_result_id,
+        serialization_plan_id=row_set.serialization_plan_id,
+        split_result_id=snapshot.split_result_id,
+        row_set_id=snapshot.row_set_id,
+        source_ids=snapshot.source_ids,
+        row_schema=row_set.row_schema,
+        container_profile=container_profile,
+        consumer_profile=consumer_profile,
+        dependencies=dependencies,
+        membership_projection=membership_projection,
+        file_plans=file_plans,
+    )
+    return plan, row_set
 
 
 def _source_plan_evidence(

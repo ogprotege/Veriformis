@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 membership boundary)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 publication boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -43,9 +43,10 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `handoff/`; `mcp/`; and `cli.py` (Typer adapter). Phase 4 currently adds the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
-source-derived plan population and normalized semantic membership enforcement.
-No destination-byte verifier, writer, supported container, or public export
-command exists yet. The macOS workbench lives
+source-derived plan population and normalized semantic membership enforcement,
+plus internal exact-byte atomic publication and independent closed-tree
+verification. No renderer, supported derivative container, or public export
+command ships, and semantic replay remains deferred. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -138,13 +139,20 @@ name.vfbundle/
   selected explicitly, and supplied evidence never falls back. Its read-only
   `create_plan` operation derives every source identity and the complete source
   membership baseline from that immutable pass; callers provide only profile,
-  dependency, and file-plan evidence. The service is composed by
-  `PipelineService`; it is not a workspace stage, does not reopen source paths,
-  and does not mutate `minimal-v1` or write destination content.
+  dependency, and file-plan evidence. `create_plan` is not a workspace stage,
+  does not reopen source paths, and does not mutate `minimal-v1` or write
+  destination content.
 - Its read-only `validate_derivative_membership` operation fresh-reconstructs a
   candidate `RowSet` from normalized train/evaluation rows and aligned
   provenance, then requires exact planned row-set and complete projection
   equality. It does not inspect produced destination bytes.
+- Its internal `publish` operation supports only exact-byte plans and is
+  reachable through Python composition. It re-verifies the source and plan,
+  checks normalized membership and planned bytes, writes a canonical receipt in
+  descriptor-anchored private staging, independently rewalks the closed tree,
+  and uses one atomic no-replace promotion. The default service has no renderer;
+  no adapter exposes publication, and no generic container or semantic replay is
+  supported.
 
 ## Related documentation
 
