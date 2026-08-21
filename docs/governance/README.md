@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 start)
 
-**Next review:** Independent-product Phase 4 start, any later phase closeout, or
-governance-schema change
+**Next review:** Independent-product Phase 4.1 state transition, any later phase
+closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -21,6 +21,7 @@ claims from drifting away from code and evidence.
 | [ADR index](../adr/README.md) | Durable architectural and product decisions |
 | [Evidence index](../evidence/index.json) | Machine-readable evidence records and evidence grades |
 | [Program ledger](../../dev/active/independent-product/program.json) | Machine-readable phase status and dependencies |
+| [Active Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, and evidence |
 
 Run the governance drift check with:
 

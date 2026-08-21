@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `6973e637` on `main` (Groups 1–7; Group 9
+**Implementation baseline reviewed:** `db9d93ef` on `main` (Groups 1–7; Group 9
 automated gates; beta-prep; private beta workbench Phases 0–2; independent
-product Phase 3 through the compatibility proof)
+product Phases 0–3 complete; Phase 4 opening baseline)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 start)
 
-**Next review:** Independent-roadmap Phase 4 packet and export-service contract
-tests; beta label cut, public Mac evidence, or any listed-item status change
+**Next review:** Independent-roadmap Phase 4.1 merge and Phase 4.2 contract-model
+start; beta label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -56,6 +56,8 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
+- [ ] Independent product Phase 4 is in progress; item 4.1 is establishing the
+      typed `ExportService` and descriptor-anchored verified source inspection.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -72,7 +74,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 1 | Enforce standalone independence | Completed | [Completed packet](dev/active/independent-product/phase-01-standalone-independence/README.md) |
 | 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
-| 4 | Build the verified export foundation | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 4 | Build the verified export foundation | In progress | [Active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
 | 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -136,11 +138,17 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Taxonomy golden round-trip and pre-taxonomy workspace/bundle compatibility proof.
 - [x] Full Phase 3 closeout gates and status/support/evidence reconciliation.
 
-### Next authorized phase
+### Active Phase 4 status
 
-Phase 4 remains planned. Its next action is to create the standard phase packet
-and pin verified export-service contract tests. No generic export capability is
-claimed by the Phase 3 closeout.
+- [ ] Phase 4.1 — typed `ExportService` and descriptor-anchored verified source
+      inspection are under implementation.
+- [ ] Phase 4.2–4.9 — versioned persisted models, trust and destination
+      bindings, derivative-only enforcement, publication guarantees,
+      deterministic claims, public surfaces, and adversarial closeout remain
+      open in the [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
+
+No persisted export models, export writer, public export commands, or generic
+export containers are claimed by this Phase 4.1 opening change.
 
 The current stage-command runtime is:
 

@@ -8,11 +8,13 @@
 and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated);
 independent-product Phase 3 completed with taxonomy discovery, public
-vocabulary cleanup, and persisted-v1 compatibility proof
+vocabulary cleanup, and persisted-v1 compatibility proof;
+independent-product Phase 4 verified export foundation in progress with its
+typed internal service boundary and descriptor-anchored source view
 
-**Review date:** 2026-08-21 (independent-product Phase 3 closeout)
+**Review date:** 2026-08-21 (independent-product Phase 4 start)
 
-**Next review:** Independent-roadmap Phase 4 start; beta label cut, public-ready
+**Next review:** Phase 4 export-model contract; beta label cut, public-ready
 checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -119,8 +121,12 @@ compile-compatibility checks, and read-only discovery through
 `PipelineService`, CLI, MCP, and CLI-backed workbench help. Ambiguous public
 taxonomy wording is reconciled without changing persisted stage IDs; the
 taxonomy golden and persisted-v1 workspace/bundle compatibility proofs pass.
-Phase 4, verified export foundation, is the next planned phase. It has not
-started; generic export containers and planned trainer-specific profiles remain
+Phase 4, verified export foundation, is in progress. Its opening slice adds a
+typed internal `ExportService`, owned by `PipelineService`, and a
+descriptor-anchored verified source view that returns the already checked
+manifest, validation report, row set, and verification result from one pass.
+Persisted export plans and receipts, publication, public export commands,
+generic export containers, and planned trainer-specific profiles remain
 unimplemented.
 
 ## Implemented interfaces
@@ -463,8 +469,9 @@ See [docs/release.md](release.md).
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
+| Independent Phase 4 in progress | Typed internal `ExportService` composition boundary and descriptor-anchored finished-bundle source inspection; no persisted export plan/receipt, writer, public export command, or production container yet |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation next and still planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation in progress and later phases planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -521,11 +528,14 @@ Independent-product Phases 0–3 are complete. The completed
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
 records the contract, compile compatibility, cross-surface discovery, public
 vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
-export foundation is next in the roadmap but remains planned and has no active
-packet. Generic export containers and any new trainer-specific profiles are not
-current capabilities; the canonical and optional Aptus profiles remain the
-implemented profile set. A deliberate beta label and public Mac checklist
-remain separate decisions.
+export foundation is in progress under its
+[active packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
+The opening service/source-view slice does not yet implement persisted export
+contracts, publication, commands, or a production export container. Generic
+export containers and any new trainer-specific profiles are not current
+capabilities; the canonical and optional Aptus profiles remain the implemented
+profile set. A deliberate beta label and public Mac checklist remain separate
+decisions.
 
 See the [independent product analysis](analysis/2026-08-11-independent-product-analysis.md),
 [tracking and evidence policy](governance/project-tracking.md),

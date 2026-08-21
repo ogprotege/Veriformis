@@ -3,7 +3,7 @@
   "program_id": "independent-product",
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
-  "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
+  "baseline_commit": "db9d93ef88e273e3727e1ba85841589530d59da3",
   "last_updated": "2026-08-21",
   "status_values": [
     "planned",
@@ -57,12 +57,12 @@
     {
       "number": 4,
       "title": "Build the verified export foundation",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [3],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-04-verified-export-foundation",
+      "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Create the standard Phase 4 packet and pin verified export-service contract tests."
+      "next_gate": "Complete and merge Phase 4.1 typed ExportService and anchored verified-source inspection with green gates; then begin Phase 4.2 versioned export models."
     },
     {
       "number": 5,

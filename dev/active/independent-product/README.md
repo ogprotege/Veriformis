@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–3 complete; Phase 4 next and planned
+**Status:** Active program — Phases 0–3 complete; Phase 4 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -19,11 +19,14 @@ with roadmap headings.
 - [Phase 1 — Standalone independence](phase-01-standalone-independence/README.md) — completed
 - [Phase 2 — Reliability and artifact boundary](phase-02-reliability-artifact-boundary/README.md) — completed
 - [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
+- [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
-implementation. Phase 4, verified export foundation, remains planned and has no
-packet yet.
+implementation. Phase 4 opened on 2026-08-21 from baseline `db9d93ef`; item
+4.1 is implementing the typed `ExportService` boundary and descriptor-anchored
+verified source inspection. Persisted export models, an export writer, public
+export commands, and generic export containers are not implemented yet.
 
 ## State change procedure
 

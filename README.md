@@ -15,7 +15,8 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–3. This is **not** a public beta or production
+> independent-product Phases 0–3 and the opening Phase 4 verified-export
+> foundation. This is **not** a public beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 > Install: [docs/install.md](docs/install.md). Status:
 > [docs/current-status.md](docs/current-status.md).
@@ -232,11 +233,13 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-**private beta workbench Phases 0–2**, and **independent-product Phases 0–3**.
-Maturity remains development **alpha** (not a public beta label). Phase 4,
-verified export foundation, is the next planned independent-roadmap phase; it
-has not started, and generic export containers and planned trainer-specific
-profiles remain unimplemented. A future beta cut must follow
+**private beta workbench Phases 0–2**, and **independent-product Phases 0–3**;
+Phase 4 verified export foundation is in progress. Its opening slice adds a
+typed internal `ExportService` boundary and descriptor-anchored inspection of
+an already verified finished bundle. It does not yet add persisted export
+models, an export writer, public export commands, generic export containers, or
+trainer-specific profiles. Maturity remains development **alpha** (not a
+public beta label). A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
 need owner signing/notarization per [docs/release.md](docs/release.md).
 **Group 8** model-assisted construction is optional and owner-gated.

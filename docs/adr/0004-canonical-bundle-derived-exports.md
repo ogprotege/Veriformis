@@ -4,6 +4,9 @@
 
 **Date:** 2026-08-11
 
+**Last reviewed:** 2026-08-21 (Phase 4 start; opening implementation remains
+faithful to this decision)
+
 **Decider:** Repository owner direction
 
 ## Context and evidence
@@ -45,6 +48,12 @@ claims remain Phase 4 implementation work.
 
 Phase 4 requires export-plan identity, atomic publication, file bindings,
 receipts, tamper checks, parity, and no-membership-change tests.
+
+The Phase 4 opening composes a typed export service beneath `PipelineService`
+and captures source semantics in the finished-bundle verifier's existing
+descriptor-anchored pass. It does not add an export writer, mutate the bundle,
+or establish a second compiler stage. Exact persisted export models remain the
+next contract step.
 
 ## Review triggers
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import stat
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, BinaryIO, Literal
 
@@ -28,6 +29,8 @@ from veriformis.bundle.finished import (
     _validate_path_syntax,
 )
 from veriformis.errors import VeriformisError
+from veriformis.datasets.serialization import RowSet
+from veriformis.datasets.validation import DatasetValidationReport
 from veriformis.identity import (
     canonical_digest,
     lossless_json_bytes,
@@ -46,6 +49,17 @@ _DIRECTORY_FLAGS = (
 _FILE_FLAGS = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
 
 _EntryFacts = tuple[int, int, int, int, int, int, int]
+
+
+@dataclass(frozen=True, slots=True)
+class VerifiedFinishedBundle:
+    """Immutable semantic state reconstructed during one verified bundle read."""
+
+    bundle_path: Path
+    manifest: FinishedBundleManifest
+    validation_report: DatasetValidationReport
+    row_set: RowSet
+    verification: VerificationResult
 
 
 def _stable_entry_facts(status: os.stat_result) -> _EntryFacts:
@@ -479,7 +493,7 @@ def _verify_row_provenance_alignment(
     file_facts: dict[str, _EntryFacts],
     files_by_path: dict[str, BundleFile],
     snapshot: Any,
-) -> None:
+) -> RowSet:
     from veriformis.datasets.curation import OBJECTIVE_FIELD_ROLES
     from veriformis.datasets.models import CurationDecision
     from veriformis.datasets.serialization import (
@@ -782,6 +796,7 @@ def _verify_row_provenance_alignment(
                 raise BundleVerificationError(
                     f"bundle file changed during row alignment: {path!r}"
                 )
+        return row_set
     finally:
         for handle in handles.values():
             handle.close()
@@ -789,11 +804,11 @@ def _verify_row_provenance_alignment(
             os.close(descriptor)
 
 
-def _verify_finished_bundle(
+def _inspect_finished_bundle(
     bundle_dir: str | os.PathLike[str],
     *,
     expected_manifest_sha256: str | None,
-) -> VerificationResult:
+) -> VerifiedFinishedBundle:
     if expected_manifest_sha256 is not None:
         try:
             validate_sha256(expected_manifest_sha256)
@@ -802,7 +817,7 @@ def _verify_finished_bundle(
                 f"invalid expected manifest SHA-256: {exc}"
             ) from exc
 
-    root = Path(bundle_dir)
+    root = Path(os.path.abspath(os.fspath(bundle_dir)))
     root_descriptor = _open_root(root)
     try:
         actual_files, actual_directories = _collect_tree(root_descriptor)
@@ -896,7 +911,7 @@ def _verify_finished_bundle(
             },
             error_type=BundleVerificationError,
         )
-        _verify_row_provenance_alignment(
+        row_set = _verify_row_provenance_alignment(
             root_descriptor,
             file_facts=actual_files,
             files_by_path={file.path: file for file in manifest.files},
@@ -936,7 +951,7 @@ def _verify_finished_bundle(
             if expected_manifest_sha256 is not None
             else "self_consistent"
         )
-        return VerificationResult.create(
+        verification = VerificationResult.create(
             bundle_id=manifest.bundle_id,
             dataset_snapshot_id=manifest.dataset_snapshot_id,
             validation_report_id=manifest.validation_report_id,
@@ -950,8 +965,34 @@ def _verify_finished_bundle(
                 if file.path in {TRAIN_PATH, EVALUATION_PATH}
             ),
         )
+        return VerifiedFinishedBundle(
+            bundle_path=root,
+            manifest=manifest,
+            validation_report=validation_report,
+            row_set=row_set,
+            verification=verification,
+        )
     finally:
         os.close(root_descriptor)
+
+
+def inspect_finished_bundle(
+    bundle_dir: str | os.PathLike[str],
+    *,
+    expected_manifest_sha256: str | None = None,
+) -> VerifiedFinishedBundle:
+    """Verify and reconstruct one bundle in the same descriptor-anchored pass."""
+    try:
+        return _inspect_finished_bundle(
+            bundle_dir,
+            expected_manifest_sha256=expected_manifest_sha256,
+        )
+    except BundleVerificationError:
+        raise
+    except (OSError, RecursionError, TypeError, UnicodeError, ValueError) as exc:
+        raise BundleVerificationError(
+            f"finished bundle inspection failed: {exc}"
+        ) from exc
 
 
 def verify_finished_bundle(
@@ -966,10 +1007,10 @@ def verify_finished_bundle(
     trust grade because it anchors the canonical manifest outside the bundle.
     """
     try:
-        return _verify_finished_bundle(
+        return _inspect_finished_bundle(
             bundle_dir,
             expected_manifest_sha256=expected_manifest_sha256,
-        )
+        ).verification
     except BundleVerificationError:
         raise
     except (OSError, RecursionError, TypeError, UnicodeError, ValueError) as exc:
@@ -978,4 +1019,8 @@ def verify_finished_bundle(
         ) from exc
 
 
-__all__ = ["verify_finished_bundle"]
+__all__ = [
+    "VerifiedFinishedBundle",
+    "inspect_finished_bundle",
+    "verify_finished_bundle",
+]

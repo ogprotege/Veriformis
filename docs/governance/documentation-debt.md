@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 3 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 start)
 
-**Next review:** Independent-product Phase 4 start or any active-document
-behavior change
+**Next review:** Independent-product Phase 4.1 state transition or any
+active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
 | --- | --- | --- | --- | --- | --- |

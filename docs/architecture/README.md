@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
 
 **Next review:** Any architecture documentation change
 
@@ -105,6 +105,7 @@ flowchart TB
         MCP["mcp/ — local stdio adapter"]
         MAC["macOS workbench — shells the CLI"]
         PIP["pipeline/ — PipelineService composition root"]
+        EXP["exports/ — verified derivative-source service"]
         WS["workspace.py — revision store, stage graph, replay-on-commit"]
     end
 
@@ -133,9 +134,11 @@ flowchart TB
     MCP --> PIP
     MAC --> CLI
     PIP --> WS
+    PIP --> EXP
     PIP --> P
     PIP --> DS
     PIP --> B
+    EXP --> B
     WS -. "lazy import replay validation" .-> stages
     P --> IR
     R --> IR
@@ -201,8 +204,14 @@ clean through plan/replay separation (see
 objective-driven records, datasets curate, split, format, and validate, and
 bundle seals and verifies. The axial units beside this stack are
 `workspace.py`, the transactional kernel; `pipeline/`, whose
-`PipelineService` composes stage behavior and transactions; and the thin
-`cli.py` and `mcp/` adapters. The CLI exposes eighteen commands: nine stage
+`PipelineService` composes stage behavior and transactions and owns the
+injected `exports.ExportService`; plus the thin `cli.py` and `mcp/` adapters.
+The export service currently establishes only a typed, consumer-neutral source
+boundary over a verified finished bundle. It obtains the manifest, validation
+report, reconstructed row set, and ordinary `VerificationResult` from one
+descriptor-anchored verification pass. It is not a workspace stage, and it
+does not yet define persisted export models, a writer, a public export command,
+or a generic container. The CLI exposes eighteen commands: nine stage
 commands plus maintenance, inspection, recipe automation, MCP, optional Aptus
 handoff, and version surfaces.
 

@@ -88,6 +88,7 @@ from veriformis.errors import (
     TaxonomyError,
     UnsupportedWorkspaceVersionError,
 )
+from veriformis.exports import DEFAULT_EXPORT_SERVICE, ExportService
 from veriformis.diagnostics import (
     parse_report_from_dict,
     parse_report_to_dict,
@@ -959,6 +960,16 @@ def _validated_block_derivations(
 
 class PipelineService:
     """Typed, surface-neutral orchestration over workspace stages."""
+
+    def __init__(self, *, export_service: ExportService | None = None) -> None:
+        self._export_service = (
+            DEFAULT_EXPORT_SERVICE if export_service is None else export_service
+        )
+
+    @property
+    def export_service(self) -> ExportService:
+        """Return the sole service authorized to derive exports from bundles."""
+        return getattr(self, "_export_service", DEFAULT_EXPORT_SERVICE)
 
     def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
         """Return a fresh, adapter-safe copy of implemented taxonomy discovery."""

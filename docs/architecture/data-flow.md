@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -172,6 +172,25 @@ separate trusted channel. A bundle verified without that retained digest must
 not be described as externally trusted (see
 `docs/contracts/finished-dataset-v1.md`).
 
+## Verified source boundary for derived exports
+
+Phase 4.1 adds a read-only boundary after the sealed bundle, not another
+workspace stage. `inspect_finished_bundle` performs the existing
+descriptor-anchored closed-tree verification and, during that same pass,
+returns an immutable `VerifiedFinishedBundle` containing the manifest,
+validation report, reconstructed `RowSet`, and the existing
+`VerificationResult`. `verify_finished_bundle` uses the same internal
+inspection core while continuing to return exactly `VerificationResult` and
+preserving its distinct verification-error envelope.
+
+`exports.ExportService.verified_source` is the consumer-neutral service entry
+to that semantic state, and `PipelineService` injects and owns the export
+service. This increment publishes no derivative bytes: persisted export
+models, planning, receipts, writing, public commands, and generic containers
+remain absent. The verified source object therefore closes the
+verify-then-read gap for later derivative work without changing the canonical
+six-file bundle or the nine-stage workspace graph.
+
 ## Persistence: the workspace revision store
 
 Durable state lives in a content-addressed object store under
@@ -194,7 +213,10 @@ and the code explicitly forbids fallible work after that swap because
 replacing HEAD is the commit point (`src/veriformis/workspace.py:2263-2277`).
 `PipelineService` acts as the composition root over this machinery: each stage
 method reloads the exact upstream artifacts, calls the domain implementation,
-and commits one revision. CLI and MCP adapters delegate to that service.
+and commits one revision. It also owns the separate read-only `ExportService`,
+which consumes sealed bundles without opening or mutating a workspace. CLI and
+MCP adapters delegate to the pipeline service, but do not expose export
+operations in Phase 4.1.
 
 ## Consistency guarantees: defense in depth
 
