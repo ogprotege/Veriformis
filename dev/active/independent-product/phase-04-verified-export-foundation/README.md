@@ -49,5 +49,15 @@ objective, split, row, and membership-baseline fact comes from one admitted
 bundle view, while callers supply only strict profile, dependency, and file-plan
 evidence. The fifth fresh-reconstructs normalized candidate semantic rows,
 provenance, row-set identity, and membership, then requires exact equality with
-the plan baseline. Destination-byte verification, writing, public export
-commands, generic containers, and new consumer profiles remain unimplemented.
+the plan baseline and merged as PR #47 at
+`1675c1a22830d506bdf27e45150170befc984bdf`. The sixth increment implements
+Python-composition-only, exact-byte conformance publication with source
+and plan re-verification, private descriptor-anchored staging, canonical
+receipt construction, independent closed-tree verification, cancellation, and
+one atomic no-replace promotion. All local gates pass; GitHub review remains
+pending.
+
+The default service still has no renderer, and no renderer-selection or public
+adapter surface exists. Semantic-only publication, deterministic rerendering,
+semantic reconstruction of produced bytes, public export commands, generic
+containers, and new consumer profiles remain unimplemented.

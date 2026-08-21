@@ -30,10 +30,17 @@ verified-export v1 models and merged as PR #44. Item 4.3 enforces
 trusted-by-default source admission with an explicit lower-trust policy and
 merged as PR #45. Item 4.4 adds read-only plan population from one immutable
 verified source view and merged as PR #46. Item 4.5 fresh-reconstructs
-normalized candidate semantic rows and provenance and requires their row-set
-and complete membership projection to equal the plan baseline. Destination-byte
-verification, an export writer, public export commands, and generic export
-containers are not implemented yet.
+normalized candidate semantic rows and provenance, requires their row-set and
+complete membership projection to equal the plan baseline, and merged as PR
+#47 at `1675c1a22830d506bdf27e45150170befc984bdf`. Item 4.6 implements internal
+`portable_exact_bytes` publication: source and plan re-verification, private
+descriptor-anchored staging, canonical receipt replay, independent closed-tree
+verification, cancellation, and one atomic no-replace promotion. All local
+gates pass, including 150 focused tests, 914 full Python tests, 902 standalone-
+release tests with 1 deselected, deterministic parity, and 38 Mac tests; GitHub
+review remains pending. It ships no renderer, public export command,
+generic export container, semantic-only publication, or deterministic rerender
+proof.
 
 ## State change procedure
 

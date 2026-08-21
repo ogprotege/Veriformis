@@ -58,12 +58,19 @@ branch is created.
 
 ### 4.6 Publish atomically and safely
 
-- [ ] Use private sibling staging and one no-replace atomic promotion.
-- [ ] Enforce portable path safety and closed file/directory sets.
-- [ ] Add explicit cancellation checkpoints and cleanup.
-- [ ] Verify staged output independently before publication.
-- [ ] Report visibility honestly if publication succeeds but a later receipt
-      step fails.
+- **Implementation state:** Implemented with every local gate green; GitHub
+  review remains pending.
+- [x] Use private sibling staging and one no-replace atomic promotion.
+- [x] Enforce portable path safety and closed file/directory sets.
+- [x] Add explicit cancellation checkpoints and cleanup.
+- [x] Verify exact planned bytes and the canonical in-tree receipt independently
+      before publication.
+- [x] Report visibility honestly if publication succeeds but later bookkeeping
+      fails; no normal receipt write occurs after promotion.
+
+Phase 4.6 publishes only `portable_exact_bytes` conformance output. Successful
+`semantic_content_only` publication, exact-byte rerender proof, and semantic
+reconstruction of produced bytes remain Phase 4.7.
 
 ### 4.7 Define deterministic evidence limits
 

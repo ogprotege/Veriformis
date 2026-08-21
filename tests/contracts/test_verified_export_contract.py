@@ -264,7 +264,12 @@ def test_normative_contract_names_every_schema_identity_and_current_boundary() -
     assert "`ExportService.validate_derivative_membership` accepts exactly" in contract
     assert "normalized in-memory semantic evidence" in contract
     assert "arbitrary destination bytes encode the checked semantics" in contract
-    assert "an export writer" in contract
+    assert "`ExportService.publish` accepts one strict" in contract
+    assert "supports only `portable_exact_bytes` plans" in contract
+    assert "MUST NOT be used as its own external trust anchor" in contract
+    assert "There is no cancellation checkpoint after promotion" in contract
+    assert "deterministic rerendering or semantic-content replay (Phase 4.7)" in contract
+    assert "`PipelineService` export operations" in contract
     assert "is not a supported product container" in contract
     assert "MUST NOT add a generic export container" in contract
     assert "no trailing line feed" in contract

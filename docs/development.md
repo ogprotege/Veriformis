@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-11 (Phase 0.1 tracking integration)
+**Last reviewed:** 2026-08-21 (Phase 4.6 export-development boundary)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -67,8 +67,8 @@ uv run pytest tests/test_cli.py -q
 The active revision-v3 pipeline is orchestrated by `pipeline/PipelineService`
 and adapted by `cli.py`, with state in `workspace.py`. Domain packages:
 `parsers/`, `ir/`, `rules/`, `chunkers/`, `construction/`, `datasets/`,
-`bundle/`, plus `recipes/`, `handoff/`, and `mcp/`. The SwiftUI workbench is
-`macos/`. `serializers/` and `validate/` are legacy M1 only.
+`bundle/`, plus `exports/`, `recipes/`, `handoff/`, and `mcp/`. The SwiftUI
+workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 
 | Path | Responsibility |
 | --- | --- |
@@ -88,6 +88,7 @@ and adapted by `cli.py`, with state in `workspace.py`. Domain packages:
 | `src/veriformis/construction/` | Objectives, recipes, constructors, lifecycle, replay |
 | `src/veriformis/datasets/` | Finished plan, curation, split, rows, 17-gate validation |
 | `src/veriformis/bundle/` | Six-file finished bundle + independent verifier |
+| `src/veriformis/exports/` | Verified-derivative models and internal exact-byte publication foundation |
 | `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
 | `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
 | `src/veriformis/mcp/` | Constrained local MCP adapter |
@@ -114,6 +115,7 @@ and adapted by `cli.py`, with state in `workspace.py`. Domain packages:
 | MCP parity | `tests/mcp/` |
 | Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
 | Finished seal / verifier | `tests/bundle/` |
+| Verified export models, membership, and publication | `tests/exports/`, `tests/contracts/test_verified_export_contract.py` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |
 | Group 9 release gates | `tests/regressions/test_group9_release_gates.py`, `scripts/release/` |
 | Program tracking and support claims | `tests/regressions/test_project_tracking.py`, `scripts/check_project_tracking.py` |
@@ -226,6 +228,21 @@ attestation.
 Directory publication and workspace receipt commit are separate atomic
 operations. Tests and errors must report a visible publication honestly if a
 later receipt commit fails.
+
+### Preserve the verified-derivative boundary
+
+`ExportService` derives from an already verified finished bundle; it must not
+construct targets, curate, balance, resplit, or accept caller-selected
+membership. Its Phase 4.6 publisher supports exact-byte plans only. It
+re-verifies source and plan, validates candidate semantics separately from
+planned bytes, writes and reloads the canonical receipt inside private staging,
+and promotes once without replacement.
+
+The default service intentionally has no renderer. Tests may inject the private
+conformance hook, but contributors must not infer a supported container or add
+adapter-specific publication policy. Semantic-content replay and deterministic
+rerender proof belong to Phase 4.7; discovery and public CLI, MCP, Mac, inspect,
+or verify operations belong to Phase 4.8.
 
 ### Keep optional-integration claims accurate
 

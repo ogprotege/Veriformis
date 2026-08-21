@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4.5 membership reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.6 publication reconciliation)
 
 **Next review:** Any architecture or dependency change
 
@@ -184,7 +184,11 @@ new layer edge. Phase 4.5 composes the existing dataset `ProductRow`,
 `RowProvenance`, and `RowSet` contracts with the existing export plan and
 projection models inside the same service. It fresh-reconstructs normalized
 semantic evidence in memory and likewise adds no workspace, filesystem,
-renderer-registry, or adapter dependency edge. `cli.py` and
+renderer-registry, or adapter dependency edge. Phase 4.6 adds one exports-
+internal filesystem helper below `ExportService`; it depends on the strict
+export models and foundation utilities and owns descriptor-anchored exact-byte
+publication. It adds no workspace, renderer-registry, `PipelineService`
+operation, or adapter dependency edge. `cli.py` and
 `mcp/server.py` translate their respective protocols into pipeline methods;
 the SwiftUI workbench shells the CLI. No adapter exposes export operations yet.
 This arrangement needs no dependency injection container because the contracts

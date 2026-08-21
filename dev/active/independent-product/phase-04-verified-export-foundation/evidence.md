@@ -1,6 +1,6 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phases 4.1–4.4 merged; Phase 4.5 local gates passed and pull-request review is pending
+**Evidence status:** In progress — Phases 4.1–4.5 merged; Phase 4.6 local gates passed and pull-request review is pending
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -179,3 +179,44 @@ equal to `origin/main` before the Phase 4.5 branch was created.
 This evidence proves normalized in-memory semantic membership preservation. It
 does not prove that produced destination bytes encode those semantics; writing
 remains Phase 4.6 and exact-byte or semantic replay remains Phase 4.7.
+
+PR #47 passed every required GitHub check and merged as
+`1675c1a22830d506bdf27e45150170befc984bdf`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.6 branch was created.
+
+## 2026-08-21 — Phase 4.6 exact-byte atomic publication
+
+The implementation under review is scoped to one private test-injected
+`portable_exact_bytes` conformance renderer. It re-verifies the source and
+rebuilds the exact plan before rendering, validates the renderer's complete
+exact-byte file set and normalized semantic membership before staging, writes a
+canonical in-tree receipt through anchored descriptors, independently rewalks
+the closed tree, and uses one atomic no-replace promotion.
+
+The Phase 4.6 proof includes cancellation before visibility, owned-
+staging cleanup, existing-target and race preservation, path/link/special-file
+rejection, staged and visible-tree tamper rejection, source re-verification,
+canonical receipt and actual digest/size replay, and honest post-visibility
+durability reporting.
+
+- Publication-only tests: 36 passed.
+- Combined export and verified-export contract tests: 150 passed.
+- Full Python suite: 914 passed with the expected exercised transport
+  durability-warning regression warning.
+- Exact standalone release gate: 902 passed, 1 deselected, with the same
+  expected warning; clean-wheel installation, both objective goldens,
+  external-digest verification, and deterministic transport passed.
+- macOS XCTest: 38 passed.
+- CLI/workbench parity, lock, Ruff, project tracking, JSON and shell structure,
+  347 changed-document local links, and `git diff --check` passed.
+- Independent adversarial review reproduced and verified fixes for plan-digest
+  self-anchoring, verification-before-staging, cleanup ownership and name-swap
+  races, FIFO blocking, receipt bounds, cancellation ordering, target
+  substitution, typed verifier I/O, and partial-publication reporting. Final
+  review found no remaining blocker under the documented integrity-controlled
+  destination-parent boundary.
+
+This increment does not prove a second exact render, reconstruct semantic
+content from produced bytes, publish `semantic_content_only`, install or select
+a product renderer, expose `PipelineService`/CLI/MCP/Mac operations, or promote
+a container or consumer profile.

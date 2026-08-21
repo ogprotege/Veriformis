@@ -13,12 +13,14 @@ independent-product Phase 4 verified export foundation in progress with its
 typed internal service boundary, descriptor-anchored source view, and strict
 versioned persisted export models, plus trusted-by-default source admission
 with explicit lower-trust policy, read-only source-derived plan population, and
-normalized semantic membership enforcement
+normalized semantic membership enforcement, plus internal exact-byte atomic
+publication and independent closed-tree verification
 
-**Review date:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
+**Review date:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
 
-**Next review:** Phase 4 atomic publication; beta label cut, public-ready
-checklist, or any contract change
+**Next review:** Phase 4.6 GitHub gates or merge; Phase 4.7
+deterministic-evidence work; beta label cut, public-ready checklist, or any
+contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -138,9 +140,19 @@ membership baseline from the immutable verified view; callers provide only
 strict profile, dependency, and output-file planning evidence. Its fifth slice
 fresh-reconstructs normalized candidate semantic rows and provenance, requires
 the exact planned row-set identity, and compares the complete candidate
-membership projection with the source baseline. Destination-byte verification,
-publication, public export commands, generic export containers, and planned
-trainer-specific profiles remain unimplemented.
+membership projection with the source baseline. Items 4.1–4.5 are merged at
+`1675c1a22830d506bdf27e45150170befc984bdf`. Its sixth slice implements a
+Python-composition-only `portable_exact_bytes` publisher. It re-verifies the
+source and complete plan, checks the renderer's normalized semantic membership
+and exact bytes, writes a canonical receipt in private descriptor-anchored
+staging, independently verifies the closed tree, and performs one atomic
+no-replace promotion with explicit cancellation and visible-outcome reporting.
+The default service has no renderer. All local gates pass: 150 focused tests,
+914 full Python tests, 902 standalone-release tests with 1 deselected,
+deterministic parity, and 38 Mac tests. GitHub review remains pending.
+Semantic-only
+publication, deterministic rerender proof, public export commands, generic
+export containers, and planned trainer-specific profiles remain unimplemented.
 
 ## Implemented interfaces
 
@@ -482,7 +494,7 @@ See [docs/release.md](release.md).
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
-| Independent Phase 4 in progress | Typed internal `ExportService`, descriptor-anchored source inspection, strict verified-export v1 models, fail-closed source-trust admission, read-only source-derived plan population, and exact normalized semantic membership enforcement; no destination-byte verification, writer, public export command, or production container yet |
+| Independent Phase 4 in progress | Items 4.1–4.5 merged at `1675c1a22830d506bdf27e45150170befc984bdf`; internal exact-byte publication now adds source/plan reverification, semantic-membership and exact-byte checks, descriptor-anchored staging, canonical receipt replay, independent closed-tree verification, cancellation, and atomic no-replace promotion; no shipped renderer, public export command, semantic-only replay, or production container |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation in progress and later phases planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -537,16 +549,19 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–3 are complete. The completed
+Independent-product Phases 0–3 are complete. Phase 4 items 4.1–4.5 are merged
+at `1675c1a22830d506bdf27e45150170befc984bdf`. The completed
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
 records the contract, compile compatibility, cross-surface discovery, public
 vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
 export foundation is in progress under its
 [active packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
-The service/source-view, model, source-trust, plan-population, and normalized
-semantic-membership slices do not yet implement destination-byte verification,
-publication, commands, or a production export container. Generic
-export containers and any new trainer-specific profiles are not current
+The current Phase 4.6 branch implements internal exact-byte publication and
+independent closed-tree verification with every local gate green. GitHub review
+remains pending. The default
+service still has no renderer, and no public command, supported derivative
+container, semantic-content replay, or deterministic rerender proof exists.
+Generic export containers and any new trainer-specific profiles are not current
 capabilities; the canonical and optional Aptus profiles remain the implemented
 profile set. A deliberate beta label and public Mac checklist remain separate
 decisions.

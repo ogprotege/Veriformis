@@ -15,8 +15,9 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–3 and the opening Phase 4 verified-export
-> foundation. This is **not** a public beta or production
+> independent-product Phases 0–3, merged Phase 4 items 4.1–4.5, and the current
+> Phase 4.6 internal exact-byte publication foundation. This is **not** a public
+> beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 > Install: [docs/install.md](docs/install.md). Status:
 > [docs/current-status.md](docs/current-status.md).
@@ -233,8 +234,10 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-**private beta workbench Phases 0–2**, and **independent-product Phases 0–3**;
-Phase 4 verified export foundation is in progress. Its opening slice adds a
+**private beta workbench Phases 0–2**, **independent-product Phases 0–3**, and
+Phase 4 items 4.1–4.5 at
+`1675c1a22830d506bdf27e45150170befc984bdf`; Phase 4 verified export foundation
+is in progress. Its opening slice adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
 versioned export plan, profile, membership, file-binding, receipt, and
@@ -244,9 +247,16 @@ read-only `create_plan`: source identities and the complete source membership
 baseline are derived from one admitted bundle view, while callers provide only
 strict profile, dependency, and file-plan evidence. Its fifth slice fresh-
 reconstructs normalized candidate semantic rows and provenance and requires
-their row-set and complete membership projection to match that baseline. It
-does not yet verify or write destination bytes, expose public export commands,
-or add generic export containers or trainer-specific profiles.
+their row-set and complete membership projection to match that baseline. The
+current Phase 4.6 branch implements internal exact-byte publication: source and
+plan re-verification, separate semantic-membership and byte checks, private
+descriptor-anchored staging, canonical receipt replay, independent closed-tree
+verification, cancellation, and one atomic no-replace promotion. Local gates
+pass: 150 focused tests, 914 full Python tests, 902 standalone-release tests
+with 1 deselected, deterministic parity, and 38 Mac tests. GitHub review remains
+pending. No renderer ships, and no public export
+command, semantic replay, generic export container, or trainer-specific profile
+is added.
 Maturity remains development **alpha** (not a
 public beta label). A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims

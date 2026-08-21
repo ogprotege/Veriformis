@@ -7,18 +7,20 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus independent-product Phases 0–3 and Phase 4 verified-export foundation in
-progress, version `0.1.0` development alpha
+plus independent-product Phases 0–3, merged Phase 4 items 4.1–4.5, and Phase
+4.6 internal exact-byte publication in progress, version `0.1.0` development
+alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–3 on `main`; Phase 4 in progress; maturity alpha; public Mac claim
-still owner-gated
+Phases 0–3 and Phase 4 items 4.1–4.5 on `main`; Phase 4.6 implemented on the
+current branch with all local gates green and GitHub review pending; maturity
+alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
 
-**Next review:** Phase 4 atomic publication; beta label cut, public-ready
-checklist, or any product-contract change
+**Next review:** Phase 4.6 merge or Phase 4.7 deterministic-evidence work; beta
+label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -55,8 +57,10 @@ Steps 11 through 16 are governed by
 The six-axis product vocabulary and compile compatibility are governed by
 [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md).
 Consumer-neutral derivative evidence is governed by
-[Verified Export Contract v1](contracts/verified-export-v1.md); its execution
-service remains under Phase 4 implementation.
+[Verified Export Contract v1](contracts/verified-export-v1.md). Its internal
+exact-byte publication foundation is implemented; renderer discovery, public
+surfaces, deterministic replay, and supported containers remain under Phase 4
+or later implementation.
 
 ## Ownership boundary
 
@@ -127,7 +131,15 @@ The fourth adds read-only source-derived plan population and binds the complete
 source membership baseline without rendering or publishing destination content.
 The fifth fresh-reconstructs normalized candidate semantic rows and provenance
 and requires their row-set identity and complete membership projection to match
-that baseline. Destination-byte verification, publication, public export
+that baseline. Items 4.1–4.5 are merged at
+`1675c1a22830d506bdf27e45150170befc984bdf`. The sixth increment implements
+internal exact-byte-only publication: it re-verifies the source and plan,
+validates semantic membership and exact planned bytes, writes and independently
+reloads a canonical receipt in a closed private staging tree, and atomically
+promotes without replacement. All local gates pass, including 150 focused, 914
+full Python, 902 standalone-release with 1 deselected, and 38 Mac tests. GitHub
+review remains pending. No
+renderer ships, and semantic replay, deterministic rerendering, public export
 commands, generic export containers, and new trainer profiles remain
 unimplemented.
 

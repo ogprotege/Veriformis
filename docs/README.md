@@ -5,10 +5,10 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.5 semantic membership)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.6 exact-byte publication)
 
-**Next review:** Phase 4 atomic publication; beta label cut, public-ready
-checklist, or any contract change
+**Next review:** Phase 4.6 merge or Phase 4.7 deterministic-evidence work; beta
+label cut, public-ready checklist, or any contract change
 
 ## Start here
 
@@ -53,7 +53,7 @@ checklist, or any contract change
 | [Bundle Transport Contract v1](contracts/bundle-transport-v1.md) | Deterministic `.vfbundle.zip` transport and archive verification | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
 | [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Implemented contract |
-| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Models and source admission implemented; execution in progress |
+| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Internal exact-byte publication implemented; no shipped renderer, public surface, or supported container |
 | [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0005) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |

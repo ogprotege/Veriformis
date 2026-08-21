@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.5 membership enforcement remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 4.6 exact-byte publication remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -12,8 +12,9 @@
 
 Veriformis already seals a strict six-file `minimal-v1` directory whose
 manifest binds the exact dataset snapshot, partitions, provenance, validation,
-and attestation. Generic external exports and named trainer packs do not yet
-have a writer, receipt, or supported product container.
+and attestation. Generic external exports and named trainer packs still have no
+shipped renderer or supported product container. Phase 4.6 now supplies only an
+internal exact-byte conformance publisher and receipt verifier.
 
 ## Decision
 
@@ -29,9 +30,11 @@ plan and bundle, not an export option.
 ## Consequences and limitations
 
 One canonical lineage prevents each exporter from becoming a second pipeline.
-Users receive both a trainer-friendly artifact and a verifiable relationship to
-the source bundle. Destination enforcement, receipts, publication, and
-deterministic rerendering remain Phase 4 implementation work.
+Users eventually receive both a trainer-friendly artifact and a verifiable
+relationship to the source bundle. Exact-byte destination enforcement, receipt
+replay, and atomic publication are implemented internally in Phase 4.6;
+deterministic rerendering, semantic replay, public surfaces, and supported
+containers remain later work.
 
 ## Alternatives considered
 
@@ -58,8 +61,12 @@ plan population, deriving all source identities and the complete source
 membership baseline from the admitted immutable bundle view. Phase 4.5 fresh-
 reconstructs normalized candidate semantic rows and provenance and requires the
 exact planned row set and complete membership projection. Destination-byte
-verification, writing, and independent derivative verification remain later
-increments.
+verification and writing arrive in Phase 4.6 for exact-byte plans only. The
+service re-verifies source and plan, checks semantic membership and planned
+bytes separately, writes and independently reloads a canonical receipt inside
+a closed private staging tree, and performs one atomic no-replace promotion.
+The default service has no renderer; deterministic rerendering and semantic
+replay remain Phase 4.7, and public surfaces remain Phase 4.8.
 
 ## Review triggers
 

@@ -17,9 +17,16 @@ derives all source identities and the source membership baseline from that
 immutable view; callers provide only strict profile, dependency, and file-plan
 evidence. Read-only derivative enforcement fresh-reconstructs normalized
 candidate semantic rows, provenance, row-set identity, and membership and
-requires exact plan-baseline equality. Destination-byte verification, writers,
-public export commands, generic export containers, and planned trainer-specific
-profiles are not implemented. Do not claim public
+requires exact plan-baseline equality. Items 4.1–4.5 are merged at
+`1675c1a22830d506bdf27e45150170befc984bdf`. On the current Phase 4.6 branch,
+internal exact-byte publication adds source and plan re-verification, private
+descriptor-anchored staging, canonical receipt replay, independent closed-tree
+verification, cancellation, and atomic no-replace promotion. Its local gates
+pass: 150 focused tests, 914 full Python tests, 902 standalone-release tests
+with 1 deselected, and 38 Mac tests; GitHub review remains pending. No renderer,
+public export command, semantic-only
+replay, generic export container, or planned trainer-specific profile is
+implemented. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

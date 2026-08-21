@@ -227,3 +227,69 @@ remaining blocker.
 
 **Next action:** Open the Phase 4.5 PR, require every GitHub check to pass,
 merge, and synchronize clean local `main` before Phase 4.6 begins.
+
+## 2026-08-21 — Phase 4.5 merged and synchronized
+
+**Status:** Complete
+
+PR #47 passed every required GitHub check and was squash-merged as
+`1675c1a22830d506bdf27e45150170befc984bdf`. Local `main` was clean and exactly
+equal to `origin/main` before the Phase 4.6 branch was created.
+
+## 2026-08-21 — Phase 4.6 exact-byte atomic publication started
+
+**Status:** Implementation in progress; local gates pending
+
+The export service now has a Python-composition-only publication boundary for
+one test-injected exact-byte conformance renderer. Publication fresh-validates
+the plan, re-verifies the source with separately retained trust evidence,
+rebuilds the plan from that immutable source, and validates both the complete
+renderer file set and normalized semantic membership before staging.
+
+The in-progress publisher uses a private descriptor-anchored sibling, writes a
+canonical receipt, independently rewalks the exact closed tree, and performs
+one atomic no-replace promotion with explicit cancellation and visible-warning
+semantics. The default service has no renderer, no renderer-selection argument,
+and no supported container. `semantic_content_only` publication, deterministic
+rerendering, semantic replay, `PipelineService` methods, and all adapter
+surfaces remain deferred.
+
+No focused, full, release, parity, tracking, Mac, Ruff, structure, link, diff,
+or independent-review gate is recorded for Phase 4.6 yet.
+
+**Next action:** Complete the Phase 4.6 implementation and adversarial review,
+then run and record every required local gate before opening its pull request.
+
+## 2026-08-21 — Phase 4.6 local gates complete
+
+**Status:** Ready for pull-request review
+
+The private Phase 4.6 exact-byte publisher now fresh-reloads its plan,
+re-verifies source trust from separately retained evidence, reconstructs the
+complete plan, validates exact renderer bytes and normalized membership before
+staging, writes the canonical receipt inside staging, independently verifies
+the closed tree, and uses one atomic no-replace promotion. Cancellation stops
+before visibility; parent-sync and later bookkeeping failures report visible
+outcomes honestly.
+
+The publication-only suite passed 36 tests and the combined export/contract
+selection passed 150. The full Python suite passed 914 tests; the standalone
+release gate passed 902 with 1 deselected. Both emitted only the established
+transport durability-warning regression warning. Clean-wheel installation,
+both objective goldens, external-digest verification, deterministic transport,
+38 XCTest tests, CLI/workbench parity, tracking, Ruff, JSON and shell structure,
+347 changed-document local links, and diff checks passed.
+
+Independent adversarial review found and verified corrections for source-trust
+self-anchoring, pre-staging verification claims, staged-name and cleanup
+ownership races, FIFO blocking, receipt bounds, cancellation ordering, target
+substitution, typed verifier I/O, and post-visibility reporting. The contract
+now states the integrity-controlled destination-parent boundary shared with the
+finished-bundle publisher. Re-review found no remaining Phase 4.6 blocker.
+
+The default service still has no renderer. Exact rerender proof and semantic
+reconstruction remain Phase 4.7; public `PipelineService`, CLI, MCP, and Mac
+surfaces remain Phase 4.8; the exhaustive closeout harness remains Phase 4.9.
+
+**Next action:** Open the Phase 4.6 PR, require every GitHub check to pass,
+merge, and synchronize clean local `main` before Phase 4.7 begins.
