@@ -53,3 +53,30 @@ and the remaining surfaces, then expose one discovery listing.
 Tracking PASS; Ruff clean; 24 taxonomy/contract tests passed; core suite 740
 passed, 1 deselected; `git diff --check` clean. The catalog is test-verified.
 Compile-surface wiring and discovery remain open.
+
+## 2026-08-21 — Compile compatibility wired through every current surface
+
+**Status:** In progress
+
+`PipelineService.construct` now resolves defaults and validates the selected
+objective, semantic row, and consumer profile through the taxonomy registry
+before opening a workspace. CLI, MCP, YAML recipes, named recipe construction,
+and the workbench compile plan delegate the same selection to that service.
+The workbench selects `aptus-handoff-v1` when its optional handoff is enabled;
+standalone compilation retains `veriformis-canonical-v1` by default. The
+Aptus descriptor builder also reuses the registry's profile refusal and loss
+boundary instead of maintaining adapter-local policy.
+
+The profile remains validation-only and is not added to recipes, workspace
+stage configuration, payload rows, manifests, or durable identity inputs.
+The golden full-text and continuation manifests and transport digests remain
+byte-for-byte unchanged.
+
+**Observed verification:** Ruff passed; 55 focused tests passed; the full
+Python suite passed (758 tests, one expected durability warning); all 29 macOS
+tests passed; both golden compiles, external-digest verification, and
+deterministic transport passed; the clean-wheel install smoke repeated both
+golden compiles successfully; `git diff --check` passed.
+
+**Next action:** Expose implemented taxonomy discovery from `PipelineService`
+through CLI, MCP, and workbench help.

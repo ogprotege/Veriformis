@@ -24,6 +24,7 @@ from veriformis.pipeline.service import (
     _output_bytes,
     _parse_one,
 )
+from veriformis.taxonomy import CANONICAL_CONSUMER_PROFILE
 
 # Re-export private loaders for regression tests and monkeypatch targets.
 __all__ = [
@@ -148,6 +149,10 @@ def construct(
     ),
     split_ratio_ppm: int = typer.Option(500_000, "--split-ratio-ppm"),
     require_review: bool = typer.Option(False, "--require-review"),
+    consumer_profile: str = typer.Option(
+        CANONICAL_CONSUMER_PROFILE,
+        "--consumer-profile",
+    ),
 ) -> None:
     """Construct evidence-bearing candidates and immutable accepted records."""
     _run(
@@ -158,6 +163,7 @@ def construct(
             target_row_schema=target_row_schema,
             split_ratio_ppm=split_ratio_ppm,
             require_review=require_review,
+            consumer_profile=consumer_profile,
         )
     )
 

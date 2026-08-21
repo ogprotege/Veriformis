@@ -16,6 +16,7 @@ from veriformis.pipeline.service import (
     SealPartialPublicationError,
 )
 from veriformis.recipes import list_named_recipes, load_pipeline_spec, run_pipeline_spec
+from veriformis.taxonomy import CANONICAL_CONSUMER_PROFILE
 
 
 def _jsonable(value: Any) -> Any:
@@ -132,6 +133,7 @@ def create_mcp_server(
         target_row_schema: str | None = None,
         split_ratio_ppm: int = 500_000,
         require_review: bool = False,
+        consumer_profile: str = CANONICAL_CONSUMER_PROFILE,
     ) -> str:
         """Construct candidates and accepted records for one objective."""
         return _outcome_json(
@@ -142,6 +144,7 @@ def create_mcp_server(
                 target_row_schema=target_row_schema,
                 split_ratio_ppm=split_ratio_ppm,
                 require_review=require_review,
+                consumer_profile=consumer_profile,
             )
         )
 

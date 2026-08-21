@@ -78,6 +78,22 @@ def test_recipe_round_trip_binds_cleaning_and_deferred_policies(tmp_path):
         dataset_recipe_from_dict(tampered)
 
 
+def test_recipe_loader_rejects_taxonomy_incompatible_objective_and_row(tmp_path):
+    bundle = source_bundle(
+        tmp_path,
+        logical_path="incompatible-row.txt",
+        blocks=[Paragraph(children=[Text("Canonical recipe source.")])],
+    )
+    value = dataset_recipe_to_dict(recipe_for((bundle.source,), "full_text"))
+    value["target_row_schema"] = "prompt_completion"
+
+    with pytest.raises(
+        ConstructionError,
+        match="full_text recipes require the product 'text' row schema",
+    ):
+        dataset_recipe_from_dict(value)
+
+
 @pytest.mark.parametrize(
     "path",
     [

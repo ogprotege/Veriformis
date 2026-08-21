@@ -24,6 +24,7 @@ from veriformis.bundle.finished import (
     VALIDATION_PATH,
     FinishedBundleManifest,
 )
+from veriformis.contracts import V1_ROW_SCHEMA_KINDS
 from veriformis.datasets.serialization import _payload_contract
 from veriformis.errors import VeriformisError
 from veriformis.identity import (
@@ -34,17 +35,25 @@ from veriformis.identity import (
     validate_id,
     validate_sha256,
 )
+from veriformis.taxonomy import (
+    PROFILE_FORBIDDEN_ROW_SCHEMAS,
+    assert_profile_row_compatible,
+    loss_boundary,
+    loss_policy_for_row,
+)
 
 APTUS_HANDOFF_SCHEMA_VERSION = "veriformis.aptus-handoff/v1"
 _ASSIGNMENT_PROJECTION_SCHEMA = "veriformis.aptus-assignment-projection/v1"
+_APTUS_CONSUMER_PROFILE = "aptus-handoff-v1"
 
-# Current Aptus MLX intake rejects plain text rows (product contract).
-_DEFAULT_ACCEPTED_SCHEMAS = (
-    "prompt_completion",
-    "instruction_output",
-    "messages",
+_DEFAULT_REJECTED_SCHEMAS = PROFILE_FORBIDDEN_ROW_SCHEMAS[
+    _APTUS_CONSUMER_PROFILE
+]
+_DEFAULT_ACCEPTED_SCHEMAS = tuple(
+    row_schema
+    for row_schema in V1_ROW_SCHEMA_KINDS
+    if row_schema not in _DEFAULT_REJECTED_SCHEMAS
 )
-_DEFAULT_REJECTED_SCHEMAS = ("text",)
 
 
 class AptusHandoffError(VeriformisError):
@@ -239,6 +248,10 @@ def build_aptus_handoff(
 
     first = provenance_rows[0]
     row_schema = _infer_row_schema(train_rows, evaluation_rows, first)
+    try:
+        assert_profile_row_compatible(_APTUS_CONSUMER_PROFILE, row_schema)
+    except VeriformisError as exc:
+        raise AptusHandoffError(exc.message) from exc
     assignment_digest = portable_assignment_digest(provenance_rows)
     source_ids = tuple(
         sorted({source_id for row in provenance_rows for source_id in row["source_ids"]})
@@ -475,31 +488,16 @@ def portable_assignment_digest(provenance_rows: list[dict[str, Any]]) -> str:
 
 
 def _masking_expectation(row_schema: str) -> MaskingExpectation:
-    if row_schema == "text":
-        return MaskingExpectation(
-            row_schema=row_schema,
-            supervised_boundary="full-sequence",
-            notes="Entire text sequence is supervised.",
-        )
-    if row_schema == "prompt_completion":
-        return MaskingExpectation(
-            row_schema=row_schema,
-            supervised_boundary="completion-only",
-            notes="Prompt is context; completion receives supervision.",
-        )
-    if row_schema == "instruction_output":
-        return MaskingExpectation(
-            row_schema=row_schema,
-            supervised_boundary="output-only",
-            notes="Instruction and input are context; output receives supervision.",
-        )
-    if row_schema == "messages":
-        return MaskingExpectation(
-            row_schema=row_schema,
-            supervised_boundary="final-assistant-suffix",
-            notes="Only the final assistant message receives supervision.",
-        )
-    raise AptusHandoffError(f"unsupported handoff row schema {row_schema!r}")
+    try:
+        policy = loss_policy_for_row(row_schema)
+        notes = loss_boundary(policy)
+    except VeriformisError as exc:
+        raise AptusHandoffError(exc.message) from exc
+    return MaskingExpectation(
+        row_schema=row_schema,
+        supervised_boundary=policy,
+        notes=notes,
+    )
 
 
 def _infer_row_schema(

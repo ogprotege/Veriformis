@@ -16,7 +16,12 @@ from veriformis.datasets import (
     SerializationPlan,
     SplitPolicy,
 )
-from veriformis.errors import ConstructionError
+from veriformis.errors import ConstructionError, TaxonomyError
+from veriformis.taxonomy import (
+    CANONICAL_CONSUMER_PROFILE,
+    assert_compile_combination,
+    default_row_schema,
+)
 
 RECIPE_LIBRARY_IDS: tuple[str, ...] = (
     "full_text.default",
@@ -34,22 +39,15 @@ _OBJECTIVE_BY_RECIPE = {
     "structured_field.default": "structured_field",
 }
 
-_ROW_SCHEMA_BY_OBJECTIVE = {
-    "full_text": "text",
-    "continuation": "prompt_completion",
-    "section_reconstruction": "prompt_completion",
-    "before_after_transformation": "prompt_completion",
-    "structured_field": "prompt_completion",
-}
-
-
 def list_named_recipes() -> tuple[dict[str, str], ...]:
     """Return stable metadata for every library recipe id."""
     return tuple(
         {
             "recipe_library_id": recipe_id,
             "objective": _OBJECTIVE_BY_RECIPE[recipe_id],
-            "target_row_schema": _ROW_SCHEMA_BY_OBJECTIVE[_OBJECTIVE_BY_RECIPE[recipe_id]],
+            "target_row_schema": default_row_schema(
+                _OBJECTIVE_BY_RECIPE[recipe_id]
+            ),
         }
         for recipe_id in RECIPE_LIBRARY_IDS
     )
@@ -64,6 +62,7 @@ def build_named_recipe(
     split_ratio_ppm: int = 500_000,
     require_review: bool = False,
     target_row_schema: str | None = None,
+    consumer_profile: str = CANONICAL_CONSUMER_PROFILE,
 ) -> DatasetRecipe:
     """Build one versioned DatasetRecipe from a library id and workspace facts."""
     if recipe_library_id not in _OBJECTIVE_BY_RECIPE:
@@ -72,7 +71,19 @@ def build_named_recipe(
             f"expected one of {list(RECIPE_LIBRARY_IDS)!r}"
         )
     objective_kind = _OBJECTIVE_BY_RECIPE[recipe_library_id]
-    row_schema = target_row_schema or _ROW_SCHEMA_BY_OBJECTIVE[objective_kind]
+    try:
+        row_schema = (
+            default_row_schema(objective_kind)
+            if target_row_schema is None
+            else target_row_schema
+        )
+        assert_compile_combination(
+            objective_kind,
+            row_schema,
+            profile=consumer_profile,
+        )
+    except TaxonomyError as exc:
+        raise ConstructionError(exc.message) from exc
     if segmentation is None:
         if objective_kind == "section_reconstruction":
             segmentation = SegmentationPolicy(

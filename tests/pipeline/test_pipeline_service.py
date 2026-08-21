@@ -5,6 +5,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from veriformis.cli import app
@@ -13,6 +14,7 @@ from veriformis.datasets import (
     dataset_validation_report_from_json_bytes,
     split_result_from_json_bytes,
 )
+from veriformis.errors import ConstructionError
 from veriformis.pipeline import PipelineService
 from veriformis.workspace import Workspace
 
@@ -304,10 +306,7 @@ def test_cli_adapter_does_not_own_stage_policy_for_construct(tmp_path):
     service.clean(workspace)
     service.chunk(workspace)
 
-    from veriformis.errors import ConstructionError
-    import pytest
-
-    with pytest.raises(ConstructionError, match="unsupported deterministic objective"):
+    with pytest.raises(ConstructionError, match="unknown objective 'summary'"):
         service.construct(workspace, objective="summary")
 
     result = runner.invoke(
@@ -316,4 +315,24 @@ def test_cli_adapter_does_not_own_stage_policy_for_construct(tmp_path):
     )
     assert result.exit_code == 2
     assert "error[construction-invalid]" in result.output
-    assert "unsupported deterministic objective" in result.output
+    assert "unknown objective 'summary'" in result.output
+
+
+def test_construct_rejects_invalid_taxonomy_before_opening_workspace(tmp_path):
+    service = PipelineService()
+    missing = tmp_path / "not-created"
+
+    with pytest.raises(ConstructionError, match="aptus-handoff-v1"):
+        service.construct(
+            missing,
+            objective="full_text",
+            consumer_profile="aptus-handoff-v1",
+        )
+    with pytest.raises(ConstructionError, match="unknown semantic row ''"):
+        service.construct(
+            missing,
+            objective="continuation",
+            target_row_schema="",
+        )
+
+    assert not missing.exists()

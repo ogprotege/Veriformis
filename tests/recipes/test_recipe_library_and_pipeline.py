@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from veriformis.cli import app
+from veriformis.errors import ConstructionError
 from veriformis.pipeline import PipelineService
 from veriformis.recipes import (
     build_named_recipe,
@@ -43,6 +45,44 @@ def test_named_recipe_library_lists_five_objectives():
         "continuation.default",
     }
     assert len(recipes) == 5
+
+
+def test_named_recipe_uses_shared_profile_compatibility():
+    source_ids = ("src-v1-" + "0" * 64,)
+
+    with pytest.raises(ConstructionError, match="aptus-handoff-v1"):
+        build_named_recipe(
+            "full_text.default",
+            source_ids=source_ids,
+            cleaning_config_digest="0" * 64,
+            consumer_profile="aptus-handoff-v1",
+        )
+
+
+def test_yaml_construct_threads_consumer_profile_before_compile(tmp_path):
+    source = tmp_path / "source.txt"
+    source.write_text("Canonical source text.", encoding="utf-8")
+    pipeline = tmp_path / "pipeline.yaml"
+    pipeline.write_text(
+        f"""
+schema_version: veriformis.pipeline/v1
+workspace: {tmp_path / 'workspace'}
+source_root: {tmp_path}
+sources:
+  - {source}
+stages:
+  parse: {{}}
+  construct:
+    objective: full_text
+    consumer_profile: aptus-handoff-v1
+""".strip(),
+        encoding="utf-8",
+    )
+
+    spec = load_pipeline_spec(pipeline)
+    with pytest.raises(ConstructionError, match="does not accept row schema 'text'"):
+        run_pipeline_spec(spec)
+    assert Workspace.open(spec.workspace).head().stages["construct"].status == "absent"
 
 
 def test_two_named_recipes_seal_repeatably(tmp_path):

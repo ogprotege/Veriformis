@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from veriformis.errors import ConstructionError
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
 
@@ -183,3 +184,22 @@ def test_mcp_server_registers_required_tools():
         "consume_handoff",
     }
     assert required <= set(tools)
+
+
+def test_mcp_construct_refuses_incompatible_profile_before_workspace_open(tmp_path):
+    missing = tmp_path / "not-created"
+    construct = _tool_map(create_mcp_server())["construct"]
+
+    with pytest.raises(ConstructionError, match="aptus-handoff-v1"):
+        _call(
+            construct,
+            str(missing),
+            "full_text",
+            None,
+            None,
+            500_000,
+            False,
+            "aptus-handoff-v1",
+        )
+
+    assert not missing.exists()

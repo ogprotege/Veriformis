@@ -8,6 +8,7 @@ from pathlib import Path
 from veriformis.pipeline.service import PipelineService, StageOutcome
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.recipes.pipeline_spec import PipelineSpec, PipelineSpecError
+from veriformis.taxonomy import CANONICAL_CONSUMER_PROFILE
 from veriformis.workspace import Workspace
 
 
@@ -77,6 +78,12 @@ def run_pipeline_spec(
                     target_row_schema=config.get("target_row_schema"),
                     split_ratio_ppm=int(config.get("split_ratio_ppm", 500_000)),
                     require_review=bool(config.get("require_review", False)),
+                    consumer_profile=str(
+                        config.get(
+                            "consumer_profile",
+                            CANONICAL_CONSUMER_PROFILE,
+                        )
+                    ),
                 )
             )
         elif stage == "curate":

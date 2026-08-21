@@ -281,8 +281,14 @@ final class CLIBridgeTests: XCTestCase {
         ])
         XCTAssertEqual(plan[0].arguments.first, "parse")
         XCTAssertTrue(plan[0].arguments.contains("--source-root"))
-        XCTAssertTrue(plan[3].arguments.contains("continuation"))
-        XCTAssertTrue(plan[3].arguments.contains("400000"))
+        XCTAssertEqual(
+            plan[3].arguments,
+            [
+                "construct", workspace.path, "--objective", "continuation",
+                "--consumer-profile", "aptus-handoff-v1",
+                "--split-ratio-ppm", "400000",
+            ]
+        )
         XCTAssertTrue(plan[4].arguments.contains("--allow-empty-evaluation"))
         XCTAssertEqual(
             plan[8].arguments,
@@ -303,7 +309,9 @@ final class CLIBridgeTests: XCTestCase {
             splitRatioPPM: 500_000
         )
         XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path])
-        XCTAssertFalse(plan.last!.arguments.contains { $0.lowercased().contains("aptus") })
+        XCTAssertFalse(
+            plan.flatMap(\.arguments).contains { $0.lowercased().contains("aptus") }
+        )
     }
 
     @MainActor

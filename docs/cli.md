@@ -219,7 +219,8 @@ LLM call; there is no `summary` objective.
 
 ```text
 veriformis construct WORKSPACE --objective OBJECTIVE [--source SELECTOR]... \
-  [--target-row-schema SCHEMA] [--split-ratio-ppm PPM] [--require-review]
+  [--target-row-schema SCHEMA] [--consumer-profile PROFILE] \
+  [--split-ratio-ppm PPM] [--require-review]
 ```
 
 | Option | Default | Effect |
@@ -227,6 +228,7 @@ veriformis construct WORKSPACE --objective OBJECTIVE [--source SELECTOR]... \
 | `--objective` | (required) | One of the five deterministic objectives below |
 | `--source` | all current sources | Repeatable; selects an exact subset by source ID or logical path |
 | `--target-row-schema` | `text` for `full_text`, else `prompt_completion` | Product row schema: `text`, `prompt_completion`, `instruction_output`, or `messages` |
+| `--consumer-profile` | `veriformis-canonical-v1` | Compile-time compatibility constraint; implemented profiles are canonical v1 and `aptus-handoff-v1` |
 | `--split-ratio-ppm` | `500000` | Prompt/completion boundary for `continuation` only; 1–999999 |
 | `--require-review` | off | Leaves construction-integrity decisions pending instead of accepting valid candidates |
 
@@ -240,6 +242,7 @@ veriformis construct WORKSPACE --objective OBJECTIVE [--source SELECTOR]... \
 
 `full_text` requires the `text` row schema; every other objective requires a
 supervised row schema. Unknown or duplicate `--source` selections fail closed.
+The Aptus profile rejects `text` before the workspace is opened or changed.
 `--require-review` leaves decisions pending because the current CLI does not
 ingest completed review evidence (the Python construction API supports
 separate review values).
@@ -252,7 +255,7 @@ and requires exact semantic equality with a fresh construction replay.
 - **Writes:** canonical `recipe` and `result` artifacts.
 
 Failure modes (exit 2): `construction-invalid` for an unsupported objective,
-an invalid row-schema combination, an out-of-range ratio, or a replay
+an invalid row-schema/profile combination, an out-of-range ratio, or a replay
 mismatch; `source-evidence-invalid` for unknown or duplicate source
 selection; `unsupported-workspace-version` when the workspace predates schema
 2 (run `upgrade-workspace` first).

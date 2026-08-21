@@ -25,14 +25,13 @@ from veriformis.contracts import (
     DETERMINISTIC_V1_OBJECTIVE_KINDS,
     V1_CONSTRUCTION_DIAGNOSTIC_CODES,
     V1_PROMOTION_REASON_CODES,
-    V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.evidence import (
     SourceEvidence,
     source_evidence_from_dict,
     source_evidence_to_dict,
 )
-from veriformis.errors import ConstructionError, DuplicateIdentityError
+from veriformis.errors import ConstructionError, DuplicateIdentityError, TaxonomyError
 from veriformis.identity import (
     canonical_digest,
     derive_id,
@@ -41,6 +40,7 @@ from veriformis.identity import (
     validate_id,
     validate_sha256,
 )
+from veriformis.taxonomy import assert_objective_row_compatible
 
 from .evidence import IRFieldEvidence
 from ._json import reject_floats
@@ -353,17 +353,13 @@ class DatasetRecipe(_StrictModel):
     def _validate_recipe(self) -> DatasetRecipe:
         validate_id(self.recipe_id, kind="rcp")
         validate_sha256(self.cleaning_config_digest)
-        if self.target_row_schema not in V1_ROW_SCHEMA_KINDS:
-            raise ValueError(
-                f"unsupported product row schema {self.target_row_schema!r}"
+        try:
+            assert_objective_row_compatible(
+                self.objective.kind,
+                self.target_row_schema,
             )
-        if self.objective.kind == "full_text":
-            if self.target_row_schema != "text":
-                raise ValueError("full_text recipes require the product 'text' row schema")
-        elif self.target_row_schema == "text":
-            raise ValueError(
-                f"objective {self.objective.kind!r} requires a supervised row schema"
-            )
+        except TaxonomyError as exc:
+            raise ValueError(exc.message) from exc
         if (
             self.objective.kind == "section_reconstruction"
             and self.segmentation.strategy != "structure"

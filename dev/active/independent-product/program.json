@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_updated": "2026-08-20",
+  "last_updated": "2026-08-21",
   "status_values": [
     "planned",
     "in_progress",
@@ -52,7 +52,7 @@
       "packet": "dev/active/independent-product/phase-03-taxonomy",
       "started_on": "2026-08-20",
       "completed_on": null,
-      "next_gate": "Define the versioned taxonomy contract and compatibility registry; invalid combinations must fail before compile."
+      "next_gate": "Expose one implemented taxonomy registry through PipelineService, CLI, MCP, and workbench help; then reconcile ambiguous public format language."
     },
     {
       "number": 4,
