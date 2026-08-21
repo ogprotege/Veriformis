@@ -24,11 +24,11 @@ branch is created.
 
 ### 4.2 Define versioned export models
 
-- [ ] Publish the verified export v1 contract.
-- [ ] Define strict export plan, container profile, consumer profile,
+- [x] Publish the verified export v1 contract.
+- [x] Define strict export plan, container profile, consumer profile,
       destination-file binding, receipt, and verification models.
-- [ ] Recompute every durable identity from canonical exact fields.
-- [ ] Add malformed, unsupported-version, duplicate-key, float, Unicode, and
+- [x] Recompute every durable identity from canonical exact fields.
+- [x] Add malformed, unsupported-version, duplicate-key, float, Unicode, and
       round-trip contract tests.
 
 ### 4.3 Enforce source trust

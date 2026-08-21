@@ -62,7 +62,7 @@
       "packet": "dev/active/independent-product/phase-04-verified-export-foundation",
       "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Complete and merge Phase 4.1 typed ExportService and anchored verified-source inspection with green gates; then begin Phase 4.2 versioned export models."
+      "next_gate": "Complete and merge Phase 4.2 strict versioned export models with green gates; then begin Phase 4.3 source-trust enforcement."
     },
     {
       "number": 5,

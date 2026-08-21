@@ -13,7 +13,7 @@
 | Portable identities exclude absolute paths, clocks, process IDs, temporary names, and durability warnings | Accepted | Cross-surface determinism requirement |
 | The v1 overwrite policy begins with no-replace/refuse only | Accepted | Phase 4 safety requirement; replacement is not required |
 | The Phase 4 conformance exporter is injected by tests and is absent from product taxonomy/support discovery | Accepted | Phase 4 exit gate versus Phase 5 scope |
-
-Exact persisted schema identifiers are intentionally deferred to the Phase 4.2
-contract review. The opening service increment adds no provisional persisted
-export model.
+| Verified export v1 uses ten strict persisted schemas under `veriformis.verified-export` version 1 | Accepted | Phase 4.2 contract and exact-schema tests |
+| Receipt identity excludes its own bytes and binds every other planned destination file | Accepted | Avoid self-hashing while preserving a closed derivative tree |
+| Every plan binds at least one exact dependency | Accepted | Empty cannot distinguish dependency-free rendering from omitted evidence |
+| Exact-byte and semantic-content-only claims are distinct closed literals | Accepted | Dependency-sensitive renderings cannot overclaim portable bytes |

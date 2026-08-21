@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4.1 export-service reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.2 export-model reconciliation)
 
 **Next review:** Any architecture or dependency change
 
@@ -170,9 +170,11 @@ Cross-layer wiring is concentrated in `pipeline/service.py`, the implemented
 surface-neutral composition root. Its methods own stage policy, verified input
 loading, deterministic domain calls, and workspace transactions. It now also
 injects and owns `exports.ExportService`, whose Phase 4.1 dependency points
-only to the bundle facade. That service calls the descriptor-anchored finished-
-bundle inspector and returns the immutable semantic result; it does not add a
-workspace dependency or persisted pydantic contract. `cli.py` and
+to the bundle facade. That service calls the descriptor-anchored finished-
+bundle inspector and returns the immutable semantic result. Phase 4.2 adds
+strict export models below that service; they depend on the finished-bundle
+verification value, contract registry, identity substrate, and taxonomy loss
+mapping without adding a workspace dependency. `cli.py` and
 `mcp/server.py` translate their respective protocols into pipeline methods;
 the SwiftUI workbench shells the CLI. No adapter exposes export operations yet.
 This arrangement needs no dependency injection container because the contracts

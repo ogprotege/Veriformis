@@ -144,3 +144,15 @@ class TaxonomyError(VeriformisError):
     """A taxonomy identifier or axis combination is unknown or incompatible."""
 
     code = "taxonomy-invalid"
+
+
+class ExportContractError(VeriformisError):
+    """A versioned export plan, profile, binding, or receipt is invalid."""
+
+    code = "export-contract-invalid"
+
+
+class ExportVerificationError(VeriformisError):
+    """A derived export is malformed, altered, incomplete, or untrusted."""
+
+    code = "export-verification-invalid"

@@ -24,9 +24,10 @@ with roadmap headings.
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
 implementation. Phase 4 opened on 2026-08-21 from baseline `db9d93ef`; item
-4.1 is implementing the typed `ExportService` boundary and descriptor-anchored
-verified source inspection. Persisted export models, an export writer, public
-export commands, and generic export containers are not implemented yet.
+4.1 implemented the typed `ExportService` boundary and descriptor-anchored
+verified source inspection and merged as PR #43. Item 4.2 defines strict
+verified-export v1 models. Plan construction, an export writer, public export
+commands, and generic export containers are not implemented yet.
 
 ## State change procedure
 

@@ -5,10 +5,9 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 start;
-Phases 0–3 completed and Phase 4 in progress)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.2 model contract)
 
-**Next review:** Phase 4 export-model contract; beta label cut, public-ready
+**Next review:** Phase 4 source-trust enforcement; beta label cut, public-ready
 checklist, or any contract change
 
 ## Start here
@@ -31,11 +30,13 @@ checklist, or any contract change
 - **CLI operator:** [install.md](install.md) → [CLI reference](cli.md)
   → [Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
 - **Optional Aptus integration:** [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
+- **Verified derivatives:** [Verified Export Contract v1](contracts/verified-export-v1.md).
 - **Workbench operator:** [install.md](install.md) →
   [macOS workbench](../macos/README.md) →
   [private beta plan](plans/2026-08-06-private-beta-workbench.md).
 - **Contract reviewer:** [product contract](product-contract.md), then Integrity,
-  Dataset Construction, Finished Dataset, Dataset Taxonomy, Bundle Transport,
+  Dataset Construction, Finished Dataset, Dataset Taxonomy, Verified Export,
+  Bundle Transport,
   and Aptus Handoff contracts plus the [ADR index](adr/README.md), with
   [current status](current-status.md) for evidence.
 
@@ -52,6 +53,7 @@ checklist, or any contract change
 | [Bundle Transport Contract v1](contracts/bundle-transport-v1.md) | Deterministic `.vfbundle.zip` transport and archive verification | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
 | [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Implemented contract |
+| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Models implemented; execution in progress |
 | [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0005) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |

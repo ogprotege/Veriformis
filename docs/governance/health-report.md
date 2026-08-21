@@ -1,13 +1,13 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 4 opening reconciled
+**Status:** Independent-product Phase 4.2 model contract reconciled
 
 **Review date:** 2026-08-21
 
 **Repository baseline:** Working tree based on
-`db9d93ef88e273e3727e1ba85841589530d59da3`
+`494fb3b2f4083b17392763258f905af8bd539da0`
 
-**Next review:** Independent-product Phase 4.1 state transition or the next
+**Next review:** Independent-product Phase 4.2 state transition or the next
 active-document behavior change
 
 ## Scope examined
@@ -30,8 +30,8 @@ active-document behavior change
 - Independent product analysis and roadmap.
 - Project governance, support registry, evidence index, ADRs, documentation
   debt, WIP, the completed Phase 0–3 packets, and the active Phase 4 packet.
-- Versioned integrity, construction, finished-dataset, and optional Aptus
-  handoff contracts, plus the implemented taxonomy contract.
+- Versioned integrity, construction, finished-dataset, verified-export, and
+  optional Aptus handoff contracts, plus the implemented taxonomy contract.
 
 These documents govern current behavior, future work, or active execution and
 must be updated when their scope changes.
@@ -69,7 +69,7 @@ deprecated document must link its replacement and removal/review trigger.
 | Active architecture described CLI-owned orchestration and obsolete dependency counts | Semantic audit against `PipelineService`, adapters, source tree, and `pyproject.toml` | Reconciled across the architecture tree and versioned contracts; obsolete CLI citations removed |
 | Group 2/3 contracts described already implemented work as future deferrals | Current source/status versus contract closeout prose | Historical deferrals labeled as such and linked to current status |
 | No privacy-safe demand evidence constrained roadmap ranking | Phase 0 corpus gate | Added a content-blind scanner, schema, matrix, and test-verified fixture aggregate; unavailable owner evidence remains explicit |
-| Phase 4 opened while active governance indexes still described it as planned and without a packet | Phase 4 program transition and `phase-04-verified-export-foundation` packet | Reconciled program, WIP, program index, and governance language to Phase 4 in progress from baseline `db9d93ef`; item 4.1 is under implementation and later export capabilities remain unclaimed |
+| Phase 4 opened while active governance indexes still described it as planned and without a packet | Phase 4 program transition and `phase-04-verified-export-foundation` packet | Reconciled program, WIP, program index, and governance language to Phase 4 in progress from baseline `db9d93ef`; 4.1 is merged and 4.2 models are under implementation while later capabilities remain unclaimed |
 
 ## Current health assessment
 
@@ -77,7 +77,7 @@ deprecated document must link its replacement and removal/review trigger.
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
 | Current capability accuracy | Good within audited active scope | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, release boundary, and Mac guide |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–3 packets, and active Phase 4 packet with item 4.1 under implementation |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–3 packets, and active Phase 4 packet with item 4.1 complete and 4.2 under implementation |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -86,17 +86,18 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Complete Phase 4.1 through its typed `ExportService`, descriptor-anchored
-   verified source inspection, green merge gate, and recorded evidence; begin
-   Phase 4.2 only after local `main` matches the merged GitHub state.
+1. Complete Phase 4.2 through its strict persisted model contract and green
+   merge gate; begin Phase 4.3 only after local `main` matches the merged GitHub
+   state.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
    historical subtree; propose moves before execution.
 4. Add pinned offline Mermaid validation only after dependency review.
 
-Persisted export models, an export writer, public export commands, and generic
-export containers remain outside the current implemented claim.
+Export plan construction, source-trust admission, a writer, public export
+commands, and generic export containers remain outside the current implemented
+claim.
 
 The detailed open list is maintained in
 [Documentation Debt](documentation-debt.md). This report summarizes health; it

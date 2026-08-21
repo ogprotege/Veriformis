@@ -236,9 +236,11 @@ On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
 **private beta workbench Phases 0–2**, and **independent-product Phases 0–3**;
 Phase 4 verified export foundation is in progress. Its opening slice adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
-an already verified finished bundle. It does not yet add persisted export
-models, an export writer, public export commands, generic export containers, or
-trainer-specific profiles. Maturity remains development **alpha** (not a
+an already verified finished bundle. Its second slice defines strict,
+versioned export plan, profile, membership, file-binding, receipt, and
+verification models. It does not yet add a plan builder, export writer, public
+export commands, generic export containers, or trainer-specific profiles.
+Maturity remains development **alpha** (not a
 public beta label). A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
 need owner signing/notarization per [docs/release.md](docs/release.md).
@@ -261,6 +263,7 @@ reading paths. The map:
   - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
   - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
   - [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
+  - [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
   - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
   - [Install guide](docs/install.md)
