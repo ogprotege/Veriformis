@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4.3 source-trust reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4.4 plan-population reconciliation)
 
 **Next review:** Any layering or architecture change
 
@@ -191,9 +191,12 @@ service depends downward on the bundle verifier and returns an immutable
 export models depend downward on bundle verification evidence, identity, and
 taxonomy semantics. Phase 4.3 keeps source-trust admission inside that service,
 requiring retained external evidence by default without entering the workspace
-stage graph.
-No plan builder, derivative writer, public export command, or generic container
-belongs to this layer yet.
+stage graph. Phase 4.4 keeps read-only plan population in the same service. It
+derives the complete source membership baseline from the verifier-returned row
+set and provenance, creates an existing strict `ExportPlan`, and adds neither a
+workspace edge nor destination I/O.
+No destination membership comparator, derivative writer, public export command,
+or generic container belongs to this layer yet.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

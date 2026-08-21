@@ -18,3 +18,5 @@
 | Every plan binds at least one exact dependency | Accepted | Empty cannot distinguish dependency-free rendering from omitted evidence |
 | Exact-byte and semantic-content-only claims are distinct closed literals | Accepted | Dependency-sensitive renderings cannot overclaim portable bytes |
 | Export-source admission defaults to `require_external_digest`; `allow_self_consistent` must be explicit, and supplied evidence never falls back | Accepted | Phase 4.3 source-trust contract and fail-closed service tests |
+| Plan population derives every source identity and the complete source membership baseline from one admitted immutable bundle view; callers cannot supply those facts | Accepted | Phase 4.4 source/output binding requirement and verify-then-read race boundary |
+| Phase 4.4 binds the source membership baseline but does not claim preservation; Phase 4.5 reconstructs and compares renderer/destination membership | Accepted | Roadmap items 4 and 5 remain separate sequential proof obligations |

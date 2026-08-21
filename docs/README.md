@@ -5,9 +5,9 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.3 source trust)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.4 plan population)
 
-**Next review:** Phase 4 source/output binding; beta label cut, public-ready
+**Next review:** Phase 4 derivative-only enforcement; beta label cut, public-ready
 checklist, or any contract change
 
 ## Start here

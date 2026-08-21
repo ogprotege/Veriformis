@@ -254,12 +254,15 @@ def test_normative_contract_names_every_schema_identity_and_current_boundary() -
     ):
         assert f"`{identity_kind}`" in contract
 
-    assert "The Phase 4.2 implementation is models only." in contract
+    assert "Phase 4.2 implementation establishes exact models" in contract
     assert "default `source_trust_policy` is exactly" in contract
     assert "absence fails before the source" in contract
     assert "fails without retry, downgrade, trimming, or coercion" in contract
     assert "records the observed grade, not the requested policy" in contract
-    assert "does not implement an export writer" in contract
+    assert "`ExportService.create_plan` is the only implemented" in contract
+    assert "derive every source fact" in contract
+    assert "does not render or reconstruct destination membership" in contract
+    assert "an export writer" in contract
     assert "is not a supported product container" in contract
     assert "MUST NOT add a generic export container" in contract
     assert "no trailing line feed" in contract

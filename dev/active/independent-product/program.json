@@ -62,7 +62,7 @@
       "packet": "dev/active/independent-product/phase-04-verified-export-foundation",
       "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Complete and merge Phase 4.3 source-trust enforcement with green gates; synchronize local main, then begin Phase 4.4 source/output binding."
+      "next_gate": "Complete and merge Phase 4.4 source-derived plan population with green gates; synchronize local main, then begin Phase 4.5 derivative-only enforcement."
     },
     {
       "number": 5,
