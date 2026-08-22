@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -138,7 +138,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
 | `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
-| `veriformis export discover` | List executable verified-export implementations; includes `split-jsonl-directory` and canonical `json` v1 |
+| `veriformis export discover` | List executable verified-export implementations; includes `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `veriformis export dry-run --request-json JSON` | Derive a source-anchored export plan without destination access |
 | `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |
 | `veriformis export execute --request-json JSON` | Publish one operator-confirmed plan with no-replace `refuse` |
@@ -188,6 +188,32 @@ contains the complete aligned train-then-evaluation sequence. This selector has
 no container options, so request v2 is refused. It preserves rows and logical
 partitions and advertises no trainer compatibility. See
 [Canonical JSON Export v1](contracts/canonical-json-export-v1.md).
+
+### Verified constrained CSV derivative
+
+`constrained-csv` v1 uses request v1 and publishes a fixed closed tree:
+
+```text
+README.md
+data/evaluation.csv
+data/train.csv
+export-receipt.json
+metadata/dataset-card.json
+metadata/row-provenance.jsonl
+```
+
+The CSV is UTF-8 without a BOM. It quotes every header and field, uses commas,
+doubles embedded quotes, and terminates every record with LF. Exact ordered
+headers are `text`; `prompt,completion`; or `instruction,input,output` for the
+three supported flat schemas. Embedded line endings, Unicode, and formula-like
+strings are preserved exactly inside quotes. Provenance is mandatory and
+aligned train then evaluation. The selector has no options and refuses request
+v2 before source access. After source admission reveals nested `messages`, the
+schema is refused before destination access with a split JSONL or canonical
+JSON alternative. The container preserves rows and
+logical partitions and advertises neither trainer nor spreadsheet
+compatibility. See
+[Constrained CSV Export v1](contracts/constrained-csv-export-v1.md).
 
 ### Minimal terminal compile (same path as the GUI)
 

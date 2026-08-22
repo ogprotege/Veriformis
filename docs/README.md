@@ -5,9 +5,9 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.2 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.3 local admission)
 
-**Next review:** Phase 5.2 merge, Phase 5.3 start, Phase 6 packet opening,
+**Next review:** Phase 5.3 merge, Phase 5.4 start, Phase 6 packet opening,
 beta label cut, public-ready checklist, or any contract change
 
 ## Start here
@@ -32,13 +32,14 @@ beta label cut, public-ready checklist, or any contract change
 - **Optional Aptus integration:** [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
 - **Verified derivatives:** [Verified Export Contract v1](contracts/verified-export-v1.md)
   → [Split JSONL Export v1](contracts/split-jsonl-export-v1.md) or
-  [Canonical JSON Export v1](contracts/canonical-json-export-v1.md).
+  [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) or
+  [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md).
 - **Workbench operator:** [install.md](install.md) →
   [macOS workbench](../macos/README.md) →
   [private beta plan](plans/2026-08-06-private-beta-workbench.md).
 - **Contract reviewer:** [product contract](product-contract.md), then Integrity,
   Dataset Construction, Finished Dataset, Dataset Taxonomy, Verified Export,
-  Split JSONL Export, Canonical JSON Export, Bundle Transport,
+  Split JSONL Export, Canonical JSON Export, Constrained CSV Export, Bundle Transport,
   and Aptus Handoff contracts plus the [ADR index](adr/README.md), with
   [current status](current-status.md) for evidence.
 
@@ -55,9 +56,10 @@ beta label cut, public-ready checklist, or any contract change
 | [Bundle Transport Contract v1](contracts/bundle-transport-v1.md) | Deterministic `.vfbundle.zip` transport and archive verification | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
 | [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Implemented contract |
-| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Phase 4 foundation plus Phase 5.1–5.2 split JSONL/canonical JSON containers; no trainer profile |
+| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Phase 4 foundation plus Phase 5.1–5.3 split JSONL/canonical JSON/constrained CSV containers; no trainer profile |
 | [Split JSONL Export v1](contracts/split-jsonl-export-v1.md) | Canonical split payload JSONL, safe configuration, aligned provenance, data card, and receipt | Implemented Phase 5.1 generic container |
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
+| [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
 | [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0005) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
@@ -76,7 +78,7 @@ beta label cut, public-ready checklist, or any contract change
 | [Phase 2 packet](../dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) | Reliability and artifact-boundary packet and closeout | Completed implementation record |
 | [Phase 3 packet](../dev/active/independent-product/phase-03-taxonomy/README.md) | Taxonomy contract, registry, discovery, and compatibility closeout | Completed implementation record |
 | [Phase 4 packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export contracts, service, surfaces, adversarial evidence, and closeout | Completed implementation record |
-| [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and pending closeout | Active implementation record; split JSONL and canonical JSON are items 5.1–5.2, while later items remain open |
+| [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and pending closeout | Active implementation record; split JSONL, canonical JSON, and constrained CSV are items 5.1–5.3, while items 5.4–5.7 remain open |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |

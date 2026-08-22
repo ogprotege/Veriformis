@@ -1024,6 +1024,7 @@ def test_determinism_runtime_does_not_leak_to_public_or_support_surfaces() -> No
         "deterministic-vfbundle-zip-v1",
         "split-jsonl-directory",
         "json",
+        "constrained-csv",
     ]
     support_registry = (
         Path(__file__).resolve().parents[2]

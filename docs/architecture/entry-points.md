@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
 
 **Next review:** Any entry-point or architecture change
 
@@ -134,8 +134,8 @@ required, and optional cancellation callback. It exposes no renderer/replayer
 selection, overwrite, filtering, or membership controls. Private
 implementations supply bytes and normalized candidates. Phase 4's default
 service failed closed because no renderer or semantic replayer was installed;
-Phase 5.1–5.2 install only the reviewed exact-byte `split-jsonl-directory` and
-canonical `json` v1 renderers.
+Phase 5.1–5.3 install only the reviewed exact-byte `split-jsonl-directory`,
+canonical `json`, and `constrained-csv` v1 renderers.
 
 Publication re-verifies source and plan, invokes the renderer twice from
 independent strict inputs, and repeats complete membership validation. Exact
@@ -150,15 +150,15 @@ profile discovery, destination-free dry run, self-described physical
 inspection, operator-confirmed execution, and source-bound verification. A
 private exact-selector catalog owns planners, renderers, and semantic
 replayers. Its production instance was empty at Phase 4 closeout; tests alone
-injected the conformance implementation. Phase 5.1–5.2 add the first production
-entries, `split-jsonl-directory` and canonical `json` v1, with no consumer
-profile and no semantic replayer.
+injected the conformance implementation. Phase 5.1–5.3 add the first production
+entries, `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1,
+with no consumer profile and no semantic replayer.
 
 `veriformis export discover`, `export dry-run`, `export inspect`,
 `export execute`, and top-level `export-verify` are thin adapters. The latter
 four take one strict canonical request through `--request-json`. Historical
-request v1 remains unchanged and selects the split-JSONL defaults and canonical
-JSON's fixed tree. Dry run, execute, and source-bound verify also accept request
+request v1 remains unchanged and selects the split-JSONL defaults, canonical
+JSON's fixed tree, or constrained CSV's fixed tree. Dry run, execute, and source-bound verify also accept request
 v2 for split JSONL only, whose complete canonical
 `veriformis.split-jsonl-options/v1` object may change only the two safe stems or
 omit provenance; inspect remains request v1. MCP exposes the same five
@@ -174,13 +174,18 @@ Phase 5.1's exact-byte renderer emits canonical payload-only partition JSONL,
 deterministic README and data-card sidecars, optional aligned provenance, and a
 receipt. Phase 5.2 emits one explicit split/schema-bearing canonical dataset
 object, mandatory separately aligned provenance, deterministic README, and the
-same receipt. Neither constructs, filters, reorders, curates, resplits, or
-changes partition membership, and neither makes a trainer-compatibility claim. The private
+same receipt. Phase 5.3 emits fixed fully quoted train/evaluation CSV, a data
+card, mandatory separately aligned provenance, deterministic README, and the
+same receipt for the three flat row schemas. It refuses request v2 before
+source access. After source admission reveals nested `messages`, it refuses the
+schema before destination access with a JSON alternative. None
+constructs, filters, reorders, curates, resplits, or changes partition
+membership, and none makes a trainer-compatibility claim. The private
 hooks remain trusted implementation code, not an untrusted plugin boundary;
 semantic replay retains complete files in memory and its fixture is statically
 bounded, but no production semantic replayer ships. Phase 4.9 remains the
-historical consolidated adversarial closeout; CSV and later generic work remain
-later Phase 5 work.
+historical consolidated adversarial closeout; archive integration and later
+generic work remain later Phase 5 work.
 
 ## Preview, recipes, and optional integrations
 
@@ -216,4 +221,5 @@ pipeline.
 - [CLI reference](../cli.md)
 - [Split JSONL Export Contract v1](../contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](../contracts/canonical-json-export-v1.md)
+- [Constrained CSV Export Contract v1](../contracts/constrained-csv-export-v1.md)
 - [Aptus Handoff Contract v1](../contracts/aptus-handoff-v1.md)

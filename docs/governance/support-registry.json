@@ -104,7 +104,8 @@
       "minimal-v1",
       "deterministic-vfbundle-zip-v1",
       "split-jsonl-directory",
-      "json"
+      "json",
+      "constrained-csv"
     ],
     "implemented_bundle_profiles": [
       {
@@ -178,8 +179,22 @@
       },
       {
         "container": "constrained-csv",
-        "state": "planned",
-        "roadmap_phase": 5
+        "state": "implemented",
+        "roadmap_phase": 5,
+        "product_role": "consumer-neutral-generic-export",
+        "container_version": 1,
+        "determinism_claim": "portable_exact_bytes",
+        "supported_row_schemas": [
+          "instruction_output",
+          "prompt_completion",
+          "text"
+        ],
+        "consumer_profile": null,
+        "evidence": [
+          "src/veriformis/exports/constrained_csv.py",
+          "docs/contracts/constrained-csv-export-v1.md",
+          "tests/exports/test_constrained_csv.py"
+        ]
       },
       {
         "container": "parquet",

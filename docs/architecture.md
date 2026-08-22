@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.2)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.3)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -51,11 +51,13 @@ preimages and reconstructed membership and replay descriptor-reread staged
 bytes. Phase 4.8 adds an initially production-empty private implementation
 catalog and thin `PipelineService`, CLI, MCP, and CLI-backed Mac operations for
 discovery, dry run, self-described inspect, execute, and source-bound verify.
-Phase 5.1–5.2 install the catalog's first two production exact-byte renderers,
-`split-jsonl-directory` and canonical `json` v1. They copy authoritative
-semantic partitions without changing rows or membership and add only
-deterministic evidence sidecars; neither has a consumer profile or trainer-
-compatibility claim. No production semantic replayer ships. The macOS workbench lives
+Phase 5.1–5.3 install the catalog's first three production exact-byte renderers,
+`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1. They copy
+authoritative semantic partitions without changing rows or membership and add only
+deterministic evidence sidecars; none has a consumer profile or trainer-
+compatibility claim. Constrained CSV admits only the three flat row schemas;
+nested `messages` is refused with a JSON alternative. No production semantic
+replayer ships. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -177,6 +179,11 @@ name.vfbundle/
   5.2 adds canonical `json` v1: request v1 selects a fixed tree containing one
   explicit split/schema-bearing `dataset.json`, mandatory separately aligned
   provenance, deterministic README, and receipt; request v2 is refused. The
+  Phase 5.3's `constrained-csv` v1 renderer uses request v1 only and writes fixed,
+  fully quoted train/evaluation CSV files, a dataset card, mandatory aligned
+  provenance, README, and receipt. Its exact ordered headers support `text`,
+  `prompt_completion`, and `instruction_output`; nested `messages` and request
+  v2 fail before publication with an actionable JSON alternative. The
   default service still has no semantic replayer and discovery advertises no
   consumer or trainer profile.
 
@@ -188,6 +195,7 @@ name.vfbundle/
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export v1](contracts/canonical-json-export-v1.md)
+- [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md)
 - [Verified Export Contract v1](contracts/verified-export-v1.md)
 - [Current implementation status](current-status.md)
 - [CLI reference](cli.md)

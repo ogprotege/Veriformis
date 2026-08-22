@@ -7,8 +7,9 @@ This file gives coding-agent guidance for the current Veriformis repository.
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
-(thin SwiftUI over CLI); independent-product Phases 0–4; and Phase 5.1–5.2's
-supported generic `split-jsonl-directory` and canonical `json` v1 exports.
+(thin SwiftUI over CLI); independent-product Phases 0–4; and Phase 5.1–5.3's
+supported generic `split-jsonl-directory`, canonical `json`, and
+`constrained-csv` v1 exports.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -28,14 +29,19 @@ at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 completes the
 adversarial harness and closeout reconciliation.
 Private render/replay hooks are trusted code, not a plugin boundary, and
 semantic replay currently retains each complete produced file in memory.
-Phase 5.1–5.2 install two production exact-byte renderers and discoverable
-physical containers: `split-jsonl-directory` v1 and canonical `json` v1.
+Phase 5.1–5.3 install three production exact-byte renderers and discoverable
+physical containers: `split-jsonl-directory`, canonical `json`, and
+`constrained-csv` v1.
 Request v1 selects split JSONL's safe `train` / `evaluation` names and aligned
-provenance, as well as canonical JSON's fixed dataset/provenance tree. Request
+provenance, canonical JSON's fixed dataset/provenance tree, or constrained
+CSV's fixed quoted-CSV tree. Request
 v2 applies only to split JSONL and requires the complete
 `veriformis.split-jsonl-options/v1` object for custom safe stems or
-provenance-off; `json` v1 refuses configured requests. Both derivatives
-preserve rows, ordering, and authoritative partition membership and claim
+provenance-off; `json` and `constrained-csv` v1 refuse configured requests.
+Constrained CSV admits only the flat `text`, `prompt_completion`, and
+`instruction_output` row schemas; `messages` must use split JSONL or canonical
+JSON. All three derivatives preserve rows, ordering, and authoritative
+partition membership and claim
 compatibility with no trainer. No production semantic replayer or trainer-
 specific profile is shipped. Do not claim public
 beta or production readiness without the checklists in
@@ -52,17 +58,18 @@ Read these current authorities before changing code:
 7. `docs/contracts/verified-export-v1.md`
 8. `docs/contracts/split-jsonl-export-v1.md`
 9. `docs/contracts/canonical-json-export-v1.md`
-10. `docs/architecture.md`
-11. `docs/analysis/2026-08-11-independent-product-analysis.md`
-12. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
-13. `docs/governance/project-tracking.md`,
+10. `docs/contracts/constrained-csv-export-v1.md`
+11. `docs/architecture.md`
+12. `docs/analysis/2026-08-11-independent-product-analysis.md`
+13. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+14. `docs/governance/project-tracking.md`,
    `dev/active/independent-product/program.json`, and the current or most
    recently completed phase packet
-14. `docs/governance/support-registry.json` and `docs/evidence/index.json`
-15. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
-16. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+15. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+16. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+17. `docs/plans/2026-07-29-veriformis-roadmap.md` and
     `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
-17. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+18. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.

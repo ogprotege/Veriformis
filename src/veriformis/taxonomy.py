@@ -56,9 +56,9 @@ IMPLEMENTED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "deterministic-vfbundle-zip-v1",
     "split-jsonl-directory",
     "json",
+    "constrained-csv",
 )
 PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
-    "constrained-csv",
     "parquet",
     "arrow",
     "hugging-face-dataset",

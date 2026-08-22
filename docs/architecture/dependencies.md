@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
 
 **Next review:** Any architecture or dependency change
 
@@ -214,6 +214,12 @@ dataset/provenance object models. It reuses the same canonical writer, row
 decoders, loss-policy lookup, paths, and publication service and adds no third-
 party, workspace, adapter-filesystem, plugin, or trainer edge. It needs no new
 request model because its fixed profile uses request v1 and refuses v2.
+Phase 5.3 adds an exports-internal constrained CSV planner/renderer and strict
+dataset-card/reload validation. It uses the Python standard-library CSV codec
+under a frozen fully quoted dialect and reuses the same row decoders,
+loss-policy lookup, paths, provenance model, and publisher. It adds no third-
+party, workspace, adapter-filesystem, plugin, trainer, or request-model edge;
+the fixed profile uses request v1 and refuses v2.
 This arrangement needs no dependency injection container because the contracts
 passed between stages are stable, low-level data values. `workspace.py` keeps
 its module-level domain coupling narrow and uses function-level imports for

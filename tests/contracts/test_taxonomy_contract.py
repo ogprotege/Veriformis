@@ -42,7 +42,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "64efd430b5b734ffd5992e1041e6cd6711a44e1188f665eb246a1bcdafe4b846"
+    "00913c649e6e7224b9c5a7871ebfa062109c0c8563e0999b04968ffe2fdc3ed1"
 )
 
 
@@ -252,6 +252,7 @@ def test_implemented_discovery_names_axes_and_omits_format() -> None:
     assert "preference-and-ranking" not in discovery["training_family"]
     assert "split-jsonl-directory" in discovery["physical_container"]
     assert "json" in discovery["physical_container"]
+    assert "constrained-csv" in discovery["physical_container"]
 
 
 def test_admitted_physical_containers_are_implemented_only() -> None:
@@ -265,4 +266,5 @@ def test_admitted_physical_containers_are_implemented_only() -> None:
         "deterministic-vfbundle-zip-v1",
         "split-jsonl-directory",
         "json",
+        "constrained-csv",
     }

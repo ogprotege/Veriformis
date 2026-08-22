@@ -361,11 +361,30 @@
       "admission_gate": "The verified export foundation, fixed canonical dataset/provenance schemas, complete membership closure, exact-byte determinism, and tamper tests must pass before implementation claims."
     },
     {
+      "work_item": "constrained-csv-export-contract",
+      "state": "provisional",
+      "rank": 3,
+      "candidates": [
+        "constrained-csv"
+      ],
+      "basis": [
+        {
+          "grade": "source-verified",
+          "sources": [
+            "docs/contracts/constrained-csv-export-v1.md",
+            "docs/governance/support-registry.json",
+            "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md"
+          ],
+          "limitation": "Constrained CSV is admitted only for structurally flat current row schemas; its implementation does not prove downstream trainer demand or compatibility."
+        }
+      ],
+      "admission_gate": "The verified export foundation, frozen UTF-8 CSV dialect, null and empty-string distinction, exact flat-schema round trips, nested-value pre-publication refusal, exact-byte determinism, and tamper tests must pass before implementation claims."
+    },
+    {
       "work_item": "additional-generic-containers",
       "state": "unranked-insufficient-evidence",
       "rank": null,
       "candidates": [
-        "constrained-csv",
         "parquet",
         "arrow",
         "hugging-face-dataset"

@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
 
 **Next review:** Any architecture documentation change
 
@@ -224,15 +224,20 @@ Exact profiles require identical normalized byte trees; semantic-only profiles
 require equal versioned canonical semantic preimages and reconstructed
 membership from both renders plus descriptor-reread staged replay. Phase 4.8
 adds a private, initially empty implementation catalog and thin Python, CLI,
-MCP, and CLI-backed Mac export operations. Phase 5.1–5.2 add the catalog's
-first two production exact-byte implementations, `split-jsonl-directory` and
-canonical `json` v1. Request v1
+MCP, and CLI-backed Mac export operations. Phase 5.1–5.3 add the catalog's
+first three production exact-byte implementations, `split-jsonl-directory`,
+canonical `json`, and `constrained-csv` v1. Request v1
 uses the safe `train` / `evaluation` filenames and includes aligned provenance;
 configured request v2 requires the complete
 `veriformis.split-jsonl-options/v1` object and may only change those safe stems
 or omit provenance. Canonical JSON uses request v1's fixed dataset/provenance
-tree and refuses request v2. Both renderers preserve payloads, ordering, split
-policy, and train/evaluation membership, and advertise no consumer or trainer profile.
+tree and refuses request v2. All three renderers preserve payloads, ordering,
+split policy, and train/evaluation membership, and advertise no consumer or
+trainer profile. Constrained CSV uses a fixed fully quoted train/evaluation
+tree with mandatory aligned provenance for the three flat row schemas. It
+refuses request v2 before source access; after source admission reveals nested
+`messages`, it refuses the schema before destination access with a JSON
+alternative.
 The default service still has no semantic replayer. The CLI exposes the nine
 stage commands plus maintenance, inspection, recipe automation, MCP, optional
 Aptus handoff, version, and verified-export surfaces.
@@ -278,4 +283,5 @@ code computes.
 - [Finished Dataset Contract v1](../contracts/finished-dataset-v1.md)
 - [Split JSONL Export Contract v1](../contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](../contracts/canonical-json-export-v1.md)
+- [Constrained CSV Export Contract v1](../contracts/constrained-csv-export-v1.md)
 - [Independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)

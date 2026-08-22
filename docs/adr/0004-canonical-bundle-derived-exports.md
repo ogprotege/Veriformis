@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON implementation)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV implementation)
 
 **Decider:** Repository owner direction
 
@@ -18,8 +18,9 @@ supplies an internal atomic publisher and receipt verifier; Phase 4.7 adds only
 private two-render exact-byte and semantic-content conformance evidence. Phase
 4.8 exposes the shared service through strict Python, CLI, MCP, and CLI-backed
 Mac operations, while its private production catalog closes empty. Phase
-5.1–5.2 now supply the first two production exact-byte implementations,
-`split-jsonl-directory` and canonical `json` v1, without adding a trainer pack.
+5.1–5.3 now supply the first three production exact-byte implementations,
+`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1, without
+adding a trainer pack.
 
 ## Decision
 
@@ -49,9 +50,14 @@ configured request v2 requires the complete
 `veriformis.split-jsonl-options/v1` object to change those safe stems or omit
 provenance. Phase 5.2 adds a fixed canonical JSON tree with one explicit
 split/schema-bearing membership object and one mandatory separately aligned
-provenance object; request v1 selects it and request v2 is refused. Neither
-derivative changes semantic rows or membership or claims compatibility with a
-trainer.
+provenance object; request v1 selects it and request v2 is refused. Those two
+derivatives change no semantic rows or membership and claim compatibility with
+no trainer. Phase 5.3 adds a fixed fully quoted CSV tree for the three flat row
+schemas with a data card and mandatory aligned provenance. It uses request v1
+and refuses request v2 before source access; nested `messages` is refused after
+source admission but before destination access and directed to an exact JSON
+container. It also changes no semantic
+rows or membership and claims compatibility with no trainer.
 
 ## Alternatives considered
 
@@ -115,7 +121,18 @@ a deterministic README, and renders twice to the same exact byte tree. Strict
 validation reconstructs the Finished Dataset v1 row set so the top-level row-
 set ID, split identity, counts, payload arrays, and provenance cannot drift
 independently. Historical request v1 is unchanged and sufficient; configured
-request v2 is refused. CSV and trainer profiles remain later work.
+request v2 is refused.
+
+Phase 5.3 verifies `constrained-csv` v1 through the same unchanged publisher
+and receipt boundary. Its renderer writes separate fully quoted UTF-8/LF train
+and evaluation files for `text`, `prompt_completion`, and
+`instruction_output`, plus a deterministic data card, mandatory aligned
+provenance, and README. Strict reload re-renders exact bytes and binds ordered
+headers, schema, counts, payloads, provenance, and logical partitions. It uses
+historical request v1, refuses request v2, and rejects nested `messages` with a
+split JSONL or canonical JSON alternative before publication. It adds no
+consumer, trainer, spreadsheet-compatibility, plugin, or dependency boundary.
+Trainer profiles remain later work.
 
 ## Review triggers
 
