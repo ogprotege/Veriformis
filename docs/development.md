@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -306,8 +306,11 @@ only `export-receipt.json`. Do not invoke a renderer, access a destination,
 mutate the source or plan, change the ten persisted export models, request or
 discovery schemas, production selectors, taxonomy, support state, or add a
 consumer/trainer claim. Item 5.6's focused, full, release, parity, Mac,
-tracking, lint, and review evidence passed locally; publication and merge remain
-separate gates, and item 5.7 remains later work.
+tracking, lint, and review evidence passed; all 14 GitHub checks passed and PR
+#58 merged at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 adds
+only the [generic export operator guide](generic-exports.md) and Phase 5
+closeout reconciliation; do not infer a runtime, support, consumer, or trainer
+change from documentation completion.
 
 ### Keep optional-integration claims accurate
 

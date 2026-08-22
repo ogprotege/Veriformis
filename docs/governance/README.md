@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
-**Next review:** Independent-product Phase 5.6 publication or merge, Phase 6
-start, any later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 5 closeout publication or merge,
+Phase 6 start, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -22,7 +22,7 @@ claims from drifting away from code and evidence.
 | [Evidence index](../evidence/index.json) | Machine-readable evidence records and evidence grades |
 | [Program ledger](../../dev/active/independent-product/program.json) | Machine-readable phase status and dependencies |
 | [Completed Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, evidence, and closeout |
-| [Active Phase 5 packet](../../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Generic local export checklist, decisions, risks, evidence, and pending closeout |
+| [Completed Phase 5 packet](../../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Generic local export checklist, decisions, risks, evidence, operator guidance, and closeout |
 
 Run the governance drift check with:
 
@@ -62,10 +62,14 @@ Item 5.5 merged as PR #57 at
 fixture closes all eleven compatible current container/schema pairs, proves one
 canonical semantic tamper fails per container, and retains constrained CSV's
 actionable pre-publication `messages` refusal. It adds no importer, replayer,
-API, taxonomy, support state, or trainer claim. Item 5.6's locally admitted
-runtime preview returns the unchanged plan and exact bounded ordinal-zero
-samples/tree in response v2 without renderer or destination access.
-Publication and merge remain the next gates before item 5.7; no taxonomy or
-support promotion is authorized.
+API, taxonomy, support state, or trainer claim. Item 5.6's runtime preview
+returns the unchanged plan and exact bounded ordinal-zero samples/tree in
+response v2 without renderer or destination access. It passed all 14 GitHub
+checks and merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 publishes the
+[generic export operator guide](../generic-exports.md) and reconciles Phase 5
+closeout without a taxonomy or support promotion. Its own pull-request result
+is not claimed by the local closeout record.
 Consumer compatibility still requires a separately admitted named profile.
-Phase 6 remains planned and requires its own packet before work begins.
+Phase 6 remains planned and requires its own packet after Phase 5 closeout
+publication and clean-main synchronization.

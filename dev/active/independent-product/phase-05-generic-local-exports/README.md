@@ -1,8 +1,10 @@
 # Phase 5 — Lossless Generic Local Exports
 
-**Status:** In progress
+**Status:** Completed
 
 **Started:** 2026-08-21
+
+**Completed:** 2026-08-22
 
 **Roadmap phase:** [Phase 5](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-5--ship-lossless-generic-local-exports)
 
@@ -33,9 +35,11 @@ row schemas merged as PR #55. Item 5.4's receipt-anchored post-export transport
 merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
 Item 5.5's discovery-closed semantic round-trip fixture merged as PR #57 at
 `c72b8e9ec7bc2746d74404226aa086d497e15db1`. It is test proof, not a
-production importer or replayer. Item 5.6's bounded runtime preview is
-implemented and locally admitted; pull-request publication, GitHub evidence,
-merge, and clean-main synchronization remain open.
+production importer or replayer. Item 5.6's bounded runtime preview merged as
+PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 completes the
+static operator guidance and closeout reconciliation locally; the item 5.7
+pull request, GitHub checks, merge, and post-merge synchronization are not
+claimed by this packet.
 
 ## Packet contents
 
@@ -43,10 +47,10 @@ merge, and clean-main synchronization remain open.
 | --- | --- |
 | [plan.md](plan.md) | Seven-item execution sequence and exit gate |
 | [progress.md](progress.md) | Append-only dated execution log |
-| [decisions.md](decisions.md) | Accepted and pending scope decisions |
-| [risks.md](risks.md) | Active risk register and controls |
-| [evidence.md](evidence.md) | Starting facts and required proof |
-| [closeout.md](closeout.md) | Pending exit-gate judgment |
+| [decisions.md](decisions.md) | Accepted scope decisions |
+| [risks.md](risks.md) | Final risk register and controls |
+| [evidence.md](evidence.md) | Starting facts and observed proof |
+| [closeout.md](closeout.md) | Exit-gate judgment |
 
 ## Current state
 
@@ -100,5 +104,18 @@ Local admission passed with 60 focused, 480 integrated, 1,238 full Python, and
 1,226 standalone release tests with one deselection; the intentional
 durability-warning regression was the only warning. Clean-wheel and both
 golden flows, parity, 66 Mac tests, tracking, lock, Ruff, structured JSON,
-diff, and independent reviews also passed. Publication and merge remain open,
-and item 5.7 has not begun.
+diff, and independent reviews also passed. Item 5.6 then passed its required
+GitHub checks, merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`, and left clean synchronized
+`main` before item 5.7 began.
+
+Item 5.7 publishes the
+[Generic Export Operator Guide](../../../../docs/generic-exports.md). It
+explains when to choose line-oriented split JSONL, one self-describing canonical
+JSON object, or constrained flat-schema CSV. It keeps that physical-container
+choice separate from the already-fixed training objective, semantic row schema,
+and any separately admitted consumer profile. The three generic exports remain
+consumer-neutral and do not imply trainer compatibility. The static guidance,
+capability/support review, and Phase 5 packet reconciliation are complete
+locally. This local completion statement does not claim publication, GitHub
+checks, merge, or clean-main synchronization for the item 5.7 pull request.

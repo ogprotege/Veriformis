@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
 **Decider:** Repository owner direction
 
@@ -21,9 +21,11 @@ Mac operations, while its private production catalog closes empty. Phase
 5.1–5.3 now supply the first three production exact-byte implementations,
 `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1, without
 adding a trainer pack. Phase 5.5's test-only semantic round-trip matrix merged
-as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 requires one
-exact, bounded dry-run view over the same plan and source rows without creating
-another renderer, destination path, or durable evidence model.
+as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 adds one exact,
+bounded dry-run view over the same plan and source rows without creating
+another renderer, destination path, or durable evidence model; it merged as PR
+#58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7 documents
+operator choice without changing this decision.
 
 ## Decision
 

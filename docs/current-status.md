@@ -25,14 +25,15 @@ optional receipt-anchored deterministic `.vfexport.zip` post-export transport
 merged as PR #56 without adding a fourth renderer, MCP operation, or Mac UI
 action; Phase 5.5's test-only consolidated semantic round-trip evidence merged
 as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`; Phase 5.6's exact bounded
-dry-run preview contract is frozen, implemented, and locally admitted;
-publication and merge remain open
+dry-run preview merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`; and Phase 5.7 publishes the
+generic-export operator guide and completes Phase 5 reconciliation without a
+runtime, taxonomy, support, consumer-profile, or trainer claim change
 
-**Review date:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
+**Review date:** 2026-08-22 (independent-product Phase 5 closeout)
 
-**Next review:** Phase 5.6 publication or merge;
-beta label cut, public-ready checklist, or any
-contract change
+**Next review:** Phase 5 closeout publication or merge, Phase 6 packet opening,
+beta label cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -273,8 +274,16 @@ closed reason, never truncated. ASCII-safe wire JSON decodes to exact source
 values. Preview construction invokes no renderer and accesses no destination.
 The ten persisted export models, request v1/v2, discovery v1, production
 selectors, taxonomy, and support state remain unchanged; response v1 remains
-exact for non-dry-run operations. Local admission evidence is recorded;
-publication and merge remain pending.
+exact for non-dry-run operations. Item 5.6 passed all 14 GitHub checks and
+merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`.
+
+Phase 5.7 adds the [generic export operator guide](generic-exports.md). It
+explains when to choose split JSONL, canonical JSON, or constrained CSV while
+keeping the already-bound training objective and row schema separate from
+physical container and consumer compatibility. It adds no runtime operation,
+importer, renderer, persisted schema, taxonomy entry, support promotion,
+consumer profile, or trainer claim. With that guidance and the reconciled
+packet/evidence/governance records, independent-product Phase 5 is complete.
 
 ## Implemented interfaces
 
@@ -629,9 +638,10 @@ See [docs/release.md](release.md).
 | Implemented independent Phase 5.3 | Production `constrained-csv` v1 exact-byte export for the three flat row schemas, fixed quoted CSV/data-card/provenance tree, nested-`messages` refusal, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.4 | Optional `deterministic-export-pack-zip-v1` post-export transport with `.vfexport.zip`, an external canonical-receipt digest, exact receipt-bound members, shared deterministic ZIP/no-replace machinery, preserved source trust, and no fourth renderer, MCP operation, or Mac UI action; merged as PR #56 at `499d61fa2e7d` |
 | Implemented and merged independent Phase 5.5 | Test-only consolidated ordinary-file semantic round-trip fixture covering all 11 compatible container/schema pairs, canonical semantic tamper for each container, and actionable pre-publication constrained-CSV/`messages` refusal; PR #57 at `c72b8e9ec7bc`; no importer, replayer, API, taxonomy, support, or trainer promotion |
-| Locally admitted independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; publication and merge pending |
+| Implemented and merged independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; PR #58 at `cd017941090c` |
+| Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete, items 5.1–5.5 merged, item 5.6 locally admitted pending publication/merge, and item 5.7 planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–5 complete and Phase 6 planned under a future standard packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -709,13 +719,16 @@ options. None changes dataset membership. Constrained CSV's supported-schema
 subset excludes nested `messages`. Phase 5.4's post-export transport and Phase
 5.5's test-only consolidated matrix are merged; the latter proves the eleven compatible
 ordinary-file round trips and three container tamper failures without adding an
-importer or replayer. Phase 5.6's runtime preview is locally admitted pending
-publication and merge; it changes no persisted or support state. New trainer-specific profiles are not current
-capabilities; the canonical and optional Aptus
+importer or replayer. Phase 5.6's runtime preview merged as PR #58 and changes
+no persisted or support state. Phase 5.7's operator guide closes the phase
+without changing that capability boundary. New trainer-specific profiles are
+not current capabilities; the canonical and optional Aptus
 profiles remain the implemented profile set. A deliberate beta label and
 public Mac checklist remain separate decisions.
 
-See the [independent product analysis](analysis/2026-08-11-independent-product-analysis.md),
+See the [generic export operator guide](generic-exports.md),
+[Phase 5 closeout](../dev/active/independent-product/phase-05-generic-local-exports/closeout.md),
+[independent product analysis](analysis/2026-08-11-independent-product-analysis.md),
 [tracking and evidence policy](governance/project-tracking.md),
 [historical private beta workbench plan](plans/2026-08-06-private-beta-workbench.md),
 [install guide](install.md), [release guide](release.md),

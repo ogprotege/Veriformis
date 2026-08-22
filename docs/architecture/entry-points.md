@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
 **Next review:** Any entry-point or architecture change
 
@@ -213,7 +213,9 @@ receipt-anchored transport leaves those renderer and surface claims unchanged.
 Phase 5.5 likewise adds no entry point: its merged eleven-pair
 ordinary-file reload matrix, three semantic-tamper cases, and constrained-CSV
 `messages` refusal are test evidence only. Item 5.6 enriches existing dry run as
-described above; item 5.7 remains later work.
+described above and merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 adds operator guidance
+and closeout records only; it creates no entry point.
 
 ## Preview, recipes, and optional integrations
 

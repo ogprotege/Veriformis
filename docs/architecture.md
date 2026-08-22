@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 preview locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -222,8 +222,12 @@ name.vfbundle/
   `export-receipt.json`. Response v2 is ASCII-safe and bounded through whole-
   row omission. Preview construction does not invoke a renderer or access a
   destination; it adds no persistence, catalog, taxonomy, support, consumer,
-  trainer, MCP-operation, or Mac-UI edge. Local admission is recorded;
-  publication and merge remain pending.
+  trainer, MCP-operation, or Mac-UI edge. It merged as PR #58 at
+  `cd017941090c7352cb1d10f9a383042b954d4f2e`.
+- Phase 5.7 changes no architecture edge. Its
+  [operator guide](generic-exports.md) documents how to choose an existing
+  container without changing the bound objective, row schema, or consumer
+  compatibility, and the completed packet reconciles Phase 5 records.
 
 ## Related documentation
 
@@ -232,6 +236,7 @@ name.vfbundle/
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
 - [Deterministic Archive Transport v1](contracts/bundle-transport-v1.md)
+- [Generic Export Operator Guide](generic-exports.md)
 - [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export v1](contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md)

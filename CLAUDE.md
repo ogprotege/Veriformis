@@ -14,7 +14,9 @@ Phase 5.4 merged as PR #56 at
 `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5's consolidated
 semantic round-trip matrix merged as PR #57 at
 `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6's exact dry-run preview
-is implemented and locally admitted; publication and merge remain open.
+merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e` after
+all 14 GitHub checks passed. Phase 5.7 completes the operator guide and local
+phase closeout without changing runtime or support state.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -82,17 +84,18 @@ Read these current authorities before changing code:
 10. `docs/contracts/canonical-json-export-v1.md`
 11. `docs/contracts/constrained-csv-export-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`
-13. `docs/architecture.md`
-14. `docs/analysis/2026-08-11-independent-product-analysis.md`
-15. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
-16. `docs/governance/project-tracking.md`,
+13. `docs/generic-exports.md`
+14. `docs/architecture.md`
+15. `docs/analysis/2026-08-11-independent-product-analysis.md`
+16. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+17. `docs/governance/project-tracking.md`,
    `dev/active/independent-product/program.json`, and the current or most
    recently completed phase packet
-17. `docs/governance/support-registry.json` and `docs/evidence/index.json`
-18. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
-19. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+18. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+19. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+20. `docs/plans/2026-07-29-veriformis-roadmap.md` and
     `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
-20. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+21. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.

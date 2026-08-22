@@ -330,3 +330,50 @@ dry-run operations use response v2. Item 5.7 has not begun.
 
 **Next action:** Publish item 5.6, require every GitHub check to pass, merge,
 and synchronize clean local `main` before starting item 5.7 operator guidance.
+
+## 2026-08-22 — Item 5.6 merged; item 5.7 started
+
+**Status:** Item 5.6 passed all 14 GitHub checks and merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Local `main` and `origin/main`
+were clean and equal at that commit before the item 5.7 branch began.
+
+Item 5.7 is documentation and reconciliation only. It publishes one operator
+guide for choosing among the three shipped generic containers, separates that
+choice from training objective, row schema, and consumer compatibility, and
+closes the Phase 5 packet. It does not change runtime behavior, persisted
+schemas, requests, responses, discovery, selectors, taxonomy, support state,
+renderers, consumer profiles, or trainer claims.
+
+**Next action:** Complete the guide, reconcile every active capability,
+evidence, governance, and packet record, run the required closeout gates, and
+record only observed results before publishing the item 5.7 pull request.
+
+## 2026-08-22 — Item 5.7 locally admitted; Phase 5 locally complete
+
+**Status:** The operator guide, documentation reconciliation, evidence record,
+and Phase 5 closeout are complete on the working tree based on PR #58's merge
+commit `cd017941090c7352cb1d10f9a383042b954d4f2e`. Pull-request publication,
+GitHub evidence, merge, and clean-main synchronization remain pending.
+
+The new guide distinguishes training objective, semantic row schema, physical
+container, and consumer profile; records the exact 11 compatible pairings and
+CSV/messages refusal; preserves train/evaluation and payload/provenance
+separation; and explains the canonical-bundle, source-bound verification, and
+optional receipt-anchored transport boundaries. The production catalog,
+support registry, runtime, persisted models, requests, responses, discovery,
+taxonomy, renderer set, trainer claims, and consumer profiles did not change.
+
+Full Python passed 1,238 tests with only the intentional durability-warning
+regression warning. The standalone release gate passed 1,226 tests with one
+deselection and the same warning, then passed lock verification, clean-wheel
+installation, and both golden compile/external-digest/transport flows. The
+complete macOS target passed 66 tests with `TEST SUCCEEDED`; standalone
+CLI/workbench parity passed. Tracking, its regression test, lock, Ruff,
+structured JSON, and diff checks passed. A syntax-aware audit checked 489 local
+link/image occurrences across 35 changed/new Markdown files; all passed, with
+five external links skipped. Independent guidance and closeout reviews found
+no remaining product, contract, support, or documentation blocker.
+
+**Next action:** Publish the item 5.7 closeout pull request, require every
+GitHub check to pass, merge, and synchronize clean local `main` with
+`origin/main` before Phase 6 begins.

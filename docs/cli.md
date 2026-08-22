@@ -18,7 +18,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
+**Last reviewed:** 2026-08-22 (Phase 5 generic export guidance and closeout)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -556,6 +556,13 @@ grade. See [Deterministic Archive Transport v1](contracts/bundle-transport-v1.md
 
 These commands are thin adapters over the same `PipelineService` operations as
 Python, MCP, and the CLI-backed Mac bridge:
+
+Use the [Generic Export Operator Guide](generic-exports.md) to choose a physical
+container without conflating it with the already-bound objective, semantic row
+schema, or downstream consumer compatibility. Phase 5.6's exact dry-run preview
+merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
+guide and Phase 5 closeout are complete on the current working tree; their pull
+request, GitHub evidence, and merge remain unclaimed.
 
 ```text
 veriformis export discover

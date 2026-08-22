@@ -11,20 +11,18 @@ plus completed independent-product Phases 0–4 and Phase 5.1–5.3's supported
 generic `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
 derivatives; Phase 5.4 receipt-anchored export-pack transport merged as PR #56,
 Phase 5.5's test-only consolidated semantic round-trip matrix merged as PR #57
-at `c72b8e9ec7bc2746d74404226aa086d497e15db1`, and Phase 5.6 exact dry-run
-preview implementation is locally admitted pending publication/merge, version
-`0.1.0` development alpha
+at `c72b8e9ec7bc2746d74404226aa086d497e15db1`, Phase 5.6 exact dry-run preview
+merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
+5.7 completes operator guidance and closeout, version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; Phase 5.1–5.5 implemented and merged; Phase 5.6 locally
-admitted with publication and merge pending; maturity alpha; public Mac claim
-still owner-gated
+Phases 0–5 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
-**Next review:** Phase 5.6 publication or merge; beta label cut, public-ready
-checklist, or any product-contract change
+**Next review:** Phase 5 closeout publication or merge, Phase 6 packet opening,
+beta label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -166,7 +164,8 @@ increment consolidates adversarial contract, tamper, path, link, source-trust,
 membership, race, cancellation, and partial-publication closeout evidence. The
 ten persisted v1 schemas and existing `publish` signature are unchanged. No
 production renderer or semantic replayer, generic export container, or new
-trainer profile ships. Phase 5 generic exports remain open.
+trainer profile shipped. At that Phase 4 closeout, Phase 5 generic exports
+remained open.
 
 Those final non-claims are the recorded Phase 4 exit boundary. Phase 5.1 now
 ships the exact-byte `split-jsonl-directory` v1 renderer and container with no
@@ -231,8 +230,14 @@ whole-row with an exact reason, never truncation or paraphrase. ASCII-safe
 transport decodes to the exact original values. Preview derivation calls no
 renderer and accesses no destination. The ten persisted verified-export v1
 models, request v1/v2, discovery v1, production selectors, taxonomy, support
-state, and trainer-neutral boundary remain unchanged. Local admission evidence
-is recorded; publication and merge remain pending.
+state, and trainer-neutral boundary remain unchanged. Item 5.6 passed all 14
+GitHub checks and merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`.
+
+Phase 5.7 publishes the [generic export operator guide](generic-exports.md) and
+closes Phase 5. The guide separates objective, semantic row schema, physical
+container, and consumer profile; it records the exact compatibility matrix and
+does not create a trainer, spreadsheet, importer, renderer, or support claim.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete

@@ -1,16 +1,16 @@
 # Phase 5 Risk Register
 
-**Status:** Active
+**Status:** Controlled at local closeout
 
 | ID | State | Likelihood | Impact | Risk | Control |
 | --- | --- | --- | --- | --- | --- |
-| P5-R1 | Controlled for 5.1–5.5 | Medium | High | A generic exporter mutates rows, filters records, or changes partition membership | The discovery-closed 5.5 matrix strictly reloads all 11 compatible pairs to the exact ordered partitions, aligned provenance, and source `RowSet` |
+| P5-R1 | Controlled for Phase 5 | Medium | High | A generic exporter mutates rows, filters records, or changes partition membership | The discovery-closed 5.5 matrix strictly reloads all 11 compatible pairs to the exact ordered partitions, aligned provenance, and source `RowSet`; the 5.7 guide states that export never changes construction, rows, or splits |
 | P5-R2 | Controlled for 5.1 | Medium | High | Configurable filenames permit traversal, aliases, collisions, or reserved output names | Strict derived stems and portable full-tree validation pass pre-source refusal tests |
 | P5-R3 | Controlled for 5.1 | Medium | High | Optional provenance is omitted, reordered, or misaligned without detection | Provenance defaults on, is all-or-nothing, and exact alignment/receipt/tamper tests passed |
-| P5-R4 | Controlled for 5.1–5.5 | Medium | High | README or machine metadata is nondeterministic or makes unsupported claims | All three contracts freeze canonical metadata, trainer non-claims, and closed trees; the 5.5 fixture reloads emitted data rather than trusting those claims |
-| P5-R5 | Controlled for 5.1–5.5 | Medium | High | A shipped profile bypasses the Phase 4 source, publication, or verification boundary | All three production entries run through `ExportService`; the 5.5 fixture adds no production path and materializes their production-rendered bytes as ordinary files |
-| P5-R6 | Controlled for 5.1–5.6 | Medium | High | Support or taxonomy is promoted before implementation evidence exists | Item 5.6 local admission passed after proving the production catalog, taxonomy, and support state remained unchanged |
-| P5-R7 | Controlled for 5.1–5.3 | Low | High | Container choice is presented as trainer compatibility | All three descriptors have no consumer profile; metadata, README, contracts, and current docs state no trainer claim |
+| P5-R4 | Controlled for Phase 5 | Medium | High | README or machine metadata is nondeterministic or makes unsupported claims | All three contracts freeze canonical metadata, trainer non-claims, and closed trees; the 5.5 fixture reloads emitted data rather than trusting those claims, and 5.7 reconciles the operator boundary |
+| P5-R5 | Controlled for Phase 5 | Medium | High | A shipped profile bypasses the Phase 4 source, publication, or verification boundary | All three production entries run through `ExportService`; the 5.5 fixture adds no production path and materializes their production-rendered bytes as ordinary files; 5.7 adds documentation only |
+| P5-R6 | Controlled for Phase 5 | Medium | High | Support or taxonomy is promoted before implementation evidence exists | Final reconciliation retains exactly the three admitted generic containers, their existing schema subsets, null consumer profiles, and unchanged taxonomy/support state |
+| P5-R7 | Controlled for Phase 5 | Low | High | Container choice is presented as trainer compatibility | All three descriptors retain a null consumer profile, and the 5.7 guide explicitly separates objective, row schema, physical container, and separately admitted consumer compatibility |
 | P5-R11 | Controlled for 5.2 | Medium | High | A single JSON document obscures partition identity or permits metadata/payload drift | Frozen split keys, fixed partition order, strict counts/schema/loss binding, and aligned provenance fail closed |
 | P5-R8 | Controlled for 5.3 | Medium | High | CSV encodes nested, null, missing, or ambiguous values lossily | The strict loader admits only the three frozen flat string mappings, makes null unrepresentable, and fails `messages` and nested values before destination access or publication with exact JSONL/JSON guidance |
 | P5-R9 | Controlled for 5.4 | Low | High | Archive work creates a second transport contract or unrelated ZIP implementation | ADR-0006 extends the one deterministic archive contract and shares the codec and package/package-verify path; dedicated and legacy compatibility evidence passed |
@@ -28,3 +28,11 @@
 | P5-R22 | Controlled for 5.5 | Medium | High | Test round-trip helpers accidentally become an unsupported public importer or conceal future catalog growth | Helpers remain under `tests/`, no product surface changes, and matrix discovery closure fails when a container or row schema is added without an explicit case |
 | P5-R23 | Controlled for 5.6 | Medium | High | A large exact row is truncated, normalized, or makes the dry-run response unbounded | Exact-ceiling, both whole-row budget fallbacks, metadata-only refusal, forged-label rejection, and ASCII-safe exact-value tests passed |
 | P5-R24 | Controlled for 5.6 | Low | High | Preview planning invokes a renderer or accesses, creates, or mutates a destination | One captured strict source snapshot feeds the immutable plan and preview; no-renderer, absent-destination, and unchanged-source tests passed |
+
+Every Phase 5 risk is controlled within the delivered, consumer-neutral scope.
+The controls do not establish trainer compatibility, a production importer or
+semantic replayer, source-bound archive verification, spreadsheet safety, or a
+maturity promotion. Item 5.6 merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`; this local closeout record makes no
+claim about publication, GitHub checks, merge, or clean-main synchronization for
+the item 5.7 pull request.

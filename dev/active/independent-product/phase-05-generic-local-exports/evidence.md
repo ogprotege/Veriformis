@@ -1,7 +1,7 @@
 # Phase 5 Evidence
 
-**Status:** In progress — items 5.1–5.5 merged; item 5.6 implemented and locally
-admitted, with publication and merge pending
+**Status:** Complete — items 5.1–5.6 merged; item 5.7 operator guidance and
+Phase 5 closeout locally admitted without claiming its own pull-request result
 
 **Opened:** 2026-08-21
 
@@ -26,6 +26,7 @@ container.
 | ADR-0006 defines `deterministic-export-pack-zip-v1` as a receipt-anchored post-export wrapper while preserving ADR-0005 and the three export selectors | `source-verified` | ADR-0006 and deterministic archive contract |
 | Item 5.4 merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8` before item 5.5 began | `source-verified` | Git commit and Phase 5 progress record |
 | Item 5.5 merged as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1` before item 5.6 began | `source-verified` | Git commit and Phase 5 progress record |
+| Item 5.6 passed all 14 GitHub checks and merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e` before item 5.7 began | `source-verified` | GitHub pull-request state, Git commit, and Phase 5 progress record |
 
 ## Required item 5.1 evidence
 
@@ -55,8 +56,8 @@ container.
 - [x] Nested CSV is refused before publication with an actionable alternative.
 - [x] Generic export-pack archives reuse the existing deterministic transport
       and verifier.
-- [ ] Dry-run sample rows and destination trees match execution.
-- [ ] Operator guidance separates container choice, training objective, and
+- [x] Dry-run sample rows and destination trees match execution.
+- [x] Operator guidance separates container choice, training objective, and
       consumer compatibility.
 
 ## Required item 5.2 evidence
@@ -172,6 +173,26 @@ container.
 - [x] Active documentation and evidence records agree that no persisted model,
       request/discovery schema, selector, taxonomy entry, support state,
       renderer, consumer profile, or trainer claim changed.
+
+## Required item 5.7 evidence
+
+- [x] One discoverable operator guide explains when to choose split JSONL,
+      canonical JSON, or constrained CSV using only shipped contract claims.
+- [x] The guide separates training objective, semantic row schema, physical
+      container, and named consumer profile as distinct decisions.
+- [x] The exact compatibility matrix is preserved: JSONL and JSON admit all
+      four current row schemas; constrained CSV admits the three flat schemas
+      and refuses nested `messages` with both JSON alternatives.
+- [x] The guide preserves train/evaluation separation, payload/provenance
+      separation, the canonical-bundle authority, source-bound export
+      verification, and receipt-anchored optional transport.
+- [x] README, install, CLI, documentation index, status, product, architecture,
+      governance, WIP, program, support, evidence, and packet records agree.
+- [x] Support registry semantics remain unchanged: the three shipped generic
+      containers retain null consumer profiles and no trainer compatibility.
+- [x] Required repository, structured-file, local-link, diff, and independent
+      documentation-review gates pass with exact observed results recorded
+      before local closeout is called complete.
 
 ## Observed results
 
@@ -329,4 +350,150 @@ evaluation, exact Unicode/control transport, normalized destination trees,
 one source snapshot, no renderer or destination access, non-dry-run response-v1
 compatibility, and strict CLI-backed Mac v2 decoding all pass. The ten persisted
 verified-export models, requests, discovery, production catalog, taxonomy, and
-support state remain unchanged. Item 5.7 has not begun.
+support state remain unchanged. At that local-admission checkpoint, item 5.7
+had not begun; item 5.6 later merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e` after all 14 GitHub checks passed.
+
+### Item 5.7 and Phase 5 local closeout — 2026-08-22
+
+Item 5.7 is a documentation-only operator-guidance and reconciliation change
+on the working tree based on PR #58's merge commit
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. The observations below do not
+claim publication, GitHub checks, merge, or clean-main synchronization for the
+item 5.7 pull request.
+
+| Evidence | Result | Grade | Limitation |
+| --- | --- | --- | --- |
+| Phase 5 exit semantics | All 11 compatible current container/schema pairs preserve exact rows and separate logical partitions; CSV/messages refusal and canonical semantic tamper evidence remain green | `recorded-local` | Executable proof was delivered by items 5.1–5.6; item 5.7 changes documentation only |
+| Full Python | 1,238 passed; one intentional durability-warning regression warning | `recorded-local` | Local Python run; GitHub's version matrix remains separate publication evidence |
+| Standalone release | 1,226 passed, 1 deselected; lock, clean wheel, and both golden compile/external-digest/transport flows passed | `recorded-local` | Optional Aptus integration remains separate |
+| macOS XCTest | 66 passed; `TEST SUCCEEDED` | `recorded-local` | Local unsigned Debug test build |
+| CLI/workbench parity | PASS | `recorded-local` | Temporary parity artifacts were not retained |
+| Governance and structure | Tracking, tracking regression, lock, Ruff, structured JSON, and diff checks passed; 489 local link/image occurrences passed across 35 changed/new Markdown files | `recorded-local` | Five external links were skipped; external crawling and Mermaid rendering are not automated gates |
+| Independent review | Guidance and closeout audits found no product, contract, support-registry, or documentation blocker | `recorded-local` | Local read-only review, not a GitHub review claim |
+
+The exact syntax-aware local-link audit is retained below so the summarized
+count is reproducible. It parses changed and untracked Markdown through
+MarkdownIt, checks local path existence and Markdown fragments, and reports but
+does not crawl external links.
+
+<!-- phase5-link-audit-script -->
+```python
+import pathlib
+import re
+import subprocess
+import urllib.parse
+
+from markdown_it import MarkdownIt
+
+root = pathlib.Path(".").resolve()
+changed = subprocess.check_output(
+    ["git", "diff", "--name-only", "--diff-filter=ACM", "--", "*.md"],
+    text=True,
+).splitlines()
+untracked = subprocess.check_output(
+    ["git", "ls-files", "--others", "--exclude-standard", "--", "*.md"],
+    text=True,
+).splitlines()
+files = sorted(set(changed + untracked))
+markdown = MarkdownIt("commonmark")
+
+
+def destinations(text):
+    result = []
+
+    def walk(tokens):
+        for token in tokens or []:
+            if token.type == "link_open":
+                result.append(token.attrGet("href"))
+            elif token.type == "image":
+                result.append(token.attrGet("src"))
+            if token.children:
+                walk(token.children)
+
+    walk(markdown.parse(text))
+    return [destination for destination in result if destination is not None]
+
+
+def anchors(path):
+    tokens = markdown.parse(path.read_text(encoding="utf-8"))
+    found = set()
+    seen = {}
+    for index, token in enumerate(tokens[:-1]):
+        if token.type != "heading_open" or tokens[index + 1].type != "inline":
+            continue
+        label = tokens[index + 1].content.strip().lower()
+        slug = re.sub(r"[^\w\-\s]", "", label, flags=re.UNICODE)
+        slug = re.sub(r"\s", "-", slug)
+        occurrence = seen.get(slug, 0)
+        seen[slug] = occurrence + 1
+        if occurrence:
+            slug = f"{slug}-{occurrence}"
+        found.add(slug)
+    return found
+
+
+anchor_cache = {}
+checked = 0
+passed = 0
+external = 0
+failures = []
+for relative_path in files:
+    source = root / relative_path
+    for destination in destinations(source.read_text(encoding="utf-8")):
+        parsed = urllib.parse.urlsplit(destination)
+        if parsed.scheme or parsed.netloc:
+            external += 1
+            continue
+        checked += 1
+        raw_path = urllib.parse.unquote(parsed.path)
+        if not raw_path:
+            target = source
+        elif raw_path.startswith("/"):
+            target = root / raw_path.lstrip("/")
+        else:
+            target = source.parent / raw_path
+        target = target.resolve()
+        valid = target.exists()
+        reason = "missing path"
+        if valid and parsed.fragment:
+            if target.is_file() and target.suffix.lower() == ".md":
+                if target not in anchor_cache:
+                    anchor_cache[target] = anchors(target)
+                valid = (
+                    urllib.parse.unquote(parsed.fragment).lower()
+                    in anchor_cache[target]
+                )
+                reason = "missing anchor"
+            else:
+                reason = "fragment target is not Markdown"
+        if valid:
+            passed += 1
+        else:
+            failures.append((relative_path, destination, reason))
+
+print(
+    f"changed_markdown_files={len(files)} local_links_checked={checked} "
+    f"passed={passed} failed={len(failures)} "
+    f"external_links_skipped={external}"
+)
+for failure in failures:
+    print("FAIL", *failure, sep=" | ")
+```
+<!-- /phase5-link-audit-script -->
+
+The [Generic Export Operator Guide](../../../../docs/generic-exports.md)
+documents when to use split JSONL, canonical JSON, or constrained CSV without
+making container choice determine training objective, row schema, or consumer
+compatibility. It preserves train/evaluation separation, payload/provenance
+separation, the canonical-bundle authority, source-bound export verification,
+and receipt-anchored optional transport. Split JSONL and canonical JSON retain
+all four current schemas; constrained CSV retains the three flat schemas and
+refuses nested `messages` with both JSON alternatives.
+
+No runtime source, test behavior, persisted schema, request, response,
+discovery entry, selector, taxonomy entry, support state, renderer, consumer
+profile, or trainer claim changed in item 5.7. The three production generic
+descriptors retain null consumer profiles. Phase 5 is locally complete; Phase 6
+remains planned and must not begin until the item 5.7 pull request is green,
+merged, and clean local `main` equals `origin/main`.

@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
+**Last reviewed:** 2026-08-22 (Phase 5 generic export guidance and closeout)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -20,7 +20,7 @@ the hood (usually via the repo’s `.venv` or `uv`).
 | **`veriformis` CLI** | Real product: parse → … → seal / verify |
 | **Mac workbench** (optional) | Thin GUI over that CLI |
 | **Sealed `.vfbundle`** | Finished dataset product |
-| **Split JSONL derivative** | Verified ordinary train/evaluation JSONL directory; no trainer profile |
+| **Generic export derivatives** | Verified split JSONL, canonical JSON, or compatible flat CSV; no trainer profile |
 
 There is not yet a notarized App Store–style installer. Private beta means:
 install the CLI on your machine, optionally build/open the Debug app.
@@ -152,6 +152,18 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis mcp` | Local MCP adapter |
 | `veriformis preview PATH` | Cleaning preview without commit |
 | `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions |
+
+### Choose a generic export container
+
+Use the [Generic Export Operator Guide](generic-exports.md) to choose among
+split JSONL, canonical JSON, and constrained CSV. The container encodes rows
+whose training objective, semantic row schema, curation, and train/evaluation
+membership are already fixed; it does not choose those semantics or prove
+compatibility with a trainer. Phase 5.6's exact dry-run preview merged as PR #58
+at `cd017941090c7352cb1d10f9a383042b954d4f2e`. The Phase 5.7 guide and Phase 5
+closeout are complete on the current working tree, while their pull request,
+GitHub evidence, and merge remain unclaimed. Product maturity remains
+development alpha.
 
 ### Verified split JSONL derivative
 

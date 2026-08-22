@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
-**Next review:** Independent-product Phase 5.6 publication or merge, Phase 6
-start, or any active-document behavior change
+**Next review:** Independent-product Phase 5 closeout publication or merge,
+Phase 6 start, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
 | --- | --- | --- | --- | --- | --- |
@@ -29,10 +29,12 @@ debt: its
 frozen fixture proves all eleven compatible ordinary-file round trips, three
 container tamper failures, and the existing constrained-CSV/`messages` refusal
 without adding a product importer or support claim. Item 5.6's exact runtime
-preview contract and local admission evidence are documented across contract,
-operator, architecture, governance, and packet records without a
-persisted-schema or support promotion; publication/merge and final item 5.7
-operator guidance remain open.
+preview passed all 14 GitHub checks and merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 closes the missing
+JSONL/JSON/CSV chooser and axis-separation obligation through the
+[generic export operator guide](../generic-exports.md), with no persisted-
+schema, runtime, taxonomy, support, consumer, trainer, or new documentation-
+debt promotion. DOC-002, DOC-003, DOC-006, and DOC-007 remain open.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

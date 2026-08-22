@@ -15,7 +15,7 @@ profile
 
 **Status:** Implemented in independent-product Phase 5.1
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
 ## Purpose and authority
 

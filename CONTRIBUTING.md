@@ -75,8 +75,10 @@ tree plus `export-receipt.json`. Preserve complete payloads through the 65,536-
 byte inclusion ceiling, whole-row omission above it or under response-budget
 pressure, ASCII-safe exact-value transport, and the no-renderer
 and no-destination boundary. Do not promote a persisted schema, selector,
-taxonomy, support state, consumer, or trainer claim. Item 5.6 local admission
-passed; publication and merge remain pending.
+taxonomy, support state, consumer, or trainer claim. Item 5.6 merged as PR #58
+at `cd017941090c7352cb1d10f9a383042b954d4f2e`; the completed Phase 5
+[operator guide](docs/generic-exports.md) is the current container-choice
+boundary.
 Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)

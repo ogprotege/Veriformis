@@ -1,14 +1,15 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 5.5 merged; Phase 5.6 locally admitted
+**Status:** Independent-product Phase 5 locally complete; closeout publication
+and merge remain unclaimed
 
 **Review date:** 2026-08-22
 
-**Repository baseline:** Working tree based on Phase 5.5 merge
-`c72b8e9ec7bc2746d74404226aa086d497e15db1`
+**Repository baseline:** Working tree based on Phase 5.6 PR #58 merge
+`cd017941090c7352cb1d10f9a383042b954d4f2e`
 
-**Next review:** Independent-product Phase 5.6 publication or merge, Phase 6
-start, or the next active-document behavior change
+**Next review:** Independent-product Phase 5 closeout publication or merge,
+Phase 6 start, or the next active-document behavior change
 
 ## Scope examined
 
@@ -26,10 +27,10 @@ start, or the next active-document behavior change
 ### Active
 
 - Product contract, current status, architecture, CLI, development, install,
-  release, and beta-limitations documents.
+  generic-export operator, release, and beta-limitations documents.
 - Independent product analysis and roadmap.
 - Project governance, support registry, evidence index, ADRs, documentation
-  debt, WIP, the completed Phase 0–4 packets, and the active Phase 5 packet.
+  debt, WIP, and the completed Phase 0–5 packets.
 - Versioned integrity, construction, finished-dataset, verified-export, split-
   JSONL, canonical-JSON, constrained-CSV, and optional Aptus handoff contracts, plus the
   implemented taxonomy contract.
@@ -85,14 +86,15 @@ deprecated document must link its replacement and removal/review trigger.
 | PR #56 merged while active records still described Phase 5.4 publication as pending, and item 5.5 lacked one closed shared semantic matrix | PR #56 at `499d61fa2e7d`; discovery-derived fixture and strict ordinary-file reload suite | Recorded the Phase 5.4 merge and locally admitted Phase 5.5 as exactly eleven compatible container/schema round trips, one canonical semantic tamper per container, and actionable constrained-CSV/`messages` refusal; retained the existing three selectors and added no importer, replayer, API, taxonomy, support, or trainer promotion |
 | PR #57 merged while active records still described Phase 5.5 publication as pending, and item 5.6 lacked a frozen bounded runtime contract | PR #57 at `c72b8e9ec7bc`; Verified Export Contract v1 and Phase 5 packet | Recorded the Phase 5.5 merge and froze response-v2 dry-run preview semantics: exact ordinal-zero samples, a 65,536-byte inclusion ceiling with whole-row omission above it or under response-budget pressure, ASCII-safe exact decoded values, and a normalized plan-derived tree plus receipt; retained all persisted models, requests, discovery, selectors, taxonomy, and support state while leaving 5.6 admission/publication open |
 | Item 5.6 implementation was present while active evidence still recorded only a 49-test partial observation | Exact preview implementation; 60 focused, 480 integrated, 1,238 full Python, 1,226 standalone, and 66 Mac test results; independent reviews | Recorded local admission after closing the all-11-pair execution matrix, digest/size binding, exact ceiling, both response-budget fallbacks, metadata-only refusal, forged-omission rejection, strict Mac v2 bounds, and no-renderer/no-destination evidence; retained unchanged persisted models, requests, discovery, selectors, taxonomy, support, and trainer/consumer claims |
+| PR #58 merged while active records still described Phase 5.6 publication as pending, and operators lacked one authoritative JSONL/JSON/CSV chooser | PR #58 at `cd017941090c`; shipped container contracts; `docs/generic-exports.md`; completed Phase 5 packet | Recorded the green merge, separated objective, row schema, physical container, and consumer profile, documented the exact compatibility matrix and safe export flow, and reconciled Phase 5 completion without changing runtime, persisted schemas, taxonomy, support state, or trainer/consumer claims |
 
 ## Current health assessment
 
 | Area | Assessment | Basis |
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
-| Current capability accuracy | Good within audited active scope; Phase 5.5 merged and Phase 5.6 locally admitted pending publication/merge | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, exact preview evidence, and unchanged production discovery/support |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–4 packets, and one active Phase 5 packet |
+| Current capability accuracy | Good within audited active scope; Phase 5 is locally complete and its closeout pull-request result remains unclaimed | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, exact preview evidence, operator guidance, and unchanged production discovery/support |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–5 packets, and Phase 6 still planned |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -101,8 +103,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Publish locally admitted item 5.6, require every GitHub check to pass, merge,
-   and synchronize clean local `main` before beginning item 5.7.
+1. Publish the Phase 5.7 guidance/closeout pull request, require every GitHub
+   check to pass, merge, and synchronize clean local `main` before Phase 6.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
@@ -128,11 +130,15 @@ focused, 453 integrated, 1,211 full Python, 1,199 standalone release with one de
 58 Mac, parity, Ruff, lock, and structured-JSON checks passed. It covers all
 eleven compatible ordinary-file pairs, per-container tamper, and the sole
 current incompatible CSV/messages pair without adding an importer or changing
-runtime support. Phase 5.6's exact dry-run contract now binds the unchanged
+runtime support. Phase 5.6's exact dry-run contract binds the unchanged
 plan, first non-empty-partition rows, normalized plan-derived tree plus receipt,
 whole-row omission, and ASCII-safe exact-value transport without renderer or
-destination access. Its local admission evidence is recorded; publication and
-merge evidence remain open.
+destination access. It merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
+[operator guide](../generic-exports.md) closes the container-choice obligation
+without adding a runtime, importer, renderer, taxonomy, support, consumer, or
+trainer capability. The local closeout record does not claim its own GitHub or
+merge result.
 Generic output does not establish trainer compatibility, and any future
 shipped semantic profile must enforce explicit resource limits.
 
