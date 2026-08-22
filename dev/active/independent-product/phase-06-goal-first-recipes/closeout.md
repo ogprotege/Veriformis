@@ -43,10 +43,17 @@ evidence will be recorded after the pull request is green.
 
 ## Verification summary
 
-Local Python, lock, Ruff, tracking, structured JSON, and diff gates are
-recorded in `evidence.md`. This Linux cloud VM cannot run XCTest or the Mac
-parity script; those remain the macOS GitHub check. Observed counts will be
-filled on the working tree before the pull request is published.
+- Focused goal tests: 373 passed.
+- Full Python: 1,910 collected; the only first-run failure was the matrix
+  catalog digest after the additive catalog fields, then corrected by
+  pinning `catalog_sha256`. Standalone release: 1,898 passed, 1 deselected,
+  with only the intentional transport durability warning.
+- Project tracking, lock, Ruff, structured JSON, fixture byte equality, and
+  diff checks passed.
+- This Linux cloud VM cannot run XCTest or the Mac parity script; those
+  remain the macOS GitHub check.
+
+Exact tables live in `evidence.md`.
 
 ## Exclusions and remaining constraints
 

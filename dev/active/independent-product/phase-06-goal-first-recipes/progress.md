@@ -485,8 +485,10 @@ workspace exists; U6 is the documented pick → preflight → compile → previe
 view-model compile/preflight argument projection.
 
 This Linux cloud VM cannot run XCTest or the Mac parity script; those gates
-are recorded as exercised by the macOS GitHub check. Observed Python gates
-are recorded in `evidence.md`.
+are recorded as exercised by the macOS GitHub check. Observed Python gates:
+373 focused goal tests passed; standalone release passed 1,898 with 1
+deselected; the only full-suite first-run failure was the matrix catalog
+digest, corrected by pinning `catalog_sha256` to the new catalog bytes.
 
 **Next action:** Publish the item 6.7 pull request, require every GitHub
 check to pass, merge, and synchronize clean local `main` with `origin/main`.

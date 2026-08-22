@@ -246,11 +246,11 @@ synchronized with `origin/main` before item 6.7 began.
 
 | Gate | Observed |
 | --- | --- |
-| Focused truthfulness, usability, catalog, preflight, and preview tests | To be recorded on this tree |
-| Full Python (`uv run pytest -q`) | To be recorded on this tree |
-| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | To be recorded on this tree |
-| `scripts/check_project_tracking.py` and its regression | To be recorded on this tree |
-| `uv lock --check`, Ruff, structured JSON, fixture `cmp`, `git diff --check` | To be recorded on this tree |
+| Focused goal tests (`tests/goals`) | 373 passed in 29.05 seconds |
+| Full Python (`uv run pytest -q`) | 1,909 passed and 1 failed on the first run: the frozen matrix still pinned the pre-6.7 catalog digest. After updating only `catalog_sha256` to `59c518d9a1f10c7bda3f518f5baf6950de0d50e75d8b80118969ca135fead80d`, that test passed. Expected full count is 1,910 with the same intentional durability warning. |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 1,898 passed, 1 deselected, 1 intentional warning in 703.82 seconds |
+| `scripts/check_project_tracking.py` and its regression | PASS |
+| `uv lock --check`, Ruff, structured JSON, fixture `cmp`, `git diff --check` | PASS |
 | macOS XCTest target and `macos/scripts/parity_check.sh` | Not runnable on this Linux cloud VM; exercised by the macOS GitHub check |
 
 Proofs recorded by tests (usability criteria U1, U4, U5, U6; U2 and U3
