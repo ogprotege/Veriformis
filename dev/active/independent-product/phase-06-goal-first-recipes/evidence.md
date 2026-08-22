@@ -1,7 +1,6 @@
 # Phase 6 Evidence
 
-**Status:** Open — items 6.1–6.6 merged as PR #60 through PR #65; item 6.7
-passed its local admission gates and awaits its pull request
+**Status:** Complete — items 6.1–6.7 merged as PR #60 through PR #65 and PR #67
 
 **Opened:** 2026-08-22
 
@@ -277,3 +276,7 @@ remain the 6.3 and 6.6 evidence):
 
 These are local observations. They do not claim publication, GitHub checks,
 merge, or clean-main synchronization for the item 6.7 pull request.
+
+Item 6.7 subsequently passed all 14 GitHub checks and merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d`; clean local `main` was
+synchronized with `origin/main`. Phase 6 is complete.

@@ -1,12 +1,12 @@
 # Phase 6 Closeout
 
-**Status:** Locally complete
+**Status:** Complete
 
 **Last reviewed:** 2026-08-22
 
 ## Exit-gate judgment
 
-Passed locally. A non-developer can select each supported goal from plain
+Passed. A non-developer can select each supported goal from plain
 language and inspect exactly what receives training loss. Every surface
 resolves to the same recipe identifiers and outputs. Instruction templates
 are the only default instruction literals; an operator instruction is
@@ -19,8 +19,9 @@ acceptance matrix, and instruction-truthfulness closeout add no objective,
 row schema, construction behavior, trainer claim, consumer profile,
 generated text, or invented question, answer, summary, or target.
 
-This closeout pull request is the Phase 6 exit. GitHub-check and merge
-evidence will be recorded after the pull request is green.
+Item 6.7 passed all 14 GitHub checks and merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d`; clean local `main` equals
+`origin/main` there.
 
 ## Delivered scope
 
@@ -68,6 +69,6 @@ Exact tables live in `evidence.md`.
 - Documentation debts DOC-002, DOC-003, DOC-006, and DOC-007 remain open;
   none changes the Phase 6 exit judgment.
 
-Phase 7 may begin under its own standard packet after this pull request
-merges with every required GitHub check passing and clean local `main`
-equals `origin/main`.
+This closeout pull request passed every required GitHub check and merged as
+PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d`; clean local `main`
+equals `origin/main` there. Phase 7 may begin under its own standard packet.

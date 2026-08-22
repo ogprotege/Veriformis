@@ -1,14 +1,13 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 5 complete; Phase 6 locally complete
-with item 6.7 closeout awaiting merge
+**Status:** Independent-product Phases 0–6 complete
 
-**Review date:** 2026-08-22 (independent-product Phase 6.7 locally complete)
+**Review date:** 2026-08-22 (independent-product Phase 6 complete)
 
-**Repository baseline:** Working tree based on Phase 6.6 PR #65 merge
-`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`
+**Repository baseline:** Working tree based on Phase 6.7 PR #67 merge
+`6995d17bef0d09f235b1c464e947c38c63dd313d`
 
-**Next review:** Independent-product Phase 6.7 pull-request merge, or the next
+**Next review:** Independent-product Phase 7 packet opening, or the next
 active-document behavior change
 
 ## Scope examined
@@ -93,8 +92,8 @@ deprecated document must link its replacement and removal/review trigger.
 | Area | Assessment | Basis |
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
-| Current capability accuracy | Good within audited active scope; Phase 5 is complete with its closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, Phase 6.1–6.6 are on `main` through PR #65, and item 6.7 is locally complete | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, instruction-truthfulness evidence, operator guidance, and unchanged production discovery/support |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–5 packets, and the active Phase 6 packet |
+| Current capability accuracy | Good within audited active scope; Phase 5 is complete with its closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, and Phase 6 is complete with its closeout merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d` | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, instruction-truthfulness evidence, operator guidance, and unchanged production discovery/support |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, and completed Phase 0–6 packets |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -103,8 +102,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Publish the item 6.7 closeout pull request, require every GitHub check
-   to pass, merge, and synchronize clean local `main` before Phase 7.
+1. Open Phase 7 under its own standard packet after existing-dataset
+   import contracts and acceptance fixtures are pinned.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a

@@ -493,3 +493,13 @@ digest, corrected by pinning `catalog_sha256` to the new catalog bytes.
 **Next action:** Publish the item 6.7 pull request, require every GitHub
 check to pass, merge, and synchronize clean local `main` with `origin/main`.
 Phase 6 then ends; Phase 7 may begin under its own packet.
+
+## 2026-08-22 — Item 6.7 merged; Phase 6 complete
+
+**Status:** Item 6.7 merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
+passed; clean local `main` equals `origin/main` at that commit.
+
+Phase 6 is complete. All seven sequential items merged:
+PR #60, #61, #62, #63, #64, #65, and #67. Phase 7 may begin under its own
+standard packet.

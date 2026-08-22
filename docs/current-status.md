@@ -30,13 +30,13 @@ dry-run preview merged as PR #58 at
 generic-export operator guide and completes Phase 5 reconciliation without a
 runtime, taxonomy, support, consumer-profile, or trainer claim change, merged
 as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
-independent-product Phase 6.1–6.6 merged sequentially as PR #60 through PR #65,
-and item 6.7's instruction-truthfulness closeout is locally complete pending
-its pull request
+independent-product Phase 6 complete, with items 6.1–6.7 merged sequentially
+as PR #60 through PR #65 and PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d`
 
-**Review date:** 2026-08-22 (independent-product Phase 6.7 locally complete)
+**Review date:** 2026-08-22 (independent-product Phase 6 complete)
 
-**Next review:** Phase 6.7 pull-request merge, beta label
+**Next review:** Phase 7 packet opening, beta label
 cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -335,9 +335,11 @@ external-digest verify; it merged as PR #65 at
 instruction templates as the only default instruction literals, admits an
 operator instruction only after a deterministic truthfulness check, proves
 `messages` user turns are exact context, judges usability criteria U1–U6,
-and writes the Phase 6 closeout; its pull request is pending. None of these
-items adds an objective, row schema, persisted schema, trainer claim, or
-consumer profile.
+and writes the Phase 6 closeout; it merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
+passed. Independent-product Phase 6 is complete. None of these items adds
+an objective, row schema, persisted schema, trainer claim, or consumer
+profile.
 
 ## Implemented interfaces
 
@@ -700,7 +702,7 @@ See [docs/release.md](release.md).
 | Implemented and merged independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; PR #58 at `cd017941090c` |
 | Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–5 complete and Phase 6 locally complete under its [standard packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–6 complete under the [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

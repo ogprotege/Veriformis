@@ -77,12 +77,12 @@
     {
       "number": 6,
       "title": "Deliver goal-first recipes and previews",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [4],
       "packet": "dev/active/independent-product/phase-06-goal-first-recipes",
       "started_on": "2026-08-22",
-      "completed_on": null,
-      "next_gate": "Items 6.1 through 6.6 merged sequentially through PR #65 at 7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5; item 6.7 instruction truthfulness and Phase 6 closeout passed all local admission gates and awaits its green pull-request merge and clean-main synchronization."
+      "completed_on": "2026-08-22",
+      "next_gate": "Completed; closeout merged as PR #67 at 6995d17bef0d09f235b1c464e947c38c63dd313d with all 14 GitHub checks passed and clean main synchronized; Phase 7 may begin under its own standard packet."
     },
     {
       "number": 7,
