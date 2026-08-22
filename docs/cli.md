@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -301,7 +301,7 @@ veriformis curate WORKSPACE [--goal GOAL | --preset PRESET] \
 | `--evaluation-ratio-ppm` | preset value | Requested evaluation partition ratio, 1–999999 |
 | `--require-evaluation` / `--allow-empty-evaluation` | preset value (required) | Permits a sole leakage group to remain entirely in train |
 | `--split-seed` | preset value | Seed entering the deterministic group order |
-| `--instruction` | none | Required when the recipe selected `instruction_output`; rejected for all other row schemas |
+| `--instruction` | the selected goal's catalog template | Required to be truthful when supplied for `instruction_output`; omitted uses the catalog template; rejected for all other row schemas |
 
 Curation runs minimum-target filtering, source-scoped conflict quarantine,
 exact deduplication, optional primary-source cap, and coverage closure, in
@@ -788,7 +788,7 @@ MCP, YAML, Python, and the workbench. See the
 Evaluate raw-source compile readiness without creating a workspace.
 
 ```text
-veriformis preflight PATH... [--source-root ROOT] (--goal ID | --preset ID) [--representation ID] [overrides...]
+veriformis preflight PATH... [--source-root ROOT] (--goal ID | --preset ID) [--representation ID] [--instruction TEXT] [overrides...]
 ```
 
 The command resolves the same recipe settings as compile, captures each
@@ -799,7 +799,10 @@ source's parser and goal-family eligibility, exact refusals, missing goal
 evidence, expected exclusions, coverage and split blockers, and explicit
 limitations. All `chunk`, `construct`, and `curate` setting flags are accepted
 as explicit overrides; omitted values come only from the selected versioned
-preset. The report is printed before exit: admission exits `0`, while a
+preset. `--instruction` is valid only for instruction-and-output; omitted
+uses the selected goal's catalog template after the truthfulness check, and
+an untruthful or empty supplied instruction is refused before source access.
+The report is printed before exit: admission exits `0`, while a
 complete negative verdict exits `2`. Source entries are bounded at 64 KiB and
 the whole response at 256 KiB without truncating values. The command creates
 no workspace, calls no renderer, and accesses no destination. See the
@@ -821,8 +824,9 @@ context and target fields, the row exactly as `format` would lower it, and the
 exact supervised span with its loss policy. When `curate` has run, each record
 carries its curation decision and every excluded record is listed with its
 reason codes. `--representation` must be compatible with the goal;
-`--instruction` supplies the instruction-and-output instruction when none is
-persisted. Records above 64 KiB or beyond the 256 KiB response budget are
+`--instruction` supplies an operator instruction for instruction-and-output;
+when omitted the catalog template is used unless a persisted instruction
+already exists. Records above 64 KiB or beyond the 256 KiB response budget are
 omitted whole with an exact reason. The command writes no state. See the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md#goal-preview-v1).
 

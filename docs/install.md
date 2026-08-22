@@ -126,11 +126,15 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | --- | --- |
 | `veriformis version` | Print package version |
 | `veriformis taxonomy` | Print the implemented training taxonomy as read-only JSON |
+| `veriformis goals` | Print the versioned goal catalog |
+| `veriformis presets` | Print versioned recipe presets |
+| `veriformis preflight PATH... --goal ID` | Raw-source compile admission without a workspace |
 | `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |
 | `veriformis clean WORKSPACE` | Cleaning plan + apply |
 | `veriformis chunk WORKSPACE` | Evidence-bearing chunks |
-| `veriformis construct WORKSPACE --objective NAME` | Build records (`full_text`, `continuation`, …) |
-| `veriformis curate WORKSPACE` | Curation (`--allow-empty-evaluation` when needed) |
+| `veriformis construct WORKSPACE --goal ID` | Build records from a catalog goal (or `--objective`) |
+| `veriformis curate WORKSPACE` | Curation; omitted `--instruction` uses the catalog template |
+| `veriformis goal-preview WORKSPACE` | Show rows and the exact supervised span |
 | `veriformis split WORKSPACE` | Train / evaluation assignment |
 | `veriformis format WORKSPACE` | Lower to product rows |
 | `veriformis validate WORKSPACE` | 17-gate validation |
@@ -248,6 +252,50 @@ veriformis package /tmp/out.vfbundle -o /tmp/out.vfbundle.zip \
 veriformis package-verify /tmp/out.vfbundle.zip \
   --manifest-sha256 "$MANIFEST_SHA256"
 ```
+
+### Goal-first walkthrough (pick → preflight → compile → preview → export)
+
+This is the documented non-developer walkthrough for usability criterion U6.
+Use two independent sources so the default split keeps a non-empty
+evaluation partition. The Mac workbench follows the same sequence: pick a
+goal, run preflight, compile, inspect the preview, then dry-run an export.
+
+```bash
+mkdir -p /tmp/vf-demo
+cat > /tmp/vf-demo/alpha.txt <<'EOF'
+Alpha opening is long enough to split into context and target. The remainder stays in this same independent source.
+
+Alpha second paragraph keeps the leakage groups distinct.
+EOF
+cat > /tmp/vf-demo/beta.txt <<'EOF'
+Beta opening is long enough to split into context and target. The remainder stays in this same independent source.
+
+Beta second paragraph keeps the leakage groups distinct.
+EOF
+
+veriformis goals
+veriformis preflight /tmp/vf-demo/alpha.txt /tmp/vf-demo/beta.txt \
+  --source-root /tmp/vf-demo --goal continue-a-passage
+veriformis parse /tmp/vf-demo/alpha.txt /tmp/vf-demo/beta.txt \
+  -o /tmp/vf-ws --source-root /tmp/vf-demo
+veriformis clean /tmp/vf-ws
+veriformis chunk /tmp/vf-ws --preset continue-a-passage.safe
+veriformis construct /tmp/vf-ws --goal continue-a-passage --preset continue-a-passage.safe
+veriformis curate /tmp/vf-ws --preset continue-a-passage.safe
+veriformis split /tmp/vf-ws
+veriformis format /tmp/vf-ws
+veriformis validate /tmp/vf-ws
+veriformis seal /tmp/vf-ws -o /tmp/out.vfbundle
+veriformis goal-preview /tmp/vf-ws
+MANIFEST_SHA256="$(sha256sum /tmp/out.vfbundle/manifest.json | awk '{print $1}')"
+veriformis verify /tmp/out.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
+```
+
+Omitted `--instruction` on instruction-and-output uses the catalog template
+after the truthfulness check. To inspect a generic export without writing a
+destination, use `veriformis export dry-run --request-json` as described in
+the [CLI reference](cli.md) and the
+[Generic Export Operator Guide](generic-exports.md).
 
 Optional Aptus adapter use is explicit: pass `--aptus-handoff` to `seal`, or
 run `handoff` after retaining the manifest digest. The adapter's current policy

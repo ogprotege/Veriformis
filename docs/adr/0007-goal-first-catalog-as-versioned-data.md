@@ -55,6 +55,11 @@ recipe identifiers on every surface.
   fails when any surface reintroduces one.
 - Plain-language fields are checked mechanically for machine identifiers and
   summary claims (usability criterion U1).
+- Phase 6.7 stores one static `instruction_template` and unique
+  `instruction_task` per goal in the same packaged catalog. Those templates
+  are the only default instruction literals. An operator instruction is
+  admitted only when it names that task and contains no claim vocabulary
+  for a transformation the goal does not perform.
 
 ## Review triggers
 

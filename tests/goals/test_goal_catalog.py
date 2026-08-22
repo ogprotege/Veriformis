@@ -38,7 +38,7 @@ from veriformis.taxonomy import (
 )
 
 DATA_PATH = Path(__file__).parents[2] / "src" / "veriformis" / "goals" / "catalog-v1.json"
-DATA_SHA256 = "c0cc0cef6959abf98f5c0b345817d0db14d683b782cb457cb4034023963e7481"
+DATA_SHA256 = "59c518d9a1f10c7bda3f518f5baf6950de0d50e75d8b80118969ca135fead80d"
 FROZEN_FIXTURE = (
     Path(__file__).parents[1] / "regressions" / "fixtures" / "phase6" / "goal-catalog.json"
 )
@@ -48,6 +48,8 @@ PLAIN_FIELDS = (
     "plain_language",
     "what_the_model_learns",
     "what_you_provide",
+    "instruction_template",
+    "instruction_task",
 )
 
 
@@ -338,6 +340,33 @@ def _mutated(edit) -> dict:
                 "requires_operator_instruction", False
             ),
             "instruction",
+        ),
+        (
+            "template omits the task phrase",
+            lambda p: p["goals"][1].__setitem__(
+                "instruction_template", "Continue the supplied opening."
+            ),
+            "instruction_task",
+        ),
+        (
+            "template claims a summary",
+            lambda p: p["goals"][1].__setitem__(
+                "instruction_template",
+                "Summarize the passage with its exact source remainder.",
+            ),
+            "summar",
+        ),
+        (
+            "duplicate instruction task",
+            lambda p: (
+                p["goals"][2].__setitem__(
+                    "instruction_task", p["goals"][1]["instruction_task"]
+                ),
+                p["goals"][2].__setitem__(
+                    "instruction_template", p["goals"][1]["instruction_template"]
+                ),
+            ),
+            "unique",
         ),
     ],
 )

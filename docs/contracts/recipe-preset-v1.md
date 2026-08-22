@@ -12,7 +12,7 @@
 reused without duplicated defaults by Phase 6.5 compile preflight, and
 acceptance-matrix bound by Phase 6.6.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.6)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7)
 
 **Next review:** Any default, preset, goal, representation, chunk-strategy,
 curation-policy, or consumer-profile change

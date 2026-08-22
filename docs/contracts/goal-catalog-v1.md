@@ -11,12 +11,13 @@
 **Implementation status:** Implemented in independent-product Phase 6.1
 (goal catalog and read-only discovery), extended additively by Phase 6.2
 (per-goal contracts and input-family eligibility), Phase 6.3 (the
-runtime-only goal preview), and Phase 6.4 (goal and preset selection on every
+runtime-only goal preview), Phase 6.4 (goal and preset selection on every
 compile surface under the [Recipe Preset Contract v1](recipe-preset-v1.md)),
-and Phase 6.5 (the runtime-only compile preflight). Items 6.6–6.7 extend it
-further with the acceptance matrix and instruction truthfulness.
+Phase 6.5 (the runtime-only compile preflight), Phase 6.6 (the
+discovery-closed acceptance matrix), and Phase 6.7 (per-goal instruction
+templates and deterministic instruction truthfulness).
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -88,6 +89,8 @@ Top-level object:
 | `review_policy_default` | `none` or `required` |
 | `review_policy_options` | Exactly `["none", "required"]` |
 | `non_claims` | Exactly the closed v1 codes `no-trainer-compatibility`, `no-generated-text`, `no-invented-target`, `no-fine-tuning-suitability-judgment` |
+| `instruction_template` | The only default instruction literal for this goal; a complete source-derived task statement used when `instruction-and-output` omits an operator instruction |
+| `instruction_task` | The unique phrase the template and every admitted operator instruction MUST name |
 | `state` | Exactly `implemented` in v1 |
 
 ### Representation object
@@ -120,20 +123,24 @@ Top-level object:
    context and the target. `full_text` admits only `whole-text`.
 6. Plain-language fields (`title`, `plain_language`,
    `what_the_model_learns`, `what_you_provide`, `not_this`,
-   `supervised_region`) MUST NOT contain, in any letter case, a machine
-   identifier: an objective, row-schema, loss-policy, recipe, or alias
-   identifier that contains `_`, `-`, or `.`. Bare English words that are also
-   identifiers (`text`, `messages`, `continuation`, `completion`,
-   `instruction`, `chat`) are permitted as ordinary words. Fields MUST be
-   non-empty, MUST NOT carry surrounding whitespace, MUST NOT contain control
-   characters, and `not_this` MUST NOT repeat an entry.
+   `instruction_template`, `instruction_task`, `supervised_region`) MUST NOT
+   contain, in any letter case, a machine identifier: an objective,
+   row-schema, loss-policy, recipe, or alias identifier that contains `_`,
+   `-`, or `.`. Bare English words that are also identifiers (`text`,
+   `messages`, `continuation`, `completion`, `instruction`, `chat`) are
+   permitted as ordinary words. Fields MUST be non-empty, MUST NOT carry
+   surrounding whitespace, MUST NOT contain control characters, and
+   `not_this` MUST NOT repeat an entry.
 7. `title`, `plain_language`, `what_the_model_learns`, `what_you_provide`,
    `required_source_evidence`, `target_construction`,
-   `supervision_boundary`, and every representation's `title`,
-   `plain_language`, and `supervised_region` MUST NOT describe a summary, an
-   answer, or a translation. `summary` is not a goal, objective, alias, or
-   representation.
-   Item 6.7 extends this claim vocabulary to operator instructions.
+   `supervision_boundary`, `instruction_template`, `instruction_task`, and
+   every representation's `title`, `plain_language`, and `supervised_region`
+   MUST NOT describe a summary, an answer, or a translation. `summary` is
+   not a goal, objective, alias, or representation. The same claim
+   vocabulary (`summar`, `answer`, `translat`) applies to every operator
+   instruction admitted for `instruction-and-output`.
+   `instruction_template` MUST contain `instruction_task` as a contiguous
+   case-insensitive substring. `instruction_task` MUST be unique per goal.
 
 8. `eligible_input_families` MUST name only families whose recovery supplies
    the goal's `required_source_evidence`; a family that can never supply it
@@ -170,6 +177,18 @@ Every goal states `curation_defaults` of `minimum_target_characters` 1,
 admit `split-jsonl-directory` and `json` for every row schema and
 `constrained-csv` for the three flat schemas only.
 
+| Goal | `instruction_task` | `instruction_template` |
+| --- | --- | --- |
+| `learn-the-text` | exact source passage | Reproduce the exact source passage as written. |
+| `continue-a-passage` | exact source remainder | Continue the passage with its exact source remainder. |
+| `recover-a-section-from-its-heading` | exact source section body | Produce the exact source section body for this heading. |
+| `reproduce-a-recorded-change` | recorded cleaning change | Apply the recorded cleaning change to this exact source text. |
+| `extract-a-structured-value` | exact structural attribute | Produce the exact structural attribute recorded by this source. |
+
+Those five templates are the only default instruction literals. They are
+byte-identical to the instruction strings pinned by the Phase 6.6
+acceptance matrix for every `instruction_output` cell.
+
 ## Resolution
 
 `resolve_goal(goal_id, representation_id=None)` returns exactly
@@ -179,6 +198,24 @@ representation, a UI alias, or an incompatible pair fails with
 `goal-catalog-invalid` before any workspace is opened. The returned objective
 and row schema are the only values that may enter a `DatasetRecipe`; goal and
 representation identifiers are never persisted in a recipe, row, or bundle.
+
+`resolve_operator_instruction(...)` is the only default-instruction path.
+It returns the catalog template or one admitted operator instruction:
+
+| Input | Result |
+| --- | --- |
+| Representation is not `instruction-and-output`, instruction omitted | `null`; no instruction is stored or rendered |
+| Representation is not `instruction-and-output`, instruction supplied | `instruction-not-applicable` |
+| `instruction-and-output`, instruction omitted (`null`) | The goal's `instruction_template` after the same truthfulness check |
+| `instruction-and-output`, empty or surrounding-whitespace text | `instruction-required` |
+| `instruction-and-output`, non-empty text that lacks `instruction_task` or contains `summar`, `answer`, or `translat` | `instruction-untruthful` |
+| `instruction-and-output`, non-empty text that names `instruction_task` and contains no forbidden claim fragment | That exact text |
+
+`curate`, compile preflight, goal preview, the CLI, MCP, the YAML runner,
+and the Mac bridge all resolve through this function. Catalog templates are
+the only default instruction literals; surfaces MUST NOT invent another
+prefix, question, summary, or task statement. `messages` user turns remain
+the exact context field and NEVER receive an instruction prefix.
 
 ## Discovery
 
@@ -239,10 +276,13 @@ Semantics:
    record with its reason codes under `exclusions`, counts included, excluded,
    and quarantined records, and reuses the persisted instruction text for the
    instruction-and-output representation unless the caller supplies one.
-5. `instruction-and-output` without an instruction (persisted or supplied)
-   reports `operator-instruction-required` and omits the rendered row while
-   keeping lineage, evidence, target, and supervised span; this is not counted
-   in `counts.omitted`, which counts only size omissions.
+5. `instruction-and-output` resolves an omitted instruction (no persisted
+   text and no caller text) through `resolve_operator_instruction` to the
+   goal's catalog template and renders the row. An empty supplied
+   instruction fails closed with `instruction-required`. An untruthful
+   supplied instruction fails closed with `instruction-untruthful`. The
+   closed omission code `operator-instruction-required` remains reserved
+   and is no longer the omitted-instruction path.
 6. Bounds mirror the Phase 5.6 export preview and are measured on the exact
    ASCII transport text: a record whose entry exceeds 65,536 bytes is omitted
    whole with `exact-record-exceeds-preview-limit`; the response is assembled
@@ -305,7 +345,8 @@ and exact unredacted entry size. Refusal codes are
 `evaluation-partition-unavailable`. Incompatibility codes are
 `selection-required`, `goal-invalid`, `preset-incompatible`,
 `representation-incompatible`, `consumer-profile-incompatible`,
-`override-invalid`, `instruction-required`, `instruction-not-applicable`, and
+`override-invalid`, `instruction-required`, `instruction-not-applicable`,
+`instruction-untruthful`, and
 `review-evidence-unavailable`.
 
 Semantics:
@@ -335,9 +376,14 @@ Semantics:
    failure are negative verdicts with exact stable reason or diagnostic codes.
    Expected exclusions remain reported even when compile can otherwise
    proceed; preflight never silently turns an exclusion into admission.
-6. The instruction-and-output representation requires a non-empty operator
-   instruction. Phase 6.5 reports that Phase 6.7 has not yet validated the
-   instruction's truthfulness; it makes no semantic claim about the text.
+6. The instruction-and-output representation requires an instruction
+   value. An omitted instruction resolves to the goal's catalog template
+   after the truthfulness check. A supplied instruction is admitted only
+   when it names that goal's `instruction_task` and contains no claim
+   vocabulary for a transformation the goal does not perform; otherwise
+   preflight reports `instruction-required` or `instruction-untruthful`
+   before source access. An instruction on any other representation is
+   `instruction-not-applicable`.
 7. Bounds are measured on exact ASCII transport text. A source entry above
    65,536 bytes drops only its diagnostic detail while preserving the complete
    verdict and omission count. A response above 262,144 bytes drops source

@@ -82,7 +82,7 @@
       "packet": "dev/active/independent-product/phase-06-goal-first-recipes",
       "started_on": "2026-08-22",
       "completed_on": null,
-      "next_gate": "Items 6.1 through 6.5 merged sequentially through PR #64 at b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d; item 6.6 goal acceptance matrix passed all local admission gates and awaits its green pull-request merge and clean-main synchronization before item 6.7."
+      "next_gate": "Items 6.1 through 6.6 merged sequentially through PR #65 at 7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5; item 6.7 instruction truthfulness and Phase 6 closeout passed all local admission gates and awaits its green pull-request merge and clean-main synchronization."
     },
     {
       "number": 7,

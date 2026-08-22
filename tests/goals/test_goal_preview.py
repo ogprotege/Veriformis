@@ -20,7 +20,6 @@ from veriformis.goals import (
 )
 from veriformis.goals import preview as preview_module
 from veriformis.goals.preview import (
-    INSTRUCTION_REQUIRED_OMISSION,
     MAX_RECORD_BYTES,
     MAX_RESPONSE_BYTES,
     RECORD_LIMIT_OMISSION,
@@ -107,7 +106,11 @@ def test_preview_shows_exact_row_and_supervised_span_for_every_goal(
 ) -> None:
     workspace = workspaces[objective]
     rep = goal_catalog().representation(rep_id)
-    instruction = "Produce the exact source-derived target." if rep.requires_operator_instruction else None
+    instruction = (
+        goal_for_objective(objective).instruction_template
+        if rep.requires_operator_instruction
+        else None
+    )
     before = _snapshot(workspace)
     outcome = SERVICE.preview_goal(workspace, representation=rep_id, instruction=instruction)
     assert _snapshot(workspace) == before
@@ -162,20 +165,22 @@ def test_preview_shows_exact_row_and_supervised_span_for_every_goal(
     assert len(preview.transport_text().encode("utf-8")) <= MAX_RESPONSE_BYTES
 
 
-def test_default_representation_follows_the_recipe_and_requires_instruction_when_needed(
+def test_default_representation_follows_the_recipe_and_uses_the_catalog_template(
     workspaces,
 ) -> None:
     preview = SERVICE.preview_goal(workspaces["continuation"]).preview
     assert preview.representation_id == "prompt-and-completion"
-    missing = SERVICE.preview_goal(
+    templated = SERVICE.preview_goal(
         workspaces["continuation"], representation="instruction-and-output"
     ).preview
-    assert missing.records
-    for entry in missing.records:
-        assert entry.omission_reason == INSTRUCTION_REQUIRED_OMISSION
-        assert entry.rendered_row is None
+    expected = goal_for_objective("continuation").instruction_template
+    assert templated.records
+    for entry in templated.records:
+        assert entry.omission_reason is None
+        assert entry.rendered_row is not None
+        assert entry.rendered_row["instruction"] == expected
         assert entry.target is not None and entry.supervised.end > 0
-    assert missing.counts["omitted"] == 0
+    assert templated.counts["omitted"] == 0
 
 
 def test_preview_reports_curation_decisions_and_persisted_instruction(tmp_path) -> None:
@@ -184,7 +189,7 @@ def test_preview_reports_curation_decisions_and_persisted_instruction(tmp_path) 
         workspace,
         minimum_target_characters=100_000,
         evaluation_required=False,
-        instruction="Continue the passage exactly.",
+        instruction=goal_for_objective("continuation").instruction_template,
     )
     preview = SERVICE.preview_goal(workspace).preview
     assert preview.available_stages == ("construct", "curate")
@@ -195,7 +200,9 @@ def test_preview_reports_curation_decisions_and_persisted_instruction(tmp_path) 
     for entry in preview.records:
         assert entry.curation_status == "excluded"
         assert "target-too-short" in entry.curation_reason_codes
-        assert entry.rendered_row["instruction"] == "Continue the passage exactly."
+        assert entry.rendered_row["instruction"] == goal_for_objective(
+            "continuation"
+        ).instruction_template
     assert preview.omitted_exclusion_count == 0
 
 

@@ -1,6 +1,6 @@
 # Phase 6 — Goal-First Recipes and Previews
 
-**Status:** In progress
+**Status:** Locally complete; item 6.7 closeout awaits its green merge
 
 **Started:** 2026-08-22
 
@@ -49,14 +49,17 @@ capabilities owned by `PipelineService`.
 
 Phase 6 opened on 2026-08-22 from baseline
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` (PR #59, the Phase 5 closeout).
-Items 6.1–6.5 merged sequentially as PR #60
+Items 6.1–6.6 merged sequentially as PR #60
 (`7316d94faf2d6c23b7abb6fe200f154da47d398c`), PR #61
 (`81becfa676fd9111868b8d4b62549218a644d3e2`), PR #62
-(`9cbab117e47cde6bd8850d67f0d363e03f0660ce`), and PR #63
-(`abdd630e25e83ebf346316319caec892f4d64886`), and PR #64
-(`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`), each after all 14 GitHub
-checks passed and clean-main synchronization. Item 6.6 is locally complete on
-`phase6/06-goal-acceptance-matrix` and awaits its pull request: its frozen,
-discovery-closed 74-cell matrix proves every eligible goal, input family, and
-representation from raw source through seal and external-digest verify with
-identical identifiers across every surface.
+(`9cbab117e47cde6bd8850d67f0d363e03f0660ce`), PR #63
+(`abdd630e25e83ebf346316319caec892f4d64886`), PR #64
+(`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`), and PR #65
+(`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`), each after all 14 GitHub
+checks passed and clean-main synchronization. Item 6.7 is locally complete:
+every goal now carries a static instruction template and task phrase; omitted
+`instruction-and-output` instructions resolve to that template; operator
+instructions fail closed unless they name the goal's task and claim no
+absent transformation; `messages` user turns remain exact context; and the
+predeclared usability criteria U1–U6 are judged with recorded evidence.
+This closeout pull request is the Phase 6 exit.

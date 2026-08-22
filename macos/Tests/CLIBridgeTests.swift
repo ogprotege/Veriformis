@@ -1217,6 +1217,93 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(workbench.selectedPreset?.segmentation.strategy, "structure")
     }
 
+    @MainActor
+    func testPhase6UsabilityWalkthroughThroughWorkbenchViewModel() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-u6-\(UUID().uuidString)")
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(defaults: defaults, supportDirectory: support)
+        let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
+        let presets = try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+        workbench.applyCatalogs(goals: goals, presets: presets)
+
+        let machineTokens = [
+            "full_text", "section_reconstruction", "before_after_transformation",
+            "structured_field", "prompt_completion", "instruction_output",
+        ]
+        for goal in goals.goals {
+            workbench.selectGoal(goal.goalID)
+            XCTAssertEqual(workbench.selectedGoalID, goal.goalID)
+            XCTAssertEqual(workbench.selectedPresetID, "\(goal.goalID).safe")
+            XCTAssertFalse(goal.notThis.isEmpty)
+            XCTAssertEqual(goal.nonClaims.count, 4)
+            XCTAssertTrue(
+                goal.instructionTemplate.lowercased().contains(goal.instructionTask.lowercased())
+            )
+            for token in machineTokens {
+                XCTAssertFalse(goal.title.contains(token), goal.goalID)
+                XCTAssertFalse(goal.plainLanguage.contains(token), goal.goalID)
+                XCTAssertFalse(goal.instructionTemplate.contains(token), goal.goalID)
+            }
+            let workspace = URL(fileURLWithPath: "/tmp/ws")
+            let plan = VeriformisCLI.compilePlan(
+                sources: [URL(fileURLWithPath: "/data/raw/a.txt")],
+                sourceRoot: URL(fileURLWithPath: "/data/raw"),
+                workspace: workspace,
+                bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+                goal: goal.goalID,
+                preset: "\(goal.goalID).safe",
+                allowEmptyEvaluation: false,
+                splitRatioPPM: nil
+            )
+            XCTAssertEqual(
+                plan.map(\.stage),
+                [.parse, .clean, .chunk, .construct, .curate, .split, .format, .validate, .seal]
+            )
+        }
+        XCTAssertEqual(workbench.selectedGoal?.title, goals.goals.last?.title)
+
+        workbench.selectGoal("continue-a-passage")
+        let continueGoal = try XCTUnwrap(workbench.selectedGoal)
+        let preflight = CompilePreflightRequest(
+            sources: [URL(fileURLWithPath: "/data/raw/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data/raw"),
+            goal: continueGoal.goalID,
+            preset: "continue-a-passage.safe",
+            representation: "instruction-and-output"
+        )
+        let preflightArgs = VeriformisCLI.preflightArguments(preflight)
+        XCTAssertFalse(preflightArgs.contains("--instruction"))
+        XCTAssertEqual(
+            Array(preflightArgs.prefix(10)),
+            [
+                "preflight", "/data/raw/a.txt",
+                "--source-root", "/data/raw",
+                "--goal", "continue-a-passage",
+                "--preset", "continue-a-passage.safe",
+                "--representation", "instruction-and-output",
+            ]
+        )
+        let compileArgs = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/raw/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data/raw"),
+            workspace: URL(fileURLWithPath: "/tmp/ws"),
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            goal: continueGoal.goalID,
+            preset: "continue-a-passage.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil,
+            representation: "instruction-and-output"
+        )
+        XCTAssertFalse(compileArgs.flatMap(\.arguments).contains("--instruction"))
+        XCTAssertEqual(compileArgs.first?.stage, .parse)
+        XCTAssertEqual(compileArgs.last?.stage, .seal)
+    }
+
     // MARK: - Goal preview (Phase 6.3)
 
     func testGoalPreviewDecodesFrozenFixtureExactly() throws {
@@ -1376,6 +1463,15 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(structural.reviewPolicyDefault, "none")
         XCTAssertEqual(structural.reviewPolicyOptions, ["none", "required"])
         XCTAssertEqual(structural.nonClaims.count, 4)
+        XCTAssertEqual(
+            structural.instructionTemplate,
+            "Produce the exact structural attribute recorded by this source."
+        )
+        XCTAssertTrue(
+            structural.instructionTemplate.lowercased().contains(
+                structural.instructionTask.lowercased()
+            )
+        )
         XCTAssertFalse(structural.requiredEvidenceDiagnostics.isEmpty)
         XCTAssertEqual(catalog.goal(withID: "learn-the-text")?.compatibleRepresentations, ["whole-text"])
         XCTAssertNil(catalog.goal(withID: "summarize-the-document"))

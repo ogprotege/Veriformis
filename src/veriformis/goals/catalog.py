@@ -29,7 +29,13 @@ from veriformis.contracts import (
     V1_CONSTRUCTION_DIAGNOSTIC_CODES,
     V1_ROW_SCHEMA_KINDS,
 )
-from veriformis.errors import GoalCatalogError, TaxonomyError
+from veriformis.errors import (
+    GoalCatalogError,
+    InstructionNotApplicableError,
+    InstructionRequiredError,
+    InstructionTruthfulnessError,
+    TaxonomyError,
+)
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.taxonomy import (
     DEFAULT_ROW_SCHEMA,
@@ -75,6 +81,8 @@ _PLAIN_GOAL_FIELDS = (
     "required_source_evidence",
     "target_construction",
     "supervision_boundary",
+    "instruction_template",
+    "instruction_task",
 )
 _PLAIN_REPRESENTATION_FIELDS = ("title", "plain_language", "supervised_region")
 _FORBIDDEN_CLAIM_FRAGMENTS = ("summar", "answer", "translat")
@@ -306,7 +314,15 @@ class Goal(_StrictModel):
     review_policy_default: Literal["none", "required"]
     review_policy_options: tuple[str, ...]
     non_claims: tuple[str, ...]
+    instruction_template: str
+    instruction_task: str
     state: Literal["implemented"]
+
+    @model_validator(mode="after")
+    def _instruction_template_names_task(self) -> "Goal":
+        if self.instruction_task.lower() not in self.instruction_template.lower():
+            raise ValueError("instruction_template must contain instruction_task")
+        return self
 
     @field_validator("eligible_input_families")
     @classmethod
@@ -480,6 +496,9 @@ class GoalCatalog(_StrictModel):
                     f"{default_row!r}, but the taxonomy default is "
                     f"{DEFAULT_ROW_SCHEMA[goal.objective]!r}"
                 )
+        tasks = [goal.instruction_task.lower() for goal in self.goals]
+        if len(set(tasks)) != len(tasks):
+            raise ValueError("instruction_task must be unique per goal")
 
     def goal(self, goal_id: str) -> Goal:
         for goal in self.goals:
@@ -596,6 +615,79 @@ def resolve_goal(
     return goal.objective, rep.row_schema, goal.recipe_library_id, rep.loss_policy
 
 
+def validate_instruction_text(goal: Goal, text: str) -> str:
+    """Admit one instruction only when it names this goal's task and no other."""
+    try:
+        checked = _require_no_forbidden_claim(
+            "instruction", _require_plain_text("instruction", text)
+        )
+    except ValueError as exc:
+        raise InstructionTruthfulnessError(str(exc)) from exc
+    if goal.instruction_task.lower() not in checked.lower():
+        raise InstructionTruthfulnessError(
+            f"instruction does not name the {goal.goal_id} task "
+            f"({goal.instruction_task!r})"
+        )
+    return checked
+
+
+def resolve_operator_instruction(
+    *,
+    goal: Goal | str | None = None,
+    objective: str | None = None,
+    representation: GoalRepresentation | str | None = None,
+    row_schema: str | None = None,
+    instruction: str | None = None,
+) -> str | None:
+    """Return the catalog template or a truthful operator instruction.
+
+    Omitted instructions resolve to the goal's static template when the
+    representation requires one. An empty supplied instruction fails closed.
+    A supplied instruction is admitted only when it names this goal's task
+    and contains no claim vocabulary for a transformation the goal does not
+    perform.
+    """
+    catalog = goal_catalog()
+    if isinstance(goal, Goal):
+        resolved_goal = goal
+    elif goal is not None:
+        resolved_goal = catalog.goal(goal)
+    elif objective is not None:
+        resolved_goal = goal_for_objective(objective)
+    else:
+        raise GoalCatalogError("instruction resolution requires a goal or objective")
+
+    if isinstance(representation, GoalRepresentation):
+        resolved_rep = representation
+    elif representation is not None:
+        resolved_rep = catalog.representation(representation)
+    elif row_schema is not None:
+        resolved_rep = representation_for_row_schema(row_schema)
+    else:
+        resolved_rep = catalog.representation(resolved_goal.default_representation)
+
+    if resolved_rep.representation_id not in resolved_goal.compatible_representations:
+        raise GoalCatalogError(
+            f"goal {resolved_goal.goal_id!r} does not allow representation "
+            f"{resolved_rep.representation_id!r}"
+        )
+    if not resolved_rep.requires_operator_instruction:
+        if instruction is not None:
+            raise InstructionNotApplicableError(
+                "instruction is valid only for the instruction-and-output representation"
+            )
+        return None
+    if instruction is None:
+        return validate_instruction_text(
+            resolved_goal, resolved_goal.instruction_template
+        )
+    if not instruction or instruction.strip() != instruction:
+        raise InstructionRequiredError(
+            "instruction is required for the instruction-and-output representation"
+        )
+    return validate_instruction_text(resolved_goal, instruction)
+
+
 def require_goal_input_family(
     goal_id: str,
     *,
@@ -645,5 +737,7 @@ __all__ = [
     "parse_goal_catalog",
     "representation_for_row_schema",
     "resolve_goal",
+    "resolve_operator_instruction",
     "require_goal_input_family",
+    "validate_instruction_text",
 ]

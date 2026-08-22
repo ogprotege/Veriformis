@@ -2399,7 +2399,8 @@ struct GoalCatalogGoal: Equatable, Sendable {
         "compatible_representations", "eligible_input_families",
         "required_source_evidence", "required_evidence_diagnostics",
         "target_construction", "supervision_boundary", "curation_defaults",
-        "review_policy_default", "review_policy_options", "non_claims", "state",
+        "review_policy_default", "review_policy_options", "non_claims",
+        "instruction_template", "instruction_task", "state",
     ]
 
     let goalID: String
@@ -2422,6 +2423,8 @@ struct GoalCatalogGoal: Equatable, Sendable {
     let reviewPolicyDefault: String
     let reviewPolicyOptions: [String]
     let nonClaims: [String]
+    let instructionTemplate: String
+    let instructionTask: String
     let state: String
 }
 
@@ -2623,8 +2626,17 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 reviewPolicyDefault: reviewDefault,
                 reviewPolicyOptions: reviewOptions,
                 nonClaims: try Self.identifiers(item, "non_claims"),
+                instructionTemplate: try Self.text(item, "instruction_template"),
+                instructionTask: try Self.text(item, "instruction_task"),
                 state: try Self.text(item, "state")
             )
+            guard goal.instructionTemplate.lowercased().contains(
+                goal.instructionTask.lowercased()
+            ) else {
+                throw GoalCatalogError.invalidGoals(
+                    "goal \(goal.goalID) instruction_template must contain instruction_task"
+                )
+            }
             guard goal.state == "implemented" else {
                 throw GoalCatalogError.invalidGoals("goal \(goal.goalID) state is not implemented")
             }
@@ -3412,6 +3424,7 @@ enum CompilePreflightIncompatibilityCode: String, Decodable, Equatable, Sendable
     case overrideInvalid = "override-invalid"
     case instructionRequired = "instruction-required"
     case instructionNotApplicable = "instruction-not-applicable"
+    case instructionUntruthful = "instruction-untruthful"
     case reviewEvidenceUnavailable = "review-evidence-unavailable"
 }
 

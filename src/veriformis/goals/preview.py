@@ -28,6 +28,7 @@ from veriformis.goals.catalog import (
     goal_catalog,
     goal_for_objective,
     representation_for_row_schema,
+    resolve_operator_instruction,
 )
 from veriformis.identity import lossless_json_bytes
 from veriformis.taxonomy import loss_boundary
@@ -290,14 +291,14 @@ def build_goal_preview(
 
     decisions = {} if curation is None else {d.record_id: d for d in curation.decisions}
     context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
-    instruction_missing = rep.requires_operator_instruction and instruction is None
-    plan = (
-        None
-        if instruction_missing
-        else SerializationPlan.create(
-            row_schema=rep.row_schema,
-            instruction_text=instruction if rep.requires_operator_instruction else None,
-        )
+    resolved_instruction = resolve_operator_instruction(
+        goal=goal,
+        representation=rep,
+        instruction=instruction,
+    )
+    plan = SerializationPlan.create(
+        row_schema=rep.row_schema,
+        instruction_text=resolved_instruction,
     )
     passes = {construction_pass.pass_id: construction_pass for construction_pass in recipe.passes}
 
@@ -330,7 +331,7 @@ def build_goal_preview(
             recovered_source=_recovered_source(record, sources),
             curation_status=None if decision is None else decision.status,
             curation_reason_codes=() if decision is None else tuple(decision.reason_codes),
-            omission_reason=INSTRUCTION_REQUIRED_OMISSION if instruction_missing else None,
+            omission_reason=None,
             exact_size_bytes=0,
         )
         full_records.append(
@@ -412,13 +413,7 @@ def build_goal_preview(
 
     # Skeleton first: every record redacted, no exclusions, no diagnostics.
     # If even that cannot fit, fail closed with an exact reason.
-    skeleton = [
-        record
-        if record.omission_reason == INSTRUCTION_REQUIRED_OMISSION
-        and record.exact_size_bytes <= MAX_RECORD_BYTES
-        else _redact(record, RESPONSE_BUDGET_OMISSION)
-        for record in full_records
-    ]
+    skeleton = [_redact(record, RESPONSE_BUDGET_OMISSION) for record in full_records]
     if not fits(assemble(skeleton, [], [])):
         raise GoalCatalogError(
             f"goal preview of {len(selected)} records cannot fit the "

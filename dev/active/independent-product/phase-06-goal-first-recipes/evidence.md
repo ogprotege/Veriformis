@@ -1,6 +1,6 @@
 # Phase 6 Evidence
 
-**Status:** Open — items 6.1–6.5 merged as PR #60 through PR #64; item 6.6
+**Status:** Open — items 6.1–6.6 merged as PR #60 through PR #65; item 6.7
 passed its local admission gates and awaits its pull request
 
 **Opened:** 2026-08-22
@@ -26,7 +26,7 @@ goal-first capability.
 | No persisted field records the supervised region; `ROW_LOSS_POLICY` derives it from row schema | `source-verified` | `src/veriformis/taxonomy.py`; `src/veriformis/datasets/serialization.py` |
 | Taxonomy v1 had six axes and no input-family axis at opening; superseded by item 6.2's seventh axis under ADR-0008 | `source-verified` | `docs/contracts/taxonomy-v1.md`; `src/veriformis/taxonomy.py` |
 | Three objectives and two row schemas have no end-to-end seal test | `source-verified` | Readiness review 2026-08-22 over `tests/` |
-| `instruction_text` is validated only for non-emptiness | `source-verified` | `src/veriformis/datasets/serialization.py`; `src/veriformis/pipeline/service.py` |
+| `instruction_text` was validated only for non-emptiness at opening; item 6.7 now resolves omitted text to the catalog template and admits a supplied instruction only after the truthfulness check | `source-verified` | `src/veriformis/goals/catalog.py`; `src/veriformis/pipeline/service.py` |
 
 ## Required item 6.1 evidence
 
@@ -46,14 +46,14 @@ goal-first capability.
 
 ## Required phase exit evidence
 
-- [ ] Every goal is selectable from plain language on every surface (U1).
-- [ ] The preview shows the exact supervised region for every goal and
+- [x] Every goal is selectable from plain language on every surface (U1).
+- [x] The preview shows the exact supervised region for every goal and
       representation, proved equal to the serialized target (U2).
 - [x] Identical recipe identifiers and outputs across surfaces for every
       acceptance cell (U3).
-- [ ] Non-claims visible everywhere a goal is shown (U4).
-- [ ] Preflight refuses incompatible selections before cost (U5).
-- [ ] Scripted non-developer walkthrough executed and recorded (U6).
+- [x] Non-claims visible everywhere a goal is shown (U4).
+- [x] Preflight refuses incompatible selections before cost (U5).
+- [x] Scripted non-developer walkthrough executed and recorded (U6).
 
 ## Observed results
 
@@ -236,3 +236,44 @@ messages are all sealed end to end.
 
 These are local observations. They do not claim publication, GitHub checks,
 merge, or clean-main synchronization for the item 6.6 pull request.
+
+Item 6.6 subsequently passed all 14 GitHub checks and merged as PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`; clean local `main` was
+synchronized with `origin/main` before item 6.7 began.
+
+### Item 6.7 (2026-08-22, working tree on
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`)
+
+| Gate | Observed |
+| --- | --- |
+| Focused goal tests (`tests/goals`) | 373 passed in 29.05 seconds |
+| Full Python (`uv run pytest -q`) | 1,909 passed and 1 failed on the first run: the frozen matrix still pinned the pre-6.7 catalog digest. After updating only `catalog_sha256` to `59c518d9a1f10c7bda3f518f5baf6950de0d50e75d8b80118969ca135fead80d`, that test passed. Expected full count is 1,910 with the same intentional durability warning. |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 1,898 passed, 1 deselected, 1 intentional warning in 703.82 seconds |
+| `scripts/check_project_tracking.py` and its regression | PASS |
+| `uv lock --check`, Ruff, structured JSON, fixture `cmp`, `git diff --check` | PASS |
+| macOS XCTest target and `macos/scripts/parity_check.sh` | Not runnable on this Linux cloud VM; exercised by the macOS GitHub check |
+
+Proofs recorded by tests (usability criteria U1, U4, U5, U6; U2 and U3
+remain the 6.3 and 6.6 evidence):
+
+- Every goal's `instruction_template` contains its unique
+  `instruction_task` and equals the 6.6 matrix literal for that goal.
+- Omitted `instruction-and-output` instructions resolve to the template on
+  curate, preflight, preview, CLI, MCP, and YAML.
+- Empty, untruthful, and inapplicable instructions fail closed before
+  source access or workspace mutation.
+- `messages` user turns equal the exact context field for every supervised
+  goal and contain no summary, answer, or translation claim.
+- U1 rejects machine identifiers and claim fragments on catalog
+  plain-language and instruction fields; `not_this` may name those
+  absences.
+- U4 surfaces `not_this` and `non_claims` in discovery and preview.
+- U5 refuses an ineligible input family and an untruthful instruction
+  before any workspace exists.
+- U6 executes the documented pick → preflight → compile → preview →
+  export walkthrough through `PipelineService` and projects the same
+  sequence through the Mac view-model compile/preflight arguments without
+  inventing an `--instruction` default.
+
+These are local observations. They do not claim publication, GitHub checks,
+merge, or clean-main synchronization for the item 6.7 pull request.
