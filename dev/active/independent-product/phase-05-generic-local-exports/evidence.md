@@ -1,7 +1,7 @@
 # Phase 5 Evidence
 
 **Status:** Complete — items 5.1–5.6 merged; item 5.7 operator guidance and
-Phase 5 closeout locally admitted without claiming its own pull-request result
+Phase 5 closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
 
 **Opened:** 2026-08-21
 
@@ -494,6 +494,7 @@ refuses nested `messages` with both JSON alternatives.
 No runtime source, test behavior, persisted schema, request, response,
 discovery entry, selector, taxonomy entry, support state, renderer, consumer
 profile, or trainer claim changed in item 5.7. The three production generic
-descriptors retain null consumer profiles. Phase 5 is locally complete; Phase 6
-remains planned and must not begin until the item 5.7 pull request is green,
-merged, and clean local `main` equals `origin/main`.
+descriptors retain null consumer profiles. The item 5.7 pull request passed all
+14 GitHub checks and merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`; clean local `main` equals
+`origin/main` there, and Phase 6 opened on 2026-08-22 under its own packet.

@@ -72,17 +72,17 @@
       "packet": "dev/active/independent-product/phase-05-generic-local-exports",
       "started_on": "2026-08-21",
       "completed_on": "2026-08-22",
-      "next_gate": "Completed; publish and merge the Phase 5 closeout and synchronize clean main before Phase 6 begins under its own standard packet."
+      "next_gate": "Completed; closeout merged as PR #59 at 65cbd471e96d83f8dd65e2cda60e90f64a916e2b with all 14 GitHub checks passed and clean main synchronized; Phase 6 began under its own standard packet."
     },
     {
       "number": 6,
       "title": "Deliver goal-first recipes and previews",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [4],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-06-goal-first-recipes",
+      "started_on": "2026-08-22",
       "completed_on": null,
-      "next_gate": "Begin after export contracts stabilize."
+      "next_gate": "Item 6.1 goal catalog in progress; each item merges as its own sequential green pull request before the next begins."
     },
     {
       "number": 7,

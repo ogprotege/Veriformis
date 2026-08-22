@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–5 complete; Phase 6 planned
+**Status:** Active program — Phases 0–5 complete; Phase 6 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -21,6 +21,7 @@ with roadmap headings.
 - [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
 - [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — completed
 - [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — completed
+- [Phase 6 — Goal-first recipes and previews](phase-06-goal-first-recipes/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -72,9 +73,11 @@ and merged as PR #58 at
 synchronized before item 5.7. The final item publishes the generic-export
 operator guide, keeps container choice separate from objective, schema, and
 consumer compatibility, and reconciles the completed Phase 5 packet without
-changing runtime or support state. Its local closeout does not claim the result
-of its own pull request. Phase 6 remains planned and requires its own packet
-after Phase 5 closeout publication and clean-main synchronization.
+changing runtime or support state. It passed all 14 GitHub checks and merged
+as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`; clean local `main`
+was synchronized before Phase 6 opened. Phase 6 opened on 2026-08-22 under
+its [packet](phase-06-goal-first-recipes/README.md); item 6.1 (goal catalog)
+is in progress.
 
 ## State change procedure
 

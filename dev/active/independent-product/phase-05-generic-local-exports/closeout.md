@@ -6,7 +6,7 @@
 
 ## Exit-gate judgment
 
-Passed locally. All seven roadmap items are complete within Phase 5's
+Passed. All seven roadmap items are complete within Phase 5's
 consumer-neutral boundary. Split JSONL and canonical JSON preserve all four
 current row schemas; constrained CSV preserves the three flat schemas and
 refuses nested `messages` before publication with both JSON alternatives. The
@@ -61,9 +61,10 @@ trainer, spreadsheet, scale, or streaming compatibility claim.
   `evidence.md`.
 
 These are local observations on the Phase 5.7 working tree based on PR #58's
-merge commit `cd017941090c7352cb1d10f9a383042b954d4f2e`. This closeout does not
-claim publication, GitHub checks, merge, or clean-main synchronization for its
-own pull request.
+merge commit `cd017941090c7352cb1d10f9a383042b954d4f2e`. This closeout
+subsequently passed all 14 GitHub checks and merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`; clean local `main` was synchronized
+with `origin/main` before Phase 6 opened.
 
 ## Exclusions and remaining constraints
 
@@ -83,5 +84,6 @@ own pull request.
 - Documentation debts DOC-002, DOC-003, DOC-006, and DOC-007 remain open; none
   changes the Phase 5 exit judgment.
 
-Phase 6 may begin only after this closeout pull request passes every required
-GitHub check, merges, and clean local `main` equals `origin/main`.
+This closeout pull request passed every required GitHub check and merged as PR
+#59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`; clean local `main` equals
+`origin/main` there. Phase 6 opened on 2026-08-22 under its own packet.

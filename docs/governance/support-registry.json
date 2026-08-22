@@ -64,6 +64,13 @@
       "section_reconstruction",
       "structured_field"
     ],
+    "implemented_goals": [
+      "learn-the-text",
+      "continue-a-passage",
+      "recover-a-section-from-its-heading",
+      "reproduce-a-recorded-change",
+      "extract-a-structured-value"
+    ],
     "implemented_row_schemas": [
       "instruction_output",
       "messages",
@@ -95,8 +102,11 @@
       "src/veriformis/recipes/library.py",
       "src/veriformis/datasets/serialization.py",
       "src/veriformis/taxonomy.py",
+      "src/veriformis/goals/catalog.py",
+      "src/veriformis/goals/catalog-v1.json",
       "docs/contracts/dataset-construction-v1.md",
-      "docs/contracts/taxonomy-v1.md"
+      "docs/contracts/taxonomy-v1.md",
+      "docs/contracts/goal-catalog-v1.md"
     ]
   },
   "artifacts": {

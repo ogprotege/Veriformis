@@ -15,8 +15,10 @@ Phase 5.4 merged as PR #56 at
 semantic round-trip matrix merged as PR #57 at
 `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6's exact dry-run preview
 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e` after
-all 14 GitHub checks passed. Phase 5.7 completes the operator guide and local
-phase closeout without changing runtime or support state.
+all 14 GitHub checks passed. Phase 5.7's operator guide and Phase 5 closeout
+merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14
+GitHub checks passed. Phase 6 (goal-first recipes and previews) is in progress
+under its standard packet; item 6.1 adds the goal catalog.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -151,6 +153,8 @@ Key modules under `src/veriformis/` are:
   shared with bundle transport;
 - `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `recipes/` for named recipe builders, statistics, and YAML pipeline specs;
+- `goals/` for the packaged versioned goal catalog and its strict models that
+  resolve plain-language goals to existing objectives and row schemas;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

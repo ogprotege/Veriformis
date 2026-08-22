@@ -33,6 +33,6 @@ Every Phase 5 risk is controlled within the delivered, consumer-neutral scope.
 The controls do not establish trainer compatibility, a production importer or
 semantic replayer, source-bound archive verification, spreadsheet safety, or a
 maturity promotion. Item 5.6 merged as PR #58 at
-`cd017941090c7352cb1d10f9a383042b954d4f2e`; this local closeout record makes no
-claim about publication, GitHub checks, merge, or clean-main synchronization for
-the item 5.7 pull request.
+`cd017941090c7352cb1d10f9a383042b954d4f2e`; item 5.7's closeout merged as PR
+#59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14 GitHub checks
+passed.

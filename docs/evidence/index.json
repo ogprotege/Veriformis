@@ -492,7 +492,7 @@
       "commit": "working-tree-on-cd017941090c7352cb1d10f9a383042b954d4f2e",
       "scope": "Independent-product Phase 5.7 generic export operator guidance and Phase 5 closeout reconciliation",
       "grade": "recorded-local",
-      "summary": "The Phase 5.7 operator guide and closeout reconciliation passed the complete current repository gates without runtime or support-registry changes: 1,238 full Python tests; 1,226 standalone release tests with 1 deselected; clean-wheel installation and both golden compile/external-digest/transport flows; 66 Mac tests; standalone CLI/workbench parity; tracking and its regression; lock; Ruff; structured JSON; 489 local link/image occurrences across 35 changed/new Markdown files; and diff checks. Full and standalone Python emitted only the intentional transport durability-warning regression warning. All 489 local links passed; five external links were skipped. Independent guidance and closeout audits found no product, contract, support-registry, or documentation blocker. The guide separates objective, row schema, physical container, and consumer profile; preserves the exact 11 compatible pairings, CSV/messages refusal, logical partitions, payload/provenance boundary, canonical bundle, source-bound verification, and optional receipt-anchored transport; and makes no trainer, spreadsheet, scale, or streaming claim. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 5.7 pull request.",
+      "summary": "The Phase 5.7 operator guide and closeout reconciliation passed the complete current repository gates without runtime or support-registry changes: 1,238 full Python tests; 1,226 standalone release tests with 1 deselected; clean-wheel installation and both golden compile/external-digest/transport flows; 66 Mac tests; standalone CLI/workbench parity; tracking and its regression; lock; Ruff; structured JSON; 489 local link/image occurrences across 35 changed/new Markdown files; and diff checks. Full and standalone Python emitted only the intentional transport durability-warning regression warning. All 489 local links passed; five external links were skipped. Independent guidance and closeout audits found no product, contract, support-registry, or documentation blocker. The guide separates objective, row schema, physical container, and consumer profile; preserves the exact 11 compatible pairings, CSV/messages refusal, logical partitions, payload/provenance boundary, canonical bundle, source-bound verification, and optional receipt-anchored transport; and makes no trainer, spreadsheet, scale, or streaming claim. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 5.7 pull request. Item 5.7 subsequently passed all 14 GitHub checks and merged as PR #59 at 65cbd471e96d83f8dd65e2cda60e90f64a916e2b.",
       "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
       "rerun": [
         "uv run pytest -q",
@@ -507,6 +507,31 @@
         "python3 -m json.tool dev/active/independent-product/program.json",
         "python3 -m json.tool docs/governance/support-registry.json",
         "python3 -c 'from pathlib import Path; text=Path(\"dev/active/independent-product/phase-05-generic-local-exports/evidence.md\").read_text(); block=text.split(\"<!-- phase5-link-audit-script -->\",1)[1].split(\"<!-- /phase5-link-audit-script -->\",1)[0].strip(); exec(block.removeprefix(\"```python\\n\").removesuffix(\"\\n```\"))'",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-6-goal-catalog-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-65cbd471e96d83f8dd65e2cda60e90f64a916e2b",
+      "scope": "Independent-product Phase 6.1 goal catalog, read-only discovery, and post-#59 reconciliation",
+      "grade": "recorded-local",
+      "summary": "The packaged veriformis.goal-catalog/v1 data and strict models passed 37 focused goal tests, 1,275 full Python tests, and 1,263 standalone release tests with 1 deselected; full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation and both golden compile/external-digest/transport flows, CLI/workbench parity, 72 Mac tests, project tracking with its new goal binding, the tracking regression, lock, Ruff, structured JSON, fixture byte equality, and diff checks passed. Evidence covers closure of five goals over the five objective kinds and four representations over the four row schemas in taxonomy order, recipe-library and loss-policy binding, default and compatibility closure against the taxonomy matrix, identifier grammar, control-character and machine-identifier rejection in plain-language fields, summary/answer/translation claim refusal, strict integer contract version, duplicate JSON key and non-canonical byte refusal, fresh mutation-safe discovery, byte-identical Python/CLI/MCP output, and strict Swift decoding of the shared frozen fixture with exact CLI argument and failure handling. An independent adversarial review found one plain-language blocker (the structural-attribute goal had described record fields and titles the structured_field objective never constructs) and nine should-fix items; all were corrected and re-verified on this tree. The item adds no objective, row schema, construction behavior, preset, preview, preflight, Mac screen, trainer claim, or consumer profile. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 6.1 pull request.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/goals",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase6-01-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q tests/regressions/test_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests scripts",
+        "python3 -m json.tool src/veriformis/goals/catalog-v1.json",
+        "cmp src/veriformis/goals/catalog-v1.json tests/regressions/fixtures/phase6/goal-catalog.json",
+        "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
     }

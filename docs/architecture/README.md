@@ -101,11 +101,12 @@ locator fields — as a correctness mechanism, not a style preference.
 ```mermaid
 flowchart TB
     subgraph entry["Adapters and Composition"]
-        CLI["cli.py — thin Typer adapter, 23 commands"]
+        CLI["cli.py — thin Typer adapter, 24 commands"]
         MCP["mcp/ — local stdio adapter"]
         MAC["macOS workbench — shells the CLI"]
         PIP["pipeline/ — PipelineService composition root"]
         EXP["exports/ — verified derivative-plan service"]
+        GOALS["goals/ — packaged versioned goal catalog"]
         WS["workspace.py — revision store, stage graph, replay-on-commit"]
     end
 

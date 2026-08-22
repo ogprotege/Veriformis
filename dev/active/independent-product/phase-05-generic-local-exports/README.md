@@ -37,9 +37,8 @@ Item 5.5's discovery-closed semantic round-trip fixture merged as PR #57 at
 `c72b8e9ec7bc2746d74404226aa086d497e15db1`. It is test proof, not a
 production importer or replayer. Item 5.6's bounded runtime preview merged as
 PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 completes the
-static operator guidance and closeout reconciliation locally; the item 5.7
-pull request, GitHub checks, merge, and post-merge synchronization are not
-claimed by this packet.
+static operator guidance and closeout reconciliation; it passed all 14 GitHub
+checks and merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 
 ## Packet contents
 
@@ -116,6 +115,6 @@ JSON object, or constrained flat-schema CSV. It keeps that physical-container
 choice separate from the already-fixed training objective, semantic row schema,
 and any separately admitted consumer profile. The three generic exports remain
 consumer-neutral and do not imply trainer compatibility. The static guidance,
-capability/support review, and Phase 5 packet reconciliation are complete
-locally. This local completion statement does not claim publication, GitHub
-checks, merge, or clean-main synchronization for the item 5.7 pull request.
+capability/support review, and Phase 5 packet reconciliation are complete.
+Item 5.7 passed all 14 GitHub checks and merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.

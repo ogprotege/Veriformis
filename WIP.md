@@ -2,18 +2,18 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `cd017941090c7352cb1d10f9a383042b954d4f2e`
+**Implementation baseline reviewed:** `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–4 and items 5.1–5.6 complete), plus the current
-Phase 5.7 operator-guidance and closeout work
+independent-product Phases 0–5 complete), plus the current Phase 6.1
+goal-catalog work
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
 
-**Next review:** Phase 5 closeout publication or merge, Phase 6 packet opening,
-beta label cut, public Mac evidence, or any listed-item status change
+**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
+label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -63,9 +63,12 @@ local, offline, and free of LLM generation.
 - [x] Independent product Phase 5 is complete under its
       [completed packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
       Item 5.6 merged as PR #58 at
-      `cd017941090c7352cb1d10f9a383042b954d4f2e`; item 5.7 publishes the
-      operator guide and reconciles the local phase closeout without claiming
-      its own pull-request result.
+      `cd017941090c7352cb1d10f9a383042b954d4f2e`; item 5.7's operator guide
+      and phase closeout merged as PR #59 at
+      `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
+- [ ] Independent product Phase 6 is in progress under its
+      [active packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md);
+      item 6.1 goal catalog is in progress.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -84,7 +87,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
 | 4 | Build the verified export foundation | Completed | [Completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
 | 5 | Ship lossless generic local exports | Completed | [Completed packet](dev/active/independent-product/phase-05-generic-local-exports/README.md) |
-| 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 6 | Deliver goal-first recipes and previews | In progress | [Active packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
 | 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 9 | Add columnar and Hugging Face dataset containers | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -212,7 +215,9 @@ three flat row schemas and refuses `messages` before publication.
 - [x] Phase 5.7 — the
       [generic export operator guide](docs/generic-exports.md) separates
       container choice from objective, schema, and consumer compatibility, and
-      the phase closeout records are reconciled locally.
+      the phase closeout records are reconciled. It merged as PR #59 at
+      `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14 GitHub checks
+      passed; clean local `main` was synchronized before Phase 6 opened.
 
 The Phase 5.1–5.7 implementation, guidance, and admission evidence support the
 split JSONL, canonical JSON, and constrained CSV promotions. Phase 5 is

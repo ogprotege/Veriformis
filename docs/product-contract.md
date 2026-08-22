@@ -13,16 +13,19 @@ derivatives; Phase 5.4 receipt-anchored export-pack transport merged as PR #56,
 Phase 5.5's test-only consolidated semantic round-trip matrix merged as PR #57
 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`, Phase 5.6 exact dry-run preview
 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
-5.7 completes operator guidance and closeout, version `0.1.0` development alpha
+5.7's operator guidance and closeout merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, completing Phases 0–5; Phase 6
+goal-first recipes and previews in progress; version `0.1.0` development
+alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–5 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
 
-**Next review:** Phase 5 closeout publication or merge, Phase 6 packet opening,
-beta label cut, public-ready checklist, or any product-contract change
+**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
+label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -321,11 +324,11 @@ check that verifies external digest, partition digests, row schema, masking
 expectations, and the portable assignment projection. The adapter policy
 currently rejects plain `text` rows. Its repository checks prove descriptor
 self-conformance, not compatibility with a live named Aptus build. Live
-training execution remains outside Veriformis. The independent product roadmap
-implements one consumer-neutral split-JSONL container under a separate
-versioned contract. That derivative does not select a trainer or claim trainer
-compatibility. Versioned optional trainer profiles and every other generic
-container remain planned.
+training execution remains outside Veriformis. The independent product ships
+three consumer-neutral generic containers, `split-jsonl-directory`, canonical
+`json`, and `constrained-csv` v1, under separate versioned contracts. None
+selects a trainer or claims trainer compatibility. Versioned optional trainer
+profiles and columnar/Hugging Face containers remain planned.
 
 ## Fail-closed seal
 

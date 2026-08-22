@@ -9,9 +9,9 @@ the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
-`handoff-verify`), taxonomy discovery (`taxonomy`), local MCP (`mcp`), verified
+`handoff-verify`), taxonomy discovery (`taxonomy`), goal discovery (`goals`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-23 commands; `export` contains four subcommands.
+24 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
@@ -44,7 +44,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, and constrained CSV v1 |
-| Read-only | `verify`, `preview`, `taxonomy` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals` | Nothing |
 | Meta | `version` | Nothing |
 
 ## Supported inputs
@@ -561,8 +561,8 @@ Use the [Generic Export Operator Guide](generic-exports.md) to choose a physical
 container without conflating it with the already-bound objective, semantic row
 schema, or downstream consumer compatibility. Phase 5.6's exact dry-run preview
 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
-guide and Phase 5 closeout are complete on the current working tree; their pull
-request, GitHub evidence, and merge remain unclaimed.
+guide and Phase 5 closeout merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 
 ```text
 veriformis export discover
@@ -729,6 +729,23 @@ the six axes separately: `training_family`, `objective`, `semantic_row`,
 `physical_container`, `consumer_profile`, and `loss_policy`. It lists only
 implemented identifiers and does not emit an ambiguous `format` field. The
 command accepts no workspace and writes no state.
+
+### `goals`
+
+Print the plain-language goal catalog as read-only JSON.
+
+```text
+veriformis goals
+```
+
+The output is the exact packaged `veriformis.goal-catalog/v1` data that
+`PipelineService`, MCP `goals`, and the workbench bridge also emit. Each goal
+states in plain words what the model learns, what you provide, and what the
+goal is not, and binds to exactly one existing objective and named recipe.
+Each representation binds to exactly one row schema and its loss policy. The
+catalog adds no objective or row schema; see the
+[Goal Catalog Contract v1](contracts/goal-catalog-v1.md). The command accepts
+no workspace and writes no state.
 
 ### `verify`
 

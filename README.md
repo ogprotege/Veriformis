@@ -15,13 +15,14 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–4 and Phase 5.1–5.6 on `main`. The supported
+> independent-product Phases 0–5 on `main`. The supported
 > generic exports are `split-jsonl-directory`, canonical `json`, and
 > `constrained-csv` v1. Phase 5.6's exact dry-run previews merged as PR #58 at
-> `cd017941090c7352cb1d10f9a383042b954d4f2e`. The current working tree adds the
-> Phase 5.7 [generic export operator guide](docs/generic-exports.md) and closeout,
-> making Phase 5 locally complete; Phase 5.7 pull-request publication, GitHub
-> evidence, and merge are not yet claimed.
+> `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
+> [generic export operator guide](docs/generic-exports.md) and Phase 5 closeout
+> merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`. Phase 6
+> (goal-first recipes and previews) is in progress; item 6.1 (goal catalog)
+> is in progress.
 > This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
@@ -259,12 +260,13 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-**private beta workbench Phases 0–2**, **independent-product Phases 0–4**, and
-**independent-product Phase 5.1–5.6**. Phase 5.6's exact dry-run preview merged
-as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. The current working
-tree completes Phase 5.7's operator guidance and Phase 5 closeout. Phase 5 is
-therefore locally complete, while this final pull request, its GitHub checks,
-and its merge remain unclaimed.
+**private beta workbench Phases 0–2**, and **independent-product Phases 0–5**.
+Phase 5.6's exact dry-run preview merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's operator guidance and
+Phase 5 closeout merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14 GitHub checks passed.
+Phase 6 (goal-first recipes and previews) is in progress under its packet;
+item 6.1 (goal catalog) is in progress and not yet on `main`.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,

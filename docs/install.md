@@ -161,9 +161,8 @@ whose training objective, semantic row schema, curation, and train/evaluation
 membership are already fixed; it does not choose those semantics or prove
 compatibility with a trainer. Phase 5.6's exact dry-run preview merged as PR #58
 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. The Phase 5.7 guide and Phase 5
-closeout are complete on the current working tree, while their pull request,
-GitHub evidence, and merge remain unclaimed. Product maturity remains
-development alpha.
+closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
+Product maturity remains development alpha.
 
 ### Verified split JSONL derivative
 
