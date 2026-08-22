@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.3 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
 
-**Next review:** Independent-product Phase 5.3 pull-request merge, Phase 5.4 or
-Phase 6 start, any later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 5.4 merge or Phase 5.5, Phase 6
+start, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -46,9 +46,17 @@ At this review, Phase 4 is complete and its closeout merged as PR #52 at
 `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 opened from that clean
 baseline under its own standard packet. Item 5.1 merged as PR #53 at
 `4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 merged as PR #54 at
-`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3 locally implements and
-admits `constrained-csv` v1 for the three flat row schemas with fixed exact
-bytes, mandatory provenance, nested-`messages` refusal, and no consumer or
-trainer claim. Its remote-green merge gate remains before item 5.4.
+`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3's
+`constrained-csv` v1 merged as PR #55 at `c6d7fc13a09a` for the three flat row
+schemas with fixed exact bytes, mandatory provenance, nested-`messages`
+refusal, and no consumer or trainer claim.
+
+Item 5.4 is locally admitted as
+`deterministic-export-pack-zip-v1`. The optional `.vfexport.zip` transport
+wraps one unchanged, already-published export directory under a separately
+retained canonical receipt digest. It is not a fourth renderer, source-bound
+export verification, consumer/trainer profile, MCP operation, or Mac UI action.
+Its required local evidence and independent review are recorded; pull-request
+publication, GitHub evidence, and merge remain pending.
 Consumer compatibility still requires a separately admitted named profile.
 Phase 6 remains planned and requires its own packet before work begins.

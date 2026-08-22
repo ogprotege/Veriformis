@@ -500,11 +500,14 @@ cannot be migrated; the standard workspace integrity errors below.
 
 ### `package`
 
-Create the deterministic Finder-safe transport of an externally anchored
-canonical bundle.
+Create one deterministic no-replace transport under exactly one explicit
+external anchor.
 
 ```text
 veriformis package BUNDLE -o OUTPUT.vfbundle.zip --manifest-sha256 EXPECTED_SHA256
+
+veriformis package EXPORT_DIRECTORY -o OUTPUT.vfexport.zip \
+  --export-receipt-sha256 EXPECTED_RECEIPT_SHA256
 ```
 
 The manifest digest is required and must have been retained outside the
@@ -518,17 +521,36 @@ Success prints the archive path, archive SHA-256, manifest SHA-256,
 `external_digest` grade, and member count. The archive is a transport wrapper,
 not a trainer export and not another bundle profile.
 
+The export-pack form requires the canonical receipt SHA-256 retained from the
+successful export response. It descriptor-inspects the unchanged closed export
+directory, archives exactly the receipt and its bound files with the same
+deterministic stored-ZIP envelope, verifies the staged archive, and then
+publishes it. Success additionally prints the embedded export plan and receipt
+IDs and preserves the source trust grade recorded by that plan. It does not
+rerender rows or turn archive verification into source-bound export
+verification.
+
+`--manifest-sha256` and `--export-receipt-sha256` are mutually exclusive and
+exactly one is required. The explicit anchor selects the profile; a suffix
+never silently selects one.
+
 ### `package-verify`
 
 ```text
 veriformis package-verify ARCHIVE.vfbundle.zip --manifest-sha256 EXPECTED_SHA256
+
+veriformis package-verify ARCHIVE.vfexport.zip \
+  --export-receipt-sha256 EXPECTED_RECEIPT_SHA256
 ```
 
 Verification requires canonical ZIP bytes and metadata, reconstructs only the
 six fixed destinations in private temporary storage, and runs the canonical
 bundle verifier with the caller's external digest. Traversal, links,
 duplicates, extra members, changed bytes, and noncanonical ZIP encodings fail.
-See [Deterministic Bundle Transport v1](contracts/bundle-transport-v1.md).
+For `.vfexport.zip`, verification strict-loads the externally anchored receipt,
+reconstructs only its validated paths, proves the closed file bindings and
+canonical archive bytes, and reports the unchanged embedded source trust
+grade. See [Deterministic Archive Transport v1](contracts/bundle-transport-v1.md).
 
 ## Verified-export commands
 

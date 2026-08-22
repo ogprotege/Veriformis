@@ -417,6 +417,28 @@
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-5-export-pack-transport-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-c6d7fc13a09a1c5920c19858acc9c2d6bb08c1cf",
+      "scope": "Independent-product Phase 5.4 deterministic receipt-anchored export-pack transport",
+      "grade": "recorded-local",
+      "summary": "The optional deterministic-export-pack-zip-v1 transport passed 66 dedicated archive, CLI, and adversarial tests, 448 integrated export/taxonomy/verified-contract/Pipeline tests, 1,195 full Python tests, 1,183 standalone core tests with 1 deselected, and 58 Mac tests. Full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation, both golden compile/external-digest/legacy-transport flows, CLI/workbench parity, project tracking, lock, Ruff, JSON validity, and diff checks passed. Evidence covers all three exact-byte generic containers, separately retained canonical receipt anchors, exact sorted receipt-bound members, stable descriptor-held verification, canonical ZIP bytes, no-replace publication, wrong anchors, tampering, CRC failure, encrypted flags, size disagreement, malformed and truncated archives, unsafe paths, links, source/destination races, cleanup, and preserved source trust. Legacy .vfbundle.zip bytes and the PipelineService package(bundle=...) keyword remain compatible. The ten persisted export v1 models and three renderer catalog entries remain unchanged; no trainer, consumer, MCP, Mac UI, signing, encryption, compression, or source-bound archive-verification claim is added. Independent contract and code reviews found promotion blockers that were corrected and cleared before publication; GitHub results remain separate publication evidence.",
+      "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_export_pack_archive.py tests/exports/test_export_pack_archive_adversarial.py tests/exports/test_export_pack_cli.py",
+        "uv run pytest -q tests/exports tests/contracts/test_taxonomy_contract.py tests/contracts/test_verified_export_contract.py tests/pipeline/test_pipeline_service.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase5-04-final-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check .",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
     }
   ]
 }

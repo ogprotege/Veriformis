@@ -7,14 +7,21 @@ through Finder and other file managers without relaxing directory verification.
 
 from __future__ import annotations
 
-import errno
-import hashlib
 import os
-import stat
 import tempfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
+
+from veriformis._archive_transport import (
+    CanonicalArchiveError,
+    canonical_zip_info,
+    files_equal,
+    publish_deterministic_archive,
+    require_canonical_archive_structure,
+    sha256_file,
+    write_deterministic_archive,
+)
 
 from veriformis.bundle.finished import (
     ATTESTATION_NAME,
@@ -43,9 +50,8 @@ _TRANSPORT_MEMBERS = tuple(
         )
     )
 )
-_FIXED_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
-_COPY_CHUNK_BYTES = 1024 * 1024
 _MAX_METADATA_BYTES = 16 * 1024 * 1024
+_COPY_CHUNK_BYTES = 1024 * 1024
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,110 +68,37 @@ class BundleArchiveReceipt:
 
 
 def _zip_info(relative_path: str) -> zipfile.ZipInfo:
-    info = zipfile.ZipInfo(relative_path, date_time=_FIXED_TIMESTAMP)
-    info.compress_type = zipfile.ZIP_STORED
-    info.create_system = 3
-    info.create_version = 45
-    info.extract_version = 45
-    info.external_attr = (stat.S_IFREG | 0o444) << 16
-    info.internal_attr = 0
-    info.extra = b""
-    info.comment = b""
-    return info
+    """Compatibility seam for the historical private metadata helper."""
+    return canonical_zip_info(relative_path)
 
 
 def _write_deterministic_archive(bundle: Path, archive_path: Path) -> None:
-    with zipfile.ZipFile(
+    """Compatibility seam used by existing transport fault-injection tests."""
+    write_deterministic_archive(
+        bundle,
         archive_path,
-        mode="w",
-        compression=zipfile.ZIP_STORED,
-        allowZip64=True,
-        strict_timestamps=True,
-    ) as archive:
-        archive.comment = b""
-        for relative_path in _TRANSPORT_MEMBERS:
-            source_path = bundle.joinpath(*relative_path.split("/"))
-            info = _zip_info(relative_path)
-            info.file_size = source_path.stat().st_size
-            with source_path.open("rb") as source, archive.open(
-                info,
-                mode="w",
-                force_zip64=True,
-            ) as destination:
-                while chunk := source.read(_COPY_CHUNK_BYTES):
-                    destination.write(chunk)
+        members=_TRANSPORT_MEMBERS,
+    )
 
 
 def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        while chunk := handle.read(_COPY_CHUNK_BYTES):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return sha256_file(path)
 
 
 def _files_equal(first: Path, second: Path) -> bool:
-    if first.stat().st_size != second.stat().st_size:
-        return False
-    with first.open("rb") as left, second.open("rb") as right:
-        while True:
-            left_chunk = left.read(_COPY_CHUNK_BYTES)
-            right_chunk = right.read(_COPY_CHUNK_BYTES)
-            if left_chunk != right_chunk:
-                return False
-            if not left_chunk:
-                return True
+    return files_equal(first, second)
 
 
 def _require_archive_structure(
     archive: zipfile.ZipFile,
 ) -> tuple[dict[str, zipfile.ZipInfo], FinishedBundleManifest, bytes]:
-    if archive.comment:
-        raise BundleVerificationError("transport archive comment is not allowed")
-    infos = archive.infolist()
-    names = tuple(info.filename for info in infos)
-    if names != _TRANSPORT_MEMBERS:
-        raise BundleVerificationError(
-            "transport archive member set or order is not canonical: "
-            f"expected={list(_TRANSPORT_MEMBERS)!r}, observed={list(names)!r}"
+    try:
+        by_name, _ = require_canonical_archive_structure(
+            archive,
+            expected_members=_TRANSPORT_MEMBERS,
         )
-    if len(set(names)) != len(names):
-        raise BundleVerificationError("transport archive contains duplicate members")
-    by_name = dict(zip(names, infos, strict=True))
-    for info in infos:
-        if info.is_dir():
-            raise BundleVerificationError(
-                f"transport archive contains directory member {info.filename!r}"
-            )
-        if info.compress_type != zipfile.ZIP_STORED:
-            raise BundleVerificationError(
-                "transport archive members must use deterministic stored encoding"
-            )
-        if info.flag_bits & 0x1:
-            raise BundleVerificationError("transport archive encryption is not allowed")
-        if info.file_size != info.compress_size:
-            raise BundleVerificationError(
-                "transport archive stored member sizes are inconsistent"
-            )
-        expected_info = _zip_info(info.filename)
-        observed_mode = info.external_attr >> 16
-        if not stat.S_ISREG(observed_mode):
-            raise BundleVerificationError(
-                f"transport archive member {info.filename!r} is not a regular file"
-            )
-        if (
-            info.date_time != expected_info.date_time
-            or info.create_system != expected_info.create_system
-            or info.create_version != expected_info.create_version
-            or info.extract_version != expected_info.extract_version
-            or info.external_attr != expected_info.external_attr
-            or info.internal_attr != expected_info.internal_attr
-            or info.extra
-            or info.comment
-        ):
-            raise BundleVerificationError(
-                f"transport archive metadata is not canonical for {info.filename!r}"
-            )
+    except CanonicalArchiveError as exc:
+        raise BundleVerificationError(str(exc)) from exc
 
     manifest_info = by_name[MANIFEST_NAME]
     if manifest_info.file_size > _MAX_METADATA_BYTES:
@@ -263,66 +196,19 @@ def write_bundle_archive(
             "transport packaging requires external-digest bundle verification"
         )
 
-    target = Path(os.path.abspath(os.fspath(target_path)))
-    if not target.name.endswith(".vfbundle.zip"):
-        raise ValueError("transport archive must end with '.vfbundle.zip'")
-    parent = target.parent
-    parent_status = parent.lstat()
-    if not stat.S_ISDIR(parent_status.st_mode) or stat.S_ISLNK(parent_status.st_mode):
-        raise ValueError("transport archive parent must be a real directory")
-    if os.path.lexists(target):
-        raise FileExistsError(
-            errno.EEXIST,
-            "transport archive target already exists",
-            target,
-        )
-
-    descriptor, staged_name = tempfile.mkstemp(
-        prefix=f".{target.name}.tmp-",
-        dir=parent,
-    )
-    os.close(descriptor)
-    staged = Path(staged_name)
-    published = False
-    publication_warnings: list[str] = []
-    try:
-        _write_deterministic_archive(bundle, staged)
-        with staged.open("rb") as handle:
-            os.fsync(handle.fileno())
-        staged_receipt = verify_bundle_archive(
+    publication = publish_deterministic_archive(
+        bundle,
+        target_path,
+        required_suffix=".vfbundle.zip",
+        write_staged=lambda staged: _write_deterministic_archive(bundle, staged),
+        verify_staged=lambda staged: verify_bundle_archive(
             staged,
             expected_manifest_sha256=expected_digest,
-        )
-        os.link(staged, target, follow_symlinks=False)
-        published = True
-        try:
-            staged.unlink()
-        except OSError as exc:
-            publication_warnings.append(
-                f"transport archive {target} is visible, but its staging link "
-                f"could not be removed: {exc}"
-            )
-    finally:
-        if not published and os.path.lexists(staged):
-            staged.unlink()
-
-    try:
-        descriptor = os.open(parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-        try:
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
-    except OSError as exc:
-        publication_warnings.append(
-            f"transport archive {target} is visible, but its parent directory "
-            f"could not be synced: {exc}"
-        )
-
-    durability_warning = "; ".join(publication_warnings) or None
-    if durability_warning is not None:
-        # The archive is already visible: durability notes are advisory and
-        # must never let a warnings filter unwind the successful publication.
-        _emit_runtime_warning(durability_warning, stacklevel=2)
+        ),
+        emit_warning=lambda message: _emit_runtime_warning(message, stacklevel=2),
+    )
+    target = publication.target_path
+    staged_receipt = publication.staged_verification
 
     return BundleArchiveReceipt(
         archive_path=target,
@@ -331,7 +217,7 @@ def write_bundle_archive(
         manifest_sha256=staged_receipt.manifest_sha256,
         member_count=staged_receipt.member_count,
         verification=staged_receipt.verification,
-        durability_warning=durability_warning,
+        durability_warning=publication.durability_warning,
     )
 
 

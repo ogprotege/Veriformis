@@ -127,6 +127,7 @@ not determine the objective or loss.
 | --- | --- | --- |
 | `minimal-v1` | implemented | Canonical six-file Veriformis bundle |
 | `deterministic-vfbundle-zip-v1` | implemented | Finder-safe transport of that bundle; not a trainer export |
+| `deterministic-export-pack-zip-v1` | implemented | Receipt-anchored transport of one unchanged generic export pack; not a renderer or trainer export |
 | `split-jsonl-directory` | implemented | Phase 5 consumer-neutral generic export; contract v1 |
 | `json` | implemented | Phase 5 consumer-neutral canonical JSON export; contract v1 |
 | `constrained-csv` | implemented | Phase 5 consumer-neutral constrained CSV export for the three flat row schemas; contract v1 |

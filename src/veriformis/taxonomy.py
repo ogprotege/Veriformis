@@ -54,6 +54,7 @@ EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
 IMPLEMENTED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "minimal-v1",
     "deterministic-vfbundle-zip-v1",
+    "deterministic-export-pack-zip-v1",
     "split-jsonl-directory",
     "json",
     "constrained-csv",

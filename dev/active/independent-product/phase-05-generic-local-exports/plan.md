@@ -92,9 +92,41 @@ next item begins.
 
 ### 5.4 Integrate deterministic generic export-pack archives
 
-- [ ] Reuse ADR-0005 and the existing bundle transport/package verifier.
-- [ ] Bind generic export-pack archives into export plans and receipts.
-- [ ] Do not create a second bundle-transport contract.
+- [x] Implement exactly transport profile
+      `deterministic-export-pack-zip-v1` with suffix `.vfexport.zip` as an
+      optional post-export wrapper, not a fourth export selector or request
+      option.
+- [x] Reuse ADR-0005's deterministic stored-ZIP codec and no-replace
+      publication path under complementary ADR-0006 and the single existing
+      deterministic archive contract.
+- [x] Require a separately retained SHA-256 of canonical
+      `export-receipt.json` bytes. Include exactly that receipt plus every path
+      in its complete `files` sequence, with no wrapper or additional member.
+- [x] Keep the ten persisted verified-export v1 models, their identities,
+      request/discovery/response schemas, and the three production renderers
+      unchanged. Bind the archive by consuming the existing embedded plan and
+      receipt rather than adding an outer self-hash.
+- [x] Admit only `portable_exact_bytes` plans in v1. Refuse
+      `semantic_content_only` until an exact profile-bound semantic replayer is
+      available to archive verification.
+- [x] Extend `package` and `package-verify` through exactly one explicit,
+      mutually exclusive `--manifest-sha256` or
+      `--export-receipt-sha256` anchor. Preserve legacy `.vfbundle.zip`
+      arguments, bytes, and verification behavior.
+- [x] Reject unsafe, colliding, duplicate, missing, extra, compressed,
+      encrypted, commented, noncanonical, corrupt, or receipt-disagreeing
+      members; reconstruct only receipt-validated paths and prove canonical
+      complete archive bytes before no-replace publication.
+- [x] Preserve the source trust grade embedded by the export plan. Do not call
+      receipt-anchored archive verification source-bound, upgrade
+      `self_consistent` to `external_digest`, or treat the archive digest as a
+      signature or trust anchor.
+- [x] Prove all three current generic export directories package and verify
+      deterministically, every relevant tamper and failure path fails closed,
+      existing bundle transport is byte-compatible, and no MCP or Mac UI
+      operation is introduced.
+- [x] Record focused and required repository evidence before claiming item
+      completion, publication, or merge.
 
 ### 5.5 Add semantic import-round-trip fixtures
 
@@ -124,11 +156,12 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Phases 5.1–5.3 are implemented and locally admitted. Item 5.3's
-focused, full, release, parity, Mac, tracking, and independent-review gates are
-green; its remote-green merge and clean-main synchronization gates remain
-before item 5.4 begins. Later checklist items and the phase-wide exit proof
-remain open.
+**Result:** Phases 5.1–5.3 are implemented, admitted, and merged; item 5.3
+merged as PR #55 at `c6d7fc13a09a`. Item 5.4 is implemented and locally
+admitted after its required repository evidence and corrected independent
+reviews passed. Pull-request publication, GitHub evidence, merge, and
+clean-main synchronization remain open. Items 5.5–5.7 and the phase-wide exit
+proof also remain open.
 
 ## Non-goals
 

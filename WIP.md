@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`
-on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
-workbench Phases 0–2; independent-product Phases 0–4 and items 5.1–5.2
-complete), plus the current Phase 5.3 constrained CSV branch
+**Implementation baseline reviewed:** `c6d7fc13a09a` on `main` (Groups 1–7;
+Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
+independent-product Phases 0–4 and items 5.1–5.3 complete), plus the current
+locally admitted Phase 5.4 receipt-anchored export-pack transport
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.3 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
 
-**Next review:** Phase 5.3 pull-request merge or Phase 5.4 start; beta
-label cut, public Mac evidence, or any listed-item status change
+**Next review:** Phase 5.4 pull-request publication or merge; beta label cut,
+public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -61,7 +61,8 @@ local, offline, and free of LLM generation.
       at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
 - [ ] Independent product Phase 5 is in progress under its
       [active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
-      Items 5.1–5.3 own the first three generic local containers.
+      Items 5.1–5.3 own the first three generic local containers; item 5.4's
+      receipt-anchored transport is locally admitted and awaits publication.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -194,19 +195,26 @@ admits the three flat row schemas and refuses `messages` before publication.
       `4f12a55063c2721993b65cfbe30e68eaad55f87f`.
 - [x] Phase 5.2 — canonical JSON v1 with explicit split/schema metadata merged
       as PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`.
-- [x] Phase 5.3 — constrained CSV v1 is locally implemented and admitted for
-      `text`, `prompt_completion`, and `instruction_output`; `messages` is
-      refused before publication. The remote-green merge gate remains.
-- [ ] Phase 5.4 — deterministic generic export-pack archive integration.
+- [x] Phase 5.3 — constrained CSV v1 for `text`, `prompt_completion`, and
+      `instruction_output` merged as PR #55 at `c6d7fc13a09a`; `messages` is
+      refused before publication.
+- [x] Phase 5.4 — deterministic generic export-pack archive integration is
+      locally admitted. The `.vfexport.zip` wrapper is anchored by the
+      separately retained canonical export-receipt digest; pull-request
+      publication, GitHub evidence, and merge remain pending.
 - [ ] Phase 5.5 — semantic import-round-trip fixtures.
 - [ ] Phase 5.6 — exact sample-row and destination-tree dry-run previews.
 - [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
 
 The Phase 5.1–5.3 implementation and admission evidence support the split
 JSONL, canonical JSON, and constrained CSV promotions. Phase 5 remains in
-progress; export-pack integration, shared round-trip fixtures, previews, final
-guidance, and every trainer profile remain unimplemented. Phase 5.4 is next
-after the Phase 5.3 remote-green merge and local synchronization gate.
+progress. Phase 5.4 locally admits
+`deterministic-export-pack-zip-v1` through the existing `package` /
+`package-verify` family; pull-request publication, GitHub evidence, and merge
+remain open. It
+adds no fourth renderer, trainer compatibility, source-bound archive
+verification, or Mac UI. Shared round-trip fixtures, previews, final guidance,
+and every trainer profile remain later work.
 
 The current stage-command runtime is:
 
@@ -556,6 +564,7 @@ pytest totals; they grow.
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+- [Deterministic Archive Transport v1](docs/contracts/bundle-transport-v1.md)
 - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)

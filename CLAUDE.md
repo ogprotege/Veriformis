@@ -9,7 +9,9 @@ tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
 (thin SwiftUI over CLI); independent-product Phases 0–4; and Phase 5.1–5.3's
 supported generic `split-jsonl-directory`, canonical `json`, and
-`constrained-csv` v1 exports.
+`constrained-csv` v1 exports. Phase 5.3 merged as PR #55 at
+`c6d7fc13a09a`. Phase 5.4's receipt-anchored export-pack transport is locally
+admitted; pull-request publication, GitHub evidence, and merge remain pending.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -43,7 +45,12 @@ Constrained CSV admits only the flat `text`, `prompt_completion`, and
 JSON. All three derivatives preserve rows, ordering, and authoritative
 partition membership and claim
 compatibility with no trainer. No production semantic replayer or trainer-
-specific profile is shipped. Do not claim public
+specific profile is shipped. Phase 5.4 adds no fourth renderer or request
+schema: `deterministic-export-pack-zip-v1` uses the existing
+`package` / `package-verify` family to wrap one unchanged export directory as
+`.vfexport.zip` under a separately retained canonical receipt digest. It
+preserves the embedded source trust grade, is not source-bound export
+verification, and adds no MCP or Mac UI operation. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 
@@ -55,21 +62,23 @@ Read these current authorities before changing code:
 4. `docs/contracts/dataset-construction-v1.md`
 5. `docs/contracts/finished-dataset-v1.md`
 6. `docs/contracts/taxonomy-v1.md`
-7. `docs/contracts/verified-export-v1.md`
-8. `docs/contracts/split-jsonl-export-v1.md`
-9. `docs/contracts/canonical-json-export-v1.md`
-10. `docs/contracts/constrained-csv-export-v1.md`
-11. `docs/architecture.md`
-12. `docs/analysis/2026-08-11-independent-product-analysis.md`
-13. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
-14. `docs/governance/project-tracking.md`,
+7. `docs/contracts/bundle-transport-v1.md`
+8. `docs/contracts/verified-export-v1.md`
+9. `docs/contracts/split-jsonl-export-v1.md`
+10. `docs/contracts/canonical-json-export-v1.md`
+11. `docs/contracts/constrained-csv-export-v1.md`
+12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`
+13. `docs/architecture.md`
+14. `docs/analysis/2026-08-11-independent-product-analysis.md`
+15. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+16. `docs/governance/project-tracking.md`,
    `dev/active/independent-product/program.json`, and the current or most
    recently completed phase packet
-15. `docs/governance/support-registry.json` and `docs/evidence/index.json`
-16. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
-17. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+17. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+18. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+19. `docs/plans/2026-07-29-veriformis-roadmap.md` and
     `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
-18. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+20. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.
@@ -120,6 +129,9 @@ Key modules under `src/veriformis/` are:
 - `taxonomy.py` for the versioned registry, compatibility policy, and read-only
   discovery catalog;
 - `bundle/` for atomic finished-bundle publication and independent verification;
+- `exports/` for verified derivatives and receipt-anchored export-pack
+  transport, with `_archive_transport.py` holding the deterministic ZIP codec
+  shared with bundle transport;
 - `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `recipes/` for named recipe builders, statistics, and YAML pipeline specs;
 - `mcp/` for the constrained local MCP adapter;

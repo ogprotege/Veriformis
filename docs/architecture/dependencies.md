@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
 
 **Next review:** Any architecture or dependency change
 
@@ -220,6 +220,15 @@ under a frozen fully quoted dialect and reuses the same row decoders,
 loss-policy lookup, paths, provenance model, and publisher. It adds no third-
 party, workspace, adapter-filesystem, plugin, trainer, or request-model edge;
 the fixed profile uses request v1 and refuses v2.
+Phase 5.4 locally admits `exports/archive.py` as a post-export transport
+adapter and moves the deterministic stored-ZIP codec into the dependency-light
+`_archive_transport.py` shared by `bundle/transport.py` and the export-pack
+path. The archive adapter depends on strict export receipt/path/publication
+machinery; it adds no renderer, export-catalog entry, third-party ZIP library,
+workspace stage, persisted model, MCP edge, Mac edge, consumer profile, or
+trainer dependency. `PipelineService` selects bundle or export-pack packaging
+through mutually exclusive explicit anchors. Pull-request publication and
+merge remain pending.
 This arrangement needs no dependency injection container because the contracts
 passed between stages are stable, low-level data values. `workspace.py` keeps
 its module-level domain coupling narrow and uses function-level imports for

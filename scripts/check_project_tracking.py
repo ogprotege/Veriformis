@@ -302,23 +302,47 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         )
 
     transport_profiles = artifacts.get("implemented_transport_profiles")
-    if not isinstance(transport_profiles, list) or len(transport_profiles) != 1:
+    if not isinstance(transport_profiles, list) or len(transport_profiles) != 2:
         errors.append(
-            "support registry must contain exactly the implemented deterministic transport"
+            "support registry must contain exactly both deterministic transports"
         )
     else:
-        transport = transport_profiles[0]
+        transports = {
+            entry.get("profile"): entry
+            for entry in transport_profiles
+            if isinstance(entry, dict)
+        }
+        bundle_transport = transports.get("deterministic-vfbundle-zip-v1", {})
+        export_transport = transports.get(
+            "deterministic-export-pack-zip-v1",
+            {},
+        )
         _require(
-            transport.get("profile") == "deterministic-vfbundle-zip-v1"
-            and transport.get("state") == "implemented"
-            and transport.get("product_role") == "immutable-transport"
-            and transport.get("is_trainer_export") is False,
-            "deterministic transport support entry differs from the taxonomy boundary",
+            set(transports)
+            == {
+                "deterministic-vfbundle-zip-v1",
+                "deterministic-export-pack-zip-v1",
+            }
+            and bundle_transport.get("state") == "implemented"
+            and bundle_transport.get("product_role") == "immutable-transport"
+            and bundle_transport.get("requires_external_manifest_digest") is True
+            and bundle_transport.get("is_trainer_export") is False
+            and export_transport.get("state") == "implemented"
+            and export_transport.get("product_role")
+            == "immutable-export-pack-transport"
+            and export_transport.get("requires_external_export_receipt_digest")
+            is True
+            and export_transport.get("is_trainer_export") is False,
+            "deterministic transport support entries differ from taxonomy",
             errors,
         )
 
     generic_containers = artifacts.get("generic_export_containers")
-    non_generic_containers = {"minimal-v1", "deterministic-vfbundle-zip-v1"}
+    non_generic_containers = {
+        "minimal-v1",
+        "deterministic-vfbundle-zip-v1",
+        "deterministic-export-pack-zip-v1",
+    }
     implemented_generic_containers = tuple(
         container
         for container in IMPLEMENTED_PHYSICAL_CONTAINERS

@@ -54,10 +54,14 @@ container, or trainer-specific profile. Its closeout merged as PR #52 at
 `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 then opened under its own
 standard packet from that clean baseline. Item 5.1 merged as PR #53 at
 `4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2's canonical `json` v1
-merged as PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3
-locally implements consumer-neutral `constrained-csv` v1 for the three flat row
-schemas through the same exact-byte service; it refuses nested `messages`
-before publication and awaits its remote-green merge gate before item 5.4.
+merged as PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3's
+consumer-neutral `constrained-csv` v1 merged as PR #55 at
+`c6d7fc13a09a` for the three flat row schemas; it refuses nested `messages`
+before publication. Item 5.4 is locally admitted as the optional
+`deterministic-export-pack-zip-v1` transport. It wraps one unchanged export
+directory as receipt-anchored `.vfexport.zip` without adding a fourth renderer,
+trainer claim, source-bound archive verification, or Mac UI. Pull-request
+publication, GitHub evidence, and merge remain pending.
 Phase 6 remains planned and requires its own packet before work begins.
 
 ## State change procedure

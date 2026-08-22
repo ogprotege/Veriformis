@@ -69,3 +69,23 @@ def test_durability_warning_cannot_unwind_publication_under_error_filter(
         verify_bundle_archive(target, expected_manifest_sha256=digest).archive_sha256
         == receipt.archive_sha256
     )
+
+
+def test_bundle_transport_retains_head_behavior_for_target_inside_bundle(
+    tmp_path: Path,
+) -> None:
+    bundle, digest = _sealed_bundle(tmp_path)
+    target = bundle / "inside.vfbundle.zip"
+
+    receipt = write_bundle_archive(
+        bundle,
+        target,
+        expected_manifest_sha256=digest,
+    )
+
+    assert target.is_file()
+    assert receipt.archive_path == target
+    assert (
+        verify_bundle_archive(target, expected_manifest_sha256=digest).archive_sha256
+        == receipt.archive_sha256
+    )

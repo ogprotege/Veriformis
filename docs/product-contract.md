@@ -9,18 +9,19 @@ optional consumer integrations
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
 plus completed independent-product Phases 0–4 and Phase 5.1–5.3's supported
 generic `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
-derivatives, version
-`0.1.0` development alpha
+derivatives; Phase 5.4 receipt-anchored export-pack transport is locally
+admitted with publication and merge pending, version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; Phase 5.1–5.3 implemented; maturity alpha; public Mac claim
+Phases 0–4 complete; Phase 5.1–5.3 implemented and merged; Phase 5.4 locally
+admitted with publication and merge pending; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.3 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
 
-**Next review:** Phase 5.3 merge or Phase 5.4; beta
-label cut, public-ready checklist, or any product-contract change
+**Next review:** Phase 5.4 pull-request publication or merge; beta label cut, public-ready
+checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -65,6 +66,9 @@ governs the first production renderer and supported generic container;
 second fixed-tree generic container;
 [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) governs the
 third, flat-schema-only fixed-tree container.
+[Deterministic Archive Transport v1](contracts/bundle-transport-v1.md) governs
+the manifest-anchored bundle wrapper and the separate receipt-anchored
+post-export wrapper; neither is a semantic renderer or trainer profile.
 
 ## Ownership boundary
 
@@ -189,7 +193,19 @@ request v1 and refuses request v2 before source access; after source admission
 reveals nested `messages`, it refuses the schema before destination access,
 directs nested rows to a JSON container, and claims
 compatibility with neither a trainer nor a spreadsheet. All new trainer
-profiles remain open later work.
+profiles remain open later work. Item 5.3 merged as PR #55 at
+`c6d7fc13a09a`.
+
+Phase 5.4 is locally admitted as
+`deterministic-export-pack-zip-v1`. The optional post-export transport uses the
+existing `package` / `package-verify` command family to wrap canonical
+`export-receipt.json` plus its exact bound file set as `.vfexport.zip` under a
+separately retained receipt digest. It consumes the existing embedded plan and
+receipt without changing the ten persisted verified-export v1 models or the
+three production selectors. Receipt-anchored archive verification preserves
+the embedded source trust grade and is not source-bound export verification.
+It adds no consumer/trainer profile, request version, MCP operation, or Mac UI
+action. Pull-request publication, GitHub evidence, and merge remain pending.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete
@@ -305,10 +321,12 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Dataset Construction Contract v1](./contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](./contracts/finished-dataset-v1.md)
 - [Dataset Taxonomy Contract v1](./contracts/taxonomy-v1.md)
+- [Deterministic Archive Transport v1](./contracts/bundle-transport-v1.md)
 - [Verified Export Contract v1](./contracts/verified-export-v1.md)
 - [Split JSONL Export Contract v1](./contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](./contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](./contracts/constrained-csv-export-v1.md)
+- [ADR-0006: Receipt-Anchored Export-Pack Transport](./adr/0006-receipt-anchored-export-pack-transport.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

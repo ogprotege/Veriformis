@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV implementation)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport)
 
 **Decider:** Repository owner direction
 
@@ -58,6 +58,15 @@ and refuses request v2 before source access; nested `messages` is refused after
 source admission but before destination access and directed to an exact JSON
 container. It also changes no semantic
 rows or membership and claims compatibility with no trainer.
+
+Phase 5.4 adds an optional deterministic transport around one already-
+published generic export directory. It archives the unchanged receipt-bound
+tree and verifies it under a separately retained canonical receipt digest. It
+does not rerender rows, change membership, add an export selector, or reinterpret
+the archive as an export destination. The inner `ExportPlan`, `ExportReceipt`,
+and file identities are identical in directory and archived form; the outer
+archive digest is runtime transport evidence only. ADR-0006 freezes that
+profile while reusing the single ADR-0005 deterministic ZIP implementation.
 
 ## Alternatives considered
 

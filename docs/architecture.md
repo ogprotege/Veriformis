@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.3)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -57,7 +57,13 @@ authoritative semantic partitions without changing rows or membership and add on
 deterministic evidence sidecars; none has a consumer profile or trainer-
 compatibility claim. Constrained CSV admits only the three flat row schemas;
 nested `messages` is refused with a JSON alternative. No production semantic
-replayer ships. The macOS workbench lives
+replayer ships. Locally admitted Phase 5.4 work adds no renderer: `exports/archive.py`
+wraps one unchanged published export directory as receipt-anchored
+`.vfexport.zip` using the deterministic codec shared in
+`_archive_transport.py`. `PipelineService.package` selects this profile only
+through the explicit receipt-digest argument. Export discovery and the
+MCP/Mac surfaces remain unchanged; pull-request publication and merge are
+pending. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -143,6 +149,14 @@ name.vfbundle/
   archive verification reconstructs the strict directory and reuses the same
   canonical verifier. This is transport only, not a trainer export. See
   [ADR 0005](adr/0005-deterministic-bundle-transport.md).
+- Phase 5.4's optional `.vfexport.zip` transport starts only after one generic
+  export directory is published. It requires the separately retained SHA-256
+  of canonical `export-receipt.json`, archives exactly that receipt and its
+  complete bound files, and reuses the same deterministic ZIP codec and
+  no-replace publication path. Its verifier is receipt-anchored, preserves the
+  embedded source trust grade, and is not source-bound export verification.
+  It adds no export selector, persisted receipt field, MCP operation, or Mac UI.
+  See [ADR-0006](adr/0006-receipt-anchored-export-pack-transport.md).
 - Phase 4 derivatives start from `ExportService`, which obtains manifest,
   validation, row-set, and verification facts in the bundle verifier's same
   descriptor-anchored pass. Export-source admission requires a retained
@@ -186,6 +200,14 @@ name.vfbundle/
   v2 fail before publication with an actionable JSON alternative. The
   default service still has no semantic replayer and discovery advertises no
   consumer or trainer profile.
+- Locally admitted Phase 5.4 work leaves that export catalog unchanged. The existing
+  `package` / `package-verify` family selects bundle or export-pack transport
+  through exactly one manifest- or export-receipt-digest anchor. The export
+  branch validates the already-published closed directory, writes canonical
+  `.vfexport.zip` bytes through the shared archive codec, verifies staged bytes,
+  and publishes without replacement. Its runtime archive facts do not alter
+  the inner plan, receipt, verification, rows, or membership. Pull-request
+  publication, GitHub evidence, and merge remain pending.
 
 ## Related documentation
 
@@ -193,6 +215,7 @@ name.vfbundle/
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Deterministic Archive Transport v1](contracts/bundle-transport-v1.md)
 - [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export v1](contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md)

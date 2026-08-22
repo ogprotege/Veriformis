@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
 
 **Next review:** Any architecture or data-flow change
 
@@ -241,6 +241,17 @@ Constrained CSV preserves the three flat row schemas as fully quoted partition
 records with exact ordered headers and keeps complete aligned provenance in a
 separate JSONL sidecar. Nested `messages` fails before publication and must use
 one of the exact JSON containers.
+Phase 5.4's locally admitted transport begins from the already-published
+directory, not from
+source rows or a new export request. The operator retains the SHA-256 of its
+canonical `export-receipt.json`, and `package` validates that closed directory
+before writing `.vfexport.zip` containing exactly the receipt plus its bound
+files. `package-verify` reconstructs only validated receipt paths and proves
+the file bindings and canonical archive bytes. That flow preserves the
+embedded source trust grade; it does not re-admit the source or become
+source-bound export verification. No archive fact flows back into the persisted
+plan or receipt, and no MCP or Mac UI edge is added. Pull-request publication
+and merge remain pending.
 The export boundary changes neither the canonical six-file
 bundle nor the nine-stage workspace graph. Phase 4.9 supplied consolidated
 adversarial foundation proof; each Phase 5 container requires separate

@@ -103,6 +103,7 @@
     "implemented_physical_containers": [
       "minimal-v1",
       "deterministic-vfbundle-zip-v1",
+      "deterministic-export-pack-zip-v1",
       "split-jsonl-directory",
       "json",
       "constrained-csv"
@@ -133,6 +134,18 @@
           "src/veriformis/bundle/transport.py",
           "docs/contracts/bundle-transport-v1.md",
           "tests/bundle/test_finished_bundle.py"
+        ]
+      },
+      {
+        "profile": "deterministic-export-pack-zip-v1",
+        "state": "implemented",
+        "product_role": "immutable-export-pack-transport",
+        "requires_external_export_receipt_digest": true,
+        "is_trainer_export": false,
+        "evidence": [
+          "src/veriformis/exports/archive.py",
+          "docs/contracts/bundle-transport-v1.md",
+          "tests/exports/test_export_pack_archive.py"
         ]
       }
     ],

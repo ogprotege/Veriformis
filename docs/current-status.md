@@ -20,11 +20,14 @@ strict initially production-empty export surfaces through Python, CLI, MCP,
 and Mac, plus the consolidated adversarial closeout harness; independent-
 product Phase 5.1–5.3 implement and admit `split-jsonl-directory`, canonical
 `json`, and `constrained-csv` v1 as the first three production generic
-exports, without a consumer or trainer profile
+exports, without a consumer or trainer profile; independent-product Phase 5.4
+locally admits the optional receipt-anchored deterministic `.vfexport.zip`
+post-export transport without adding a fourth renderer, MCP operation, or Mac
+UI action
 
-**Review date:** 2026-08-22 (independent-product Phase 5.3 local admission)
+**Review date:** 2026-08-22 (independent-product Phase 5.4 local admission)
 
-**Next review:** Phase 5.3 merge or Phase 5.4;
+**Next review:** Phase 5.4 merge or Phase 5.5;
 beta label cut, public-ready checklist, or any
 contract change
 
@@ -219,7 +222,7 @@ historical request v1 and has no options; configured request v2 fails before
 source or destination access. Item 5.2 merged as PR #54 at
 `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`.
 
-Phase 5.3 locally adds `constrained-csv` version 1 for the flat `text`,
+Phase 5.3, merged as PR #55, adds `constrained-csv` version 1 for the flat `text`,
 `prompt_completion`, and `instruction_output` row schemas. Its fixed tree is:
 
 ```text
@@ -259,6 +262,8 @@ The installed console entry point is `veriformis`.
 | `seal WORKSPACE -o BUNDLE` | Revalidates, atomically publishes, independently verifies, and receipts a finished bundle; writes only the canonical bundle by default | External six-file bundle; `manifest`, `attestation`; optional explicit `*.aptus-handoff.json` |
 | `verify BUNDLE` | Verifies the closed bundle without workspace access | Terminal verification result |
 | `package BUNDLE -o ARCHIVE --manifest-sha256 DIGEST` | Externally verifies and deterministically publishes the canonical six-file bundle as a no-replace transport archive | `*.vfbundle.zip`; archive and manifest digests |
+| `package EXPORT -o ARCHIVE --export-receipt-sha256 DIGEST` | Descriptor-inspects one closed generic export and deterministically publishes its externally receipt-anchored tree without rerendering | `*.vfexport.zip`; archive, receipt, plan, content-root, and retained source-trust facts |
+| `package-verify ARCHIVE --export-receipt-sha256 DIGEST` | Reconstructs only receipt-validated export paths, verifies the unchanged inner plan/receipt/file bindings, and proves canonical archive bytes | Receipt-anchored transport result; not source-bound export verification |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
@@ -590,8 +595,9 @@ See [docs/release.md](release.md).
 | Implemented independent Phase 5.1 | Production `split-jsonl-directory` v1 exact-byte export, request-v1 defaults, strict configured request v2, canonical payload JSONL, deterministic README/data card, optional aligned provenance, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.2 | Production canonical `json` v1 exact-byte export, fixed dataset/provenance object tree, explicit split/schema metadata, mandatory aligned provenance, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.3 | Production `constrained-csv` v1 exact-byte export for the three flat row schemas, fixed quoted CSV/data-card/provenance tree, nested-`messages` refusal, receipt, and no trainer claim or membership change |
+| Locally admitted independent Phase 5.4 | Optional `deterministic-export-pack-zip-v1` post-export transport with `.vfexport.zip`, an external canonical-receipt digest, exact receipt-bound members, shared deterministic ZIP/no-replace machinery, preserved source trust, and no fourth renderer, MCP operation, or Mac UI action; pull-request publication remains |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 and items 5.1–5.3 locally admitted and items 5.4–5.7 planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete, items 5.1–5.3 merged, item 5.4 locally admitted pending publication, and items 5.5–5.7 planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
