@@ -16,7 +16,9 @@ import veriformis.mcp.server as mcp_module
 from veriformis.cli import app
 from veriformis.exports.api import (
     EXPORT_SURFACE_REQUEST_SCHEMA,
+    EXPORT_SURFACE_REQUEST_SCHEMA_V2,
     ExportDiscovery,
+    ExportDryRunRequestV2,
     ExportInspectRequest,
     ExportOperationCancelled,
     ExportPartialPublicationError,
@@ -26,6 +28,11 @@ from veriformis.exports.api import (
     export_inspection_response,
     export_response_json,
     export_verify_response,
+)
+from veriformis.exports.split_jsonl import (
+    SPLIT_JSONL_CONTAINER_ID,
+    SPLIT_JSONL_CONTAINER_VERSION,
+    SplitJsonlOptions,
 )
 from veriformis.identity import derive_id, lossless_json_bytes
 from veriformis.mcp.server import create_mcp_server
@@ -599,3 +606,56 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
     }
     assert runtime.render_calls == 6
     assert runtime.planner_calls == 9
+
+
+def test_production_split_jsonl_v2_dry_run_has_python_cli_mcp_parity(
+    tmp_path,
+    monkeypatch,
+):
+    bundle = _materialize_bundle(tmp_path)
+    pipeline = PipelineService()
+    monkeypatch.setattr(cli_module, "_SERVICE", pipeline)
+    server = create_mcp_server(pipeline)
+    request = ExportDryRunRequestV2(
+        schema_version=EXPORT_SURFACE_REQUEST_SCHEMA_V2,
+        operation="dry_run",
+        bundle=str(bundle),
+        container_id=SPLIT_JSONL_CONTAINER_ID,
+        container_version=SPLIT_JSONL_CONTAINER_VERSION,
+        consumer_id=None,
+        consumer_profile_version=None,
+        source_trust_policy="require_external_digest",
+        expected_manifest_sha256=(
+            "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
+        ),
+        overwrite_policy="refuse",
+        container_options=SplitJsonlOptions(
+            train_partition_name="learn",
+            evaluation_partition_name="score",
+            include_provenance=False,
+        ).model_dump(mode="json"),
+    )
+    request_json = request.canonical_bytes().decode("utf-8")
+    python_outcome = pipeline.dry_run_export(request)
+    assert python_outcome.plan is not None
+    expected = export_dry_run_response(python_outcome.plan)
+
+    cli_result = CliRunner().invoke(
+        app,
+        ["export", "dry-run", "--request-json", request_json],
+    )
+    assert cli_result.exit_code == 0, cli_result.output
+    mcp_result = _call_tool(
+        server,
+        "export_dry_run",
+        {"request_json": request_json},
+    )
+
+    assert json.loads(cli_result.stdout) == json.loads(mcp_result) == expected
+    paths = {item["path"] for item in expected["result"]["plan"]["files"]}
+    assert paths == {
+        "README.md",
+        "data/learn.jsonl",
+        "data/score.jsonl",
+        "metadata/dataset-card.json",
+    }

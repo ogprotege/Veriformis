@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 5.1 first derivative implementation)
 
 **Decider:** Repository owner direction
 
@@ -12,12 +12,14 @@
 
 Veriformis already seals a strict six-file `minimal-v1` directory whose
 manifest binds the exact dataset snapshot, partitions, provenance, validation,
-and attestation. Generic external exports and named trainer packs still have no
-shipped renderer or supported product container. Phase 4.6 supplies an internal
-atomic publisher and receipt verifier; Phase 4.7 adds only private two-render
-exact-byte and semantic-content conformance evidence. Phase 4.8 exposes the
-shared service through strict Python, CLI, MCP, and CLI-backed Mac operations,
-while its private production catalog remains empty.
+and attestation. At Phase 4 closeout, generic external exports and named trainer
+packs had no shipped renderer or supported product container. Phase 4.6
+supplies an internal atomic publisher and receipt verifier; Phase 4.7 adds only
+private two-render exact-byte and semantic-content conformance evidence. Phase
+4.8 exposes the shared service through strict Python, CLI, MCP, and CLI-backed
+Mac operations, while its private production catalog closes empty. Phase 5.1
+now supplies the first production exact-byte implementation,
+`split-jsonl-directory` v1, without adding a trainer pack.
 
 ## Decision
 
@@ -39,9 +41,14 @@ replay, and atomic publication are implemented internally in Phase 4.6. Phase
 4.7 privately compares two exact byte trees or two reconstructed canonical
 semantic-preimage trees and replays staged semantic bytes. Phase 4.8 fulfills
 the surface decision with strict discovery, dry run, self-described inspect,
-operator-confirmed no-replace execute, and source-bound verify operations. No
-production implementation is discoverable, so supported containers remain
-later work.
+operator-confirmed no-replace execute, and source-bound verify operations. That
+phase intentionally has no discoverable production implementation. Phase 5.1
+uses the same boundary to admit one exact-byte generic container. Its request-v1
+defaults use `train` / `evaluation` filenames and include aligned provenance;
+configured request v2 requires the complete
+`veriformis.split-jsonl-options/v1` object to change those safe stems or omit
+provenance. The derivative changes neither semantic rows nor membership and
+claims compatibility with no trainer.
 
 ## Alternatives considered
 
@@ -78,14 +85,25 @@ require equal versioned canonical semantic preimages and complete reconstructed
 membership, with service-computed digests and descriptor-reread staged replay.
 This adds no persisted rerender transcript or new schema. The private hooks are
 trusted conformance code, semantic replay currently retains complete files in
-memory, and the fixture is statically bounded. The default service has no
-renderer or semantic replayer. Phase 4.8 adds a private exact-selector catalog
-and shared strict surface protocol, but production discovery remains empty and
+memory, and the fixture is statically bounded. The Phase 4 default service had
+no renderer or semantic replayer. Phase 4.8 adds a private exact-selector catalog
+and shared strict surface protocol, but production discovery remained empty and
 adapters accept no caller-supplied plan, implementation, membership, or
 replacement authority. Phase 4.9 consolidates adversarial contract, tamper,
 path, link, source-trust, membership, race, cancellation, and partial-
 publication proof. The roadmap exit gate passes without a shipped
 implementation; generic containers remain Phase 5.
+
+Phase 5.1 verifies `split-jsonl-directory` v1 through that unchanged publisher
+and receipt boundary. Its renderer copies the authoritative train and
+evaluation payloads into canonical JSONL, emits deterministic README and data-
+card evidence, optionally emits the complete aligned provenance stream, and
+renders twice to the same exact byte tree. Request v1, the ten persisted
+verified-export v1 models, discovery v1, and response v1 remain unchanged;
+configured dry run, execute, and source-bound verification use additive request
+v2. Tests prove all four current row schemas round-trip with identical order and
+partition membership and exercise option, path, tamper, and closed-tree
+refusals. Other generic containers and trainer profiles remain later work.
 
 ## Review triggers
 

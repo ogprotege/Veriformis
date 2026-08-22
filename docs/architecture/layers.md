@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
 
 **Next review:** Any layering or architecture change
 
@@ -206,11 +206,16 @@ private renderer twice from fresh
 strict inputs, compares exact byte trees or private replayed canonical semantic
 preimages, validates complete membership, and replay-checks descriptor-read
 staging. It adds no workspace stage, adapter policy, renderer/replayer registry,
-or new persisted model. The default service has no renderer or semantic
-replayer. Phase 4.8 adds a private production-empty implementation catalog,
-typed `PipelineService` operations, and thin CLI/MCP/Mac adapters without a
-second registry or filesystem implementation. No generic container belongs to
-this layer.
+or new persisted model. At Phase 4 closeout the default service has no renderer
+or semantic replayer. Phase 4.8 adds a private, initially empty implementation
+catalog, typed `PipelineService` operations, and thin CLI/MCP/Mac adapters
+without a second registry or filesystem implementation. Phase 5.1 adds the
+exact-byte `split-jsonl-directory` v1 planner and renderer inside this same
+axial layer. Its request-v1 defaults and fully specified request-v2 layout
+options affect derivative paths and provenance inclusion only; normalized rows,
+ordering, curation, split policy, and membership remain source-derived and
+plan-equal. It adds no workspace stage, consumer profile, trainer claim,
+semantic replayer, or second filesystem implementation.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

@@ -127,7 +127,7 @@ not determine the objective or loss.
 | --- | --- | --- |
 | `minimal-v1` | implemented | Canonical six-file Veriformis bundle |
 | `deterministic-vfbundle-zip-v1` | implemented | Finder-safe transport of that bundle; not a trainer export |
-| `split-jsonl-directory` | planned | Phase 5 generic export |
+| `split-jsonl-directory` | implemented | Phase 5 consumer-neutral generic export; contract v1 |
 | `json` | planned | Phase 5 generic export |
 | `constrained-csv` | planned | Phase 5 generic export |
 | `parquet` | planned | Phase 9 |
@@ -211,9 +211,10 @@ labels MAY be friendlier if they remain bound to those identifiers.
 ## Version and migration
 
 The taxonomy catalog uses schema `veriformis.taxonomy/v1`. Adding a planned
-name does not by itself change the schema version. Changing the meaning of an
-existing identifier, allowed combination, or loss boundary requires a new
-taxonomy schema version and a migration test.
+name or promoting an admitted identifier from planned to implemented does not
+by itself change the schema version. Changing the meaning of an existing
+identifier, allowed combination, or loss boundary requires a new taxonomy
+schema version and a migration test.
 
 Historical construction, finished-dataset, bundle, and handoff schemas remain
 readable through their own loaders. This contract does not replace them.
@@ -222,6 +223,6 @@ readable through their own loaders. This contract does not replace them.
 
 - Implementing preference, classification, tool-use, multimodal, pre-tokenized,
   or generated-data families.
-- Adding export containers or new consumer profiles.
+- Adding consumer-specific trainer profiles or changing container semantics.
 - Renaming `aptus-row-shape` without a versioned report migration.
 - Declaring beta or public-ready maturity.

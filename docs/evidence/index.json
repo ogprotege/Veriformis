@@ -352,6 +352,27 @@
         "uv run ruff check src tests",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-5-split-jsonl-local-2026-08-21",
+      "date": "2026-08-21",
+      "commit": "working-tree-on-a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
+      "scope": "Independent-product Phase 5.1 lossless generic split JSONL export",
+      "grade": "recorded-local",
+      "summary": "The first production generic export container, split-jsonl-directory v1, passed 45 dedicated contract tests, 288 focused export/taxonomy/verified-contract tests, 1,039 full Python tests, 1,027 standalone core tests with 1 deselected, and 56 Mac tests. Full and standalone Python emitted only the expected transport durability-warning regression warning. Clean-wheel installation, both golden compile/external-digest/transport flows, production request-v2 Python/CLI/MCP parity, workbench parity, project tracking, lock, Ruff, 15 JSON, 10 shell, 387 changed-document local links, and diff checks passed. Evidence covers all four current row schemas, exact partition and provenance round trips, payload-only canonical JSONL, safe configurable names, provenance on/off, deterministic README/data card/receipt bytes, every-file tamper failure, strict wrong-operation/subclass refusal, changed-option plan anchoring, empty evaluation emission, and strict data-card layout/loss-policy binding. The ten persisted export v1 models, discovery v1, response v1, source bundle, and membership remain unchanged; no trainer profile or compatibility claim is added.",
+      "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_split_jsonl.py",
+        "uv run pytest -q tests/exports tests/contracts/test_taxonomy_contract.py tests/contracts/test_verified_export_contract.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase5-01-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests scripts",
+        "git diff --check"
+      ]
     }
   ]
 }

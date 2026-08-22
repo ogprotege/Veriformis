@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
 
-**Next review:** Independent-product Phase 5 or Phase 6 packet opening, or any
-active-document behavior change
+**Next review:** Independent-product Phase 5.1 merge, Phase 5.2 or Phase 6
+start, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
 | --- | --- | --- | --- | --- | --- |
@@ -16,6 +16,11 @@ active-document behavior change
 | DOC-005 | Closed 2026-08-11 | High | No privacy-preserving corpus/workflow matrix constrained future input, output, and consumer priorities. | `docs/governance/corpus-demand-matrix.json`; scanner regression | Matrix and content-blind scanner added; unsupported priorities remain explicitly unranked until representative owner evidence exists |
 | DOC-006 | Open | Medium | Existing status/release documents record the pre-independent program vocabulary and group numbering alongside the new program. | Current historical implementation record | Retain for history; progressively distinguish historical groups from current phases |
 | DOC-007 | Open | Medium | The generic v1 row-shape validator persists under the consumer-specific ID `aptus-row-shape`. | `V1_FINISHED_DATASET_GATES` and persisted plan/report identities | Rename only through a versioned contract and report migration; until then document that the ID imports no adapter and proves no live compatibility |
+
+The Phase 5.1 review identified no new documentation debt. The admitted split
+JSONL contract and evidence are reconciled in the active packet; later Phase 5
+containers, previews, and guidance remain explicit roadmap work rather than
+current capability claims.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

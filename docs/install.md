@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-21 (Phase 4 verified-export closeout)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -20,6 +20,7 @@ the hood (usually via the repo’s `.venv` or `uv`).
 | **`veriformis` CLI** | Real product: parse → … → seal / verify |
 | **Mac workbench** (optional) | Thin GUI over that CLI |
 | **Sealed `.vfbundle`** | Finished dataset product |
+| **Split JSONL derivative** | Verified ordinary train/evaluation JSONL directory; no trainer profile |
 
 There is not yet a notarized App Store–style installer. Private beta means:
 install the CLI on your machine, optionally build/open the Debug app.
@@ -137,7 +138,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
 | `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
-| `veriformis export discover` | List executable verified-export implementations; production discovery is currently empty |
+| `veriformis export discover` | List executable verified-export implementations; includes `split-jsonl-directory` v1 |
 | `veriformis export dry-run --request-json JSON` | Derive a source-anchored export plan without destination access |
 | `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |
 | `veriformis export execute --request-json JSON` | Publish one operator-confirmed plan with no-replace `refuse` |
@@ -149,6 +150,26 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis mcp` | Local MCP adapter |
 | `veriformis preview PATH` | Cleaning preview without commit |
 | `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions |
+
+### Verified split JSONL derivative
+
+`split-jsonl-directory` v1 is the first production generic export. A request-v1
+dry run, execute, or source-bound verify uses these fixed defaults:
+
+```json
+{"evaluation_partition_name":"evaluation","include_provenance":true,"schema_version":"veriformis.split-jsonl-options/v1","train_partition_name":"train"}
+```
+
+The resulting closed derivative directory contains canonical payload-only
+`data/train.jsonl` and `data/evaluation.jsonl`, deterministic `README.md` and
+`metadata/dataset-card.json`, aligned
+`metadata/row-provenance.jsonl`, and `export-receipt.json`. To use different
+safe partition filename stems or omit the provenance sidecar, use
+`veriformis.export-surface-request/v2` and provide the complete options object;
+partial options are refused. These choices do not change row content, order,
+curation, split policy, or train/evaluation membership. The container advertises
+no trainer compatibility. See the [CLI reference](cli.md) and
+[Split JSONL Export v1](contracts/split-jsonl-export-v1.md).
 
 ### Minimal terminal compile (same path as the GUI)
 

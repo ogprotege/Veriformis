@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout boundary)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -88,7 +88,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | `src/veriformis/construction/` | Objectives, recipes, constructors, lifecycle, replay |
 | `src/veriformis/datasets/` | Finished plan, curation, split, rows, 17-gate validation |
 | `src/veriformis/bundle/` | Six-file finished bundle + independent verifier |
-| `src/veriformis/exports/` | Verified-derivative models, source admission, planning, publication/verification, and strict surface protocol over a private production-empty implementation catalog |
+| `src/veriformis/exports/` | Verified-derivative models, source admission, planning, publication/verification, strict surface protocol, and the production exact-byte `split-jsonl-directory` v1 implementation |
 | `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
 | `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
 | `src/veriformis/mcp/` | Constrained local MCP adapter, including canonical verified-export tools over `PipelineService` |
@@ -241,23 +241,31 @@ bytes, but their private replayer must return equal versioned canonical semantic
 preimages and plan-equal normalized membership; the service computes each
 digest and replays descriptor-reread staged bytes before promotion.
 
-The default service intentionally has no renderer or semantic replayer. Tests
-may inject the private trusted conformance implementation, but that hook is not
-an untrusted plugin boundary and contributors must not infer a supported
-container or add adapter-specific publication policy. Semantic replay currently
-retains each complete produced file in memory; the Phase 4.7 fixture is
-statically bounded. Any future shipped semantic profile must define and enforce
-explicit byte, record, nesting, and other applicable resource limits.
+Phase 4 intentionally closed with no production renderer or semantic replayer.
+Phase 5.1 adds one reviewed production exact-byte renderer for
+`split-jsonl-directory` v1; it does not make the private implementation hook an
+untrusted plugin boundary. Tests may still inject the bounded trusted
+conformance implementation. Semantic replay currently retains each complete
+produced file in memory; the Phase 4.7 fixture is statically bounded, and no
+production semantic replayer ships. Any future shipped semantic profile must
+define and enforce explicit byte, record, nesting, and other applicable
+resource limits.
 
 Verified-export surfaces must call the typed `PipelineService` operations. Keep
-the production catalog private and empty until a later phase ships an
-implementation.
+the production catalog private and descriptor-driven; its only current entry is
+`split-jsonl-directory` v1 with no consumer profile.
 CLI and MCP must share the canonical export request/response serializer; the
 Mac bridge shells those CLI commands and must decode stdout separately from
-stderr. Do not add caller-supplied profiles, dependencies, file plans,
-membership, renderers, replayers, replacement, or force controls. The Phase 4.9
-adversarial closeout harness must remain test-only; generic containers remain
-Phase 5.
+stderr. Preserve request v1 exactly: for split JSONL it chooses the safe
+`train` / `evaluation` names and includes aligned provenance. Configured dry
+run, execute, and source-bound verify use request v2 and require the complete
+canonical `veriformis.split-jsonl-options/v1` object; it may change only the two
+safe stems or omit provenance. Do not add caller-supplied profiles,
+dependencies, file plans, membership, renderers, replayers, replacement, or
+force controls. Filename and provenance options must never mutate rows,
+ordering, curation, split policy, or partition membership. The Phase 4.9
+adversarial closeout harness remains test-only; other generic containers remain
+later Phase 5 work.
 
 ### Keep optional-integration claims accurate
 

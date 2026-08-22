@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL admission)
 
 **Next review:** Any architecture or data-flow change
 
@@ -230,12 +230,14 @@ re-verifies the source, re-derives the plan, and checks the destination against
 that external authority. CLI, MCP, and Mac use bounded canonical surface
 envelopes over those `PipelineService` operations.
 
-The private render/replay hooks remain trusted conformance code, and semantic
-replay currently retains each complete file in memory. No production renderer,
-replayer, or generic container exists; shipped discovery is empty. The export
-boundary therefore changes neither the canonical six-file bundle nor the nine-
-stage workspace graph. Phase 4.9 closes the boundary with consolidated
-adversarial proof; Phase 5 owns generic containers.
+The private render/replay hooks remain trusted implementation code, and
+semantic replay currently retains each complete file in memory. Phase 4 closed
+with no production entry; Phase 5.1 now installs one exact-byte renderer,
+`split-jsonl-directory` v1, while no production semantic replayer or trainer
+profile exists. The export boundary changes neither the canonical six-file
+bundle nor the nine-stage workspace graph. Phase 4.9 supplied consolidated
+adversarial foundation proof; each Phase 5 container requires separate
+admission evidence.
 
 ## Persistence: the workspace revision store
 

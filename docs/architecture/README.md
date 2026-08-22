@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
 
 **Next review:** Any architecture documentation change
 
@@ -223,9 +223,15 @@ verifies the source and plan and renders twice from independent strict inputs.
 Exact profiles require identical normalized byte trees; semantic-only profiles
 require equal versioned canonical semantic preimages and reconstructed
 membership from both renders plus descriptor-reread staged replay. Phase 4.8
-adds a private production-empty implementation catalog and thin Python, CLI,
-MCP, and CLI-backed Mac export operations. The default service has no renderer
-or semantic replayer, and no generic container ships. The CLI exposes the nine
+adds a private, initially empty implementation catalog and thin Python, CLI,
+MCP, and CLI-backed Mac export operations. Phase 5.1 adds the catalog's first
+production exact-byte implementation, `split-jsonl-directory` v1. Request v1
+uses the safe `train` / `evaluation` filenames and includes aligned provenance;
+configured request v2 requires the complete
+`veriformis.split-jsonl-options/v1` object and may only change those safe stems
+or omit provenance. The renderer preserves payloads, ordering, split policy,
+and train/evaluation membership, and advertises no consumer or trainer profile.
+The default service still has no semantic replayer. The CLI exposes the nine
 stage commands plus maintenance, inspection, recipe automation, MCP, optional
 Aptus handoff, version, and verified-export surfaces.
 

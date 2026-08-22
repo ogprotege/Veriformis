@@ -102,7 +102,8 @@
   "artifacts": {
     "implemented_physical_containers": [
       "minimal-v1",
-      "deterministic-vfbundle-zip-v1"
+      "deterministic-vfbundle-zip-v1",
+      "split-jsonl-directory"
     ],
     "implemented_bundle_profiles": [
       {
@@ -136,8 +137,23 @@
     "generic_export_containers": [
       {
         "container": "split-jsonl-directory",
-        "state": "planned",
-        "roadmap_phase": 5
+        "state": "implemented",
+        "roadmap_phase": 5,
+        "product_role": "consumer-neutral-generic-export",
+        "container_version": 1,
+        "determinism_claim": "portable_exact_bytes",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ],
+        "consumer_profile": null,
+        "evidence": [
+          "src/veriformis/exports/split_jsonl.py",
+          "docs/contracts/split-jsonl-export-v1.md",
+          "tests/exports/test_split_jsonl.py"
+        ]
       },
       {
         "container": "json",

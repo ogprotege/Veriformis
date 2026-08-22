@@ -511,6 +511,117 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testConfiguredSplitJSONLRequestsEncodeCanonicalV2JSON() throws {
+        let options = try SplitJSONLOptions(
+            trainPartitionName: "training-data",
+            evaluationPartitionName: "held_out",
+            includeProvenance: true
+        )
+        let dryRun = try ExportDryRunRequestV2(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "split-jsonl-directory",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a"),
+            containerOptions: options
+        )
+        let expectedOptions = "\"container_options\":{\"evaluation_partition_name\":\"held_out\",\"include_provenance\":true,\"schema_version\":\"veriformis.split-jsonl-options/v1\",\"train_partition_name\":\"training-data\"}"
+
+        XCTAssertEqual(
+            try dryRun.canonicalJSON(),
+            "{\"bundle\":\"/tmp/source.vfbundle\",\"consumer_id\":null,\"consumer_profile_version\":null,\"container_id\":\"split-jsonl-directory\",\(expectedOptions),\"container_version\":1,\"expected_manifest_sha256\":\"\(digest("a"))\",\"operation\":\"dry_run\",\"overwrite_policy\":\"refuse\",\"schema_version\":\"veriformis.export-surface-request/v2\",\"source_trust_policy\":\"require_external_digest\"}"
+        )
+
+        let execute = try ExportExecuteRequestV2(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "split-jsonl-directory",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a"),
+            destinationRoot: "/tmp/export",
+            expectedExportPlanID: "export-plan-v1-\(digest("b"))",
+            containerOptions: options
+        )
+        XCTAssertEqual(
+            try execute.canonicalJSON(),
+            "{\"bundle\":\"/tmp/source.vfbundle\",\"consumer_id\":null,\"consumer_profile_version\":null,\"container_id\":\"split-jsonl-directory\",\(expectedOptions),\"container_version\":1,\"destination_root\":\"/tmp/export\",\"expected_export_plan_id\":\"export-plan-v1-\(digest("b"))\",\"expected_manifest_sha256\":\"\(digest("a"))\",\"operation\":\"execute\",\"overwrite_policy\":\"refuse\",\"schema_version\":\"veriformis.export-surface-request/v2\",\"source_trust_policy\":\"require_external_digest\"}"
+        )
+
+        let verify = try ExportVerifyRequestV2(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "split-jsonl-directory",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a"),
+            destinationRoot: "/tmp/export",
+            expectedExportPlanID: "export-plan-v1-\(digest("b"))",
+            containerOptions: options
+        )
+        XCTAssertEqual(
+            try verify.canonicalJSON(),
+            "{\"bundle\":\"/tmp/source.vfbundle\",\"consumer_id\":null,\"consumer_profile_version\":null,\"container_id\":\"split-jsonl-directory\",\(expectedOptions),\"container_version\":1,\"destination_root\":\"/tmp/export\",\"expected_export_plan_id\":\"export-plan-v1-\(digest("b"))\",\"expected_manifest_sha256\":\"\(digest("a"))\",\"operation\":\"verify\",\"overwrite_policy\":\"refuse\",\"schema_version\":\"veriformis.export-surface-request/v2\",\"source_trust_policy\":\"require_external_digest\"}"
+        )
+    }
+
+    func testConfiguredSplitJSONLRequestsRejectUnsafeOrMismatchedOptions() throws {
+        XCTAssertThrowsError(
+            try SplitJSONLOptions(
+                trainPartitionName: "Train",
+                evaluationPartitionName: "evaluation",
+                includeProvenance: true
+            )
+        )
+        XCTAssertThrowsError(
+            try SplitJSONLOptions(
+                trainPartitionName: "same",
+                evaluationPartitionName: "same",
+                includeProvenance: false
+            )
+        )
+        XCTAssertThrowsError(
+            try SplitJSONLOptions(
+                trainPartitionName: "con",
+                evaluationPartitionName: "evaluation",
+                includeProvenance: false
+            )
+        )
+        XCTAssertThrowsError(
+            try SplitJSONLOptions(
+                trainPartitionName: String(repeating: "a", count: 65),
+                evaluationPartitionName: "evaluation",
+                includeProvenance: false
+            )
+        )
+
+        let options = try SplitJSONLOptions(
+            trainPartitionName: "train",
+            evaluationPartitionName: "evaluation",
+            includeProvenance: false
+        )
+        XCTAssertThrowsError(
+            try ExportDryRunRequestV2(
+                bundle: "/tmp/source.vfbundle",
+                containerID: "other-container",
+                containerVersion: 1,
+                sourceTrustPolicy: .allowSelfConsistent,
+                expectedManifestSHA256: nil,
+                containerOptions: options
+            )
+        )
+        XCTAssertThrowsError(
+            try ExportDryRunRequestV2(
+                bundle: "/tmp/source.vfbundle",
+                containerID: "split-jsonl-directory",
+                containerVersion: 1,
+                consumerID: "trainer",
+                consumerProfileVersion: 1,
+                sourceTrustPolicy: .allowSelfConsistent,
+                expectedManifestSHA256: nil,
+                containerOptions: options
+            )
+        )
+    }
+
     func testExportRuntimePathsEnforceUTF8ByteLimit() throws {
         let exactLimit = String(repeating: "é", count: 16 * 1024)
         XCTAssertEqual(exactLimit.utf8.count, 32 * 1024)
@@ -557,6 +668,39 @@ final class CLIBridgeTests: XCTestCase {
         let inspect = try ExportInspectRequest(destinationRoot: "/tmp/export")
         let execute = try exportExecuteRequest()
         let verify = try exportVerifyRequest()
+        let configuredOptions = try SplitJSONLOptions(
+            trainPartitionName: "training-data",
+            evaluationPartitionName: "held_out",
+            includeProvenance: true
+        )
+        let configuredDryRun = try ExportDryRunRequestV2(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "split-jsonl-directory",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a"),
+            containerOptions: configuredOptions
+        )
+        let configuredExecute = try ExportExecuteRequestV2(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "split-jsonl-directory",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a"),
+            destinationRoot: "/tmp/export",
+            expectedExportPlanID: "export-plan-v1-\(digest("b"))",
+            containerOptions: configuredOptions
+        )
+        let configuredVerify = try ExportVerifyRequestV2(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "split-jsonl-directory",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a"),
+            destinationRoot: "/tmp/export",
+            expectedExportPlanID: "export-plan-v1-\(digest("b"))",
+            containerOptions: configuredOptions
+        )
 
         let discovery = try await cli.discoverExports()
         XCTAssertEqual(discovery.status, .error)
@@ -589,12 +733,36 @@ final class CLIBridgeTests: XCTestCase {
             try recordedArguments(arguments),
             ["export-verify", "--request-json", try verify.canonicalJSON()]
         )
+
+        let configuredDryRunResponse = try await cli.dryRunExport(configuredDryRun)
+        XCTAssertEqual(configuredDryRunResponse.status, .error)
+        XCTAssertEqual(
+            try recordedArguments(arguments),
+            ["export", "dry-run", "--request-json", try configuredDryRun.canonicalJSON()]
+        )
+
+        let configuredExecuteResponse = try await cli.executeExport(configuredExecute)
+        XCTAssertEqual(configuredExecuteResponse.status, .error)
+        XCTAssertEqual(
+            try recordedArguments(arguments),
+            ["export", "execute", "--request-json", try configuredExecute.canonicalJSON()]
+        )
+
+        let configuredVerifyResponse = try await cli.verifyExport(configuredVerify)
+        XCTAssertEqual(configuredVerifyResponse.status, .error)
+        XCTAssertEqual(
+            try recordedArguments(arguments),
+            ["export-verify", "--request-json", try configuredVerify.canonicalJSON()]
+        )
         XCTAssertFalse(
             [
                 try dryRun.canonicalJSON(),
                 try inspect.canonicalJSON(),
                 try execute.canonicalJSON(),
                 try verify.canonicalJSON(),
+                try configuredDryRun.canonicalJSON(),
+                try configuredExecute.canonicalJSON(),
+                try configuredVerify.canonicalJSON(),
             ].contains { $0.contains("force") }
         )
     }

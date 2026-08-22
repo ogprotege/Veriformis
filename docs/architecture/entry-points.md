@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
 
 **Next review:** Any entry-point or architecture change
 
@@ -99,7 +99,7 @@ the sealed directory and optional expected manifest digest to
 trusted channel. The optional Aptus handoff is a separate adapter artifact and
 is not required for core bundle verification.
 
-## Phase 4 export composition, publication, and surface boundary
+## Phase 4 export foundation and Phase 5.1 split JSONL implementation
 
 `PipelineService.export_service` exposes the injected `ExportService` to
 Python composition. Its `verified_source` method calls
@@ -131,9 +131,11 @@ overwrite, writer, or publication control.
 existing arguments accept a strict exact-byte or semantic-content plan, source
 bundle locator, destination root, separately retained source digest when
 required, and optional cancellation callback. It exposes no renderer/replayer
-selection, overwrite, filtering, or membership controls. A private conformance
-subclass supplies bytes and normalized candidates; the default service fails
-closed because no renderer or semantic replayer is installed.
+selection, overwrite, filtering, or membership controls. Private
+implementations supply bytes and normalized candidates. Phase 4's default
+service failed closed because no renderer or semantic replayer was installed;
+Phase 5.1 installs only the reviewed exact-byte `split-jsonl-directory` v1
+renderer.
 
 Publication re-verifies source and plan, invokes the renderer twice from
 independent strict inputs, and repeats complete membership validation. Exact
@@ -147,12 +149,19 @@ Phase 4.8 adds five typed operations through `PipelineService`: executable-
 profile discovery, destination-free dry run, self-described physical
 inspection, operator-confirmed execution, and source-bound verification. A
 private exact-selector catalog owns planners, renderers, and semantic
-replayers. Its production instance is empty; tests alone inject the conformance
-implementation, so discovery makes no new product support claim.
+replayers. Its production instance was empty at Phase 4 closeout; tests alone
+injected the conformance implementation. Phase 5.1 adds the first production
+entry, `split-jsonl-directory` v1, with no consumer profile and no semantic
+replayer.
 
 `veriformis export discover`, `export dry-run`, `export inspect`,
-`export execute`, and top-level `export-verify` are thin adapters. The latter four take
-one strict canonical request through `--request-json`. MCP exposes the same five
+`export execute`, and top-level `export-verify` are thin adapters. The latter
+four take one strict canonical request through `--request-json`. Historical
+request v1 remains unchanged and selects the split-JSONL defaults: `train` /
+`evaluation` filenames and aligned provenance. Dry run, execute, and source-
+bound verify also accept request v2, whose complete canonical
+`veriformis.split-jsonl-options/v1` object may change only the two safe stems or
+omit provenance; inspect remains request v1. MCP exposes the same five
 operations and canonical response envelope. The Mac bridge shells those CLI
 commands, decodes stdout separately from diagnostics, and does not enumerate,
 rewrite, or verify destination files itself. No surface accepts a plan,
@@ -161,11 +170,15 @@ flag. Python callers import the cancellation callback, frozen publication
 outcome, and visible-partial exception from `veriformis.exports`; publication
 hooks remain private.
 
-There is still no shipped renderer or semantic replayer and no generic
-derivative container. The private hooks are trusted conformance code, not an
-untrusted plugin boundary; semantic replay retains complete files in memory and
-its fixture is statically bounded. Phase 4.9 supplies the consolidated
-adversarial closeout; generic containers remain Phase 5.
+Phase 5.1's exact-byte renderer emits canonical payload-only partition JSONL,
+deterministic README and data-card sidecars, optional aligned provenance, and a
+receipt. It never constructs, filters, reorders, curates, resplits, or changes
+partition membership, and it makes no trainer-compatibility claim. The private
+hooks remain trusted implementation code, not an untrusted plugin boundary;
+semantic replay retains complete files in memory and its fixture is statically
+bounded, but no production semantic replayer ships. Phase 4.9 remains the
+historical consolidated adversarial closeout; other generic containers remain
+later Phase 5 work.
 
 ## Preview, recipes, and optional integrations
 

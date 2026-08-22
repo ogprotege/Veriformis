@@ -2,18 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `d91542fe12c5a492de578ad060836a7d65999e42`
+**Implementation baseline reviewed:** `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`
 on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
-workbench Phases 0–2; independent-product Phases 0–3 complete; Phase 4.8 merged
-and corrected), plus the current Phase 4.9 closeout branch
+workbench Phases 0–2; independent-product Phases 0–4 complete), plus the
+current Phase 5.1 split JSONL branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
 
-**Next review:** Independent-roadmap Phase 5 or Phase 6 packet opening; beta
-label cut, public Mac evidence, or any
-listed-item status change
+**Next review:** Phase 5.1 pull-request merge or Phase 5.2 start; beta
+label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -58,10 +57,11 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [x] Independent product Phase 4 is complete. Item 4.8 merged as PR #50 at
-      `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; its review corrections merged
-      as PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Item 4.9 completes the
-      consolidated adversarial harness and closeout reconciliation.
+- [x] Independent product Phase 4 is complete. Its closeout merged as PR #52
+      at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
+- [ ] Independent product Phase 5 is in progress under its
+      [active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
+      Item 5.1 owns only generic split JSONL.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -79,7 +79,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
 | 4 | Build the verified export foundation | Completed | [Completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
-| 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 5 | Ship lossless generic local exports | In progress | [Active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md) |
 | 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -175,12 +175,31 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
       active-document reconciliation are complete in the
       [completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-Phase 4 exposes the foundation without shipping an implementation: production
-discovery is empty and tests alone inject the conformance exporter. The default
-service ships no renderer or semantic replayer, supported generic export
-container, or trainer-specific profile. The ten persisted v1 schemas, taxonomy,
-and support capability lists remain unchanged. Closing the stale generic-export-
-service foundation gap is not a container or profile promotion.
+At Phase 4 closeout, the foundation shipped without a production
+implementation: discovery was empty and tests alone injected the conformance
+exporter. Phase 5.1 now installs one reviewed exact-byte renderer,
+`split-jsonl-directory` v1, and promotes only that consumer-neutral physical
+container. No semantic replayer or trainer-specific profile ships. The ten
+persisted export v1 models remain unchanged; additive request v2 carries the
+container's strict configuration.
+
+### Active Phase 5 status
+
+- [x] Standard Phase 5 packet created and machine/human phase state changed to
+      `in_progress` from baseline
+      `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
+- [x] Phase 5.1 — generic split JSONL v1 is locally implemented and verified
+      only through the export service; merge/remote gates remain the next step.
+- [ ] Phase 5.2 — canonical JSON with explicit split/schema metadata.
+- [ ] Phase 5.3 — structurally lossless CSV with nested-value refusal.
+- [ ] Phase 5.4 — deterministic generic export-pack archive integration.
+- [ ] Phase 5.5 — semantic import-round-trip fixtures.
+- [ ] Phase 5.6 — exact sample-row and destination-tree dry-run previews.
+- [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
+
+The Phase 5.1 implementation and admission evidence support the split JSONL
+promotion. Phase 5 remains in progress; later containers and every trainer
+profile remain unimplemented.
 
 The current stage-command runtime is:
 

@@ -1,16 +1,15 @@
 """Verified-bundle-only composition service for derived exports.
 
-Phase 4 builds every export operation through this service. The current
-increments establish a typed, descriptor-anchored source boundary, fail-closed
-trust admission, source-derived plan population, and private deterministic
-publication conformance without promoting Phase 5 containers.
+Phase 4 built every export operation through this service. Phase 5 installs
+reviewed internal container implementations in the immutable production
+catalog while retaining the same source, plan, membership, and publication
+boundary.
 """
 
 from __future__ import annotations
 
 import os
-from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from veriformis.bundle import (
@@ -49,12 +48,14 @@ from veriformis.exports.models import (
 from veriformis.exports.api import (
     ExportDiscovery,
     ExportDryRunRequest,
+    ExportDryRunRequestV2,
     ExportExecuteRequest,
+    ExportExecuteRequestV2,
     ExportInspectRequest,
     ExportInspection,
-    ExportProfileDescriptor,
     ExportVerifiedOutcome,
     ExportVerifyRequest,
+    ExportVerifyRequestV2,
     _validate_executable_plan_response_budget,
 )
 from veriformis.exports._publication import (
@@ -65,7 +66,13 @@ from veriformis.exports._publication import (
     _publish_semantic_export,
     _verify_export_directory,
 )
+from veriformis.exports._implementation import (
+    _ExportImplementation,
+    _RenderedDerivative,
+    _ReplayedDerivative,
+)
 from veriformis.exports.paths import validate_export_relative_path
+from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
 from veriformis.identity import lossless_json_bytes, sha256_digest
 
 
@@ -73,74 +80,14 @@ _SOURCE_TRUST_POLICIES = frozenset(
     {"require_external_digest", "allow_self_consistent"}
 )
 
-
-@dataclass(frozen=True, slots=True)
-class _RenderedDerivative:
-    """Test-injected renderer output before service-owned publication."""
-
-    files: tuple[tuple[str, bytes], ...]
-    train_rows: tuple[ProductRow, ...]
-    evaluation_rows: tuple[ProductRow, ...]
-    provenance: tuple[RowProvenance, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class _ReplayedDerivative:
-    """Test-injected reconstruction of semantics from produced file bytes.
-
-    ``semantic_contents`` contains the canonical, profile-versioned semantic
-    preimage for every planned file.  The service hashes these bytes itself;
-    an injected implementation cannot assert a digest without supplying the
-    evidence that produced it.
-    """
-
-    semantic_contents: tuple[tuple[str, bytes], ...]
-    train_rows: tuple[ProductRow, ...]
-    evaluation_rows: tuple[ProductRow, ...]
-    provenance: tuple[RowProvenance, ...]
-
-
-_FilePlanner = Callable[
-    [ExportProfileDescriptor, RowSet],
-    Sequence[ExportFilePlan],
-]
-_Renderer = Callable[[ExportPlan, RowSet], _RenderedDerivative]
-_SemanticReplayer = Callable[
-    [ExportPlan, tuple[tuple[str, bytes], ...]],
-    _ReplayedDerivative,
-]
-
-
-@dataclass(frozen=True, slots=True)
-class _ExportImplementation:
-    """Private executable half of one discoverable profile selector."""
-
-    descriptor: ExportProfileDescriptor
-    file_planner: _FilePlanner
-    renderer: _Renderer
-    semantic_replayer: _SemanticReplayer | None
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.descriptor, ExportProfileDescriptor):
-            raise ExportContractError(
-                "export implementation descriptor has the wrong runtime type"
-            )
-        if not callable(self.file_planner) or not callable(self.renderer):
-            raise ExportContractError(
-                "export implementation planner and renderer must be callable"
-            )
-        semantic = (
-            self.descriptor.container_profile.determinism_claim
-            == "semantic_content_only"
-        )
-        if semantic and not callable(self.semantic_replayer):
-            raise ExportContractError(
-                "semantic export implementation requires a semantic replayer"
-            )
-        if not semantic and self.semantic_replayer is not None:
-            raise ExportContractError(
-                "portable exact implementation cannot install a semantic replayer"
-            )
+_SelectedExportRequest = (
+    ExportDryRunRequest
+    | ExportDryRunRequestV2
+    | ExportExecuteRequest
+    | ExportExecuteRequestV2
+    | ExportVerifyRequest
+    | ExportVerifyRequestV2
+)
 
 
 class ExportService:
@@ -151,16 +98,21 @@ class ExportService:
     enforcement, receipts, publication, and verification. Phase 4.7 adds
     private two-render exact comparison and semantic reconstruction without
     changing that boundary. Phase 4.8 exposes only the typed operations through
-    the composition root and a private, production-empty implementation catalog.
+    the composition root and a private implementation catalog. Phase 5.1 adds
+    the first reviewed generic container to that catalog.
     """
 
     def __init__(
         self,
         *,
-        _implementations: Sequence[_ExportImplementation] = (),
+        _implementations: Sequence[_ExportImplementation] | None = None,
     ) -> None:
-        """Build one immutable private catalog; production defaults to empty."""
-        implementations = tuple(_implementations)
+        """Build one immutable private catalog from reviewed implementations."""
+        implementations = (
+            (SPLIT_JSONL_IMPLEMENTATION,)
+            if _implementations is None
+            else tuple(_implementations)
+        )
         if any(not isinstance(item, _ExportImplementation) for item in implementations):
             raise ExportContractError(
                 "export implementations must use the private implementation type"
@@ -186,9 +138,19 @@ class ExportService:
             tuple(item.descriptor for item in self._catalog())
         )
 
-    def dry_run_export(self, request: ExportDryRunRequest) -> ExportPlan:
+    def dry_run_export(
+        self,
+        request: ExportDryRunRequest | ExportDryRunRequestV2,
+    ) -> ExportPlan:
         """Derive one exact plan without touching a destination or rendering."""
-        checked = ExportDryRunRequest.from_json_bytes(request.canonical_bytes())
+        if type(request) is ExportDryRunRequest:
+            checked = ExportDryRunRequest.from_json_bytes(request.canonical_bytes())
+        elif type(request) is ExportDryRunRequestV2:
+            checked = ExportDryRunRequestV2.from_json_bytes(request.canonical_bytes())
+        else:
+            raise ExportContractError(
+                "dry_run_export requires an exact dry-run request type"
+            )
         implementation = self._resolve_implementation(checked)
         return self._plan_registered_export(checked, implementation)
 
@@ -212,14 +174,21 @@ class ExportService:
 
     def execute_export(
         self,
-        request: ExportExecuteRequest,
+        request: ExportExecuteRequest | ExportExecuteRequestV2,
         *,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportPublicationOutcome:
         """Re-derive, anchor, render twice, and atomically publish one profile."""
         if cancellation_check is not None and not callable(cancellation_check):
             raise ExportContractError("cancellation_check must be callable")
-        checked = ExportExecuteRequest.from_json_bytes(request.canonical_bytes())
+        if type(request) is ExportExecuteRequest:
+            checked = ExportExecuteRequest.from_json_bytes(request.canonical_bytes())
+        elif type(request) is ExportExecuteRequestV2:
+            checked = ExportExecuteRequestV2.from_json_bytes(request.canonical_bytes())
+        else:
+            raise ExportContractError(
+                "execute_export requires an exact execute request type"
+            )
         implementation = self._resolve_implementation(checked)
         plan = self._plan_registered_export(
             checked,
@@ -241,14 +210,21 @@ class ExportService:
 
     def verify_export(
         self,
-        request: ExportVerifyRequest,
+        request: ExportVerifyRequest | ExportVerifyRequestV2,
         *,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportVerifiedOutcome:
         """Re-derive the expected plan from source, then verify visible bytes."""
         if cancellation_check is not None and not callable(cancellation_check):
             raise ExportContractError("cancellation_check must be callable")
-        checked = ExportVerifyRequest.from_json_bytes(request.canonical_bytes())
+        if type(request) is ExportVerifyRequest:
+            checked = ExportVerifyRequest.from_json_bytes(request.canonical_bytes())
+        elif type(request) is ExportVerifyRequestV2:
+            checked = ExportVerifyRequestV2.from_json_bytes(request.canonical_bytes())
+        else:
+            raise ExportContractError(
+                "verify_export requires an exact verify request type"
+            )
         implementation = self._resolve_implementation(checked)
         plan = self._plan_registered_export(
             checked,
@@ -291,7 +267,7 @@ class ExportService:
 
     def _resolve_implementation(
         self,
-        request: ExportDryRunRequest | ExportExecuteRequest | ExportVerifyRequest,
+        request: _SelectedExportRequest,
     ) -> _ExportImplementation:
         selector = (
             request.container_id,
@@ -308,12 +284,17 @@ class ExportService:
 
     def _plan_registered_export(
         self,
-        request: ExportDryRunRequest | ExportExecuteRequest | ExportVerifyRequest,
+        request: _SelectedExportRequest,
         implementation: _ExportImplementation,
         *,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportPlan:
         _run_cancellation_check(cancellation_check)
+        configured = isinstance(
+            request,
+            (ExportDryRunRequestV2, ExportExecuteRequestV2, ExportVerifyRequestV2),
+        )
+        options = self._parse_container_options(request, implementation)
         source = self.verified_source(
             request.bundle,
             source_trust_policy=request.source_trust_policy,
@@ -330,9 +311,23 @@ class ExportService:
                 raise ExportContractError(
                     "selected export implementation does not support the source row schema"
                 )
-            file_plans = tuple(
-                implementation.file_planner(descriptor, planner_row_set)
-            )
+            if not configured:
+                file_plans = tuple(
+                    implementation.file_planner(descriptor, planner_row_set)
+                )
+            else:
+                if implementation.configured_file_planner is None:
+                    raise ExportContractError(
+                        "selected export implementation does not accept "
+                        "container_options"
+                    )
+                file_plans = tuple(
+                    implementation.configured_file_planner(
+                        descriptor,
+                        planner_row_set,
+                        options,
+                    )
+                )
             plan, _ = _plan_from_verified_source(
                 source,
                 source_trust_policy=request.source_trust_policy,
@@ -361,6 +356,37 @@ class ExportService:
             raise ExportContractError(
                 f"invalid registered export planning evidence: {exc}"
             ) from exc
+
+    def _parse_container_options(
+        self,
+        request: _SelectedExportRequest,
+        implementation: _ExportImplementation,
+    ) -> object:
+        """Validate selected container options before source or destination access."""
+        if not isinstance(
+            request,
+            (ExportDryRunRequestV2, ExportExecuteRequestV2, ExportVerifyRequestV2),
+        ):
+            return None
+        raw: Mapping[str, object] = request.container_options
+        parser = implementation.options_parser
+        if parser is None:
+            raise ExportContractError(
+                "selected export implementation does not accept container_options"
+            )
+        try:
+            return parser(raw)
+        except ExportContractError:
+            raise
+        except (
+            AttributeError,
+            RecursionError,
+            TypeError,
+            UnicodeError,
+            ValueError,
+            VeriformisError,
+        ) as exc:
+            raise ExportContractError(f"invalid container_options: {exc}") from exc
 
     def verified_source(
         self,
@@ -567,10 +593,10 @@ class ExportService:
     ) -> ExportPublicationOutcome:
         """Atomically publish one test-injected deterministic derivative.
 
-        This lower-level operation intentionally has no renderer-selection
-        argument or shipped implementation. A conformance-only subclass may
-        override the private render and semantic-replay hooks; Phase 4.8
-        surfaces reach it only through an exact private catalog selection.
+        This lower-level operation intentionally has no caller-supplied
+        renderer-selection argument. The base hooks remain injection-only;
+        shipped implementations bind them through exact private catalog
+        selection before this publication primitive is called.
         """
         if cancellation_check is not None and not callable(cancellation_check):
             raise ExportContractError("cancellation_check must be callable")

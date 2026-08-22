@@ -7,9 +7,9 @@ This file gives coding-agent guidance for the current Veriformis repository.
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
-(thin SwiftUI over CLI); and independent-product Phases 0–4, including the
-implemented taxonomy contract/discovery surfaces and the completed verified-
-export foundation. Phase 4 introduces the typed internal
+(thin SwiftUI over CLI); independent-product Phases 0–4; and Phase 5.1's first
+supported generic export, `split-jsonl-directory` v1. Phase 4 introduces the
+implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
 view. Strict verified-export v1 models and trusted-by-default source admission
 with explicit lower trust are implemented. Read-only plan population now
@@ -17,7 +17,7 @@ derives all source identities and the source membership baseline from that
 immutable view; callers provide only strict profile, dependency, and file-plan
 evidence. Read-only derivative enforcement fresh-reconstructs normalized
 candidate semantic rows, provenance, row-set identity, and membership and
-requires exact plan-baseline equality. A private production-empty
+requires exact plan-baseline equality. Phase 4's private, initially empty
 implementation catalog backs strict discovery, dry
 run, self-described inspect, operator-confirmed no-replace execute, and source-
 bound verify operations through `PipelineService`, CLI, MCP, and the CLI-backed
@@ -25,11 +25,15 @@ Mac bridge. Phase 4.8 merged as PR #50 at
 `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
 at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 completes the
 adversarial harness and closeout reconciliation.
-Private render/replay hooks are trusted conformance code, not a plugin boundary,
-and semantic replay currently retains each complete produced file in memory. No
-production renderer or semantic replayer, generic export container, or planned
-trainer-specific profile is shipped; production discovery is empty. Do not
-claim public
+Private render/replay hooks are trusted code, not a plugin boundary, and
+semantic replay currently retains each complete produced file in memory.
+Phase 5.1 installs one production exact-byte renderer and discoverable physical
+container: `split-jsonl-directory` v1. Request v1 selects safe `train` /
+`evaluation` names and aligned provenance; request v2 requires the complete
+`veriformis.split-jsonl-options/v1` object for custom safe stems or
+provenance-off. The derivative preserves rows, ordering, and authoritative
+partition membership and claims compatibility with no trainer. No production
+semantic replayer or trainer-specific profile is shipped. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 
@@ -42,17 +46,18 @@ Read these current authorities before changing code:
 5. `docs/contracts/finished-dataset-v1.md`
 6. `docs/contracts/taxonomy-v1.md`
 7. `docs/contracts/verified-export-v1.md`
-8. `docs/architecture.md`
-9. `docs/analysis/2026-08-11-independent-product-analysis.md`
-10. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
-11. `docs/governance/project-tracking.md`,
+8. `docs/contracts/split-jsonl-export-v1.md`
+9. `docs/architecture.md`
+10. `docs/analysis/2026-08-11-independent-product-analysis.md`
+11. `docs/plans/2026-08-11-veriformis-independent-product-roadmap.md`
+12. `docs/governance/project-tracking.md`,
    `dev/active/independent-product/program.json`, and the current or most
    recently completed phase packet
-12. `docs/governance/support-registry.json` and `docs/evidence/index.json`
-13. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
-14. `docs/plans/2026-07-29-veriformis-roadmap.md` and
+13. `docs/governance/support-registry.json` and `docs/evidence/index.json`
+14. `docs/contracts/aptus-handoff-v1.md` (optional Aptus integration)
+15. `docs/plans/2026-07-29-veriformis-roadmap.md` and
     `docs/plans/2026-08-06-private-beta-workbench.md` (historical evidence)
-15. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
+16. `docs/install.md`, `docs/beta-limitations.md`, `docs/release.md`
 
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.
