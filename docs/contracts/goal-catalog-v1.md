@@ -9,11 +9,12 @@
 **Execution profile:** `offline-deterministic-v1`
 
 **Implementation status:** Implemented in independent-product Phase 6.1
-(goal catalog and read-only discovery). Items 6.2–6.7 extend this contract
-additively with per-goal contracts, the input-family axis, previews, presets,
-preflight, the acceptance matrix, and instruction truthfulness.
+(goal catalog and read-only discovery) and extended additively by Phase 6.2
+(per-goal contracts and input-family eligibility). Items 6.3–6.7 extend it
+further with previews, presets, preflight, the acceptance matrix, and
+instruction truthfulness.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.1)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.2)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -76,6 +77,15 @@ Top-level object:
 | `recipe_library_id` | The named recipe whose objective equals `objective` |
 | `default_representation` | A compatible `representation_id` resolving to the taxonomy default row schema |
 | `compatible_representations` | Unique, ordered `representation_id` values resolving exactly to the taxonomy compatibility row for `objective` |
+| `eligible_input_families` | Non-empty, unique implemented input families in taxonomy order whose recovery supplies the goal's evidence |
+| `required_source_evidence` | Plain-language statement of the evidence the source must contain |
+| `required_evidence_diagnostics` | The construction diagnostic codes that report that evidence missing; a subset of `V1_CONSTRUCTION_DIAGNOSTIC_CODES` |
+| `target_construction` | Plain-language statement of exactly how context and target are derived |
+| `supervision_boundary` | Plain-language statement of which part is context and which receives loss |
+| `curation_defaults` | Object with `minimum_target_characters`, `balance_mode`, `maximum_records_per_primary_source`, `evaluation_ratio_ppm`, `evaluation_required`, `split_seed`; validated as an executable `CurationPolicy`; equal to the defaults every surface executes until Phase 6.4 presets own them. `balance_mode` uses the persisted `CurationPolicy` spelling (`none`, `primary_source_cap`); the CLI and MCP hyphenated surface spelling is unified in 6.4 |
+| `review_policy_default` | `none` or `required` |
+| `review_policy_options` | Exactly `["none", "required"]` |
+| `non_claims` | Exactly the closed v1 codes `no-trainer-compatibility`, `no-generated-text`, `no-invented-target`, `no-fine-tuning-suitability-judgment` |
 | `state` | Exactly `implemented` in v1 |
 
 ### Representation object
@@ -89,6 +99,7 @@ Top-level object:
 | `row_schema` | Exactly one persisted row schema |
 | `loss_policy` | The taxonomy loss policy of that row schema |
 | `requires_operator_instruction` | `true` exactly for `instruction_output` |
+| `compatible_generic_exports` | Non-empty, unique production generic export containers in taxonomy order whose descriptors admit `row_schema` |
 
 ## Closure rules
 
@@ -115,10 +126,47 @@ Top-level object:
    non-empty, MUST NOT carry surrounding whitespace, MUST NOT contain control
    characters, and `not_this` MUST NOT repeat an entry.
 7. `title`, `plain_language`, `what_the_model_learns`, `what_you_provide`,
-   and every representation's `title`, `plain_language`, and
-   `supervised_region` MUST NOT describe a summary, an answer, or a
-   translation. `summary` is not a goal, objective, alias, or representation.
+   `required_source_evidence`, `target_construction`,
+   `supervision_boundary`, and every representation's `title`,
+   `plain_language`, and `supervised_region` MUST NOT describe a summary, an
+   answer, or a translation. `summary` is not a goal, objective, alias, or
+   representation.
    Item 6.7 extends this claim vocabulary to operator instructions.
+
+8. `eligible_input_families` MUST name only families whose recovery supplies
+   the goal's `required_source_evidence`; a family that can never supply it
+   MUST be absent. Current exclusions: `delimited-table` and `json-records`
+   carry no supported scalar; `source-code` is one code block that cleaning
+   never edits, so it can supply no before-and-after pair; `pdf-text`
+   recovery supplies paragraphs under synthetic per-page labels, not real
+   headings, so it can supply neither a section nor a recorded attribute.
+   `required_evidence_diagnostics` MUST include `source-chunks-unavailable`
+   for every goal because construction reports it for every objective. Item
+   6.6 proves every named family end to end.
+9. `curation_defaults` MUST equal the defaults executed by
+   `PipelineService.curate`, CLI `curate`, MCP `curate`, and the recipe
+   library; a test enforces the equality until Phase 6.4 presets become the
+   single executing source.
+10. `compatible_generic_exports` MUST equal the production export catalog's
+    admitted containers for the representation's row schema; a test derives
+    it from `PipelineService.discover_exports()`.
+
+## Goal bindings (v1)
+
+| Goal | Objective | Eligible input families | Missing-evidence diagnostics |
+| --- | --- | --- | --- |
+| `learn-the-text` | `full_text` | all eight | `source-chunks-unavailable` |
+| `continue-a-passage` | `continuation` | all eight | `source-chunks-unavailable`, `continuation-boundary-unavailable` |
+| `recover-a-section-from-its-heading` | `section_reconstruction` | `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `section-structure-unavailable` |
+| `reproduce-a-recorded-change` | `before_after_transformation` | all except `source-code` | `source-chunks-unavailable`, `transformation-pair-unavailable`, `transformation-pair-empty-or-unchanged` |
+| `extract-a-structured-value` | `structured_field` | `source-code`, `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `structured-ir-artifact-unavailable`, `structured-field-unavailable`, `structured-field-chunk-unavailable`, `structured-field-empty-value` |
+
+Every goal states `curation_defaults` of `minimum_target_characters` 1,
+`balance_mode` `none`, no per-source cap, `evaluation_ratio_ppm` 500000,
+`evaluation_required` true, and `split_seed` `veriformis-v1`;
+`review_policy_default` `none`; and all four non-claim codes. Representations
+admit `split-jsonl-directory` and `json` for every row schema and
+`constrained-csv` for the three flat schemas only.
 
 ## Resolution
 

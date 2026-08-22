@@ -49,9 +49,13 @@ capabilities owned by `PipelineService`.
 
 Phase 6 opened on 2026-08-22 from baseline
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` (PR #59, the Phase 5 closeout).
-Item 6.1 is locally complete on branch `phase6/01-goal-catalog`: the packaged
-`veriformis.goal-catalog/v1` data, strict models, read-only discovery on
-Python, CLI, MCP, and the Mac bridge, the Goal Catalog Contract v1, ADR-0007,
-the support-registry and tracking binding, the predeclared usability criteria,
-and the post-#59 reconciliation. Its pull request, GitHub checks, merge, and
-clean-main synchronization are not claimed by this packet.
+Item 6.1's plain-language goal catalog merged as PR #60 at
+`7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub checks passed.
+Item 6.2 is locally complete on branch `phase6/02-goal-contracts`: per-goal
+contracts (eligible input families, required evidence and its diagnostics,
+target construction, supervision boundary, curation defaults, review policy,
+closed non-claims), per-representation generic-export compatibility, and
+`input_family` as the seventh taxonomy axis under ADR-0008, with discovery,
+the Swift decoders and compile-view disclosure, golden fixtures, the support
+registry, and the tracking checker updated. Its pull request, GitHub checks,
+merge, and clean-main synchronization are not claimed by this packet.

@@ -15,16 +15,25 @@ from functools import lru_cache
 from importlib import resources
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
 
 from veriformis.contracts import (
     DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    V1_CONSTRUCTION_DIAGNOSTIC_CODES,
     V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import GoalCatalogError
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.taxonomy import (
     DEFAULT_ROW_SCHEMA,
+    IMPLEMENTED_INPUT_FAMILIES,
+    IMPLEMENTED_PHYSICAL_CONTAINERS,
     LOSS_POLICY_IDS,
     OBJECTIVE_FAMILY,
     OBJECTIVE_ROW_COMPATIBILITY,
@@ -34,11 +43,35 @@ from veriformis.taxonomy import (
 
 GOAL_CATALOG_DATA_NAME = "catalog-v1.json"
 
+# Closed v1 non-claim vocabulary. Every goal states all of them.
+NON_CLAIM_CODES: tuple[str, ...] = (
+    "no-trainer-compatibility",
+    "no-generated-text",
+    "no-invented-target",
+    "no-fine-tuning-suitability-judgment",
+)
+REVIEW_POLICY_OPTIONS: tuple[str, ...] = ("none", "required")
+_NON_GENERIC_CONTAINERS = frozenset(
+    {
+        "minimal-v1",
+        "deterministic-vfbundle-zip-v1",
+        "deterministic-export-pack-zip-v1",
+    }
+)
+GENERIC_EXPORT_CONTAINERS: tuple[str, ...] = tuple(
+    container
+    for container in IMPLEMENTED_PHYSICAL_CONTAINERS
+    if container not in _NON_GENERIC_CONTAINERS
+)
+
 _PLAIN_GOAL_FIELDS = (
     "title",
     "plain_language",
     "what_the_model_learns",
     "what_you_provide",
+    "required_source_evidence",
+    "target_construction",
+    "supervision_boundary",
 )
 _PLAIN_REPRESENTATION_FIELDS = ("title", "plain_language", "supervised_region")
 _FORBIDDEN_CLAIM_FRAGMENTS = ("summar", "answer", "translat")
@@ -81,6 +114,25 @@ def _require_identifier(field: str, value: str) -> str:
     return value
 
 
+def _require_closed_sequence(
+    field: str,
+    value: tuple[str, ...],
+    allowed: tuple[str, ...],
+    *,
+    ordered: bool = True,
+) -> tuple[str, ...]:
+    if not value or len(set(value)) != len(value):
+        raise ValueError(f"{field} must be non-empty and unique")
+    for item in value:
+        if item not in allowed:
+            raise ValueError(f"{field} names unknown identifier {item!r}; allowed {list(allowed)!r}")
+    if ordered:
+        expected = tuple(item for item in allowed if item in value)
+        if value != expected:
+            raise ValueError(f"{field} must follow taxonomy order {list(expected)!r}")
+    return value
+
+
 def _require_plain_text(field: str, value: str) -> str:
     if not value or value.strip() != value:
         raise ValueError(f"{field} must be non-empty without surrounding whitespace")
@@ -112,6 +164,60 @@ class _StrictModel(BaseModel):
     )
 
 
+class CurationDefaults(_StrictModel):
+    """Documented curation and split defaults a goal executes with.
+
+    Phase 6.4 presets become the single executing source of these values;
+    until then the catalog states them and a test proves they equal the
+    defaults the service, CLI, MCP, runner, and library currently execute.
+    """
+
+    minimum_target_characters: int
+    balance_mode: Literal["none", "primary_source_cap"]
+    maximum_records_per_primary_source: int | None
+    evaluation_ratio_ppm: int
+    evaluation_required: bool
+    split_seed: str
+
+    @field_validator("minimum_target_characters")
+    @classmethod
+    def _minimum(cls, value: int) -> int:
+        if type(value) is not int or value < 1:
+            raise ValueError("minimum_target_characters must be a positive integer")
+        return value
+
+    @field_validator("evaluation_ratio_ppm")
+    @classmethod
+    def _ratio(cls, value: int) -> int:
+        if type(value) is not int or not 0 <= value <= 1_000_000:
+            raise ValueError("evaluation_ratio_ppm must be an integer within 0..1000000")
+        return value
+
+    @field_validator("split_seed")
+    @classmethod
+    def _seed(cls, value: str) -> str:
+        if not value or value.strip() != value or not value.isprintable():
+            raise ValueError(
+                "split_seed must be non-empty printable text without surrounding whitespace"
+            )
+        return value
+
+    @model_validator(mode="after")
+    def _executable(self) -> "CurationDefaults":
+        from veriformis.datasets import CurationPolicy
+        from veriformis.errors import CurationError
+
+        try:
+            CurationPolicy.create(
+                minimum_target_characters=self.minimum_target_characters,
+                balance_mode=self.balance_mode,
+                maximum_records_per_primary_source=self.maximum_records_per_primary_source,
+            )
+        except (CurationError, ValueError, TypeError) as exc:
+            raise ValueError(f"curation_defaults are not an executable policy: {exc}") from exc
+        return self
+
+
 class GoalRepresentation(_StrictModel):
     """One plain-language representation bound to exactly one row schema."""
 
@@ -122,6 +228,14 @@ class GoalRepresentation(_StrictModel):
     row_schema: RowSchemaKind
     loss_policy: LossPolicyKind
     requires_operator_instruction: bool
+    compatible_generic_exports: tuple[str, ...]
+
+    @field_validator("compatible_generic_exports")
+    @classmethod
+    def _exports(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        return _require_closed_sequence(
+            "compatible_generic_exports", value, GENERIC_EXPORT_CONTAINERS
+        )
 
     @field_validator("representation_id")
     @classmethod
@@ -172,7 +286,52 @@ class Goal(_StrictModel):
     recipe_library_id: str
     default_representation: str
     compatible_representations: tuple[str, ...]
+    eligible_input_families: tuple[str, ...]
+    required_source_evidence: str
+    required_evidence_diagnostics: tuple[str, ...]
+    target_construction: str
+    supervision_boundary: str
+    curation_defaults: CurationDefaults
+    review_policy_default: Literal["none", "required"]
+    review_policy_options: tuple[str, ...]
+    non_claims: tuple[str, ...]
     state: Literal["implemented"]
+
+    @field_validator("eligible_input_families")
+    @classmethod
+    def _families(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        return _require_closed_sequence(
+            "eligible_input_families", value, IMPLEMENTED_INPUT_FAMILIES
+        )
+
+    @field_validator("required_evidence_diagnostics")
+    @classmethod
+    def _diagnostics(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        return _require_closed_sequence(
+            "required_evidence_diagnostics",
+            value,
+            V1_CONSTRUCTION_DIAGNOSTIC_CODES,
+            ordered=False,
+        )
+
+    @field_validator("review_policy_options")
+    @classmethod
+    def _review_options(cls, value: tuple[str, ...], info) -> tuple[str, ...]:
+        if value != REVIEW_POLICY_OPTIONS:
+            raise ValueError(
+                f"review_policy_options must be exactly {list(REVIEW_POLICY_OPTIONS)!r}"
+            )
+        default = info.data.get("review_policy_default")
+        if default is not None and default not in value:
+            raise ValueError("review_policy_default must be one of review_policy_options")
+        return value
+
+    @field_validator("non_claims")
+    @classmethod
+    def _non_claims(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if value != NON_CLAIM_CODES:
+            raise ValueError(f"non_claims must state exactly {list(NON_CLAIM_CODES)!r}")
+        return value
 
     @field_validator("goal_id")
     @classmethod
@@ -427,7 +586,11 @@ def resolve_goal(
 
 
 __all__ = [
+    "GENERIC_EXPORT_CONTAINERS",
     "GOAL_CATALOG_DATA_NAME",
+    "NON_CLAIM_CODES",
+    "REVIEW_POLICY_OPTIONS",
+    "CurationDefaults",
     "Goal",
     "GoalCatalog",
     "GoalRepresentation",

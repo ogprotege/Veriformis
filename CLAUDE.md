@@ -18,7 +18,10 @@ merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e` after
 all 14 GitHub checks passed. Phase 5.7's operator guide and Phase 5 closeout
 merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14
 GitHub checks passed. Phase 6 (goal-first recipes and previews) is in progress
-under its standard packet; item 6.1 adds the goal catalog.
+under its standard packet. Item 6.1's plain-language goal catalog merged as
+PR #60 at `7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub
+checks passed; item 6.2 adds per-goal contracts and the seventh taxonomy axis
+`input_family`.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -84,8 +87,11 @@ Read these current authorities before changing code:
 8. `docs/contracts/verified-export-v1.md`
 9. `docs/contracts/split-jsonl-export-v1.md`
 10. `docs/contracts/canonical-json-export-v1.md`
-11. `docs/contracts/constrained-csv-export-v1.md`
-12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`
+11. `docs/contracts/constrained-csv-export-v1.md` and
+    `docs/contracts/goal-catalog-v1.md`
+12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
+    `docs/adr/0007-goal-first-catalog-as-versioned-data.md`, and
+    `docs/adr/0008-input-family-taxonomy-axis.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

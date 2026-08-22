@@ -287,6 +287,22 @@ consumer profile, or trainer claim. With that guidance and the reconciled
 packet/evidence/governance records, independent-product Phase 5 is complete.
 Item 5.7 merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 
+Phase 6.1 adds the packaged `veriformis.goal-catalog/v1` data: five
+plain-language goals bound one-to-one to the existing objectives and named
+recipes, and four representations bound to the existing row schemas and loss
+policies, discoverable read-only and byte-identically through Python, CLI
+`goals`, MCP `goals`, and the Mac bridge. It merged as PR #60 at
+`7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub checks
+passed. Phase 6.2 (in progress, unmerged) extends each goal with required
+source evidence, its
+missing-evidence diagnostics, target construction, supervision boundary,
+curation defaults, review policy, and closed non-claims; binds each
+representation to its compatible generic exports; and adds `input_family`
+as the seventh taxonomy axis (eight implemented recovery families plus
+`ocr-image` explicitly unsupported) under ADR-0008. Neither item adds an
+objective, row schema, construction behavior, preset, preview, preflight,
+Mac screen, trainer claim, or consumer profile.
+
 ## Implemented interfaces
 
 The installed console entry point is `veriformis`.
@@ -308,7 +324,7 @@ The installed console entry point is `veriformis`.
 | `package EXPORT -o ARCHIVE --export-receipt-sha256 DIGEST` | Descriptor-inspects one closed generic export and deterministically publishes its externally receipt-anchored tree without rerendering | `*.vfexport.zip`; archive, receipt, plan, content-root, and retained source-trust facts |
 | `package-verify ARCHIVE --export-receipt-sha256 DIGEST` | Reconstructs only receipt-validated export paths, verifies the unchanged inner plan/receipt/file bindings, and proves canonical archive bytes | Receipt-anchored transport result; not source-bound export verification |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
-| `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
+| `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |

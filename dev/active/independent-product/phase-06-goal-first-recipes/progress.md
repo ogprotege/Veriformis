@@ -97,3 +97,80 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.1 pull request, require every GitHub
 check to pass, merge, and synchronize clean local `main` with `origin/main`
 before item 6.2 begins.
+
+## 2026-08-22 — Item 6.1 merged; item 6.2 started
+
+**Status:** Item 6.1 merged as PR #60 at
+`7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub checks passed;
+clean local `main` equals `origin/main` at that commit. Branch
+`phase6/02-goal-contracts` was created from it.
+
+One observation from the item 6.1 checks: the Phase 5.6 adapter test
+`test_mcp_cancellation_race_preserves_visible_publication_outcome[False-ok]`
+failed once on the `test (py3.12, ubuntu-latest)` push-trigger run and passed
+on the identical pull-request-trigger cell and on re-run. That test gave a
+worker thread one second to finish a real export execution before the
+cancellation race; the failing runner took 185 seconds for the suite versus
+about 70 locally. Item 6.1 did not touch that test or the export path. Item
+6.2 widens the thread-event budget in that test
+(`tests/exports/test_adapters.py`)
+to thirty seconds as a declared test-robustness fix; the race remains ordered
+by events, not time.
+
+Item 6.2 scope: extend every catalog goal with `eligible_input_families`,
+`required_source_evidence`, `required_evidence_diagnostics`,
+`target_construction`, `supervision_boundary`, `curation_defaults`,
+`review_policy_default`, `review_policy_options`, and closed `non_claims`;
+bind each representation to `compatible_generic_exports`; add `input_family`
+as the seventh taxonomy axis under ADR-0008 with suffix and parser closure
+enforced by the tracking checker; update discovery, the Swift decoders, golden
+fixtures, the support registry, and contracts.
+
+**Next action:** Finish the 6.2 proofs (defaults equal every executing
+surface, exports equal the production catalog, parsers supply exactly the
+evidence each goal claims), run the complete admission gates, record
+evidence, and publish the item 6.2 pull request.
+
+## 2026-08-22 — Item 6.2 locally complete
+
+**Status:** Local implementation and admission gates passed; pull-request
+merge pending.
+
+Every catalog goal now states its eligible input families, required source
+evidence with the construction diagnostics that report it missing, target
+construction, supervision boundary, curation defaults, review policy, and the
+closed non-claim codes; every representation states its compatible generic
+exports. `input_family` is the seventh taxonomy axis: eight implemented
+recovery families partition the declared v1 suffixes and name their parser
+kinds, `ocr-image` is explicitly unsupported, and discovery, the Swift
+decoder and compile-view disclosure, the golden fixture, the support
+registry, and the tracking checker changed in the same tree.
+
+An independent adversarial review found one blocker: `source-code` had been
+listed as eligible for the before/after goal, but cleaning never edits a code
+block, so that family can never supply a recorded change; the proof test had
+only checked that any block existed. The binding was corrected and the test
+now runs cleaning and requires real edits. The review also showed that PDF
+recovery emits synthetic `Page N` headings rather than document structure, so
+`pdf-text` was removed from the section and structural-attribute goals under
+the no-invented-target doctrine, with a test binding that exclusion to the
+parser's labels. Five further should-fix items (universal
+`source-chunks-unavailable`, `CurationDefaults` validated as an executable
+`CurationPolicy`, the `balance_mode` spelling note, long lines, and the Mac
+seventh-axis disclosure) were corrected and re-verified.
+
+Observed gates on the reconciled working tree:
+
+- 83 focused goal and taxonomy tests passed; 1,308 full Python tests passed
+  with only the intentional durability-warning regression warning; 1,296
+  standalone release tests passed with 1 deselected and the same warning.
+- Clean-wheel installation and both golden compile/external-digest/transport
+  flows passed; standalone CLI/workbench parity passed.
+- The complete macOS XCTest target passed 72 tests with `TEST SUCCEEDED`.
+- Project tracking (now binding input families and the suffix partition), its
+  regression test, lock, Ruff, structured JSON, fixture byte equality, and
+  diff checks passed.
+
+**Next action:** Publish the item 6.2 pull request, require every GitHub
+check to pass, merge, and synchronize clean local `main` with `origin/main`
+before item 6.3 begins.

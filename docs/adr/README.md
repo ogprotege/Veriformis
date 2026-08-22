@@ -29,6 +29,7 @@ not substitutes for implementation or tests.
 | [0005](0005-deterministic-bundle-transport.md) | Deterministic immutable bundle transport | Accepted | Bundle profile, packaging, compression, or trust-envelope change |
 | [0006](0006-receipt-anchored-export-pack-transport.md) | Receipt-anchored deterministic export-pack transport | Accepted | Export receipt, archive profile, packaging, or trust-envelope change |
 | [0007](0007-goal-first-catalog-as-versioned-data.md) | Goal-first catalog and presets as versioned data over existing objectives | Accepted | Objective, row-schema, loss-policy, or representation change; Phase 6.4 preset freeze; Phase 17 or 18 |
+| [0008](0008-input-family-taxonomy-axis.md) | Input family as the seventh taxonomy axis | Accepted | New parser kind or suffix; Phase 11 input qualification; Phase 12 OCR |
 
 ## ADR template
 

@@ -725,8 +725,9 @@ veriformis taxonomy
 
 The JSON comes from the same registry used by `PipelineService`, MCP, compile
 compatibility checks, and workbench help. It reports contract metadata plus
-the six axes separately: `training_family`, `objective`, `semantic_row`,
-`physical_container`, `consumer_profile`, and `loss_policy`. It lists only
+the seven axes separately: `training_family`, `objective`, `semantic_row`,
+`physical_container`, `consumer_profile`, `loss_policy`, and `input_family`.
+It lists only
 implemented identifiers and does not emit an ambiguous `format` field. The
 command accepts no workspace and writes no state.
 

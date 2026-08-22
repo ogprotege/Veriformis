@@ -87,10 +87,16 @@ def _tool_names(server) -> set[str]:
     return asyncio.run(list_names())
 
 
+# Worker threads in these races perform a real export execution before they
+# signal. Loaded CI runners have taken several times longer than a local run,
+# so the budget is generous; the race itself is ordered by events, not time.
+_THREAD_EVENT_TIMEOUT_SECONDS = 30.0
+
+
 async def _wait_for_thread_event(
     event: threading.Event,
     *,
-    timeout: float = 1.0,
+    timeout: float = _THREAD_EVENT_TIMEOUT_SECONDS,
 ) -> None:
     if not await asyncio.to_thread(event.wait, timeout):
         pytest.fail(f"thread event was not set within {timeout} seconds")
@@ -172,7 +178,7 @@ class _PublicationRacePipeline:
         )
         assert outcome.publication is not None
         self.visible.set()
-        assert self.release.wait(1.0)
+        assert self.release.wait(_THREAD_EVENT_TIMEOUT_SECONDS)
         if self.partial:
             raise ExportPartialPublicationError(
                 outcome.publication,

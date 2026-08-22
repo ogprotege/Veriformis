@@ -13,9 +13,14 @@ from veriformis.contracts import (
 )
 from veriformis.errors import TaxonomyError
 from veriformis.identity import lossless_json_bytes, sha256_digest
+from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
 from veriformis.taxonomy import (
     CANONICAL_CONSUMER_PROFILE,
+    EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES,
     EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES,
+    IMPLEMENTED_INPUT_FAMILIES,
+    INPUT_FAMILY_PARSERS,
+    INPUT_FAMILY_SUFFIXES,
     IMPLEMENTED_CONSUMER_PROFILES,
     IMPLEMENTED_PHYSICAL_CONTAINERS,
     IMPLEMENTED_TRAINING_FAMILIES,
@@ -31,6 +36,8 @@ from veriformis.taxonomy import (
     default_row_schema,
     family_for_objective,
     implemented_discovery,
+    input_family_for_parser,
+    input_family_for_suffix,
     loss_boundary,
     loss_policy_for_row,
     require_axis,
@@ -42,7 +49,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "acda1b61db563b5d6241b023b3a1d8a441224a63d06561f281654c78d7c53eb5"
+    "ae1e2bf654bc25dc932da210b0cfb89fd36ce64105be4a0b30330ebda100f4b7"
 )
 
 
@@ -57,6 +64,7 @@ def test_taxonomy_contract_constants_are_exact() -> None:
         "physical_container",
         "consumer_profile",
         "loss_policy",
+        "input_family",
     )
     assert "format" not in TAXONOMY_AXES
 
@@ -79,6 +87,7 @@ def test_taxonomy_catalog_v1_golden_canonical_json_round_trip() -> None:
         "consumer_profile",
         "contract_id",
         "contract_version",
+        "input_family",
         "loss_policy",
         "objective",
         "physical_container",
@@ -269,4 +278,58 @@ def test_admitted_physical_containers_are_implemented_only() -> None:
         "split-jsonl-directory",
         "json",
         "constrained-csv",
+    }
+
+
+def test_input_families_close_over_declared_suffixes_and_parsers() -> None:
+    assert IMPLEMENTED_INPUT_FAMILIES == (
+        "plain-text",
+        "source-code",
+        "markdown",
+        "word-document",
+        "html",
+        "pdf-text",
+        "delimited-table",
+        "json-records",
+    )
+    assert EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES == ("ocr-image",)
+    assert tuple(INPUT_FAMILY_SUFFIXES) == IMPLEMENTED_INPUT_FAMILIES
+    assert tuple(INPUT_FAMILY_PARSERS) == IMPLEMENTED_INPUT_FAMILIES
+    owned: list[str] = []
+    for family, suffixes in INPUT_FAMILY_SUFFIXES.items():
+        assert suffixes and suffixes == tuple(sorted(suffixes)), family
+        assert all(suffix.startswith(".") and suffix == suffix.lower() for suffix in suffixes)
+        owned.extend(suffixes)
+    assert len(owned) == len(set(owned))
+    assert set(owned) == set(DECLARED_V1_EXTENSIONS)
+    for suffix in DECLARED_V1_EXTENSIONS:
+        family = input_family_for_suffix(suffix)
+        assert suffix in INPUT_FAMILY_SUFFIXES[family]
+        assert input_family_for_suffix(suffix.upper().lstrip(".")) == family
+    assert input_family_for_parser("text") == ("plain-text", "source-code")
+    assert input_family_for_parser("jsonl") == ("json-records",)
+    parsers = {parser for parsers in INPUT_FAMILY_PARSERS.values() for parser in parsers}
+    assert parsers == {"text", "markdown", "docx", "html", "pdf", "csv", "json", "jsonl"}
+    with pytest.raises(TaxonomyError, match="no implemented input family owns"):
+        input_family_for_suffix(".png")
+    with pytest.raises(TaxonomyError, match="no implemented input family is produced"):
+        input_family_for_parser("ocr")
+
+
+def test_input_family_axis_is_discoverable_but_unsupported_families_are_not() -> None:
+    assert require_axis("input_family") == "input_family"
+    assert require_identifier("input_family", "pdf-text") == "pdf-text"
+    assert require_identifier("input_family", "ocr-image") == "ocr-image"
+    with pytest.raises(TaxonomyError, match="unknown input family"):
+        require_identifier("input_family", "image")
+    assert implemented_discovery()["input_family"] == IMPLEMENTED_INPUT_FAMILIES
+    assert "ocr-image" not in implemented_discovery()["input_family"]
+    states = {
+        entry.identifier: entry.state
+        for entry in catalog()
+        if entry.axis == "input_family"
+    }
+    assert states == {
+        **{family: "implemented" for family in IMPLEMENTED_INPUT_FAMILIES},
+        "ocr-image": "explicitly_unsupported",
     }

@@ -316,6 +316,29 @@ final class CLIBridgeTests: XCTestCase {
         let instruction = try XCTUnwrap(catalog.representation(withID: "instruction-and-output"))
         XCTAssertTrue(instruction.requiresOperatorInstruction)
         XCTAssertEqual(instruction.rowSchema, "instruction_output")
+        XCTAssertEqual(
+            instruction.compatibleGenericExports,
+            ["split-jsonl-directory", "json", "constrained-csv"]
+        )
+        let conversation = try XCTUnwrap(catalog.representation(withID: "conversation"))
+        XCTAssertEqual(conversation.compatibleGenericExports, ["split-jsonl-directory", "json"])
+        let structural = try XCTUnwrap(catalog.goal(withID: "extract-a-structured-value"))
+        XCTAssertEqual(
+            structural.eligibleInputFamilies,
+            ["source-code", "markdown", "word-document", "html"]
+        )
+        XCTAssertFalse(structural.eligibleInputFamilies.contains("delimited-table"))
+        XCTAssertFalse(structural.eligibleInputFamilies.contains("pdf-text"))
+        let recorded = try XCTUnwrap(catalog.goal(withID: "reproduce-a-recorded-change"))
+        XCTAssertFalse(recorded.eligibleInputFamilies.contains("source-code"))
+        XCTAssertTrue(recorded.requiredEvidenceDiagnostics.contains("source-chunks-unavailable"))
+        XCTAssertEqual(structural.curationDefaults.minimumTargetCharacters, 1)
+        XCTAssertEqual(structural.curationDefaults.evaluationRatioPPM, 500_000)
+        XCTAssertNil(structural.curationDefaults.maximumRecordsPerPrimarySource)
+        XCTAssertEqual(structural.reviewPolicyDefault, "none")
+        XCTAssertEqual(structural.reviewPolicyOptions, ["none", "required"])
+        XCTAssertEqual(structural.nonClaims.count, 4)
+        XCTAssertFalse(structural.requiredEvidenceDiagnostics.isEmpty)
         XCTAssertEqual(catalog.goal(withID: "learn-the-text")?.compatibleRepresentations, ["whole-text"])
         XCTAssertNil(catalog.goal(withID: "summarize-the-document"))
     }
@@ -467,6 +490,35 @@ final class CLIBridgeTests: XCTestCase {
         ) { error in
             XCTAssertEqual(error as? GoalCatalogError, .invalidMetadata("title"))
         }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    var defaults = goals[0]["curation_defaults"] as! [String: Any]
+                    defaults["shuffle"] = true
+                    goals[0]["curation_defaults"] = defaults
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidKeySet(scope: "curation_defaults", missing: [], unexpected: ["shuffle"])
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["review_policy_options"] = ["none"]
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("review policy options drift"))
+        }
         XCTAssertTrue(GoalCatalog.isIdentifier("learn-the-text"))
         XCTAssertFalse(GoalCatalog.isIdentifier("Learn-The-Text"))
         XCTAssertFalse(GoalCatalog.isIdentifier("learn--the"))
@@ -552,6 +604,8 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertFalse(discovery.physicalContainers.isEmpty)
         XCTAssertFalse(discovery.consumerProfiles.isEmpty)
         XCTAssertFalse(discovery.lossPolicies.isEmpty)
+        XCTAssertEqual(discovery.inputFamilies.first, "plain-text")
+        XCTAssertEqual(discovery.inputFamilies.count, 8)
         XCTAssertFalse(TaxonomyDiscovery.expectedKeys.contains("format"))
     }
 
@@ -2165,6 +2219,16 @@ final class CLIBridgeTests: XCTestCase {
                 "completion-only",
                 "output-only",
                 "final-assistant-suffix",
+            ],
+            "input_family": [
+                "plain-text",
+                "source-code",
+                "markdown",
+                "word-document",
+                "html",
+                "pdf-text",
+                "delimited-table",
+                "json-records",
             ],
         ]
     }
