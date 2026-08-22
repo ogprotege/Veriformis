@@ -7,18 +7,18 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus completed independent-product Phases 0–4 and Phase 5.1's first supported
-generic derivative, `split-jsonl-directory` v1, version `0.1.0` development
-alpha
+plus completed independent-product Phases 0–4 and Phase 5.1–5.2's supported
+generic `split-jsonl-directory` and canonical `json` v1 derivatives, version
+`0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; Phase 5.1 implemented; maturity alpha; public Mac claim
+Phases 0–4 complete; Phase 5.1–5.2 implemented; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 5.1)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.2)
 
-**Next review:** Phase 5.2 or any later Phase 5 increment; beta
+**Next review:** Phase 5.2 merge or any later Phase 5 increment; beta
 label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -59,7 +59,9 @@ Consumer-neutral derivative evidence is governed by
 [Verified Export Contract v1](contracts/verified-export-v1.md). Its internal
 exact-byte publication, deterministic replay, and public surface foundation is
 implemented. [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
-governs the first production renderer and supported generic container.
+governs the first production renderer and supported generic container;
+[Canonical JSON Export v1](contracts/canonical-json-export-v1.md) governs the
+second fixed-tree generic container.
 
 ## Ownership boundary
 
@@ -165,8 +167,16 @@ canonical `veriformis.split-jsonl-options/v1` object to change those stems or
 omit provenance. Both requests preserve exact payload rows, ordering,
 objective, curation result, split assignment, and train/evaluation membership.
 The ten persisted verified-export v1 schemas, discovery v1, response v1, and
-the existing `publish` signature remain unchanged. Other generic containers
-and all new trainer profiles remain open Phase 5 work.
+the existing `publish` signature remain unchanged.
+
+Phase 5.2 adds canonical `json` v1 under the same boundary. Its fixed tree
+contains one membership-bearing dataset object with explicit schema,
+objective, loss, row-set, split-result, partition-order, count, and payload-
+array fields; one mandatory separate aligned provenance object; a deterministic
+README; and the shared receipt. It uses request v1 and refuses configured
+request v2. It preserves the same exact rows, order, and partitions and claims
+compatibility with no trainer. CSV and all new trainer profiles remain open
+Phase 5 work.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete
@@ -284,6 +294,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Dataset Taxonomy Contract v1](./contracts/taxonomy-v1.md)
 - [Verified Export Contract v1](./contracts/verified-export-v1.md)
 - [Split JSONL Export Contract v1](./contracts/split-jsonl-export-v1.md)
+- [Canonical JSON Export Contract v1](./contracts/canonical-json-export-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

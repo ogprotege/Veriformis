@@ -27,12 +27,12 @@ consolidated adversarial harness and closeout without changing a persisted
 schema. Phase 4 did not implement a public renderer or replayer registry or a
 supported product export container. Phase 5.1 adds one reviewed internal
 `split-jsonl-directory` v1 implementation and an additive configured request
-v2 surface; the ten persisted models, discovery v1, and response v1 remain
-unchanged.
+v2 surface. Phase 5.2 adds canonical `json` v1 under historical request v1;
+the ten persisted models, discovery v1, and response v1 remain unchanged.
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL admission)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
 
-**Next review:** Phase 5.2 or any export schema change
+**Next review:** Phase 5.3 or any export schema change
 
 ## Purpose
 
@@ -793,6 +793,17 @@ Phase 5.1 additionally installs the first reviewed production implementation:
 - the normative rules and admission evidence in
   [Split JSONL Export v1](split-jsonl-export-v1.md).
 
+Phase 5.2 additionally installs the second reviewed production implementation:
+
+- selector `json`, version 1, with no consumer profile;
+- all four current row schemas under a `portable_exact_bytes` claim;
+- v1 requests selecting a fixed closed tree and configured request v2 refused;
+- one canonical membership-bearing dataset object with explicit split/schema
+  metadata, one mandatory separate aligned provenance object, deterministic
+  README, receipt-bound atomic publication, and source-bound verification; and
+- the normative rules and admission evidence in
+  [Canonical JSON Export v1](canonical-json-export-v1.md).
+
 The request envelope is operation-discriminated. Selected operations name only
 the source bundle path, exact catalog selector, source-trust policy and retained
 digest, and the literal overwrite policy `refuse`. Execute and verify also
@@ -839,12 +850,12 @@ Persisted profile selectors and a test-injected conformance implementation are
 not support claims. Phase 4 MUST NOT add a generic export container or consumer
 profile to taxonomy discovery or the support capability lists, and it did not
 do so.
-Production export discovery was therefore empty through Phase 4. Phase 5.1 now
-ships exactly one consumer-neutral implementation,
-`split-jsonl-directory` v1, under its separate container contract. The existing
+Production export discovery was therefore empty through Phase 4. Phase 5.1–5.2
+now ship two consumer-neutral implementations, `split-jsonl-directory` and
+canonical `json` v1, under their separate container contracts. The existing
 `minimal-v1` bundle and deterministic bundle transport remain canonical and
-transport containers respectively. Generic JSON and CSV remain Phase 5 work;
-named trainer profiles remain later work. Shipping generic JSONL does not
+transport containers respectively. Generic CSV remains Phase 5 work; named
+trainer profiles remain later work. Shipping generic JSONL or JSON does not
 create or imply a consumer profile.
 
 ## Version and migration

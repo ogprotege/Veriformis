@@ -18,12 +18,13 @@ publication and independent closed-tree verification, private two-render
 exact-byte and semantic-content conformance with staged descriptor replay, and
 strict initially production-empty export surfaces through Python, CLI, MCP,
 and Mac, plus the consolidated adversarial closeout harness; independent-
-product Phase 5.1 implements and admits `split-jsonl-directory` v1 as the first
-production generic export, without a consumer or trainer profile
+product Phase 5.1–5.2 implement and admit `split-jsonl-directory` and canonical
+`json` v1 as the first two production generic exports, without a consumer or
+trainer profile
 
-**Review date:** 2026-08-21 (independent-product Phase 5.1)
+**Review date:** 2026-08-22 (independent-product Phase 5.2)
 
-**Next review:** Phase 5.2 or any later Phase 5 increment;
+**Next review:** Phase 5.2 merge or any later Phase 5 increment;
 beta label cut, public-ready checklist, or any
 contract change
 
@@ -197,8 +198,26 @@ complete canonical `veriformis.split-jsonl-options/v1` object; it can change
 only the two safe filename stems and whether provenance is included. Omitting
 provenance removes only `metadata/row-provenance.jsonl`. The exported payload
 rows, order, objective, curation result, split assignment, and authoritative
-train/evaluation membership remain unchanged. Other generic containers and
-all new trainer-specific profiles remain unimplemented.
+train/evaluation membership remain unchanged.
+
+Phase 5.2 adds canonical `json` version 1 with the same exact-byte, all-schema,
+consumer-neutral boundary. Its fixed closed tree is:
+
+```text
+README.md
+dataset.json
+export-receipt.json
+metadata/row-provenance.json
+```
+
+`dataset.json` carries explicit schema, objective, loss-policy, row-set,
+split-result, partition-order, and row-count metadata plus payload-only
+`train` and `evaluation` arrays. The separate mandatory provenance object
+contains the complete train-then-evaluation Finished Dataset v1 sequence.
+`dataset.json` alone bears complete membership scope. Canonical JSON uses
+historical request v1 and has no options; configured request v2 fails before
+source or destination access. CSV and all new trainer-specific profiles remain
+unimplemented.
 
 ## Implemented interfaces
 
@@ -220,8 +239,8 @@ The installed console entry point is `veriformis`.
 | `package BUNDLE -o ARCHIVE --manifest-sha256 DIGEST` | Externally verifies and deterministically publishes the canonical six-file bundle as a no-replace transport archive | `*.vfbundle.zip`; archive and manifest digests |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
-| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `split-jsonl-directory` v1 |
-| `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan without destination access; request v1 uses split-JSONL defaults and request v2 supplies its complete options object | Canonical plan-summary response |
+| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `split-jsonl-directory` and `json` v1 |
+| `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan without destination access; request v1 selects both containers, while request v2 configures only split JSONL | Canonical plan-summary response |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
 | `export execute --request-json JSON` | Re-derives and atomically publishes the operator-confirmed no-replace plan | Canonical receipt and verification response, or explicit cancellation/visible-partial status |
 | `export-verify --request-json JSON` | Re-verifies source authority, re-derives the confirmed plan, and independently verifies the destination | Canonical source-bound verification response |
@@ -547,8 +566,9 @@ See [docs/release.md](release.md).
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
 | Implemented independent Phase 4 | Verified-export contracts, source trust, source-derived plans, complete derivative membership, atomic publication, exact/semantic evidence limits, production-empty cross-surface operations, and adversarial closeout; no shipped renderer/replayer, production container, or support promotion |
 | Implemented independent Phase 5.1 | Production `split-jsonl-directory` v1 exact-byte export, request-v1 defaults, strict configured request v2, canonical payload JSONL, deterministic README/data card, optional aligned provenance, receipt, and no trainer claim or membership change |
+| Implemented independent Phase 5.2 | Production canonical `json` v1 exact-byte export, fixed dataset/provenance object tree, explicit split/schema metadata, mandatory aligned provenance, receipt, and no trainer claim or membership change |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 and item 5.1 complete and later Phase 5 items planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 and items 5.1–5.2 complete and later Phase 5 items planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -583,6 +603,7 @@ Selected permanent locks:
 | Deterministic transport | `tests/bundle/test_finished_bundle.py`, `scripts/release/golden_compile.sh`, [bundle transport contract](contracts/bundle-transport-v1.md), [ADR 0005](adr/0005-deterministic-bundle-transport.md) |
 | Taxonomy discovery | `tests/test_cli.py`, `tests/pipeline/test_pipeline_service.py`, `tests/mcp/test_mcp_pipeline_parity.py`, `macos/Tests/` |
 | Split JSONL export | `tests/exports/test_split_jsonl.py`, `tests/exports/test_api.py`, `tests/contracts/test_verified_export_contract.py`, [Split JSONL Export v1](contracts/split-jsonl-export-v1.md) |
+| Canonical JSON export | `tests/exports/test_canonical_json.py`, `tests/exports/test_api.py`, `tests/contracts/test_verified_export_contract.py`, [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) |
 | Group 9 golden + scripts | `tests/regressions/test_group9_release_gates.py`, `scripts/release/`, [release guide](release.md) |
 | Operator install | [install.md](install.md) |
 | Beta limitations | [beta-limitations.md](beta-limitations.md) |
@@ -602,8 +623,8 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–4 are complete, and Phase 5.1 supplies the first
-supported generic derivative container. The completed
+Independent-product Phases 0–4 are complete, and Phase 5.1–5.2 supply the first
+two supported generic derivative containers. The completed
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
 records the contract, compile compatibility, cross-surface discovery, public
 vocabulary cleanup, and persisted-v1 compatibility evidence. The completed
@@ -614,12 +635,13 @@ the boundary: private hooks are trusted conformance code, not an
 untrusted plugin boundary, and semantic replay currently retains each complete
 produced file in memory. The statically bounded fixture does not establish a
 scalable public parser; any future shipped semantic profile must enforce
-explicit resource limits. Phase 5.1 adds the production exact-byte split-JSONL
-renderer without adding a semantic replayer. Shipped discovery therefore lists
-`split-jsonl-directory` v1 and no consumer profile. Its v1 defaults and strict
-v2 options change only derivative filenames and provenance inclusion, never
-dataset membership. Other generic containers and any new trainer-specific
-profiles are not current capabilities; the canonical and optional Aptus
+explicit resource limits. Phase 5.1–5.2 add production exact-byte split-JSONL
+and canonical-JSON renderers without adding a semantic replayer. Shipped
+discovery therefore lists `split-jsonl-directory` and `json` v1 with no
+consumer profile. Split JSONL's v1 defaults and strict v2 options change only
+derivative filenames and provenance inclusion; canonical JSON has a fixed v1
+tree and no options. Neither changes dataset membership. CSV and any new
+trainer-specific profiles are not current capabilities; the canonical and optional Aptus
 profiles remain the implemented profile set. A deliberate beta label and
 public Mac checklist remain separate decisions.
 

@@ -29,6 +29,18 @@ from veriformis.exports.api import (
     export_response_json,
     export_verify_response,
 )
+from veriformis.exports.canonical_json import (
+    CANONICAL_JSON_CONTAINER_ID,
+    CANONICAL_JSON_CONTAINER_VERSION,
+    CANONICAL_JSON_DATASET_PATH,
+    CANONICAL_JSON_DATASET_SCHEMA,
+    CANONICAL_JSON_PROVENANCE_PATH,
+    CANONICAL_JSON_PROVENANCE_SCHEMA,
+    CANONICAL_JSON_README_PATH,
+    CanonicalJsonDataset,
+    CanonicalJsonProvenance,
+    CanonicalJsonSplits,
+)
 from veriformis.exports.models import (
     EXPORT_RECEIPT_PATH,
     ExportConsumerProfile,
@@ -58,7 +70,17 @@ from veriformis.exports.split_jsonl import (
 from veriformis.exports.service import DEFAULT_EXPORT_SERVICE, ExportService
 
 __all__ = [
+    "CANONICAL_JSON_CONTAINER_ID",
+    "CANONICAL_JSON_CONTAINER_VERSION",
+    "CANONICAL_JSON_DATASET_PATH",
+    "CANONICAL_JSON_DATASET_SCHEMA",
+    "CANONICAL_JSON_PROVENANCE_PATH",
+    "CANONICAL_JSON_PROVENANCE_SCHEMA",
+    "CANONICAL_JSON_README_PATH",
     "CancellationCheck",
+    "CanonicalJsonDataset",
+    "CanonicalJsonProvenance",
+    "CanonicalJsonSplits",
     "DEFAULT_EXPORT_SERVICE",
     "EXPORT_DISCOVERY_SCHEMA",
     "EXPORT_RECEIPT_PATH",

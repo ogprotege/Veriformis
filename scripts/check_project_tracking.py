@@ -364,6 +364,18 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
                 "split JSONL support evidence differs from its executable contract",
                 errors,
             )
+        canonical_json = implemented_entries.get("json")
+        if canonical_json is not None:
+            _require(
+                canonical_json.get("container_version") == 1
+                and canonical_json.get("determinism_claim")
+                == "portable_exact_bytes"
+                and canonical_json.get("consumer_profile") is None
+                and canonical_json.get("supported_row_schemas")
+                == sorted(V1_ROW_SCHEMAS),
+                "canonical JSON support evidence differs from its executable contract",
+                errors,
+            )
 
     consumer_profiles = support.get("consumer_profiles")
     if not isinstance(consumer_profiles, list):

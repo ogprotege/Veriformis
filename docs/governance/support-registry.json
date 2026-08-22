@@ -1,7 +1,7 @@
 {
   "schema_version": "veriformis.support-registry/v1",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-21",
+  "last_reviewed": "2026-08-22",
   "claim_policy": "docs/governance/project-tracking.md",
   "product": {
     "name": "Veriformis",
@@ -103,7 +103,8 @@
     "implemented_physical_containers": [
       "minimal-v1",
       "deterministic-vfbundle-zip-v1",
-      "split-jsonl-directory"
+      "split-jsonl-directory",
+      "json"
     ],
     "implemented_bundle_profiles": [
       {
@@ -157,8 +158,23 @@
       },
       {
         "container": "json",
-        "state": "planned",
-        "roadmap_phase": 5
+        "state": "implemented",
+        "roadmap_phase": 5,
+        "product_role": "consumer-neutral-generic-export",
+        "container_version": 1,
+        "determinism_claim": "portable_exact_bytes",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ],
+        "consumer_profile": null,
+        "evidence": [
+          "src/veriformis/exports/canonical_json.py",
+          "docs/contracts/canonical-json-export-v1.md",
+          "tests/exports/test_canonical_json.py"
+        ]
       },
       {
         "container": "constrained-csv",

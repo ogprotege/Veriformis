@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL admission)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
 
 **Next review:** Any architecture or dependency change
 
@@ -209,6 +209,11 @@ taxonomy loss-policy lookup, portable export paths, and publication service;
 no third-party serializer, workspace-stage, adapter filesystem, public plugin,
 or trainer dependency edge is added. Additive request v2 is mirrored by the
 CLI-backed Mac model while discovery and response remain v1.
+Phase 5.2 adds an exports-internal canonical JSON planner/renderer and strict
+dataset/provenance object models. It reuses the same canonical writer, row
+decoders, loss-policy lookup, paths, and publication service and adds no third-
+party, workspace, adapter-filesystem, plugin, or trainer edge. It needs no new
+request model because its fixed profile uses request v1 and refuses v2.
 This arrangement needs no dependency injection container because the contracts
 passed between stages are stable, low-level data values. `workspace.py` keeps
 its module-level domain coupling narrow and uses function-level imports for

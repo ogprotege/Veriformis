@@ -16,6 +16,11 @@
 | Split JSONL is container v1 with exact-byte determinism, request-v1 defaults, and complete strict request-v2 options | Accepted | `docs/contracts/split-jsonl-export-v1.md` |
 | Request v1 defaults to `train` / `evaluation` filenames and included aligned provenance; request v2 may safely rename stems or omit provenance | Accepted | Loss-preserving default and explicit optional sidecar contract |
 | Discovery and response stay v1; request v2 is additive and the ten persisted export models remain unchanged | Accepted | Strict compatibility and Mac parity evidence |
+| Canonical JSON uses selector `json` v1 with exact bytes, all four current row schemas, and no consumer profile | Accepted | Roadmap item 5.2 and `docs/contracts/canonical-json-export-v1.md` |
+| Canonical JSON v1 has a fixed closed tree and no container options | Accepted | One stable portable representation; request v1 remains sufficient |
+| `dataset.json` is the sole membership-bearing file and keeps train/evaluation as explicit ordered arrays | Accepted | Exact partition preservation and complete-membership receipt binding |
+| Complete provenance is mandatory but remains a separate canonical object with `train_then_evaluation` alignment | Accepted | Payload-only row discipline and Finished Dataset v1 provenance alignment |
 
-No item 5.1 decision remains pending. Later container decisions remain scoped
-to their own sequential pull requests and cannot broaden this support claim.
+No item 5.1 or 5.2 decision remains pending. Later container decisions remain
+scoped to their own sequential pull requests and cannot broaden these support
+claims.

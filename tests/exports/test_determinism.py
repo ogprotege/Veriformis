@@ -1023,6 +1023,7 @@ def test_determinism_runtime_does_not_leak_to_public_or_support_surfaces() -> No
         "minimal-v1",
         "deterministic-vfbundle-zip-v1",
         "split-jsonl-directory",
+        "json",
     ]
     support_registry = (
         Path(__file__).resolve().parents[2]

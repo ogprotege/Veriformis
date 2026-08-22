@@ -25,9 +25,9 @@ Specific trainer compatibility and consumer profiles remain later work.
 
 Every implementation must enter through the Phase 4 verified export service
 and its plan, receipt, publication, and verification boundaries. Packet
-opening alone was not support evidence; the separate Phase 5.1 implementation,
-contract, tests, and reconciled admission record now support exactly one
-generic container.
+opening alone was not support evidence. The separately admitted Phase 5.1 and
+5.2 implementations support split JSONL and canonical JSON respectively;
+later Phase 5 work remains unimplemented.
 
 ## Packet contents
 
@@ -43,8 +43,11 @@ generic container.
 ## Current state
 
 Phase 5 opened on 2026-08-21 from baseline
-`a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Item 5.1 is locally complete:
-`split-jsonl-directory` v1 is implemented, admitted for all four current row
-schemas, and reflected in taxonomy/support records without changing the
-trainer-neutral boundary. Its pull-request and remote-green merge gate remain
-before item 5.2 begins.
+`a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Item 5.1 merged as PR #53 at
+`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 adds `json` v1 for all
+four current row schemas: one canonical dataset object carries explicit
+schema, objective, loss, split, and partition metadata, while a separate
+mandatory canonical object preserves complete aligned provenance. It remains
+trainer-neutral and changes no source row or logical partition. Independent
+code, security, and documentation reviews found no blocker; its remote-green
+merge gate remains before item 5.3 begins.

@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 first derivative implementation)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON implementation)
 
 **Decider:** Repository owner direction
 
@@ -17,9 +17,9 @@ packs had no shipped renderer or supported product container. Phase 4.6
 supplies an internal atomic publisher and receipt verifier; Phase 4.7 adds only
 private two-render exact-byte and semantic-content conformance evidence. Phase
 4.8 exposes the shared service through strict Python, CLI, MCP, and CLI-backed
-Mac operations, while its private production catalog closes empty. Phase 5.1
-now supplies the first production exact-byte implementation,
-`split-jsonl-directory` v1, without adding a trainer pack.
+Mac operations, while its private production catalog closes empty. Phase
+5.1–5.2 now supply the first two production exact-byte implementations,
+`split-jsonl-directory` and canonical `json` v1, without adding a trainer pack.
 
 ## Decision
 
@@ -47,8 +47,11 @@ uses the same boundary to admit one exact-byte generic container. Its request-v1
 defaults use `train` / `evaluation` filenames and include aligned provenance;
 configured request v2 requires the complete
 `veriformis.split-jsonl-options/v1` object to change those safe stems or omit
-provenance. The derivative changes neither semantic rows nor membership and
-claims compatibility with no trainer.
+provenance. Phase 5.2 adds a fixed canonical JSON tree with one explicit
+split/schema-bearing membership object and one mandatory separately aligned
+provenance object; request v1 selects it and request v2 is refused. Neither
+derivative changes semantic rows or membership or claims compatibility with a
+trainer.
 
 ## Alternatives considered
 
@@ -103,7 +106,16 @@ verified-export v1 models, discovery v1, and response v1 remain unchanged;
 configured dry run, execute, and source-bound verification use additive request
 v2. Tests prove all four current row schemas round-trip with identical order and
 partition membership and exercise option, path, tamper, and closed-tree
-refusals. Other generic containers and trainer profiles remain later work.
+refusals.
+
+Phase 5.2 verifies canonical `json` v1 through the same unchanged publisher and
+receipt boundary. Its renderer places authoritative train and evaluation rows
+in explicit canonical arrays, emits separately aligned complete provenance and
+a deterministic README, and renders twice to the same exact byte tree. Strict
+validation reconstructs the Finished Dataset v1 row set so the top-level row-
+set ID, split identity, counts, payload arrays, and provenance cannot drift
+independently. Historical request v1 is unchanged and sufficient; configured
+request v2 is refused. CSV and trainer profiles remain later work.
 
 ## Review triggers
 

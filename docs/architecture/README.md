@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
 
 **Next review:** Any architecture documentation change
 
@@ -224,13 +224,15 @@ Exact profiles require identical normalized byte trees; semantic-only profiles
 require equal versioned canonical semantic preimages and reconstructed
 membership from both renders plus descriptor-reread staged replay. Phase 4.8
 adds a private, initially empty implementation catalog and thin Python, CLI,
-MCP, and CLI-backed Mac export operations. Phase 5.1 adds the catalog's first
-production exact-byte implementation, `split-jsonl-directory` v1. Request v1
+MCP, and CLI-backed Mac export operations. Phase 5.1–5.2 add the catalog's
+first two production exact-byte implementations, `split-jsonl-directory` and
+canonical `json` v1. Request v1
 uses the safe `train` / `evaluation` filenames and includes aligned provenance;
 configured request v2 requires the complete
 `veriformis.split-jsonl-options/v1` object and may only change those safe stems
-or omit provenance. The renderer preserves payloads, ordering, split policy,
-and train/evaluation membership, and advertises no consumer or trainer profile.
+or omit provenance. Canonical JSON uses request v1's fixed dataset/provenance
+tree and refuses request v2. Both renderers preserve payloads, ordering, split
+policy, and train/evaluation membership, and advertise no consumer or trainer profile.
 The default service still has no semantic replayer. The CLI exposes the nine
 stage commands plus maintenance, inspection, recipe automation, MCP, optional
 Aptus handoff, version, and verified-export surfaces.
@@ -274,4 +276,6 @@ code computes.
 - [Integrity Contract v1](../contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](../contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](../contracts/finished-dataset-v1.md)
+- [Split JSONL Export Contract v1](../contracts/split-jsonl-export-v1.md)
+- [Canonical JSON Export Contract v1](../contracts/canonical-json-export-v1.md)
 - [Independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)

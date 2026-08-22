@@ -563,6 +563,23 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testCanonicalJSONUsesV1SelectionWithoutContainerOptions() throws {
+        let request = try ExportDryRunRequest(
+            bundle: "/tmp/source.vfbundle",
+            containerID: "json",
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: digest("a")
+        )
+
+        let encoded = try request.canonicalJSON()
+        XCTAssertEqual(
+            encoded,
+            "{\"bundle\":\"/tmp/source.vfbundle\",\"consumer_id\":null,\"consumer_profile_version\":null,\"container_id\":\"json\",\"container_version\":1,\"expected_manifest_sha256\":\"\(digest("a"))\",\"operation\":\"dry_run\",\"overwrite_policy\":\"refuse\",\"schema_version\":\"veriformis.export-surface-request/v1\",\"source_trust_policy\":\"require_external_digest\"}"
+        )
+        XCTAssertFalse(encoded.contains("container_options"))
+    }
+
     func testConfiguredSplitJSONLRequestsRejectUnsafeOrMismatchedOptions() throws {
         XCTAssertThrowsError(
             try SplitJSONLOptions(

@@ -72,3 +72,40 @@ Observed gates on the reconciled working tree:
 **Next action:** Resolve any independent final-review finding, publish the
 Phase 5.1 pull request, require its GitHub checks to pass, merge it, and
 synchronize clean local `main` before beginning item 5.2.
+
+## 2026-08-22 — Item 5.2 canonical JSON implemented
+
+**Status:** Local implementation, admission, and repository gates passed;
+independent code, security, and documentation reviews found no blocker;
+pull-request publication and merge remain.
+
+Phase 5.1 merged as PR #53 at
+`4f12a55063c2721993b65cfbe30e68eaad55f87f`, and the item 5.2 branch began from
+clean local `main` equal to `origin/main` at that commit. Production discovery
+adds `json` v1 with no consumer profile, all four current row schemas, and a
+`portable_exact_bytes` claim.
+
+The fixed closed tree contains deterministic `README.md`, one canonical
+`dataset.json`, mandatory aligned `metadata/row-provenance.json`, and the
+shared receipt. The dataset object carries explicit schema, objective, loss,
+row-set, split-result, partition-order, count, and trainer-non-claim metadata;
+its train and evaluation arrays contain payload objects only. The provenance
+object carries the complete train-then-evaluation Finished Dataset v1 sequence.
+`dataset.json` alone bears complete membership scope.
+
+Canonical JSON has no container options: historical request v1 selects it,
+while configured request v2 fails before source or destination access. The ten
+persisted verified-export v1 models, discovery v1, response v1, source bundle,
+logical membership, and trainer-neutral boundary remain unchanged.
+
+**Observed gates:** The dedicated canonical-JSON suite passed 33 tests; the
+focused export/taxonomy/verified-contract gate passed 322 tests; and full
+Python passed 1,073 tests with only the expected transport durability-warning
+regression warning. Standalone release passed 1,061 tests with 1 deselected and
+the expected warning, then passed lock, Ruff, clean-wheel installation, and
+both golden compile/external-digest/transport flows. CLI/workbench parity
+passed, the full Mac target passed 57 tests with `TEST SUCCEEDED`, and tracking,
+JSON validity, and diff checks passed. Final code review found no blocker.
+
+**Next action:** Publish item 5.2, require every GitHub check to pass, merge,
+and synchronize clean local `main` before item 5.3.

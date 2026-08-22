@@ -2,7 +2,7 @@
 
 **Status:** In progress
 
-**Last updated:** 2026-08-21
+**Last updated:** 2026-08-22
 
 Each numbered roadmap work item is one sequential pull request. A pull request
 must pass its focused and required repository gates, pass required GitHub
@@ -31,9 +31,9 @@ next item begins.
 
 ### 5.2 Implement canonical JSON export
 
-- [ ] Define canonical arrays/objects with explicit split and schema metadata.
-- [ ] Preserve every compatible current row schema and logical partition.
-- [ ] Bind deterministic output and semantic replay to the verified export
+- [x] Define canonical arrays/objects with explicit split and schema metadata.
+- [x] Preserve every compatible current row schema and logical partition.
+- [x] Bind deterministic output and semantic preservation to the verified export
       receipt.
 
 ### 5.3 Implement structurally lossless CSV export
@@ -78,8 +78,10 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Phase 5.1 locally complete; its remote-green merge gate remains.
-Later checklist items and the phase-wide exit proof remain open.
+**Result:** Phases 5.1 and 5.2 are implemented, and 5.2's independent code,
+security, and documentation reviews found no blocker. Its remote-green merge
+gate remains before 5.3 begins. Later checklist items and the phase-wide exit
+proof remain open.
 
 ## Non-goals
 

@@ -385,7 +385,10 @@ def test_closeout_conformance_injection_never_changes_production_discovery() -> 
     injected, _ = _service()
 
     assert len(injected.discover_exports().profiles) == 1
-    expected = [("split-jsonl-directory", 1, None, None)]
+    expected = [
+        ("json", 1, None, None),
+        ("split-jsonl-directory", 1, None, None),
+    ]
     assert [
         item.selector for item in DEFAULT_EXPORT_SERVICE.discover_exports().profiles
     ] == expected
