@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
 
-**Next review:** Independent-product Phase 5.5 merge or Phase 5.6, Phase 6
+**Next review:** Independent-product Phase 5.6 publication or merge, Phase 6
 start, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
@@ -23,11 +23,16 @@ the active packet, and item 5.3 merged as PR #55 at `c6d7fc13a09a`. Phase
 5.4's receipt-anchored export-pack transport merged as PR #56 at
 `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`; it is not a fourth renderer,
 trainer profile, source-bound verification path, or Mac UI action. Phase 5.5's
-locally admitted test-only matrix introduces no new documentation debt: its
+test-only matrix merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1` and introduces no new documentation
+debt: its
 frozen fixture proves all eleven compatible ordinary-file round trips, three
 container tamper failures, and the existing constrained-CSV/`messages` refusal
-without adding a product importer or support claim. Exact previews and final
-operator guidance remain explicit items 5.6 and 5.7.
+without adding a product importer or support claim. Item 5.6's exact runtime
+preview contract and local admission evidence are documented across contract,
+operator, architecture, governance, and packet records without a
+persisted-schema or support promotion; publication/merge and final item 5.7
+operator guidance remain open.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

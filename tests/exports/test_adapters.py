@@ -17,6 +17,7 @@ from veriformis.cli import app
 from veriformis.exports.api import (
     EXPORT_SURFACE_REQUEST_SCHEMA,
     EXPORT_SURFACE_REQUEST_SCHEMA_V2,
+    EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
     ExportDiscovery,
     ExportDryRunRequest,
     ExportDryRunRequestV2,
@@ -24,7 +25,7 @@ from veriformis.exports.api import (
     ExportOperationCancelled,
     ExportPartialPublicationError,
     export_discovery_response,
-    export_dry_run_response,
+    export_dry_run_preview_response,
     export_execution_response,
     export_inspection_response,
     export_response_json,
@@ -251,6 +252,7 @@ def test_cli_and_mcp_reject_the_same_strict_malformed_request(monkeypatch):
     cli_payload = json.loads(cli_result.stdout)
     mcp_payload = json.loads(mcp_result)
     assert cli_payload == mcp_payload
+    assert cli_payload["schema_version"] == EXPORT_SURFACE_RESPONSE_SCHEMA_V2
     assert cli_payload["operation"] == "dry_run"
     assert cli_payload["status"] == "error"
     assert cli_payload["error"]["code"] == "export-contract-invalid"
@@ -481,8 +483,9 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
 
     python_plan_outcome = pipeline.dry_run_export(dry_request)
     assert python_plan_outcome.plan is not None
+    assert python_plan_outcome.preview is not None
     plan = python_plan_outcome.plan
-    python_dry = export_dry_run_response(plan)
+    python_dry = export_dry_run_preview_response(python_plan_outcome.preview)
 
     cli_dry_result = CliRunner().invoke(
         app,
@@ -655,7 +658,8 @@ def test_production_split_jsonl_v2_dry_run_has_python_cli_mcp_parity(
     request_json = request.canonical_bytes().decode("utf-8")
     python_outcome = pipeline.dry_run_export(request)
     assert python_outcome.plan is not None
-    expected = export_dry_run_response(python_outcome.plan)
+    assert python_outcome.preview is not None
+    expected = export_dry_run_preview_response(python_outcome.preview)
 
     cli_result = CliRunner().invoke(
         app,
@@ -705,7 +709,8 @@ def test_production_canonical_json_v1_dry_run_has_python_cli_mcp_parity(
 
     python_outcome = pipeline.dry_run_export(request)
     assert python_outcome.plan is not None
-    expected = export_dry_run_response(python_outcome.plan)
+    assert python_outcome.preview is not None
+    expected = export_dry_run_preview_response(python_outcome.preview)
 
     cli_result = CliRunner().invoke(
         app,
@@ -758,7 +763,8 @@ def test_production_constrained_csv_v1_dry_run_has_python_cli_mcp_parity(
 
     python_outcome = pipeline.dry_run_export(request)
     assert python_outcome.plan is not None
-    expected = export_dry_run_response(python_outcome.plan)
+    assert python_outcome.preview is not None
+    expected = export_dry_run_preview_response(python_outcome.preview)
 
     cli_result = CliRunner().invoke(
         app,

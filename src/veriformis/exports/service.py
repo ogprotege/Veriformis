@@ -47,6 +47,7 @@ from veriformis.exports.models import (
 )
 from veriformis.exports.api import (
     ExportDiscovery,
+    ExportDryRunPreview,
     ExportDryRunRequest,
     ExportDryRunRequestV2,
     ExportExecuteRequest,
@@ -162,6 +163,26 @@ class ExportService:
             )
         implementation = self._resolve_implementation(checked)
         return self._plan_registered_export(checked, implementation)
+
+    def dry_run_export_preview(
+        self,
+        request: ExportDryRunRequest | ExportDryRunRequestV2,
+    ) -> ExportDryRunPreview:
+        """Derive one plan-bound preview without renderer or destination access."""
+        if type(request) is ExportDryRunRequest:
+            checked = ExportDryRunRequest.from_json_bytes(request.canonical_bytes())
+        elif type(request) is ExportDryRunRequestV2:
+            checked = ExportDryRunRequestV2.from_json_bytes(request.canonical_bytes())
+        else:
+            raise ExportContractError(
+                "dry_run_export_preview requires an exact dry-run request type"
+            )
+        implementation = self._resolve_implementation(checked)
+        plan, row_set = self._plan_registered_export_evidence(
+            checked,
+            implementation,
+        )
+        return ExportDryRunPreview.create(plan=plan, row_set=row_set)
 
     def inspect_export(
         self,
@@ -298,6 +319,20 @@ class ExportService:
         *,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportPlan:
+        return self._plan_registered_export_evidence(
+            request,
+            implementation,
+            cancellation_check=cancellation_check,
+        )[0]
+
+    def _plan_registered_export_evidence(
+        self,
+        request: _SelectedExportRequest,
+        implementation: _ExportImplementation,
+        *,
+        cancellation_check: CancellationCheck | None = None,
+    ) -> tuple[ExportPlan, RowSet]:
+        """Plan once and retain the exact strict row-set snapshot it binds."""
         _run_cancellation_check(cancellation_check)
         configured = isinstance(
             request,
@@ -312,7 +347,8 @@ class ExportService:
         _run_cancellation_check(cancellation_check)
         descriptor = implementation.descriptor
         try:
-            source_row_set = _source_plan_evidence(source)[1]
+            source_evidence = _source_plan_evidence(source)
+            source_row_set = source_evidence[1]
             planner_row_set = row_set_from_json_bytes(
                 lossless_json_bytes(source_row_set.model_dump(mode="json"))
             )
@@ -350,8 +386,8 @@ class ExportService:
                         options,
                     )
                 )
-            plan, _ = _plan_from_verified_source(
-                source,
+            plan, planned_row_set = _plan_from_source_evidence(
+                source_evidence,
                 source_trust_policy=request.source_trust_policy,
                 container_profile=descriptor.container_profile,
                 consumer_profile=descriptor.consumer_profile,
@@ -362,9 +398,17 @@ class ExportService:
                 raise ExportContractError(
                     "requested overwrite policy differs from the export contract"
                 )
+            if (
+                planned_row_set != planner_row_set
+                or lossless_json_bytes(planned_row_set.model_dump(mode="json"))
+                != lossless_json_bytes(planner_row_set.model_dump(mode="json"))
+            ):
+                raise ExportContractError(
+                    "registered export planner row set changed within one dry run"
+                )
             _validate_executable_plan_response_budget(plan)
             _run_cancellation_check(cancellation_check)
-            return plan
+            return plan, planned_row_set
         except (ExportContractError, ExportVerificationError):
             raise
         except (
@@ -1008,13 +1052,33 @@ def _plan_from_verified_source(
     file_plans: Sequence[ExportFilePlan],
 ) -> tuple[ExportPlan, RowSet]:
     """Build a plan and return the same freshly closed source row set."""
-    (
-        report,
-        row_set,
-        verification,
-        objective_id,
-        membership_projection,
-    ) = _source_plan_evidence(source)
+    return _plan_from_source_evidence(
+        _source_plan_evidence(source),
+        source_trust_policy=source_trust_policy,
+        container_profile=container_profile,
+        consumer_profile=consumer_profile,
+        dependencies=dependencies,
+        file_plans=file_plans,
+    )
+
+
+def _plan_from_source_evidence(
+    evidence: tuple[
+        DatasetValidationReport,
+        RowSet,
+        VerificationResult,
+        str,
+        ExportMembershipProjection,
+    ],
+    *,
+    source_trust_policy: SourceTrustPolicy,
+    container_profile: ExportContainerProfile,
+    consumer_profile: ExportConsumerProfile | None,
+    dependencies: Sequence[ExportDependencyBinding],
+    file_plans: Sequence[ExportFilePlan],
+) -> tuple[ExportPlan, RowSet]:
+    """Build a plan from one already captured strict source-evidence snapshot."""
+    report, row_set, verification, objective_id, membership_projection = evidence
     snapshot = report.snapshot
     plan = ExportPlan.create(
         source_bundle_id=verification.bundle_id,

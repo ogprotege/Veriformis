@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
 
 **Next review:** Any architecture documentation change
 
@@ -252,6 +252,15 @@ test-owned consolidated ordinary-file reload evidence for the eleven compatible
 current container/schema pairs, three container tamper cases, and the existing
 constrained-CSV/`messages` refusal. It adds no runtime importer, semantic
 replayer, surface, taxonomy, support state, or trainer claim.
+
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 stays on the existing
+dry-run edge: planning returns the unchanged plan plus one bounded runtime
+preview derived from the same admitted `RowSet`. It exposes ordinal-zero
+non-empty-partition samples and the sorted relative planned tree plus receipt,
+with ASCII-safe whole-row payload inclusion or exact omission. It never calls a
+renderer or touches a destination and adds no durable model or dependency edge.
+
 The default service still has no semantic replayer. The CLI exposes the nine
 stage commands plus maintenance, inspection, recipe automation, MCP, optional
 Aptus handoff, version, and verified-export surfaces.

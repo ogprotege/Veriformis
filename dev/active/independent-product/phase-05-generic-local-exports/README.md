@@ -31,9 +31,11 @@ The separately admitted Phase 5.1 and 5.2 implementations support split JSONL
 and canonical JSON respectively. Item 5.3's constrained CSV for the three flat
 row schemas merged as PR #55. Item 5.4's receipt-anchored post-export transport
 merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
-Item 5.5's discovery-closed semantic round-trip fixture is locally admitted;
-pull-request publication, GitHub evidence, and merge remain pending. It is
-test proof, not a production importer or replayer.
+Item 5.5's discovery-closed semantic round-trip fixture merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. It is test proof, not a
+production importer or replayer. Item 5.6's bounded runtime preview is
+implemented and locally admitted; pull-request publication, GitHub evidence,
+merge, and clean-main synchronization remain open.
 
 ## Packet contents
 
@@ -75,8 +77,9 @@ evidence. See the
 [deterministic archive contract](../../../../docs/contracts/bundle-transport-v1.md)
 and [ADR-0006](../../../../docs/adr/0006-receipt-anchored-export-pack-transport.md).
 
-Item 5.5 is locally admitted on the working tree based on that synchronized
-merge. Its frozen fixture closes over the current catalog and current row
+Item 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Its frozen fixture closes over
+the current catalog and current row
 schemas: 11 compatible pairs strictly reload ordered, separate train and
 evaluation payloads plus aligned provenance to the exact source `RowSet`, while
 constrained CSV with `messages` refuses before publication and names both JSON
@@ -84,3 +87,18 @@ alternatives. One canonical semantic tamper per container fails strict reload.
 Focused 16, integrated 453, full 1,211, standalone release 1,199 with one
 deselection, parity, and 58 Mac tests passed. The fixture adds no public import
 operation, production replayer, schema, taxonomy, or support change.
+
+Item 5.6 started from that synchronized merge. `export dry-run` now returns the
+unchanged plan plus one runtime-only `veriformis.export-dry-run-preview/v1`
+object in response v2. The preview shows the first row of each non-empty
+train/evaluation partition and a normalized, plan-derived destination tree that
+includes `export-receipt.json`. Exact payloads larger than 64 KiB, or unable to
+fit the bounded response, are omitted whole with an explicit reason; values are
+never truncated or rewritten. This work adds no renderer, destination access,
+persisted schema, selector, taxonomy entry, support promotion, or trainer claim.
+Local admission passed with 60 focused, 480 integrated, 1,238 full Python, and
+1,226 standalone release tests with one deselection; the intentional
+durability-warning regression was the only warning. Clean-wheel and both
+golden flows, parity, 66 Mac tests, tracking, lock, Ruff, structured JSON,
+diff, and independent reviews also passed. Publication and merge remain open,
+and item 5.7 has not begun.

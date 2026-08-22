@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 preview locally admitted)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -209,12 +209,21 @@ name.vfbundle/
   `.vfexport.zip` bytes through the shared archive codec, verifies staged bytes,
   and publishes without replacement. Its runtime archive facts do not alter
   the inner plan, receipt, verification, rows, or membership.
-- Phase 5.5 changes no runtime edge. Its locally admitted test-only fixture
+- Phase 5.5 changes no runtime edge. Its merged test-only fixture
   reloads ordinary files for all eleven compatible current container/schema
   pairs to the exact ordered partitions, provenance, and source `RowSet`, and
   checks one semantic tamper per container plus constrained CSV's actionable
   `messages` refusal. It adds no importer, replayer, API, taxonomy, support, or
-  trainer boundary.
+  trainer boundary. Phase 5.5 merged as PR #57 at
+  `c72b8e9ec7bc2746d74404226aa086d497e15db1`.
+- Phase 5.6 adds one runtime-only edge inside the existing dry-run operation:
+  the same admitted `RowSet` and immutable plan yield exact ordinal-zero
+  non-empty-partition samples and a sorted relative plan-derived tree plus
+  `export-receipt.json`. Response v2 is ASCII-safe and bounded through whole-
+  row omission. Preview construction does not invoke a renderer or access a
+  destination; it adds no persistence, catalog, taxonomy, support, consumer,
+  trainer, MCP-operation, or Mac-UI edge. Local admission is recorded;
+  publication and merge remain pending.
 
 ## Related documentation
 

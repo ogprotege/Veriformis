@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 enum SidebarDestination: String, CaseIterable, Identifiable {
@@ -204,7 +205,9 @@ enum ExportSurfaceSchema {
     static let request = "veriformis.export-surface-request/v1"
     static let requestV2 = "veriformis.export-surface-request/v2"
     static let response = "veriformis.export-surface-response/v1"
+    static let responseV2 = "veriformis.export-surface-response/v2"
     static let discovery = "veriformis.export-discovery/v1"
+    static let dryRunPreview = "veriformis.export-dry-run-preview/v1"
     static let splitJSONLOptions = "veriformis.split-jsonl-options/v1"
 }
 
@@ -952,6 +955,11 @@ struct ExportProfileDescriptorSummary: Decodable, Equatable, Sendable {
 
 protocol ExportSurfaceResult: Decodable, Equatable, Sendable {
     static var operation: ExportOperation { get }
+    static var responseSchema: String { get }
+}
+
+extension ExportSurfaceResult {
+    static var responseSchema: String { ExportSurfaceSchema.response }
 }
 
 struct ExportDiscovery: ExportSurfaceResult {
@@ -1263,16 +1271,298 @@ struct ExportVerificationSummary: Decodable, Equatable, Sendable {
     }
 }
 
-struct ExportDryRunResult: ExportSurfaceResult {
-    static let operation = ExportOperation.dryRun
-    let plan: ExportPlanSummary
+enum ExportPreviewJSONValue: Decodable, Equatable, Sendable {
+    case null
+    case bool(Bool)
+    case integer(Int)
+    case string(String)
+    case array([ExportPreviewJSONValue])
+    case object([String: ExportPreviewJSONValue])
 
     init(from decoder: Decoder) throws {
-        try decoder.requireExactExportKeys(["plan"], model: "export dry-run result")
-        plan = try decoder.container(keyedBy: CodingKeys.self).decode(ExportPlanSummary.self, forKey: .plan)
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            self = .null
+        } else if let value = try? container.decode(Bool.self) {
+            self = .bool(value)
+        } else if let value = try? container.decode(Int.self) {
+            self = .integer(value)
+        } else if let value = try? container.decode(String.self) {
+            self = .string(value)
+        } else if let value = try? container.decode([ExportPreviewJSONValue].self) {
+            self = .array(value)
+        } else if let value = try? container.decode(
+            [String: ExportPreviewJSONValue].self
+        ) {
+            self = .object(value)
+        } else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export preview payload contains an unsupported or floating-point JSON value."
+            )
+        }
+    }
+}
+
+enum ExportPreviewPartition: String, Decodable, Equatable, Sendable {
+    case train
+    case evaluation
+}
+
+enum ExportPreviewOmissionReason: String, Decodable, Equatable, Sendable {
+    case previewLimit = "exact-payload-exceeds-preview-limit"
+    case responseBudget = "exact-payload-exceeds-response-budget"
+}
+
+struct ExportDryRunSampleRow: Decodable, Equatable, Sendable {
+    let partition: ExportPreviewPartition
+    let ordinal: Int
+    let payloadSHA256: String
+    let payloadByteSize: Int
+    let payload: [String: ExportPreviewJSONValue]?
+    let omissionReason: ExportPreviewOmissionReason?
+
+    init(from decoder: Decoder) throws {
+        try decoder.requireExactExportKeys(
+            [
+                "partition", "ordinal", "payload_sha256", "payload_byte_size",
+                "payload", "omission_reason",
+            ],
+            model: "export dry-run sample row"
+        )
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        partition = try container.decode(ExportPreviewPartition.self, forKey: .partition)
+        ordinal = try container.decode(Int.self, forKey: .ordinal)
+        payloadSHA256 = try container.decode(String.self, forKey: .payloadSHA256)
+        payloadByteSize = try container.decode(Int.self, forKey: .payloadByteSize)
+        if try container.decodeNil(forKey: .payload) {
+            payload = nil
+        } else {
+            payload = try container.decode(
+                [String: ExportPreviewJSONValue].self,
+                forKey: .payload
+            )
+        }
+        omissionReason = try container.decodeIfPresent(
+            ExportPreviewOmissionReason.self,
+            forKey: .omissionReason
+        )
+
+        try validateExportSHA256(payloadSHA256, label: "payload_sha256")
+        guard ordinal == 0, payloadByteSize > 0 else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export preview samples require ordinal zero and a positive payload byte size."
+            )
+        }
+        switch (payload, omissionReason) {
+        case (.some(let payload), nil):
+            guard payloadByteSize <= ExportDryRunPreview.maximumSamplePayloadBytes else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "An included export preview payload exceeds the preview limit."
+                )
+            }
+            let canonicalPayload = try canonicalExportPreviewPayloadBytes(payload)
+            guard canonicalPayload.count == payloadByteSize,
+                  exportPreviewSHA256(canonicalPayload) == payloadSHA256
+            else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "Export preview payload bytes differ from their declared binding."
+                )
+            }
+        case (nil, .previewLimit):
+            guard payloadByteSize > ExportDryRunPreview.maximumSamplePayloadBytes else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "Preview-limit omission requires an oversized exact payload."
+                )
+            }
+        case (nil, .responseBudget):
+            guard payloadByteSize <= ExportDryRunPreview.maximumSamplePayloadBytes else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "Response-budget omission cannot conceal a preview-limit omission."
+                )
+            }
+        default:
+            throw ExportSurfaceModelError.invalidValue(
+                "Export preview payload and omission reason are inconsistent."
+            )
+        }
     }
 
-    enum CodingKeys: CodingKey { case plan }
+    enum CodingKeys: String, CodingKey {
+        case partition
+        case ordinal
+        case payloadSHA256 = "payload_sha256"
+        case payloadByteSize = "payload_byte_size"
+        case payload
+        case omissionReason = "omission_reason"
+    }
+}
+
+struct ExportDryRunDestinationTree: Decodable, Equatable, Sendable {
+    let directories: [String]
+    let files: [String]
+
+    init(from decoder: Decoder) throws {
+        try decoder.requireExactExportKeys(
+            ["directories", "files"],
+            model: "export dry-run destination tree"
+        )
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        directories = try container.decode([String].self, forKey: .directories)
+        files = try container.decode([String].self, forKey: .files)
+        guard directories == directories.sorted(),
+              files == files.sorted(),
+              Set(directories).count == directories.count,
+              Set(files).count == files.count,
+              !files.isEmpty
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export preview destination tree must be sorted, unique, and non-empty."
+            )
+        }
+        try directories.forEach { try validateExportPreviewRelativePath($0) }
+        try files.forEach { try validateExportPreviewRelativePath($0) }
+    }
+
+    enum CodingKeys: CodingKey {
+        case directories
+        case files
+    }
+}
+
+struct ExportDryRunPreview: Decodable, Equatable, Sendable {
+    static let maximumSamplePayloadBytes = 65_536
+
+    let schemaVersion: String
+    let exportPlanID: String
+    let containerProfileID: String
+    let rowSetID: String
+    let rowSchema: String
+    let samplePolicy: String
+    let maximumSamplePayloadBytes: Int
+    let destinationTree: ExportDryRunDestinationTree
+    let sampleRows: [ExportDryRunSampleRow]
+
+    init(from decoder: Decoder) throws {
+        try decoder.requireExactExportKeys(
+            [
+                "schema_version", "export_plan_id", "container_profile_id",
+                "row_set_id", "row_schema", "sample_policy",
+                "maximum_sample_payload_bytes", "destination_tree", "sample_rows",
+            ],
+            model: "export dry-run preview"
+        )
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(String.self, forKey: .schemaVersion)
+        exportPlanID = try container.decode(String.self, forKey: .exportPlanID)
+        containerProfileID = try container.decode(String.self, forKey: .containerProfileID)
+        rowSetID = try container.decode(String.self, forKey: .rowSetID)
+        rowSchema = try container.decode(String.self, forKey: .rowSchema)
+        samplePolicy = try container.decode(String.self, forKey: .samplePolicy)
+        maximumSamplePayloadBytes = try container.decode(
+            Int.self,
+            forKey: .maximumSamplePayloadBytes
+        )
+        destinationTree = try container.decode(
+            ExportDryRunDestinationTree.self,
+            forKey: .destinationTree
+        )
+        sampleRows = try container.decode(
+            [ExportDryRunSampleRow].self,
+            forKey: .sampleRows
+        )
+
+        try requireExportSchema(
+            schemaVersion,
+            expected: ExportSurfaceSchema.dryRunPreview,
+            model: "export dry-run preview"
+        )
+        guard samplePolicy == "first-row-per-non-empty-partition",
+              maximumSamplePayloadBytes == Self.maximumSamplePayloadBytes
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export dry-run preview policy or payload limit is unsupported."
+            )
+        }
+    }
+
+    func validate(against plan: ExportPlanSummary) throws {
+        guard exportPlanID == plan.exportPlanID,
+              containerProfileID == plan.containerProfileID,
+              rowSetID == plan.rowSetID,
+              rowSchema == plan.rowSchema
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export dry-run preview bindings differ from its plan summary."
+            )
+        }
+        guard [
+            "text", "prompt_completion", "instruction_output", "messages",
+        ].contains(rowSchema) else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export dry-run preview row schema is unsupported: \(rowSchema)."
+            )
+        }
+
+        let expectedFiles = (plan.files.map(\.path) + ["export-receipt.json"]).sorted()
+        guard Set(expectedFiles).count == expectedFiles.count,
+              destinationTree.files == expectedFiles,
+              destinationTree.directories == exportPreviewDirectories(for: expectedFiles)
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export dry-run preview tree differs from its plan summary."
+            )
+        }
+
+        var expectedPartitions: [ExportPreviewPartition] = [.train]
+        if plan.evaluationRecordCount > 0 {
+            expectedPartitions.append(.evaluation)
+        }
+        guard sampleRows.map(\.partition) == expectedPartitions else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export dry-run preview samples differ from non-empty plan partitions."
+            )
+        }
+        for sample in sampleRows {
+            if let payload = sample.payload {
+                try validateExportPreviewPayload(payload, rowSchema: rowSchema)
+            }
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case exportPlanID = "export_plan_id"
+        case containerProfileID = "container_profile_id"
+        case rowSetID = "row_set_id"
+        case rowSchema = "row_schema"
+        case samplePolicy = "sample_policy"
+        case maximumSamplePayloadBytes = "maximum_sample_payload_bytes"
+        case destinationTree = "destination_tree"
+        case sampleRows = "sample_rows"
+    }
+}
+
+struct ExportDryRunResult: ExportSurfaceResult {
+    static let operation = ExportOperation.dryRun
+    static let responseSchema = ExportSurfaceSchema.responseV2
+    let plan: ExportPlanSummary
+    let preview: ExportDryRunPreview
+
+    init(from decoder: Decoder) throws {
+        try decoder.requireExactExportKeys(
+            ["plan", "preview"],
+            model: "export dry-run result"
+        )
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        plan = try container.decode(ExportPlanSummary.self, forKey: .plan)
+        preview = try container.decode(ExportDryRunPreview.self, forKey: .preview)
+        try preview.validate(against: plan)
+    }
+
+    enum CodingKeys: CodingKey {
+        case plan
+        case preview
+    }
 }
 
 struct ExportInspectionResult: ExportSurfaceResult {
@@ -1383,7 +1673,7 @@ struct ExportSurfaceResponse<Result: ExportSurfaceResult>: Decodable, Equatable,
 
         try requireExportSchema(
             schemaVersion,
-            expected: ExportSurfaceSchema.response,
+            expected: Result.responseSchema,
             model: "export response"
         )
         guard operation == Result.operation else {
@@ -1506,6 +1796,216 @@ private extension Decoder {
             )
         }
     }
+}
+
+private func validateExportPreviewRelativePath(_ value: String) throws {
+    let normalized = value.precomposedStringWithCanonicalMapping
+    let parts = value.split(separator: "/", omittingEmptySubsequences: false)
+    guard !value.isEmpty,
+          !value.hasPrefix("/"),
+          !value.contains("\\"),
+          !value.contains("\0"),
+          parts.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." }),
+          !value.unicodeScalars.contains(where: CharacterSet.controlCharacters.contains),
+          value.unicodeScalars.map(\.value) == normalized.unicodeScalars.map(\.value)
+    else {
+        throw ExportSurfaceModelError.invalidValue(
+            "Export preview tree contains a noncanonical relative path."
+        )
+    }
+}
+
+private func exportPreviewDirectories(for files: [String]) -> [String] {
+    var directories = Set<String>()
+    for file in files {
+        let parts = file.split(separator: "/", omittingEmptySubsequences: false)
+        guard parts.count > 1 else { continue }
+        for end in 1 ..< parts.count {
+            directories.insert(parts[..<end].joined(separator: "/"))
+        }
+    }
+    return directories.sorted()
+}
+
+private func validateExportPreviewPayload(
+    _ payload: [String: ExportPreviewJSONValue],
+    rowSchema: String
+) throws {
+    func requireNonemptyString(
+        _ value: ExportPreviewJSONValue?,
+        label: String
+    ) throws {
+        guard case .string(let string)? = value, !string.isEmpty else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export preview \(label) must be a non-empty exact string."
+            )
+        }
+    }
+
+    switch rowSchema {
+    case "text":
+        guard Set(payload.keys) == ["text"] else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A text export preview payload requires exactly the text key."
+            )
+        }
+        try requireNonemptyString(payload["text"], label: "text")
+    case "prompt_completion":
+        guard Set(payload.keys) == ["prompt", "completion"] else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A prompt_completion export preview payload requires exactly prompt and completion."
+            )
+        }
+        try requireNonemptyString(payload["prompt"], label: "prompt")
+        try requireNonemptyString(payload["completion"], label: "completion")
+    case "instruction_output":
+        guard Set(payload.keys) == ["instruction", "input", "output"] else {
+            throw ExportSurfaceModelError.invalidValue(
+                "An instruction_output export preview payload requires exactly instruction, input, and output."
+            )
+        }
+        try requireNonemptyString(payload["instruction"], label: "instruction")
+        try requireNonemptyString(payload["input"], label: "input")
+        try requireNonemptyString(payload["output"], label: "output")
+    case "messages":
+        guard Set(payload.keys) == ["messages"],
+              case .array(let messages)? = payload["messages"],
+              messages.count == 2
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A messages export preview payload requires exactly two ordered turns."
+            )
+        }
+        for (index, expectedRole) in ["user", "assistant"].enumerated() {
+            guard case .object(let message) = messages[index],
+                  Set(message.keys) == ["role", "content"],
+                  case .string(let role)? = message["role"],
+                  role == expectedRole
+            else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "Export preview message \(index) has an invalid role or shape."
+                )
+            }
+            try requireNonemptyString(
+                message["content"],
+                label: "message \(index) content"
+            )
+        }
+    default:
+        throw ExportSurfaceModelError.invalidValue(
+            "Export dry-run preview row schema is unsupported: \(rowSchema)."
+        )
+    }
+}
+
+private func canonicalExportPreviewPayloadBytes(
+    _ payload: [String: ExportPreviewJSONValue]
+) throws -> Data {
+    var result = ""
+    try appendCanonicalExportPreviewJSON(.object(payload), to: &result, depth: 0)
+    guard let data = result.data(using: .utf8) else {
+        throw ExportSurfaceModelError.invalidValue(
+            "Export preview payload could not be represented as canonical UTF-8 JSON."
+        )
+    }
+    return data
+}
+
+private func appendCanonicalExportPreviewJSON(
+    _ value: ExportPreviewJSONValue,
+    to result: inout String,
+    depth: Int
+) throws {
+    guard depth <= 128 else {
+        throw ExportSurfaceModelError.invalidValue(
+            "Export preview payload exceeds the maximum JSON nesting depth."
+        )
+    }
+    switch value {
+    case .null:
+        result += "null"
+    case .bool(let value):
+        result += value ? "true" : "false"
+    case .integer(let value):
+        result += String(value)
+    case .string(let value):
+        appendCanonicalExportPreviewJSONString(value, to: &result)
+    case .array(let values):
+        result += "["
+        for (index, item) in values.enumerated() {
+            if index > 0 { result += "," }
+            try appendCanonicalExportPreviewJSON(
+                item,
+                to: &result,
+                depth: depth + 1
+            )
+        }
+        result += "]"
+    case .object(let object):
+        result += "{"
+        let keys = object.keys.sorted(by: exportPreviewUnicodeScalarOrder)
+        for (index, key) in keys.enumerated() {
+            if index > 0 { result += "," }
+            appendCanonicalExportPreviewJSONString(key, to: &result)
+            result += ":"
+            guard let item = object[key] else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "Export preview payload contains an unavailable object member."
+                )
+            }
+            try appendCanonicalExportPreviewJSON(
+                item,
+                to: &result,
+                depth: depth + 1
+            )
+        }
+        result += "}"
+    }
+}
+
+private func appendCanonicalExportPreviewJSONString(
+    _ value: String,
+    to result: inout String
+) {
+    result += "\""
+    for scalar in value.unicodeScalars {
+        switch scalar.value {
+        case 0x08:
+            result += "\\b"
+        case 0x09:
+            result += "\\t"
+        case 0x0A:
+            result += "\\n"
+        case 0x0C:
+            result += "\\f"
+        case 0x0D:
+            result += "\\r"
+        case 0 ... 0x1F:
+            result += String(format: "\\u%04x", scalar.value)
+        case 0x22:
+            result += "\\\""
+        case 0x5C:
+            result += "\\\\"
+        default:
+            result.unicodeScalars.append(scalar)
+        }
+    }
+    result += "\""
+}
+
+private func exportPreviewUnicodeScalarOrder(_ lhs: String, _ rhs: String) -> Bool {
+    let left = lhs.unicodeScalars.map(\.value)
+    let right = rhs.unicodeScalars.map(\.value)
+    for (leftValue, rightValue) in zip(left, right) where leftValue != rightValue {
+        return leftValue < rightValue
+    }
+    return left.count < right.count
+}
+
+private func exportPreviewSHA256(_ data: Data) -> String {
+    SHA256.hash(data: data)
+        .map { String(format: "%02x", $0) }
+        .joined()
 }
 
 private func validateExportSelection(

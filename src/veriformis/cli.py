@@ -18,10 +18,12 @@ import typer
 from veriformis.errors import VeriformisError
 from veriformis.evidence import EvidenceError
 from veriformis.exports.api import (
+    EXPORT_SURFACE_RESPONSE_SCHEMA,
+    EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
     ExportOperationCancelled,
     _EXPORT_SURFACE_EXCEPTIONS,
     export_discovery_response,
-    export_dry_run_response,
+    export_dry_run_preview_response,
     export_error_response,
     export_execution_response,
     export_inspection_response,
@@ -159,15 +161,29 @@ def _emit_export_response(payload: dict[str, object], response_json: str) -> Non
         raise typer.Exit(code=status)
 
 
-def _run_export_operation(operation: str, response_builder, call) -> None:
+def _run_export_operation(
+    operation: str,
+    response_builder,
+    call,
+    *,
+    response_schema: str = EXPORT_SURFACE_RESPONSE_SCHEMA,
+) -> None:
     try:
         payload = response_builder(call())
     except _EXPORT_SURFACE_EXCEPTIONS as exc:
-        payload = export_error_response(operation, exc)
+        payload = export_error_response(
+            operation,
+            exc,
+            response_schema=response_schema,
+        )
     try:
         response_json = export_response_json(payload)
     except _EXPORT_SURFACE_EXCEPTIONS as exc:
-        payload = export_error_response(operation, exc)
+        payload = export_error_response(
+            operation,
+            exc,
+            response_schema=response_schema,
+        )
         response_json = export_response_json(payload)
     _emit_export_response(payload, response_json)
 
@@ -482,10 +498,15 @@ def export_dry_run(
             expected_operation="dry_run",
         )
         outcome = _SERVICE.dry_run_export(request)
-        assert outcome.plan is not None
-        return outcome.plan
+        assert outcome.preview is not None
+        return outcome.preview
 
-    _run_export_operation("dry_run", export_dry_run_response, run)
+    _run_export_operation(
+        "dry_run",
+        export_dry_run_preview_response,
+        run,
+        response_schema=EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
+    )
 
 
 @export_app.command(name="inspect")

@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -285,14 +285,29 @@ legacy bundle behavior must remain byte-compatible, and no MCP or Mac UI
 operation is added. Item 5.4 merged as PR #56 at
 `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
 
-Phase 5.5's locally admitted consolidation is test-only. Keep its frozen
+Phase 5.5's merged PR #57 consolidation is test-only. Keep its frozen
 ordinary-file fixture and strict reload helpers under `tests/`; derive the
 matrix from production discovery, cover all eleven compatible current
 container/schema pairs, rebuild the exact ordered partitions, provenance, and
 source `RowSet`, and retain constrained CSV's actionable `messages` refusal.
 Exercise one canonical semantic tamper per container. Do not turn these fixtures
 into a product importer, semantic replayer, new API, taxonomy or support state,
-or trainer claim. Items 5.6–5.7 remain later work.
+or trainer claim.
+
+Item 5.6 uses the same typed dry-run operation across Python, CLI, MCP, and the
+CLI-backed Mac bridge. Preserve the exact response-v2 result `{plan, preview}`
+and runtime preview-v1 fields. Samples are ordinal zero from each non-empty
+partition in train-then-evaluation order. Bind every sample to exact compact
+UTF-8 payload JSON bytes; include the object whole only at or below 65,536
+bytes and within the response budget, otherwise return null with the exact
+closed omission reason. Serialize response v2 ASCII-safely without changing
+decoded values. Derive the sorted relative tree from the immutable plan and add
+only `export-receipt.json`. Do not invoke a renderer, access a destination,
+mutate the source or plan, change the ten persisted export models, request or
+discovery schemas, production selectors, taxonomy, support state, or add a
+consumer/trainer claim. Item 5.6's focused, full, release, parity, Mac,
+tracking, lint, and review evidence passed locally; publication and merge remain
+separate gates, and item 5.7 remains later work.
 
 ### Keep optional-integration claims accurate
 

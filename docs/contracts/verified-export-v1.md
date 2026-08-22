@@ -33,12 +33,17 @@ v1. Phase 5.4 adds an optional receipt-anchored deterministic transport around
 an already-published export directory and merged as PR #56 at
 `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5 adds only a
 consolidated ordinary-file semantic round-trip fixture matrix over those three
-existing renderers. The ten persisted models, request and discovery schemas,
-production selectors, and response v1 remain unchanged.
+existing renderers and merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 adds one bounded,
+runtime-only exact dry-run preview under additive surface response v2. The ten
+persisted models, request and discovery schemas, production selectors,
+taxonomy, and support state remain unchanged; response v1 remains unchanged for
+non-dry-run operations.
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 consolidated semantic round-trip)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview contract)
 
-**Next review:** Phase 5.6 or any export or receipt schema change
+**Next review:** Phase 5.6 publication/merge, Phase 5.7, or any export or receipt schema
+change
 
 ## Purpose
 
@@ -857,6 +862,14 @@ consolidated evidence for the existing contracts, not a first-class dataset
 importer, public replay API, taxonomy change, support promotion, or consumer
 compatibility claim.
 
+Phase 5.6 adds no production export implementation, renderer, replayer, or
+destination operation. It adds the bounded runtime preview protocol below to
+the existing dry-run operation. Preview derivation MUST reuse the exact
+strictly admitted source `RowSet`, immutable `ExportPlan`, selected profile, and
+container options that execution will later rederive. It MUST NOT call a
+renderer, inspect or create a destination, stage or publish files, mutate the
+source, or alter the plan or its identity.
+
 This wrapper does not change the inner `ExportPlan`, `ExportReceipt`,
 `ExportVerification`, file bindings, or their identities. Its outer digest is
 not inserted into a persisted model because the receipt is itself an archive
@@ -890,6 +903,80 @@ profile, dependency graph, file plan, membership projection, renderer,
 replayer, replacement policy, or force flag. A v2 request for an implementation
 without a reviewed options parser fails even when the object is empty.
 
+### Exact dry-run preview response
+
+Public dry-run success and error responses use exactly
+`veriformis.export-surface-response/v2`. The outer envelope retains the exact
+response-v1 fields `error`, `operation`, `result`, `schema_version`, and
+`status`; `operation` is `dry_run`. A successful result contains exactly
+`plan` and `preview`. The plan is the existing bounded summary of the unchanged
+`ExportPlan`. Discovery, inspect, execute, verify, cancellation, and visible-
+partial outcomes retain `veriformis.export-surface-response/v1` and its exact
+historical bytes. Response v2 is a transport surface, not persisted export
+evidence.
+
+The product operation adapters (`PipelineService`, CLI, MCP, and the CLI-backed
+Mac bridge) use response v2 for dry-run success and errors. The exported legacy
+Python helper `export_dry_run_response(plan)` deliberately remains available as
+an explicit plan-only response-v1 serializer for compatibility; it is not the
+current product dry-run operation response and does not add preview fields to
+v1. The generic error helper defaults dry-run errors to v2; a caller may request
+v1 explicitly only when reproducing a historical compatibility envelope.
+
+The preview object uses schema identifier exactly
+`veriformis.export-dry-run-preview/v1` and contains exactly:
+
+- `schema_version`;
+- `export_plan_id`;
+- `container_profile_id`;
+- `row_set_id`;
+- `row_schema`;
+- `sample_policy`, exactly `first-row-per-non-empty-partition`;
+- `maximum_sample_payload_bytes`, exactly `65536`;
+- `destination_tree`; and
+- `sample_rows`.
+
+`export_plan_id`, `container_profile_id`, `row_set_id`, and `row_schema` MUST
+equal the values in the returned plan. `destination_tree` contains exactly the
+arrays `directories` and `files`. `files` is the lexicographically sorted,
+root-relative POSIX set of every unchanged planned file path plus
+`export-receipt.json`. `directories` is the lexicographically sorted set of
+non-empty ancestor directory paths derived from those files. Neither array may
+contain an absolute destination, root marker, temporary or staging path,
+unplanned output, duplicate, portable alias, or rewritten path.
+
+`sample_rows` contains ordinal zero from every non-empty logical partition,
+ordered `train` then `evaluation`; an empty evaluation partition contributes
+no sample. Every sample contains exactly `partition`, `ordinal`,
+`payload_sha256`, `payload_byte_size`, `payload`, and `omission_reason`.
+`payload_sha256` and `payload_byte_size` bind the exact compact, sorted-key,
+exact-string UTF-8 JSON bytes of that authoritative payload object. They remain
+present when the payload is omitted.
+
+If those exact payload bytes occupy at most 65,536 bytes and the complete
+response fits its bound, `payload` is the complete object and
+`omission_reason` is null. A larger payload is never sliced or summarized:
+`payload` is null and `omission_reason` is exactly
+`exact-payload-exceeds-preview-limit`. A within-limit payload that cannot fit
+the complete response is likewise omitted whole with
+`exact-payload-exceeds-response-budget`. Budget fitting prefers retaining the
+train payload by omitting the evaluation payload first, then the train payload
+only if still required. If the plan and preview metadata cannot fit after all
+eligible payload omissions, dry run fails rather than returning a partial or
+oversized response.
+
+Response v2 JSON transport is ASCII-safe: non-ASCII characters and controls may
+be represented by JSON escape sequences on the wire, including surrogate-pair
+escapes where JSON requires them. Decoding MUST recover the exact source object
+keys and string values, including distinct NFC/NFD sequences, NUL, embedded
+CR/LF/CRLF, and non-BMP characters. Transport escaping MUST NOT normalize,
+truncate, paraphrase, sanitize, or otherwise rewrite decoded payload content.
+
+The preview is normalized runtime information only. It is not an eleventh
+persisted verified-export model, receipt member, durable attestation, new
+request version, discovery version, profile, renderer selector, taxonomy entry,
+support claim, or consumer/trainer compatibility claim.
+
 The canonical UTF-8 bytes of one request MUST NOT exceed 1 MiB (1,048,576
 bytes). Every runtime bundle or destination path MUST be non-empty, contain no
 NUL, and occupy at most 32 KiB (32,768 bytes) in UTF-8. The canonical bytes of
@@ -899,9 +986,11 @@ written separately to stderr. The Mac process bridge retains up to 2 MiB for
 each stream independently, decodes only complete untruncated canonical stdout,
 and therefore retains the maximum response plus its one-byte CLI framing. MCP
 returns the same canonical response object without adding a durable evidence
-schema. An executable plan whose canonical dry-run response exceeds 256 KiB is
-refused before rendering or destination access; this reserves bounded room for
-the receipt and verification summaries of any later execute outcome. Plan
+schema. The complete canonical ASCII-safe dry-run response v2 MUST NOT exceed
+256 KiB (262,144 bytes). Whole-row response-budget omission is applied as
+defined above; a plan and preview whose metadata still exceed that bound are
+refused before rendering or destination access. This also reserves bounded room
+for the receipt and verification summaries of any later execute outcome. Plan
 admission separately refuses a planned file whose parent path contains more
 than 128 directory segments, before rendering or destination access. Public
 tree inspection and verification use an iterative descriptor walk and refuse
@@ -928,6 +1017,10 @@ containers are transport profiles rather than row renderers and do not appear
 in export discovery. Named trainer profiles remain later work.
 Shipping generic JSONL, JSON, or constrained CSV does not create or imply a
 consumer profile or trainer/spreadsheet compatibility.
+Phase 5.6 changes none of these support or discovery claims. It provides one
+shared exact preview for the already-supported catalog through Python, CLI,
+MCP, and the CLI-backed Mac bridge; it does not add a new operation or Mac UI
+destination chooser.
 
 ## Version and migration
 

@@ -18,7 +18,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -596,13 +596,42 @@ v2 is refused for that selector even when `container_options` is empty.
 Constrained `constrained-csv` v1 has the same request boundary: request v1
 selects its fixed tree, while request v2 and every options object are refused.
 
-Dry run verifies the selected source and derives a plan without destination
-access. Execute re-derives that plan, requires the operator-confirmed
+Dry run verifies the selected source and derives a plan plus an exact bounded
+preview without renderer or destination access. Its canonical
+`veriformis.export-surface-response/v2` result contains exactly `plan` and
+`preview`; requests remain v1 or v2 as described above. The preview uses
+`veriformis.export-dry-run-preview/v1` and reports:
+
+- the exact `export_plan_id`, `container_profile_id`, `row_set_id`, and
+  `row_schema`;
+- `first-row-per-non-empty-partition`, selecting ordinal zero in train-then-
+  evaluation order and omitting the evaluation sample when that partition is
+  empty;
+- each sample's partition, ordinal, exact canonical payload SHA-256 and UTF-8
+  byte size, whole payload object or null, and closed omission reason; and
+- sorted root-relative `directories` and `files` derived from the unchanged
+  plan, with `export-receipt.json` included in the files.
+
+An exact payload object is included only when its canonical JSON occupies at
+most 65,536 bytes and the complete dry-run response fits the 256 KiB budget.
+Larger payloads use `exact-payload-exceeds-preview-limit`; within-limit payloads
+omitted to fit the response use `exact-payload-exceeds-response-budget`. The
+CLI never truncates a row. Response v2 is ASCII-safe JSON, so its raw stdout may
+contain escapes; after JSON decoding, object keys and strings are the exact
+source values, including Unicode and embedded control characters. The preview
+does not render output, inspect or create a destination, or alter the returned
+plan. It is runtime operator information, not a receipt or persisted schema.
+
+Execute re-derives that plan, requires the operator-confirmed
 `expected_export_plan_id`, and publishes with the only overwrite policy,
 `refuse`. Inspect remains request v1: it accepts only a destination and returns
 `self_described_physical` evidence without asserting source authority.
 `export-verify` separately re-verifies the selected source, re-derives the
 confirmed plan, and independently verifies the destination.
+
+Discover, inspect, execute, and verify retain response v1. Dry-run response v2
+is shared canonically across Python, CLI, MCP, and the CLI-backed Mac bridge;
+it adds no new command, MCP operation, or Mac UI action.
 
 With request-v1 defaults, the split-JSONL derivative tree is exactly:
 
@@ -664,10 +693,12 @@ See
 [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md).
 
 Requests are limited to 1 MiB of canonical UTF-8 JSON, and each runtime path is
-limited to 32 KiB of UTF-8. Responses are one canonical
-`veriformis.export-surface-response/v1` object with exactly `error`, `operation`,
-`result`, `schema_version`, and `status`, limited to 1 MiB before framing. The
-CLI writes that object to stdout followed by one LF; diagnostics use stderr.
+limited to 32 KiB of UTF-8. Responses are one canonical export-surface object
+with exactly `error`, `operation`, `result`, `schema_version`, and `status`,
+limited to 1 MiB before framing. Dry run uses
+`veriformis.export-surface-response/v2`; every other operation uses
+`veriformis.export-surface-response/v1`. The CLI writes that object to stdout
+followed by one LF; diagnostics use stderr.
 Statuses are `ok`, `error`, `cancelled`, or `visible_partial`. Their exit codes
 are respectively 0, generally 1, 130, and 1; malformed request contracts exit
 2. Public export-tree walks refuse directory depth greater than 128. No command

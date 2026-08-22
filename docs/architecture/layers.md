@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
 
 **Next review:** Any layering or architecture change
 
@@ -232,6 +232,14 @@ no workspace stage, persisted export model, renderer, MCP adapter, or Mac UI
 policy. Phase 5.5 adds only test-layer fixtures and strict reload assertions for
 the existing container/schema matrix; no production layer, dependency,
 importer, replayer, or surface changes.
+
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 remains within the
+existing exports axial layer and thin adapters. The export service combines
+the already-admitted `RowSet` and immutable plan into one runtime preview;
+adapters serialize the same response v2. No workspace, renderer, publication,
+filesystem, persistence, taxonomy, support, MCP-tool, or Mac-UI layer is added.
+
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

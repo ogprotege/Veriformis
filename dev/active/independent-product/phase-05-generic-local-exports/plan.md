@@ -137,9 +137,19 @@ next item begins.
 
 ### 5.6 Expose exact dry-run previews
 
-- [ ] Show exact sample rows and the normalized destination tree without
+- [x] Show exact sample rows and the normalized destination tree without
       writing a destination.
-- [ ] Prove preview, plan, and execution use the same profile semantics.
+- [x] Prove preview, plan, and execution use the same profile semantics.
+
+The frozen runtime contract is `veriformis.export-dry-run-preview/v1` inside a
+dry-run `veriformis.export-surface-response/v2` whose result is exactly
+`plan` plus `preview`. It samples ordinal zero from each non-empty partition in
+train-then-evaluation order, omits an exact payload whole when its canonical
+UTF-8 JSON exceeds 65,536 bytes or the bounded response budget, and never
+truncates or rewrites decoded values. Its destination tree is sorted,
+root-relative, derived from the unchanged plan, and includes
+`export-receipt.json`. Implementation and all required local admission evidence
+passed; publication and merge are tracked separately.
 
 ### 5.7 Publish generic export operator guidance
 
@@ -156,13 +166,11 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Items 5.1–5.4 are implemented, admitted, and merged; item 5.4
-merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
-Item 5.5 is locally admitted as a test-only, discovery-closed semantic
-round-trip matrix after its required repository evidence and independent
-review passed. Pull-request publication, GitHub evidence, merge, and clean-main
-synchronization for item 5.5 remain open. Items 5.6–5.7 and the remaining
-phase-wide preview and guidance proof also remain open.
+**Result:** Items 5.1–5.5 are implemented, admitted, and merged. Item 5.5 merged
+as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Item 5.6's exact runtime
+preview is implemented and locally admitted; publication, GitHub evidence,
+merge, and clean-main synchronization remain open. Item 5.7 and final guidance
+reconciliation remain open.
 
 ## Non-goals
 

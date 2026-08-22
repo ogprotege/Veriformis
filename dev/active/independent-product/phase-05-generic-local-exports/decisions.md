@@ -15,7 +15,7 @@
 | Item 5.4 reuses ADR-0005's deterministic ZIP envelope through complementary ADR-0006 and the single existing deterministic archive contract | Accepted | Roadmap work item 4; ADR-0006 |
 | Split JSONL is container v1 with exact-byte determinism, request-v1 defaults, and complete strict request-v2 options | Accepted | `docs/contracts/split-jsonl-export-v1.md` |
 | Request v1 defaults to `train` / `evaluation` filenames and included aligned provenance; request v2 may safely rename stems or omit provenance | Accepted | Loss-preserving default and explicit optional sidecar contract |
-| Discovery and response stay v1; request v2 is additive and the ten persisted export models remain unchanged | Accepted | Strict compatibility and Mac parity evidence |
+| Discovery stays v1; request v2 is additive; response v1 stays exact for non-dry-run operations while item 5.6 adds dry-run response v2; the ten persisted export models remain unchanged | Accepted | Strict compatibility and Mac parity evidence |
 | Canonical JSON uses selector `json` v1 with exact bytes, all four current row schemas, and no consumer profile | Accepted | Roadmap item 5.2 and `docs/contracts/canonical-json-export-v1.md` |
 | Canonical JSON v1 has a fixed closed tree and no container options | Accepted | One stable portable representation; request v1 remains sufficient |
 | `dataset.json` is the sole membership-bearing file and keeps train/evaluation as explicit ordered arrays | Accepted | Exact partition preservation and complete-membership receipt binding |
@@ -42,10 +42,17 @@
 | Round-trip proof starts from ordinary emitted files and preserves separate ordered train/evaluation partitions, aligned provenance, and exact `RowSet` identity | Accepted | Phase 5 exit semantics without inventing an import product surface |
 | Constrained CSV proof uses its strict contract loader and never the general ingest CSV recovery parser | Accepted | Recovery parsing trims, normalizes, drops, or pads inputs outside the exact export contract |
 | Item 5.5 adds one canonical semantic tamper case per current container while exhaustive byte/member tampering remains in the container suites | Accepted | Consolidated semantic closure without duplicating existing adversarial coverage |
+| Dry-run success uses additive runtime response v2 with result exactly `plan` and `preview`; non-dry-run operations retain response v1 | Accepted | Exact strict-envelope compatibility without changing durable export evidence |
+| The runtime preview schema is `veriformis.export-dry-run-preview/v1` and is not one of the ten persisted verified-export v1 models | Accepted | Preview is bounded operator information, not a receipt or durable attestation |
+| Preview samples ordinal zero from each non-empty partition in train-then-evaluation order under `first-row-per-non-empty-partition` | Accepted | Exact deterministic sample selection without filtering or resplitting |
+| Canonical payload JSON larger than 65,536 bytes or unable to fit the response budget is omitted whole with an exact reason, never truncated | Accepted | Preserve decoded row values and bounded transport simultaneously |
+| Preview transport is ASCII-safe while decoding to the exact payload values, without Unicode normalization or content rewriting | Accepted | Canonical response transport and semantic fidelity |
+| The sorted root-relative tree is derived from the plan and adds only the known `export-receipt.json`; preview never calls a renderer or accesses a destination | Accepted | One plan semantics and a side-effect-free dry run |
+| Item 5.6 changes no persisted schema, request, discovery, selector, taxonomy, support state, renderer, destination policy, trainer, or consumer claim | Accepted | Bounded roadmap item and compatibility discipline |
 
-No item 5.1, 5.2, 5.3, 5.4, or 5.5 contract decision remains pending. Item 5.4
-merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
-Item 5.5 is locally admitted after its required evidence and independent review
-passed. Pull-request publication, GitHub evidence, merge, and clean-main
-synchronization for item 5.5 remain pending. Later decisions remain scoped to
-their own sequential pull requests and cannot broaden these support claims.
+No item 5.1–5.6 contract decision remains pending. Item 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Item 5.6 implementation and local
+admission evidence passed under the accepted contract above; pull-request
+publication, GitHub evidence, merge, and clean-main synchronization remain
+open. Later decisions remain scoped to their own sequential pull
+requests and cannot broaden these support claims.

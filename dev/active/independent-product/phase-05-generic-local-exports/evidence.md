@@ -1,7 +1,7 @@
 # Phase 5 Evidence
 
-**Status:** In progress — items 5.1–5.4 merged; item 5.5 locally admitted,
-pull-request publication and merge pending
+**Status:** In progress — items 5.1–5.5 merged; item 5.6 implemented and locally
+admitted, with publication and merge pending
 
 **Opened:** 2026-08-21
 
@@ -25,6 +25,7 @@ container.
 | Item 5.3 merged as PR #55 at `c6d7fc13a09a` before item 5.4 began | `source-verified` | Git commit and Phase 5 progress record |
 | ADR-0006 defines `deterministic-export-pack-zip-v1` as a receipt-anchored post-export wrapper while preserving ADR-0005 and the three export selectors | `source-verified` | ADR-0006 and deterministic archive contract |
 | Item 5.4 merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8` before item 5.5 began | `source-verified` | Git commit and Phase 5 progress record |
+| Item 5.5 merged as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1` before item 5.6 began | `source-verified` | Git commit and Phase 5 progress record |
 
 ## Required item 5.1 evidence
 
@@ -147,6 +148,31 @@ container.
       a production importer, replayer, public surface, persisted schema,
       taxonomy entry, or support claim.
 
+## Required item 5.6 evidence
+
+- [x] Strict response-v2 and `veriformis.export-dry-run-preview/v1` contract
+      tests pin exact fields, literals, ordering, and bounded canonical bytes.
+- [x] Every current container and row schema produces ordinal-zero samples for
+      each non-empty partition in train-then-evaluation order, with exact
+      decoded payload values and canonical digest/byte-size metadata.
+- [x] Empty evaluation yields no evaluation sample; payloads over 65,536 bytes
+      and payloads excluded by the response budget are omitted whole with the
+      exact closed reason and are never truncated or rewritten.
+- [x] The sorted root-relative destination tree equals plan-derived parent
+      directories and planned files plus `export-receipt.json`; no absolute,
+      staging, temporary, or undeclared path appears.
+- [x] Preview uses the same admitted source, strict `RowSet`, plan identity,
+      profile, and container options as execute, without invoking a renderer or
+      accessing, creating, publishing, or mutating a destination.
+- [x] Python, CLI, MCP, and CLI-backed Mac dry-run responses are canonically
+      identical; non-dry-run response-v1 behavior remains unchanged.
+- [x] Dedicated, integrated, full, standalone release, parity, Mac, tracking,
+      lock, lint, structured-file, diff, and independent-review gates pass with
+      exact observed results recorded before item 5.6 is locally admitted.
+- [x] Active documentation and evidence records agree that no persisted model,
+      request/discovery schema, selector, taxonomy entry, support state,
+      renderer, consumer profile, or trainer claim changed.
+
 ## Observed results
 
 The opening record above remains historical. The following results were
@@ -248,9 +274,10 @@ the unchanged three-renderer discovery boundary.
 
 ### Item 5.5 local admission — 2026-08-22
 
-Item 5.5 is locally admitted as a frozen, discovery-closed conformance fixture.
-The following results are local observations, not GitHub results; pull-request
-publication and merge remain pending.
+Item 5.5 was locally admitted as a frozen, discovery-closed conformance fixture
+and subsequently merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. The following results remain local
+observations, not GitHub results.
 
 | Evidence | Result | Grade | Limitation |
 | --- | --- | --- | --- |
@@ -270,5 +297,36 @@ sole constrained-CSV/`messages` refusal. Each positive case writes ordinary
 files, reloads separate ordered train/evaluation payloads and complete aligned
 provenance, and reconstructs the exact source `RowSet` identity. The fixture
 includes comma, quote, tab, NUL, CR/LF/CRLF, formula-looking, NFC/NFD, and
-non-BMP strings. One semantic tamper per container fails. Items 5.6–5.7 and the
-phase-wide preview and operator-guidance proof remain open.
+non-BMP strings. One semantic tamper per container fails. At that historical
+5.5 checkpoint, items 5.6–5.7 remained open; item 5.6 is locally admitted in
+the section below, while item 5.7 operator guidance remains open.
+
+### Item 5.6 local admission — 2026-08-22
+
+The runtime preview implementation and its required evidence passed locally on
+the item 5.6 working tree based on
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. These observations are local; no
+GitHub, publication, merge, or clean-main synchronization result is claimed.
+
+| Evidence | Result | Grade | Limitation |
+| --- | --- | --- | --- |
+| Preview/API/adapter focus | 60 passed | `recorded-local` | Runtime transport proof, not persisted export evidence |
+| Export/taxonomy/verified-contract/tracking integration | 480 passed | `recorded-local` | Covers the current catalog and contract boundary |
+| Full Python | 1,238 passed; one intentional durability-warning regression warning | `recorded-local` | Local Python run; no GitHub matrix result is claimed |
+| Standalone release | 1,226 passed, 1 deselected; lock, clean wheel, and both golden flows passed | `recorded-local` | Optional Aptus integration remains separate |
+| CLI/workbench parity | PASS | `recorded-local` | No new Mac UI operation exists |
+| macOS XCTest | 66 passed; `TEST SUCCEEDED` | `recorded-local` | Local unsigned Debug test build |
+| Governance and structure | Tracking, lock, Ruff, fixture/evidence JSON validity, and diff checks passed | `recorded-local` | Reconciled after executable gates |
+| Independent review | Code, documentation, boundary, and adversarial test audits found no remaining blocker | `recorded-local` | Review is local, not a GitHub review claim |
+
+The positive matrix executes and strictly reloads all 11 compatible current
+container/schema pairs, comparing each preview payload, canonical byte size,
+and SHA-256 to ordinal zero of the published partition. Exact payloads through
+65,536 bytes remain complete; over-limit, evaluation-first response-budget,
+train-second response-budget, and metadata-only refusal paths are pinned.
+Retained plan-bound evidence makes forged omission labels fail closed. Empty
+evaluation, exact Unicode/control transport, normalized destination trees,
+one source snapshot, no renderer or destination access, non-dry-run response-v1
+compatibility, and strict CLI-backed Mac v2 decoding all pass. The ten persisted
+verified-export models, requests, discovery, production catalog, taxonomy, and
+support state remain unchanged. Item 5.7 has not begun.

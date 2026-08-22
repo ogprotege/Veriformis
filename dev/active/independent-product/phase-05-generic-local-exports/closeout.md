@@ -6,22 +6,21 @@
 
 ## Judgment
 
-Phase 5 is in progress. Items 5.1–5.4 are merged; item 5.4 merged as PR #56 at
-`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Item 5.5's test-only semantic
-round-trip matrix is locally admitted after its required evidence and
-independent review passed; pull-request publication, GitHub evidence, and
-merge remain pending. Items 5.6–5.7 also remain open, so Phase 5 is not
-complete.
+Phase 5 is in progress. Items 5.1–5.5 are merged; item 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Item 5.6's runtime preview is
+implemented and locally admitted, but publication, GitHub evidence, merge, and
+clean-main synchronization remain pending. Item 5.7 also remains open, so
+Phase 5 is not complete.
 
 ## Required before completion
 
 - [ ] Items 5.1–5.7 are complete or explicitly deferred by an accepted
       roadmap-permitted decision.
-- [ ] Every compatible schema/container pairing round-trips to identical rows
+- [x] Every compatible schema/container pairing round-trips to identical rows
       and logical partitions.
-- [ ] Tamper detection passes and nested CSV fails before publication with an
+- [x] Tamper detection passes and nested CSV fails before publication with an
       actionable alternative.
-- [ ] Focused, full, release, tracking, parity, Mac, lint, and diff gates pass
+- [x] Focused, full, release, tracking, parity, Mac, lint, and diff gates pass
       and are recorded in `evidence.md`.
 - [ ] Program, WIP, current status, support registry, evidence index,
       documentation, and this packet agree.
@@ -38,11 +37,14 @@ complete.
   published directory. It is not a fourth renderer, trainer format,
   source-bound export verification, persisted receipt change, MCP operation,
   or Mac UI action.
-- Item 5.5 is a locally admitted, discovery-closed fixture proving all 11
+- Item 5.5 is a merged, discovery-closed fixture proving all 11
   compatible current container/schema pairs, actionable nested-CSV refusal,
-  and semantic tampering. It is not a production importer or replayer; its
-  publication and merge remain open.
-- Previews and final guidance remain later Phase 5 work.
+  and semantic tampering. It is not a production importer or replayer.
+- Item 5.6 previews are runtime-only bounded response evidence: exact
+  ordinal-zero partition samples and one normalized plan-derived tree, with
+  whole-row omission rather than truncation. Its implementation and local
+  admission evidence passed; publication and merge remain open. Final guidance
+  remains item 5.7 work.
 - Generic output is not evidence of Aptus, MLX-LM, TRL, or any other trainer
   compatibility.
 - Phase 5 does not add construction, curation, balancing, splitting, public

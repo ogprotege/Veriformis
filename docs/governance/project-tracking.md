@@ -4,9 +4,9 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
 
-**Next review:** Independent-product Phase 5.5 merge or Phase 5.6, Phase 6
+**Next review:** Independent-product Phase 5.6 publication or merge, Phase 6
 start, or any program-state, evidence-grade, or
 completion-rule change
 

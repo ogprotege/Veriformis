@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
 
 **Next review:** Any architecture or data-flow change
 
@@ -258,6 +258,16 @@ pairs and compares exact train/evaluation payloads, provenance, and `RowSet`
 identity. Canonical semantic tamper fails for every container, and nested
 `messages` still stops at the constrained-CSV selection boundary before
 publication.
+
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 adds a read-only branch
+after source admission and plan derivation: the strict source `RowSet` supplies
+ordinal-zero payloads, while the plan supplies normalized directories and
+files plus the known receipt path. Exact payload JSON becomes digest/size
+metadata and either one whole object or a closed omission reason. ASCII-safe
+response encoding changes wire escapes only. No data flows through a renderer,
+destination, staging tree, receipt writer, or workspace commit.
+
 The export boundary changes neither the canonical six-file
 bundle nor the nine-stage workspace graph. Phase 4.9 supplied consolidated
 adversarial foundation proof; each Phase 5 container requires separate
