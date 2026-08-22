@@ -23,6 +23,7 @@ from veriformis.errors import (
 )
 from veriformis.exports._json import canonical_export_object_from_bytes
 from veriformis.exports._publication import (
+    CancellationCheck,
     ExportPartialPublicationError,
     ExportPublicationOutcome,
     _MAX_EXPORT_TREE_DEPTH,
@@ -100,7 +101,11 @@ def _bounded_message(message: str) -> str:
 
 
 def _bounded_error_message(exc: BaseException) -> str:
-    return _bounded_message(str(exc))
+    try:
+        message = str(exc)
+    except Exception:
+        message = f"{type(exc).__name__}: message unavailable"
+    return _bounded_message(message)
 
 
 class _ExportSurfaceRequest(BaseModel):
@@ -414,6 +419,18 @@ class ExportOperationCancelled(Exception):
     """A cooperative surface cancellation observed before publication."""
 
 
+_EXPORT_SURFACE_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    ExportPartialPublicationError,
+    ExportOperationCancelled,
+    VeriformisError,
+    OSError,
+    RecursionError,
+    UnicodeError,
+    ValueError,
+    TypeError,
+)
+
+
 def _file_plan_summary(plan: ExportPlan) -> list[dict[str, Any]]:
     return [
         {
@@ -431,41 +448,68 @@ def _file_plan_summary(plan: ExportPlan) -> list[dict[str, Any]]:
     ]
 
 
-def export_plan_summary(plan: ExportPlan) -> dict[str, Any]:
-    checked = ExportPlan.from_json_bytes(plan.canonical_bytes())
-    projection = checked.membership_projection
+def _canonical_model_sha256(model: BaseModel) -> str:
+    """Hash one already-validated model without invoking its strict loader."""
+    return sha256_digest(lossless_json_bytes(model.model_dump(mode="json")))
+
+
+def _export_plan_summary_from_validated(plan: ExportPlan) -> dict[str, Any]:
+    """Project one validated plan into the bounded transport summary."""
+    projection = plan.membership_projection
     return {
-        "canonical_sha256": sha256_digest(checked.canonical_bytes()),
+        "canonical_sha256": _canonical_model_sha256(plan),
         "consumer_profile_id": (
-            checked.consumer_profile.consumer_profile_id
-            if checked.consumer_profile is not None
+            plan.consumer_profile.consumer_profile_id
+            if plan.consumer_profile is not None
             else None
         ),
-        "container_profile_id": checked.container_profile.container_profile_id,
+        "container_profile_id": plan.container_profile.container_profile_id,
         "evaluation_record_count": projection.evaluation_record_count,
-        "export_plan_id": checked.export_plan_id,
-        "files": _file_plan_summary(checked),
+        "export_plan_id": plan.export_plan_id,
+        "files": _file_plan_summary(plan),
         "membership_projection_id": projection.membership_projection_id,
-        "overwrite_policy": checked.overwrite_policy,
-        "row_schema": checked.row_schema,
-        "row_set_id": checked.row_set_id,
-        "source_bundle_id": checked.source_bundle_id,
-        "source_manifest_sha256": checked.source_manifest_sha256,
-        "source_trust_grade": checked.source_trust_grade,
-        "source_trust_policy": checked.source_trust_policy,
+        "overwrite_policy": plan.overwrite_policy,
+        "row_schema": plan.row_schema,
+        "row_set_id": plan.row_set_id,
+        "source_bundle_id": plan.source_bundle_id,
+        "source_manifest_sha256": plan.source_manifest_sha256,
+        "source_trust_grade": plan.source_trust_grade,
+        "source_trust_policy": plan.source_trust_policy,
         "total_record_count": projection.total_record_count,
         "train_record_count": projection.train_record_count,
     }
 
 
+def export_plan_summary(plan: ExportPlan) -> dict[str, Any]:
+    checked = ExportPlan.from_json_bytes(plan.canonical_bytes())
+    return _export_plan_summary_from_validated(checked)
+
+
+def _export_receipt_summary_from_validated(
+    receipt: ExportReceipt,
+) -> dict[str, Any]:
+    """Project one validated receipt without a second strict reload."""
+    return {
+        "canonical_sha256": _canonical_model_sha256(receipt),
+        "export_plan_id": receipt.export_plan_id,
+        "export_receipt_id": receipt.export_receipt_id,
+        "files": [item.model_dump(mode="json") for item in receipt.files],
+        "output_content_root_sha256": receipt.output_content_root_sha256,
+    }
+
+
 def export_receipt_summary(receipt: ExportReceipt) -> dict[str, Any]:
     checked = ExportReceipt.from_json_bytes(receipt.canonical_bytes())
+    return _export_receipt_summary_from_validated(checked)
+
+
+def _export_verification_summary_from_validated(
+    verification: ExportVerification,
+) -> dict[str, Any]:
+    """Project one validated verification without a second strict reload."""
     return {
-        "canonical_sha256": sha256_digest(checked.canonical_bytes()),
-        "export_plan_id": checked.export_plan_id,
-        "export_receipt_id": checked.export_receipt_id,
-        "files": [item.model_dump(mode="json") for item in checked.files],
-        "output_content_root_sha256": checked.output_content_root_sha256,
+        **verification.model_dump(mode="json"),
+        "canonical_sha256": _canonical_model_sha256(verification),
     }
 
 
@@ -473,10 +517,7 @@ def export_verification_summary(
     verification: ExportVerification,
 ) -> dict[str, Any]:
     checked = ExportVerification.from_json_bytes(verification.canonical_bytes())
-    return {
-        **checked.model_dump(mode="json"),
-        "canonical_sha256": sha256_digest(checked.canonical_bytes()),
-    }
+    return _export_verification_summary_from_validated(checked)
 
 
 def export_discovery_response(discovery: ExportDiscovery) -> dict[str, Any]:
@@ -504,18 +545,45 @@ def export_execution_response(
 ) -> dict[str, Any]:
     return _response(
         "execute",
-        result={
-            "destination_root": str(publication.destination_root),
-            "durability_warning": (
-                _bounded_message(publication.durability_warning)
-                if publication.durability_warning is not None
-                else None
-            ),
-            "plan": export_plan_summary(publication.receipt.export_plan),
-            "receipt": export_receipt_summary(publication.receipt),
-            "verification": export_verification_summary(publication.verification),
-        },
+        result=_export_execution_result(publication, revalidate=True),
     )
+
+
+def _export_execution_result(
+    publication: ExportPublicationOutcome,
+    *,
+    revalidate: bool,
+) -> dict[str, Any]:
+    """Build one execution result, optionally reloading persisted evidence."""
+    if revalidate:
+        plan_summary = export_plan_summary(publication.receipt.export_plan)
+        receipt_summary = export_receipt_summary(publication.receipt)
+        verification_summary = export_verification_summary(publication.verification)
+    else:
+        # A partial-publication exception is raised only after publication has
+        # created these frozen, validated evidence models. Avoid strict reloads
+        # while reporting that exception: reporting must not mask the visible
+        # destination if a loader itself is the failing dependency.
+        plan_summary = _export_plan_summary_from_validated(
+            publication.receipt.export_plan
+        )
+        receipt_summary = _export_receipt_summary_from_validated(
+            publication.receipt
+        )
+        verification_summary = _export_verification_summary_from_validated(
+            publication.verification
+        )
+    return {
+        "destination_root": str(publication.destination_root),
+        "durability_warning": (
+            _bounded_message(publication.durability_warning)
+            if publication.durability_warning is not None
+            else None
+        ),
+        "plan": plan_summary,
+        "receipt": receipt_summary,
+        "verification": verification_summary,
+    }
 
 
 def export_verify_response(verified: ExportVerifiedOutcome) -> dict[str, Any]:
@@ -536,7 +604,10 @@ def export_error_response(
 ) -> dict[str, Any]:
     if isinstance(exc, ExportPartialPublicationError):
         publication = exc.publication
-        response = export_execution_response(publication)
+        response = _response(
+            "execute",
+            result=_export_execution_result(publication, revalidate=False),
+        )
         response["status"] = "visible_partial"
         response["error"] = {
             "code": "export-partial-publication",
@@ -580,6 +651,11 @@ def _validate_executable_plan_response_budget(plan: ExportPlan) -> None:
             "export plan exceeds the executable surface response budget"
         )
     exact = plan.container_profile.determinism_claim == "portable_exact_bytes"
+    if exact and any(
+        item.expected_sha256 is None or item.expected_byte_size is None
+        for item in plan.file_plans
+    ):
+        raise ExportContractError("exact export plan lacks complete byte evidence")
     files = tuple(
         ExportDestinationFileBinding.create(
             file_plan_id=item.file_plan_id,
@@ -600,8 +676,6 @@ def _validate_executable_plan_response_budget(plan: ExportPlan) -> None:
         )
         for item in plan.file_plans
     )
-    if any(item.sha256 is None or item.byte_size is None for item in files):
-        raise ExportContractError("exact export plan lacks complete byte evidence")
     receipt = ExportReceipt.create(export_plan=plan, files=files)
     synthetic = ExportPublicationOutcome(
         destination_root=Path("/" + "\x01" * (_MAX_RUNTIME_PATH_BYTES - 1)),
@@ -634,6 +708,7 @@ def _response(
 
 
 __all__ = [
+    "CancellationCheck",
     "EXPORT_DISCOVERY_SCHEMA",
     "EXPORT_SURFACE_REQUEST_SCHEMA",
     "EXPORT_SURFACE_RESPONSE_SCHEMA",

@@ -89,6 +89,7 @@ from veriformis.errors import (
     UnsupportedWorkspaceVersionError,
 )
 from veriformis.exports import (
+    CancellationCheck,
     DEFAULT_EXPORT_SERVICE,
     ExportDiscovery,
     ExportDryRunRequest,
@@ -101,7 +102,6 @@ from veriformis.exports import (
     ExportVerifiedOutcome,
     ExportVerifyRequest,
 )
-from veriformis.exports._publication import CancellationCheck
 from veriformis.diagnostics import (
     parse_report_from_dict,
     parse_report_to_dict,

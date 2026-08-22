@@ -19,7 +19,7 @@ from veriformis.errors import VeriformisError
 from veriformis.evidence import EvidenceError
 from veriformis.exports.api import (
     ExportOperationCancelled,
-    ExportPartialPublicationError,
+    _EXPORT_SURFACE_EXCEPTIONS,
     export_discovery_response,
     export_dry_run_response,
     export_error_response,
@@ -105,18 +105,6 @@ def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], 
     ) as exc:
         _echo_error(exc, status=status)
     _emit_outcome(outcome)
-
-
-_EXPORT_SURFACE_EXCEPTIONS = (
-    ExportPartialPublicationError,
-    ExportOperationCancelled,
-    VeriformisError,
-    OSError,
-    RecursionError,
-    UnicodeError,
-    ValueError,
-    TypeError,
-)
 
 
 class _ExportCancellationToken:

@@ -1246,8 +1246,13 @@ private func validateExportSelection(
 }
 
 private func validateExportRuntimePath(_ value: String, label: String) throws {
-    guard !value.isEmpty, !value.contains("\0") else {
-        throw ExportSurfaceModelError.invalidValue("\(label) must be a non-empty exact path string.")
+    guard !value.isEmpty,
+          !value.contains("\0"),
+          value.utf8.count <= 32 * 1024
+    else {
+        throw ExportSurfaceModelError.invalidValue(
+            "\(label) must be a non-empty exact path string of at most 32 KiB UTF-8."
+        )
     }
 }
 

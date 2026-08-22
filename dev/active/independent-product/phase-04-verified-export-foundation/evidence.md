@@ -287,9 +287,10 @@ exit evidence; Phase 4.8 surfaces and Phase 4.9 closeout remain separate.
 - `PipelineService`, CLI, MCP, and the CLI-backed Mac bridge use the same three
   strict canonical surface schemas. Frozen cross-surface evidence proves the
   same plan, receipt, verification, and file digests.
-- Python publicly exports the frozen publication outcome and visible-partial
-  exception so callers can handle both honest runtime results without importing
-  an underscore module; render, replay, and filesystem hooks remain private.
+- Python publicly exports the cancellation callback type, frozen publication
+  outcome, and visible-partial exception so callers can type honest runtime
+  behavior without importing an underscore module; render, replay, and
+  filesystem hooks remain private.
 - Requests cannot supply a plan, profile, dependency graph, file plan,
   membership projection, renderer, semantic replayer, registry entry, force,
   or replacement control. Overwrite policy is exactly `refuse`.
@@ -300,26 +301,32 @@ exit evidence; Phase 4.8 surfaces and Phase 4.9 closeout remain separate.
 - Cancellation preserves a complete successful or visible-partial response;
   forced termination without a complete response is reported as ambiguous,
   never as a proven rollback.
+- Pull-request review additionally verified failure-safe visible-partial
+  reporting without strict evidence reloads, cooperative cancellation around
+  source admission and planning, serialized large-receipt inspection memory,
+  shared root anchoring, public MCP test dispatch, raw-byte taxonomy decoding,
+  and the Mac-side 32 KiB UTF-8 path bound.
 
 Observed results:
 
-- Focused API and adapter suite: 27 passed.
-- Complete export suite: 185 passed.
-- Combined export and verified-export contract suite: 190 passed.
-- Full Python suite: 954 passed with the expected exercised transport
+- Focused API and adapter suite: 29 passed.
+- Complete export suite: 187 passed.
+- Combined export and verified-export contract suite: 192 passed.
+- Full Python suite: 956 passed with the expected exercised transport
   durability-warning regression warning.
-- Standalone release gate: 942 passed, 1 deselected, with the same expected
+- Standalone release gate: 944 passed, 1 deselected, with the same expected
   warning; clean-wheel installation, both objective goldens, external-digest
   verification, and deterministic transports passed.
-- macOS XCTest: 52 passed.
+- macOS XCTest: 54 passed.
 - CLI/workbench parity and project tracking passed.
 - Ruff, lock integrity, 15 JSON files, 10 shell files, 373 changed-document
   local links, and `git diff --check` passed.
-- Independent adversarial review found and verified corrections for invalid-
-  Unicode error serialization and recursion failure on deeply nested trees.
-  Iterative descriptor traversal, bounded depth, canonical adapter failures,
-  pre-render depth admission, and regression tests leave no known Phase 4.8
-  blocker.
+- Independent and pull-request adversarial review found and verified
+  corrections for invalid-Unicode error serialization, recursive deep-tree
+  failure, unbounded concurrent receipt parsing, delayed cancellation, lossy
+  taxonomy decoding, and failure-prone visible-partial reporting. Iterative
+  descriptor traversal, bounded memory and depth, canonical adapter failures,
+  pre-render admission, and regression tests leave no known Phase 4.8 blocker.
 
 This evidence does not ship or advertise a renderer, semantic replayer,
 generic export container, or consumer profile and changes none of the ten

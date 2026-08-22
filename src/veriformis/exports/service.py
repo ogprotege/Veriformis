@@ -217,9 +217,15 @@ class ExportService:
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportPublicationOutcome:
         """Re-derive, anchor, render twice, and atomically publish one profile."""
+        if cancellation_check is not None and not callable(cancellation_check):
+            raise ExportContractError("cancellation_check must be callable")
         checked = ExportExecuteRequest.from_json_bytes(request.canonical_bytes())
         implementation = self._resolve_implementation(checked)
-        plan = self._plan_registered_export(checked, implementation)
+        plan = self._plan_registered_export(
+            checked,
+            implementation,
+            cancellation_check=cancellation_check,
+        )
         if plan.export_plan_id != checked.expected_export_plan_id:
             raise ExportVerificationError(
                 "execution plan differs from the operator-confirmed dry run"
@@ -240,9 +246,15 @@ class ExportService:
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportVerifiedOutcome:
         """Re-derive the expected plan from source, then verify visible bytes."""
+        if cancellation_check is not None and not callable(cancellation_check):
+            raise ExportContractError("cancellation_check must be callable")
         checked = ExportVerifyRequest.from_json_bytes(request.canonical_bytes())
         implementation = self._resolve_implementation(checked)
-        plan = self._plan_registered_export(checked, implementation)
+        plan = self._plan_registered_export(
+            checked,
+            implementation,
+            cancellation_check=cancellation_check,
+        )
         if plan.export_plan_id != checked.expected_export_plan_id:
             raise ExportVerificationError(
                 "verification plan differs from the operator-confirmed dry run"
@@ -298,12 +310,16 @@ class ExportService:
         self,
         request: ExportDryRunRequest | ExportExecuteRequest | ExportVerifyRequest,
         implementation: _ExportImplementation,
+        *,
+        cancellation_check: CancellationCheck | None = None,
     ) -> ExportPlan:
+        _run_cancellation_check(cancellation_check)
         source = self.verified_source(
             request.bundle,
             source_trust_policy=request.source_trust_policy,
             expected_manifest_sha256=request.expected_manifest_sha256,
         )
+        _run_cancellation_check(cancellation_check)
         descriptor = implementation.descriptor
         try:
             source_row_set = _source_plan_evidence(source)[1]
@@ -330,6 +346,7 @@ class ExportService:
                     "requested overwrite policy differs from the export contract"
                 )
             _validate_executable_plan_response_budget(plan)
+            _run_cancellation_check(cancellation_check)
             return plan
         except (ExportContractError, ExportVerificationError):
             raise
@@ -592,6 +609,7 @@ class ExportService:
             source_trust_policy=checked_plan.source_trust_policy,
             expected_manifest_sha256=expected_manifest_sha256,
         )
+        _run_cancellation_check(cancellation_check)
         rebuilt_plan, source_row_set = _plan_from_verified_source(
             source,
             source_trust_policy=checked_plan.source_trust_policy,
@@ -600,6 +618,7 @@ class ExportService:
             dependencies=checked_plan.dependencies,
             file_plans=checked_plan.file_plans,
         )
+        _run_cancellation_check(cancellation_check)
         if (
             rebuilt_plan != checked_plan
             or rebuilt_plan.canonical_bytes() != checked_plan.canonical_bytes()
@@ -785,6 +804,7 @@ class _ImplementationBoundExportService(ExportService):
         owner: ExportService,
         implementation: _ExportImplementation,
     ) -> None:
+        super().__init__(_implementations=(implementation,))
         self._owner = owner
         self._implementation = implementation
 

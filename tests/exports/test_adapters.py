@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import threading
 
 import pytest
+from mcp.types import CallToolResult, TextContent
 from typer.testing import CliRunner
 
 import veriformis.cli as cli_module
@@ -39,16 +41,34 @@ from test_api import (
 )
 
 
-def _tool_map(server):
-    manager = server._tool_manager
-    return {tool.name: tool.fn for tool in manager.list_tools()}
+async def _call_tool_async(server, name: str, arguments: dict[str, str]) -> str:
+    result = await server.call_tool(name, arguments)
+    assert isinstance(result, CallToolResult)
+    assert result.is_error is False
+    assert len(result.content) == 1
+    content = result.content[0]
+    assert isinstance(content, TextContent)
+    return content.text
 
 
-def _call(fn, *args, **kwargs):
-    result = fn(*args, **kwargs)
-    if hasattr(result, "__await__"):
-        result = asyncio.run(result)
-    return result
+def _call_tool(server, name: str, arguments: dict[str, str]) -> str:
+    return asyncio.run(_call_tool_async(server, name, arguments))
+
+
+def _tool_names(server) -> set[str]:
+    async def list_names() -> set[str]:
+        return {tool.name for tool in await server.list_tools()}
+
+    return asyncio.run(list_names())
+
+
+async def _wait_for_thread_event(
+    event: threading.Event,
+    *,
+    timeout: float = 1.0,
+) -> None:
+    if not await asyncio.to_thread(event.wait, timeout):
+        pytest.fail(f"thread event was not set within {timeout} seconds")
 
 
 class _DiscoveryOnlyPipeline:
@@ -170,7 +190,11 @@ def test_cli_and_mcp_export_discovery_have_exact_canonical_parity(monkeypatch):
     )
 
     cli_result = CliRunner().invoke(app, ["export", "discover"])
-    mcp_result = _call(_tool_map(create_mcp_server(service))["export_discover"])
+    mcp_result = _call_tool(
+        create_mcp_server(service),
+        "export_discover",
+        {},
+    )
 
     assert cli_result.exit_code == 0, cli_result.output
     assert cli_result.stdout == f"{expected}\n"
@@ -193,9 +217,10 @@ def test_cli_and_mcp_reject_the_same_strict_malformed_request(monkeypatch):
         app,
         ["export", "dry-run", "--request-json", request_json],
     )
-    mcp_result = _call(
-        _tool_map(create_mcp_server(service))["export_dry_run"],
-        request_json,
+    mcp_result = _call_tool(
+        create_mcp_server(service),
+        "export_dry_run",
+        {"request_json": request_json},
     )
 
     assert cli_result.exit_code == 2
@@ -224,7 +249,11 @@ def test_cli_and_mcp_fail_closed_with_the_same_oversized_response(monkeypatch):
     monkeypatch.setattr(mcp_module, "export_discovery_response", oversized_response)
 
     cli_result = CliRunner().invoke(app, ["export", "discover"])
-    mcp_result = _call(_tool_map(create_mcp_server(service))["export_discover"])
+    mcp_result = _call_tool(
+        create_mcp_server(service),
+        "export_discover",
+        {},
+    )
 
     assert cli_result.exit_code == 2
     assert json.loads(cli_result.stdout) == json.loads(mcp_result)
@@ -236,7 +265,11 @@ def test_cli_and_mcp_sanitize_invalid_unicode_errors_identically(monkeypatch):
     monkeypatch.setattr(cli_module, "_SERVICE", service)
 
     cli_result = CliRunner().invoke(app, ["export", "discover"])
-    mcp_result = _call(_tool_map(create_mcp_server(service))["export_discover"])
+    mcp_result = _call_tool(
+        create_mcp_server(service),
+        "export_discover",
+        {},
+    )
 
     assert cli_result.exit_code == 1
     assert json.loads(cli_result.stdout) == json.loads(mcp_result)
@@ -264,9 +297,10 @@ def test_cli_and_mcp_reject_excessive_tree_depth_without_traceback(
         app,
         ["export", "inspect", "--request-json", request_json],
     )
-    mcp_result = _call(
-        _tool_map(create_mcp_server(service))["export_inspect"],
-        request_json,
+    mcp_result = _call_tool(
+        create_mcp_server(service),
+        "export_inspect",
+        {"request_json": request_json},
     )
 
     assert cli_result.exit_code == 1
@@ -289,7 +323,7 @@ def test_export_surfaces_expose_no_force_or_replacement_control():
 
 
 def test_mcp_registers_all_five_thin_export_tools():
-    tools = set(_tool_map(create_mcp_server()))
+    tools = _tool_names(create_mcp_server())
     assert {
         "export_discover",
         "export_dry_run",
@@ -320,17 +354,36 @@ def test_mcp_blocking_export_tools_wait_for_cooperative_cleanup_before_cancel(
     operation,
 ):
     service = _CancellablePipeline(operation)
-    tool = _tool_map(create_mcp_server(service))[tool_name]
+    server = create_mcp_server(service)
 
     async def exercise() -> None:
-        task = asyncio.create_task(tool(_cancellable_request(operation)))
-        while not service.started.is_set():
-            await asyncio.sleep(0)
-        escape = asyncio.get_running_loop().call_later(1.0, service.escape.set)
-        task.cancel()
-        with pytest.raises(asyncio.CancelledError):
-            await task
-        escape.cancel()
+        task = asyncio.create_task(
+            _call_tool_async(
+                server,
+                tool_name,
+                {"request_json": _cancellable_request(operation)},
+            )
+        )
+        escape = None
+        try:
+            await _wait_for_thread_event(service.started)
+            escape = asyncio.get_running_loop().call_later(
+                1.0,
+                service.escape.set,
+            )
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+        finally:
+            if escape is not None:
+                escape.cancel()
+            if not task.done():
+                task.cancel()
+            service.escape.set()
+            try:
+                await task
+            except (asyncio.CancelledError, Exception):
+                pass
 
     asyncio.run(exercise())
 
@@ -355,23 +408,37 @@ def test_mcp_cancellation_race_preserves_visible_publication_outcome(
     destination = tmp_path / "published"
     request = _execute_request(bundle, destination, plan_outcome.plan)
     service = _PublicationRacePipeline(delegate, partial=partial)
-    tool = _tool_map(create_mcp_server(service))["export_execute"]
+    server = create_mcp_server(service)
 
     async def exercise() -> str:
         task = asyncio.create_task(
-            tool(request.canonical_bytes().decode("utf-8"))
+            _call_tool_async(
+                server,
+                "export_execute",
+                {
+                    "request_json": request.canonical_bytes().decode("utf-8"),
+                },
+            )
         )
-        while not service.visible.is_set():
+        try:
+            await _wait_for_thread_event(service.visible)
+            task.cancel()
             await asyncio.sleep(0)
-        task.cancel()
-        await asyncio.sleep(0)
-        service.release.set()
-        return await task
+            service.release.set()
+            return await task
+        finally:
+            service.release.set()
+            if not task.done():
+                task.cancel()
+            try:
+                await task
+            except (asyncio.CancelledError, Exception):
+                pass
 
     payload = json.loads(asyncio.run(exercise()))
 
     assert payload["status"] == expected_status
-    assert payload["result"]["destination_root"] == str(destination.resolve())
+    assert payload["result"]["destination_root"] == os.path.abspath(destination)
     assert destination.is_dir()
 
 
@@ -383,7 +450,7 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
     export_service, runtime = _service()
     pipeline = PipelineService(export_service=export_service)
     monkeypatch.setattr(cli_module, "_SERVICE", pipeline)
-    tools = _tool_map(create_mcp_server(pipeline))
+    server = create_mcp_server(pipeline)
 
     dry_request = _dry_run_request(bundle)
     dry_json = dry_request.canonical_bytes().decode("utf-8")
@@ -399,7 +466,9 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
     )
     assert cli_dry_result.exit_code == 0, cli_dry_result.output
     cli_dry = json.loads(cli_dry_result.stdout)
-    mcp_dry = json.loads(_call(tools["export_dry_run"], dry_json))
+    mcp_dry = json.loads(
+        _call_tool(server, "export_dry_run", {"request_json": dry_json})
+    )
     assert python_dry == cli_dry == mcp_dry
 
     destinations = {
@@ -432,9 +501,14 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
 
     mcp_execute_request = _execute_request(bundle, destinations["mcp"], plan)
     mcp_execute = json.loads(
-        _call(
-            tools["export_execute"],
-            mcp_execute_request.canonical_bytes().decode("utf-8"),
+        _call_tool(
+            server,
+            "export_execute",
+            {
+                "request_json": mcp_execute_request.canonical_bytes().decode(
+                    "utf-8"
+                ),
+            },
         )
     )
 
@@ -471,8 +545,20 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
             assert verify_result.exit_code == 0, verify_result.output
             verify_payload = json.loads(verify_result.stdout)
         else:
-            inspect_payload = json.loads(_call(tools["export_inspect"], inspect_json))
-            verify_payload = json.loads(_call(tools["export_verify"], verify_json))
+            inspect_payload = json.loads(
+                _call_tool(
+                    server,
+                    "export_inspect",
+                    {"request_json": inspect_json},
+                )
+            )
+            verify_payload = json.loads(
+                _call_tool(
+                    server,
+                    "export_verify",
+                    {"request_json": verify_json},
+                )
+            )
 
         assert inspect_payload["status"] == "ok"
         assert inspect_payload["result"]["inspection_scope"] == (
@@ -509,7 +595,7 @@ def test_injected_exact_export_has_python_cli_mcp_evidence_parity(
         for payload in (*execute_payloads, *inspect_payloads, *verify_payloads)
     }
     assert observed_destinations == {
-        str(destination.resolve()) for destination in destinations.values()
+        os.path.abspath(destination) for destination in destinations.values()
     }
     assert runtime.render_calls == 6
     assert runtime.planner_calls == 9

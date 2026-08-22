@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -408,6 +409,54 @@ def test_error_response_sanitizes_unpaired_unicode() -> None:
     assert json.loads(export_response_json(response)) == response
 
 
+def test_visible_partial_error_response_does_not_reload_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = _materialize_bundle(tmp_path)
+    service, _ = _service()
+    plan = service.dry_run_export(_dry_run_request(bundle))
+    destination = tmp_path / "published"
+    publication = service.execute_export(
+        _execute_request(bundle, destination, plan)
+    )
+
+    def reject_reload(cls, data):
+        raise ExportContractError(f"{cls.__name__} strict loader unavailable")
+
+    for model_type in (
+        type(publication.receipt.export_plan),
+        type(publication.receipt),
+        type(publication.verification),
+    ):
+        monkeypatch.setattr(
+            model_type,
+            "from_json_bytes",
+            classmethod(reject_reload),
+        )
+
+    response = api_module.export_error_response(
+        "execute",
+        api_module.ExportPartialPublicationError(
+            publication,
+            OSError("post-publication bookkeeping failed"),
+        ),
+    )
+
+    assert response["status"] == "visible_partial"
+    assert response["result"]["destination_root"] == str(
+        Path(os.path.abspath(destination))
+    )
+    assert response["result"]["plan"]["export_plan_id"] == plan.export_plan_id
+    assert response["result"]["receipt"]["export_receipt_id"] == (
+        publication.receipt.export_receipt_id
+    )
+    assert response["result"]["verification"]["export_verification_id"] == (
+        publication.verification.export_verification_id
+    )
+    assert json.loads(export_response_json(response)) == response
+
+
 def test_unknown_selector_fails_before_source_or_destination_access(
     tmp_path: Path,
 ) -> None:
@@ -491,7 +540,7 @@ def test_execute_requires_confirmed_plan_and_refuses_existing_destination(
     request = _execute_request(bundle, destination, plan)
     publication = service.execute_export(request)
 
-    assert publication.destination_root == destination.resolve()
+    assert publication.destination_root == Path(os.path.abspath(destination))
     assert publication.receipt.export_plan.canonical_bytes() == plan.canonical_bytes()
     assert publication.verification.export_plan_id == plan.export_plan_id
     assert runtime.render_calls == 2
@@ -502,6 +551,37 @@ def test_execute_requires_confirmed_plan_and_refuses_existing_destination(
 
     assert _tree_bytes(destination) == published_before
     assert not list(tmp_path.glob(".veriformis-export-*"))
+
+
+def test_execute_cancellation_after_source_admission_stops_before_planning(
+    tmp_path: Path,
+) -> None:
+    bundle = _materialize_bundle(tmp_path)
+    service, runtime = _service()
+    plan = service.dry_run_export(_dry_run_request(bundle))
+    planner_calls_before = runtime.planner_calls
+    destination = tmp_path / "cancelled"
+    checks = 0
+
+    def cancel_after_admission() -> None:
+        nonlocal checks
+        checks += 1
+        if checks == 2:
+            raise api_module.ExportOperationCancelled("cancelled after admission")
+
+    with pytest.raises(
+        api_module.ExportOperationCancelled,
+        match="cancelled after admission",
+    ):
+        service.execute_export(
+            _execute_request(bundle, destination, plan),
+            cancellation_check=cancel_after_admission,
+        )
+
+    assert checks == 2
+    assert runtime.planner_calls == planner_calls_before
+    assert runtime.render_calls == 0
+    assert not destination.exists()
 
 
 def test_inspect_is_self_described_read_only_and_never_constructs_verification(

@@ -406,6 +406,39 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testDiscoverTaxonomyRejectsInvalidUTF8WithoutLossyReplacement() async throws {
+        let root = temporaryTestDirectory("taxonomy-invalid-utf8")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let responseFile = root.appendingPathComponent("taxonomy.json")
+        var response = try taxonomyData()
+        let identifier = Data("minimal-v1".utf8)
+        let identifierRange = try XCTUnwrap(response.range(of: identifier))
+        response.replaceSubrange(identifierRange, with: [0xFF])
+        try response.write(to: responseFile)
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            cat "\(responseFile.path)"
+            printf '\\n'
+            """
+        )
+
+        do {
+            _ = try await VeriformisCLI(
+                executableURL: executable,
+                prefixArguments: []
+            ).discoverTaxonomy()
+            XCTFail("invalid UTF-8 must not become an accepted replacement character")
+        } catch {
+            guard case .invalidPayload = error as? TaxonomyDiscoveryError else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+    }
+
     func testExportDiscoveryDecodesStdoutOnlyAndIgnoresStderrNoise() async throws {
         let root = temporaryTestDirectory("export-discovery")
         defer { try? FileManager.default.removeItem(at: root) }
@@ -472,6 +505,25 @@ final class CLIBridgeTests: XCTestCase {
                 containerVersion: 1,
                 consumerID: "trainer",
                 consumerProfileVersion: nil,
+                sourceTrustPolicy: .allowSelfConsistent,
+                expectedManifestSHA256: nil
+            )
+        )
+    }
+
+    func testExportRuntimePathsEnforceUTF8ByteLimit() throws {
+        let exactLimit = String(repeating: "é", count: 16 * 1024)
+        XCTAssertEqual(exactLimit.utf8.count, 32 * 1024)
+        XCTAssertNoThrow(try ExportInspectRequest(destinationRoot: exactLimit))
+
+        let overLimit = exactLimit + "a"
+        XCTAssertEqual(overLimit.utf8.count, (32 * 1024) + 1)
+        XCTAssertThrowsError(try ExportInspectRequest(destinationRoot: overLimit))
+        XCTAssertThrowsError(
+            try ExportDryRunRequest(
+                bundle: overLimit,
+                containerID: "trainer-jsonl",
+                containerVersion: 1,
                 sourceTrustPolicy: .allowSelfConsistent,
                 expectedManifestSHA256: nil
             )
@@ -1453,7 +1505,10 @@ final class CLIBridgeTests: XCTestCase {
             withJSONObject: payload,
             options: [.sortedKeys, .withoutEscapingSlashes]
         )
-        return String(decoding: data, as: UTF8.self)
+        guard let response = String(bytes: data, encoding: .utf8) else {
+            preconditionFailure("JSONSerialization must produce UTF-8 JSON")
+        }
+        return response
     }
 
     private func exportSuccessfulExecutionResponse(
@@ -1491,7 +1546,10 @@ final class CLIBridgeTests: XCTestCase {
             withJSONObject: payload,
             options: [.sortedKeys, .withoutEscapingSlashes]
         )
-        return String(decoding: data, as: UTF8.self)
+        guard let response = String(bytes: data, encoding: .utf8) else {
+            preconditionFailure("JSONSerialization must produce UTF-8 JSON")
+        }
+        return response
     }
 
     private struct ExportSurfaceParityFixture: Decodable {

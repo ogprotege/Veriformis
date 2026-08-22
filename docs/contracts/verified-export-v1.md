@@ -18,15 +18,14 @@ verification and merged as PR #48 at
 `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 implements
 private two-render evidence for both determinism claims and descriptor-anchored
 semantic replay and merged as PR #49 at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 locally implements the
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 implements the
 strict Python, CLI, MCP, and CLI-backed Mac surface boundary over a private
 production-empty catalog. It does not implement a public renderer or replayer
 registry or a supported product export container.
 
 **Last reviewed:** 2026-08-21 (Phase 4.8 export surfaces)
 
-**Next review:** Phase 4.8 gate completion, Phase 4.9 closeout, or any
-export schema change
+**Next review:** Phase 4.9 closeout or any export schema change
 
 ## Purpose
 
@@ -750,8 +749,7 @@ Phase 4.7 was additionally implemented and merged as PR #49 at
 - explicit persisted-evidence limits: v1 verification binds the profile claim
   and one published instance, not a durable rerender transcript.
 
-Phase 4.8 additionally implements locally, with every required local gate
-passing and pull-request review pending:
+Phase 4.8 additionally implements:
 
 - a private, immutable, default-empty implementation catalog selected by exact
   container and optional consumer identifiers and versions;
@@ -784,9 +782,12 @@ and therefore retains the maximum response plus its one-byte CLI framing. MCP
 returns the same canonical response object without adding a durable evidence
 schema. An executable plan whose canonical dry-run response exceeds 256 KiB is
 refused before rendering or destination access; this reserves bounded room for
-the receipt and verification summaries of any later execute outcome. Public
-tree inspection and verification use an iterative descriptor walk and refuse a
-directory depth greater than 128 rather than entering unbounded recursion.
+the receipt and verification summaries of any later execute outcome. Plan
+admission separately refuses a planned file whose parent path contains more
+than 128 directory segments, before rendering or destination access. Public
+tree inspection and verification use an iterative descriptor walk and refuse
+an observed directory depth greater than 128 rather than entering unbounded
+recursion.
 
 Phase 4.2–4.8 do **not** implement:
 
