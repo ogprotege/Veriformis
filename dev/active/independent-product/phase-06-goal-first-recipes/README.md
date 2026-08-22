@@ -49,13 +49,14 @@ capabilities owned by `PipelineService`.
 
 Phase 6 opened on 2026-08-22 from baseline
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` (PR #59, the Phase 5 closeout).
-Items 6.1–6.4 merged sequentially as PR #60
+Items 6.1–6.5 merged sequentially as PR #60
 (`7316d94faf2d6c23b7abb6fe200f154da47d398c`), PR #61
 (`81becfa676fd9111868b8d4b62549218a644d3e2`), PR #62
 (`9cbab117e47cde6bd8850d67f0d363e03f0660ce`), and PR #63
-(`abdd630e25e83ebf346316319caec892f4d64886`), each after all 14 GitHub
-checks passed and clean-main synchronization. Item 6.5 is locally complete on
-`phase6/05-compile-preflight`, with its pull request pending: the bounded,
-runtime-only preflight evaluates one captured raw-source snapshot using the
-same parse, cleaning, chunking, construction, curation, and split semantics as
-compile and creates no workspace or destination.
+(`abdd630e25e83ebf346316319caec892f4d64886`), and PR #64
+(`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`), each after all 14 GitHub
+checks passed and clean-main synchronization. Item 6.6 is locally complete on
+`phase6/06-goal-acceptance-matrix` and awaits its pull request: its frozen,
+discovery-closed 74-cell matrix proves every eligible goal, input family, and
+representation from raw source through seal and external-digest verify with
+identical identifiers across every surface.

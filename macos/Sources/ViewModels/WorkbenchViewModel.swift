@@ -709,6 +709,12 @@ final class WorkbenchViewModel: ObservableObject {
                     preset: presetSnapshot,
                     allowEmptyEvaluation: allowEmptySnapshot,
                     splitRatioPPM: splitSnapshot,
+                    representation: preflightRequest.representation,
+                    instruction: preflightRequest.instruction,
+                    cleaningRules: preflightRequest.rules,
+                    cleaningCustom: preflightRequest.custom,
+                    chunkSize: preflightRequest.size,
+                    chunkOverlap: preflightRequest.overlap,
                     includeHandoff: handoffSnapshot
                 )
 

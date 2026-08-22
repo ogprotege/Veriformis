@@ -1,6 +1,6 @@
 # Phase 6 Evidence
 
-**Status:** Open — items 6.1–6.4 merged as PR #60 through PR #63; item 6.5
+**Status:** Open — items 6.1–6.5 merged as PR #60 through PR #64; item 6.6
 passed its local admission gates and awaits its pull request
 
 **Opened:** 2026-08-22
@@ -49,7 +49,7 @@ goal-first capability.
 - [ ] Every goal is selectable from plain language on every surface (U1).
 - [ ] The preview shows the exact supervised region for every goal and
       representation, proved equal to the serialized target (U2).
-- [ ] Identical recipe identifiers and outputs across surfaces for every
+- [x] Identical recipe identifiers and outputs across surfaces for every
       acceptance cell (U3).
 - [ ] Non-claims visible everywhere a goal is shown (U4).
 - [ ] Preflight refuses incompatible selections before cost (U5).
@@ -196,3 +196,43 @@ metadata field.
 
 These are local observations. They do not claim publication, GitHub checks,
 merge, or clean-main synchronization for the item 6.5 pull request.
+
+Item 6.5 subsequently passed all 14 GitHub checks, had no review threads, and
+merged as PR #64 at `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`; clean local
+`main` was synchronized with `origin/main` before item 6.6 began.
+
+### Item 6.6 (2026-08-22, working tree on
+`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`)
+
+| Gate | Observed |
+| --- | --- |
+| Complete Python/CLI/MCP/YAML matrix | 297 passed in 266.23 seconds |
+| Focused goal tests (`tests/goals`) | 353 passed in 22.77 seconds |
+| Full Python (`uv run pytest -q`) | 1,890 passed, 1 intentional durability warning in 418.50 seconds |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 1,878 passed, 1 deselected, 1 intentional warning in 419.06 seconds |
+| `scripts/release/check_local.sh` | PASS (clean wheel, both golden compiles, external digest, transport) |
+| `macos/scripts/parity_check.sh` | PASS with identical bundle and file-binding identities |
+| macOS XCTest target | 97 passed, 0 failures in 332.436 seconds; `TEST SUCCEEDED` |
+| `scripts/check_project_tracking.py` and its regression | PASS |
+| `uv lock --check`, Ruff, structured JSON, generator byte comparison, and `git diff --check` | PASS |
+| Independent adversarial review | No blocker or should-fix remained after the evaluation-default, adapter-preview, exact-exclusion, Unicode, external-digest, bridge-scope, and vacuous-Swift findings were corrected and re-verified |
+
+Proofs recorded by tests (usability criterion U3): catalog discovery closes
+to exactly 74 goal/input-family/representation cells. Every cell starts from
+two distinct same-family raw sources, keeps the safe preset's required
+evaluation policy, produces non-empty train and evaluation partitions, seals,
+and passes external-digest verification. The fixture pins exact `recipe_id`,
+semantic row-set digest, manifest digest, loss policy and boundary, supervised
+sample digest, and ordered per-record exclusion facts. Seven plain-text cells
+exercise real internal exact-duplicate exclusions while retaining an included
+record from each source; all other empty exclusion lists are pinned exactly.
+Python, CLI, MCP, and YAML independently compile every cell; CLI and MCP call
+their own goal-preview adapters. The Mac test materializes the frozen sources
+and runs the shipped CLI through all 74 compiles, previews, seals, and verifies.
+NFC non-ASCII text exercises Python/Swift scalar and canonicalization parity,
+including structured context evidence. DOCX, section reconstruction,
+before/after transformation, structured extraction, instruction/output, and
+messages are all sealed end to end.
+
+These are local observations. They do not claim publication, GitHub checks,
+merge, or clean-main synchronization for the item 6.6 pull request.

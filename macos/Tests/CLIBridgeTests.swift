@@ -767,6 +767,353 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath: output.path).isEmpty)
     }
 
+    // MARK: - Goal acceptance matrix (Phase 6.6)
+
+    func testGoalAcceptanceMatrixStrictlyDecodesEveryCellAndProjectsExactCompilePlan() throws {
+        let fixture = try goalAcceptanceMatrixFixture()
+        XCTAssertEqual(fixture.schemaID, "veriformis.goal-acceptance-matrix/v1")
+        XCTAssertEqual(fixture.sourceFixtures.count, 16)
+        XCTAssertEqual(fixture.cells.count, 74)
+
+        let goalData = try goalCatalogData()
+        let presetData = try recipePresetsData()
+        XCTAssertEqual(fixture.catalogSHA256, sha256Hex(goalData))
+        XCTAssertEqual(fixture.presetCatalogSHA256, sha256Hex(presetData))
+        let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalData)
+        let presets = try JSONDecoder().decode(RecipePresetCatalog.self, from: presetData)
+
+        let expectedCellIDs = goals.goals.flatMap { goal in
+            goal.eligibleInputFamilies.flatMap { family in
+                goal.compatibleRepresentations.map { representation in
+                    "\(goal.goalID)__\(family)__\(representation)"
+                }
+            }
+        }
+        XCTAssertEqual(fixture.cells.map(\.cellID), expectedCellIDs)
+        XCTAssertEqual(Set(expectedCellIDs).count, 74)
+
+        var sourcesByID: [String: GoalAcceptanceMatrixFixture.SourceFixture] = [:]
+        for sourceFixture in fixture.sourceFixtures {
+            XCTAssertNil(
+                sourcesByID.updateValue(
+                    sourceFixture,
+                    forKey: sourceFixture.sourceFixtureID
+                ),
+                "duplicate source_fixture_id \(sourceFixture.sourceFixtureID)"
+            )
+        }
+        XCTAssertEqual(sourcesByID.count, fixture.sourceFixtures.count)
+        var sourceFixtureContainsNFCNonASCII = false
+        for sourceFixture in fixture.sourceFixtures {
+            let raw = try XCTUnwrap(
+                Data(base64Encoded: sourceFixture.rawBase64),
+                "invalid raw_base64 for \(sourceFixture.sourceFixtureID)"
+            )
+            XCTAssertEqual(raw.count, sourceFixture.size, sourceFixture.sourceFixtureID)
+            XCTAssertEqual(sha256Hex(raw), sourceFixture.sha256, sourceFixture.sourceFixtureID)
+            XCTAssertFalse(sourceFixture.logicalPath.hasPrefix("/"), sourceFixture.sourceFixtureID)
+            XCTAssertFalse(
+                sourceFixture.logicalPath.split(separator: "/").contains(".."),
+                sourceFixture.sourceFixtureID
+            )
+            if let text = String(data: raw, encoding: .utf8),
+               text.unicodeScalars.contains(where: { $0.value > 0x7F }),
+               text == text.precomposedStringWithCanonicalMapping
+            {
+                sourceFixtureContainsNFCNonASCII = true
+            }
+        }
+        XCTAssertTrue(sourceFixtureContainsNFCNonASCII)
+
+        var fixtureHasExclusions = false
+        for cell in fixture.cells {
+            guard cell.sourceFixtureIDs.count == 2 else {
+                XCTFail("\(cell.cellID): expected exactly two source fixtures")
+                continue
+            }
+            let sourceFixtures = try cell.sourceFixtureIDs.map {
+                try XCTUnwrap(sourcesByID[$0], "\(cell.cellID):\($0)")
+            }
+            XCTAssertTrue(
+                sourceFixtures.allSatisfy { $0.inputFamily == cell.inputFamily },
+                cell.cellID
+            )
+            XCTAssertEqual(Set(sourceFixtures.map(\.logicalPath)).count, 2, cell.cellID)
+            XCTAssertNotEqual(sourceFixtures[0].sha256, sourceFixtures[1].sha256, cell.cellID)
+            XCTAssertTrue(cell.evaluationRequired, cell.cellID)
+            fixtureHasExclusions = fixtureHasExclusions || !cell.exclusions.isEmpty
+            XCTAssertTrue(
+                cell.exclusions.allSatisfy {
+                    $0.status == "excluded" && $0.reasonCodes == ["exact-duplicate"]
+                },
+                cell.cellID
+            )
+            let goal = try XCTUnwrap(goals.goal(withID: cell.goalID), cell.cellID)
+            XCTAssertTrue(goal.eligibleInputFamilies.contains(cell.inputFamily), cell.cellID)
+            XCTAssertTrue(
+                goal.compatibleRepresentations.contains(cell.representationID),
+                cell.cellID
+            )
+            let preset = try XCTUnwrap(presets.preset(withID: cell.presetID), cell.cellID)
+            XCTAssertEqual(preset.goalID, cell.goalID, cell.cellID)
+            XCTAssertTrue(preset.curation.evaluationRequired, cell.cellID)
+
+            let sourceRoot = URL(fileURLWithPath: "/matrix/sources", isDirectory: true)
+            let sources = sourceFixtures.map {
+                sourceRoot.appendingPathComponent($0.logicalPath)
+            }
+            let workspace = URL(fileURLWithPath: "/matrix/workspace", isDirectory: true)
+            let bundle = URL(fileURLWithPath: "/matrix/out.vfbundle", isDirectory: true)
+            let plan = VeriformisCLI.compilePlan(
+                sources: sources,
+                sourceRoot: sourceRoot,
+                workspace: workspace,
+                bundle: bundle,
+                goal: cell.goalID,
+                preset: cell.presetID,
+                allowEmptyEvaluation: false,
+                splitRatioPPM: nil,
+                representation: cell.representationID,
+                instruction: cell.instruction,
+                cleaningRules: cell.cleaningRules,
+                cleaningCustom: cell.cleaningCustom,
+                chunkSize: cell.chunkSize,
+                chunkOverlap: cell.chunkOverlap
+            )
+
+            var clean = ["clean", workspace.path]
+            if !cell.cleaningRules.isEmpty {
+                clean += ["--rules", cell.cleaningRules]
+            }
+            if !cell.cleaningCustom.isEmpty {
+                clean += ["--custom", cell.cleaningCustom]
+            }
+            var chunk = ["chunk", workspace.path, "--preset", cell.presetID]
+            if let chunkSize = cell.chunkSize {
+                chunk += ["--size", String(chunkSize)]
+            }
+            if let chunkOverlap = cell.chunkOverlap {
+                chunk += ["--overlap", String(chunkOverlap)]
+            }
+            var construct = ["construct", workspace.path, "--goal", cell.goalID]
+            if cell.chunkSize == nil, cell.chunkOverlap == nil {
+                construct += ["--preset", cell.presetID]
+            }
+            construct += ["--representation", cell.representationID]
+            var curate = ["curate", workspace.path, "--preset", cell.presetID]
+            if let instruction = cell.instruction {
+                curate += ["--instruction", instruction]
+            }
+            XCTAssertEqual(
+                plan,
+                [
+                    StageCommand(
+                        stage: .parse,
+                        arguments: ["parse"] + sources.map(\.path) + [
+                            "-o", workspace.path, "--source-root", sourceRoot.path,
+                        ]
+                    ),
+                    StageCommand(stage: .clean, arguments: clean),
+                    StageCommand(stage: .chunk, arguments: chunk),
+                    StageCommand(stage: .construct, arguments: construct),
+                    StageCommand(stage: .curate, arguments: curate),
+                    StageCommand(stage: .split, arguments: ["split", workspace.path]),
+                    StageCommand(stage: .format, arguments: ["format", workspace.path]),
+                    StageCommand(stage: .validate, arguments: ["validate", workspace.path]),
+                    StageCommand(
+                        stage: .seal,
+                        arguments: ["seal", workspace.path, "-o", bundle.path]
+                    ),
+                ],
+                cell.cellID
+            )
+            XCTAssertFalse(
+                plan.flatMap(\.arguments).contains("--allow-empty-evaluation"),
+                cell.cellID
+            )
+        }
+        XCTAssertTrue(fixtureHasExclusions)
+    }
+
+    func testGoalAcceptanceMatrixEveryCellSealsAndVerifiesWithRealRepoCLI() async throws {
+        continueAfterFailure = false
+        let fixture = try goalAcceptanceMatrixFixture()
+        let sourcesByID = Dictionary(
+            fixture.sourceFixtures.map { ($0.sourceFixtureID, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
+        let repositoryRoot = testRepositoryRoot()
+        let repoCLI = repositoryRoot.appendingPathComponent(".venv/bin/veriformis")
+        XCTAssertTrue(FileManager.default.isExecutableFile(atPath: repoCLI.path))
+        let cli = try VeriformisCLI.resolve(
+            repositoryRoot: repositoryRoot,
+            environment: ["VERIFORMIS_CLI": repoCLI.path]
+        )
+        XCTAssertEqual(cli.executableURL.standardizedFileURL, repoCLI.standardizedFileURL)
+
+        let root = temporaryTestDirectory("phase6-goal-matrix-real-cli")
+        defer { try? FileManager.default.removeItem(at: root) }
+        var runtimeHasExclusions = false
+        for cell in fixture.cells {
+            guard cell.sourceFixtureIDs.count == 2 else {
+                XCTFail("\(cell.cellID): expected exactly two source fixtures")
+                continue
+            }
+            XCTAssertTrue(cell.evaluationRequired, cell.cellID)
+            let cellRoot = root.appendingPathComponent(cell.cellID, isDirectory: true)
+            let sourceRoot = cellRoot.appendingPathComponent("sources", isDirectory: true)
+            let workspace = cellRoot.appendingPathComponent("workspace", isDirectory: true)
+            let bundle = cellRoot.appendingPathComponent("out.vfbundle", isDirectory: true)
+            var sources: [URL] = []
+            for sourceFixtureID in cell.sourceFixtureIDs {
+                let sourceFixture = try XCTUnwrap(
+                    sourcesByID[sourceFixtureID],
+                    "\(cell.cellID):\(sourceFixtureID)"
+                )
+                let raw = try XCTUnwrap(
+                    Data(base64Encoded: sourceFixture.rawBase64),
+                    "\(cell.cellID):\(sourceFixtureID)"
+                )
+                XCTAssertEqual(raw.count, sourceFixture.size, cell.cellID)
+                XCTAssertEqual(sha256Hex(raw), sourceFixture.sha256, cell.cellID)
+                let source = sourceRoot.appendingPathComponent(sourceFixture.logicalPath)
+                try FileManager.default.createDirectory(
+                    at: source.deletingLastPathComponent(),
+                    withIntermediateDirectories: true
+                )
+                try raw.write(to: source)
+                sources.append(source)
+            }
+
+            let plan = VeriformisCLI.compilePlan(
+                sources: sources,
+                sourceRoot: sourceRoot,
+                workspace: workspace,
+                bundle: bundle,
+                goal: cell.goalID,
+                preset: cell.presetID,
+                allowEmptyEvaluation: false,
+                splitRatioPPM: nil,
+                representation: cell.representationID,
+                instruction: cell.instruction,
+                cleaningRules: cell.cleaningRules,
+                cleaningCustom: cell.cleaningCustom,
+                chunkSize: cell.chunkSize,
+                chunkOverlap: cell.chunkOverlap
+            )
+            for command in plan {
+                _ = try await requireSuccessfulRealCLI(
+                    cli,
+                    arguments: command.arguments,
+                    operation: "\(cell.cellID):\(command.stage.rawValue)"
+                )
+            }
+
+            for partition in ["train.jsonl", "evaluation.jsonl"] {
+                let data = try Data(
+                    contentsOf: bundle
+                        .appendingPathComponent("data", isDirectory: true)
+                        .appendingPathComponent(partition)
+                )
+                XCTAssertFalse(data.isEmpty, "\(cell.cellID):\(partition)")
+                XCTAssertFalse(
+                    data.split(separator: 0x0A, omittingEmptySubsequences: true).isEmpty,
+                    "\(cell.cellID):\(partition)"
+                )
+            }
+            let manifest = try Data(
+                contentsOf: bundle.appendingPathComponent("manifest.json")
+            )
+            XCTAssertEqual(sha256Hex(manifest), cell.manifestSHA256, cell.cellID)
+            let identity = try bundleValidationIdentity(bundle)
+            XCTAssertEqual(identity.recipeID, cell.recipeID, cell.cellID)
+            XCTAssertEqual(identity.rowSetSHA256, cell.rowSetSHA256, cell.cellID)
+
+            let preview = try await cli.previewGoal(workspace: workspace)
+            XCTAssertEqual(preview.recipeID, cell.recipeID, cell.cellID)
+            XCTAssertEqual(preview.lossPolicy, cell.lossPolicy, cell.cellID)
+            XCTAssertEqual(preview.lossBoundary, cell.lossBoundary, cell.cellID)
+            XCTAssertEqual(preview.records.count, 2, cell.cellID)
+            let contextRowKeys = preview.records.first?.contextRowKeys ?? []
+            let supervisedRowKey = preview.records.first?.supervised.rowKey ?? ""
+            XCTAssertTrue(
+                preview.records.allSatisfy {
+                    $0.contextRowKeys == contextRowKeys
+                        && $0.supervised.rowKey == supervisedRowKey
+                },
+                cell.cellID
+            )
+            XCTAssertEqual(contextRowKeys, cell.contextRowKeys, cell.cellID)
+            XCTAssertEqual(supervisedRowKey, cell.supervisedRowKey, cell.cellID)
+            let supervisedValues = try preview.records.map {
+                try XCTUnwrap($0.supervisedValue, "\(cell.cellID):\($0.recordID)")
+            }
+            if cell.goalID == "extract-a-structured-value" {
+                for record in preview.records {
+                    let context = try XCTUnwrap(
+                        record.context,
+                        "\(cell.cellID):\(record.recordID): missing structured context"
+                    )
+                    XCTAssertTrue(
+                        context.values.contains {
+                            $0.unicodeScalars.contains { $0.value > 0x7F }
+                                && $0 == $0.precomposedStringWithCanonicalMapping
+                        },
+                        "\(cell.cellID): structured context must contain NFC non-ASCII evidence"
+                    )
+                }
+            } else {
+                XCTAssertTrue(
+                    supervisedValues.allSatisfy {
+                        $0.unicodeScalars.contains { $0.value > 0x7F }
+                            && $0 == $0.precomposedStringWithCanonicalMapping
+                    },
+                    "\(cell.cellID): text supervision must exercise NFC non-ASCII scalars"
+                )
+            }
+            XCTAssertEqual(
+                try goalPreviewSupervisionSHA256(preview),
+                cell.supervisionSHA256,
+                cell.cellID
+            )
+            XCTAssertEqual(preview.omittedExclusionCount, 0, cell.cellID)
+            runtimeHasExclusions = runtimeHasExclusions || !preview.exclusions.isEmpty
+            XCTAssertTrue(
+                preview.exclusions.allSatisfy {
+                    $0.status == "excluded" && $0.reasonCodes == ["exact-duplicate"]
+                },
+                cell.cellID
+            )
+            XCTAssertEqual(
+                preview.exclusions.map {
+                    GoalAcceptanceMatrixFixture.Cell.Exclusion(
+                        recordID: $0.recordID,
+                        status: $0.status,
+                        reasonCodes: $0.reasonCodes
+                    )
+                },
+                cell.exclusions,
+                cell.cellID
+            )
+
+            let verification = try await requireSuccessfulRealCLI(
+                cli,
+                arguments: [
+                    "verify", bundle.path,
+                    "--manifest-sha256", cell.manifestSHA256,
+                ],
+                operation: "\(cell.cellID):verify"
+            )
+            XCTAssertTrue(
+                verification.combinedOutput.contains("external_digest"),
+                cell.cellID
+            )
+            try FileManager.default.removeItem(at: cellRoot)
+        }
+        XCTAssertTrue(runtimeHasExclusions)
+    }
+
     // MARK: - Recipe presets (Phase 6.4)
 
     func testRecipePresetsDecodeFrozenFixtureExactly() throws {
@@ -2630,6 +2977,81 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testCompilePlanProjectsPhase66MatrixBridgeOverridesExactly() throws {
+        let workspace = URL(fileURLWithPath: "/tmp/ws")
+        let plan = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/raw/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data/raw"),
+            workspace: workspace,
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            goal: "continue-a-passage",
+            preset: "continue-a-passage.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil,
+            representation: "instruction-and-output",
+            instruction: "Continue the supplied passage.",
+            cleaningRules: "whitespace,urls",
+            cleaningCustom: "strip_margin"
+        )
+
+        XCTAssertEqual(
+            try XCTUnwrap(plan.first { $0.stage == .clean }).arguments,
+            ["clean", workspace.path, "--rules", "whitespace,urls", "--custom", "strip_margin"]
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(plan.first { $0.stage == .construct }).arguments,
+            [
+                "construct", workspace.path,
+                "--goal", "continue-a-passage",
+                "--preset", "continue-a-passage.safe",
+                "--representation", "instruction-and-output",
+            ]
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(plan.first { $0.stage == .curate }).arguments,
+            [
+                "curate", workspace.path,
+                "--preset", "continue-a-passage.safe",
+                "--instruction", "Continue the supplied passage.",
+            ]
+        )
+    }
+
+    func testCompilePlanProjectsSegmentationOverridesWithoutReassertingPresetAtConstruct() throws {
+        let workspace = URL(fileURLWithPath: "/tmp/ws")
+        let plan = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/raw/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data/raw"),
+            workspace: workspace,
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            goal: "reproduce-a-recorded-change",
+            preset: "reproduce-a-recorded-change.safe",
+            allowEmptyEvaluation: true,
+            splitRatioPPM: nil,
+            representation: "prompt-and-completion",
+            chunkSize: 24,
+            chunkOverlap: 0
+        )
+
+        XCTAssertEqual(
+            try XCTUnwrap(plan.first { $0.stage == .chunk }).arguments,
+            [
+                "chunk", workspace.path,
+                "--preset", "reproduce-a-recorded-change.safe",
+                "--size", "24",
+                "--overlap", "0",
+            ]
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(plan.first { $0.stage == .construct }).arguments,
+            [
+                "construct", workspace.path,
+                "--goal", "reproduce-a-recorded-change",
+                "--representation", "prompt-and-completion",
+            ]
+        )
+    }
+
     func testCompilePlanStandaloneModeEmitsNoAptusFlag() {
         let workspace = URL(fileURLWithPath: "/tmp/ws")
         let bundle = URL(fileURLWithPath: "/tmp/b.vfbundle")
@@ -3504,6 +3926,406 @@ final class CLIBridgeTests: XCTestCase {
             try await Task.sleep(nanoseconds: 10_000_000)
         }
         XCTFail("timed out waiting for \(url.path)")
+    }
+
+    private struct GoalAcceptanceMatrixKey: CodingKey {
+        let stringValue: String
+        var intValue: Int? { nil }
+        init?(stringValue: String) { self.stringValue = stringValue }
+        init?(intValue: Int) { nil }
+        init(_ value: String) { stringValue = value }
+    }
+
+    private struct GoalAcceptanceMatrixFixture: Decodable {
+        static let expectedKeys: Set<String> = [
+            "schema_id", "catalog_sha256", "preset_catalog_sha256",
+            "source_fixtures", "cells",
+        ]
+
+        let schemaID: String
+        let catalogSHA256: String
+        let presetCatalogSHA256: String
+        let sourceFixtures: [SourceFixture]
+        let cells: [Cell]
+
+        struct SourceFixture: Decodable {
+            static let expectedKeys: Set<String> = [
+                "source_fixture_id", "input_family", "logical_path", "raw_base64",
+                "sha256", "size",
+            ]
+
+            let sourceFixtureID: String
+            let inputFamily: String
+            let logicalPath: String
+            let rawBase64: String
+            let sha256: String
+            let size: Int
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: GoalAcceptanceMatrixKey.self)
+                try GoalAcceptanceMatrixFixture.requireKeys(
+                    container,
+                    expected: Self.expectedKeys
+                )
+                sourceFixtureID = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("source_fixture_id")
+                )
+                inputFamily = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("input_family")
+                )
+                logicalPath = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("logical_path")
+                )
+                rawBase64 = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("raw_base64")
+                )
+                sha256 = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("sha256")
+                )
+                size = try container.decode(
+                    Int.self,
+                    forKey: GoalAcceptanceMatrixKey("size")
+                )
+            }
+        }
+
+        struct Cell: Decodable {
+            static let expectedKeys: Set<String> = [
+                "cell_id", "source_fixture_ids", "input_family", "goal_id", "preset_id",
+                "representation_id", "instruction", "cleaning_rules", "cleaning_custom",
+                "chunk_size", "chunk_overlap", "evaluation_required", "recipe_id",
+                "row_set_sha256", "manifest_sha256", "loss_policy", "loss_boundary",
+                "context_row_keys", "supervised_row_key", "supervision_sha256",
+                "exclusions",
+            ]
+
+            let cellID: String
+            let sourceFixtureIDs: [String]
+            let inputFamily: String
+            let goalID: String
+            let presetID: String
+            let representationID: String
+            let instruction: String?
+            let cleaningRules: String
+            let cleaningCustom: String
+            let chunkSize: Int?
+            let chunkOverlap: Int?
+            let evaluationRequired: Bool
+            let recipeID: String
+            let rowSetSHA256: String
+            let manifestSHA256: String
+            let lossPolicy: String
+            let lossBoundary: String
+            let contextRowKeys: [String]
+            let supervisedRowKey: String
+            let supervisionSHA256: String
+            let exclusions: [Exclusion]
+
+            struct Exclusion: Decodable, Equatable {
+                static let expectedKeys: Set<String> = [
+                    "record_id", "status", "reason_codes",
+                ]
+
+                let recordID: String
+                let status: String
+                let reasonCodes: [String]
+
+                init(recordID: String, status: String, reasonCodes: [String]) {
+                    self.recordID = recordID
+                    self.status = status
+                    self.reasonCodes = reasonCodes
+                }
+
+                init(from decoder: Decoder) throws {
+                    let container = try decoder.container(
+                        keyedBy: GoalAcceptanceMatrixKey.self
+                    )
+                    try GoalAcceptanceMatrixFixture.requireKeys(
+                        container,
+                        expected: Self.expectedKeys
+                    )
+                    recordID = try container.decode(
+                        String.self,
+                        forKey: GoalAcceptanceMatrixKey("record_id")
+                    )
+                    status = try container.decode(
+                        String.self,
+                        forKey: GoalAcceptanceMatrixKey("status")
+                    )
+                    reasonCodes = try container.decode(
+                        [String].self,
+                        forKey: GoalAcceptanceMatrixKey("reason_codes")
+                    )
+                }
+            }
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: GoalAcceptanceMatrixKey.self)
+                try GoalAcceptanceMatrixFixture.requireKeys(
+                    container,
+                    expected: Self.expectedKeys
+                )
+                cellID = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("cell_id")
+                )
+                sourceFixtureIDs = try container.decode(
+                    [String].self,
+                    forKey: GoalAcceptanceMatrixKey("source_fixture_ids")
+                )
+                inputFamily = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("input_family")
+                )
+                goalID = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("goal_id")
+                )
+                presetID = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("preset_id")
+                )
+                representationID = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("representation_id")
+                )
+                instruction = try container.decodeIfPresent(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("instruction")
+                )
+                cleaningRules = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("cleaning_rules")
+                )
+                cleaningCustom = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("cleaning_custom")
+                )
+                chunkSize = try container.decodeIfPresent(
+                    Int.self,
+                    forKey: GoalAcceptanceMatrixKey("chunk_size")
+                )
+                chunkOverlap = try container.decodeIfPresent(
+                    Int.self,
+                    forKey: GoalAcceptanceMatrixKey("chunk_overlap")
+                )
+                evaluationRequired = try container.decode(
+                    Bool.self,
+                    forKey: GoalAcceptanceMatrixKey("evaluation_required")
+                )
+                recipeID = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("recipe_id")
+                )
+                rowSetSHA256 = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("row_set_sha256")
+                )
+                manifestSHA256 = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("manifest_sha256")
+                )
+                lossPolicy = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("loss_policy")
+                )
+                lossBoundary = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("loss_boundary")
+                )
+                contextRowKeys = try container.decode(
+                    [String].self,
+                    forKey: GoalAcceptanceMatrixKey("context_row_keys")
+                )
+                supervisedRowKey = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("supervised_row_key")
+                )
+                supervisionSHA256 = try container.decode(
+                    String.self,
+                    forKey: GoalAcceptanceMatrixKey("supervision_sha256")
+                )
+                exclusions = try container.decode(
+                    [Exclusion].self,
+                    forKey: GoalAcceptanceMatrixKey("exclusions")
+                )
+            }
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: GoalAcceptanceMatrixKey.self)
+            try Self.requireKeys(container, expected: Self.expectedKeys)
+            schemaID = try container.decode(
+                String.self,
+                forKey: GoalAcceptanceMatrixKey("schema_id")
+            )
+            catalogSHA256 = try container.decode(
+                String.self,
+                forKey: GoalAcceptanceMatrixKey("catalog_sha256")
+            )
+            presetCatalogSHA256 = try container.decode(
+                String.self,
+                forKey: GoalAcceptanceMatrixKey("preset_catalog_sha256")
+            )
+            sourceFixtures = try container.decode(
+                [SourceFixture].self,
+                forKey: GoalAcceptanceMatrixKey("source_fixtures")
+            )
+            cells = try container.decode(
+                [Cell].self,
+                forKey: GoalAcceptanceMatrixKey("cells")
+            )
+        }
+
+        private static func requireKeys(
+            _ container: KeyedDecodingContainer<GoalAcceptanceMatrixKey>,
+            expected: Set<String>
+        ) throws {
+            let actual = Set(container.allKeys.map(\.stringValue))
+            guard actual == expected else {
+                throw DecodingError.dataCorrupted(
+                    DecodingError.Context(
+                        codingPath: container.codingPath,
+                        debugDescription: "goal acceptance matrix key drift: expected \(expected.sorted()), got \(actual.sorted())"
+                    )
+                )
+            }
+        }
+    }
+
+    private enum GoalAcceptanceMatrixTestError: LocalizedError {
+        case commandFailed(operation: String, exitCode: Int32, output: String)
+        case outputTruncated(operation: String)
+        case invalidBundle(String)
+        case invalidPreview(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .commandFailed(let operation, let exitCode, let output):
+                return "real CLI \(operation) failed (exit \(exitCode)): \(output)"
+            case .outputTruncated(let operation):
+                return "real CLI \(operation) output was truncated"
+            case .invalidBundle(let message):
+                return "sealed bundle is invalid: \(message)"
+            case .invalidPreview(let message):
+                return "goal preview is invalid: \(message)"
+            }
+        }
+    }
+
+    private func goalAcceptanceMatrixFixture() throws -> GoalAcceptanceMatrixFixture {
+        let fixture = testRepositoryRoot()
+            .appendingPathComponent(
+                "tests/regressions/fixtures/phase6/goal-acceptance-matrix.json"
+            )
+        return try JSONDecoder().decode(
+            GoalAcceptanceMatrixFixture.self,
+            from: Data(contentsOf: fixture)
+        )
+    }
+
+    private func testRepositoryRoot() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private func sha256Hex(_ data: Data) -> String {
+        SHA256.hash(data: data)
+            .map { String(format: "%02x", $0) }
+            .joined()
+    }
+
+    private func requireSuccessfulRealCLI(
+        _ cli: VeriformisCLI,
+        arguments: [String],
+        operation: String
+    ) async throws -> CLIProcessResult {
+        let result = try await cli.run(arguments: arguments)
+        guard !result.outputTruncated else {
+            throw GoalAcceptanceMatrixTestError.outputTruncated(operation: operation)
+        }
+        guard result.exitCode == 0 else {
+            throw GoalAcceptanceMatrixTestError.commandFailed(
+                operation: operation,
+                exitCode: result.exitCode,
+                output: result.combinedOutput
+            )
+        }
+        return result
+    }
+
+    private struct BundleValidationIdentity {
+        let recipeID: String
+        let rowSetSHA256: String
+    }
+
+    private func bundleValidationIdentity(_ bundle: URL) throws -> BundleValidationIdentity {
+        let validation = bundle.appendingPathComponent("validation.json")
+        let object = try JSONSerialization.jsonObject(with: Data(contentsOf: validation))
+        guard let root = object as? [String: Any],
+              let snapshot = root["snapshot"] as? [String: Any],
+              let recipeID = snapshot["recipe_id"] as? String,
+              !recipeID.isEmpty,
+              let bindings = snapshot["artifact_bindings"] as? [[String: Any]]
+        else {
+            throw GoalAcceptanceMatrixTestError.invalidBundle(
+                "validation snapshot identity is missing"
+            )
+        }
+        let rowSetBindings = bindings.filter { $0["role"] as? String == "row-set" }
+        guard rowSetBindings.count == 1,
+              let rowSetSHA256 = rowSetBindings[0]["sha256"] as? String,
+              !rowSetSHA256.isEmpty
+        else {
+            throw GoalAcceptanceMatrixTestError.invalidBundle(
+                "validation snapshot must contain exactly one row-set binding"
+            )
+        }
+        return BundleValidationIdentity(
+            recipeID: recipeID,
+            rowSetSHA256: rowSetSHA256
+        )
+    }
+
+    private func goalPreviewSupervisionSHA256(_ preview: GoalPreview) throws -> String {
+        var boundaries: [[String: Any]] = []
+        for record in preview.records {
+            guard let supervisedValue = record.supervisedValue else {
+                throw GoalAcceptanceMatrixTestError.invalidPreview(
+                    "record \(record.recordID) has no supervised value"
+                )
+            }
+            let scalarCount = supervisedValue.unicodeScalars.count
+            guard record.supervised.start == 0,
+                  record.supervised.end == scalarCount
+            else {
+                throw GoalAcceptanceMatrixTestError.invalidPreview(
+                    "record \(record.recordID) span does not use Unicode scalar offsets"
+                )
+            }
+            boundaries.append(
+                [
+                    "record_id": record.recordID,
+                    "context_row_keys": record.contextRowKeys,
+                    "row_key": record.supervised.rowKey,
+                    "start": record.supervised.start,
+                    "end": record.supervised.end,
+                    "target_sha256": sha256Hex(Data(supervisedValue.utf8)),
+                ]
+            )
+        }
+        let canonical = try JSONSerialization.data(
+            withJSONObject: boundaries,
+            options: [.sortedKeys, .withoutEscapingSlashes]
+        )
+        return sha256Hex(canonical)
     }
 
     private func recipePresetsFixtureURL() -> URL {

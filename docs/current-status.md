@@ -29,12 +29,15 @@ dry-run preview merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`; and Phase 5.7 publishes the
 generic-export operator guide and completes Phase 5 reconciliation without a
 runtime, taxonomy, support, consumer-profile, or trainer claim change, merged
-as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
+as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
+independent-product Phase 6.1–6.5 merged sequentially as PR #60 through PR #64,
+and item 6.6's goal acceptance matrix is locally complete pending its pull
+request
 
-**Review date:** 2026-08-22 (independent-product Phase 6 opening)
+**Review date:** 2026-08-22 (independent-product Phase 6.6 locally complete)
 
-**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
-label cut, public-ready checklist, or any contract change
+**Next review:** Phase 6.6 pull-request merge, Phase 6.7 closeout, beta label
+cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -322,9 +325,14 @@ paths: one immutable capture is replayed through the production parser,
 selected cleaning, segmentation, named construction, global curation, and
 leakage-group split entirely in memory. Python, CLI, MCP, and the Mac panel
 share the exact report, and real construction shares its goal/input-family
-gate. No workspace, renderer, or destination is created or accessed. None of
-these items adds an objective, row schema, persisted schema, trainer claim, or
-consumer profile.
+gate. No workspace, renderer, or destination is created or accessed; it merged
+as PR #64 at `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`. Phase 6.6 is
+locally complete with a frozen 74-cell raw-source-to-verified-bundle matrix:
+Python, CLI, MCP, YAML, and the real Mac CLI bridge agree on recipe, row-set,
+manifest, supervision, and exact exclusion identities through seal and
+external-digest verify; its pull request is pending. None of these items adds
+an objective, row schema, persisted schema, trainer claim, or consumer
+profile.
 
 ## Implemented interfaces
 

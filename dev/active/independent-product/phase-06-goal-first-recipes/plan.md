@@ -161,19 +161,19 @@ the repository requires. The widening is recorded in `decisions.md`.
 
 ### 6.6 Add the goal acceptance matrix
 
-- [ ] Freeze a discovery-closed fixture
+- [x] Freeze a discovery-closed fixture
       (`tests/regressions/fixtures/phase6/goal-acceptance-matrix.json`) that
       compiles every goal across every eligible input family and every
       compatible representation from raw sources through `seal` and `verify`,
       pinning `recipe_id`, row-set and manifest digests, supervised
       boundaries, and exclusion reason codes.
-- [ ] Close the coverage gaps the readiness review found:
+- [x] Close the coverage gaps the readiness review found:
       `section_reconstruction`,
       `before_after_transformation`, and `structured_field` sealed end to end;
       `instruction_output` and `messages` sealed end to end; `.docx` compiled;
       MCP parity asserting `recipe_id`; a Swift test that runs the real CLI and
       compares recipe and manifest digests.
-- [ ] Prove identical identifiers and outputs across Python, CLI, MCP, YAML,
+- [x] Prove identical identifiers and outputs across Python, CLI, MCP, YAML,
       and Mac for every matrix cell.
 
 ### 6.7 Validate truthfulness and close Phase 6

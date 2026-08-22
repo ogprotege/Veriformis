@@ -378,3 +378,62 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.5 pull request, require every GitHub check
 to pass, merge, and synchronize clean local `main` with `origin/main` before
 item 6.6 begins.
+
+## 2026-08-22 — Item 6.5 merged; item 6.6 started
+
+**Status:** Item 6.5 merged as PR #64 at
+`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d` after all 14 GitHub checks
+passed; the pull request had no review threads and clean local `main` equaled
+`origin/main` at that commit. Branch `phase6/06-goal-acceptance-matrix` was
+created from it.
+
+Item 6.6 owns the frozen discovery-closed acceptance fixture. Every catalog
+goal must compile every eligible input family and compatible representation
+from raw source through seal and external-digest verify, with `recipe_id`,
+semantic row-set digest, manifest digest, supervised boundaries, and exclusion
+codes pinned. Python, CLI, MCP, YAML, and the real Mac CLI bridge must agree for
+every cell. The matrix also closes the explicit sealed-product gaps for
+section reconstruction, recorded changes, structured values,
+instruction/output, messages, and DOCX.
+
+**Next action:** Build the deterministic raw-source matrix and frozen expected
+fixture, add every surface and real-CLI proof, then run the complete admission
+gates before publishing PR 6.6.
+
+## 2026-08-22 — Item 6.6 locally complete
+
+**Status:** Local implementation and admission gates passed; pull-request
+publication and merge pending.
+
+The canonical `veriformis.goal-acceptance-matrix/v1` fixture closes discovery
+to 74 cells over 16 deterministic raw-source descriptors. Each cell uses two
+distinct sources in one eligible family, retains the safe preset's required
+evaluation policy, produces non-empty train and evaluation partitions, and
+pins recipe, semantic row-set, manifest, supervision, and exact ordered
+exclusion identities through external-digest verification. Plain-text source
+A contains repeated and unique evidence, so seven cells prove real
+`exact-duplicate` exclusions without violating finished-dataset source
+coverage. NFC non-ASCII evidence exercises scalar handling. Python, CLI, MCP,
+YAML, and the real Mac CLI bridge agree for every cell.
+
+Observed gates on the reconciled working tree:
+
+- The complete Python/CLI/MCP/YAML matrix passed 297 tests in 266.23 seconds;
+  `tests/goals` passed 353 tests in 22.77 seconds.
+- Full Python passed 1,890 tests in 418.50 seconds with only the intentional
+  durability-warning regression warning.
+- The standalone release selection passed 1,878 tests with 1 deselected and
+  the same warning in 419.06 seconds; `check_local.sh` then passed its clean
+  wheel, both golden compiles, external-digest, and transport gates.
+- The parity script passed with identical bundle/file identities. The complete
+  macOS XCTest target passed 97 tests with no failures in 332.436 seconds.
+- Project tracking and its regression, lock, Ruff, all structured JSON,
+  byte-identical fixture regeneration, fixture SHA-256
+  `60be61c2c4bf67313f68eb527e5ba5ca1d0cb138f9beb8637a47219596cc2a86`,
+  and diff checks passed.
+- The final independent adversarial audit found no remaining implementation,
+  U3, code, fixture, Swift, or contract blocker or should-fix.
+
+**Next action:** Publish the item 6.6 pull request, require every GitHub check
+to pass, merge, and synchronize clean local `main` with `origin/main` before
+item 6.7 begins.
