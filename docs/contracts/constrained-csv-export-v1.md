@@ -14,7 +14,7 @@
 
 **Status:** Implemented and merged in independent-product Phase 5.3 (PR #55)
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 consolidated semantic round-trip)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
 
 ## Purpose and authority
 
@@ -328,6 +328,14 @@ support promotion, or trainer claim. This consolidation does not weaken the
 container-specific admission evidence required here; Phase 5.3 was promoted
 only after that evidence was recorded.
 
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 adds only the shared
+runtime preview defined by Verified Export Contract v1 for compatible flat
+schemas: ordinal-zero samples for non-empty partitions and this unchanged
+plan-derived tree plus `export-receipt.json`. Nested `messages` retains its
+actionable refusal before preview success. Preview does not invoke this
+renderer or change these bytes, paths, schemas, or support claims.
+
 ## Dependency, license, security, and resource boundary
 
 The renderer uses the Python standard-library CSV machinery only with every
@@ -345,7 +353,9 @@ memory claim.
 ## Versioning, migration, and deprecation
 
 The ten persisted `veriformis.verified-export` v1 models, request v1, response
-v1, discovery v1, Finished Dataset v1, and source bundle remain unchanged.
+v1 for non-dry-run operations, discovery v1, Finished Dataset v1, and source
+bundle remain unchanged. Dry run uses the shared runtime-only response v2 and
+preview v1; they do not change this container contract or persisted evidence.
 
 Changing the supported row schemas, field mapping or order, dialect, encoding,
 byte-order-mark policy, quoting or escape rules, record terminator, null or

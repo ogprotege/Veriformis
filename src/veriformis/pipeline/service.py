@@ -92,6 +92,7 @@ from veriformis.exports import (
     CancellationCheck,
     DEFAULT_EXPORT_SERVICE,
     ExportDiscovery,
+    ExportDryRunPreview,
     ExportDryRunRequest,
     ExportDryRunRequestV2,
     ExportExecuteRequest,
@@ -317,6 +318,7 @@ class ExportDiscoveryOutcome(StageOutcome):
 @dataclass(frozen=True)
 class ExportPlanOutcome(StageOutcome):
     plan: ExportPlan | None = None
+    preview: ExportDryRunPreview | None = None
 
 
 @dataclass(frozen=True)
@@ -1029,8 +1031,9 @@ class PipelineService:
         self,
         request: ExportDryRunRequest | ExportDryRunRequestV2,
     ) -> ExportPlanOutcome:
-        """Derive a source-anchored export plan without destination access."""
-        return ExportPlanOutcome(plan=self.export_service.dry_run_export(request))
+        """Derive a source-anchored plan and exact destination-free preview."""
+        preview = self.export_service.dry_run_export_preview(request)
+        return ExportPlanOutcome(plan=preview.plan, preview=preview)
 
     def inspect_export(
         self,

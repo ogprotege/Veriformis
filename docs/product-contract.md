@@ -10,18 +10,20 @@ release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
 plus completed independent-product Phases 0–4 and Phase 5.1–5.3's supported
 generic `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
 derivatives; Phase 5.4 receipt-anchored export-pack transport merged as PR #56,
-and Phase 5.5's test-only consolidated semantic round-trip matrix is locally
-admitted, version `0.1.0` development alpha
+Phase 5.5's test-only consolidated semantic round-trip matrix merged as PR #57
+at `c72b8e9ec7bc2746d74404226aa086d497e15db1`, and Phase 5.6 exact dry-run
+preview implementation is locally admitted pending publication/merge, version
+`0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; Phase 5.1–5.4 implemented and merged; Phase 5.5 locally
+Phases 0–4 complete; Phase 5.1–5.5 implemented and merged; Phase 5.6 locally
 admitted with publication and merge pending; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
 
-**Next review:** Phase 5.5 pull-request publication or merge; beta label cut, public-ready
+**Next review:** Phase 5.6 publication or merge; beta label cut, public-ready
 checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -174,8 +176,9 @@ complete aligned provenance stream. Additive request v2 requires a complete
 canonical `veriformis.split-jsonl-options/v1` object to change those stems or
 omit provenance. Both requests preserve exact payload rows, ordering,
 objective, curation result, split assignment, and train/evaluation membership.
-The ten persisted verified-export v1 schemas, discovery v1, response v1, and
-the existing `publish` signature remain unchanged.
+The ten persisted verified-export v1 schemas, discovery v1, and the existing
+`publish` signature remain unchanged. Response v1 remains unchanged for non-
+dry-run operations; item 5.6 adds only runtime dry-run response v2.
 
 Phase 5.2 adds canonical `json` v1 under the same boundary. Its fixed tree
 contains one membership-bearing dataset object with explicit schema,
@@ -208,14 +211,28 @@ preserves the embedded source trust grade and is not source-bound export
 verification. It adds no consumer/trainer profile, request version, MCP
 operation, or Mac UI action.
 
-Phase 5.5 is locally admitted as test-only consolidated evidence over the
-unchanged three production selectors. A frozen ordinary-file fixture reloads
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1` as test-only consolidated evidence
+over the unchanged three production selectors. A frozen ordinary-file fixture reloads
 all eleven compatible container/schema pairs to the identical ordered train and
 evaluation payloads, complete provenance, and source `RowSet`. It also proves a
 canonical semantic tamper fails for each container and preserves constrained
 CSV's actionable pre-publication refusal for nested `messages`. The fixture is
 not a product importer or public semantic replayer and changes no API, persisted
 schema, taxonomy, support state, consumer profile, or trainer claim.
+
+Phase 5.6 exposes exact bounded runtime information through the existing
+dry-run operation. Response v2 contains exactly the unchanged plan summary and
+one `veriformis.export-dry-run-preview/v1`: ordinal zero from each non-empty
+train/evaluation partition, complete exact payloads only at or below 65,536
+canonical UTF-8 JSON bytes and within the response budget, and the sorted
+plan-derived relative destination tree plus `export-receipt.json`. Omission is
+whole-row with an exact reason, never truncation or paraphrase. ASCII-safe
+transport decodes to the exact original values. Preview derivation calls no
+renderer and accesses no destination. The ten persisted verified-export v1
+models, request v1/v2, discovery v1, production selectors, taxonomy, support
+state, and trainer-neutral boundary remain unchanged. Local admission evidence
+is recorded; publication and merge remain pending.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete

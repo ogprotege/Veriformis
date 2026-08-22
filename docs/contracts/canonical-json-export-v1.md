@@ -14,7 +14,7 @@
 
 **Status:** Implemented in independent-product Phase 5.2
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 consolidated semantic round-trip)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
 
 ## Purpose and authority
 
@@ -199,6 +199,13 @@ canonical semantic tamper for this container. It does not add a product
 importer, semantic replayer, API, taxonomy entry, support promotion, or trainer
 claim, and it does not weaken the container-specific admission evidence above.
 
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 adds only the shared
+runtime preview defined by Verified Export Contract v1: ordinal-zero samples
+for non-empty partitions and this unchanged plan-derived tree plus
+`export-receipt.json`. It does not invoke this renderer or change these bytes,
+paths, schemas, or support claims.
+
 ## Dependency, license, security, and resource boundary
 
 The renderer uses only Veriformis's canonical row and export services and adds
@@ -215,7 +222,9 @@ hold all rows in memory. V1 makes no large-scale performance or memory claim.
 ## Versioning, migration, and deprecation
 
 The ten persisted `veriformis.verified-export` v1 models, request v1, response
-v1, discovery v1, Finished Dataset v1, and source bundle are unchanged.
+v1 for non-dry-run operations, discovery v1, Finished Dataset v1, and source
+bundle are unchanged. Dry run uses the shared runtime-only response v2 and
+preview v1; they do not change this container contract or persisted evidence.
 
 Changing row encoding, the fixed tree, top-level fields, split-object shape,
 partition order, provenance alignment, determinism claim, selector meaning, or

@@ -13,11 +13,13 @@ from mcp.server.mcpserver import MCPServer
 
 from veriformis.errors import VeriformisError
 from veriformis.exports.api import (
+    EXPORT_SURFACE_RESPONSE_SCHEMA,
+    EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
     ExportOperationCancelled,
     ExportPartialPublicationError,
     _EXPORT_SURFACE_EXCEPTIONS,
     export_discovery_response,
-    export_dry_run_response,
+    export_dry_run_preview_response,
     export_error_response,
     export_execution_response,
     export_inspection_response,
@@ -60,16 +62,32 @@ def _outcome_json(outcome: Any) -> str:
     return json.dumps(_jsonable(outcome), ensure_ascii=False, indent=2, sort_keys=True)
 
 
-def _export_tool_response(operation: str, response_builder, call) -> str:
+def _export_tool_response(
+    operation: str,
+    response_builder,
+    call,
+    *,
+    response_schema: str = EXPORT_SURFACE_RESPONSE_SCHEMA,
+) -> str:
     """Return the same canonical export envelope as the CLI adapter."""
     try:
         payload = response_builder(call())
     except _EXPORT_SURFACE_EXCEPTIONS as exc:
-        payload = export_error_response(operation, exc)
+        payload = export_error_response(
+            operation,
+            exc,
+            response_schema=response_schema,
+        )
     try:
         return export_response_json(payload)
     except _EXPORT_SURFACE_EXCEPTIONS as exc:
-        return export_response_json(export_error_response(operation, exc))
+        return export_response_json(
+            export_error_response(
+                operation,
+                exc,
+                response_schema=response_schema,
+            )
+        )
 
 
 async def _export_tool_response_async(operation: str, response_builder, call) -> str:
@@ -190,10 +208,15 @@ def create_mcp_server(
                 expected_operation="dry_run",
             )
             outcome = pipeline.dry_run_export(request)
-            assert outcome.plan is not None
-            return outcome.plan
+            assert outcome.preview is not None
+            return outcome.preview
 
-        return _export_tool_response("dry_run", export_dry_run_response, run)
+        return _export_tool_response(
+            "dry_run",
+            export_dry_run_preview_response,
+            run,
+            response_schema=EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
+        )
 
     @server.tool()
     async def export_inspect(request_json: str) -> str:

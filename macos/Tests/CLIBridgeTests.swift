@@ -1,3 +1,4 @@
+import CryptoKit
 import XCTest
 @testable import Veriformis
 
@@ -693,7 +694,12 @@ final class CLIBridgeTests: XCTestCase {
             else
               operation="$2"
             fi
-            printf '{"error":{"code":"invalid-data","message":"not registered"},"operation":"%s","result":null,"schema_version":"veriformis.export-surface-response/v1","status":"error"}\\n' "$operation"
+            if [ "$operation" = "dry_run" ]; then
+              response_schema=veriformis.export-surface-response/v2
+            else
+              response_schema=veriformis.export-surface-response/v1
+            fi
+            printf '{"error":{"code":"invalid-data","message":"not registered"},"operation":"%s","result":null,"schema_version":"%s","status":"error"}\\n' "$operation" "$response_schema"
             exit 1
             """
         )
@@ -742,6 +748,7 @@ final class CLIBridgeTests: XCTestCase {
 
         let dryRunResponse = try await cli.dryRunExport(dryRun)
         XCTAssertEqual(dryRunResponse.status, .error)
+        XCTAssertEqual(dryRunResponse.schemaVersion, ExportSurfaceSchema.responseV2)
         XCTAssertEqual(
             try recordedArguments(arguments),
             ["export", "dry-run", "--request-json", try dryRun.canonicalJSON()]
@@ -770,6 +777,10 @@ final class CLIBridgeTests: XCTestCase {
 
         let configuredDryRunResponse = try await cli.dryRunExport(configuredDryRun)
         XCTAssertEqual(configuredDryRunResponse.status, .error)
+        XCTAssertEqual(
+            configuredDryRunResponse.schemaVersion,
+            ExportSurfaceSchema.responseV2
+        )
         XCTAssertEqual(
             try recordedArguments(arguments),
             ["export", "dry-run", "--request-json", try configuredDryRun.canonicalJSON()]
@@ -820,6 +831,213 @@ final class CLIBridgeTests: XCTestCase {
                 )
             )
         }
+    }
+
+    func testDryRunBridgeDecodesStrictV2PreviewAndPreservesNestedUnicodeScalars() async throws {
+        let root = temporaryTestDirectory("export-dry-run-preview")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let responseFile = root.appendingPathComponent("response.json")
+        try Data(exportDryRunPreviewResponse().utf8).write(to: responseFile)
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            cat "\(responseFile.path)"
+            printf '\\n'
+            """
+        )
+
+        let response = try await VeriformisCLI(
+            executableURL: executable,
+            prefixArguments: []
+        ).dryRunExport(try exportDryRunRequest())
+        let result = try XCTUnwrap(response.result)
+
+        XCTAssertEqual(response.schemaVersion, ExportSurfaceSchema.responseV2)
+        XCTAssertEqual(result.preview.schemaVersion, ExportSurfaceSchema.dryRunPreview)
+        XCTAssertEqual(result.preview.exportPlanID, result.plan.exportPlanID)
+        XCTAssertEqual(result.preview.containerProfileID, result.plan.containerProfileID)
+        XCTAssertEqual(result.preview.rowSetID, result.plan.rowSetID)
+        XCTAssertEqual(result.preview.rowSchema, "messages")
+        XCTAssertEqual(
+            result.preview.destinationTree.files,
+            ["evaluation.jsonl", "export-receipt.json", "train.jsonl"]
+        )
+        XCTAssertEqual(result.preview.destinationTree.directories, [])
+        XCTAssertEqual(
+            result.preview.sampleRows.map(\.partition),
+            [.train, .evaluation]
+        )
+
+        let trainPayload = try XCTUnwrap(result.preview.sampleRows[0].payload)
+        guard case .array(let turns)? = trainPayload["messages"],
+              turns.count == 2,
+              case .object(let firstTurn) = turns[0],
+              case .string(let content)? = firstTurn["content"]
+        else {
+            return XCTFail("nested messages payload did not retain its exact shape")
+        }
+        let expected = "train \0\r\n\u{001B}\u{009B}\u{202E}\u{00E9}e\u{0301}\u{1F600}"
+        XCTAssertEqual(
+            content.unicodeScalars.map(\.value),
+            expected.unicodeScalars.map(\.value)
+        )
+        XCTAssertNil(result.preview.sampleRows[0].omissionReason)
+    }
+
+    func testDryRunPreviewAcceptsExplicitWholePayloadOmissions() throws {
+        let samples = "["
+            + "{\"omission_reason\":\"exact-payload-exceeds-preview-limit\",\"ordinal\":0,\"partition\":\"train\",\"payload\":null,\"payload_byte_size\":65537,\"payload_sha256\":\"\(digest("d"))\"},"
+            + "{\"omission_reason\":\"exact-payload-exceeds-response-budget\",\"ordinal\":0,\"partition\":\"evaluation\",\"payload\":null,\"payload_byte_size\":128,\"payload_sha256\":\"\(digest("e"))\"}"
+            + "]"
+        let response = try JSONDecoder().decode(
+            ExportSurfaceResponse<ExportDryRunResult>.self,
+            from: Data(exportDryRunPreviewResponse(sampleRowsJSON: samples).utf8)
+        )
+        let rows = try XCTUnwrap(response.result?.preview.sampleRows)
+
+        XCTAssertNil(rows[0].payload)
+        XCTAssertEqual(rows[0].omissionReason, .previewLimit)
+        XCTAssertEqual(rows[0].payloadByteSize, 65_537)
+        XCTAssertNil(rows[1].payload)
+        XCTAssertEqual(rows[1].omissionReason, .responseBudget)
+        XCTAssertEqual(rows[1].payloadByteSize, 128)
+    }
+
+    func testDryRunPreviewAcceptsEmptyEvaluationWithOnlyTrainSample() throws {
+        let response = try JSONDecoder().decode(
+            ExportSurfaceResponse<ExportDryRunResult>.self,
+            from: Data(
+                exportDryRunPreviewResponse(evaluationRecordCount: 0).utf8
+            )
+        )
+        let result = try XCTUnwrap(response.result)
+
+        XCTAssertEqual(result.plan.evaluationRecordCount, 0)
+        XCTAssertEqual(result.plan.totalRecordCount, 1)
+        XCTAssertEqual(result.preview.sampleRows.map(\.partition), [.train])
+        XCTAssertEqual(
+            result.preview.destinationTree.files,
+            ["evaluation.jsonl", "export-receipt.json", "train.jsonl"]
+        )
+    }
+
+    func testDryRunPreviewRejectsEvaluationSampleWhenPlanEvaluationIsEmpty() throws {
+        let response = exportDryRunPreviewResponse(
+            evaluationRecordCount: 0,
+            includeEvaluationSample: true
+        )
+
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                ExportSurfaceResponse<ExportDryRunResult>.self,
+                from: Data(response.utf8)
+            )
+        )
+    }
+
+    func testDryRunPreviewRejectsUnknownMissingAndDetachedEvidence() throws {
+        let source = Data(exportDryRunPreviewResponse().utf8)
+
+        var unexpected = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: source) as? [String: Any]
+        )
+        var unexpectedResult = try XCTUnwrap(unexpected["result"] as? [String: Any])
+        var unexpectedPreview = try XCTUnwrap(
+            unexpectedResult["preview"] as? [String: Any]
+        )
+        unexpectedPreview["unexpected"] = true
+        unexpectedResult["preview"] = unexpectedPreview
+        unexpected["result"] = unexpectedResult
+        XCTAssertThrowsError(
+            try decodeDryRunResponseObject(unexpected)
+        ) { error in
+            XCTAssertEqual(
+                error as? ExportSurfaceModelError,
+                .invalidKeySet(
+                    model: "export dry-run preview",
+                    missing: [],
+                    unexpected: ["unexpected"]
+                )
+            )
+        }
+
+        var missing = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: source) as? [String: Any]
+        )
+        var missingResult = try XCTUnwrap(missing["result"] as? [String: Any])
+        var missingPreview = try XCTUnwrap(missingResult["preview"] as? [String: Any])
+        var missingRows = try XCTUnwrap(missingPreview["sample_rows"] as? [[String: Any]])
+        missingRows[0].removeValue(forKey: "payload_sha256")
+        missingPreview["sample_rows"] = missingRows
+        missingResult["preview"] = missingPreview
+        missing["result"] = missingResult
+        XCTAssertThrowsError(try decodeDryRunResponseObject(missing))
+
+        var detached = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: source) as? [String: Any]
+        )
+        var detachedResult = try XCTUnwrap(detached["result"] as? [String: Any])
+        var detachedPreview = try XCTUnwrap(detachedResult["preview"] as? [String: Any])
+        detachedPreview["row_set_id"] = "another-row-set"
+        detachedResult["preview"] = detachedPreview
+        detached["result"] = detachedResult
+        XCTAssertThrowsError(try decodeDryRunResponseObject(detached))
+
+        var wrongTree = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: source) as? [String: Any]
+        )
+        var wrongTreeResult = try XCTUnwrap(wrongTree["result"] as? [String: Any])
+        var wrongTreePreview = try XCTUnwrap(
+            wrongTreeResult["preview"] as? [String: Any]
+        )
+        wrongTreePreview["destination_tree"] = [
+            "directories": [],
+            "files": ["train.jsonl"],
+        ]
+        wrongTreeResult["preview"] = wrongTreePreview
+        wrongTree["result"] = wrongTreeResult
+        XCTAssertThrowsError(try decodeDryRunResponseObject(wrongTree))
+    }
+
+    func testDryRunRequiresResponseV2WhileOtherOperationsRemainV1() throws {
+        let dryRunV1 = "{\"error\":{\"code\":\"invalid-data\",\"message\":\"failed\"},\"operation\":\"dry_run\",\"result\":null,\"schema_version\":\"veriformis.export-surface-response/v1\",\"status\":\"error\"}"
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                ExportSurfaceResponse<ExportDryRunResult>.self,
+                from: Data(dryRunV1.utf8)
+            )
+        )
+
+        let dryRunV2 = dryRunV1.replacingOccurrences(
+            of: "veriformis.export-surface-response/v1",
+            with: "veriformis.export-surface-response/v2"
+        )
+        XCTAssertNoThrow(
+            try JSONDecoder().decode(
+                ExportSurfaceResponse<ExportDryRunResult>.self,
+                from: Data(dryRunV2.utf8)
+            )
+        )
+
+        XCTAssertNoThrow(
+            try JSONDecoder().decode(
+                ExportSurfaceResponse<ExportDiscovery>.self,
+                from: Data(exportDiscoveryResponse().utf8)
+            )
+        )
+        let discoveryV2 = exportDiscoveryResponse().replacingOccurrences(
+            of: "veriformis.export-surface-response/v1",
+            with: "veriformis.export-surface-response/v2"
+        )
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                ExportSurfaceResponse<ExportDiscovery>.self,
+                from: Data(discoveryV2.utf8)
+            )
+        )
     }
 
     func testExportBridgeRejectsTruncatedOutputBeforeDecode() async throws {
@@ -1062,6 +1280,104 @@ final class CLIBridgeTests: XCTestCase {
                 guard case .invalidResponse(operation: .discover, _) = error as? ExportCLIBridgeError else {
                     return XCTFail("unexpected error: \(error)")
                 }
+            }
+        }
+    }
+
+    func testDryRunBridgeRejectsNoncanonicalAndDuplicateV2Stdout() async throws {
+        let canonical = exportDryRunPreviewResponse()
+        let payloads = [
+            canonical.replacingOccurrences(
+                of: "{\"error\":null",
+                with: "{ \"error\":null"
+            ),
+            canonical.replacingOccurrences(
+                of: "\"operation\":\"dry_run\"",
+                with: "\"operation\":\"dry_run\",\"operation\":\"dry_run\""
+            ),
+            canonical.replacingOccurrences(of: "\\u00e9", with: "é"),
+            canonical.replacingOccurrences(of: "\\u00e9", with: "\\u00E9"),
+        ]
+        for (index, payload) in payloads.enumerated() {
+            XCTAssertNotEqual(payload, canonical)
+            let root = temporaryTestDirectory("export-v2-noncanonical-\(index)")
+            defer { try? FileManager.default.removeItem(at: root) }
+            try FileManager.default.createDirectory(
+                at: root,
+                withIntermediateDirectories: true
+            )
+            let executable = root.appendingPathComponent("fake-veriformis")
+            let responseFile = root.appendingPathComponent("response.json")
+            try Data(payload.utf8).write(to: responseFile)
+            try writeExecutable(
+                executable,
+                script: """
+                #!/bin/sh
+                cat "\(responseFile.path)"
+                printf '\\n'
+                """
+            )
+
+            do {
+                _ = try await VeriformisCLI(
+                    executableURL: executable,
+                    prefixArguments: []
+                ).dryRunExport(try exportDryRunRequest())
+                XCTFail("noncanonical response v2 must be rejected")
+            } catch {
+                guard case .invalidResponse(operation: .dryRun, _) =
+                    error as? ExportCLIBridgeError
+                else {
+                    return XCTFail("unexpected error: \(error)")
+                }
+            }
+        }
+    }
+
+    func testDryRunBridgeRejectsCanonicalV2AbovePreviewResponseLimit() async throws {
+        let response = "{"
+            + "\"error\":{\"code\":\"invalid-data\",\"message\":\""
+            + String(repeating: "x", count: 256 * 1024)
+            + "\"},"
+            + "\"operation\":\"dry_run\","
+            + "\"result\":null,"
+            + "\"schema_version\":\"veriformis.export-surface-response/v2\","
+            + "\"status\":\"error\""
+            + "}"
+        let responseData = Data(response.utf8)
+        XCTAssertGreaterThan(responseData.count, 256 * 1024)
+        XCTAssertLessThan(responseData.count, 1024 * 1024)
+
+        let root = temporaryTestDirectory("export-v2-oversize")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(
+            at: root,
+            withIntermediateDirectories: true
+        )
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let responseFile = root.appendingPathComponent("response.json")
+        try responseData.write(to: responseFile)
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            cat "\(responseFile.path)"
+            printf '\\n'
+            exit 1
+            """
+        )
+
+        do {
+            _ = try await VeriformisCLI(
+                executableURL: executable,
+                prefixArguments: []
+            ).dryRunExport(try exportDryRunRequest())
+            XCTFail("dry-run response v2 above 256 KiB must be rejected")
+        } catch {
+            guard case .invalidResponse(operation: .dryRun, _) =
+                error as? ExportCLIBridgeError
+            else {
+                return XCTFail("unexpected error: \(error)")
             }
         }
     }
@@ -1611,6 +1927,112 @@ final class CLIBridgeTests: XCTestCase {
 
     private func exportDiscoveryResponse() -> String {
         "{\"error\":null,\"operation\":\"discover\",\"result\":{\"profiles\":[],\"schema_version\":\"veriformis.export-discovery/v1\"},\"schema_version\":\"veriformis.export-surface-response/v1\",\"status\":\"ok\"}"
+    }
+
+    private func exportDryRunPreviewResponse(
+        sampleRowsJSON: String? = nil,
+        evaluationRecordCount: Int = 1,
+        includeEvaluationSample: Bool? = nil
+    ) -> String {
+        precondition(evaluationRecordCount >= 0)
+        let source = Data(exportVisiblePartialResponse().utf8)
+        let response = try! JSONSerialization.jsonObject(with: source) as! [String: Any]
+        let result = response["result"] as! [String: Any]
+        var plan = result["plan"] as! [String: Any]
+        plan["evaluation_record_count"] = evaluationRecordCount
+        plan["row_schema"] = "messages"
+        plan["total_record_count"] = 1 + evaluationRecordCount
+
+        let trainFile = (plan["files"] as! [[String: Any]])[0]
+        var evaluationFile = trainFile
+        evaluationFile["file_plan_id"] = "evaluation-file-plan"
+        evaluationFile["membership_scope"] = "evaluation"
+        evaluationFile["path"] = "evaluation.jsonl"
+        evaluationFile["record_count"] = evaluationRecordCount
+        evaluationFile["role"] = "evaluation"
+        plan["files"] = [evaluationFile, trainFile]
+
+        let planData = try! JSONSerialization.data(
+            withJSONObject: plan,
+            options: [.sortedKeys, .withoutEscapingSlashes]
+        )
+        let planJSON = String(decoding: planData, as: UTF8.self)
+
+        let trainExactUnicode = "\u{009B}\u{202E}\u{00E9}e\u{0301}\u{1F600}"
+        let trainCanonicalPayload =
+            #"{"messages":[{"content":"train \u0000\r\n\u001b"#
+            + trainExactUnicode
+            + #"","role":"user"},{"content":"assistant","role":"assistant"}]}"#
+        let trainResponsePayload =
+            #"{"messages":[{"content":"train \u0000\r\n\u001b\u009b\u202e\u00e9e\u0301\ud83d\ude00","role":"user"},{"content":"assistant","role":"assistant"}]}"#
+        let evaluationCanonicalPayload =
+            #"{"messages":[{"content":"evaluation","role":"user"},{"content":"assistant","role":"assistant"}]}"#
+
+        let includeEvaluation = includeEvaluationSample
+            ?? (evaluationRecordCount > 0)
+        var defaultSamples = exportDryRunSampleJSON(
+            partition: "train",
+            responsePayloadJSON: trainResponsePayload,
+            canonicalPayloadJSON: trainCanonicalPayload
+        )
+        if includeEvaluation {
+            defaultSamples += "," + exportDryRunSampleJSON(
+                partition: "evaluation",
+                responsePayloadJSON: evaluationCanonicalPayload,
+                canonicalPayloadJSON: evaluationCanonicalPayload
+            )
+        }
+        let samples = sampleRowsJSON ?? "[\(defaultSamples)]"
+        let preview = "{"
+            + "\"container_profile_id\":\"container-profile\","
+            + "\"destination_tree\":{\"directories\":[],\"files\":[\"evaluation.jsonl\",\"export-receipt.json\",\"train.jsonl\"]},"
+            + "\"export_plan_id\":\"plan\","
+            + "\"maximum_sample_payload_bytes\":65536,"
+            + "\"row_schema\":\"messages\","
+            + "\"row_set_id\":\"row-set\","
+            + "\"sample_policy\":\"first-row-per-non-empty-partition\","
+            + "\"sample_rows\":\(samples),"
+            + "\"schema_version\":\"veriformis.export-dry-run-preview/v1\""
+            + "}"
+        return "{"
+            + "\"error\":null,"
+            + "\"operation\":\"dry_run\","
+            + "\"result\":{\"plan\":\(planJSON),\"preview\":\(preview)},"
+            + "\"schema_version\":\"veriformis.export-surface-response/v2\","
+            + "\"status\":\"ok\""
+            + "}"
+    }
+
+    private func exportDryRunSampleJSON(
+        partition: String,
+        responsePayloadJSON: String,
+        canonicalPayloadJSON: String
+    ) -> String {
+        let payload = Data(canonicalPayloadJSON.utf8)
+        let payloadSHA256 = SHA256.hash(data: payload)
+            .map { String(format: "%02x", $0) }
+            .joined()
+        return "{"
+            + "\"omission_reason\":null,"
+            + "\"ordinal\":0,"
+            + "\"partition\":\"\(partition)\","
+            + "\"payload\":\(responsePayloadJSON),"
+            + "\"payload_byte_size\":\(payload.count),"
+            + "\"payload_sha256\":\"\(payloadSHA256)\""
+            + "}"
+    }
+
+    private func decodeDryRunResponseObject(
+        _ value: [String: Any]
+    ) throws -> ExportSurfaceResponse<ExportDryRunResult> {
+        let data = try JSONSerialization.data(
+            withJSONObject: value,
+            options: [.sortedKeys, .withoutEscapingSlashes]
+        )
+        return try JSONDecoder().decode(
+            ExportSurfaceResponse<ExportDryRunResult>.self,
+            from: data
+        )
     }
 
     private func exportVisiblePartialResponse() -> String {

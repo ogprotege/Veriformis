@@ -61,12 +61,13 @@ before publication. Item 5.4's optional
 `deterministic-export-pack-zip-v1` transport merged as PR #56 at
 `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. It wraps one unchanged export
 directory as receipt-anchored `.vfexport.zip` without adding a fourth renderer,
-trainer claim, source-bound archive verification, or Mac UI. Item 5.5 is
-locally admitted as a test-only consolidated eleven-pair ordinary-file semantic
-round-trip matrix with one tamper case per container and the actionable
-constrained-CSV/`messages` refusal. It adds no product importer, replayer, API,
-taxonomy, support, or trainer promotion; its pull-request merge remains the
-gate before item 5.6.
+trainer claim, source-bound archive verification, or Mac UI. Item 5.5's
+test-only consolidated eleven-pair ordinary-file semantic round-trip matrix
+merged as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1` with one tamper
+case per container and the actionable constrained-CSV/`messages` refusal. It
+adds no product importer, replayer, API, taxonomy, support, or trainer
+promotion. Item 5.6's exact bounded runtime preview is implemented and locally
+admitted; publication and merge remain open before item 5.7.
 Phase 6 remains planned and requires its own packet before work begins.
 
 ## State change procedure

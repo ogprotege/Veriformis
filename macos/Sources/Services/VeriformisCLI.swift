@@ -1,4 +1,5 @@
 import Darwin
+import CoreFoundation
 import Foundation
 
 struct CLIProcessCancellation: Equatable, Sendable {
@@ -438,7 +439,8 @@ struct VeriformisCLI: Sendable {
         let response: ExportSurfaceResponse<Result>
         do {
             let responseData = try Self.canonicalExportResponseData(
-                from: processResult.standardOutputData
+                from: processResult.standardOutputData,
+                operation: operation
             )
             response = try JSONDecoder().decode(
                 ExportSurfaceResponse<Result>.self,
@@ -487,7 +489,10 @@ struct VeriformisCLI: Sendable {
         return response
     }
 
-    private static func canonicalExportResponseData(from output: Data) throws -> Data {
+    private static func canonicalExportResponseData(
+        from output: Data,
+        operation: ExportOperation
+    ) throws -> Data {
         var received = output
         if received.last == 0x0A {
             received.removeLast()
@@ -495,20 +500,160 @@ struct VeriformisCLI: Sendable {
         guard !received.isEmpty else {
             throw ExportSurfaceModelError.invalidValue("Export response stdout was empty.")
         }
+        guard received.count <= 1024 * 1024 else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export response exceeds the 1 MiB surface limit."
+            )
+        }
+        if operation == .dryRun, received.count > 256 * 1024 {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export dry-run response exceeds the 256 KiB preview limit."
+            )
+        }
         let object = try JSONSerialization.jsonObject(with: received)
         guard JSONSerialization.isValidJSONObject(object) else {
             throw ExportSurfaceModelError.invalidValue("Export response was not a JSON object.")
         }
-        let canonical = try JSONSerialization.data(
-            withJSONObject: object,
-            options: [.sortedKeys, .withoutEscapingSlashes]
-        )
+        let responseSchema = (object as? [String: Any])?["schema_version"] as? String
+        let canonical: Data
+        if responseSchema == ExportSurfaceSchema.responseV2 {
+            canonical = try canonicalASCIIExportResponseData(object)
+        } else {
+            canonical = try JSONSerialization.data(
+                withJSONObject: object,
+                options: [.sortedKeys, .withoutEscapingSlashes]
+            )
+        }
         guard canonical == received else {
             throw ExportSurfaceModelError.invalidValue(
                 "Export response stdout was not one canonical JSON object."
             )
         }
         return received
+    }
+
+    private static func canonicalASCIIExportResponseData(_ value: Any) throws -> Data {
+        var result = ""
+        try appendCanonicalASCIIExportJSON(value, to: &result, depth: 0)
+        guard let data = result.data(using: .ascii) else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export response v2 could not be represented as canonical ASCII JSON."
+            )
+        }
+        return data
+    }
+
+    private static func appendCanonicalASCIIExportJSON(
+        _ value: Any,
+        to result: inout String,
+        depth: Int
+    ) throws {
+        guard depth <= 128 else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export response v2 exceeds the maximum JSON nesting depth."
+            )
+        }
+        switch value {
+        case is NSNull:
+            result += "null"
+        case let value as String:
+            appendCanonicalASCIIExportJSONString(value, to: &result)
+        case let value as NSNumber:
+            if CFGetTypeID(value) == CFBooleanGetTypeID() {
+                result += value.boolValue ? "true" : "false"
+                return
+            }
+            let numberType = String(cString: value.objCType)
+            guard numberType != "f", numberType != "d",
+                  value.stringValue.range(
+                      of: "^-?(0|[1-9][0-9]*)$",
+                      options: .regularExpression
+                  ) != nil
+            else {
+                throw ExportSurfaceModelError.invalidValue(
+                    "Export response v2 contains a noncanonical number."
+                )
+            }
+            result += value.stringValue
+        case let value as [Any]:
+            result += "["
+            for (index, item) in value.enumerated() {
+                if index > 0 { result += "," }
+                try appendCanonicalASCIIExportJSON(
+                    item,
+                    to: &result,
+                    depth: depth + 1
+                )
+            }
+            result += "]"
+        case let value as [String: Any]:
+            result += "{"
+            let keys = value.keys.sorted(by: exportJSONUnicodeScalarOrder)
+            for (index, key) in keys.enumerated() {
+                if index > 0 { result += "," }
+                appendCanonicalASCIIExportJSONString(key, to: &result)
+                result += ":"
+                guard let item = value[key] else {
+                    throw ExportSurfaceModelError.invalidValue(
+                        "Export response v2 contains an unavailable object member."
+                    )
+                }
+                try appendCanonicalASCIIExportJSON(
+                    item,
+                    to: &result,
+                    depth: depth + 1
+                )
+            }
+            result += "}"
+        default:
+            throw ExportSurfaceModelError.invalidValue(
+                "Export response v2 contains an unsupported JSON value."
+            )
+        }
+    }
+
+    private static func appendCanonicalASCIIExportJSONString(
+        _ value: String,
+        to result: inout String
+    ) {
+        result += "\""
+        for scalar in value.unicodeScalars {
+            switch scalar.value {
+            case 0x08:
+                result += "\\b"
+            case 0x09:
+                result += "\\t"
+            case 0x0A:
+                result += "\\n"
+            case 0x0C:
+                result += "\\f"
+            case 0x0D:
+                result += "\\r"
+            case 0x22:
+                result += "\\\""
+            case 0x5C:
+                result += "\\\\"
+            case 0x20 ... 0x7E:
+                result.unicodeScalars.append(scalar)
+            case 0 ... 0xFFFF:
+                result += String(format: "\\u%04x", scalar.value)
+            default:
+                let supplementary = scalar.value - 0x1_0000
+                let high = 0xD800 + (supplementary >> 10)
+                let low = 0xDC00 + (supplementary & 0x3FF)
+                result += String(format: "\\u%04x\\u%04x", high, low)
+            }
+        }
+        result += "\""
+    }
+
+    private static func exportJSONUnicodeScalarOrder(_ lhs: String, _ rhs: String) -> Bool {
+        let left = lhs.unicodeScalars.map(\.value)
+        let right = rhs.unicodeScalars.map(\.value)
+        for (leftValue, rightValue) in zip(left, right) where leftValue != rightValue {
+            return leftValue < rightValue
+        }
+        return left.count < right.count
     }
 
     private static func exitCode(_ exitCode: Int32, agreesWith status: ExportResponseStatus) -> Bool {

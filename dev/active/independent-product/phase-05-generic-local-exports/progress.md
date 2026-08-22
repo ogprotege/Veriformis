@@ -264,3 +264,69 @@ consumer claim was added.
 **Next action:** Publish item 5.5, require every GitHub check to pass, merge,
 and synchronize clean local `main` before item 5.6. Items 5.6–5.7 and Phase 5
 closeout remain open.
+
+## 2026-08-22 — Item 5.5 merged; item 5.6 started
+
+**Status:** Item 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Item 5.6's contract is frozen;
+implementation, local admission evidence, publication, GitHub evidence, and
+merge remain pending.
+
+Dry-run success moves to `veriformis.export-surface-response/v2` with a result
+containing exactly the unchanged `plan` and one runtime-only
+`veriformis.export-dry-run-preview/v1`. The preview identifies the plan,
+container profile, row set, and row schema; states policy
+`first-row-per-non-empty-partition` and the 65,536-byte exact-payload limit;
+lists a normalized sorted plan-derived destination tree plus
+`export-receipt.json`; and includes sample metadata in train-then-evaluation
+order. Sample payload JSON uses ASCII-safe transport while preserving exact
+decoded strings. A payload is included whole or omitted whole with
+`exact-payload-exceeds-preview-limit` or
+`exact-payload-exceeds-response-budget`; it is never truncated.
+
+Preview construction must use the same admitted source, `RowSet`, exact plan,
+and profile semantics as execution. It must not call a renderer, inspect or
+create a destination, publish, mutate the source, or change the plan. The ten
+persisted verified-export v1 models, request v1/v2, discovery v1, production
+selectors, taxonomy, and support state remain unchanged. Response v1 remains
+the strict surface for non-dry-run operations.
+
+**Next action:** Complete the implementation and exact contract/parity tests,
+run and record every required local gate without speculative counts, resolve
+review findings, then publish and merge only after every GitHub check is green.
+Item 5.7 remains pending.
+
+## 2026-08-22 — Item 5.6 locally admitted
+
+**Status:** Implementation, exact contract evidence, repository gates, and
+independent reviews passed; pull-request publication, GitHub evidence, merge,
+and clean-main synchronization remain pending.
+
+Product dry run now returns the unchanged plan and one exact bounded
+`veriformis.export-dry-run-preview/v1` in response v2. A single admitted-source
+snapshot binds the plan, normalized tree, and ordinal-zero train/evaluation
+samples. Payloads are complete through exactly 65,536 canonical UTF-8 bytes;
+larger payloads and within-limit payloads excluded by response pressure are
+omitted whole with closed reasons. Evaluation is omitted before train under
+pressure, metadata-only overflow refuses the response, decoded Unicode and
+controls remain exact, and retained source evidence rejects forged omission
+labels. Preview invokes no renderer and accesses no destination.
+
+All 11 compatible current container/schema pairs executed, published ordinary
+files, strict-reloaded, and matched preview payload, canonical size, and digest.
+The focused preview/API/adapter suite passed 60 tests; integrated
+export/taxonomy/verified-contract/tracking passed 480; full Python passed 1,238
+with only the intentional durability-warning regression warning; standalone
+release passed 1,226 with one deselection plus lock, clean wheel, and both
+golden flows. CLI/workbench parity, 66 Mac tests, tracking, lock, Ruff,
+structured JSON, and diff checks passed. Independent code, documentation,
+boundary, and adversarial test audits found no remaining blocker.
+
+The ten persisted verified-export v1 models, request v1/v2, discovery v1,
+three production selectors, taxonomy, support state, renderer set, destination
+policy, trainer claims, and consumer claims remain unchanged. The legacy
+plan-only Python helper remains response v1; current Pipeline, CLI, MCP, and Mac
+dry-run operations use response v2. Item 5.7 has not begun.
+
+**Next action:** Publish item 5.6, require every GitHub check to pass, merge,
+and synchronize clean local `main` before starting item 5.7 operator guidance.

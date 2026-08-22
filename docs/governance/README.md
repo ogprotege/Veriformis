@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
 
-**Next review:** Independent-product Phase 5.5 merge or Phase 5.6, Phase 6
+**Next review:** Independent-product Phase 5.6 publication or merge, Phase 6
 start, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -57,11 +57,15 @@ transport wraps one unchanged, already-published export directory under a
 separately retained canonical receipt digest. It is not a fourth renderer,
 source-bound export verification, consumer/trainer profile, MCP operation, or
 Mac UI action.
-Item 5.5 is locally admitted as a test-only frozen ordinary-file fixture that
-closes all eleven compatible current container/schema pairs, proves one
+Item 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Its test-only frozen ordinary-file
+fixture closes all eleven compatible current container/schema pairs, proves one
 canonical semantic tamper fails per container, and retains constrained CSV's
 actionable pre-publication `messages` refusal. It adds no importer, replayer,
-API, taxonomy, support state, or trainer claim; its pull-request merge is the
-next gate before item 5.6.
+API, taxonomy, support state, or trainer claim. Item 5.6's locally admitted
+runtime preview returns the unchanged plan and exact bounded ordinal-zero
+samples/tree in response v2 without renderer or destination access.
+Publication and merge remain the next gates before item 5.7; no taxonomy or
+support promotion is authorized.
 Consumer compatibility still requires a separately admitted named profile.
 Phase 6 remains planned and requires its own packet before work begins.

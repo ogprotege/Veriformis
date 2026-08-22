@@ -65,12 +65,18 @@ Item 5.4 merged as PR #56 at
 `deterministic-export-pack-zip-v1` packages one unchanged, already-published
 export directory as `.vfexport.zip` under an externally retained canonical
 receipt digest. It is not a fourth renderer, source-bound verification,
-consumer/trainer profile, MCP operation, or Mac UI promise. Phase 5.5's
-locally admitted fixture is test proof only: it strictly reloads all compatible
+consumer/trainer profile, MCP operation, or Mac UI promise. Phase 5.5's merged
+PR #57 fixture is test proof only: it strictly reloads all compatible
 container/schema pairs from ordinary files and adds no production importer,
-replayer, public surface, persisted schema, taxonomy, or support claim.
-Pull-request publication, GitHub evidence, and merge for item 5.5 remain
-pending.
+replayer, public surface, persisted schema, taxonomy, or support claim. Item
+5.6 adds only one bounded runtime dry-run response: an unchanged plan, exact
+ordinal-zero samples for non-empty partitions, and a normalized plan-derived
+tree plus `export-receipt.json`. Preserve complete payloads through the 65,536-
+byte inclusion ceiling, whole-row omission above it or under response-budget
+pressure, ASCII-safe exact-value transport, and the no-renderer
+and no-destination boundary. Do not promote a persisted schema, selector,
+taxonomy, support state, consumer, or trainer claim. Item 5.6 local admission
+passed; publication and merge remain pending.
 Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)

@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 dry-run preview boundary)
 
 **Next review:** Any taxonomy, loss-policy, or compatibility-matrix change
 
@@ -134,6 +134,11 @@ not determine the objective or loss.
 | `parquet` | planned | Phase 9 |
 | `arrow` | planned | Phase 9 |
 | `hugging-face-dataset` | planned | Phase 9 |
+
+Phase 5.6's `veriformis.export-dry-run-preview/v1` is a runtime view of one
+already-selected physical container and immutable export plan. It is not a
+physical container, semantic row schema, training objective, consumer profile,
+or loss policy, and it changes no taxonomy or support-registry state.
 
 ### Consumer profile
 

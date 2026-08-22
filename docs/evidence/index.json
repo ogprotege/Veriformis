@@ -446,7 +446,7 @@
       "commit": "working-tree-on-499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8",
       "scope": "Independent-product Phase 5.5 consolidated semantic import-round-trip fixture matrix",
       "grade": "recorded-local",
-      "summary": "The frozen, discovery-closed Phase 5.5 fixture passed 16 dedicated tests, 453 integrated export/taxonomy/verified-contract/tracking tests, 1,211 full Python tests, 1,199 standalone core tests with 1 deselected, and 58 Mac tests. Full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation, both golden flows, CLI/workbench parity, project tracking, lock, Ruff, fixture and evidence JSON validity, and diff checks passed. The matrix covers 11 compatible current container/schema pairs plus the sole constrained-CSV/messages negative. Every positive case materializes production-rendered bytes as ordinary files and strictly reloads separate ordered train/evaluation payloads, complete aligned provenance, and the exact source RowSet identity; one canonical semantic tamper per container fails. The negative refuses before publication, leaves the destination absent, and names split-jsonl-directory v1 and json v1. The fixture includes comma, quote, tab, NUL, CR/LF/CRLF, formula-looking, NFC/NFD, and non-BMP strings. It adds no production importer, replayer, API, CLI, MCP, Mac operation, persisted schema, taxonomy entry, support claim, trainer profile, or consumer profile. Independent adversarial review found no blocker and reproduced the 16 focused tests; GitHub results remain separate publication evidence.",
+      "summary": "The frozen, discovery-closed Phase 5.5 fixture passed 16 dedicated tests, 453 integrated export/taxonomy/verified-contract/tracking tests, 1,211 full Python tests, 1,199 standalone core tests with 1 deselected, and 58 Mac tests. Full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation, both golden flows, CLI/workbench parity, project tracking, lock, Ruff, fixture and evidence JSON validity, and diff checks passed. The matrix covers 11 compatible current container/schema pairs plus the sole constrained-CSV/messages negative. Every positive case materializes production-rendered bytes as ordinary files and strictly reloads separate ordered train/evaluation payloads, complete aligned provenance, and the exact source RowSet identity; one canonical semantic tamper per container fails. The negative refuses before publication, leaves the destination absent, and names split-jsonl-directory v1 and json v1. The fixture includes comma, quote, tab, NUL, CR/LF/CRLF, formula-looking, NFC/NFD, and non-BMP strings. It adds no production importer, replayer, API, CLI, MCP, Mac operation, persisted schema, taxonomy entry, support claim, trainer profile, or consumer profile. Independent adversarial review found no blocker and reproduced the 16 focused tests. These counts remain local evidence; item 5.5 subsequently merged as PR #57 at c72b8e9ec7bc2746d74404226aa086d497e15db1.",
       "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
       "rerun": [
         "uv run pytest -q tests/exports/test_semantic_round_trip.py",
@@ -455,6 +455,29 @@
         "bash scripts/release/check_local.sh",
         "bash macos/scripts/parity_check.sh",
         "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase5-05-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check .",
+        "python3 -m json.tool tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-5-exact-dry-run-preview-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-c72b8e9ec7bc2746d74404226aa086d497e15db1",
+      "scope": "Independent-product Phase 5.6 exact bounded dry-run previews",
+      "grade": "recorded-local",
+      "summary": "The exact bounded dry-run preview passed 60 focused Python tests, 480 integrated export/taxonomy/verified-contract/tracking tests, 1,238 full Python tests, 1,226 standalone core tests with 1 deselected, and 66 Mac tests. Full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation, both golden compile/external-digest/transport flows, CLI/workbench parity, project tracking, lock, Ruff, fixture/evidence JSON validity, diff checks, and independent code/documentation/boundary/adversarial reviews passed. Evidence covers strict response v2 and preview v1, all 11 compatible current container/schema executions and strict reloads with matching ordinal-zero payload/digest/size, empty evaluation, exact 65,536-byte inclusion, whole-row over-limit and evaluation-then-train response-budget omissions, metadata-only refusal, forged-omission rejection from retained plan-bound evidence, ASCII-safe exact decoded Unicode/control values, normalized plan-derived trees plus export-receipt.json, one source snapshot, and no renderer or destination access. The ten persisted verified-export v1 models, request v1/v2, discovery v1, three production selectors, taxonomy, support state, trainer claims, and consumer claims remain unchanged. This is local admission evidence only; no GitHub, publication, merge, or clean-main synchronization result is claimed.",
+      "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_api.py tests/exports/test_adapters.py tests/exports/test_dry_run_preview.py",
+        "uv run pytest -q tests/exports tests/contracts/test_taxonomy_contract.py tests/contracts/test_verified_export_contract.py tests/regressions/test_project_tracking.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase5-06-final-xcode CODE_SIGNING_ALLOWED=NO",
         "uv run python scripts/check_project_tracking.py",
         "uv lock --check",
         "uv run ruff check .",

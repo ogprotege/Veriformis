@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
 
 **Next review:** Any architecture or dependency change
 
@@ -233,6 +233,15 @@ through mutually exclusive explicit anchors. Phase 5.5 adds no production
 dependency. Its test-only ordinary-file fixture composes the existing strict
 row, provenance, split-JSONL, canonical-JSON, constrained-CSV, and discovery
 loaders without installing an importer or semantic replayer.
+
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 reuses existing strict
+`RowSet`, `ExportPlan`, identity/JSON, response serialization, pipeline, CLI,
+MCP, and Mac bridge dependencies. It adds response-v2 runtime models but no
+persisted model, third-party package, renderer/replayer, filesystem adapter,
+workspace edge, catalog selector, taxonomy/support dependency, or new public
+operation.
+
 This arrangement needs no dependency injection container because the contracts
 passed between stages are stable, low-level data values. `workspace.py` keeps
 its module-level domain coupling narrow and uses function-level imports for

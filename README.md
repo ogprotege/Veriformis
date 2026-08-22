@@ -19,8 +19,9 @@ explicitly selects it as training content.
 > `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 exports.
 > Phase 5.4 merged as PR #56 at
 > `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`; Phase 5.5's test-only semantic
-> round-trip matrix is locally admitted, with pull-request publication and
-> merge still pending.
+> round-trip matrix merged as PR #57 at
+> `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 exact dry-run previews
+> are implemented and locally admitted; publication and merge remain open.
 > This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
@@ -256,10 +257,10 @@ source paths.
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
 **private beta workbench Phases 0–2**, **independent-product Phases 0–4**, and
-**independent-product Phase 5.1–5.4**. Phase 5.4 merged as PR #56 at
-`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5's test-only semantic
-round-trip matrix is locally admitted on the current working tree;
-pull-request publication, GitHub evidence, and merge remain pending.
+**independent-product Phase 5.1–5.5**. Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6's exact dry-run preview
+is implemented and locally admitted on the current working tree; publication,
+GitHub evidence, and merge remain pending.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
@@ -293,12 +294,20 @@ Phase 5.4 does not add a renderer. It adds the optional
 set as `.vfexport.zip`. Archive verification preserves the embedded source
 trust grade and is not source-bound export verification. Export discovery,
 request schemas, persisted export models, and the Mac UI remain unchanged.
-The locally admitted Phase 5.5 fixture then exercises all 11 compatible
+The merged Phase 5.5 fixture then exercises all 11 compatible
 container/current-row-schema pairs by materializing and strictly reloading
 ordinary files, plus the one actionable constrained-CSV/`messages` refusal
 and one semantic tamper per container. This is proof infrastructure only: it
 does not ship a production importer or replayer and changes no public surface,
 taxonomy, support claim, or persisted schema.
+Phase 5.6 keeps the same `export dry-run` operation and requests but moves its
+runtime result to response v2 with exactly the unchanged `plan` plus a
+`preview`. The preview selects ordinal zero from each non-empty partition,
+reports exact payload digest and byte size, includes each payload whole only at
+or below 65,536 bytes and within the response budget, and lists the sorted
+plan-derived destination tree plus `export-receipt.json`. Omitted rows are
+never truncated. The ASCII-safe wire response decodes to the exact original
+values. Preview derivation calls no renderer and accesses no destination.
 Historical request v1 remains unchanged: it selects split JSONL's `train` /
 `evaluation` filenames with aligned provenance and the canonical JSON fixed
 tree, or constrained CSV's fixed quoted-CSV tree. Request v2 applies only to
@@ -308,8 +317,10 @@ or omit provenance; canonical JSON and constrained CSV refuse configured
 requests. Constrained CSV supports the three flat row schemas and refuses
 `messages` with a split JSONL or canonical JSON alternative. No request
 changes source rows, ordering, partition membership, curation, or split policy.
-The ten persisted verified-export v1 schemas, discovery v1, response v1, and
-existing `ExportService.publish` call signature remain unchanged. Every new
+The ten persisted verified-export v1 schemas, request v1/v2, discovery v1, and
+existing `ExportService.publish` call signature remain unchanged. Response v1
+remains exact for non-dry-run operations; dry run uses runtime response v2 and
+preview v1 without creating durable export evidence. Every new
 trainer-specific profile remains later work.
 Maturity remains development **alpha** (not a
 public beta label). A future beta cut must follow

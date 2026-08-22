@@ -2,18 +2,18 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`
+**Implementation baseline reviewed:** `c72b8e9ec7bc2746d74404226aa086d497e15db1`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–4 and items 5.1–5.4 complete), plus the current
-locally admitted Phase 5.5 semantic round-trip matrix
+independent-product Phases 0–4 and items 5.1–5.5 complete), plus the current
+Phase 5.6 exact dry-run preview work
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
 
-**Next review:** Phase 5.5 pull-request publication or merge; beta label cut,
-public Mac evidence, or any listed-item status change
+**Next review:** Phase 5.6 pull-request publication or merge; beta
+label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -62,8 +62,8 @@ local, offline, and free of LLM generation.
       at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
 - [ ] Independent product Phase 5 is in progress under its
       [active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
-      Items 5.1–5.4 are merged; item 5.5's test-only semantic round-trip matrix
-      is locally admitted and awaits publication.
+      Items 5.1–5.5 are merged; item 5.6's runtime preview is implemented and
+      locally admitted, with publication and merge pending.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -201,22 +201,26 @@ three flat row schemas and refuses `messages` before publication.
       refused before publication.
 - [x] Phase 5.4 — deterministic generic export-pack archive integration merged
       as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
-- [x] Phase 5.5 — the test-only semantic import-round-trip matrix is locally
-      admitted; pull-request publication, GitHub evidence, and merge remain
-      pending. It adds no production importer or replayer.
-- [ ] Phase 5.6 — exact sample-row and destination-tree dry-run previews.
+- [x] Phase 5.5 — the test-only semantic import-round-trip matrix merged as PR
+      #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`. It adds no production
+      importer or replayer.
+- [x] Phase 5.6 — exact sample-row and destination-tree dry-run previews are
+      implemented and locally admitted; publication and merge remain open.
 - [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
 
-The Phase 5.1–5.4 implementation and admission evidence support the split
+The Phase 5.1–5.6 implementation and admission evidence support the split
 JSONL, canonical JSON, and constrained CSV promotions. Phase 5 remains in
 progress. Phase 5.4 ships
 `deterministic-export-pack-zip-v1` through the existing `package` /
 `package-verify` family and adds no fourth renderer, trainer compatibility,
-source-bound archive verification, or Mac UI. Phase 5.5's locally admitted,
+source-bound archive verification, or Mac UI. Phase 5.5's merged,
 discovery-closed fixture proves the 11 compatible pairs, the sole nested-CSV
 refusal, and per-container semantic tampering without adding a production
-importer or replayer. Its publication and merge, previews, final guidance, and
-every trainer profile remain later work.
+importer or replayer. Item 5.6 adds only runtime response v2
+with the unchanged plan, exact whole-or-omitted ordinal-zero partition samples,
+and a normalized plan-derived tree plus receipt. Its local evidence passed;
+publication, merge, final guidance, and every trainer profile remain later
+work.
 
 The current stage-command runtime is:
 

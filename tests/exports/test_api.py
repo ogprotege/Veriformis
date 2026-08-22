@@ -598,6 +598,7 @@ def test_dry_run_derives_stable_plan_without_render_or_destination_io(
     assert not destination.exists()
     assert _tree_bytes(bundle) == source_before
     response = export_dry_run_response(first)
+    assert response["schema_version"] == EXPORT_SURFACE_RESPONSE_SCHEMA
     assert response["result"]["plan"]["export_plan_id"] == first.export_plan_id
 
 

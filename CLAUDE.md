@@ -12,8 +12,9 @@ supported generic `split-jsonl-directory`, canonical `json`, and
 `constrained-csv` v1 exports plus receipt-anchored export-pack transport.
 Phase 5.4 merged as PR #56 at
 `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5's consolidated
-semantic round-trip matrix is locally admitted; pull-request publication,
-GitHub evidence, and merge remain pending.
+semantic round-trip matrix merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6's exact dry-run preview
+is implemented and locally admitted; publication and merge remain open.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -56,8 +57,15 @@ verification, and adds no MCP or Mac UI operation. Phase 5.5 adds only a
 frozen, discovery-closed test fixture that strictly reloads ordinary emitted
 files for all 11 compatible container/schema pairs, proves the sole nested-CSV
 refusal, and exercises semantic tampering. It adds no production importer,
-replayer, request, schema, taxonomy, or support claim. Do not claim public
-beta or production readiness without the checklists in
+replayer, request, schema, taxonomy, or support claim. Phase 5.6 adds a
+runtime-only dry-run response v2: the unchanged plan, exact ordinal-zero
+samples for non-empty train/evaluation partitions, and a normalized plan-
+derived destination tree plus `export-receipt.json`. Payloads over 64 KiB or
+unable to fit the response budget are omitted whole with an exact reason;
+ASCII-safe transport preserves decoded values. Preview must not call a
+renderer or access a destination, and it changes no persisted model, request,
+discovery, selector, taxonomy, support, consumer, or trainer claim. Do not
+claim public beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 
 Read these current authorities before changing code:

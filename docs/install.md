@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -141,7 +141,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis package EXPORT -o EXPORT.vfexport.zip --export-receipt-sha256 HEX` | Deterministic receipt-anchored transport of an unchanged generic export directory |
 | `veriformis package-verify ARCHIVE --export-receipt-sha256 HEX` | Verify receipt-bound export members and canonical transport bytes |
 | `veriformis export discover` | List executable verified-export implementations; includes `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
-| `veriformis export dry-run --request-json JSON` | Derive a source-anchored export plan without destination access |
+| `veriformis export dry-run --request-json JSON` | Derive a source-anchored plan plus exact first-row/non-empty-partition samples and normalized plan-derived tree, without renderer or destination access; whole payloads over 65,536 bytes or excluded by the response budget are omitted with an exact reason |
 | `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |
 | `veriformis export execute --request-json JSON` | Publish one operator-confirmed plan with no-replace `refuse` |
 | `veriformis export-verify --request-json JSON` | Re-derive source authority and independently verify an export |

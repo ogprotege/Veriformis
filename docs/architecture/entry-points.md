@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview locally admitted)
 
 **Next review:** Any entry-point or architecture change
 
@@ -167,8 +167,9 @@ surface, not an `export` subcommand, MCP tool, or Mac UI action.
 `export execute`, and top-level `export-verify` are thin adapters. The latter
 four take one strict canonical request through `--request-json`. Historical
 request v1 remains unchanged and selects the split-JSONL defaults, canonical
-JSON's fixed tree, or constrained CSV's fixed tree. Dry run, execute, and source-bound verify also accept request
-v2 for split JSONL only, whose complete canonical
+JSON's fixed tree, or constrained CSV's fixed tree. Dry run, execute, and
+source-bound verify also accept request v2 for split JSONL only, whose complete
+canonical
 `veriformis.split-jsonl-options/v1` object may change only the two safe stems or
 omit provenance; inspect remains request v1. MCP exposes the same five
 operations and canonical response envelope. The Mac bridge shells those CLI
@@ -178,6 +179,20 @@ profile, renderer, replayer, membership projection, replacement mode, or force
 flag. Python callers import the cancellation callback, frozen publication
 outcome, and visible-partial exception from `veriformis.exports`; publication
 hooks remain private.
+
+Phase 5.6 changes only the product dry-run response. `PipelineService`, CLI,
+MCP, and the CLI-backed Mac bridge emit canonical
+`veriformis.export-surface-response/v2` with result exactly `plan` and
+`preview`; other operations retain response v1. The exported legacy Python
+`export_dry_run_response(plan)` serializer remains an explicit plan-only v1
+compatibility helper and is not used by those product operation adapters.
+`veriformis.export-dry-run-preview/v1` carries ordinal-zero samples for each
+non-empty partition and a sorted relative plan-derived tree plus receipt.
+Payload objects are complete through 65,536 canonical bytes, or null with an
+exact over-limit or response-budget omission reason; ASCII-safe wire escapes
+decode to unchanged values. The
+adapter path introduces no new operation, renderer selection, destination
+argument, filesystem policy, MCP tool, or Mac UI action.
 
 Phase 5.1's exact-byte renderer emits canonical payload-only partition JSONL,
 deterministic README and data-card sidecars, optional aligned provenance, and a
@@ -195,10 +210,10 @@ semantic replay retains complete files in memory and its fixture is statically
 bounded, but no production semantic replayer ships. Phase 4.9 remains the
 historical consolidated adversarial closeout. Phase 5.4's merged
 receipt-anchored transport leaves those renderer and surface claims unchanged.
-Phase 5.5 likewise adds no entry point: its locally admitted eleven-pair
+Phase 5.5 likewise adds no entry point: its merged eleven-pair
 ordinary-file reload matrix, three semantic-tamper cases, and constrained-CSV
-`messages` refusal are test evidence only. Later generic work remains in items
-5.6–5.7.
+`messages` refusal are test evidence only. Item 5.6 enriches existing dry run as
+described above; item 5.7 remains later work.
 
 ## Preview, recipes, and optional integrations
 

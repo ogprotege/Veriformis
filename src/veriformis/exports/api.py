@@ -8,6 +8,7 @@ not additional persisted export evidence.
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +17,7 @@ from typing import Any, Literal, Self
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from veriformis.contracts import V1_ROW_SCHEMA_KINDS
+from veriformis.datasets import RowSet, row_set_from_json_bytes
 from veriformis.errors import (
     ExportContractError,
     ExportVerificationError,
@@ -29,6 +31,7 @@ from veriformis.exports._publication import (
     _MAX_EXPORT_TREE_DEPTH,
 )
 from veriformis.exports.models import (
+    EXPORT_RECEIPT_PATH,
     ExportConsumerProfile,
     ExportContainerProfile,
     ExportDependencyBinding,
@@ -43,7 +46,9 @@ from veriformis.identity import lossless_json_bytes, sha256_digest, validate_id
 EXPORT_SURFACE_REQUEST_SCHEMA = "veriformis.export-surface-request/v1"
 EXPORT_SURFACE_REQUEST_SCHEMA_V2 = "veriformis.export-surface-request/v2"
 EXPORT_SURFACE_RESPONSE_SCHEMA = "veriformis.export-surface-response/v1"
+EXPORT_SURFACE_RESPONSE_SCHEMA_V2 = "veriformis.export-surface-response/v2"
 EXPORT_DISCOVERY_SCHEMA = "veriformis.export-discovery/v1"
+EXPORT_DRY_RUN_PREVIEW_SCHEMA = "veriformis.export-dry-run-preview/v1"
 
 ExportOperation = Literal["discover", "dry_run", "inspect", "execute", "verify"]
 ExportResponseStatus = Literal[
@@ -58,7 +63,12 @@ _MAX_SURFACE_REQUEST_BYTES = 1024 * 1024
 _MAX_SURFACE_RESPONSE_BYTES = 1024 * 1024
 _MAX_RUNTIME_PATH_BYTES = 32 * 1024
 _MAX_EXECUTABLE_PLAN_RESPONSE_BYTES = 256 * 1024
+_MAX_DRY_RUN_PREVIEW_RESPONSE_BYTES = 256 * 1024
 _MAX_ERROR_MESSAGE_BYTES = 4096
+_MAX_SAMPLE_PAYLOAD_BYTES = 64 * 1024
+_SAMPLE_POLICY = "first-row-per-non-empty-partition"
+_PREVIEW_LIMIT_OMISSION = "exact-payload-exceeds-preview-limit"
+_RESPONSE_BUDGET_OMISSION = "exact-payload-exceeds-response-budget"
 
 
 def _selector_sort_key(
@@ -510,6 +520,399 @@ class ExportVerifiedOutcome:
     verification: ExportVerification
 
 
+PreviewOmissionReason = Literal[
+    "exact-payload-exceeds-preview-limit",
+    "exact-payload-exceeds-response-budget",
+]
+
+
+@dataclass(frozen=True, slots=True)
+class _ExportDryRunSample:
+    """One immutable exact semantic payload or one whole-row omission."""
+
+    partition: Literal["train", "evaluation"]
+    ordinal: int
+    payload_sha256: str
+    payload_byte_size: int
+    canonical_payload_bytes: bytes | None
+    omission_reason: PreviewOmissionReason | None
+
+    def __post_init__(self) -> None:
+        if type(self.partition) is not str or self.partition not in {
+            "train",
+            "evaluation",
+        }:
+            raise ExportContractError("preview sample partition is invalid")
+        if type(self.ordinal) is not int or self.ordinal != 0:
+            raise ExportContractError(
+                "preview samples must use authoritative partition ordinal zero"
+            )
+        if (
+            type(self.payload_sha256) is not str
+            or len(self.payload_sha256) != 64
+            or any(
+                character not in "0123456789abcdef"
+                for character in self.payload_sha256
+            )
+        ):
+            raise ExportContractError("preview sample payload digest is invalid")
+        if type(self.payload_byte_size) is not int or self.payload_byte_size < 0:
+            raise ExportContractError("preview sample payload size is invalid")
+
+        payload_bytes = self.canonical_payload_bytes
+        if payload_bytes is not None:
+            if type(payload_bytes) is not bytes:
+                raise ExportContractError(
+                    "preview sample payload must be immutable canonical bytes"
+                )
+            try:
+                canonical_export_object_from_bytes(
+                    payload_bytes,
+                    label="export dry-run preview sample",
+                )
+            except ExportVerificationError as exc:
+                raise ExportContractError(str(exc)) from exc
+            if (
+                len(payload_bytes) != self.payload_byte_size
+                or sha256_digest(payload_bytes) != self.payload_sha256
+            ):
+                raise ExportContractError(
+                    "preview sample payload bytes differ from their binding"
+                )
+            if self.omission_reason is not None:
+                raise ExportContractError(
+                    "an emitted preview payload cannot have an omission reason"
+                )
+            return
+
+        if self.omission_reason not in {
+            _PREVIEW_LIMIT_OMISSION,
+            _RESPONSE_BUDGET_OMISSION,
+        }:
+            raise ExportContractError(
+                "an omitted preview payload requires an exact omission reason"
+            )
+        if (
+            self.omission_reason == _PREVIEW_LIMIT_OMISSION
+            and self.payload_byte_size <= _MAX_SAMPLE_PAYLOAD_BYTES
+        ):
+            raise ExportContractError(
+                "preview-limit omission requires a payload above the exact limit"
+            )
+        if (
+            self.omission_reason == _RESPONSE_BUDGET_OMISSION
+            and self.payload_byte_size > _MAX_SAMPLE_PAYLOAD_BYTES
+        ):
+            raise ExportContractError(
+                "an over-limit payload must use the preview-limit omission reason"
+            )
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = (
+            canonical_export_object_from_bytes(
+                self.canonical_payload_bytes,
+                label="export dry-run preview sample",
+            )
+            if self.canonical_payload_bytes is not None
+            else None
+        )
+        return {
+            "omission_reason": self.omission_reason,
+            "ordinal": self.ordinal,
+            "partition": self.partition,
+            "payload": payload,
+            "payload_byte_size": self.payload_byte_size,
+            "payload_sha256": self.payload_sha256,
+        }
+
+
+def _sample_omitted_for_response_budget(
+    sample: _ExportDryRunSample,
+) -> _ExportDryRunSample:
+    if sample.canonical_payload_bytes is None:
+        return sample
+    return _ExportDryRunSample(
+        partition=sample.partition,
+        ordinal=sample.ordinal,
+        payload_sha256=sample.payload_sha256,
+        payload_byte_size=sample.payload_byte_size,
+        canonical_payload_bytes=None,
+        omission_reason=_RESPONSE_BUDGET_OMISSION,
+    )
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class _ExportDryRunSampleEvidence:
+    """Bounded canonical evidence retained for one selected source payload."""
+
+    partition: Literal["train", "evaluation"]
+    payload_sha256: str
+    payload_byte_size: int
+    canonical_payload_bytes: bytes | None
+
+    def __init__(self) -> None:
+        raise TypeError(
+            "dry-run sample evidence must be derived from canonical payload bytes"
+        )
+
+    @classmethod
+    def _from_payload_bytes(
+        cls,
+        *,
+        partition: Literal["train", "evaluation"],
+        payload_bytes: bytes,
+    ) -> Self:
+        if type(partition) is not str or partition not in {"train", "evaluation"}:
+            raise ExportContractError("preview sample evidence partition is invalid")
+        if type(payload_bytes) is not bytes:
+            raise ExportContractError(
+                "preview sample evidence requires immutable canonical bytes"
+            )
+        try:
+            canonical_export_object_from_bytes(
+                payload_bytes,
+                label="export dry-run preview sample evidence",
+            )
+        except ExportVerificationError as exc:
+            raise ExportContractError(str(exc)) from exc
+        evidence = object.__new__(cls)
+        object.__setattr__(evidence, "partition", partition)
+        object.__setattr__(
+            evidence,
+            "payload_sha256",
+            sha256_digest(payload_bytes),
+        )
+        object.__setattr__(evidence, "payload_byte_size", len(payload_bytes))
+        object.__setattr__(
+            evidence,
+            "canonical_payload_bytes",
+            (
+                bytes(payload_bytes)
+                if len(payload_bytes) <= _MAX_SAMPLE_PAYLOAD_BYTES
+                else None
+            ),
+        )
+        return evidence
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class ExportDryRunPreview:
+    """One non-persisted preview bound to one exact export plan."""
+
+    plan: ExportPlan
+    sample_rows: tuple[_ExportDryRunSample, ...]
+    _sample_evidence: tuple[_ExportDryRunSampleEvidence, ...]
+
+    def __init__(self) -> None:
+        raise TypeError(
+            "ExportDryRunPreview must be created from exact plan-bound row evidence"
+        )
+
+    @classmethod
+    def _from_samples(
+        cls,
+        *,
+        plan: ExportPlan,
+        sample_rows: tuple[_ExportDryRunSample, ...],
+        sample_evidence: tuple[_ExportDryRunSampleEvidence, ...],
+    ) -> Self:
+        """Construct only inside the service-owned preview derivation path."""
+        preview = object.__new__(cls)
+        object.__setattr__(preview, "plan", plan)
+        object.__setattr__(preview, "sample_rows", sample_rows)
+        object.__setattr__(preview, "_sample_evidence", sample_evidence)
+        preview.__post_init__()
+        return preview
+
+    def __post_init__(self) -> None:
+        try:
+            checked_plan = ExportPlan.from_json_bytes(self.plan.canonical_bytes())
+        except (
+            AttributeError,
+            TypeError,
+            UnicodeError,
+            ValueError,
+            VeriformisError,
+        ) as exc:
+            raise ExportContractError(f"invalid dry-run preview plan: {exc}") from exc
+        samples = tuple(self.sample_rows)
+        evidence = tuple(self._sample_evidence)
+        expected_partitions: tuple[str, ...] = (
+            ("train", "evaluation")
+            if checked_plan.membership_projection.evaluation_record_count
+            else ("train",)
+        )
+        if (
+            tuple(sample.partition for sample in samples) != expected_partitions
+            or tuple(item.partition for item in evidence) != expected_partitions
+            or len(samples) != len(evidence)
+        ):
+            raise ExportContractError(
+                "preview samples must contain ordinal zero for every non-empty "
+                "partition in train-then-evaluation order"
+            )
+        entries = {
+            (entry.partition, entry.ordinal): entry
+            for entry in checked_plan.membership_projection.entries
+        }
+        for sample, source in zip(samples, evidence, strict=True):
+            if type(sample) is not _ExportDryRunSample:
+                raise ExportContractError("preview sample has the wrong runtime type")
+            if type(source) is not _ExportDryRunSampleEvidence:
+                raise ExportContractError(
+                    "preview sample evidence has the wrong runtime type"
+                )
+            entry = entries.get((sample.partition, sample.ordinal))
+            if (
+                entry is None
+                or entry.payload_sha256 != sample.payload_sha256
+                or source.payload_sha256 != sample.payload_sha256
+                or source.payload_byte_size != sample.payload_byte_size
+            ):
+                raise ExportContractError(
+                    "preview sample differs from the export plan membership binding"
+                )
+            candidate = source.canonical_payload_bytes
+            if candidate is None:
+                if (
+                    sample.canonical_payload_bytes is not None
+                    or sample.omission_reason != _PREVIEW_LIMIT_OMISSION
+                ):
+                    raise ExportContractError(
+                        "preview-limit omission differs from exact source evidence"
+                    )
+            elif sample.canonical_payload_bytes is not None:
+                if sample.canonical_payload_bytes != candidate:
+                    raise ExportContractError(
+                        "included preview payload differs from exact source evidence"
+                    )
+            elif sample.omission_reason != _RESPONSE_BUDGET_OMISSION:
+                raise ExportContractError(
+                    "within-limit preview omission has an invalid reason"
+                )
+        object.__setattr__(self, "plan", checked_plan)
+        object.__setattr__(self, "sample_rows", samples)
+        object.__setattr__(self, "_sample_evidence", evidence)
+
+    @classmethod
+    def create(cls, *, plan: ExportPlan, row_set: RowSet) -> Self:
+        """Freeze ordinal-zero payloads from the exact row set used by planning."""
+        try:
+            checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
+            checked_row_set = row_set_from_json_bytes(
+                lossless_json_bytes(row_set.model_dump(mode="json"))
+            )
+        except (AttributeError, TypeError, UnicodeError, ValueError, VeriformisError) as exc:
+            raise ExportContractError(
+                f"invalid dry-run preview source evidence: {exc}"
+            ) from exc
+        if (
+            checked_row_set.row_set_id != checked_plan.row_set_id
+            or checked_row_set.row_schema != checked_plan.row_schema
+            or checked_row_set.train_row_count
+            != checked_plan.membership_projection.train_record_count
+            or checked_row_set.evaluation_row_count
+            != checked_plan.membership_projection.evaluation_record_count
+        ):
+            raise ExportContractError(
+                "dry-run preview row set differs from its exact export plan"
+            )
+
+        selected = [("train", checked_row_set.train_rows[0])]
+        if checked_row_set.evaluation_rows:
+            selected.append(("evaluation", checked_row_set.evaluation_rows[0]))
+        evidence: list[_ExportDryRunSampleEvidence] = []
+        for partition, row in selected:
+            payload_bytes = lossless_json_bytes(row.payload)
+            evidence.append(
+                _ExportDryRunSampleEvidence._from_payload_bytes(
+                    partition=partition,  # type: ignore[arg-type]
+                    payload_bytes=payload_bytes,
+                )
+            )
+        return _derive_dry_run_preview_from_evidence(
+            plan=checked_plan,
+            evidence=tuple(evidence),
+        )
+
+    @property
+    def destination_files(self) -> tuple[str, ...]:
+        return tuple(
+            sorted((*[item.path for item in self.plan.file_plans], EXPORT_RECEIPT_PATH))
+        )
+
+    @property
+    def destination_directories(self) -> tuple[str, ...]:
+        directories: set[str] = set()
+        for path in self.destination_files:
+            parts = path.split("/")
+            directories.update(
+                "/".join(parts[:index]) for index in range(1, len(parts))
+            )
+        return tuple(sorted(directories))
+
+    def strict_copy(self) -> Self:
+        checked = _derive_dry_run_preview_from_evidence(
+            plan=ExportPlan.from_json_bytes(self.plan.canonical_bytes()),
+            evidence=tuple(self._sample_evidence),
+        )
+        if self.sample_rows != checked.sample_rows:
+            raise ExportContractError(
+                "dry-run preview omission state differs from its exact source evidence"
+            )
+        return checked
+
+    def to_dict(self) -> dict[str, Any]:
+        return _dry_run_preview_dict_from_validated(self.strict_copy())
+
+
+def _derive_dry_run_preview_from_evidence(
+    *,
+    plan: ExportPlan,
+    evidence: tuple[_ExportDryRunSampleEvidence, ...],
+) -> ExportDryRunPreview:
+    samples = tuple(
+        _ExportDryRunSample(
+            partition=item.partition,
+            ordinal=0,
+            payload_sha256=item.payload_sha256,
+            payload_byte_size=item.payload_byte_size,
+            canonical_payload_bytes=item.canonical_payload_bytes,
+            omission_reason=(
+                _PREVIEW_LIMIT_OMISSION
+                if item.canonical_payload_bytes is None
+                else None
+            ),
+        )
+        for item in evidence
+    )
+    preview = ExportDryRunPreview._from_samples(
+        plan=plan,
+        sample_rows=samples,
+        sample_evidence=evidence,
+    )
+    return _fit_dry_run_preview_response_budget(preview)
+
+
+def _dry_run_preview_dict_from_validated(
+    preview: ExportDryRunPreview,
+) -> dict[str, Any]:
+    return {
+        "container_profile_id": preview.plan.container_profile.container_profile_id,
+        "destination_tree": {
+            "directories": list(preview.destination_directories),
+            "files": list(preview.destination_files),
+        },
+        "export_plan_id": preview.plan.export_plan_id,
+        "maximum_sample_payload_bytes": _MAX_SAMPLE_PAYLOAD_BYTES,
+        "row_schema": preview.plan.row_schema,
+        "row_set_id": preview.plan.row_set_id,
+        "sample_policy": _SAMPLE_POLICY,
+        "sample_rows": [sample.to_dict() for sample in preview.sample_rows],
+        "schema_version": EXPORT_DRY_RUN_PREVIEW_SCHEMA,
+    }
+
+
 class ExportOperationCancelled(Exception):
     """A cooperative surface cancellation observed before publication."""
 
@@ -620,7 +1023,72 @@ def export_discovery_response(discovery: ExportDiscovery) -> dict[str, Any]:
 
 
 def export_dry_run_response(plan: ExportPlan) -> dict[str, Any]:
+    """Return the legacy v1 plan-only response."""
     return _response("dry_run", result={"plan": export_plan_summary(plan)})
+
+
+def export_dry_run_preview_response(
+    preview: ExportDryRunPreview,
+) -> dict[str, Any]:
+    """Return the v2 dry-run response with one plan-bound exact preview."""
+    if type(preview) is not ExportDryRunPreview:
+        raise ExportContractError("dry-run preview has the wrong runtime type")
+    checked = preview.strict_copy()
+    return _export_dry_run_preview_response_from_validated(checked)
+
+
+def _export_dry_run_preview_response_from_validated(
+    preview: ExportDryRunPreview,
+) -> dict[str, Any]:
+    """Project one already validated, response-budgeted preview."""
+    return _response(
+        "dry_run",
+        result={
+            "plan": export_plan_summary(preview.plan),
+            "preview": _dry_run_preview_dict_from_validated(preview),
+        },
+        schema_version=EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
+    )
+
+
+def _dry_run_preview_response_size(preview: ExportDryRunPreview) -> int:
+    response = _export_dry_run_preview_response_from_validated(preview)
+    return len(export_response_json(response).encode("ascii"))
+
+
+def _fit_dry_run_preview_response_budget(
+    preview: ExportDryRunPreview,
+) -> ExportDryRunPreview:
+    """Omit whole candidate payloads until the exact v2 response is bounded."""
+    checked = preview
+    if _dry_run_preview_response_size(checked) <= _MAX_DRY_RUN_PREVIEW_RESPONSE_BYTES:
+        return checked
+
+    samples = list(checked.sample_rows)
+    # Keep deterministic train-then-evaluation ordering while preferring the
+    # train sample when only one complete payload fits.
+    for partition in ("evaluation", "train"):
+        for index, sample in enumerate(samples):
+            if (
+                sample.partition == partition
+                and sample.canonical_payload_bytes is not None
+            ):
+                samples[index] = _sample_omitted_for_response_budget(sample)
+                break
+        checked = ExportDryRunPreview._from_samples(
+            plan=checked.plan,
+            sample_rows=tuple(samples),
+            sample_evidence=checked._sample_evidence,
+        )
+        if (
+            _dry_run_preview_response_size(checked)
+            <= _MAX_DRY_RUN_PREVIEW_RESPONSE_BYTES
+        ):
+            return checked
+
+    raise ExportContractError(
+        "export dry-run plan and preview metadata exceed the 256 KiB response budget"
+    )
 
 
 def export_inspection_response(inspection: ExportInspection) -> dict[str, Any]:
@@ -696,8 +1164,32 @@ def export_verify_response(verified: ExportVerifiedOutcome) -> dict[str, Any]:
 def export_error_response(
     operation: ExportOperation,
     exc: BaseException,
+    *,
+    response_schema: str | None = None,
 ) -> dict[str, Any]:
+    if response_schema is None:
+        response_schema = (
+            EXPORT_SURFACE_RESPONSE_SCHEMA_V2
+            if operation == "dry_run"
+            else EXPORT_SURFACE_RESPONSE_SCHEMA
+        )
+    if response_schema not in {
+        EXPORT_SURFACE_RESPONSE_SCHEMA,
+        EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
+    }:
+        raise ExportContractError("unsupported export error response schema")
+    if (
+        response_schema == EXPORT_SURFACE_RESPONSE_SCHEMA_V2
+        and operation != "dry_run"
+    ):
+        raise ExportContractError(
+            "export response v2 is reserved for the dry-run preview operation"
+        )
     if isinstance(exc, ExportPartialPublicationError):
+        if response_schema != EXPORT_SURFACE_RESPONSE_SCHEMA:
+            raise ExportContractError(
+                "visible partial publication uses export response v1"
+            )
         publication = exc.publication
         response = _response(
             "execute",
@@ -720,12 +1212,28 @@ def export_error_response(
         status=status,
         result=None,
         error={"code": code, "message": _bounded_error_message(exc)},
+        schema_version=response_schema,
     )
 
 
 def export_response_json(payload: dict[str, Any]) -> str:
     """Return one bounded canonical response, without a trailing LF."""
-    data = lossless_json_bytes(payload)
+    if payload.get("schema_version") == EXPORT_SURFACE_RESPONSE_SCHEMA_V2:
+        try:
+            data = json.dumps(
+                payload,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+                allow_nan=False,
+            ).encode("ascii")
+        except (RecursionError, TypeError, UnicodeError, ValueError) as exc:
+            raise ExportContractError(
+                f"invalid export response v2 payload: {exc}"
+            ) from exc
+    else:
+        # Preserve the historical response-v1 bytes exactly.
+        data = lossless_json_bytes(payload)
     if len(data) > _MAX_SURFACE_RESPONSE_BYTES:
         raise ExportContractError("export surface response exceeds the 1 MiB limit")
     return data.decode("utf-8")
@@ -792,12 +1300,22 @@ def _response(
     status: ExportResponseStatus = "ok",
     result: dict[str, Any] | None,
     error: dict[str, Any] | None = None,
+    schema_version: str = EXPORT_SURFACE_RESPONSE_SCHEMA,
 ) -> dict[str, Any]:
+    if schema_version not in {
+        EXPORT_SURFACE_RESPONSE_SCHEMA,
+        EXPORT_SURFACE_RESPONSE_SCHEMA_V2,
+    }:
+        raise ExportContractError("unsupported export surface response schema")
+    if schema_version == EXPORT_SURFACE_RESPONSE_SCHEMA_V2 and operation != "dry_run":
+        raise ExportContractError(
+            "export surface response v2 is reserved for dry-run preview"
+        )
     return {
         "error": error,
         "operation": operation,
         "result": result,
-        "schema_version": EXPORT_SURFACE_RESPONSE_SCHEMA,
+        "schema_version": schema_version,
         "status": status,
     }
 
@@ -805,10 +1323,13 @@ def _response(
 __all__ = [
     "CancellationCheck",
     "EXPORT_DISCOVERY_SCHEMA",
+    "EXPORT_DRY_RUN_PREVIEW_SCHEMA",
     "EXPORT_SURFACE_REQUEST_SCHEMA",
     "EXPORT_SURFACE_REQUEST_SCHEMA_V2",
     "EXPORT_SURFACE_RESPONSE_SCHEMA",
+    "EXPORT_SURFACE_RESPONSE_SCHEMA_V2",
     "ExportDiscovery",
+    "ExportDryRunPreview",
     "ExportDryRunRequest",
     "ExportDryRunRequestV2",
     "ExportExecuteRequest",
@@ -823,6 +1344,7 @@ __all__ = [
     "ExportVerifyRequest",
     "ExportVerifyRequestV2",
     "export_discovery_response",
+    "export_dry_run_preview_response",
     "export_dry_run_response",
     "export_error_response",
     "export_execution_response",

@@ -23,12 +23,14 @@ product Phase 5.1–5.3 implement and admit `split-jsonl-directory`, canonical
 exports, without a consumer or trainer profile; independent-product Phase 5.4's
 optional receipt-anchored deterministic `.vfexport.zip` post-export transport
 merged as PR #56 without adding a fourth renderer, MCP operation, or Mac UI
-action; Phase 5.5 is locally admitted as test-only consolidated semantic
-round-trip evidence over the unchanged three-container catalog
+action; Phase 5.5's test-only consolidated semantic round-trip evidence merged
+as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`; Phase 5.6's exact bounded
+dry-run preview contract is frozen, implemented, and locally admitted;
+publication and merge remain open
 
-**Review date:** 2026-08-22 (independent-product Phase 5.5 local admission)
+**Review date:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
 
-**Next review:** Phase 5.5 merge or Phase 5.6;
+**Next review:** Phase 5.6 publication or merge;
 beta label cut, public-ready checklist, or any
 contract change
 
@@ -250,7 +252,8 @@ Phase 5.4's `deterministic-export-pack-zip-v1` transport merged as PR #56 at
 receipt-anchored post-export wrapper around one unchanged published directory,
 not a fourth semantic renderer or a source-bound verification path.
 
-Phase 5.5 is locally admitted as test-only consolidated evidence. One frozen
+Phase 5.5 merged as PR #57 at
+`c72b8e9ec7bc2746d74404226aa086d497e15db1`. One frozen
 ordinary-file fixture closes the discovery-derived matrix at eleven compatible
 container/schema pairs: all four current rows for split JSONL and canonical
 JSON, and the three flat rows for constrained CSV. Every pairing reloads the
@@ -259,6 +262,19 @@ source `RowSet`; one canonical semantic tamper per container fails, and the
 twelfth current pairing retains constrained CSV's actionable pre-publication
 `messages` refusal. This adds no product importer, semantic replayer, API,
 taxonomy or support promotion, trainer claim, or new runtime behavior.
+
+Phase 5.6 adds one runtime-only exact preview to the existing dry-run
+operation. Dry-run response v2 contains exactly the unchanged plan summary and
+a preview: ordinal zero from each non-empty partition in train-then-evaluation
+order, exact payload digest and UTF-8 JSON byte size, and the sorted relative
+plan-derived destination tree plus `export-receipt.json`. Payloads above
+65,536 bytes or unable to fit the 256 KiB response are omitted whole with a
+closed reason, never truncated. ASCII-safe wire JSON decodes to exact source
+values. Preview construction invokes no renderer and accesses no destination.
+The ten persisted export models, request v1/v2, discovery v1, production
+selectors, taxonomy, and support state remain unchanged; response v1 remains
+exact for non-dry-run operations. Local admission evidence is recorded;
+publication and merge remain pending.
 
 ## Implemented interfaces
 
@@ -283,7 +299,7 @@ The installed console entry point is `veriformis`.
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
-| `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan without destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical plan-summary response |
+| `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
 | `export execute --request-json JSON` | Re-derives and atomically publishes the operator-confirmed no-replace plan | Canonical receipt and verification response, or explicit cancellation/visible-partial status |
 | `export-verify --request-json JSON` | Re-verifies source authority, re-derives the confirmed plan, and independently verifies the destination | Canonical source-bound verification response |
@@ -612,9 +628,10 @@ See [docs/release.md](release.md).
 | Implemented independent Phase 5.2 | Production canonical `json` v1 exact-byte export, fixed dataset/provenance object tree, explicit split/schema metadata, mandatory aligned provenance, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.3 | Production `constrained-csv` v1 exact-byte export for the three flat row schemas, fixed quoted CSV/data-card/provenance tree, nested-`messages` refusal, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.4 | Optional `deterministic-export-pack-zip-v1` post-export transport with `.vfexport.zip`, an external canonical-receipt digest, exact receipt-bound members, shared deterministic ZIP/no-replace machinery, preserved source trust, and no fourth renderer, MCP operation, or Mac UI action; merged as PR #56 at `499d61fa2e7d` |
-| Locally admitted independent Phase 5.5 | Test-only consolidated ordinary-file semantic round-trip fixture covering all 11 compatible container/schema pairs, canonical semantic tamper for each container, and actionable pre-publication constrained-CSV/`messages` refusal; no importer, replayer, API, taxonomy, support, or trainer promotion |
+| Implemented and merged independent Phase 5.5 | Test-only consolidated ordinary-file semantic round-trip fixture covering all 11 compatible container/schema pairs, canonical semantic tamper for each container, and actionable pre-publication constrained-CSV/`messages` refusal; PR #57 at `c72b8e9ec7bc`; no importer, replayer, API, taxonomy, support, or trainer promotion |
+| Locally admitted independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; publication and merge pending |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete, items 5.1–5.4 merged, item 5.5 locally admitted pending publication, and items 5.6–5.7 planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete, items 5.1–5.5 merged, item 5.6 locally admitted pending publication/merge, and item 5.7 planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -689,10 +706,11 @@ replayer. Shipped discovery lists `constrained-csv`, `json`, and
 and strict v2 options change only derivative filenames and provenance
 inclusion; canonical JSON and constrained CSV have fixed v1 trees and no
 options. None changes dataset membership. Constrained CSV's supported-schema
-subset excludes nested `messages`. Phase 5.4's post-export transport is merged,
-and Phase 5.5's test-only consolidated matrix now proves the eleven compatible
+subset excludes nested `messages`. Phase 5.4's post-export transport and Phase
+5.5's test-only consolidated matrix are merged; the latter proves the eleven compatible
 ordinary-file round trips and three container tamper failures without adding an
-importer or replayer. New trainer-specific profiles are not current
+importer or replayer. Phase 5.6's runtime preview is locally admitted pending
+publication and merge; it changes no persisted or support state. New trainer-specific profiles are not current
 capabilities; the canonical and optional Aptus
 profiles remain the implemented profile set. A deliberate beta label and
 public Mac checklist remain separate decisions.
