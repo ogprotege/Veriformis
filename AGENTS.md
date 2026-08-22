@@ -23,10 +23,12 @@ built or run here.
   `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"`; the
   `tests/handoff` suite and the `aptus_integration` marker are optional Aptus
   integration checks that are intentionally excluded from the core gates.
-- `uv run pytest` on the full core suite takes ~90s. One test
-  (`tests/bundle/test_defectclose_transport.py`) intentionally emits a
-  `RuntimeWarning` about an unremovable staging link; that warning is expected
-  and not a failure.
+- The full core suite is filesystem-heavy. Timing varies widely by VM: it can
+ run in ~90s on fast disks but has been observed to take ~11–12 minutes on
+ slower cloud storage (~1878 tests). It is not hung — allow generous time. One
+ test (`tests/bundle/test_defectclose_transport.py`) intentionally emits a
+ `RuntimeWarning` about an unremovable staging link; that warning is expected
+ and not a failure.
 - End-to-end compile (`parse → clean → chunk → construct → curate → split →
   format → validate → seal → verify`) needs at least two independent sources to
   produce a non-empty evaluation partition under default split rules. With a
