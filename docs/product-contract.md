@@ -7,18 +7,19 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus completed independent-product Phases 0–4 and Phase 5.1–5.2's supported
-generic `split-jsonl-directory` and canonical `json` v1 derivatives, version
+plus completed independent-product Phases 0–4 and Phase 5.1–5.3's supported
+generic `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
+derivatives, version
 `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; Phase 5.1–5.2 implemented; maturity alpha; public Mac claim
+Phases 0–4 complete; Phase 5.1–5.3 implemented; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.2)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.3 local admission)
 
-**Next review:** Phase 5.2 merge or any later Phase 5 increment; beta
+**Next review:** Phase 5.3 merge or Phase 5.4; beta
 label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -61,7 +62,9 @@ exact-byte publication, deterministic replay, and public surface foundation is
 implemented. [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
 governs the first production renderer and supported generic container;
 [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) governs the
-second fixed-tree generic container.
+second fixed-tree generic container;
+[Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) governs the
+third, flat-schema-only fixed-tree container.
 
 ## Ownership boundary
 
@@ -175,8 +178,18 @@ objective, loss, row-set, split-result, partition-order, count, and payload-
 array fields; one mandatory separate aligned provenance object; a deterministic
 README; and the shared receipt. It uses request v1 and refuses configured
 request v2. It preserves the same exact rows, order, and partitions and claims
-compatibility with no trainer. CSV and all new trainer profiles remain open
-Phase 5 work.
+compatibility with no trainer. Item 5.2 merged as PR #54 at
+`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`.
+
+Phase 5.3 adds `constrained-csv` v1 under the same boundary for `text`,
+`prompt_completion`, and `instruction_output`. Its fixed fully quoted UTF-8/LF
+train/evaluation files, dataset card, mandatory aligned provenance, README,
+and receipt preserve exact strings, order, and logical partitions. It uses
+request v1 and refuses request v2 before source access; after source admission
+reveals nested `messages`, it refuses the schema before destination access,
+directs nested rows to a JSON container, and claims
+compatibility with neither a trainer nor a spreadsheet. All new trainer
+profiles remain open later work.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete
@@ -295,6 +308,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Verified Export Contract v1](./contracts/verified-export-v1.md)
 - [Split JSONL Export Contract v1](./contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](./contracts/canonical-json-export-v1.md)
+- [Constrained CSV Export Contract v1](./contracts/constrained-csv-export-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

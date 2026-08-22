@@ -14,6 +14,7 @@ Before changing code, read:
 - [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
 - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
+- [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -44,13 +45,18 @@ bridge. It merged as PR #50 at
 `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
 at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 completes the
 adversarial closeout. Those remain historical Phase 4 facts: its production
-catalog closed empty. Phase 5.1–5.2 now install exact-byte
-`split-jsonl-directory` and canonical `json` v1 implementations without adding
+catalog closed empty. Phase 5.1–5.3 now install exact-byte
+`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
+implementations without adding
 a semantic replayer or trainer-specific profile. Request v1 uses split JSONL's
 `train` / `evaluation` names and aligned provenance and canonical JSON's fixed
-tree. Request v2 applies only to split JSONL and must provide the complete
+tree; it also selects constrained CSV's fixed quoted-CSV tree. Request v2
+applies only to split JSONL and must provide the complete
 `veriformis.split-jsonl-options/v1` object to change the safe filename stems or
-omit provenance. Canonical JSON refuses configured requests. No surface may
+omit provenance. Canonical JSON and constrained CSV refuse configured
+requests. Constrained CSV admits the flat `text`, `prompt_completion`, and
+`instruction_output` schemas and refuses `messages` before publication with a
+split JSONL or canonical JSON alternative. No surface may
 change rows, ordering, curation, split policy, or partition membership.
 Maturity remains
 development **alpha**. Do not describe the
@@ -162,7 +168,7 @@ local MCP, optional Aptus handoff, and the SwiftUI workbench. It remains a
 development alpha. Follow the current state and exit gates in the
 [independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [program ledger](dev/active/independent-product/program.json), and the current
-phase packet when one is active. `split-jsonl-directory` and canonical `json`
-v1 are the supported generic containers; CSV and every new trainer-specific
-profile remain planned until their own roadmap gates pass.
+phase packet when one is active. `split-jsonl-directory`, canonical `json`,
+and `constrained-csv` v1 are the supported generic containers. Every new
+trainer-specific profile remains planned until its own roadmap gates pass.
 This does not erase the existing canonical or optional Aptus profiles.

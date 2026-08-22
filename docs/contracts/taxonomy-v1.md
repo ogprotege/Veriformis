@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
 
 **Next review:** Any taxonomy, loss-policy, or compatibility-matrix change
 
@@ -129,7 +129,7 @@ not determine the objective or loss.
 | `deterministic-vfbundle-zip-v1` | implemented | Finder-safe transport of that bundle; not a trainer export |
 | `split-jsonl-directory` | implemented | Phase 5 consumer-neutral generic export; contract v1 |
 | `json` | implemented | Phase 5 consumer-neutral canonical JSON export; contract v1 |
-| `constrained-csv` | planned | Phase 5 generic export |
+| `constrained-csv` | implemented | Phase 5 consumer-neutral constrained CSV export for the three flat row schemas; contract v1 |
 | `parquet` | planned | Phase 9 |
 | `arrow` | planned | Phase 9 |
 | `hugging-face-dataset` | planned | Phase 9 |

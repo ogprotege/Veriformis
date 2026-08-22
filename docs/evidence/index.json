@@ -395,6 +395,28 @@
         "python3 -m json.tool docs/governance/corpus-demand-matrix.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-5-constrained-csv-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-f6a5d45f01e0b3117c259271bc59f3599a89dbb6",
+      "scope": "Independent-product Phase 5.3 structurally lossless constrained CSV export",
+      "grade": "recorded-local",
+      "summary": "The third production generic export container, constrained-csv v1, passed 47 dedicated contract tests, 371 export/taxonomy/verified-contract/tracking tests, 1,121 full Python tests, 1,109 standalone core tests with 1 deselected, and 58 Mac tests. Full and standalone Python emitted only the expected transport durability-warning regression warning. Clean-wheel installation, both golden compile/external-digest/transport flows, request-v1 Python/CLI/MCP/Mac parity, project tracking, lock, Ruff, JSON validity, 437 scoped local Markdown links, and diff checks passed. Evidence covers all three compatible flat row schemas, independently pinned literal headers, exact quote-all UTF-8/LF bytes, embedded CR/LF/CRLF, NUL and Unicode preservation, null and empty-field distinction, header-only evaluation, mandatory aligned provenance, source RowSet reconstruction, actionable messages refusal after source admission but before destination access, request-v2 refusal before source access, every-file tamper failure, and closed-tree verification. The ten persisted export v1 models, request v1, discovery v1, response v1, source bundle, and membership remain unchanged; no nested-message encoding, trainer profile, spreadsheet compatibility, archive, or preview claim is added. Independent review found no executable blocker; two promotion-evidence blockers were corrected before publication. GitHub results remain separate publication evidence.",
+      "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_constrained_csv.py",
+        "uv run pytest -q tests/exports tests/contracts/test_taxonomy_contract.py tests/contracts/test_verified_export_contract.py tests/regressions/test_project_tracking.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase5-03-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests scripts",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
     }
   ]
 }

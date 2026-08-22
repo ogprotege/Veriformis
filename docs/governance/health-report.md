@@ -1,13 +1,13 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 5.2 local admission reconciled
+**Status:** Independent-product Phase 5.3 local admission reconciled
 
 **Review date:** 2026-08-22
 
 **Repository baseline:** Working tree based on
-`4f12a55063c2721993b65cfbe30e68eaad55f87f`
+`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`
 
-**Next review:** Independent-product Phase 5.2 merge, Phase 5.3 or Phase 6
+**Next review:** Independent-product Phase 5.3 merge, Phase 5.4 or Phase 6
 start, or the next active-document behavior change
 
 ## Scope examined
@@ -31,7 +31,7 @@ start, or the next active-document behavior change
 - Project governance, support registry, evidence index, ADRs, documentation
   debt, WIP, the completed Phase 0–4 packets, and the active Phase 5 packet.
 - Versioned integrity, construction, finished-dataset, verified-export, split-
-  JSONL, canonical-JSON, and optional Aptus handoff contracts, plus the
+  JSONL, canonical-JSON, constrained-CSV, and optional Aptus handoff contracts, plus the
   implemented taxonomy contract.
 
 These documents govern current behavior, future work, or active execution and
@@ -79,6 +79,7 @@ deprecated document must link its replacement and removal/review trigger.
 | Phase 4 closeout merged while active tracking still showed Phase 5 as planned and had no packet | PR #52 at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`; Phase 5 roadmap dependency and opening decision | Created the standard Phase 5 packet and reconciled program, WIP, and governance indexes to `in_progress`; item 5.1 is active, while packet creation alone makes no support claim |
 | Phase 5.1 changed production discovery and physical-container support from the Phase 4 empty baseline | Split JSONL implementation, request-v2 configuration, four-schema round trips, tamper evidence, and current contracts | Promoted exactly `split-jsonl-directory` v1, retained historical request/discovery/response and persisted export v1 contracts, and reconciled current architecture, operator, support, evidence, and packet records without adding a trainer profile |
 | Phase 5.2 added a second exact-byte generic container while active docs still described JSON as planned | Canonical JSON implementation, strict dataset/provenance models, four-schema admission suite, source-row-set closure regression, and container contract | Promoted exactly canonical `json` v1 alongside split JSONL; retained request/discovery/response and persisted export v1 contracts, fixed the tree, refused request v2, and reconciled active product, architecture, operator, support, and packet records without claiming CSV, previews, archives, or trainer compatibility |
+| Phase 5.3 added a third exact-byte generic container while active docs still described CSV as planned | Constrained CSV implementation, frozen flat-schema dialect/tree, strict reload and tamper checks, nested-`messages` refusal, support admission, and container contract | Promoted exactly `constrained-csv` v1 for `text`, `prompt_completion`, and `instruction_output`; retained request/discovery/response and persisted export v1 contracts, refused request v2 before source or destination access, refused `messages` after source admission but before destination access or publication, and reconciled active product, architecture, operator, support, and packet records without claiming previews, archives, trainer, or spreadsheet compatibility |
 
 ## Current health assessment
 
@@ -95,8 +96,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Publish independently reviewed Phase 5.2, merge only when every required
-   GitHub check is green, and synchronize local `main` before item 5.3.
+1. Publish independently reviewed Phase 5.3, merge only when every required
+   GitHub check is green, and synchronize local `main` before item 5.4.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
@@ -105,11 +106,13 @@ deprecated document must link its replacement and removal/review trigger.
 
 The Phase 4 closeout baseline exposed strict export operations across Python,
 CLI, MCP, and the CLI-backed Mac bridge while production discovery remained
-empty and conformance code remained test-injected. Phase 5.1–5.2 now admit the
-first two production entries, `split-jsonl-directory` and canonical `json` v1,
-after container-specific semantic/tamper evidence and current support records
-agree. Canonical JSON validation reconstructs the source row set so top-level
-identity, split metadata, payload arrays, and provenance must close together.
+empty and conformance code remained test-injected. Phase 5.1–5.3 now admit the
+first three production entries, `split-jsonl-directory`, canonical `json`, and
+`constrained-csv` v1, after container-specific semantic/tamper evidence and
+current support records agree. Canonical JSON validation reconstructs the
+source row set so top-level identity, split metadata, payload arrays, and
+provenance must close together. Constrained CSV admits only the three flat
+schemas and refuses nested `messages` with an exact JSON alternative.
 Generic output does not establish trainer compatibility, and any future
 shipped semantic profile must enforce explicit resource limits.
 

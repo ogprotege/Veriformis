@@ -26,8 +26,9 @@ Specific trainer compatibility and consumer profiles remain later work.
 Every implementation must enter through the Phase 4 verified export service
 and its plan, receipt, publication, and verification boundaries. Packet
 opening alone was not support evidence. The separately admitted Phase 5.1 and
-5.2 implementations support split JSONL and canonical JSON respectively;
-later Phase 5 work remains unimplemented.
+5.2 implementations support split JSONL and canonical JSON respectively. Item
+5.3 locally admits constrained CSV for the three flat row schemas; later Phase
+5 work remains unimplemented.
 
 ## Packet contents
 
@@ -44,10 +45,13 @@ later Phase 5 work remains unimplemented.
 
 Phase 5 opened on 2026-08-21 from baseline
 `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Item 5.1 merged as PR #53 at
-`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 adds `json` v1 for all
-four current row schemas: one canonical dataset object carries explicit
-schema, objective, loss, split, and partition metadata, while a separate
-mandatory canonical object preserves complete aligned provenance. It remains
-trainer-neutral and changes no source row or logical partition. Independent
-code, security, and documentation reviews found no blocker; its remote-green
-merge gate remains before item 5.3 begins.
+`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2's `json` v1 merged as
+PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3 locally adds
+`constrained-csv` v1 with fixed `data/train.csv` and `data/evaluation.csv`, a
+dataset card, mandatory aligned provenance, README, and the shared receipt.
+Every field is quoted with the frozen UTF-8/LF dialect. It admits `text`,
+`prompt_completion`, and `instruction_output`, refuses `messages` with an
+actionable JSON alternative, has no options, consumer, or trainer claim, and
+changes no source row or logical partition. Its remote-green merge gate remains
+before item 5.4 begins. See the
+[Constrained CSV Export Contract v1](../../../../docs/contracts/constrained-csv-export-v1.md).

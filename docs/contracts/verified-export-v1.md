@@ -28,11 +28,12 @@ schema. Phase 4 did not implement a public renderer or replayer registry or a
 supported product export container. Phase 5.1 adds one reviewed internal
 `split-jsonl-directory` v1 implementation and an additive configured request
 v2 surface. Phase 5.2 adds canonical `json` v1 under historical request v1;
-the ten persisted models, discovery v1, and response v1 remain unchanged.
+Phase 5.3 adds flat-schema-only `constrained-csv` v1 under historical request
+v1. The ten persisted models, discovery v1, and response v1 remain unchanged.
 
-**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
+**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
 
-**Next review:** Phase 5.3 or any export schema change
+**Next review:** Phase 5.4 or any export schema change
 
 ## Purpose
 
@@ -507,9 +508,13 @@ semantic reconstruction of actual destination content.
 locator, one runtime destination root, an optional separately retained expected
 source-manifest SHA-256, and an optional cancellation checkpoint callable. It
 has no renderer-selection, overwrite, filter, membership, resplit, or semantic-
-mapping argument. The default service has no installed renderer. Only a private
-test conformance subclass may override the internal rendering and semantic-
-replay hooks. The renderer receives a strict plan and freshly reconstructed
+mapping argument. A direct call to this lower-level base-service primitive has
+no selected renderer.
+Production dry-run/execute/verify operations first select one exact private
+catalog implementation and bind its internal rendering and semantic-replay
+hooks through a private implementation-bound service; test conformance
+subclasses may also override those hooks. Neither path exposes renderer choice
+to the caller. The renderer receives a strict plan and freshly reconstructed
 source row set, not a destination or staging path. The semantic replayer
 receives a strict plan and one immutable complete `(path, bytes)` tree, not a
 destination path, separately supplied digest, or caller-selected membership.
@@ -804,6 +809,22 @@ Phase 5.2 additionally installs the second reviewed production implementation:
 - the normative rules and admission evidence in
   [Canonical JSON Export v1](canonical-json-export-v1.md).
 
+Phase 5.3 additionally installs the third reviewed production implementation:
+
+- selector `constrained-csv`, version 1, with no consumer profile;
+- `text`, `prompt_completion`, and `instruction_output` under a
+  `portable_exact_bytes` claim; after source admission reveals nested
+  `messages`, selection is refused before destination access with a split JSONL
+  or canonical JSON alternative;
+- historical v1 requests selecting a fixed closed tree, with request v2 and
+  container options refused;
+- fully quoted UTF-8/LF train and evaluation CSV with exact ordered headers,
+  one deterministic dataset card, mandatory aligned provenance JSONL,
+  deterministic README, receipt-bound atomic publication, and source-bound
+  verification; and
+- the normative rules and admission evidence in
+  [Constrained CSV Export v1](constrained-csv-export-v1.md).
+
 The request envelope is operation-discriminated. Selected operations name only
 the source bundle path, exact catalog selector, source-trust policy and retained
 digest, and the literal overwrite policy `refuse`. Execute and verify also
@@ -850,13 +871,16 @@ Persisted profile selectors and a test-injected conformance implementation are
 not support claims. Phase 4 MUST NOT add a generic export container or consumer
 profile to taxonomy discovery or the support capability lists, and it did not
 do so.
-Production export discovery was therefore empty through Phase 4. Phase 5.1–5.2
-now ship two consumer-neutral implementations, `split-jsonl-directory` and
-canonical `json` v1, under their separate container contracts. The existing
+Production export discovery was therefore empty through Phase 4. Phase 5.1–5.3
+now ship three consumer-neutral implementations, `split-jsonl-directory`,
+canonical `json`, and `constrained-csv` v1, under their separate container
+contracts. Split JSONL and canonical JSON admit all four current row schemas;
+constrained CSV admits the three flat schemas and refuses nested `messages`.
+The existing
 `minimal-v1` bundle and deterministic bundle transport remain canonical and
-transport containers respectively. Generic CSV remains Phase 5 work; named
-trainer profiles remain later work. Shipping generic JSONL or JSON does not
-create or imply a consumer profile.
+transport containers respectively. Named trainer profiles remain later work.
+Shipping generic JSONL, JSON, or constrained CSV does not create or imply a
+consumer profile or trainer/spreadsheet compatibility.
 
 ## Version and migration
 

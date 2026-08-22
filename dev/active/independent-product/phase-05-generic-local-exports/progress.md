@@ -109,3 +109,42 @@ JSON validity, and diff checks passed. Final code review found no blocker.
 
 **Next action:** Publish item 5.2, require every GitHub check to pass, merge,
 and synchronize clean local `main` before item 5.3.
+
+## 2026-08-22 — Item 5.3 constrained CSV implemented
+
+**Status:** Local implementation and admission reconciliation complete;
+pull-request publication and merge remain.
+
+Item 5.2 merged as PR #54 at
+`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`, and item 5.3 began from that
+synchronized baseline. Production discovery adds consumer-neutral
+`constrained-csv` v1 with `portable_exact_bytes` determinism for `text`,
+`prompt_completion`, and `instruction_output`. Nested `messages` is not a CSV
+schema: after source admission reveals it, selection fails before destination
+access and directs the operator to split JSONL or canonical JSON.
+
+The fixed closed tree contains fully quoted UTF-8/LF `data/train.csv` and
+`data/evaluation.csv`, deterministic `README.md`,
+`metadata/dataset-card.json`, mandatory train-then-evaluation
+`metadata/row-provenance.jsonl`, and the shared receipt. Ordered headers are
+frozen by row schema; embedded line endings and exact Unicode field content
+are preserved inside quotes. Strict reload re-renders exact bytes and rejects
+empty values, non-string values, count/schema/alignment drift, mutation,
+missing files, and unexpected files.
+
+Historical request v1 selects this fixed tree. Request v2 and container
+options are refused before source or destination access. The verified-export
+persisted models, source bundle, rows, ordering, and logical partition
+membership remain unchanged. Local admission covers the dedicated container
+contract, shared export/taxonomy contracts, cross-surface request-v1 parity,
+tamper/refusal behavior, tracking, and documentation reconciliation. The
+dedicated suite passed 47 tests; the integrated export/taxonomy/verified-
+contract gate passed 371; full Python passed 1,121 with only the expected
+transport warning; the standalone release gate passed 1,109 with one
+deselection plus the clean wheel and both golden flows; parity passed; and the
+complete Mac target passed 58 tests with `TEST SUCCEEDED`. Independent review
+found no executable blocker; its two promotion-evidence blockers were
+corrected before publication.
+
+**Next action:** Publish item 5.3, require every GitHub check to pass, merge,
+and synchronize clean local `main` before item 5.4.

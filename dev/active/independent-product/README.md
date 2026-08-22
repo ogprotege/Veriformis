@@ -53,12 +53,12 @@ Phase 4 shipped no production renderer or semantic replayer, generic export
 container, or trainer-specific profile. Its closeout merged as PR #52 at
 `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 then opened under its own
 standard packet from that clean baseline. Item 5.1 merged as PR #53 at
-`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 implements canonical
-`json` v1 with explicit split/schema metadata, complete separately aligned
-provenance, exact-byte publication, and no trainer profile; independent
-security/documentation review and its remote-green merge gate remain before
-item 5.3. Phase 6 remains planned and requires its own packet before work
-begins.
+`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2's canonical `json` v1
+merged as PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3
+locally implements consumer-neutral `constrained-csv` v1 for the three flat row
+schemas through the same exact-byte service; it refuses nested `messages`
+before publication and awaits its remote-green merge gate before item 5.4.
+Phase 6 remains planned and requires its own packet before work begins.
 
 ## State change procedure
 

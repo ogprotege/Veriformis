@@ -376,6 +376,18 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
                 "canonical JSON support evidence differs from its executable contract",
                 errors,
             )
+        constrained_csv = implemented_entries.get("constrained-csv")
+        if constrained_csv is not None:
+            _require(
+                constrained_csv.get("container_version") == 1
+                and constrained_csv.get("determinism_claim")
+                == "portable_exact_bytes"
+                and constrained_csv.get("consumer_profile") is None
+                and constrained_csv.get("supported_row_schemas")
+                == ["instruction_output", "prompt_completion", "text"],
+                "constrained CSV support evidence differs from its executable contract",
+                errors,
+            )
 
     consumer_profiles = support.get("consumer_profiles")
     if not isinstance(consumer_profiles, list):

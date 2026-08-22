@@ -72,6 +72,9 @@ from veriformis.exports._implementation import (
     _ReplayedDerivative,
 )
 from veriformis.exports.canonical_json import CANONICAL_JSON_IMPLEMENTATION
+from veriformis.exports.constrained_csv import (
+    CONSTRAINED_CSV_IMPLEMENTATION,
+)
 from veriformis.exports.paths import validate_export_relative_path
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
 from veriformis.identity import lossless_json_bytes, sha256_digest
@@ -111,7 +114,11 @@ class ExportService:
     ) -> None:
         """Build one immutable private catalog from reviewed implementations."""
         implementations = (
-            (SPLIT_JSONL_IMPLEMENTATION, CANONICAL_JSON_IMPLEMENTATION)
+            (
+                SPLIT_JSONL_IMPLEMENTATION,
+                CANONICAL_JSON_IMPLEMENTATION,
+                CONSTRAINED_CSV_IMPLEMENTATION,
+            )
             if _implementations is None
             else tuple(_implementations)
         )
@@ -144,7 +151,7 @@ class ExportService:
         self,
         request: ExportDryRunRequest | ExportDryRunRequestV2,
     ) -> ExportPlan:
-        """Derive one exact plan without touching a destination or rendering."""
+        """Derive one exact plan without touching or publishing a destination."""
         if type(request) is ExportDryRunRequest:
             checked = ExportDryRunRequest.from_json_bytes(request.canonical_bytes())
         elif type(request) is ExportDryRunRequestV2:
@@ -310,8 +317,21 @@ class ExportService:
                 lossless_json_bytes(source_row_set.model_dump(mode="json"))
             )
             if planner_row_set.row_schema not in descriptor.supported_row_schemas:
+                if (
+                    descriptor.selector
+                    == CONSTRAINED_CSV_IMPLEMENTATION.descriptor.selector
+                    and planner_row_set.row_schema == "messages"
+                ):
+                    raise ExportContractError(
+                        "export selector 'constrained-csv' v1 does not support "
+                        "source row schema 'messages'; use split-jsonl-directory "
+                        "v1 or json v1 to preserve nested values"
+                    )
                 raise ExportContractError(
-                    "selected export implementation does not support the source row schema"
+                    f"export selector {descriptor.container_profile.container_id!r} "
+                    f"v{descriptor.container_profile.container_version} does not "
+                    f"support source row schema {planner_row_set.row_schema!r}; "
+                    "choose a discovered profile that lists that schema"
                 )
             if not configured:
                 file_plans = tuple(

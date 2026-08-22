@@ -38,11 +38,57 @@ next item begins.
 
 ### 5.3 Implement structurally lossless CSV export
 
-- [ ] Admit only flat text, prompt/completion, and
-      instruction/input/output mappings that remain lossless.
-- [ ] Freeze quoting, encoding, newline, null, empty-string, and Unicode rules.
-- [ ] Refuse nested values before publication with an actionable JSONL or JSON
-      alternative.
+- [x] Implement only selector `constrained-csv` version `1`, with no consumer
+      profile, `portable_exact_bytes`, refuse-only overwrite behavior, and the
+      internal renderer dependency frozen by the
+      [Constrained CSV Export v1 contract](../../../../docs/contracts/constrained-csv-export-v1.md).
+- [x] Admit exactly `text`, `prompt_completion`, and `instruction_output`, with
+      the contract's exact schema-specific column order. Do not advertise or
+      encode `messages` or any other nested value.
+- [x] Emit the fixed closed tree: deterministic README, `data/train.csv`,
+      `data/evaluation.csv`, canonical data card, mandatory complete aligned
+      provenance, and the shared receipt. Accept no container options.
+- [x] Freeze and enforce strict UTF-8 without a byte-order mark, comma
+      delimiter, quote-all headers and values, doubled embedded quotes, LF
+      record terminators and final LF, and exact embedded CR/LF/Unicode
+      preservation without normalization.
+- [x] Define null as unrepresentable and quoted empty field as the exact empty
+      string encoding while retaining Finished Dataset v1's current non-empty
+      product-field requirement. Reject missing, ragged, extra, coerced, and
+      non-string values.
+- [x] Refuse `messages` on dry run, execution, and source-bound verification
+      before destination access or publication. Name the incompatible schema
+      and direct the operator to `split-jsonl-directory` v1 or `json` v1.
+- [x] Keep request, response, discovery, Finished Dataset, source bundle, and
+      the ten persisted verified-export v1 models unchanged. Historical request
+      v1 selects the fixed contract; configured request v2 fails before source
+      or destination access.
+- [x] Prove Python, CLI, MCP, and CLI-backed Mac plan parity, exact-byte
+      determinism across supported Python versions, closed-tree publication,
+      source-bound verification, and no trainer-compatibility claim.
+
+#### Required item 5.3 admission evidence
+
+- [x] Dedicated contract tests reload every supported schema and both logical
+      partitions to identical payload rows, mandatory provenance, and the exact
+      source `RowSet` identity.
+- [x] Golden and adversarial fixtures cover commas, quotes, tabs, whitespace,
+      NUL, embedded CR/LF/CRLF, formula-looking strings, non-ASCII/non-BMP text,
+      and distinct NFC/NFD sequences without rewriting.
+- [x] Negative fixtures reject null, missing and empty required data fields,
+      wrong or reordered headers, ragged and over-wide rows, blank records,
+      invalid UTF-8, byte-order marks, alternate dialects, noncanonical quoting,
+      and missing final LF.
+- [x] Empty evaluation emits the exact quoted header and final LF with payload
+      record count zero; it is not represented as a zero-byte file.
+- [x] Nested `messages` refusal is actionable and leaves the destination
+      untouched for every selected operation.
+- [x] Repeated rendering, every-file tamper, missing and unexpected members,
+      payload/provenance disagreement, receipt/source/plan mismatch, membership
+      mutation, and reconstructed row-set drift fail the applicable gate.
+- [x] Focused, full, release, tracking, parity, Mac, lint, structured-file, and
+      diff gates pass before any support, taxonomy, status, or evidence claim is
+      promoted.
 
 ### 5.4 Integrate deterministic generic export-pack archives
 
@@ -78,10 +124,11 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Phases 5.1 and 5.2 are implemented, and 5.2's independent code,
-security, and documentation reviews found no blocker. Its remote-green merge
-gate remains before 5.3 begins. Later checklist items and the phase-wide exit
-proof remain open.
+**Result:** Phases 5.1–5.3 are implemented and locally admitted. Item 5.3's
+focused, full, release, parity, Mac, tracking, and independent-review gates are
+green; its remote-green merge and clean-main synchronization gates remain
+before item 5.4 begins. Later checklist items and the phase-wide exit proof
+remain open.
 
 ## Non-goals
 

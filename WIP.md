@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `4f12a55063c2721993b65cfbe30e68eaad55f87f`
+**Implementation baseline reviewed:** `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`
 on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
-workbench Phases 0–2; independent-product Phases 0–4 complete), plus the
-current Phase 5.2 canonical JSON branch
+workbench Phases 0–2; independent-product Phases 0–4 and items 5.1–5.2
+complete), plus the current Phase 5.3 constrained CSV branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.2 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.3 local admission)
 
-**Next review:** Phase 5.2 pull-request merge or Phase 5.3 start; beta
+**Next review:** Phase 5.3 pull-request merge or Phase 5.4 start; beta
 label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -61,7 +61,7 @@ local, offline, and free of LLM generation.
       at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
 - [ ] Independent product Phase 5 is in progress under its
       [active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
-      Item 5.1 owns only generic split JSONL.
+      Items 5.1–5.3 own the first three generic local containers.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -177,11 +177,13 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 
 At Phase 4 closeout, the foundation shipped without a production
 implementation: discovery was empty and tests alone injected the conformance
-exporter. Phase 5.1–5.2 install reviewed exact-byte renderers for
-`split-jsonl-directory` and canonical `json` v1 and promote only those
+exporter. Phase 5.1–5.3 install reviewed exact-byte renderers for
+`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 and
+promote only those
 consumer-neutral physical containers. No semantic replayer or trainer-specific
 profile ships. The ten persisted export v1 models remain unchanged; additive
-request v2 carries only split JSONL's strict configuration.
+request v2 carries only split JSONL's strict configuration. Constrained CSV
+admits the three flat row schemas and refuses `messages` before publication.
 
 ### Active Phase 5 status
 
@@ -190,20 +192,21 @@ request v2 carries only split JSONL's strict configuration.
       `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
 - [x] Phase 5.1 — generic split JSONL v1 merged as PR #53 at
       `4f12a55063c2721993b65cfbe30e68eaad55f87f`.
-- [x] Phase 5.2 — canonical JSON v1 with explicit split/schema metadata is
-      implemented only through the export service; independent code,
-      security, and documentation reviews found no blocker, and only the
-      remote-green merge gate remains.
-- [ ] Phase 5.3 — structurally lossless CSV with nested-value refusal.
+- [x] Phase 5.2 — canonical JSON v1 with explicit split/schema metadata merged
+      as PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`.
+- [x] Phase 5.3 — constrained CSV v1 is locally implemented and admitted for
+      `text`, `prompt_completion`, and `instruction_output`; `messages` is
+      refused before publication. The remote-green merge gate remains.
 - [ ] Phase 5.4 — deterministic generic export-pack archive integration.
 - [ ] Phase 5.5 — semantic import-round-trip fixtures.
 - [ ] Phase 5.6 — exact sample-row and destination-tree dry-run previews.
 - [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
 
-The Phase 5.1–5.2 implementation and admission evidence support the split
-JSONL and canonical JSON promotions. Phase 5 remains in progress; CSV,
-export-pack integration, shared round-trip fixtures, previews, final guidance,
-and every trainer profile remain unimplemented.
+The Phase 5.1–5.3 implementation and admission evidence support the split
+JSONL, canonical JSON, and constrained CSV promotions. Phase 5 remains in
+progress; export-pack integration, shared round-trip fixtures, previews, final
+guidance, and every trainer profile remain unimplemented. Phase 5.4 is next
+after the Phase 5.3 remote-green merge and local synchronization gate.
 
 The current stage-command runtime is:
 
@@ -555,6 +558,7 @@ pytest totals; they grow.
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
+- [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Architecture](docs/architecture.md)
 - [Architecture tree](docs/architecture/README.md)

@@ -15,8 +15,9 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–4, plus Phase 5.1–5.2's supported generic
-> `split-jsonl-directory` and canonical `json` v1 exports. This is **not** a public
+> independent-product Phases 0–4, plus Phase 5.1–5.3's supported generic
+> `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 exports.
+> This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 > Install: [docs/install.md](docs/install.md). Status:
@@ -63,6 +64,10 @@ Version `0.1.0` provides:
 - a verified canonical `json` v1 derivative with explicit train/evaluation
   arrays and schema metadata, mandatory aligned provenance, and an export
   receipt;
+- a verified `constrained-csv` v1 derivative for `text`,
+  `prompt_completion`, and `instruction_output`, with fixed fully quoted
+  train/evaluation CSV, mandatory aligned provenance, and nested-`messages`
+  refusal;
 - one-to-one lowering into `text`, `prompt_completion`,
   `instruction_output`, or structured `messages` rows;
 - payload-only partition JSONL plus an aligned provenance stream;
@@ -241,7 +246,7 @@ source paths.
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
 **private beta workbench Phases 0–2**, **independent-product Phases 0–4**, and
-**independent-product Phase 5.1–5.2**.
+**independent-product Phase 5.1–5.3**.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
@@ -264,18 +269,22 @@ discovery, dry-run, inspect, execute, and source-bound verify operations through
 `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
 at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9 completes the
 adversarial harness and closeout reconciliation.
-That empty catalog is a completed Phase 4 fact. Phase 5.1–5.2 install two
-production exact-byte renderers: `split-jsonl-directory` v1 and canonical
-`json` v1, both with no consumer profile or trainer-compatibility claim.
+That empty catalog is a completed Phase 4 fact. Phase 5.1–5.3 install three
+production exact-byte renderers: `split-jsonl-directory`, canonical `json`,
+and `constrained-csv` v1, all with no consumer profile or trainer-compatibility
+claim.
 Historical request v1 remains unchanged: it selects split JSONL's `train` /
 `evaluation` filenames with aligned provenance and the canonical JSON fixed
-tree. Request v2 applies only to split JSONL and requires the complete
+tree, or constrained CSV's fixed quoted-CSV tree. Request v2 applies only to
+split JSONL and requires the complete
 `veriformis.split-jsonl-options/v1` object to change those safe filename stems
-or omit provenance; canonical JSON refuses configured requests. No request
+or omit provenance; canonical JSON and constrained CSV refuse configured
+requests. Constrained CSV supports the three flat row schemas and refuses
+`messages` with a split JSONL or canonical JSON alternative. No request
 changes source rows, ordering, partition membership, curation, or split policy.
 The ten persisted verified-export v1 schemas, discovery v1, response v1, and
-existing `ExportService.publish` call signature remain unchanged. CSV and
-every new trainer-specific profile remain later Phase 5 work.
+existing `ExportService.publish` call signature remain unchanged. Every new
+trainer-specific profile remains later work.
 Maturity remains development **alpha** (not a
 public beta label). A future beta cut must follow
 [docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
@@ -302,6 +311,7 @@ reading paths. The map:
   - [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
   - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
   - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
+  - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
   - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
   - [Install guide](docs/install.md)

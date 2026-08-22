@@ -1,6 +1,6 @@
 # Phase 5 Evidence
 
-**Status:** In progress — items 5.1 and 5.2 local evidence complete
+**Status:** In progress — items 5.1–5.3 locally admitted
 
 **Opened:** 2026-08-21
 
@@ -69,6 +69,23 @@ container.
 - [x] Capability/support, current-status, evidence-index, and packet records
       agree before the pull request merges.
 
+## Required item 5.3 evidence
+
+- [x] The fixed CSV dialect, exact ordered headers, fixed tree, data card, and
+      mandatory provenance formats are frozen by a versioned contract.
+- [x] `text`, `prompt_completion`, and `instruction_output` preserve exact
+      string fields, row order, and train/evaluation membership.
+- [x] Nested `messages`, non-string values, empty fields, schema/count drift,
+      malformed quoting, and provenance misalignment fail closed.
+- [x] Configured request v2 fails before source or destination access. After
+      source admission reveals unsupported `messages`, selection fails before
+      destination access with an actionable split JSONL or canonical JSON
+      alternative.
+- [x] Request v1 discovery, planning, execution, verification, and Mac request
+      parity retain the shared verified-export contracts.
+- [x] Capability/support, current-status, tracking, and packet records are
+      reconciled without claiming trainer or spreadsheet compatibility.
+
 ## Observed results
 
 The opening record above remains historical. The following results were
@@ -89,9 +106,11 @@ The recorded evidence above proves the admitted JSONL container, exact
 membership and round-trip preservation, deterministic bytes, safe
 configuration, and shared
 surface behavior. Canonical JSON item 5.2 adds its separate fixed-tree contract
-and implementation under the local evidence below. Neither increment claims
-CSV, export-pack archives, shared Phase 5.5 fixtures, dry-run sample previews,
-trainer compatibility, scale, or Phase 5 completion.
+and implementation under the local evidence below. Constrained CSV item 5.3
+then adds the flat-schema-only fixed tree described after the historical 5.2
+record. None of these increments claims export-pack archives, shared Phase 5.5
+fixtures, dry-run sample previews, trainer compatibility, scale, or Phase 5
+completion.
 
 ### Item 5.2 observed results — 2026-08-22
 
@@ -112,3 +131,32 @@ refusal, and mutation/tamper failure. Release, clean-wheel, golden, parity,
 Mac, tracking, lock, lint, JSON, and diff gates passed. Final code, security,
 and documentation reviews found no blocker. GitHub results remain separate
 publication evidence.
+
+### Item 5.3 local admission — 2026-08-22
+
+The constrained-CSV contract and implementation freeze a fully quoted
+UTF-8/LF codec for the three flat row schemas, exact ordered headers, separate
+train and evaluation files, deterministic dataset-card and README sidecars,
+mandatory train-then-evaluation provenance, and the shared receipt. Exact-byte
+reload, payload/provenance binding, mutation and closed-tree checks, request-v1
+surface parity, request-v2 refusal, and the actionable nested-`messages`
+alternative are the admission boundary. The container claims neither trainer
+nor spreadsheet compatibility and does not rewrite formula-like strings.
+
+| Evidence | Result | Grade | Limitation |
+| --- | --- | --- | --- |
+| Dedicated constrained CSV contract | 47 passed | `recorded-local` | Container-specific fixtures, not the later Phase 5.5 consolidated matrix |
+| Export/taxonomy/verified-contract integration | 371 passed | `recorded-local` | Full export surface plus taxonomy, verified-export, and tracking contracts |
+| Full Python | 1,121 passed; one expected transport durability-warning regression warning | `recorded-local` | Local Python 3.12; GitHub supplies the 3.11–3.13 matrix |
+| Standalone release | 1,109 passed, 1 deselected; clean wheel and both golden compile/external-digest/transport flows passed | `recorded-local` | Optional Aptus integration remains separate |
+| macOS XCTest | 58 passed; `TEST SUCCEEDED` | `recorded-local` | Local unsigned Debug test build; the first sandboxed launch was retried outside the sandbox |
+| CLI/workbench parity | PASS | `recorded-local` | Temporary artifacts were not retained |
+| Governance and structure | Tracking, lock, Ruff, JSON validity, 437 scoped local Markdown links, and diff checks passed | `recorded-local` | Independent review found no executable blocker; two promotion-evidence blockers were corrected before publication |
+
+The dedicated tests cover all three admitted flat schemas, independent literal
+headers, exact quote-all bytes, embedded CR/LF/CRLF and Unicode, null and
+empty-field distinctions, header-only evaluation, strict data-card/provenance
+reconstruction, actionable `messages` and request-v2 refusal, repeated
+rendering, every-file tamper, and closed-tree verification. Item 5.3 still
+requires the GitHub-green merge and local `main` synchronization gate before
+item 5.4 begins.

@@ -20,7 +20,16 @@
 | Canonical JSON v1 has a fixed closed tree and no container options | Accepted | One stable portable representation; request v1 remains sufficient |
 | `dataset.json` is the sole membership-bearing file and keeps train/evaluation as explicit ordered arrays | Accepted | Exact partition preservation and complete-membership receipt binding |
 | Complete provenance is mandatory but remains a separate canonical object with `train_then_evaluation` alignment | Accepted | Payload-only row discipline and Finished Dataset v1 provenance alignment |
+| Constrained CSV uses selector `constrained-csv` v1, no consumer profile, `portable_exact_bytes`, and no container options | Accepted | Roadmap item 5.3 and `docs/contracts/constrained-csv-export-v1.md` |
+| Constrained CSV supports exactly `instruction_output`, `prompt_completion`, and `text` in frozen column order | Accepted | Only the three current payload mappings are structurally flat exact strings |
+| `messages` and every nested value fail before destination access or publication with `split-jsonl-directory` v1 and `json` v1 named as alternatives | Accepted | Roadmap nested-CSV refusal and truthful discovery |
+| The CSV dialect is UTF-8 without BOM, comma-delimited, quote-all, doubled-quote escaped, and LF-terminated with exact embedded newline and Unicode preservation | Accepted | Portable exact-byte determinism without platform or library defaults |
+| CSV v1 has no null encoding; quoted empty field denotes an exact empty string, while current admitted ProductRow fields remain non-empty | Accepted | Null and empty string must not collapse to one ambiguous CSV cell |
+| Constrained CSV uses fixed `data/train.csv` and `data/evaluation.csv` payload files, a canonical data card, mandatory train-then-evaluation provenance, deterministic README, and the shared receipt | Accepted | Exact partitions, row-set closure, and one closed derivative tree |
+| Historical request v1 selects constrained CSV; configured request v2 is refused before source or destination access | Accepted | The v1 tree and dialect expose no safe configuration surface |
+| The general ingest CSV parser is not admissible round-trip evidence for constrained CSV export | Accepted | Ingest recovery normalizes newlines, trims cells, drops blank rows, and pads ragged rows |
 
-No item 5.1 or 5.2 decision remains pending. Later container decisions remain
-scoped to their own sequential pull requests and cannot broaden these support
-claims.
+No item 5.1, 5.2, or 5.3 contract decision remains pending. Item 5.3 is
+implemented and locally admitted; only its GitHub-green merge and local-main
+synchronization gates remain. Later container decisions remain scoped to their
+own sequential pull requests and cannot broaden these support claims.
