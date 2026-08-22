@@ -8,10 +8,11 @@
 
 **Execution profile:** `offline-deterministic-v1`
 
-**Implementation status:** Implemented in independent-product Phase 6.4 and
-reused without duplicated defaults by Phase 6.5 compile preflight.
+**Implementation status:** Implemented in independent-product Phase 6.4,
+reused without duplicated defaults by Phase 6.5 compile preflight, and
+acceptance-matrix bound by Phase 6.6.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.6)
 
 **Next review:** Any default, preset, goal, representation, chunk-strategy,
 curation-policy, or consumer-profile change
@@ -99,7 +100,7 @@ every segmentation, construction, curation, and review field, and returns
 | YAML `veriformis.pipeline/v1` | Stage keys `goal`, `preset`, and (construct) `representation`; omitted values resolve from the data. `recipe_library_id` remains supported. |
 | CLI `presets` / MCP `presets` / `PipelineService.discover_presets` | Emit the exact packaged text. |
 | `PipelineService.preflight` / CLI and MCP `preflight` / Mac workbench | Resolve the same selection and explicit overrides before workspace creation, then replay the effective settings entirely in memory. |
-| Mac workbench | Discovers `goals` and `presets` at startup, offers a plain-language goal picker with the goal's safe preset, and an Advanced disclosure for explicit overrides; it holds no recipe default constant and passes only the selection and explicit overrides (`chunk --preset`, `construct --goal --preset`, `curate --preset`). |
+| Mac workbench and CLI bridge | The workbench discovers `goals` and `presets` at startup, offers a plain-language goal picker with the goal's safe preset, and holds no recipe default constant. Its current UI forwards the selected representation plus its reachable split-ratio, evaluation, and consumer-profile controls. The production compile-plan bridge additionally projects the cleaning, instruction, representation, and chunk size/overlap values exercised by the Phase 6.6 acceptance matrix; this is bridge conformance, not a claim that the current UI exposes every `CompilePreflightRequest` field. With preset segmentation the bridge passes `chunk --preset`, `construct --goal --preset`, and `curate --preset`. With an explicitly supplied size or overlap override it passes that override to `chunk --preset`, then uses `construct --goal` so construction truthfully adopts the persisted overridden chunks; `construct --preset` is intentionally reserved for exact preset segmentation. |
 
 The tracking checker binds `training.implemented_presets` to the packaged
 presets and fails when any surface source file or the workbench holds a

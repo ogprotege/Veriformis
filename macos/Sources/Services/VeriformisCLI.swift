@@ -252,15 +252,42 @@ struct VeriformisCLI: Sendable {
         preset: String,
         allowEmptyEvaluation: Bool,
         splitRatioPPM: Int?,
+        representation: String? = nil,
+        instruction: String? = nil,
+        cleaningRules: String = "",
+        cleaningCustom: String = "",
+        chunkSize: Int? = nil,
+        chunkOverlap: Int? = nil,
         includeHandoff: Bool = false
     ) -> [StageCommand] {
         var parseArgs = ["parse"]
         parseArgs.append(contentsOf: sources.map(\.path))
         parseArgs.append(contentsOf: ["-o", workspace.path, "--source-root", sourceRoot.path])
 
-        let chunkArgs = ["chunk", workspace.path, "--preset", preset]
+        var cleanArgs = ["clean", workspace.path]
+        if !cleaningRules.isEmpty {
+            cleanArgs.append(contentsOf: ["--rules", cleaningRules])
+        }
+        if !cleaningCustom.isEmpty {
+            cleanArgs.append(contentsOf: ["--custom", cleaningCustom])
+        }
 
-        var constructArgs = ["construct", workspace.path, "--goal", goal, "--preset", preset]
+        let hasSegmentationOverride = chunkSize != nil || chunkOverlap != nil
+        var chunkArgs = ["chunk", workspace.path, "--preset", preset]
+        if let chunkSize {
+            chunkArgs.append(contentsOf: ["--size", String(chunkSize)])
+        }
+        if let chunkOverlap {
+            chunkArgs.append(contentsOf: ["--overlap", String(chunkOverlap)])
+        }
+
+        var constructArgs = ["construct", workspace.path, "--goal", goal]
+        if !hasSegmentationOverride {
+            constructArgs.append(contentsOf: ["--preset", preset])
+        }
+        if let representation {
+            constructArgs.append(contentsOf: ["--representation", representation])
+        }
         if includeHandoff {
             constructArgs.append(contentsOf: ["--consumer-profile", "aptus-handoff-v1"])
         }
@@ -269,6 +296,9 @@ struct VeriformisCLI: Sendable {
         }
 
         var curateArgs = ["curate", workspace.path, "--preset", preset]
+        if let instruction {
+            curateArgs.append(contentsOf: ["--instruction", instruction])
+        }
         if allowEmptyEvaluation {
             curateArgs.append("--allow-empty-evaluation")
         }
@@ -280,7 +310,7 @@ struct VeriformisCLI: Sendable {
 
         return [
             StageCommand(stage: .parse, arguments: parseArgs),
-            StageCommand(stage: .clean, arguments: ["clean", workspace.path]),
+            StageCommand(stage: .clean, arguments: cleanArgs),
             StageCommand(stage: .chunk, arguments: chunkArgs),
             StageCommand(stage: .construct, arguments: constructArgs),
             StageCommand(stage: .curate, arguments: curateArgs),

@@ -26,9 +26,11 @@ checks passed; item 6.2's per-goal contracts and seventh taxonomy axis
 preview merged as PR #62 at `9cbab117e47cde6bd8850d67f0d363e03f0660ce`; item
 6.4's versioned recipe presets and goal-first compile surfaces merged as PR #63
 at `abdd630e25e83ebf346316319caec892f4d64886` after all 14 GitHub checks
-passed. Item 6.5's compile preflight over raw sources is locally complete on
-its feature branch without creating a workspace or destination; its pull
-request is pending.
+passed. Item 6.5's compile preflight over raw sources merged as PR #64 at
+`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d` after all 14 checks passed.
+Item 6.6's frozen goal acceptance matrix across every eligible input family,
+compatible representation, and product surface is locally complete and awaits
+its pull request.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

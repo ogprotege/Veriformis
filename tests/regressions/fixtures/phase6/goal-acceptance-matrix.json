@@ -1,0 +1,2271 @@
+{
+  "catalog_sha256": "c0cc0cef6959abf98f5c0b345817d0db14d683b782cb457cb4034023963e7481",
+  "cells": [
+    {
+      "cell_id": "learn-the-text__plain-text__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-b4f2883ac33df0f9a8a988e822c1ad6c70c359322c5eed4e30ca11b0bf0ec9a4",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "learn-the-text",
+      "input_family": "plain-text",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "b24188c606288f9f1026ff6225a914ad0a947c781f4ba7b7812f0debb60daf51",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-a074c971cc8d7b8dffa27ac549ee7730c5418edabb4903a0d1bb7b1986b08902",
+      "representation_id": "whole-text",
+      "row_set_sha256": "f631fa50063be52d3ed4272193028ebc8f7f635bbea81dba3450bab23ca9d2af",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "e99bbc8a13022b12388018c6bd83f12a45e19454829cfcb63e07a0df73784be1"
+    },
+    {
+      "cell_id": "learn-the-text__source-code__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "source-code",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "15e1f300234edfa1a151fb394b19d8bd9afcb5d90b7d566ba1463768e5fcd5cb",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-1976cbef3e6a049920bb40e7371bf6ef70b64e50cb64c99c6e81f84d22fb2d1b",
+      "representation_id": "whole-text",
+      "row_set_sha256": "6a906b230c084b051565d2e5426a500a006a7f0d97625289caa1344fcfb18e9f",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "b72a62c2354520609e487a6d1ee5691d9e4f0a12230d01542c74a42d6b19414d"
+    },
+    {
+      "cell_id": "learn-the-text__markdown__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "8c8b93be9f63196a4282ae5da4311bda130ed9ca2688f807c63d1171db1c85d5",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-9733893902c8ac356b68abefb64f7a6d53036bd08a2066fb9bcb7388286f39ee",
+      "representation_id": "whole-text",
+      "row_set_sha256": "d546bf24d2d31ec872ad6b3141ccbf3439a9124d1159e112f4e410e288f57b99",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "a83e68735d050d2961a19a70d554cb6c67ee39673ec15e5d0c74a57886fcd517"
+    },
+    {
+      "cell_id": "learn-the-text__word-document__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "ec8b9b324e7a63f83902bc1ecf2a8fc9078669ac9294abecd427c39a7f39fd48",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-8dafdd0244a72482ecc4c7d66177964ae709d04b9f750ed5a77a8940af7bcfd2",
+      "representation_id": "whole-text",
+      "row_set_sha256": "8c33a7c03b630519641853f9feca517e9949786d327abf9e6a69e8da963048c3",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "eab58507b60f2eb8eeec3d8ad872cb8bbdd8f4500b47c1e768746839d0e6c121"
+    },
+    {
+      "cell_id": "learn-the-text__html__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "6954b5e333972eee980f53a6c15d2b5be83f5cf23089c2e63606f6c1d526cbdc",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-aedbb9a57ef78cab416317b055c9c9ddc75e155b707f5082cc5ee849c9b5b9b0",
+      "representation_id": "whole-text",
+      "row_set_sha256": "10d17a1d41c22a26379c1bcc0f884a4ced1d2da7708aa7f5e68afe9cd282436a",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "f46894a93fce6ad565228dbb760af48f48fb8b741ad9af6fc23696b45653db19"
+    },
+    {
+      "cell_id": "learn-the-text__pdf-text__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "pdf-text",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "0a3257e6ea67597e8219583b754332a1a0293b8e056926cfbc13cc1fdd343b40",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-524b2397eee27e584e9f5edcaa1387e7b64bad434df353784a332dc4a65160e3",
+      "representation_id": "whole-text",
+      "row_set_sha256": "655109fa0861b5dd62e4f24d2658777e53a2531cda7cbcbfb1dddd67d4916a31",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "ec93551055d58f56eb871fddcd1067afdf2d9dbcd34ce744412fad4bb63ea962"
+    },
+    {
+      "cell_id": "learn-the-text__delimited-table__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "delimited-table",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "cb849545f33b12797a653a543c021c4f081910795b26d2881826d1f6675bcf5f",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-519d29d7382507e15764d71108f2e9124dbe465fe2d0cbb1c3251eaf61407529",
+      "representation_id": "whole-text",
+      "row_set_sha256": "d60fda126e66725595a3e86c5f61606a09cf3f2b708014fc411cfb9bc072f106",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "eb628a87308ca6590c56674cc0362fedc3cdec92aef3d024dd858f66e647f445"
+    },
+    {
+      "cell_id": "learn-the-text__json-records__whole-text",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "learn-the-text",
+      "input_family": "json-records",
+      "instruction": null,
+      "loss_boundary": "Entire text sequence is supervised.",
+      "loss_policy": "full-sequence",
+      "manifest_sha256": "be2ce086a4a07f09782c6f30b452ce7c43dfc804eecf45a37033b83032a0c980",
+      "preset_id": "learn-the-text.safe",
+      "recipe_id": "rcp-v1-24e239f518c63a42ec7a83c4f328942215ce87c9bed735994706ece5bcecb898",
+      "representation_id": "whole-text",
+      "row_set_sha256": "9e9a4448c2249c67a761ea7dd7b0f91c7be933d8ea30fde56fd4eb44dc3543cf",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "text",
+      "supervision_sha256": "50a567bf92c7a805243223beed665b204913603018b966720b08f3c427bd3d76"
+    },
+    {
+      "cell_id": "continue-a-passage__plain-text__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-9bb833601a6e3c876e2e0152f9412d47f73796efff4ae44e3d17ecf852cd2d84",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "continue-a-passage",
+      "input_family": "plain-text",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "a1821b3e70f82d5e10c5a9a93b07c4e7761d8181f9ccd6f39ff9c08fcbc086b0",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-f24628b05e286e009a7ffc0b359972a54a7e358599df5a2af701690c4dbf927c",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "b4fe5ad7b28893f21bb352b97c4b3c8ca40ad5385c359a76138c1a6497195f6c",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "bc5e812cbaa932df4275d358a65d5f796c376c43034ff7bc8fd3fbd8d2128ca1"
+    },
+    {
+      "cell_id": "continue-a-passage__plain-text__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-39130c611c68f7c17cbaa1c292eb8ca778337e6ee64178e9bb643701f7534b53",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "continue-a-passage",
+      "input_family": "plain-text",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "c9999b58e2c548065a1edcfe1c04a5c30dddab5652f01c12c9158144fd934108",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-2d301b6f97fc07c95352df06d383a17f96e86b79047f8e64c1ef1784baf4b468",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "f3b7051fa8d52080bfe6e8934c4ea4336e0236570e0def808b5dbb14291a8add",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "e4cda07f22c08f6970de4568f335f92c28930ca601dbe82b8ebcec6dbc518020"
+    },
+    {
+      "cell_id": "continue-a-passage__plain-text__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-ef1b68151fa318284eb5c1636779d981d16ca6652b994ec39a242e02aca7f68d",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "continue-a-passage",
+      "input_family": "plain-text",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "a7981f19fcb0a8dc7480fe5d32bb24eabf77d77efeef5f6a6d1dd2131ace32b9",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-75908e68a9bd980353537b9d16c3719a3ad6704fe2edf96c9437411da5e57fb6",
+      "representation_id": "conversation",
+      "row_set_sha256": "b191676bababfe80e9e0b1fecdbd58e6ddbae7b01ee1e31c05f4c2f89c2e5fec",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "1de5017af9ec116bf93302a243287d7cf608170dddedcd3667f29409a60a55cf"
+    },
+    {
+      "cell_id": "continue-a-passage__source-code__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "source-code",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "13b0e1787dfc6f1a292c1d414e684a74a4e22d8da9680e7271bd238fef26efd1",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-e1003e912af9d45f43de0f8e567a9b8148063a8d0a909aa95a2bceaee90d4463",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "27c0b3819b7690e79388099f01cc688164a06ee213ea3dc6d4d24fd3fcbbf4ec",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "0e319d83a2c36db636902aef8b4a3cf19ef42152971bd8416e2e5db40ee10aa8"
+    },
+    {
+      "cell_id": "continue-a-passage__source-code__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "source-code",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "07e672e53feb7b666c08158e13bec06888426e34e58add89e1181f71f1c3fb4a",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-d4795d6a34d0d20500dca540baa85d807a6274da4479132a7859563cfe896710",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "f1ec6a1064fddd512ae579c2ca0ccf9046795d3f54d4c882701245a0a3db976a",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "a287ffc0b93ea245346b07e13368f5dc176fac6c257424691f21e6a4931d058f"
+    },
+    {
+      "cell_id": "continue-a-passage__source-code__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "source-code",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "720c09d725821a56f61a2dfc876b36ad48caa1e03bc4da9ea5cfb1a410a29a50",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-b0a4f5d99458102937f3dfc55ab24091894c8e36bd164a926a3026826b5da98d",
+      "representation_id": "conversation",
+      "row_set_sha256": "48766887ed8d837260aba72991a64ca4c5c5ee5655263406e36ae9f66445bacd",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "b2df6fe9f07aa1a2be26b106f0f8e5ad5c6ed928d5cf59c13be15183d6e7866e"
+    },
+    {
+      "cell_id": "continue-a-passage__markdown__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "8088a1c419f69de7284f25a0de0922067d20aef453dd34877033588372421e35",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-d5d3e6ba0f7077150814dbe8dab854f7f89e382440cf6042a3cedc1675b0a380",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "3a6e07a0d989520e72bc6db7e204f6b5083095479f83d6d06c366ce9fa44ed1a",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "21bf6ca7f1ad3d4039cb47aa1e741592e40fa6e80d3f9139b7b3d87db0aacbf3"
+    },
+    {
+      "cell_id": "continue-a-passage__markdown__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "markdown",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "293d2320b3b52b8f26db6baf4c8560821b8922d5bff01112f19a8ae511d71c6d",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-f83069a839825c5f40badcd37adccc366d701cd69b280a8515a59b32329d7eea",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "172d10b24df998283fe242e208720851bc932a3ecd4adbe89346f6c966ba3d58",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "a77d7d1a1f80fab0978bd8a0261b28f53677ff8e51996b8a155a971560378941"
+    },
+    {
+      "cell_id": "continue-a-passage__markdown__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "331133b925e227868f1a04aaed3b353a2369db1dd4f5517e26cc3a94416fe096",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-ec6134ce753a73e1ed128755a5b2dd58b3f2d7db59808e3cb5fa692b81763d33",
+      "representation_id": "conversation",
+      "row_set_sha256": "5fe3dcb1e9f385f514701a7a5f394acd879bb301c0a95d9777691a84af03d748",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "497a3f15c3bfaed2434eca0e90292a3cc5e89c57b159be1941fb2402e6254eb5"
+    },
+    {
+      "cell_id": "continue-a-passage__word-document__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "927e91d41faa880c48f0b260ed65fe6900c9df6d4412c1f9395b3cdfa813f3a4",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-fa809df4b45868eb15d980f7a8721f0514cd2bc6bdfe2e3ea941a9f0aa15547c",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "505ffabb2fdf469f6f78e55e758cd7f133c9e8ae35d4afdfe20383e405f55450",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "a8959130c33bf86aea350fb1928cb804cdbd887d6de0d8b7c2f7e0bdfddf7664"
+    },
+    {
+      "cell_id": "continue-a-passage__word-document__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "word-document",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "d500c40021c221317fe0ddbdcebfcd10e13c4bf2028b10387da965d9cf523db3",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-e5536ae31b880cadbe0c6d66943078dbb473f034b52a5293ef4ddbb2773b3078",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "569bec220244c3ff386ce81da74e982fe705792fd0e85fd6767d990319d665c5",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "22bbffbb0c110526315ff0986762969f239646d493e881a5675e32c89eca5a39"
+    },
+    {
+      "cell_id": "continue-a-passage__word-document__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "745e0182e37f7dcee6b56c1f79836f1d7060a0aa2adbabc0ccb01597d6af917d",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-981cf65c647c3beda34abc03991fc22226fbcffa23a43a368166db9a3188c746",
+      "representation_id": "conversation",
+      "row_set_sha256": "9a77415375f9ee374b20d1738edea7c6665988a39b2f8f2f10d50b8b92eb903a",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "834993eede0cf99b51919b461f5fe53604c435a9b300fc9c545f488c0bf741a0"
+    },
+    {
+      "cell_id": "continue-a-passage__html__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "2433c1bbd5f67da26ccd81c70aa89bdfda346b5416eaf4373a1fe629344b1205",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-21767dc93472840de425963450db750c2c92a63b8c793dfe97ad6531d765aede",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "593ff04f8e81719942ee5ca93b3b18ca27460f91fc95cdd52d045c78a109e348",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "126c6bf35260800803e57bf4a6d3cba8b5f1c4b0d517dd3bfe65fcf3025f0e3e"
+    },
+    {
+      "cell_id": "continue-a-passage__html__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "html",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "2f9ae4434f6dd515c26948ec56b60a74d0766f31ce2c1be5c02d4de70a71e745",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-a209554256e615cf80311cab5c8cd461a32fdd9a30614fb20c93a67f52ff4b44",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "ee383e753ad34ab9f4d80802ef42ab415377d40516242a416dfaef957609e0c6",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "a04e9e1b64e3a78fd846e4c9a12dd87b80388ca476b539274491788b4a0a3a17"
+    },
+    {
+      "cell_id": "continue-a-passage__html__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "c21af5779ddb10279e5fdcea442223449759021c608749beaf2a4b150f8ff464",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-fc187a90849c8a8ed14119b236af5f4064fa817f35b7435eda44eba755a81adc",
+      "representation_id": "conversation",
+      "row_set_sha256": "6f3a2c87201cb0123190197d46b23fe4dabcf97fb9236c6a747f5dbd66cf7eca",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "d6bad7912bab5e7154084b085a60c8b23bbb938513c90ceff1715849bcdfc22e"
+    },
+    {
+      "cell_id": "continue-a-passage__pdf-text__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "pdf-text",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "5fe1c7b598323f27126a5f69db61a7df2fae9acf5b989039b4296948c5b3ac79",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-c6b3e24f9f7e8f16b7df38b09e36c6f3dfbb7ab469249356a7d061c8589614de",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "00af176ca00b8df007287cbd519c7da7ae44bd12e04dd55ad17a76d48e7569eb",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "f4ca9af240b50a36bf17374fd1323f3104a7f66b1244d9f3b7bbf295a0d86cb9"
+    },
+    {
+      "cell_id": "continue-a-passage__pdf-text__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "pdf-text",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "694298cd4e9766131a1d76bd87b11b213ae704bf9a7809f12b3df17473b84aa5",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-aa8a1d05c336683d5e7cbbbf4fde79460d3037339ee3c6517414a7f376b33d1c",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "979e6db94cd46cc2deb0350795cef58a35c43eabd67dd3d2ac62d6c26a402add",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "75b569fe5245f71cac9f7d3d1bdc590d1ec0086c385d758346097123eb228226"
+    },
+    {
+      "cell_id": "continue-a-passage__pdf-text__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "pdf-text",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "29035551052137e5773edd4839d3e3622887e30987b7382f98a94e3252c76bdf",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-f1063ee99e8c7b6b66e1e22f675575a8ec1a3fe4de9471fb4f7854ff8635a1d1",
+      "representation_id": "conversation",
+      "row_set_sha256": "ff77a4273ce5354a73acd34192487513362e905ae4e1e5df4e6be4e2c5a43705",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "8602fdcd62d29b247e62eae596e24ed4a1843a9dffd82c01b8b6b6c4104f10b5"
+    },
+    {
+      "cell_id": "continue-a-passage__delimited-table__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "delimited-table",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "4de6b2971dca2f7f15e37e855e1e39c4fa77b9d155e9b8c2b5f69a519cf66dcb",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-9e48f25fc36694031ba33370fdbc37ac9c969517c35a9313e8d3da8cb74c5ce0",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "ce40f24f7d9a77c7989f561360001de87ec8a73a80701745b1010240895513c0",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "ce0d7b769e1bbe9a89803bbbc75558a18756cddf492be1cee0b88eaa652ee09f"
+    },
+    {
+      "cell_id": "continue-a-passage__delimited-table__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "delimited-table",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "00ec75f692df3b010d8f7170c50dde46e62cb7a4ea2246b8344dcaedba7357d5",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-c69ae7e83001b7bfd88ec55e47c78c24b0060d754b1d44b1fd74c7971d7d8e99",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "95388bfe9ecc7d07ff5bcb622c8693a9125bd7c8d9f5b2a389a81be9549a64ff",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "74ca56fa2fda5be59a0f263788c4c628519924f9ca750cca5608ae8a74d971da"
+    },
+    {
+      "cell_id": "continue-a-passage__delimited-table__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "delimited-table",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "7377949c381564d26bc1d1fd56731918df6272365319ae764b341a6241c636f0",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-5e5eb739e06753a65dbd62a70667534f91ca7c5dc9909b4040ccfe6bf4728192",
+      "representation_id": "conversation",
+      "row_set_sha256": "8c4a9d950e4d5eba3f361fda099e061eb6ef5dfecd3cc0a0150c051f7cbd5edc",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "23392af6a0e6b1c39ad985d3226d91c76df8344be90ce5dde258aabd9e1e28e3"
+    },
+    {
+      "cell_id": "continue-a-passage__json-records__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "json-records",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "ffec641d58a85bea3f5dff6ac381095598eea9cbbba662012ddb80d2a50c818d",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-26c23be1b94ab5f11957518b9e7f0404fdc6e26c26390898d925273b77f18239",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "a5e99d6ffeea4bbfd813ada9ac18a56d76a6b12b78f234a8e08a54ec764dd43f",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "3b803b950b9190e2c34bb2ef768d1ed9ba5b73c94905fe909bc6c364549fc670"
+    },
+    {
+      "cell_id": "continue-a-passage__json-records__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "json-records",
+      "instruction": "Continue the passage with its exact source remainder.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "0cffbf80d3174a6b1c11784558323aa30911958908d121b9a844442c34b411b5",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-d778bea09befb014d1d2f9f59df0edb82f32dd98b110fe0ab3ba3a0dd7602480",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "cd729258250af3741f7db7513cbf700a30bcd67478741dd8eeac28a3b9bf8488",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "164a473087ec6783806e96d38fb7d9743865adda7de384a71727c069c3c06d1e"
+    },
+    {
+      "cell_id": "continue-a-passage__json-records__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "continue-a-passage",
+      "input_family": "json-records",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "28a8f6cbb05547840ffb2d59cf0cfeabb65e00fb730165956b4c072df86e5dc6",
+      "preset_id": "continue-a-passage.safe",
+      "recipe_id": "rcp-v1-f1c6566c3cfc2c6d292e8f1a1026be67ed9f9b6c6a467918cd031c86463f9eb2",
+      "representation_id": "conversation",
+      "row_set_sha256": "450dd61049116f35535ce52d04a5f57bb8397e486d7af8790277477db3eab494",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "d5250f198bffdafcd5133ad9ac90890870cc63cf7ecdfa5e18bdf7923c2d3693"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__markdown__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "20dcb6a70154e3b2b1555f4970e1cc2ce40ab6bbb8cca4f2d0312de6b9544465",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-021f5804f0d66f51d94379cff49978bd442e8e8561a3e0a07b0bbc2237e63ec3",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "4871c6d65cc72546c9b3777b106f6b04f4e13360ccd29c5ed1678d9e45e6ee1e",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "b468578844769039db8680c1f255da37084edbcb561b39b313646ab8627b8467"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__markdown__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "markdown",
+      "instruction": "Produce the exact source section body for this heading.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "717117866caab08d2383fd852e155b5ac4113d445ec31e11dd69955fbb7f4fe4",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-b655040e59c2da5e4b1ff091526eb5ab3cbf32c93a00913e6e5d5a7c4a3ce1f1",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "7b82655f5d3184b229aa247f47ebc7cb56f69a88eda262f096e4b5ea7e4e62ef",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "50f6914890801d8acc4682b62edee4ca6f4bba4b7c481a41db70170ef918bcaf"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__markdown__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "e9aaf804a915dc0d06c6ecb0f13572610d446c85797fe27c90cbcd1621ebe474",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-3806d1ed78a2a9eba289e32482924513a9da8b777849fd7b62deb71f2017fc55",
+      "representation_id": "conversation",
+      "row_set_sha256": "6994bf48f5e070a59f42bcdc0ee0f63e87dc72b2a93d4c47a7dd04bc488eb110",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "9b97f04f13ac57b368a331d4843c86d966702d62dd04c0e93a11cf11e82c957a"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__word-document__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "2af490b607390d5679d04c6f8f87a74f8b8b0da6d5f24d07cb8339f9bd305385",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-0328c30c66a20bd4a492d8d8dca04e716e9b126dd19cdb2fba497c8ed3674e10",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "ca48b9327b7a42f3366b103f5d928dbcfb1b74a6521c8b152963147b15b21083",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "b17455d7edbc6fa0c494f289cf3aaa5ded195fe8fdf88906c3dc4edceec1bb0c"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__word-document__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "word-document",
+      "instruction": "Produce the exact source section body for this heading.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "be961415045cffb7eccb5e6228b518f0b9058e164195afd9f960e828d8c25ff1",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-130629ccf1ae0cd2f340efd72e292aea13f313fcb9214fd59009aa6cbae8082c",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "887285328c228d5311d5535d04e308ecf2828969048202a002965d73cf8ba630",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "f4c802608309e1dc677a800a219846f3f0305680e664a0d44b770c530bc2a9cb"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__word-document__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "caee9b9171681fb19716b274a7607cbdfe8167d1e8f349109155ad81dd8c45be",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-159a66215e73e31ce6c2caf2a72296e23b98d438fee6a5c9f6f9a395942277a4",
+      "representation_id": "conversation",
+      "row_set_sha256": "d8db3073c382023305a3ac8a54015cf7937f4bfefa49283442414621442efad9",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "079d18fc48c217083ff00f94a88a012a698c5812af87c1560864e9e30b1b0aaa"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__html__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "671ab58390975014c98632d161dd05137dd854ba15959891ff0c4b17a98f8a87",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-d2ffbfdbcd3813547f1fc02834f49de8d9b44da0af8a3674e5d308a88487b645",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "8ad586edbc9ed37c2318e55045e9c5a152f88fbdb741012783c8d20bed5e3c2e",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "e81a649ac612f989b37d5d16669c39bb7fe3e49f5bbf4d9a6bf7e6767e96c272"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__html__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "html",
+      "instruction": "Produce the exact source section body for this heading.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "19959e10f7968f7646d416718253759311d417ca97b59ad2a55c13b47cf8ff44",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-7bc455f6d3e5707f55aa6104a9791a9aac6895c10aedd8e0d352ab24762f980a",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "86474601b4c085f8ef1b8911c47bc1def46fde818140245b269f34808502a31c",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "43a8adffc6ef1d35a31ec3c7697d9e1d6b34448a0bbef9be7bb71824d307b14c"
+    },
+    {
+      "cell_id": "recover-a-section-from-its-heading__html__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "recover-a-section-from-its-heading",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "cdb79fdc6f2f0eded03d6b9cd983b7bf7739d92e7511a18a3c885672ed6265f9",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "recipe_id": "rcp-v1-862a4382218e381053398ca9439eae7bbe450500cb13bb0e408c0f4fc0fd0156",
+      "representation_id": "conversation",
+      "row_set_sha256": "36da2a1c443e2c8457c9b87b9118665c292d6e008ca447618bb58d809d06d271",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "65d69cb4219b793ab85578a29bc9968ac70f0a5606273cb4e3dd54c9da29d599"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__plain-text__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-68bfd9fad33cba4bc25f768213baa6b051a1f21340e0762a50d1830c337e68a2",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "plain-text",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "631be508c72565604f259e09d2598182ce9b668fbafc70a28038eaf850bc0e22",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-c976b6c465d6a12e546d10df2acebbc58a35003c6fdc288e745d6b837f8f3464",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "8c79327e1f4f1d178d5c3fda0881cf29a89bb4c954f4748a689ed0649f0af4b7",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "c5dece61ac4d49a1a7ff947ef046aa549ea11ea0a8939457dc13b5ea8477ea75"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__plain-text__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-cad263f09bfd6e3d56a0a4e441a46c072c0daa4b573153f90fb910873f04c127",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "plain-text",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "5d355cd407c829acde5ef380dcce58fab6d12be0db5f36741f3624810967c6cf",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-3b24a6742b41f90a35d085b76d39fb7fc913de1b450b6cbe0db26ead875898e0",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "c03460257b8d39771916270f6cfeaa7cd42be34fb95cb77100ecf1a85e499d55",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "dfde408e8df74353b115f573e562dab6ce16d5ed92d5b5683c3edcf550d104b8"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__plain-text__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [
+        {
+          "reason_codes": [
+            "exact-duplicate"
+          ],
+          "record_id": "rec-v1-b9c2f97bb9eaa1bedd09fea6a47a9035b454d0ddccdf8f88f8e7def5d6b98c10",
+          "status": "excluded"
+        }
+      ],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "plain-text",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "2a9abb1fd2684ac98734e0ee858f6a4f72efa491feb93cabfe6cf08acf70e7bf",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-6d9c7939987d6d21b20ab2f99aacf4d92b7909c4782f6de584fd90fad15b6481",
+      "representation_id": "conversation",
+      "row_set_sha256": "5b283d6600db6419ae93bfda645b9462bacf379bcd84c758767d0b9a02953f72",
+      "source_fixture_ids": [
+        "plain-text-a-v1",
+        "plain-text-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "8b98c882b586707f37eb6fc2a21522dffe286472168b27c340ae26980271d041"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__markdown__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "3b45776e67af4ac2ae78d974fbff682b35c7ba16616e849fc18293e479502c71",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-8f4b537f165c4ae64233af160b18339376055b65ecf6dd94021b4195ea8d4884",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "c71742496242af8bf96b302e6afe39cf8137a06fc16a70807b77b0359a588f3f",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "f56a473615f2348c3b067770cc5030faf8c8628a7d10dea487cd1504a9be88f6"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__markdown__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "markdown",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "739c3e6c3c55bada0f9c07a0b1822c9f1c8574ed770e63b192ec1d004ffdd474",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-0f1d0c9f376b1fb5e40ce9ccb73db4e78aea0a30bb49f92801c77025833de596",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "88c80a9219ec003df96d03ee3b3e1eb40779f1caaff1e093607572920be389a1",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "c1d1a919f9c014727a492b1f93785e959e3c9a04680be9bee3af4a8d9f81219f"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__markdown__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "b520f38e5ed590c1d06dfbc255c0acb7ee6327650fe4a6768d55ef615c0701e8",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-16f496289f92efd10c357dfa25505bd9a6ae544826e5c2c97432c717ecc3e195",
+      "representation_id": "conversation",
+      "row_set_sha256": "5f83a0acd2b06c906f32326740ecff33535a5a45330038accc6963ead46a57ab",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "5d928260f199e4d9e9f82a9a3737fbf1c307f3c4add3ff7463829cb9c1e8e22c"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__word-document__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "d4180979e197093097ea31347e4f38108c4240915acecb7613f2ae14af63a46f",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-bf3acac839a3caefb21790f5ff5c4b6b8d8a7e9f37a182a8416d5c804096a4d2",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "ce96c1f4e7a54aaec6090d9eb7ffeaaadd30d242e38475f95ae2ed4ac43197f3",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "498afcafe509bef41938109badf00b94e196021d09ffc17662768fcc7ebc9930"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__word-document__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "word-document",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "3618a5e4339e5e79c2a3dc6c326e112a2a7862cda36ae14d7b6dbf3c77c64f62",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-180b6fdbc6f60e377d3bc4a92b643cdded2ed46cdf7ae989769805369a682fbc",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "37acd9a0134364cb214d80d9232f768a2354818dbe5ec700ea890cef79da5b49",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "8e080e6f8f885a8717987580e7016499b38f886b788ec07368ab8d8d1bab42ff"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__word-document__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "a2e5b18013e7e0a29490c95bfb6e3d90ca403dffef85540ead785afb3c119aba",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-f95db08a2810343ecab17757f46c169a422a4396db055057b6354ab5eb79d2eb",
+      "representation_id": "conversation",
+      "row_set_sha256": "efbd720a139231a55ac16540d18b13a94fcec1cb2372e3f9f6fb29c0b74bdd1c",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "d12d729ebd9c55f0787d335ee1c23010a4138e14293b6e7d3027d9c1fe1de1ff"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__html__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "fcd00f22eff3609924a7111da716fd673a4412e342ade233f21787d7d5fcdd95",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-509d07e51b9c68794f6f20823e0ad0c0d93e3419dfceaa40965e848d059786aa",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "b8cd143af1730ada1e329e2585d2cf486e187e1f3c558ec01a37aa6493e6f15a",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "b3484214415f4f3b6f4f41b7753a00004c407b01537e11661b102223e31d209c"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__html__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "html",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "15978cb6fba693d19cec1b5e189fddab3a45c32cda6dd836e58b029ce6d62941",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-2208ddf18ee7bce0314c447b43847ed84b8f70e4e835b8276fdc22d12bbfbb27",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "234bc7eaf2598ce93a77cd50bbc67dc52c2162cea89ea2c43066454577df7716",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "0d36dfd3560e2335b6655116e92e8db046596cc729e4a9be96f2f07aa2b53227"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__html__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "REMOVE",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "204e398026cbeeefb7751484c73a84ae74eca5dace4cc93538b5ce5d2dba3afd",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-7894a57490291b91b61aba9e1e713fa94ceb446076f6fc9147c873e7a30c66da",
+      "representation_id": "conversation",
+      "row_set_sha256": "708b0cd2a9a29df7da09b5b37b3517c5b15c489e0c0f8234ba7471226bddf0ec",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "b4a74eac50fee8e42f5240e82a53ef01411b66ef8c4cc243107a446fcb2104dc"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__pdf-text__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "PDF",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "pdf-text",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "ce66a5e990d8dc1f1cd845203ca6f7164fca51ca8369551e9ebb856ab301ae24",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-bd87fbb6c204894591abd716f37d091b8ac01277cbbc1e3df4b9a746e2fabd84",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "e5e3e14ef37460393f1994bd052a141ce817d67ade35eff38fc1bc06230a31f8",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "7fa12d88aff46414d96e590f10028e22d46f3e8163b97812074a738ff64ec25b"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__pdf-text__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "PDF",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "pdf-text",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "1cb02db1899bd3ef6bc0f8f88c88a680dbe2097a6f50988b3b4b84d6a74f7248",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-b8b0fb2f6e3fd4a9f5931dac8d62c41dceb18c5da8776f6d3073adc6d6ba88a9",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "685123a93d585bef168177bc1554d914b321309590ff9ada9839611e327e3f47",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "1780d97ca3d9d7c26c2ab4a747c5a0de5ba49ff8c3ca91a63908cb62e6632b13"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__pdf-text__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "PDF",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "pdf-text",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "d8b3571ef660061102e205417e87103af571e2a52c9b98e4f41cbae34476ba23",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-69714698a33454c53399c2e7f992e24ac019aae8a2d9ee3bde4bece9616de138",
+      "representation_id": "conversation",
+      "row_set_sha256": "6ddb6ed855d93af6ae5644e63fad52ce3cfbb3cda5a03f92362538e049e83682",
+      "source_fixture_ids": [
+        "pdf-text-a-v1",
+        "pdf-text-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "0c1b5830d2e08b459d3870f843dec70f67ad8cf35147c2b2816481935bab9a2a"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__delimited-table__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "alpha",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "delimited-table",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "44844171fca7b18a504fd1b7ace44421a49a0af8104be53ddd149876532cc893",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-9d8a8656640f4d5a2062c34ec58547f8505748470a1673835fbfbf1f2a308c95",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "b4072ebeaa1c8b1f019666a37f19a4c8fe83c0f716870ce654ec00c6ef7758e5",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "862566394530398d7286d50bb9c080c396f4b8d3a7508d0192de23c573298ab0"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__delimited-table__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "alpha",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "delimited-table",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "3437d10321a228b016ee613dc6bd985ad81aab6618e5565022cb395f99db9f47",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-9c7985a7b5c19a2d0220dcdf79c3085e0b7e5376503756377816c503f9e49f81",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "afb1616b43108385fb59f3b5cd206fa43c650877062e0db20de2f71fc0f76803",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "b597686d1f6b7c7438786ea5508cfd4be095c2503f65ff7291e4cd1a1e0b1395"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__delimited-table__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "alpha",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "delimited-table",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "cd25339010af35395def1d98e9a1783ec48397619bf23f6ece60606fe1f02a80",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-9462cb23a9cce6ae6e49838e8d16c49b8febcbbcc878dff0e72517ccb32f7384",
+      "representation_id": "conversation",
+      "row_set_sha256": "eca38614fef1d3aed2696a0ab6aa374cbc8be29eb19b2c2e4e4814f2ea8665ea",
+      "source_fixture_ids": [
+        "delimited-table-a-v1",
+        "delimited-table-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "332aba722671c2ff6c3e46189639a559a52d85c39780537d669b2d1aba1797aa"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__json-records__prompt-and-completion",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "first",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "json-records",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "eb31289fae8d0f3aae3cefc8eb912f890ac9d4e2f51fa34ed87be1df2e87b946",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-2c3895c06c47ac6764dd670bc17d85a826d8753984c7ed64c5d28a6a824394f3",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "eb035a4c7ba45947f90eb70b8a8f89cc522368721f1d5ea3ccfda63b64293d64",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "3c2cc2cf016bbb6c938b2ab59024be620b88ecdf5218e2fea44b2ccc5426eda1"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__json-records__instruction-and-output",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "first",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "json-records",
+      "instruction": "Apply the recorded cleaning change to this exact source text.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "2f4ab487a2acd8e20f91f25790478d5033418e4d4ce1d4b8271ccc0ca2fc90f3",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-56e324936217ce9b7622980aca79a8f5f81cfab857be1be7de785399c16ee658",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "decb713012946f33ca5014ed45d2d2e0438194927ef9ee445dc21560695fd470",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "1a9a536c0d5e049951ba8a495e396fd9096a898032d4662d42f85dc219c6a48c"
+    },
+    {
+      "cell_id": "reproduce-a-recorded-change__json-records__conversation",
+      "chunk_overlap": 0,
+      "chunk_size": 24,
+      "cleaning_custom": "first",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "reproduce-a-recorded-change",
+      "input_family": "json-records",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "64c2e44469f4600fb75b4e7a5edb32fda0c0c50d056dc3f6a0403cc8cc7ddd37",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "recipe_id": "rcp-v1-9888cab9107f84d20a83ce3019d3a6cdda21bb8253496626d9d2db14925d7072",
+      "representation_id": "conversation",
+      "row_set_sha256": "f00dcd02da812ec8cb89d3ce0c6a09e78fa20be854b7a0ea9b8620b0a8db7a72",
+      "source_fixture_ids": [
+        "json-records-a-v1",
+        "json-records-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "e94feadda176b0b6cd7fe44b3a0a55a82af8bd2f46ff1d6ff670cc888a18a925"
+    },
+    {
+      "cell_id": "extract-a-structured-value__source-code__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "source-code",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "1eeec4cfe37bc8fb474aafe461837f5b5beab2b4945c2a9dc8ee339b82c5c7f2",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-eb04e8575faa05e8433e1d131b74302dd2e11584a359155d06c91e3c0f367afa",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "38490d9de98a4f3068245b96401d1735cc832b5037838b3a74793a90716fd065",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "2efe3834e042dbe70cd2e71c0b506967f49455a6c46263cd183feee1d1adce63"
+    },
+    {
+      "cell_id": "extract-a-structured-value__source-code__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "source-code",
+      "instruction": "Produce the exact structural attribute recorded by this source.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "435cf4c3dce1444bd111f109d592107eb27bf50ba96cba2baa96e6b933fd3e22",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-1addc5bc8fe6f1f16b46c25b474cb8857c91e45f3d46189d6243a0bba558f8ff",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "788092bb867f4276462627988bb176fc288837199ed9078f46b30879b7d5ace8",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "f2094809a4b5018d1cfecbb72973d6db48cd38ae605eae25cbb3ed6bc2afec1c"
+    },
+    {
+      "cell_id": "extract-a-structured-value__source-code__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "source-code",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "aa69023111c9fe986987a802f4e3c2a5ad925de8a4b23f395ab5c341cf95055d",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-cad562c731eedf6c3a944e808b0ded71fdb77a273112770e1353042641776a6e",
+      "representation_id": "conversation",
+      "row_set_sha256": "6b35dc8b8b24b003317e6fd8f17366881cc9b32f9e3394f93378f7d0d26b9677",
+      "source_fixture_ids": [
+        "source-code-a-v1",
+        "source-code-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "036f6dfb54ecf0e878e46c18135e21005864cee4eb9b2ecd420414938df64d59"
+    },
+    {
+      "cell_id": "extract-a-structured-value__markdown__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "fbe19acfc31edf85a6d748eb4d43deff9766189e5f551389c4277ff057c1428d",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-f6b9e545a06d53b6957278fd1cbb8b234d95744a589b97448592015a410f1375",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "494384e4e1c2381ce6aef919008e48a5de8b5a0c30bfd7ff3ac8a8a2d6111fc3",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "f5e2aba7ebdf76d7dd6c0e03e373c8d065fb009dcbaef6d4957ccdb452ab4287"
+    },
+    {
+      "cell_id": "extract-a-structured-value__markdown__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "markdown",
+      "instruction": "Produce the exact structural attribute recorded by this source.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "5478673c36343fd88336da59aa6926e5739169089a04015985a1a57b4fd8b9dd",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-7f4f45847dd7e83a8e72abd9bfaa0ac772582473e42d62b2592e46f489d404eb",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "023fcf2afff51cf169527678550ae5d359199fa520513e3bc0e4c87d3c8c4697",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "0e0925a0494daa0b85372b3f140eb7a17e6936d3f667e02a3e7ce520ce1110d0"
+    },
+    {
+      "cell_id": "extract-a-structured-value__markdown__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "markdown",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "fb0b7c476b1a36f1e45fcc9315d612ca154745b3cd4c1494e867b9773e4f8f9a",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-e340424e484c0a1c5c083f296c44a8793d28140cdf5b10240200973739fc8f1e",
+      "representation_id": "conversation",
+      "row_set_sha256": "49403b3668d25a4e4af3951dca36941c39efbb6dbe9a340a67b58e79258d7958",
+      "source_fixture_ids": [
+        "markdown-a-v1",
+        "markdown-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "f9617bbbd410866f488fb1126d4f2c99e7da78d42818584782e9012d86479942"
+    },
+    {
+      "cell_id": "extract-a-structured-value__word-document__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "baf8cf22f3974ef8a635648a3e620c0556058d3699ecc1d70fcaa95f804ff15a",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-b7ff7372b84d772a27a7137197544f8a52d6e375ab5b74ccf978d19771903714",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "4acba6ef20477ef0c80baf29e3d4b3bd6b133a8a2a1e77fe854848ef9729914c",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "6100804bc5e9f67ade2dfa5909ffb24d8631fa575c6aa5e69c316cd54142148e"
+    },
+    {
+      "cell_id": "extract-a-structured-value__word-document__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "word-document",
+      "instruction": "Produce the exact structural attribute recorded by this source.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "5cb0c6b574091172c4f94c10b8edac2f70fd2d1c521d02216cab0b0a2c6d196c",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-3e0ba70bd6d04c7635a4f63351b10b23d98269123c7e3aa1b6dee249d447041d",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "364735eac4af167b84b08af58bf6398bc40558ac9371b1c530077aa50d7807c1",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "0190106b2bddf02f28782daa4acf0c65097b36dc02d5ef15e758d5bcdc8f73b1"
+    },
+    {
+      "cell_id": "extract-a-structured-value__word-document__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "word-document",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "ecbdab99e51474bb1282bc7b0db1676c114014716225d8666c54989152e867aa",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-32b75a18e70f4b72f767769c836e9ab51c925d715d9b86200eaed03861595ed4",
+      "representation_id": "conversation",
+      "row_set_sha256": "1332a22f82d0b9c7c3500e659a7f3816bac9e73387edc8f209d83fb5b28fde15",
+      "source_fixture_ids": [
+        "word-document-a-v1",
+        "word-document-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "0e0e46a18502acd27d5ad359a95eb6ac9a0cda62984c60899dc891ca09500189"
+    },
+    {
+      "cell_id": "extract-a-structured-value__html__prompt-and-completion",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "prompt"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Prompt is context; completion receives supervision.",
+      "loss_policy": "completion-only",
+      "manifest_sha256": "b2ba18b2deb54b7ff45f4c39cc91612a4cea9a9b5da597f218414d9aa7e92ef1",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-92cbe4d12547a4b21f60bf188bf8143b4fb14a20995ce1d731d8aa2af8ff7f23",
+      "representation_id": "prompt-and-completion",
+      "row_set_sha256": "f41daa6fc97d8b29a5b29558b82c1701844273ee5ae17c5138fe3463dbff7064",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "completion",
+      "supervision_sha256": "636e1ce825d081d7ef9565ef17f0dc9fcb51ecb09b37ce6c86c62dac8cfa8d3f"
+    },
+    {
+      "cell_id": "extract-a-structured-value__html__instruction-and-output",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "instruction",
+        "input"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "html",
+      "instruction": "Produce the exact structural attribute recorded by this source.",
+      "loss_boundary": "Instruction and input are context; output receives supervision.",
+      "loss_policy": "output-only",
+      "manifest_sha256": "1b78730d86e7e0ec0d9c3abc5a08c3a0e58ccb2b56edd16845c11ec1bc8ac9ab",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-e9db611b25420466e1588bedee1e92d6c8bfb50fea1a95c57d2de5fc247b5edb",
+      "representation_id": "instruction-and-output",
+      "row_set_sha256": "35b8f826ebed3b92180fffe03fb434e19915c41fdb6c5a3251d6888a360eaf29",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "output",
+      "supervision_sha256": "917d0d372a84fe1793123d5744845b8137cb613e699d073aaff1d80447a085e6"
+    },
+    {
+      "cell_id": "extract-a-structured-value__html__conversation",
+      "chunk_overlap": null,
+      "chunk_size": null,
+      "cleaning_custom": "",
+      "cleaning_rules": "",
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "evaluation_required": true,
+      "exclusions": [],
+      "goal_id": "extract-a-structured-value",
+      "input_family": "html",
+      "instruction": null,
+      "loss_boundary": "Only the final assistant message receives supervision.",
+      "loss_policy": "final-assistant-suffix",
+      "manifest_sha256": "bb1baac1214a1121f39ce1a5b09720ad50f916a77f509d77738bfb6a0d62842c",
+      "preset_id": "extract-a-structured-value.safe",
+      "recipe_id": "rcp-v1-779f92feacef4060da8f903c21a8e9e1564240a608a378c30b5e6d8e5cb9bce3",
+      "representation_id": "conversation",
+      "row_set_sha256": "2c4e446305e1e5702f6762cf1e59b72bf03b2947ed1cf10c97274a53c68a4c52",
+      "source_fixture_ids": [
+        "html-a-v1",
+        "html-b-v1"
+      ],
+      "supervised_row_key": "messages[1].content",
+      "supervision_sha256": "7e38a7294bf2c77886418dcca588b37772a9bdbf46d1af60002a0905c41cce92"
+    }
+  ],
+  "preset_catalog_sha256": "cf85c7207f0d1089aa3b64de59263ea9548bc1142042839375f0e278ebcae43c",
+  "schema_id": "veriformis.goal-acceptance-matrix/v1",
+  "source_fixtures": [
+    {
+      "input_family": "plain-text",
+      "logical_path": "source-a.txt",
+      "raw_base64": "RHVwbGljYXRlIFJFTU9WRSBjYWbDqSBldmlkZW5jZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEEgbmHDr3ZlIGVuZGluZyByZW1haW5zIGV4YWN0LgoKRHVwbGljYXRlIFJFTU9WRSBjYWbDqSBldmlkZW5jZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEZhaXRoZnVsIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBGYWl0aGZ1bCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRmFpdGhmdWwgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEEgbmHDr3ZlIGVuZGluZyByZW1haW5zIGV4YWN0LgoKVW5pcXVlIFJFTU9WRSBjYWbDqSBldmlkZW5jZS4gRGlzdGluY3Qgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIERpc3RpbmN0IHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBEaXN0aW5jdCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRGlzdGluY3Qgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIERpc3RpbmN0IHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBEaXN0aW5jdCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRGlzdGluY3Qgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIERpc3RpbmN0IHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBEaXN0aW5jdCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRGlzdGluY3Qgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIERpc3RpbmN0IHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBEaXN0aW5jdCBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gRGlzdGluY3Qgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIEFub3RoZXIgbmHDr3ZlIGVuZGluZyByZW1haW5zIGV4YWN0Lgo=",
+      "sha256": "c372ed428c04a7e9df6b3fb61414e124b5284efc1b58d74c69824f3b56959231",
+      "size": 1991,
+      "source_fixture_id": "plain-text-a-v1"
+    },
+    {
+      "input_family": "plain-text",
+      "logical_path": "source-b.txt",
+      "raw_base64": "SW5kZXBlbmRlbnQgUkVNT1ZFIGNhZsOpIGV2aWRlbmNlLiBTZXBhcmF0ZSBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gU2VwYXJhdGUgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIFNlcGFyYXRlIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBTZXBhcmF0ZSBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gU2VwYXJhdGUgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIFNlcGFyYXRlIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBTZXBhcmF0ZSBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gU2VwYXJhdGUgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIFNlcGFyYXRlIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBTZXBhcmF0ZSBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gU2VwYXJhdGUgc291cmNlLWdyb3VuZGVkIHdvcmRzIGNvbnRpbnVlIGhlcmUuIFNlcGFyYXRlIHNvdXJjZS1ncm91bmRlZCB3b3JkcyBjb250aW51ZSBoZXJlLiBTZXBhcmF0ZSBzb3VyY2UtZ3JvdW5kZWQgd29yZHMgY29udGludWUgaGVyZS4gSXRzIG5hw692ZSBlbmRpbmcgYWxzbyByZW1haW5zIGV4YWN0Lgo=",
+      "sha256": "39886f7e4067b08600e1fbeef5b1ff9348d902bbe9620e89d952d3966d24354f",
+      "size": 671,
+      "source_fixture_id": "plain-text-b-v1"
+    },
+    {
+      "input_family": "source-code",
+      "logical_path": "source-a.py",
+      "raw_base64": "ZGVmIGV4YWN0X3NvdXJjZV92YWx1ZShudW1iZXIpOgogICAgcmV0dXJuIGYiY2Fmw6kge251bWJlciArIDF9Igo=",
+      "sha256": "af90fd01337a38934c9d98fa1559a64609dfff5eff23f44b95ae6bddb8b0963a",
+      "size": 65,
+      "source_fixture_id": "source-code-a-v1"
+    },
+    {
+      "input_family": "source-code",
+      "logical_path": "source-b.js",
+      "raw_base64": "ZnVuY3Rpb24gZGlzdGluY3RTb3VyY2VWYWx1ZShudW1iZXIpIHsKICByZXR1cm4gYG5hw692ZSAke251bWJlciArIDJ9YDsKfQo=",
+      "sha256": "79cfa522d9940ee983518c8837bdf1eaa5698821293f94634e6f3ea706445c36",
+      "size": 74,
+      "source_fixture_id": "source-code-b-v1"
+    },
+    {
+      "input_family": "markdown",
+      "logical_path": "source-a.md",
+      "raw_base64": "IyBSZWNvdmVyZWQgaGVhZGluZwoKQm9keSBSRU1PVkUgY2Fmw6kgdGV4dCBiZW5lYXRoIHRoZSBoZWFkaW5nOyBuYcOvdmUgc291cmNlIHJlbWFpbnMgZXhhY3QuCg==",
+      "sha256": "c0976aba873c4fe5f4430b867728923fe333cc8332e044007d222d10c6f1ce4e",
+      "size": 94,
+      "source_fixture_id": "markdown-a-v1"
+    },
+    {
+      "input_family": "markdown",
+      "logical_path": "source-b.md",
+      "raw_base64": "IyMgRGlzdGluY3QgcmVjb3ZlcmVkIGhlYWRpbmcKCkRpc3RpbmN0IGJvZHkgUkVNT1ZFIGNhZsOpIHRleHQ7IG5hw692ZSBzb3VyY2UgcmVtYWlucyBleGFjdC4K",
+      "sha256": "be5a98be5fb438130af24808600537c008647a3fe81dfd3fbf68cc0ad014646c",
+      "size": 93,
+      "source_fixture_id": "markdown-b-v1"
+    },
+    {
+      "input_family": "word-document",
+      "logical_path": "source-a.docx",
+      "raw_base64": "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",
+      "sha256": "bc969548ff492e78aaa6f1d50645cc5b89042fe1af6a3b4aa28a5e5138576f2a",
+      "size": 34335,
+      "source_fixture_id": "word-document-a-v1"
+    },
+    {
+      "input_family": "word-document",
+      "logical_path": "source-b.docx",
+      "raw_base64": "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",
+      "sha256": "3ff40e13432f4ac3d1289752c0c8690697cd05b35130135d7fbc957d70895fde",
+      "size": 34328,
+      "source_fixture_id": "word-document-b-v1"
+    },
+    {
+      "input_family": "html",
+      "logical_path": "source-a.html",
+      "raw_base64": "PCFkb2N0eXBlIGh0bWw+PGh0bWw+PGJvZHk+PGgxPlJlY292ZXJlZCBoZWFkaW5nPC9oMT48cD5Cb2R5IFJFTU9WRSBjYWbDqSB0ZXh0OyBuYcOvdmUgc291cmNlIHJlbWFpbnMgZXhhY3QuPC9wPjwvYm9keT48L2h0bWw+",
+      "sha256": "8b9bcf7d44e5a234bce187f3f6e53ad123857dfeaa6dc0d174344f8c68188ed8",
+      "size": 126,
+      "source_fixture_id": "html-a-v1"
+    },
+    {
+      "input_family": "html",
+      "logical_path": "source-b.html",
+      "raw_base64": "PCFkb2N0eXBlIGh0bWw+PGh0bWw+PGJvZHk+PGgyPkRpc3RpbmN0IHJlY292ZXJlZCBoZWFkaW5nPC9oMj48cD5EaXN0aW5jdCBib2R5IFJFTU9WRSBjYWbDqSB0ZXh0OyBuYcOvdmUgc291cmNlIHJlbWFpbnMgZXhhY3QuPC9wPjwvYm9keT48L2h0bWw+",
+      "sha256": "6c68e7a1557dc10cb50cdc4726c3bf529c51faa843b802156e4c790ffec4801d",
+      "size": 144,
+      "source_fixture_id": "html-b-v1"
+    },
+    {
+      "input_family": "pdf-text",
+      "logical_path": "source-a.pdf",
+      "raw_base64": "JVBERi0xLjEKMSAwIG9iajw8IC9UeXBlIC9DYXRhbG9nIC9QYWdlcyAyIDAgUiA+PmVuZG9iagoyIDAgb2JqPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj5lbmRvYmoKMyAwIG9iajw8IC9UeXBlIC9QYWdlIC9QYXJlbnQgMiAwIFIgL01lZGlhQm94IFswIDAgMzAwIDE0NF0gL0NvbnRlbnRzIDQgMCBSIC9SZXNvdXJjZXM8PCAvRm9udDw8IC9GMSA1IDAgUiA+PiA+PiA+PmVuZG9iago0IDAgb2JqPDwgL0xlbmd0aCA1NSA+PnN0cmVhbQpCVCAvRjEgMjQgVGYgNDAgMTAwIFRkIChIZWxsbyBQREYgY2Fm6SBsYXllcikgVGogRVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+ZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMDI2NiAwMDAwMCBuIAowMDAwMDAwMzcyIDAwMDAwIG4gCnRyYWlsZXI8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0NTIKJSVFT0YK",
+      "sha256": "f451c375145fe78023691bfa6faaabc65d452396b9fba5cf10ce3282d120a5c6",
+      "size": 582,
+      "source_fixture_id": "pdf-text-a-v1"
+    },
+    {
+      "input_family": "pdf-text",
+      "logical_path": "source-b.pdf",
+      "raw_base64": "JVBERi0xLjEKMSAwIG9iajw8IC9UeXBlIC9DYXRhbG9nIC9QYWdlcyAyIDAgUiA+PmVuZG9iagoyIDAgb2JqPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj5lbmRvYmoKMyAwIG9iajw8IC9UeXBlIC9QYWdlIC9QYXJlbnQgMiAwIFIgL01lZGlhQm94IFswIDAgMzAwIDE0NF0gL0NvbnRlbnRzIDQgMCBSIC9SZXNvdXJjZXM8PCAvRm9udDw8IC9GMSA1IDAgUiA+PiA+PiA+PmVuZG9iago0IDAgb2JqPDwgL0xlbmd0aCA1NSA+PnN0cmVhbQpCVCAvRjEgMjQgVGYgNDAgMTAwIFRkIChPdGhlciBQREYgY2Fm6SBsYXllcikgVGogRVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+ZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMDI2NiAwMDAwMCBuIAowMDAwMDAwMzcyIDAwMDAwIG4gCnRyYWlsZXI8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0NTIKJSVFT0YK",
+      "sha256": "5aad2029f355edafd69a50b2256e19c3b2d55282d99b86c2f22dcb8ce5245845",
+      "size": 582,
+      "source_fixture_id": "pdf-text-b-v1"
+    },
+    {
+      "input_family": "delimited-table",
+      "logical_path": "source-a.csv",
+      "raw_base64": "bmFtZSx2YWx1ZQphbHBoYSxjYWbDqSBmaXJzdCBleGFjdCBzb3VyY2UgdmFsdWUKYmV0YSxuYcOvdmUgc2Vjb25kIGV4YWN0IHNvdXJjZSB2YWx1ZQo=",
+      "sha256": "d36eed735c187f220b7d223b10f1562b43b79eddd933c61bdb194affc51838fc",
+      "size": 86,
+      "source_fixture_id": "delimited-table-a-v1"
+    },
+    {
+      "input_family": "delimited-table",
+      "logical_path": "source-b.csv",
+      "raw_base64": "bmFtZSx2YWx1ZQphbHBoYSxjYWbDqSBkaXN0aW5jdCBleGFjdCBzb3VyY2UgdmFsdWUKZ2FtbWEsYW5vdGhlciBuYcOvdmUgZGlzdGluY3Qgc291cmNlIHZhbHVlCg==",
+      "sha256": "2ccdbeaac10f3b48fe79966cf36b0aeec04f89f91035eda4e8e9cbdf6ec5de0d",
+      "size": 94,
+      "source_fixture_id": "delimited-table-b-v1"
+    },
+    {
+      "input_family": "json-records",
+      "logical_path": "source-a.jsonl",
+      "raw_base64": "eyJ0ZXh0IjoiZmlyc3QgY2Fmw6kgZXhhY3Qgc291cmNlLWdyb3VuZGVkIHJlY29yZCJ9CnsidGV4dCI6InNlY29uZCBuYcOvdmUgZXhhY3Qgc291cmNlLWdyb3VuZGVkIHJlY29yZCJ9Cg==",
+      "sha256": "944a95885bdfe2efea59ca53398a53c8fb0121618534503b467a9f64069db32a",
+      "size": 106,
+      "source_fixture_id": "json-records-a-v1"
+    },
+    {
+      "input_family": "json-records",
+      "logical_path": "source-b.jsonl",
+      "raw_base64": "eyJ0ZXh0IjoiZmlyc3QgY2Fmw6kgZGlzdGluY3Qgc291cmNlLWdyb3VuZGVkIHJlY29yZCJ9CnsidGV4dCI6InRoaXJkIG5hw692ZSBkaXN0aW5jdCBzb3VyY2UtZ3JvdW5kZWQgcmVjb3JkIn0K",
+      "sha256": "f5e1f81b61a8239ced2bef8cfe232c769b4c8072bfeb2723643a082432bf72d0",
+      "size": 111,
+      "source_fixture_id": "json-records-b-v1"
+    }
+  ]
+}
