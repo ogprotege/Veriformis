@@ -293,8 +293,7 @@ recipes, and four representations bound to the existing row schemas and loss
 policies, discoverable read-only and byte-identically through Python, CLI
 `goals`, MCP `goals`, and the Mac bridge. It merged as PR #60 at
 `7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub checks
-passed. Phase 6.2 (in progress, unmerged) extends each goal with required
-source evidence, its
+passed. Phase 6.2 extends each goal with required source evidence, its
 missing-evidence diagnostics, target construction, supervision boundary,
 curation defaults, review policy, and closed non-claims; binds each
 representation to its compatible generic exports; and adds `input_family`
@@ -309,16 +308,23 @@ derivation lineage, context and target fields, the row exactly as `format`
 lowers it, the exact supervised span with its loss policy, and the curation
 decision and excluded records with reason codes, bounded like the Phase 5.6
 export preview; it merged as PR #62 at
-`9cbab117e47cde6bd8850d67f0d363e03f0660ce`. Phase 6.4 (in progress,
-unmerged) adds `veriformis.recipe-preset/v1`: packaged versioned data that is
+`9cbab117e47cde6bd8850d67f0d363e03f0660ce`. Phase 6.4 adds
+`veriformis.recipe-preset/v1`: packaged versioned data that is
 the single source of every recipe default and of one safe preset per goal;
 `chunk`, `construct`, and `curate` on Python, CLI, MCP, and YAML select by
 `--goal`/`--preset` with explicit overrides only, the recipe library is on the
 execution path so every selection yields one `recipe_id`, the workbench offers
 a plain-language goal picker with an Advanced disclosure and holds no recipe
-constant, and the tracking checker refuses recipe default literals. None of
-these items adds an objective, row schema, construction behavior, preflight,
-persisted schema, trainer claim, or consumer profile.
+constant, and the tracking checker refuses recipe default literals; it merged
+as PR #63 at `abdd630e25e83ebf346316319caec892f4d64886`. Phase 6.5 adds the
+bounded runtime-only `veriformis.compile-preflight/v1` response over raw source
+paths: one immutable capture is replayed through the production parser,
+selected cleaning, segmentation, named construction, global curation, and
+leakage-group split entirely in memory. Python, CLI, MCP, and the Mac panel
+share the exact report, and real construction shares its goal/input-family
+gate. No workspace, renderer, or destination is created or accessed. None of
+these items adds an objective, row schema, persisted schema, trainer claim, or
+consumer profile.
 
 ## Implemented interfaces
 
@@ -344,6 +350,7 @@ The installed console entry point is `veriformis`.
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
+| `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
@@ -362,12 +369,12 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy and goal-catalog discovery, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
-| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy and goal-catalog JSON and canonical verified-export responses |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy and goal-catalog discovery, raw-source compile preflight, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy and goal-catalog JSON, compile preflight, and canonical verified-export responses |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
-| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, and verified-export service operations |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, compile-preflight, and verified-export service operations |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
-| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, strict goal-catalog and goal-preview bridges with a post-compile preview screen, and a strict canonical verified-export bridge |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, strict goal-catalog, pre-workspace compile-preflight, and post-compile goal-preview screens, and a strict canonical verified-export bridge |
 
 ## Workspace and identity status
 

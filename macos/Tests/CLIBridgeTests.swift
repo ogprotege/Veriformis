@@ -230,6 +230,10 @@ final class CLIBridgeTests: XCTestCase {
             let script = """
             #!/bin/sh
             stage="$1"
+            if [ "$stage" = "preflight" ]; then
+              \(try compilePreflightHeredoc())
+              exit 0
+            fi
             if [ "$stage" = "seal" ]; then
               printf 'manifest SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\n'
             fi
@@ -288,6 +292,481 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
+    // MARK: - Compile preflight (Phase 6.5)
+
+    func testCompilePreflightDecodesCompleteStrictResponse() throws {
+        let report = try JSONDecoder().decode(
+            CompilePreflight.self,
+            from: compilePreflightData()
+        )
+
+        XCTAssertEqual(report.schemaID, "veriformis.compile-preflight/v1")
+        XCTAssertTrue(report.admitted)
+        XCTAssertEqual(report.evaluatedThrough, .split)
+        XCTAssertEqual(report.counts.sourceCount, 1)
+        XCTAssertEqual(report.counts.admittedSourceCount, 1)
+        XCTAssertEqual(report.selection.resolved?.goalID, "continue-a-passage")
+        XCTAssertEqual(report.selection.resolved?.objective, .continuation)
+        XCTAssertEqual(report.selection.resolved?.rowSchema, "prompt_completion")
+        let source = try XCTUnwrap(report.sources.first)
+        XCTAssertEqual(source.inputFamily, "plain-text")
+        XCTAssertEqual(source.parserID, "plain-text-v1")
+        XCTAssertEqual(source.parserStatus, .complete)
+        XCTAssertEqual(source.evidenceStatus, .available)
+        XCTAssertTrue(source.admitted)
+        XCTAssertEqual(source.diagnosticCounts.first?.count, 1)
+        XCTAssertEqual(source.diagnostics.first?.lossKind, "none")
+        XCTAssertEqual(report.expectedExclusions.first?.status, .excluded)
+        XCTAssertEqual(report.knownLimitations.first?.code, "point-in-time-source-capture")
+    }
+
+    func testCompilePreflightAcceptsContractValidLogicalPathWhitespace() throws {
+        let report = try JSONDecoder().decode(
+            CompilePreflight.self,
+            from: compilePreflightData { payload in
+                var sources = payload["sources"] as! [[String: Any]]
+                sources[0]["logical_path"] = " leading and trailing .txt "
+                payload["sources"] = sources
+            }
+        )
+
+        XCTAssertEqual(report.sources.first?.logicalPath, " leading and trailing .txt ")
+    }
+
+    func testCompilePreflightRejectsKeyAndEnumDrift() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                CompilePreflight.self,
+                from: compilePreflightData { $0.removeValue(forKey: "known_limitations") }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? CompilePreflightError,
+                .invalidKeySet(
+                    scope: "response",
+                    missing: ["known_limitations"],
+                    unexpected: []
+                )
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                CompilePreflight.self,
+                from: compilePreflightData { payload in
+                    var sources = payload["sources"] as! [[String: Any]]
+                    sources[0]["parser_status"] = "probably"
+                    payload["sources"] = sources
+                }
+            )
+        )
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                CompilePreflight.self,
+                from: compilePreflightData { payload in
+                    var counts = payload["counts"] as! [String: Any]
+                    counts["guessed_count"] = 1
+                    payload["counts"] = counts
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? CompilePreflightError,
+                .invalidKeySet(
+                    scope: "counts",
+                    missing: [],
+                    unexpected: ["guessed_count"]
+                )
+            )
+        }
+    }
+
+    func testCompilePreflightDecodesSelectionRefusalWithoutInventingResolution() throws {
+        let data = try compilePreflightData(admitted: false) { payload in
+            payload["captured_source_digest"] = NSNull()
+            payload["evaluated_through"] = "selection"
+            payload["sources"] = []
+            payload["missing_evidence"] = []
+            var counts = payload["counts"] as! [String: Any]
+            for key in Array(counts.keys) {
+                counts[key] = 0
+            }
+            payload["counts"] = counts
+            payload["selection"] = [
+                "requested_goal": NSNull(),
+                "requested_preset": NSNull(),
+                "requested_representation": NSNull(),
+                "instruction_supplied": false,
+                "resolved": NSNull(),
+            ]
+            payload["incompatibilities"] = [[
+                "code": "selection-required",
+                "fields": ["goal", "preset"],
+                "message": "Select a goal and preset.",
+            ]]
+        }
+        let report = try JSONDecoder().decode(CompilePreflight.self, from: data)
+
+        XCTAssertFalse(report.admitted)
+        XCTAssertEqual(report.evaluatedThrough, .selection)
+        XCTAssertNil(report.selection.resolved)
+        XCTAssertNil(report.selection.requestedGoal)
+        XCTAssertEqual(report.incompatibilities.first?.code, .selectionRequired)
+    }
+
+    func testPreflightArgumentsProjectEveryOverrideExactly() {
+        let request = CompilePreflightRequest(
+            sources: [URL(fileURLWithPath: "/raw/a.txt"), URL(fileURLWithPath: "/raw/b.md")],
+            sourceRoot: URL(fileURLWithPath: "/raw"),
+            goal: "continue-a-passage",
+            preset: "continue-a-passage.safe",
+            representation: "prompt-and-completion",
+            instruction: "Use the supplied opening.",
+            rules: "whitespace",
+            custom: "custom-rule",
+            strategy: "paragraph",
+            size: 800,
+            overlap: 80,
+            splitRatioPPM: 400_000,
+            requireReview: false,
+            consumerProfile: "aptus-handoff-v1",
+            minimumTargetCharacters: 90,
+            balanceMode: "primary-source-cap",
+            maximumRecordsPerPrimarySource: 12,
+            evaluationRatioPPM: 200_000,
+            evaluationRequired: false,
+            splitSeed: "seed-2",
+            reviewPolicy: "none"
+        )
+
+        XCTAssertEqual(
+            VeriformisCLI.preflightArguments(request),
+            [
+                "preflight", "/raw/a.txt", "/raw/b.md",
+                "--source-root", "/raw",
+                "--goal", "continue-a-passage",
+                "--preset", "continue-a-passage.safe",
+                "--representation", "prompt-and-completion",
+                "--instruction", "Use the supplied opening.",
+                "--rules", "whitespace",
+                "--custom", "custom-rule",
+                "--strategy", "paragraph",
+                "--size", "800",
+                "--overlap", "80",
+                "--split-ratio-ppm", "400000",
+                "--no-require-review",
+                "--consumer-profile", "aptus-handoff-v1",
+                "--minimum-target-characters", "90",
+                "--balance-mode", "primary-source-cap",
+                "--maximum-records-per-primary-source", "12",
+                "--evaluation-ratio-ppm", "200000",
+                "--allow-empty-evaluation",
+                "--split-seed", "seed-2",
+                "--review-policy", "none",
+            ]
+        )
+    }
+
+    func testPreflightBridgeAcceptsExitZeroAdmissionAndExitTwoRefusal() async throws {
+        for admitted in [true, false] {
+            let root = temporaryTestDirectory("preflight-exit-\(admitted)")
+            defer { try? FileManager.default.removeItem(at: root) }
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            let executable = root.appendingPathComponent("fake-veriformis")
+            let arguments = root.appendingPathComponent("arguments.txt")
+            try writeExecutable(
+                executable,
+                script: """
+                #!/bin/sh
+                printf '%s\n' "$@" > "\(arguments.path)"
+                \(try compilePreflightHeredoc(admitted: admitted))
+                exit \(admitted ? 0 : 2)
+                """
+            )
+            let request = compilePreflightRequest(root: root)
+            let report = try await VeriformisCLI(
+                executableURL: executable,
+                prefixArguments: []
+            ).preflight(request)
+
+            XCTAssertEqual(report.admitted, admitted)
+            XCTAssertEqual(
+                Array(try recordedArguments(arguments).prefix(10)),
+                [
+                    "preflight", request.sources[0].path,
+                    "--source-root", request.sourceRoot.path,
+                    "--goal", request.goal,
+                    "--preset", request.preset,
+                    "--representation", request.representation,
+                ]
+            )
+        }
+    }
+
+    func testPreflightBridgeRejectsInconsistentExitStatus() async throws {
+        for (admitted, exitCode) in [(false, 0), (true, 2)] {
+            let root = temporaryTestDirectory("preflight-inconsistent-\(exitCode)")
+            defer { try? FileManager.default.removeItem(at: root) }
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            let executable = root.appendingPathComponent("fake-veriformis")
+            try writeExecutable(
+                executable,
+                script: """
+                #!/bin/sh
+                \(try compilePreflightHeredoc(admitted: admitted))
+                exit \(exitCode)
+                """
+            )
+            do {
+                _ = try await VeriformisCLI(
+                    executableURL: executable,
+                    prefixArguments: []
+                ).preflight(compilePreflightRequest(root: root))
+                XCTFail("expected inconsistent exit refusal")
+            } catch {
+                XCTAssertEqual(
+                    error as? CompilePreflightError,
+                    .inconsistentExitStatus(exitCode: Int32(exitCode), admitted: admitted)
+                )
+            }
+        }
+    }
+
+    func testPreflightBridgeRejectsMalformedTruncatedAndUnexpectedExit() async throws {
+        let root = temporaryTestDirectory("preflight-invalid-transport")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let request = compilePreflightRequest(root: root)
+        let cli = VeriformisCLI(executableURL: executable, prefixArguments: [])
+
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf 'not-json\n'
+            exit 0
+            """
+        )
+        do {
+            _ = try await cli.preflight(request)
+            XCTFail("malformed stdout must be refused")
+        } catch let error as CompilePreflightError {
+            guard case .invalidPayload = error else {
+                return XCTFail("unexpected malformed-response error: \(error)")
+            }
+        }
+
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            \(try compilePreflightHeredoc())
+            exit 0
+            """
+        )
+        do {
+            _ = try await cli.preflight(
+                request,
+                controller: CLIProcessController(maxRetainedOutputBytes: 1_024)
+            )
+            XCTFail("truncated stdout must be refused")
+        } catch {
+            XCTAssertEqual(error as? CompilePreflightError, .outputTruncated)
+        }
+
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf 'internal failure\n' >&2
+            exit 1
+            """
+        )
+        do {
+            _ = try await cli.preflight(request)
+            XCTFail("unexpected exit must be refused")
+        } catch let error as CompilePreflightError {
+            guard case .commandFailed(let exitCode, let message) = error else {
+                return XCTFail("unexpected exit-status error: \(error)")
+            }
+            XCTAssertEqual(exitCode, 1)
+            XCTAssertTrue(message.contains("internal failure"))
+        }
+    }
+
+    func testPreflightCancellationWinsOverAnyPartialResponse() async throws {
+        let root = temporaryTestDirectory("preflight-cancel")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let started = root.appendingPathComponent("started")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            : > "\(started.path)"
+            \(try compilePreflightHeredoc())
+            trap 'exit 0' TERM INT
+            while :; do sleep 0.02; done
+            """
+        )
+        let controller = CLIProcessController(terminationGrace: 0.1)
+        let task = Task {
+            try await VeriformisCLI(
+                executableURL: executable,
+                prefixArguments: []
+            ).preflight(compilePreflightRequest(root: root), controller: controller)
+        }
+        try await waitForFile(started)
+        controller.cancel()
+
+        do {
+            _ = try await task.value
+            XCTFail("cancelled preflight must not accept stdout")
+        } catch is CancellationError {
+            // Expected: cancellation wins even if complete JSON raced into stdout.
+        }
+    }
+
+    @MainActor
+    func testWorkbenchPreflightCancelsAndDiscardsStaleResponse() async throws {
+        let root = temporaryTestDirectory("preflight-stale")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let source = root.appendingPathComponent("source.txt")
+        try Data("source text".utf8).write(to: source)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let firstStarted = root.appendingPathComponent("first-started")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            if [ ! -e "\(firstStarted.path)" ]; then
+              : > "\(firstStarted.path)"
+              trap 'exit 0' TERM INT
+              while :; do sleep 0.02; done
+            fi
+            \(try compilePreflightHeredoc())
+            exit 0
+            """
+        )
+        let defaults = try isolatedDefaults(output: output)
+        defer { defaults.defaults.removePersistentDomain(forName: defaults.name) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: defaults.defaults,
+            supportDirectory: root.appendingPathComponent("support")
+        )
+        try configureForPreflight(workbench, source: source, root: root, output: output)
+
+        workbench.refreshCompilePreflight()
+        try await waitForFile(firstStarted)
+        workbench.splitRatioPPM = 400_000
+        XCTAssertEqual(workbench.compilePreflightState, .idle)
+        workbench.refreshCompilePreflight()
+        let state = try await waitForTerminalPreflightState(workbench)
+        guard case .ready(let report) = state else {
+            return XCTFail("replacement request did not win: \(state)")
+        }
+        XCTAssertTrue(report.admitted)
+        XCTAssertTrue(workbench.canCompile)
+    }
+
+    @MainActor
+    func testCompileRerunsPreflightAndCreatesNoWorkspaceWhenSnapshotIsBlocked() async throws {
+        let root = temporaryTestDirectory("preflight-jit-block")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let source = root.appendingPathComponent("source.txt")
+        try Data("source text".utf8).write(to: source)
+        let admitted = root.appendingPathComponent("admitted.json")
+        let blocked = root.appendingPathComponent("blocked.json")
+        try compilePreflightData().write(to: admitted)
+        try compilePreflightData(admitted: false).write(to: blocked)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let first = root.appendingPathComponent("first")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            if [ ! -e "\(first.path)" ]; then
+              : > "\(first.path)"
+              cat "\(admitted.path)"
+              exit 0
+            fi
+            cat "\(blocked.path)"
+            exit 2
+            """
+        )
+        let defaults = try isolatedDefaults(output: output)
+        defer { defaults.defaults.removePersistentDomain(forName: defaults.name) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: defaults.defaults,
+            supportDirectory: root.appendingPathComponent("support")
+        )
+        try configureForPreflight(workbench, source: source, root: root, output: output)
+
+        workbench.refreshCompilePreflight()
+        guard case .ready(let firstReport) = try await waitForTerminalPreflightState(workbench) else {
+            return XCTFail("initial preflight did not finish")
+        }
+        XCTAssertTrue(firstReport.admitted)
+        XCTAssertTrue(workbench.canCompile)
+        workbench.compile()
+        try await waitForCompileToFinish(workbench)
+
+        guard case .ready(let finalReport) = workbench.compilePreflightState else {
+            return XCTFail("just-in-time preflight report was not retained")
+        }
+        XCTAssertFalse(finalReport.admitted)
+        XCTAssertFalse(workbench.showRunSheet)
+        XCTAssertTrue(workbench.runHistory.isEmpty)
+        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath: output.path).isEmpty)
+    }
+
+    @MainActor
+    func testCompileCancellationDuringPreflightCreatesNoWorkspaceOrHistory() async throws {
+        let root = temporaryTestDirectory("preflight-jit-cancel")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let source = root.appendingPathComponent("source.txt")
+        try Data("source text".utf8).write(to: source)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let started = root.appendingPathComponent("started")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            : > "\(started.path)"
+            trap 'exit 0' TERM INT
+            while :; do sleep 0.02; done
+            """
+        )
+        let defaults = try isolatedDefaults(output: output)
+        defer { defaults.defaults.removePersistentDomain(forName: defaults.name) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: defaults.defaults,
+            supportDirectory: root.appendingPathComponent("support")
+        )
+        try configureForPreflight(workbench, source: source, root: root, output: output)
+
+        workbench.compile()
+        try await waitForFile(started)
+        XCTAssertFalse(workbench.showRunSheet)
+        workbench.cancelCompile()
+        try await waitForCompileToFinish(workbench)
+
+        XCTAssertNil(workbench.lastCancellation)
+        XCTAssertTrue(workbench.runHistory.isEmpty)
+        XCTAssertEqual(workbench.compilePreflightState, .idle)
+        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath: output.path).isEmpty)
+    }
+
     // MARK: - Recipe presets (Phase 6.4)
 
     func testRecipePresetsDecodeFrozenFixtureExactly() throws {
@@ -327,6 +806,26 @@ final class CLIBridgeTests: XCTestCase {
             )
         ) { error in
             XCTAssertEqual(error as? RecipePresetError, .invalidMetadata("segmentation"))
+        }
+    }
+
+    func testRecipePresetsRejectEvaluationRatioEndpoints() throws {
+        for endpoint in [0, 1_000_000] {
+            XCTAssertThrowsError(
+                try JSONDecoder().decode(
+                    RecipePresetCatalog.self,
+                    from: recipePresetsData { payload in
+                        var presets = payload["presets"] as! [[String: Any]]
+                        var curation = presets[0]["curation"] as! [String: Any]
+                        curation["evaluation_ratio_ppm"] = endpoint
+                        presets[0]["curation"] = curation
+                        payload["presets"] = presets
+                    }
+                ),
+                "evaluation_ratio_ppm=\(endpoint) must be rejected"
+            ) { error in
+                XCTAssertEqual(error as? RecipePresetError, .invalidMetadata("curation"))
+            }
         }
     }
 
@@ -580,6 +1079,29 @@ final class CLIBridgeTests: XCTestCase {
                 error as? GoalCatalogError,
                 .invalidKeySet(scope: "goal", missing: [], unexpected: ["summary"])
             )
+        }
+    }
+
+    func testGoalCatalogRejectsEvaluationRatioEndpoints() throws {
+        for endpoint in [0, 1_000_000] {
+            XCTAssertThrowsError(
+                try JSONDecoder().decode(
+                    GoalCatalog.self,
+                    from: goalCatalogData { payload in
+                        var goals = payload["goals"] as! [[String: Any]]
+                        var defaults = goals[0]["curation_defaults"] as! [String: Any]
+                        defaults["evaluation_ratio_ppm"] = endpoint
+                        goals[0]["curation_defaults"] = defaults
+                        payload["goals"] = goals
+                    }
+                ),
+                "evaluation_ratio_ppm=\(endpoint) must be rejected"
+            ) { error in
+                XCTAssertEqual(
+                    error as? GoalCatalogError,
+                    .invalidGoals("curation_defaults out of range")
+                )
+            }
         }
     }
 
@@ -2765,6 +3287,213 @@ final class CLIBridgeTests: XCTestCase {
         try String(contentsOf: url, encoding: .utf8)
             .split(separator: "\n", omittingEmptySubsequences: true)
             .map(String.init)
+    }
+
+    private func compilePreflightRequest(root: URL) -> CompilePreflightRequest {
+        CompilePreflightRequest(
+            sources: [root.appendingPathComponent("source.txt")],
+            sourceRoot: root,
+            goal: "continue-a-passage",
+            preset: "continue-a-passage.safe",
+            representation: "prompt-and-completion"
+        )
+    }
+
+    private func compilePreflightData(
+        admitted: Bool = true,
+        mutating mutation: ((inout [String: Any]) -> Void)? = nil
+    ) throws -> Data {
+        let digestA = String(repeating: "a", count: 64)
+        let digestB = String(repeating: "b", count: 64)
+        let refusalReasons: [[String: Any]] = admitted
+            ? []
+            : [[
+                "code": "goal-evidence-unavailable",
+                "detail_codes": ["target-boundary-missing"],
+                "message": "The source does not supply the required target boundary.",
+            ]]
+        let source: [String: Any] = [
+            "logical_path": "source.txt",
+            "source_id": "source-v1-\(digestA)",
+            "sha256": digestA,
+            "size": 128,
+            "input_family": "plain-text",
+            "parser_id": "plain-text-v1",
+            "parser_status": "complete",
+            "parser_eligible": true,
+            "goal_family_eligible": true,
+            "evidence_status": admitted ? "available" : "missing",
+            "admitted": admitted,
+            "refusal_reasons": refusalReasons,
+            "diagnostic_counts": [["code": "source-preserved", "count": 1]],
+            "diagnostics": [[
+                "diagnostic_id": "diagnostic-v1-\(digestB)",
+                "code": "source-preserved",
+                "severity": "info",
+                "disposition": "preserved",
+                "loss_kind": "none",
+                "message": "Source text was preserved.",
+            ]],
+            "omitted_diagnostic_count": 0,
+            "omission_reason": NSNull(),
+            "exact_size_bytes": 640,
+        ]
+        let counts: [String: Any] = [
+            "source_count": 1,
+            "parser_eligible_source_count": 1,
+            "family_eligible_source_count": 1,
+            "evidence_eligible_source_count": admitted ? 1 : 0,
+            "admitted_source_count": admitted ? 1 : 0,
+            "candidate_count": admitted ? 2 : 0,
+            "record_count": admitted ? 1 : 0,
+            "pending_review_count": 0,
+            "included_count": admitted ? 1 : 0,
+            "excluded_count": admitted ? 1 : 0,
+            "quarantined_count": 0,
+        ]
+        var payload: [String: Any] = [
+            "schema_id": "veriformis.compile-preflight/v1",
+            "request_digest": digestA,
+            "captured_source_digest": digestB,
+            "evaluated_through": admitted ? "split" : "construct",
+            "admitted": admitted,
+            "selection": [
+                "requested_goal": "continue-a-passage",
+                "requested_preset": "continue-a-passage.safe",
+                "requested_representation": "prompt-and-completion",
+                "instruction_supplied": false,
+                "resolved": [
+                    "goal_id": "continue-a-passage",
+                    "preset_id": "continue-a-passage.safe",
+                    "representation_id": "prompt-and-completion",
+                    "objective": "continuation",
+                    "row_schema": "prompt_completion",
+                    "recipe_library_id": "finished-dataset-v1",
+                    "consumer_profile": "veriformis-canonical-v1",
+                    "settings_digest": digestA,
+                    "cleaning_config_digest": digestB,
+                    "segmentation": [
+                        "strategy": "paragraph",
+                        "size": 1000,
+                        "overlap": 100,
+                    ],
+                    "construction": [
+                        "split_ratio_ppm": 500_000,
+                        "require_review": false,
+                        "consumer_profile": "veriformis-canonical-v1",
+                    ],
+                    "curation": [
+                        "minimum_target_characters": 80,
+                        "balance_mode": "none",
+                        "maximum_records_per_primary_source": NSNull(),
+                        "evaluation_ratio_ppm": 200_000,
+                        "evaluation_required": true,
+                        "split_seed": "preflight-seed",
+                    ],
+                    "review_policy": "none",
+                ],
+            ],
+            "counts": counts,
+            "sources": [source],
+            "incompatibilities": [],
+            "missing_evidence": admitted ? [] : [[
+                "diagnostic_id": "diagnostic-v1-\(digestA)",
+                "code": "target-boundary-missing",
+                "message": "The goal-specific target boundary is missing.",
+                "pass_id": "construct",
+                "source_ids": ["source-v1-\(digestA)"],
+                "chunk_ids": [],
+            ]],
+            "expected_exclusion_counts": admitted ? [[
+                "stage": "curate",
+                "status": "excluded",
+                "reason_code": "short-target",
+                "count": 1,
+            ]] : [],
+            "expected_exclusions": admitted ? [[
+                "stage": "curate",
+                "subject_id": "record-v1-\(digestB)",
+                "source_ids": ["source-v1-\(digestA)"],
+                "status": "excluded",
+                "reason_codes": ["short-target"],
+            ]] : [],
+            "omitted_expected_exclusion_count": 0,
+            "coverage_blockers": [],
+            "known_limitations": [[
+                "code": "point-in-time-source-capture",
+                "message": "Compile recaptures sources and may observe later changes.",
+                "source_ids": [],
+            ]],
+            "omitted_diagnostic_count": 0,
+        ]
+        mutation?(&payload)
+        return try JSONSerialization.data(
+            withJSONObject: payload,
+            options: [.sortedKeys, .withoutEscapingSlashes]
+        )
+    }
+
+    private func compilePreflightHeredoc(admitted: Bool = true) throws -> String {
+        let payload = String(decoding: try compilePreflightData(admitted: admitted), as: UTF8.self)
+        return """
+        cat <<'VERIFORMIS_COMPILE_PREFLIGHT_JSON'
+        \(payload)
+        VERIFORMIS_COMPILE_PREFLIGHT_JSON
+        """
+    }
+
+    private func isolatedDefaults(
+        output: URL
+    ) throws -> (defaults: UserDefaults, name: String) {
+        let name = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: name))
+        defaults.set(output.path, forKey: "veriformis.workbench.defaultOutput")
+        return (defaults, name)
+    }
+
+    @MainActor
+    private func configureForPreflight(
+        _ workbench: WorkbenchViewModel,
+        source: URL,
+        root: URL,
+        output: URL
+    ) throws {
+        workbench.applyCatalogs(
+            goals: try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData()),
+            presets: try JSONDecoder().decode(
+                RecipePresetCatalog.self,
+                from: recipePresetsData()
+            )
+        )
+        workbench.sourceURLs = [source]
+        workbench.sourceRootURL = root
+        workbench.outputDirectoryURL = output
+    }
+
+    @MainActor
+    private func waitForTerminalPreflightState(
+        _ workbench: WorkbenchViewModel
+    ) async throws -> CompilePreflightState {
+        for _ in 0 ..< 300 {
+            switch workbench.compilePreflightState {
+            case .ready, .unavailable:
+                return workbench.compilePreflightState
+            case .idle, .loading:
+                try await Task.sleep(nanoseconds: 10_000_000)
+            }
+        }
+        XCTFail("compile preflight did not reach a terminal state")
+        return workbench.compilePreflightState
+    }
+
+    @MainActor
+    private func waitForCompileToFinish(
+        _ workbench: WorkbenchViewModel
+    ) async throws {
+        for _ in 0 ..< 300 where workbench.isRunning {
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertFalse(workbench.isRunning, "compile did not finish")
     }
 
     private func waitForFile(_ url: URL) async throws {

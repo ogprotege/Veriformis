@@ -28,16 +28,16 @@ _TEXT = (
 )
 
 
-def _sources(root: Path) -> tuple[Path, list[Path]]:
+def _sources(root: Path, *, name: str = "doc.txt") -> tuple[Path, list[Path]]:
     source_root = root / "sources"
     source_root.mkdir(parents=True, exist_ok=True)
-    path = source_root / "doc.txt"
+    path = source_root / name
     path.write_text(_TEXT, encoding="utf-8")
     return source_root, [path]
 
 
-def _prepare(root: Path, name: str, **chunk) -> Path:
-    source_root, paths = _sources(root)
+def _prepare(root: Path, name: str, *, source_name: str = "doc.txt", **chunk) -> Path:
+    source_root, paths = _sources(root, name=source_name)
     workspace = root / name
     SERVICE.parse(paths, workspace, source_root=source_root)
     SERVICE.clean(workspace)
@@ -114,10 +114,15 @@ stages:
 
 
 def test_preset_enforces_its_segmentation_against_the_workspace_chunks(tmp_path) -> None:
-    workspace = _prepare(tmp_path, "mismatch")  # paragraph chunks
+    workspace = _prepare(tmp_path, "mismatch", source_name="doc.md")  # paragraph chunks
     with pytest.raises(ConstructionError, match="re-run `veriformis chunk"):
         SERVICE.construct(workspace, preset="recover-a-section-from-its-heading.safe")
-    good = _prepare(tmp_path, "match", preset="recover-a-section-from-its-heading.safe")
+    good = _prepare(
+        tmp_path,
+        "match",
+        source_name="doc.md",
+        preset="recover-a-section-from-its-heading.safe",
+    )
     store = Workspace.open(good)
     assert store.head().stages["chunk"].config["strategy"] == "structure"
 

@@ -8,9 +8,10 @@
 
 **Execution profile:** `offline-deterministic-v1`
 
-**Implementation status:** Implemented in independent-product Phase 6.4.
+**Implementation status:** Implemented in independent-product Phase 6.4 and
+reused without duplicated defaults by Phase 6.5 compile preflight.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.4)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
 
 **Next review:** Any default, preset, goal, representation, chunk-strategy,
 curation-policy, or consumer-profile change
@@ -61,7 +62,8 @@ Both carry `segmentation` (`strategy`, `size`, `overlap`, validated as an
 executable `SegmentationPolicy`), `construction` (`split_ratio_ppm` in
 1..999999, `require_review`, an implemented `consumer_profile`), `curation`
 (the Goal Catalog `curation_defaults` shape, validated as an executable
-`CurationPolicy`), and `review_policy` (`none` or `required`). A preset adds
+`CurationPolicy` and `SplitPolicy`, including `evaluation_ratio_ppm` in
+1..999999), and `review_policy` (`none` or `required`). A preset adds
 `preset_id` (exactly `<goal_id>.<name>`), `goal_id`, a `representation_id`
 the goal allows, `title`, and `plain_language`. Every preset MUST be
 compilable under the taxonomy for its objective, row schema, and profile.
@@ -96,6 +98,7 @@ every segmentation, construction, curation, and review field, and returns
 | MCP `chunk`, `construct`, `curate` | The same parameters, appended after the existing ones. |
 | YAML `veriformis.pipeline/v1` | Stage keys `goal`, `preset`, and (construct) `representation`; omitted values resolve from the data. `recipe_library_id` remains supported. |
 | CLI `presets` / MCP `presets` / `PipelineService.discover_presets` | Emit the exact packaged text. |
+| `PipelineService.preflight` / CLI and MCP `preflight` / Mac workbench | Resolve the same selection and explicit overrides before workspace creation, then replay the effective settings entirely in memory. |
 | Mac workbench | Discovers `goals` and `presets` at startup, offers a plain-language goal picker with the goal's safe preset, and an Advanced disclosure for explicit overrides; it holds no recipe default constant and passes only the selection and explicit overrides (`chunk --preset`, `construct --goal --preset`, `curate --preset`). |
 
 The tracking checker binds `training.implemented_presets` to the packaged
@@ -113,4 +116,4 @@ workspace or bundle; only the resolved recipe and finished plan are.
 
 - Deciding whether fine-tuning is appropriate.
 - Adding an objective, row schema, construction behavior, or trainer claim.
-- Preflight (Phase 6.5) and the acceptance matrix (Phase 6.6).
+- The acceptance matrix (Phase 6.6).

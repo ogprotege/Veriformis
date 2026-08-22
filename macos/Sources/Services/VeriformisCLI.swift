@@ -291,6 +291,71 @@ struct VeriformisCLI: Sendable {
         ]
     }
 
+    /// Exact CLI argument projection for one runtime-only compile preflight.
+    /// Omitted overrides leave the selected versioned preset authoritative.
+    static func preflightArguments(_ request: CompilePreflightRequest) -> [String] {
+        var arguments = ["preflight"]
+        arguments.append(contentsOf: request.sources.map(\.path))
+        arguments += [
+            "--source-root", request.sourceRoot.path,
+            "--goal", request.goal,
+            "--preset", request.preset,
+            "--representation", request.representation,
+        ]
+        if let instruction = request.instruction {
+            arguments += ["--instruction", instruction]
+        }
+        if !request.rules.isEmpty {
+            arguments += ["--rules", request.rules]
+        }
+        if !request.custom.isEmpty {
+            arguments += ["--custom", request.custom]
+        }
+        if let strategy = request.strategy {
+            arguments += ["--strategy", strategy]
+        }
+        if let size = request.size {
+            arguments += ["--size", String(size)]
+        }
+        if let overlap = request.overlap {
+            arguments += ["--overlap", String(overlap)]
+        }
+        if let splitRatioPPM = request.splitRatioPPM {
+            arguments += ["--split-ratio-ppm", String(splitRatioPPM)]
+        }
+        if let requireReview = request.requireReview {
+            arguments.append(requireReview ? "--require-review" : "--no-require-review")
+        }
+        if let consumerProfile = request.consumerProfile {
+            arguments += ["--consumer-profile", consumerProfile]
+        }
+        if let minimumTargetCharacters = request.minimumTargetCharacters {
+            arguments += ["--minimum-target-characters", String(minimumTargetCharacters)]
+        }
+        if let balanceMode = request.balanceMode {
+            arguments += ["--balance-mode", balanceMode]
+        }
+        if let maximumRecordsPerPrimarySource = request.maximumRecordsPerPrimarySource {
+            arguments += [
+                "--maximum-records-per-primary-source",
+                String(maximumRecordsPerPrimarySource),
+            ]
+        }
+        if let evaluationRatioPPM = request.evaluationRatioPPM {
+            arguments += ["--evaluation-ratio-ppm", String(evaluationRatioPPM)]
+        }
+        if let evaluationRequired = request.evaluationRequired {
+            arguments.append(evaluationRequired ? "--require-evaluation" : "--allow-empty-evaluation")
+        }
+        if let splitSeed = request.splitSeed {
+            arguments += ["--split-seed", splitSeed]
+        }
+        if let reviewPolicy = request.reviewPolicy {
+            arguments += ["--review-policy", reviewPolicy]
+        }
+        return arguments
+    }
+
     @discardableResult
     func run(
         arguments: [String],
@@ -394,6 +459,49 @@ struct VeriformisCLI: Sendable {
         } catch {
             throw RecipePresetError.invalidPayload(error.localizedDescription)
         }
+    }
+
+    /// Inspect raw sources and the complete resolved recipe before a workspace exists.
+    /// Exit 0 is admitted and exit 2 is a complete, ordinary refusal response.
+    func preflight(
+        _ request: CompilePreflightRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> CompilePreflight {
+        let result = try await run(
+            arguments: Self.preflightArguments(request),
+            controller: controller
+        )
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard !result.standardOutputTruncated else {
+            throw CompilePreflightError.outputTruncated
+        }
+        guard result.exitCode == 0 || result.exitCode == 2 else {
+            throw CompilePreflightError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        let response: CompilePreflight
+        do {
+            response = try JSONDecoder().decode(
+                CompilePreflight.self,
+                from: result.standardOutputData
+            )
+        } catch let error as CompilePreflightError {
+            throw error
+        } catch {
+            throw CompilePreflightError.invalidPayload(error.localizedDescription)
+        }
+        let expectedExit: Int32 = response.admitted ? 0 : 2
+        guard result.exitCode == expectedExit else {
+            throw CompilePreflightError.inconsistentExitStatus(
+                exitCode: result.exitCode,
+                admitted: response.admitted
+            )
+        }
+        return response
     }
 
     /// Load the goal-specific preview for a constructed workspace without blocking the main actor.

@@ -81,7 +81,6 @@ from veriformis.errors import (
     GoalCatalogError,
     MissingStageInputError,
     ConstructionError,
-    InvalidSourceLocatorError,
     ParseError,
     TaxonomyError,
     UnsupportedWorkspaceVersionError,
@@ -120,7 +119,6 @@ from veriformis.evidence import (
 from veriformis.identity import (
     canonical_digest,
     lossless_json_bytes,
-    normalize_logical_path,
     sha256_digest,
 )
 from veriformis.ir import (
@@ -151,7 +149,11 @@ from veriformis.rules.derivations import (
     load_exact_block_derivations,
 )
 from veriformis.rules.library import rules_from_clean_config, select_rules
-from veriformis.sources import ParseResult, SourceRef
+from veriformis.sources import (
+    ParseResult,
+    SourceRef,
+    capture_source_batch,
+)
 from veriformis.taxonomy import (
     implemented_discovery,
     require_identifier,
@@ -165,6 +167,7 @@ from veriformis.workspace import (
 )
 
 if TYPE_CHECKING:
+    from veriformis.goals.preflight import CompilePreflight
     from veriformis.goals.preview import GoalPreview
 
 _CODE_EXTS = CODE_EXTENSIONS
@@ -315,6 +318,11 @@ class GoalPreviewOutcome(StageOutcome):
 
 
 @dataclass(frozen=True)
+class CompilePreflightOutcome(StageOutcome):
+    preflight: CompilePreflight | None = None
+
+
+@dataclass(frozen=True)
 class ExportDiscoveryOutcome(StageOutcome):
     discovery: ExportDiscovery | None = None
 
@@ -359,29 +367,6 @@ def _require_accepted_parse(result: ParseResult, *, logical_path: str) -> None:
     )
     detail = ", ".join(codes) if codes else "unspecified-parser-error"
     raise ParseError(f"parser refused {logical_path}: {detail}")
-
-
-def _logical_paths(
-    paths: list[Path],
-    *,
-    source_root: Path | None,
-) -> dict[Path, str]:
-    """Derive locators from one explicit root, never from batch composition."""
-    root = (source_root or Path.cwd()).resolve()
-    if not root.is_dir():
-        raise InvalidSourceLocatorError(f"source root is not a directory: {root}")
-    logical: dict[Path, str] = {}
-    for path in paths:
-        resolved = path.resolve()
-        try:
-            relative = resolved.relative_to(root)
-        except ValueError as exc:
-            raise InvalidSourceLocatorError(
-                f"source {resolved} is outside source root {root}; "
-                "pass --source-root explicitly"
-            ) from exc
-        logical[path] = normalize_logical_path(relative)
-    return logical
 
 
 def _recover_exact_finished_bundle(
@@ -1037,6 +1022,62 @@ class PipelineService:
 
         return discover_presets()
 
+    def preflight(
+        self,
+        paths: list[Path],
+        *,
+        source_root: Path | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
+        representation: str | None = None,
+        instruction: str | None = None,
+        rules: str = "",
+        custom: str = "",
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
+        split_ratio_ppm: int | None = None,
+        require_review: bool | None = None,
+        consumer_profile: str | None = None,
+        minimum_target_characters: int | None = None,
+        balance_mode: str | None = None,
+        maximum_records_per_primary_source: int | None = None,
+        evaluation_ratio_ppm: int | None = None,
+        evaluation_required: bool | None = None,
+        split_seed: str | None = None,
+        review_policy: str | None = None,
+    ) -> CompilePreflightOutcome:
+        """Evaluate one immutable source capture without opening a workspace."""
+        from veriformis.goals import build_compile_preflight
+
+        preflight = build_compile_preflight(
+            paths,
+            source_root=source_root,
+            goal=goal,
+            preset=preset,
+            representation=representation,
+            instruction=instruction,
+            rules=rules,
+            custom=custom,
+            strategy=strategy,
+            size=size,
+            overlap=overlap,
+            split_ratio_ppm=split_ratio_ppm,
+            require_review=require_review,
+            consumer_profile=consumer_profile,
+            minimum_target_characters=minimum_target_characters,
+            balance_mode=balance_mode,
+            maximum_records_per_primary_source=maximum_records_per_primary_source,
+            evaluation_ratio_ppm=evaluation_ratio_ppm,
+            evaluation_required=evaluation_required,
+            split_seed=split_seed,
+            review_policy=review_policy,
+        )
+        return CompilePreflightOutcome(
+            preflight=preflight,
+            exit_status=0 if preflight.admitted else 2,
+        )
+
     def preview_goal(
         self,
         workspace: Path,
@@ -1151,15 +1192,24 @@ class PipelineService:
         source_root: Path | None = None,
     ) -> ParseOutcome:
         """Capture raw files and commit one canonical parse revision."""
-        logical_paths = _logical_paths(paths, source_root=source_root)
-        captured = [(path, path.read_bytes()) for path in paths]
+        source_captures = capture_source_batch(paths, source_root=source_root)
+        captured: list[tuple[Path, bytes]] = []
+        for source_capture in source_captures:
+            if source_capture.error is not None:
+                raise source_capture.error
+            assert source_capture.raw_bytes is not None
+            captured.append((source_capture.path, source_capture.raw_bytes))
         results = [
             _parse_one(
                 path,
-                logical_path=logical_paths[path],
+                logical_path=source_capture.logical_path,
                 raw_bytes=raw_bytes,
             )
-            for path, raw_bytes in captured
+            for source_capture, (path, raw_bytes) in zip(
+                source_captures,
+                captured,
+                strict=True,
+            )
         ]
         for result in results:
             _require_accepted_parse(
@@ -1605,6 +1655,22 @@ class PipelineService:
             )
         source_ids = _select_construction_sources(current, source)
         inputs = _load_construction_inputs(store, current, source_ids)
+        from veriformis.goals import require_goal_input_family
+
+        family_errors: list[str] = []
+        for selected_source in sorted(inputs.sources, key=lambda item: item.logical_path):
+            try:
+                require_goal_input_family(
+                    settings.goal_id,
+                    logical_path=selected_source.logical_path,
+                    parser_id=selected_source.parser,
+                )
+            except GoalCatalogError as exc:
+                family_errors.append(exc.message)
+        if family_errors:
+            raise ConstructionError(
+                "goal input-family admission failed: " + "; ".join(family_errors)
+            )
         chunk_config = current.stages["chunk"].config
         if preset is not None:
             expected = settings.segmentation.model_dump()
@@ -2394,8 +2460,15 @@ class PipelineService:
                     )
                 )
         else:
-            raw_bytes = path.read_bytes()
-            logical_path = _logical_paths([path], source_root=source_root)[path]
+            source_capture = capture_source_batch(
+                [path],
+                source_root=source_root,
+            )[0]
+            if source_capture.error is not None:
+                raise source_capture.error
+            assert source_capture.raw_bytes is not None
+            raw_bytes = source_capture.raw_bytes
+            logical_path = source_capture.logical_path
             result = _parse_one(
                 path,
                 logical_path=logical_path,

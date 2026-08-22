@@ -10,16 +10,16 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and preview (`goals`, `presets`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-26 commands; `export` contains four subcommands.
+27 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-22 (Phase 5 generic export guidance and closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -45,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, and constrained CSV v1 |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `goal-preview` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview` | Nothing |
 | Meta | `version` | Nothing |
 
 ## Supported inputs
@@ -60,7 +60,9 @@ examples below use the installed name.
 Source code enters as one language-tagged code block. Digitally-born PDFs with
 no extractable text layer refuse with a named OCR limitation. Directories are
 not expanded by the CLI (the workbench may expand folders before calling
-`parse`). Text and structured inputs must be UTF-8.
+`parse`). Raw-source capture rejects symlink components and non-regular files,
+and walks from a pinned source-root descriptor so a concurrent retarget cannot
+escape the chosen root. Text and structured inputs must be UTF-8.
 
 ## Workspace and artifacts
 
@@ -780,6 +782,28 @@ preset per goal. `chunk`, `construct`, and `curate` accept `--goal GOAL` and
 literal default, so the same selection yields the same recipe on the CLI,
 MCP, YAML, Python, and the workbench. See the
 [Recipe Preset Contract v1](contracts/recipe-preset-v1.md).
+
+### `preflight`
+
+Evaluate raw-source compile readiness without creating a workspace.
+
+```text
+veriformis preflight PATH... [--source-root ROOT] (--goal ID | --preset ID) [--representation ID] [overrides...]
+```
+
+The command resolves the same recipe settings as compile, captures each
+regular file once, and replays the production parser, selected cleaning,
+segmentation, construction, global curation, and leakage-group split entirely
+in memory. Its ASCII-safe `veriformis.compile-preflight/v1` JSON reports every
+source's parser and goal-family eligibility, exact refusals, missing goal
+evidence, expected exclusions, coverage and split blockers, and explicit
+limitations. All `chunk`, `construct`, and `curate` setting flags are accepted
+as explicit overrides; omitted values come only from the selected versioned
+preset. The report is printed before exit: admission exits `0`, while a
+complete negative verdict exits `2`. Source entries are bounded at 64 KiB and
+the whole response at 256 KiB without truncating values. The command creates
+no workspace, calls no renderer, and accesses no destination. See the
+[Goal Catalog Contract v1](contracts/goal-catalog-v1.md#compile-preflight-v1).
 
 ### `goal-preview`
 

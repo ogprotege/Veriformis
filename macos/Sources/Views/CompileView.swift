@@ -6,6 +6,7 @@ struct CompileView: View {
     @State private var showRecipeSettings = false
     @State private var showIntegrations = false
     @State private var showTaxonomy = false
+    @State private var showPreflightDetails = false
 
     var body: some View {
         HSplitView {
@@ -23,6 +24,8 @@ struct CompileView: View {
                         .foregroundStyle(.secondary)
 
                     configurationPanel
+
+                    preflightPanel
 
                     if let reason = workbench.compileBlockedReason, !workbench.isRunning {
                         Text(reason)
@@ -126,6 +129,181 @@ struct CompileView: View {
                     }
                 }
                 .padding(.top, 4)
+            }
+        }
+    }
+
+    private var preflightPanel: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 10) {
+                switch workbench.compilePreflightState {
+                case .idle:
+                    Text("Check source eligibility, goal evidence, expected exclusions, and known limitations before compiling.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Check sources and recipe") {
+                        workbench.refreshCompilePreflight()
+                    }
+                    .disabled(!workbench.canPreflight)
+
+                case .loading:
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Checking the current source snapshot…")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Cancel") {
+                            if workbench.isRunning {
+                                workbench.cancelCompile()
+                            } else {
+                                workbench.cancelCompilePreflight()
+                            }
+                        }
+                        .controlSize(.small)
+                    }
+
+                case .unavailable(let message):
+                    Label("Preflight unavailable", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Retry") { workbench.refreshCompilePreflight() }
+                        .disabled(!workbench.canPreflight)
+
+                case .ready(let report):
+                    HStack(alignment: .firstTextBaseline) {
+                        Label(
+                            report.admitted ? "Ready to compile" : "Preflight found blockers",
+                            systemImage: report.admitted
+                                ? "checkmark.circle.fill"
+                                : "xmark.octagon.fill"
+                        )
+                        .foregroundStyle(report.admitted ? .green : .red)
+                        Spacer()
+                        Button("Check again") { workbench.refreshCompilePreflight() }
+                            .controlSize(.small)
+                            .disabled(!workbench.canPreflight)
+                    }
+                    Text(
+                        "\(report.counts.admittedSourceCount) of \(report.counts.sourceCount) sources admitted · evaluated through \(report.evaluatedThrough.rawValue)"
+                    )
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+
+                    if !report.incompatibilities.isEmpty {
+                        preflightMessages(
+                            report.incompatibilities.map {
+                                "[\($0.code.rawValue)] \($0.message)"
+                            }
+                        )
+                    }
+                    if !report.coverageBlockers.isEmpty {
+                        preflightMessages(
+                            report.coverageBlockers.map {
+                                "[\($0.blockerCodes.joined(separator: ", "))] source \($0.sourceID)"
+                            }
+                        )
+                    }
+
+                    DisclosureGroup("Report details", isExpanded: $showPreflightDetails) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(Array(report.sources.enumerated()), id: \.offset) { _, source in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Label(
+                                        source.logicalPath,
+                                        systemImage: source.admitted
+                                            ? "checkmark.circle"
+                                            : "xmark.circle"
+                                    )
+                                    .font(.caption.weight(.semibold))
+                                    Text(
+                                        "\(source.inputFamily ?? "unclassified") · \(source.parserID ?? "no parser") · \(source.parserStatus.rawValue)"
+                                    )
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                                    ForEach(Array(source.refusalReasons.enumerated()), id: \.offset) { _, refusal in
+                                        Text("[\(refusal.code.rawValue)] \(refusal.message)")
+                                            .font(.caption)
+                                            .foregroundStyle(.red)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                }
+                            }
+
+                            if !report.missingEvidence.isEmpty {
+                                Text("Missing evidence")
+                                    .font(.caption.weight(.semibold))
+                                preflightMessages(
+                                    report.missingEvidence.map { "[\($0.code)] \($0.message)" }
+                                )
+                            }
+
+                            if !report.expectedExclusionCounts.isEmpty {
+                                Text("Expected exclusions")
+                                    .font(.caption.weight(.semibold))
+                                preflightMessages(
+                                    report.expectedExclusionCounts.map {
+                                        "\($0.stage.rawValue) · \($0.status.rawValue) · [\($0.reasonCode)] \($0.count)"
+                                    }
+                                )
+                            }
+
+                            ForEach(Array(report.expectedExclusions.enumerated()), id: \.offset) { _, exclusion in
+                                Text(
+                                    "\(exclusion.subjectID): \(exclusion.reasonCodes.joined(separator: ", "))"
+                                )
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                            }
+
+                            if !report.knownLimitations.isEmpty {
+                                Text("Known limitations")
+                                    .font(.caption.weight(.semibold))
+                                preflightMessages(
+                                    report.knownLimitations.map { "[\($0.code)] \($0.message)" }
+                                )
+                            }
+
+                            if report.omittedDiagnosticCount > 0
+                                || report.omittedExpectedExclusionCount > 0
+                            {
+                                Text(
+                                    "Omitted details: \(report.omittedDiagnosticCount) diagnostics, \(report.omittedExpectedExclusionCount) expected exclusions."
+                                )
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            }
+
+                            Text("Request \(report.requestDigest)")
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                        }
+                        .padding(.top, 4)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Label("Compile preflight", systemImage: "checklist.checked")
+                .font(.headline)
+        }
+    }
+
+    private func preflightMessages(_ messages: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            ForEach(Array(messages.enumerated()), id: \.offset) { _, message in
+                Text(message)
+                    .font(.caption)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
             }
         }
     }

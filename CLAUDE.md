@@ -24,8 +24,11 @@ checks passed; item 6.2's per-goal contracts and seventh taxonomy axis
 `input_family` merged as PR #61 at
 `81becfa676fd9111868b8d4b62549218a644d3e2`; item 6.3's runtime-only goal
 preview merged as PR #62 at `9cbab117e47cde6bd8850d67f0d363e03f0660ce`; item
-6.4 adds versioned recipe presets as the single source of every recipe default
-and goal/preset selection on every compile surface.
+6.4's versioned recipe presets and goal-first compile surfaces merged as PR #63
+at `abdd630e25e83ebf346316319caec892f4d64886` after all 14 GitHub checks
+passed. Item 6.5's compile preflight over raw sources is locally complete on
+its feature branch without creating a workspace or destination; its pull
+request is pending.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -164,9 +167,10 @@ Key modules under `src/veriformis/` are:
   shared with bundle transport;
 - `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `recipes/` for named recipe builders, statistics, and YAML pipeline specs;
-- `goals/` for the packaged versioned goal catalog, recipe presets, and goal
-  preview, whose strict models resolve plain-language goals and presets to
-  existing objectives, row schemas, and executable recipe settings;
+- `goals/` for the packaged versioned goal catalog, recipe presets, goal
+  preview, and compile preflight, whose strict models resolve plain-language
+  goals and presets to existing objectives, row schemas, and executable recipe
+  settings, and probe raw sources without workspace mutation;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

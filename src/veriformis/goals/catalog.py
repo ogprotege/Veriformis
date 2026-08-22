@@ -13,6 +13,7 @@ import json
 import re
 from functools import lru_cache
 from importlib import resources
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import (
@@ -28,7 +29,7 @@ from veriformis.contracts import (
     V1_CONSTRUCTION_DIAGNOSTIC_CODES,
     V1_ROW_SCHEMA_KINDS,
 )
-from veriformis.errors import GoalCatalogError
+from veriformis.errors import GoalCatalogError, TaxonomyError
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.taxonomy import (
     DEFAULT_ROW_SCHEMA,
@@ -39,6 +40,8 @@ from veriformis.taxonomy import (
     OBJECTIVE_ROW_COMPATIBILITY,
     ROW_LOSS_POLICY,
     ROW_SCHEMA_UI_ALIASES,
+    INPUT_FAMILY_PARSERS,
+    input_family_for_suffix,
 )
 
 GOAL_CATALOG_DATA_NAME = "catalog-v1.json"
@@ -189,8 +192,8 @@ class CurationDefaults(_StrictModel):
     @field_validator("evaluation_ratio_ppm")
     @classmethod
     def _ratio(cls, value: int) -> int:
-        if type(value) is not int or not 0 <= value <= 1_000_000:
-            raise ValueError("evaluation_ratio_ppm must be an integer within 0..1000000")
+        if type(value) is not int or not 1 <= value <= 999_999:
+            raise ValueError("evaluation_ratio_ppm must be an integer within 1..999999")
         return value
 
     @field_validator("split_seed")
@@ -204,7 +207,7 @@ class CurationDefaults(_StrictModel):
 
     @model_validator(mode="after")
     def _executable(self) -> "CurationDefaults":
-        from veriformis.datasets import CurationPolicy
+        from veriformis.datasets import CurationPolicy, SplitPolicy
         from veriformis.errors import CurationError
 
         try:
@@ -213,8 +216,16 @@ class CurationDefaults(_StrictModel):
                 balance_mode=self.balance_mode,
                 maximum_records_per_primary_source=self.maximum_records_per_primary_source,
             )
+            SplitPolicy.create(
+                evaluation_ratio_ppm=self.evaluation_ratio_ppm,
+                evaluation_required=self.evaluation_required,
+                seed=self.split_seed,
+            )
         except (CurationError, ValueError, TypeError) as exc:
-            raise ValueError(f"curation_defaults are not an executable policy: {exc}") from exc
+            raise ValueError(
+                f"curation_defaults are not an executable policy "
+                f"(curation and split): {exc}"
+            ) from exc
         return self
 
 
@@ -585,6 +596,39 @@ def resolve_goal(
     return goal.objective, rep.row_schema, goal.recipe_library_id, rep.loss_policy
 
 
+def require_goal_input_family(
+    goal_id: str,
+    *,
+    logical_path: str,
+    parser_id: str,
+) -> str:
+    """Return the source family only when the goal may consume it.
+
+    The logical suffix is the family authority and the observed parser must be
+    one declared producer of that family. This function is shared by preflight
+    and the real construct stage; otherwise synthetic PDF headings could be
+    mistaken for source-supplied section or structured-field evidence.
+    """
+    try:
+        family = input_family_for_suffix(Path(logical_path).suffix)
+    except TaxonomyError as exc:
+        raise GoalCatalogError(exc.message) from exc
+    allowed_parsers = INPUT_FAMILY_PARSERS[family]
+    if parser_id not in allowed_parsers:
+        raise GoalCatalogError(
+            f"source {logical_path!r} is classified as input family {family!r}, "
+            f"but parser {parser_id!r} is not one of {list(allowed_parsers)!r}"
+        )
+    goal = goal_catalog().goal(goal_id)
+    if family not in goal.eligible_input_families:
+        raise GoalCatalogError(
+            f"goal {goal_id!r} does not accept input family {family!r} for "
+            f"source {logical_path!r}; expected one of "
+            f"{list(goal.eligible_input_families)!r}"
+        )
+    return family
+
+
 __all__ = [
     "GENERIC_EXPORT_CONTAINERS",
     "GOAL_CATALOG_DATA_NAME",
@@ -601,4 +645,5 @@ __all__ = [
     "parse_goal_catalog",
     "representation_for_row_schema",
     "resolve_goal",
+    "require_goal_input_family",
 ]

@@ -206,6 +206,57 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def preflight(
+        paths: list[str],
+        source_root: str | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
+        representation: str | None = None,
+        instruction: str | None = None,
+        rules: str = "",
+        custom: str = "",
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
+        split_ratio_ppm: int | None = None,
+        require_review: bool | None = None,
+        consumer_profile: str | None = None,
+        minimum_target_characters: int | None = None,
+        balance_mode: str | None = None,
+        maximum_records_per_primary_source: int | None = None,
+        evaluation_ratio_ppm: int | None = None,
+        evaluation_required: bool | None = None,
+        split_seed: str | None = None,
+        review_policy: str | None = None,
+    ) -> str:
+        """Evaluate raw-source compile readiness without creating a workspace."""
+        outcome = pipeline.preflight(
+            [Path(path) for path in paths],
+            source_root=None if source_root is None else Path(source_root),
+            goal=goal,
+            preset=preset,
+            representation=representation,
+            instruction=instruction,
+            rules=rules,
+            custom=custom,
+            strategy=strategy,
+            size=size,
+            overlap=overlap,
+            split_ratio_ppm=split_ratio_ppm,
+            require_review=require_review,
+            consumer_profile=consumer_profile,
+            minimum_target_characters=minimum_target_characters,
+            balance_mode=balance_mode,
+            maximum_records_per_primary_source=maximum_records_per_primary_source,
+            evaluation_ratio_ppm=evaluation_ratio_ppm,
+            evaluation_required=evaluation_required,
+            split_seed=split_seed,
+            review_policy=review_policy,
+        )
+        assert outcome.preflight is not None
+        return outcome.preflight.transport_text()
+
+    @server.tool()
     def goal_preview(
         workspace: str,
         representation: str | None = None,
