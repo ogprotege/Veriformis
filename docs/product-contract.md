@@ -7,17 +7,18 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus completed independent-product Phases 0–4, including the verified-export
-foundation and its production-empty cross-surface operations, version `0.1.0`
-development alpha
+plus completed independent-product Phases 0–4 and Phase 5.1's first supported
+generic derivative, `split-jsonl-directory` v1, version `0.1.0` development
+alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; maturity alpha; public Mac claim still owner-gated
+Phases 0–4 complete; Phase 5.1 implemented; maturity alpha; public Mac claim
+still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 5.1)
 
-**Next review:** Phase 5 or Phase 6 packet opening; beta
+**Next review:** Phase 5.2 or any later Phase 5 increment; beta
 label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -57,8 +58,8 @@ The six-axis product vocabulary and compile compatibility are governed by
 Consumer-neutral derivative evidence is governed by
 [Verified Export Contract v1](contracts/verified-export-v1.md). Its internal
 exact-byte publication, deterministic replay, and public surface foundation is
-implemented; production renderers and supported containers remain under later
-implementation.
+implemented. [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
+governs the first production renderer and supported generic container.
 
 ## Ownership boundary
 
@@ -155,6 +156,18 @@ ten persisted v1 schemas and existing `publish` signature are unchanged. No
 production renderer or semantic replayer, generic export container, or new
 trainer profile ships. Phase 5 generic exports remain open.
 
+Those final non-claims are the recorded Phase 4 exit boundary. Phase 5.1 now
+ships the exact-byte `split-jsonl-directory` v1 renderer and container with no
+consumer profile or trainer-compatibility claim. Historical export request v1
+remains exact and selects safe `train` / `evaluation` filename stems with the
+complete aligned provenance stream. Additive request v2 requires a complete
+canonical `veriformis.split-jsonl-options/v1` object to change those stems or
+omit provenance. Both requests preserve exact payload rows, ordering,
+objective, curation result, split assignment, and train/evaluation membership.
+The ten persisted verified-export v1 schemas, discovery v1, response v1, and
+the existing `publish` signature remain unchanged. Other generic containers
+and all new trainer profiles remain open Phase 5 work.
+
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete
 produced file in memory; its fixture is statically bounded. Before any semantic
@@ -238,9 +251,10 @@ expectations, and the portable assignment projection. The adapter policy
 currently rejects plain `text` rows. Its repository checks prove descriptor
 self-conformance, not compatibility with a live named Aptus build. Live
 training execution remains outside Veriformis. The independent product roadmap
-plans a consumer-neutral export contract and versioned optional trainer
-profiles; those capabilities are not implemented by the completed taxonomy
-phase.
+implements one consumer-neutral split-JSONL container under a separate
+versioned contract. That derivative does not select a trainer or claim trainer
+compatibility. Versioned optional trainer profiles and every other generic
+container remain planned.
 
 ## Fail-closed seal
 
@@ -269,6 +283,7 @@ Veriformis does not train models, prove that a dataset will improve a particular
 - [Finished Dataset Contract v1](./contracts/finished-dataset-v1.md)
 - [Dataset Taxonomy Contract v1](./contracts/taxonomy-v1.md)
 - [Verified Export Contract v1](./contracts/verified-export-v1.md)
+- [Split JSONL Export Contract v1](./contracts/split-jsonl-export-v1.md)
 - [Current implementation status](./current-status.md)
 - [Architecture](./architecture.md)
 - [Existing design specification](./superpowers/specs/2026-07-28-veriformis-design.md)

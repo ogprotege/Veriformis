@@ -318,8 +318,15 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         )
 
     generic_containers = artifacts.get("generic_export_containers")
+    non_generic_containers = {"minimal-v1", "deterministic-vfbundle-zip-v1"}
+    implemented_generic_containers = tuple(
+        container
+        for container in IMPLEMENTED_PHYSICAL_CONTAINERS
+        if container not in non_generic_containers
+    )
     expected_generic_containers = [
-        (container, "planned") for container in PLANNED_PHYSICAL_CONTAINERS
+        *((container, "implemented") for container in implemented_generic_containers),
+        *((container, "planned") for container in PLANNED_PHYSICAL_CONTAINERS),
     ]
     if not isinstance(generic_containers, list):
         errors.append("support generic_export_containers must be a list")
@@ -332,9 +339,31 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         _require(
             len(current_generic_containers) == len(generic_containers)
             and current_generic_containers == expected_generic_containers,
-            "generic export containers differ from planned taxonomy containers",
+            "generic export containers differ from taxonomy container states",
             errors,
         )
+        implemented_entries = {
+            entry.get("container"): entry
+            for entry in generic_containers
+            if isinstance(entry, dict) and entry.get("state") == "implemented"
+        }
+        _require(
+            set(implemented_entries) == set(implemented_generic_containers),
+            "implemented generic export entries differ from taxonomy",
+            errors,
+        )
+        split_jsonl = implemented_entries.get("split-jsonl-directory")
+        if split_jsonl is not None:
+            _require(
+                split_jsonl.get("container_version") == 1
+                and split_jsonl.get("determinism_claim")
+                == "portable_exact_bytes"
+                and split_jsonl.get("consumer_profile") is None
+                and split_jsonl.get("supported_row_schemas")
+                == sorted(V1_ROW_SCHEMAS),
+                "split JSONL support evidence differs from its executable contract",
+                errors,
+            )
 
     consumer_profiles = support.get("consumer_profiles")
     if not isinstance(consumer_profiles, list):

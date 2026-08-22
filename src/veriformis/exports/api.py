@@ -41,6 +41,7 @@ from veriformis.exports.models import (
 from veriformis.identity import lossless_json_bytes, sha256_digest, validate_id
 
 EXPORT_SURFACE_REQUEST_SCHEMA = "veriformis.export-surface-request/v1"
+EXPORT_SURFACE_REQUEST_SCHEMA_V2 = "veriformis.export-surface-request/v2"
 EXPORT_SURFACE_RESPONSE_SCHEMA = "veriformis.export-surface-response/v1"
 EXPORT_DISCOVERY_SCHEMA = "veriformis.export-discovery/v1"
 
@@ -116,7 +117,10 @@ class _ExportSurfaceRequest(BaseModel):
         revalidate_instances="always",
     )
 
-    schema_version: Literal["veriformis.export-surface-request/v1"]
+    schema_version: Literal[
+        "veriformis.export-surface-request/v1",
+        "veriformis.export-surface-request/v2",
+    ]
     operation: ExportOperation
 
     @classmethod
@@ -142,6 +146,7 @@ class _ExportSurfaceRequest(BaseModel):
 
 
 class _SelectedExportRequest(_ExportSurfaceRequest):
+    schema_version: Literal["veriformis.export-surface-request/v1"]
     bundle: str
     container_id: str
     container_version: int
@@ -210,11 +215,58 @@ class _SelectedExportRequest(_ExportSurfaceRequest):
         return self
 
 
+class _SelectedExportRequestV2(_SelectedExportRequest):
+    """Selected request with versioned, implementation-validated options."""
+
+    schema_version: Literal["veriformis.export-surface-request/v2"]
+    container_options: dict[str, str | bool | int | None]
+
+    @field_validator("container_options")
+    @classmethod
+    def _valid_container_options(
+        cls,
+        value: dict[str, str | bool | int | None],
+    ) -> dict[str, str | bool | int | None]:
+        if type(value) is not dict:
+            raise ValueError("container_options must be an exact JSON object")
+        for key, item in value.items():
+            if type(key) is not str or _SELECTOR_LABEL.fullmatch(key) is None:
+                raise ValueError(
+                    "container_options keys must be lowercase canonical identifiers"
+                )
+            if item is not None and type(item) not in {str, bool, int}:
+                raise ValueError(
+                    "container_options values must be exact strings, booleans, "
+                    "integers, or null"
+                )
+        return dict(value)
+
+
 class ExportDryRunRequest(_SelectedExportRequest):
     operation: Literal["dry_run"]
 
 
+class ExportDryRunRequestV2(_SelectedExportRequestV2):
+    operation: Literal["dry_run"]
+
+
 class ExportExecuteRequest(_SelectedExportRequest):
+    operation: Literal["execute"]
+    destination_root: str
+    expected_export_plan_id: str
+
+    @field_validator("destination_root")
+    @classmethod
+    def _valid_destination(cls, value: str) -> str:
+        return _runtime_path(value, label="destination_root")
+
+    @field_validator("expected_export_plan_id")
+    @classmethod
+    def _valid_plan_id(cls, value: str) -> str:
+        return validate_id(value, kind="export-plan")
+
+
+class ExportExecuteRequestV2(_SelectedExportRequestV2):
     operation: Literal["execute"]
     destination_root: str
     expected_export_plan_id: str
@@ -246,7 +298,24 @@ class ExportVerifyRequest(_SelectedExportRequest):
         return validate_id(value, kind="export-plan")
 
 
+class ExportVerifyRequestV2(_SelectedExportRequestV2):
+    operation: Literal["verify"]
+    destination_root: str
+    expected_export_plan_id: str
+
+    @field_validator("destination_root")
+    @classmethod
+    def _valid_destination(cls, value: str) -> str:
+        return _runtime_path(value, label="destination_root")
+
+    @field_validator("expected_export_plan_id")
+    @classmethod
+    def _valid_plan_id(cls, value: str) -> str:
+        return validate_id(value, kind="export-plan")
+
+
 class ExportInspectRequest(_ExportSurfaceRequest):
+    schema_version: Literal["veriformis.export-surface-request/v1"]
     operation: Literal["inspect"]
     destination_root: str
 
@@ -257,7 +326,13 @@ class ExportInspectRequest(_ExportSurfaceRequest):
 
 
 ExportActionRequest = (
-    ExportDryRunRequest | ExportInspectRequest | ExportExecuteRequest | ExportVerifyRequest
+    ExportDryRunRequest
+    | ExportDryRunRequestV2
+    | ExportInspectRequest
+    | ExportExecuteRequest
+    | ExportExecuteRequestV2
+    | ExportVerifyRequest
+    | ExportVerifyRequestV2
 )
 
 
@@ -277,16 +352,36 @@ def export_request_from_json_bytes(
         raise ExportContractError(
             f"export request operation must be {expected_operation!r}"
         )
-    request_types: dict[str, type[_ExportSurfaceRequest]] = {
-        "dry_run": ExportDryRunRequest,
-        "inspect": ExportInspectRequest,
-        "execute": ExportExecuteRequest,
-        "verify": ExportVerifyRequest,
+    schema_version = value.get("schema_version")
+    request_types: dict[
+        tuple[str, str],
+        type[_ExportSurfaceRequest],
+    ] = {
+        (EXPORT_SURFACE_REQUEST_SCHEMA, "dry_run"): ExportDryRunRequest,
+        (EXPORT_SURFACE_REQUEST_SCHEMA, "inspect"): ExportInspectRequest,
+        (EXPORT_SURFACE_REQUEST_SCHEMA, "execute"): ExportExecuteRequest,
+        (EXPORT_SURFACE_REQUEST_SCHEMA, "verify"): ExportVerifyRequest,
+        (EXPORT_SURFACE_REQUEST_SCHEMA_V2, "dry_run"): ExportDryRunRequestV2,
+        (EXPORT_SURFACE_REQUEST_SCHEMA_V2, "execute"): ExportExecuteRequestV2,
+        (EXPORT_SURFACE_REQUEST_SCHEMA_V2, "verify"): ExportVerifyRequestV2,
     }
-    request = request_types[expected_operation].from_json_bytes(data)
+    request_type = request_types.get((str(schema_version), expected_operation))
+    if request_type is None:
+        raise ExportContractError(
+            "unsupported export request schema and operation combination"
+        )
+    request = request_type.from_json_bytes(data)
     assert isinstance(
         request,
-        (ExportDryRunRequest, ExportInspectRequest, ExportExecuteRequest, ExportVerifyRequest),
+        (
+            ExportDryRunRequest,
+            ExportDryRunRequestV2,
+            ExportInspectRequest,
+            ExportExecuteRequest,
+            ExportExecuteRequestV2,
+            ExportVerifyRequest,
+            ExportVerifyRequestV2,
+        ),
     )
     return request
 
@@ -711,10 +806,13 @@ __all__ = [
     "CancellationCheck",
     "EXPORT_DISCOVERY_SCHEMA",
     "EXPORT_SURFACE_REQUEST_SCHEMA",
+    "EXPORT_SURFACE_REQUEST_SCHEMA_V2",
     "EXPORT_SURFACE_RESPONSE_SCHEMA",
     "ExportDiscovery",
     "ExportDryRunRequest",
+    "ExportDryRunRequestV2",
     "ExportExecuteRequest",
+    "ExportExecuteRequestV2",
     "ExportInspectRequest",
     "ExportInspection",
     "ExportOperationCancelled",
@@ -723,6 +821,7 @@ __all__ = [
     "ExportPublicationOutcome",
     "ExportVerifiedOutcome",
     "ExportVerifyRequest",
+    "ExportVerifyRequestV2",
     "export_discovery_response",
     "export_dry_run_response",
     "export_error_response",

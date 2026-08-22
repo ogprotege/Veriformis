@@ -4,10 +4,11 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
 
-**Next review:** Independent-product Phase 5 or Phase 6 packet opening, or any
-program-state, evidence-grade, or completion-rule change
+**Next review:** Independent-product Phase 5.1 merge, Phase 5.2 or Phase 6
+start, or any program-state, evidence-grade, or
+completion-rule change
 
 ## Purpose
 

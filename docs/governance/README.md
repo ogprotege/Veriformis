@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
 
-**Next review:** Independent-product Phase 5 or Phase 6 packet opening, any
-later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 5.1 pull-request merge, Phase 5.2 or
+Phase 6 start, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -22,6 +22,7 @@ claims from drifting away from code and evidence.
 | [Evidence index](../evidence/index.json) | Machine-readable evidence records and evidence grades |
 | [Program ledger](../../dev/active/independent-product/program.json) | Machine-readable phase status and dependencies |
 | [Completed Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, evidence, and closeout |
+| [Active Phase 5 packet](../../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Generic local export checklist, decisions, risks, evidence, and pending closeout |
 
 Run the governance drift check with:
 
@@ -41,12 +42,10 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, Phase 4 is complete. Its surface implementation merged as PR
-#50 at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, and its review corrections
-merged as PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9
-consolidates the adversarial harness and reconciles this program. Production
-discovery is empty and no renderer, replayer, supported container, or consumer
-profile was added. The support registry closes only the resolved generic-export-
-service foundation gap; its capability lists and the taxonomy remain unchanged.
-Phases 5 and 6 may begin only under their own packets after the closeout pull
-request merges and clean local `main` equals `origin/main`.
+At this review, Phase 4 is complete and its closeout merged as PR #52 at
+`a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 opened from that clean
+baseline under its own standard packet. Item 5.1 now has locally passing code,
+admission tests, support/evidence records, and current-status reconciliation
+for exactly `split-jsonl-directory` v1; its remote-green merge gate remains.
+Consumer compatibility still requires a separately admitted named profile.
+Phase 6 remains planned and requires its own packet before work begins.

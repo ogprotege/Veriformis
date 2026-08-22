@@ -25,12 +25,16 @@ from veriformis.exports import service as service_module
 from veriformis.exports.api import (
     EXPORT_DISCOVERY_SCHEMA,
     EXPORT_SURFACE_REQUEST_SCHEMA,
+    EXPORT_SURFACE_REQUEST_SCHEMA_V2,
     EXPORT_SURFACE_RESPONSE_SCHEMA,
     ExportDryRunRequest,
+    ExportDryRunRequestV2,
     ExportExecuteRequest,
+    ExportExecuteRequestV2,
     ExportInspectRequest,
     ExportProfileDescriptor,
     ExportVerifyRequest,
+    ExportVerifyRequestV2,
     export_discovery_response,
     export_dry_run_response,
     export_execution_response,
@@ -247,19 +251,23 @@ def _verify_request(
     return ExportVerifyRequest(**values)
 
 
-def test_production_export_discovery_is_truthfully_empty_and_fresh() -> None:
+def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
     first = DEFAULT_EXPORT_SERVICE.discover_exports()
     second = ExportService().discover_exports()
 
     assert first is not second
-    assert (
-        first.to_dict()
-        == second.to_dict()
-        == {
-            "profiles": [],
-            "schema_version": EXPORT_DISCOVERY_SCHEMA,
-        }
+    assert first.to_dict() == second.to_dict()
+    assert first.schema_version == EXPORT_DISCOVERY_SCHEMA
+    assert [item.selector for item in first.profiles] == [
+        ("split-jsonl-directory", 1, None, None)
+    ]
+    assert first.profiles[0].supported_row_schemas == (
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+        "text",
     )
+    assert first.profiles[0].overwrite_policies == ("refuse",)
     assert export_discovery_response(first) == {
         "error": None,
         "operation": "discover",
@@ -272,7 +280,9 @@ def test_production_export_discovery_is_truthfully_empty_and_fresh() -> None:
     assert [item.selector for item in injected.discover_exports().profiles] == [
         (CONTAINER_ID, CONTAINER_VERSION, CONSUMER_ID, CONSUMER_VERSION)
     ]
-    assert DEFAULT_EXPORT_SERVICE.discover_exports().profiles == ()
+    assert [
+        item.selector for item in DEFAULT_EXPORT_SERVICE.discover_exports().profiles
+    ] == [("split-jsonl-directory", 1, None, None)]
 
     consumerless = ExportProfileDescriptor(
         container_profile=_descriptor().container_profile,
@@ -351,6 +361,60 @@ def test_surface_requests_are_canonical_strict_and_closed(tmp_path: Path) -> Non
         export_request_from_json_bytes(
             canonical,
             expected_operation="execute",
+        )
+
+
+def test_v2_surface_requests_add_only_strict_container_options(
+    tmp_path: Path,
+) -> None:
+    selection = {
+        **_selection(tmp_path / "bundle"),
+        "schema_version": EXPORT_SURFACE_REQUEST_SCHEMA_V2,
+        "container_options": {
+            "evaluation_partition_name": "dev",
+            "include_provenance": True,
+            "schema_version": "veriformis.split-jsonl-options/v1",
+            "train_partition_name": "learn",
+        },
+    }
+    requests = (
+        ExportDryRunRequestV2(operation="dry_run", **selection),
+        ExportExecuteRequestV2(
+            operation="execute",
+            destination_root=str(tmp_path / "out"),
+            expected_export_plan_id="export-plan-v1-" + "0" * 64,
+            **selection,
+        ),
+        ExportVerifyRequestV2(
+            operation="verify",
+            destination_root=str(tmp_path / "out"),
+            expected_export_plan_id="export-plan-v1-" + "0" * 64,
+            **selection,
+        ),
+    )
+
+    for request in requests:
+        loaded = export_request_from_json_bytes(
+            request.canonical_bytes(),
+            expected_operation=request.operation,
+        )
+        assert loaded == request
+        assert type(loaded) is type(request)
+
+    assert "container_options" not in ExportDryRunRequest.model_fields
+    payload = requests[0].model_dump(mode="json")
+    payload["container_options"] = {"nested": {"not": "flat"}}
+    with pytest.raises(ExportContractError):
+        export_request_from_json_bytes(
+            lossless_json_bytes(payload),
+            expected_operation="dry_run",
+        )
+    payload = requests[0].model_dump(mode="json")
+    payload["schema_version"] = EXPORT_SURFACE_REQUEST_SCHEMA
+    with pytest.raises(ExportContractError):
+        export_request_from_json_bytes(
+            lossless_json_bytes(payload),
+            expected_operation="dry_run",
         )
 
 

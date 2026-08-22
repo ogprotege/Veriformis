@@ -353,6 +353,17 @@ struct VeriformisCLI: Sendable {
         )
     }
 
+    func dryRunExport(
+        _ request: ExportDryRunRequestV2,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportDryRunResult> {
+        try await runExportCommand(
+            operation: .dryRun,
+            arguments: ["export", "dry-run", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
     func inspectExport(
         _ request: ExportInspectRequest,
         controller: CLIProcessController = CLIProcessController()
@@ -375,8 +386,30 @@ struct VeriformisCLI: Sendable {
         )
     }
 
+    func executeExport(
+        _ request: ExportExecuteRequestV2,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportExecutionResult> {
+        try await runExportCommand(
+            operation: .execute,
+            arguments: ["export", "execute", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
     func verifyExport(
         _ request: ExportVerifyRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportVerifyResult> {
+        try await runExportCommand(
+            operation: .verify,
+            arguments: ["export-verify", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
+    func verifyExport(
+        _ request: ExportVerifyRequestV2,
         controller: CLIProcessController = CLIProcessController()
     ) async throws -> ExportSurfaceResponse<ExportVerifyResult> {
         try await runExportCommand(

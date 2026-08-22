@@ -93,7 +93,9 @@ from veriformis.exports import (
     DEFAULT_EXPORT_SERVICE,
     ExportDiscovery,
     ExportDryRunRequest,
+    ExportDryRunRequestV2,
     ExportExecuteRequest,
+    ExportExecuteRequestV2,
     ExportInspectRequest,
     ExportInspection,
     ExportPublicationOutcome,
@@ -101,6 +103,7 @@ from veriformis.exports import (
     ExportService,
     ExportVerifiedOutcome,
     ExportVerifyRequest,
+    ExportVerifyRequestV2,
 )
 from veriformis.diagnostics import (
     parse_report_from_dict,
@@ -1019,7 +1022,10 @@ class PipelineService:
             discovery=self.export_service.discover_exports()
         )
 
-    def dry_run_export(self, request: ExportDryRunRequest) -> ExportPlanOutcome:
+    def dry_run_export(
+        self,
+        request: ExportDryRunRequest | ExportDryRunRequestV2,
+    ) -> ExportPlanOutcome:
         """Derive a source-anchored export plan without destination access."""
         return ExportPlanOutcome(plan=self.export_service.dry_run_export(request))
 
@@ -1039,7 +1045,7 @@ class PipelineService:
 
     def execute_export(
         self,
-        request: ExportExecuteRequest,
+        request: ExportExecuteRequest | ExportExecuteRequestV2,
         *,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportExecutionOutcome:
@@ -1053,7 +1059,7 @@ class PipelineService:
 
     def verify_export(
         self,
-        request: ExportVerifyRequest,
+        request: ExportVerifyRequest | ExportVerifyRequestV2,
         *,
         cancellation_check: CancellationCheck | None = None,
     ) -> ExportVerifyOutcome:

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (independent-product Phase 5.1)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -48,10 +48,14 @@ plus internal exact-byte atomic publication and independent closed-tree
 verification. Phase 4.7 adds private two-render evidence: exact profiles compare
 normalized byte trees, while semantic profiles compare versioned canonical
 preimages and reconstructed membership and replay descriptor-reread staged
-bytes. Phase 4.8 adds a production-empty private implementation catalog and
-thin `PipelineService`, CLI, MCP, and CLI-backed Mac operations for discovery,
-dry run, self-described inspect, execute, and source-bound verify. No production
-renderer or semantic replayer or supported derivative container ships. The macOS workbench lives
+bytes. Phase 4.8 adds an initially production-empty private implementation
+catalog and thin `PipelineService`, CLI, MCP, and CLI-backed Mac operations for
+discovery, dry run, self-described inspect, execute, and source-bound verify.
+Phase 5.1 installs the catalog's first production exact-byte renderer,
+`split-jsonl-directory` v1. It copies authoritative semantic partitions without
+changing rows or membership and adds only deterministic evidence sidecars; it
+has no consumer profile or trainer-compatibility claim. No production semantic
+replayer ships. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -162,9 +166,16 @@ name.vfbundle/
   discovery, dry run, self-described inspect, operator-confirmed execute, and
   source-bound verify operations through `PipelineService`, CLI, MCP, and the
   CLI-backed Mac bridge. Execute reaches the same internal publisher; adapters
-  do not implement filesystem policy. The production catalog is empty, the
-  default service has no renderer or semantic replayer, and no generic
-  container is supported.
+  do not implement filesystem policy. At the Phase 4 exit the production
+  catalog is empty. Phase 5.1 adds only the exact-byte
+  `split-jsonl-directory` v1 implementation. Its request-v1 defaults write
+  canonical `data/train.jsonl`, `data/evaluation.jsonl`, aligned provenance, a
+  deterministic README/data card, and the receipt. Configured request v2 must
+  provide the complete `veriformis.split-jsonl-options/v1` object and may only
+  change the two safe filename stems or omit provenance. Those layout choices
+  do not mutate rows, ordering, curation, split policy, or membership. The
+  default service still has no semantic replayer and discovery advertises no
+  consumer or trainer profile.
 
 ## Related documentation
 
@@ -172,6 +183,8 @@ name.vfbundle/
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Verified Export Contract v1](contracts/verified-export-v1.md)
+- [Split JSONL Export Contract v1](contracts/split-jsonl-export-v1.md)
 - [Current implementation status](current-status.md)
 - [CLI reference](cli.md)
 - [Development guide](development.md)

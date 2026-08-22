@@ -3,7 +3,7 @@
   "program_id": "independent-product",
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
-  "baseline_commit": "db9d93ef88e273e3727e1ba85841589530d59da3",
+  "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
   "last_updated": "2026-08-21",
   "status_values": [
     "planned",
@@ -67,12 +67,12 @@
     {
       "number": 5,
       "title": "Ship lossless generic local exports",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [4],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-05-generic-local-exports",
+      "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Implement only through the verified export service."
+      "next_gate": "Complete and merge item 5.1 split JSONL through the verified export service before beginning item 5.2."
     },
     {
       "number": 6,

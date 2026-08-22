@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–4 complete; Phases 5 and 6 planned
+**Status:** Active program — Phases 0–4 complete; Phase 5 in progress; Phase 6 planned
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -20,6 +20,7 @@ with roadmap headings.
 - [Phase 2 — Reliability and artifact boundary](phase-02-reliability-artifact-boundary/README.md) — completed
 - [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
 - [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — completed
+- [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -48,10 +49,13 @@ PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Item 4.9 completes the
 adversarial harness and reconciles the program under the completed
 [Phase 4 packet](phase-04-verified-export-foundation/README.md).
 
-Phase 4 ships no production renderer or semantic replayer, generic export
-container, or trainer-specific profile. Production discovery remains empty.
-Phases 5 and 6 may begin only under their own standard packets after the Phase
-4 closeout pull request merges and clean local `main` equals `origin/main`.
+Phase 4 shipped no production renderer or semantic replayer, generic export
+container, or trainer-specific profile. Its closeout merged as PR #52 at
+`a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 then opened under its own
+standard packet from that clean baseline. Item 5.1 now has local implementation
+and admission evidence for `split-jsonl-directory` v1; its remote-green merge
+gate remains before item 5.2. Phase 6 remains planned and requires its own
+packet before work begins.
 
 ## State change procedure
 

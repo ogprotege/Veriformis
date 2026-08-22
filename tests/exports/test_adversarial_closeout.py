@@ -385,8 +385,11 @@ def test_closeout_conformance_injection_never_changes_production_discovery() -> 
     injected, _ = _service()
 
     assert len(injected.discover_exports().profiles) == 1
-    assert DEFAULT_EXPORT_SERVICE.discover_exports().profiles == ()
-    assert ExportService().discover_exports().profiles == ()
+    expected = [("split-jsonl-directory", 1, None, None)]
+    assert [
+        item.selector for item in DEFAULT_EXPORT_SERVICE.discover_exports().profiles
+    ] == expected
+    assert [item.selector for item in ExportService().discover_exports().profiles] == expected
 
 
 @pytest.mark.parametrize(

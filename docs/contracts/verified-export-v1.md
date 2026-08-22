@@ -24,12 +24,15 @@ production-empty catalog and merged as PR #50 at
 `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; its review corrections merged as
 PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9 completes the
 consolidated adversarial harness and closeout without changing a persisted
-schema. Phase 4 does not implement a public renderer or replayer registry or a
-supported product export container.
+schema. Phase 4 did not implement a public renderer or replayer registry or a
+supported product export container. Phase 5.1 adds one reviewed internal
+`split-jsonl-directory` v1 implementation and an additive configured request
+v2 surface; the ten persisted models, discovery v1, and response v1 remain
+unchanged.
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL admission)
 
-**Next review:** Phase 5 implementation or any export schema change
+**Next review:** Phase 5.2 or any export schema change
 
 ## Purpose
 
@@ -774,8 +777,21 @@ digest and source-tamper refusal before visibility; complete membership-mutation
 failure including ordinal mutation; final cancellation ordering; and honest,
 independently verifiable visible-partial reporting. Balancing has no independent
 export representation: it necessarily changes the exact membership projection
-or order and fails the same gate. Production discovery remains empty
-throughout.
+or order and fails the same gate. Production discovery remained empty
+throughout Phase 4.
+
+Phase 5.1 additionally installs the first reviewed production implementation:
+
+- selector `split-jsonl-directory`, version 1, with no consumer profile;
+- all four current row schemas under a `portable_exact_bytes` claim;
+- v1 requests using the fixed safe default layout and additive
+  `veriformis.export-surface-request/v2` selected requests carrying one strict
+  container-options object;
+- canonical split payload JSONL, optional aligned provenance, deterministic
+  README/data card, receipt-bound atomic publication, and source-bound
+  verification; and
+- the normative rules and admission evidence in
+  [Split JSONL Export v1](split-jsonl-export-v1.md).
 
 The request envelope is operation-discriminated. Selected operations name only
 the source bundle path, exact catalog selector, source-trust policy and retained
@@ -785,6 +801,16 @@ destination and returns `self_described_physical` evidence. No request may
 supply a profile, dependency graph, file plan, membership projection, renderer,
 semantic replayer, replacement policy, or force flag. Surface responses are
 bounded summaries and are not additional durable evidence schemas.
+
+Request v2 preserves every v1 selected-operation field and adds only
+`container_options`, a flat canonical JSON object whose complete meaning and
+strict schema are owned by the selected container contract. It applies to dry
+run, execute, and verify; inspect remains v1 because it reads the self-described
+receipt. V2 options MUST be validated before source or destination access, MUST
+be repeated across the three source-bound operations, and MUST NOT supply a
+profile, dependency graph, file plan, membership projection, renderer,
+replayer, replacement policy, or force flag. A v2 request for an implementation
+without a reviewed options parser fails even when the object is empty.
 
 The canonical UTF-8 bytes of one request MUST NOT exceed 1 MiB (1,048,576
 bytes). Every runtime bundle or destination path MUST be non-empty, contain no
@@ -813,11 +839,13 @@ Persisted profile selectors and a test-injected conformance implementation are
 not support claims. Phase 4 MUST NOT add a generic export container or consumer
 profile to taxonomy discovery or the support capability lists, and it did not
 do so.
-Production export discovery is therefore empty until a later phase ships an
-internal implementation. The existing
-`minimal-v1` bundle and deterministic bundle transport remain the only shipped
-physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;
-named trainer profiles remain later work.
+Production export discovery was therefore empty through Phase 4. Phase 5.1 now
+ships exactly one consumer-neutral implementation,
+`split-jsonl-directory` v1, under its separate container contract. The existing
+`minimal-v1` bundle and deterministic bundle transport remain canonical and
+transport containers respectively. Generic JSON and CSV remain Phase 5 work;
+named trainer profiles remain later work. Shipping generic JSONL does not
+create or imply a consumer profile.
 
 ## Version and migration
 
@@ -830,7 +858,8 @@ by this contract.
 
 ## Non-goals
 
-- Adding any generic production export container.
+- Adding another generic production export container without its own admitted
+  contract and evidence.
 - Claiming Aptus, MLX-LM, TRL, or another trainer profile.
 - Changing `minimal-v1`, its six-file closed set, or its verifier contract.
 - Adding an export workspace stage or mutating workspace history.

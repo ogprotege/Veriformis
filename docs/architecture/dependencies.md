@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL admission)
 
 **Next review:** Any architecture or dependency change
 
@@ -203,6 +203,12 @@ adapters over one strict request/response protocol. The Mac process bridge
 retains stdout and stderr separately so it decodes only canonical stdout. No
 adapter adds a registry, renderer, filesystem verifier, taxonomy edge, or
 support claim.
+Phase 5.1 adds an exports-internal split JSONL planner/renderer and strict
+options/data-card models. They reuse the existing dataset rows, identity,
+taxonomy loss-policy lookup, portable export paths, and publication service;
+no third-party serializer, workspace-stage, adapter filesystem, public plugin,
+or trainer dependency edge is added. Additive request v2 is mirrored by the
+CLI-backed Mac model while discovery and response remain v1.
 This arrangement needs no dependency injection container because the contracts
 passed between stages are stable, low-level data values. `workspace.py` keeps
 its module-level domain coupling narrow and uses function-level imports for

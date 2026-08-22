@@ -42,7 +42,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "4a5a7b6fbd00b2b07ac38cd84817bbde87d54af32844e331dc5a65770954aeac"
+    "b9e05829c186dd9a084284a03a7a048458e9e7ef18072ef5a348eae6c1a2cba2"
 )
 
 
@@ -250,13 +250,17 @@ def test_implemented_discovery_names_axes_and_omits_format() -> None:
     assert discovery["physical_container"] == IMPLEMENTED_PHYSICAL_CONTAINERS
     assert discovery["consumer_profile"] == IMPLEMENTED_CONSUMER_PROFILES
     assert "preference-and-ranking" not in discovery["training_family"]
-    assert "split-jsonl-directory" not in discovery["physical_container"]
+    assert "split-jsonl-directory" in discovery["physical_container"]
 
 
-def test_canonical_and_transport_containers_are_implemented_only() -> None:
+def test_admitted_physical_containers_are_implemented_only() -> None:
     implemented = {
         entry.identifier
         for entry in catalog()
         if entry.axis == "physical_container" and entry.state == "implemented"
     }
-    assert implemented == {"minimal-v1", "deterministic-vfbundle-zip-v1"}
+    assert implemented == {
+        "minimal-v1",
+        "deterministic-vfbundle-zip-v1",
+        "split-jsonl-directory",
+    }

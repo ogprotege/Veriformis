@@ -202,8 +202,10 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
 
 enum ExportSurfaceSchema {
     static let request = "veriformis.export-surface-request/v1"
+    static let requestV2 = "veriformis.export-surface-request/v2"
     static let response = "veriformis.export-surface-response/v1"
     static let discovery = "veriformis.export-discovery/v1"
+    static let splitJSONLOptions = "veriformis.split-jsonl-options/v1"
 }
 
 enum ExportOperation: String, Codable, Equatable, Sendable {
@@ -276,6 +278,43 @@ extension ExportSurfaceRequest {
             )
         }
         return json
+    }
+}
+
+struct SplitJSONLOptions: Encodable, Equatable, Sendable {
+    let schemaVersion = ExportSurfaceSchema.splitJSONLOptions
+    let trainPartitionName: String
+    let evaluationPartitionName: String
+    let includeProvenance: Bool
+
+    init(
+        trainPartitionName: String,
+        evaluationPartitionName: String,
+        includeProvenance: Bool
+    ) throws {
+        try validateSplitJSONLPartitionName(
+            trainPartitionName,
+            label: "train_partition_name"
+        )
+        try validateSplitJSONLPartitionName(
+            evaluationPartitionName,
+            label: "evaluation_partition_name"
+        )
+        guard trainPartitionName != evaluationPartitionName else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Split JSONL train and evaluation partition names must differ."
+            )
+        }
+        self.trainPartitionName = trainPartitionName
+        self.evaluationPartitionName = evaluationPartitionName
+        self.includeProvenance = includeProvenance
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case trainPartitionName = "train_partition_name"
+        case evaluationPartitionName = "evaluation_partition_name"
+        case includeProvenance = "include_provenance"
     }
 }
 
@@ -355,6 +394,64 @@ struct ExportDryRunRequest: ExportSurfaceRequest, Equatable {
         case sourceTrustPolicy = "source_trust_policy"
         case expectedManifestSHA256 = "expected_manifest_sha256"
         case overwritePolicy = "overwrite_policy"
+    }
+}
+
+struct ExportDryRunRequestV2: ExportSurfaceRequest, Equatable {
+    let schemaVersion = ExportSurfaceSchema.requestV2
+    let operation = ExportOperation.dryRun
+    let bundle: String
+    let containerID: String
+    let containerVersion: Int
+    let consumerID: String?
+    let consumerProfileVersion: Int?
+    let sourceTrustPolicy: ExportSourceTrustPolicy
+    let expectedManifestSHA256: String?
+    let overwritePolicy = ExportOverwritePolicy.refuse
+    let containerOptions: SplitJSONLOptions
+
+    init(
+        bundle: String,
+        containerID: String,
+        containerVersion: Int,
+        consumerID: String? = nil,
+        consumerProfileVersion: Int? = nil,
+        sourceTrustPolicy: ExportSourceTrustPolicy,
+        expectedManifestSHA256: String?,
+        containerOptions: SplitJSONLOptions
+    ) throws {
+        try validateConfiguredSplitJSONLSelection(
+            bundle: bundle,
+            containerID: containerID,
+            containerVersion: containerVersion,
+            consumerID: consumerID,
+            consumerProfileVersion: consumerProfileVersion,
+            sourceTrustPolicy: sourceTrustPolicy,
+            expectedManifestSHA256: expectedManifestSHA256
+        )
+        self.bundle = bundle
+        self.containerID = containerID
+        self.containerVersion = containerVersion
+        self.consumerID = consumerID
+        self.consumerProfileVersion = consumerProfileVersion
+        self.sourceTrustPolicy = sourceTrustPolicy
+        self.expectedManifestSHA256 = expectedManifestSHA256
+        self.containerOptions = containerOptions
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeSelectedExportRequestV2(
+            to: encoder,
+            operation: operation,
+            bundle: bundle,
+            containerID: containerID,
+            containerVersion: containerVersion,
+            consumerID: consumerID,
+            consumerProfileVersion: consumerProfileVersion,
+            sourceTrustPolicy: sourceTrustPolicy,
+            expectedManifestSHA256: expectedManifestSHA256,
+            containerOptions: containerOptions
+        )
     }
 }
 
@@ -466,6 +563,74 @@ struct ExportExecuteRequest: ExportSurfaceRequest, Equatable {
     }
 }
 
+struct ExportExecuteRequestV2: ExportSurfaceRequest, Equatable {
+    let schemaVersion = ExportSurfaceSchema.requestV2
+    let operation = ExportOperation.execute
+    let bundle: String
+    let containerID: String
+    let containerVersion: Int
+    let consumerID: String?
+    let consumerProfileVersion: Int?
+    let sourceTrustPolicy: ExportSourceTrustPolicy
+    let expectedManifestSHA256: String?
+    let overwritePolicy = ExportOverwritePolicy.refuse
+    let destinationRoot: String
+    let expectedExportPlanID: String
+    let containerOptions: SplitJSONLOptions
+
+    init(
+        bundle: String,
+        containerID: String,
+        containerVersion: Int,
+        consumerID: String? = nil,
+        consumerProfileVersion: Int? = nil,
+        sourceTrustPolicy: ExportSourceTrustPolicy,
+        expectedManifestSHA256: String?,
+        destinationRoot: String,
+        expectedExportPlanID: String,
+        containerOptions: SplitJSONLOptions
+    ) throws {
+        try validateConfiguredSplitJSONLSelection(
+            bundle: bundle,
+            containerID: containerID,
+            containerVersion: containerVersion,
+            consumerID: consumerID,
+            consumerProfileVersion: consumerProfileVersion,
+            sourceTrustPolicy: sourceTrustPolicy,
+            expectedManifestSHA256: expectedManifestSHA256
+        )
+        try validateExportRuntimePath(destinationRoot, label: "destination_root")
+        try validateExportID(expectedExportPlanID, kind: "export-plan")
+        self.bundle = bundle
+        self.containerID = containerID
+        self.containerVersion = containerVersion
+        self.consumerID = consumerID
+        self.consumerProfileVersion = consumerProfileVersion
+        self.sourceTrustPolicy = sourceTrustPolicy
+        self.expectedManifestSHA256 = expectedManifestSHA256
+        self.destinationRoot = destinationRoot
+        self.expectedExportPlanID = expectedExportPlanID
+        self.containerOptions = containerOptions
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeSelectedExportRequestV2(
+            to: encoder,
+            operation: operation,
+            bundle: bundle,
+            containerID: containerID,
+            containerVersion: containerVersion,
+            consumerID: consumerID,
+            consumerProfileVersion: consumerProfileVersion,
+            sourceTrustPolicy: sourceTrustPolicy,
+            expectedManifestSHA256: expectedManifestSHA256,
+            containerOptions: containerOptions,
+            destinationRoot: destinationRoot,
+            expectedExportPlanID: expectedExportPlanID
+        )
+    }
+}
+
 struct ExportVerifyRequest: ExportSurfaceRequest, Equatable {
     let schemaVersion = ExportSurfaceSchema.request
     let operation = ExportOperation.verify
@@ -554,6 +719,74 @@ struct ExportVerifyRequest: ExportSurfaceRequest, Equatable {
         case overwritePolicy = "overwrite_policy"
         case destinationRoot = "destination_root"
         case expectedExportPlanID = "expected_export_plan_id"
+    }
+}
+
+struct ExportVerifyRequestV2: ExportSurfaceRequest, Equatable {
+    let schemaVersion = ExportSurfaceSchema.requestV2
+    let operation = ExportOperation.verify
+    let bundle: String
+    let containerID: String
+    let containerVersion: Int
+    let consumerID: String?
+    let consumerProfileVersion: Int?
+    let sourceTrustPolicy: ExportSourceTrustPolicy
+    let expectedManifestSHA256: String?
+    let overwritePolicy = ExportOverwritePolicy.refuse
+    let destinationRoot: String
+    let expectedExportPlanID: String
+    let containerOptions: SplitJSONLOptions
+
+    init(
+        bundle: String,
+        containerID: String,
+        containerVersion: Int,
+        consumerID: String? = nil,
+        consumerProfileVersion: Int? = nil,
+        sourceTrustPolicy: ExportSourceTrustPolicy,
+        expectedManifestSHA256: String?,
+        destinationRoot: String,
+        expectedExportPlanID: String,
+        containerOptions: SplitJSONLOptions
+    ) throws {
+        try validateConfiguredSplitJSONLSelection(
+            bundle: bundle,
+            containerID: containerID,
+            containerVersion: containerVersion,
+            consumerID: consumerID,
+            consumerProfileVersion: consumerProfileVersion,
+            sourceTrustPolicy: sourceTrustPolicy,
+            expectedManifestSHA256: expectedManifestSHA256
+        )
+        try validateExportRuntimePath(destinationRoot, label: "destination_root")
+        try validateExportID(expectedExportPlanID, kind: "export-plan")
+        self.bundle = bundle
+        self.containerID = containerID
+        self.containerVersion = containerVersion
+        self.consumerID = consumerID
+        self.consumerProfileVersion = consumerProfileVersion
+        self.sourceTrustPolicy = sourceTrustPolicy
+        self.expectedManifestSHA256 = expectedManifestSHA256
+        self.destinationRoot = destinationRoot
+        self.expectedExportPlanID = expectedExportPlanID
+        self.containerOptions = containerOptions
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeSelectedExportRequestV2(
+            to: encoder,
+            operation: operation,
+            bundle: bundle,
+            containerID: containerID,
+            containerVersion: containerVersion,
+            consumerID: consumerID,
+            consumerProfileVersion: consumerProfileVersion,
+            sourceTrustPolicy: sourceTrustPolicy,
+            expectedManifestSHA256: expectedManifestSHA256,
+            containerOptions: containerOptions,
+            destinationRoot: destinationRoot,
+            expectedExportPlanID: expectedExportPlanID
+        )
     }
 }
 
@@ -1183,6 +1416,71 @@ struct ExportSurfaceResponse<Result: ExportSurfaceResult>: Decodable, Equatable,
     }
 }
 
+private enum ExportSelectedRequestV2CodingKeys: String, CodingKey {
+    case schemaVersion = "schema_version"
+    case operation
+    case bundle
+    case containerID = "container_id"
+    case containerVersion = "container_version"
+    case consumerID = "consumer_id"
+    case consumerProfileVersion = "consumer_profile_version"
+    case sourceTrustPolicy = "source_trust_policy"
+    case expectedManifestSHA256 = "expected_manifest_sha256"
+    case overwritePolicy = "overwrite_policy"
+    case containerOptions = "container_options"
+    case destinationRoot = "destination_root"
+    case expectedExportPlanID = "expected_export_plan_id"
+}
+
+private func encodeSelectedExportRequestV2(
+    to encoder: Encoder,
+    operation: ExportOperation,
+    bundle: String,
+    containerID: String,
+    containerVersion: Int,
+    consumerID: String?,
+    consumerProfileVersion: Int?,
+    sourceTrustPolicy: ExportSourceTrustPolicy,
+    expectedManifestSHA256: String?,
+    containerOptions: SplitJSONLOptions,
+    destinationRoot: String? = nil,
+    expectedExportPlanID: String? = nil
+) throws {
+    guard (destinationRoot == nil) == (expectedExportPlanID == nil) else {
+        throw ExportSurfaceModelError.invalidValue(
+            "Configured export destination and expected plan must be supplied together."
+        )
+    }
+    var container = encoder.container(keyedBy: ExportSelectedRequestV2CodingKeys.self)
+    try container.encode(ExportSurfaceSchema.requestV2, forKey: .schemaVersion)
+    try container.encode(operation, forKey: .operation)
+    try container.encode(bundle, forKey: .bundle)
+    try container.encode(containerID, forKey: .containerID)
+    try container.encode(containerVersion, forKey: .containerVersion)
+    if let consumerID {
+        try container.encode(consumerID, forKey: .consumerID)
+    } else {
+        try container.encodeNil(forKey: .consumerID)
+    }
+    if let consumerProfileVersion {
+        try container.encode(consumerProfileVersion, forKey: .consumerProfileVersion)
+    } else {
+        try container.encodeNil(forKey: .consumerProfileVersion)
+    }
+    try container.encode(sourceTrustPolicy, forKey: .sourceTrustPolicy)
+    if let expectedManifestSHA256 {
+        try container.encode(expectedManifestSHA256, forKey: .expectedManifestSHA256)
+    } else {
+        try container.encodeNil(forKey: .expectedManifestSHA256)
+    }
+    try container.encode(ExportOverwritePolicy.refuse, forKey: .overwritePolicy)
+    try container.encode(containerOptions, forKey: .containerOptions)
+    if let destinationRoot, let expectedExportPlanID {
+        try container.encode(destinationRoot, forKey: .destinationRoot)
+        try container.encode(expectedExportPlanID, forKey: .expectedExportPlanID)
+    }
+}
+
 private struct ExportDynamicCodingKey: CodingKey {
     let stringValue: String
     let intValue: Int? = nil
@@ -1241,6 +1539,54 @@ private func validateExportSelection(
     if sourceTrustPolicy == .requireExternalDigest, expectedManifestSHA256 == nil {
         throw ExportSurfaceModelError.invalidValue(
             "require_external_digest needs expected_manifest_sha256."
+        )
+    }
+}
+
+private func validateConfiguredSplitJSONLSelection(
+    bundle: String,
+    containerID: String,
+    containerVersion: Int,
+    consumerID: String?,
+    consumerProfileVersion: Int?,
+    sourceTrustPolicy: ExportSourceTrustPolicy,
+    expectedManifestSHA256: String?
+) throws {
+    try validateExportSelection(
+        bundle: bundle,
+        containerID: containerID,
+        containerVersion: containerVersion,
+        consumerID: consumerID,
+        consumerProfileVersion: consumerProfileVersion,
+        sourceTrustPolicy: sourceTrustPolicy,
+        expectedManifestSHA256: expectedManifestSHA256
+    )
+    guard containerID == "split-jsonl-directory",
+          containerVersion == 1,
+          consumerID == nil,
+          consumerProfileVersion == nil
+    else {
+        throw ExportSurfaceModelError.invalidValue(
+            "split-jsonl-options/v1 requires split-jsonl-directory v1 without a consumer profile."
+        )
+    }
+}
+
+private func validateSplitJSONLPartitionName(_ value: String, label: String) throws {
+    let allowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789_-")
+    let firstAllowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789")
+    let reserved = Set(
+        ["con", "prn", "aux", "nul"]
+            + (1 ... 9).flatMap { ["com\($0)", "lpt\($0)"] }
+    )
+    guard !value.isEmpty,
+          value.utf8.count <= 64,
+          value.unicodeScalars.allSatisfy(allowed.contains),
+          value.unicodeScalars.first.map(firstAllowed.contains) == true,
+          !reserved.contains(value)
+    else {
+        throw ExportSurfaceModelError.invalidValue(
+            "\(label) must be a portable 1-64 character lowercase ASCII partition stem."
         )
     }
 }
