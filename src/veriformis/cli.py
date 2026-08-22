@@ -309,7 +309,14 @@ def curate(
         "--require-evaluation/--allow-empty-evaluation",
     ),
     split_seed: str | None = typer.Option(None, "--split-seed"),
-    instruction: str | None = typer.Option(None, "--instruction"),
+    instruction: str | None = typer.Option(
+        None,
+        "--instruction",
+        help=(
+            "Operator instruction for instruction-and-output; omitted uses the "
+            "goal's catalog template after the truthfulness check."
+        ),
+    ),
 ) -> None:
     """Fix the complete dataset plan, then curate constructed records.
 
@@ -657,7 +664,14 @@ def preflight(
     representation: str | None = typer.Option(
         None, "--representation", help="Catalog representation id."
     ),
-    instruction: str | None = typer.Option(None, "--instruction"),
+    instruction: str | None = typer.Option(
+        None,
+        "--instruction",
+        help=(
+            "Operator instruction for instruction-and-output; omitted uses the "
+            "goal's catalog template after the truthfulness check."
+        ),
+    ),
     rules: str = typer.Option("", "--rules"),
     custom: str = typer.Option("", "--custom"),
     strategy: str | None = typer.Option(None, "--strategy"),
@@ -726,7 +740,10 @@ def goal_preview(
     instruction: str | None = typer.Option(
         None,
         "--instruction",
-        help="Operator instruction for the instruction-and-output representation.",
+        help=(
+            "Operator instruction for instruction-and-output; omitted uses the "
+            "goal's catalog template after the truthfulness check."
+        ),
     ),
     record: list[str] | None = typer.Option(
         None,

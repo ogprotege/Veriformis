@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 locally complete)
 
-**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
+**Next review:** Independent-product Phase 6.7 pull-request merge, any Phase 6
 item closeout, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
@@ -35,6 +35,10 @@ JSONL/JSON/CSV chooser and axis-separation obligation through the
 [generic export operator guide](../generic-exports.md), with no persisted-
 schema, runtime, taxonomy, support, consumer, trainer, or new documentation-
 debt promotion. DOC-002, DOC-003, DOC-006, and DOC-007 remain open.
+
+Item 6.7 adds no new documentation debt: instruction templates live in the
+existing catalog contract, the walkthrough is recorded in `docs/install.md`,
+and DOC-002, DOC-003, DOC-006, and DOC-007 remain open.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

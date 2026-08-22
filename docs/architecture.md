@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 locally complete)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -83,7 +83,12 @@ chunking, named construction, global curation, and split functions in memory.
 The service, CLI, MCP, and Mac workbench share its exact response, while real
 construction shares the same goal/input-family gate so preflight and compile
 cannot disagree about source eligibility. It creates no workspace and accesses
-no renderer or destination.
+no renderer or destination. Phase 6.6 freezes the discovery-closed acceptance
+matrix over every eligible goal, input family, and compatible representation.
+Phase 6.7 stores one static instruction template and unique task phrase per
+goal in the catalog; omitted `instruction-and-output` instructions resolve to
+that template, and a supplied instruction is admitted only after the
+deterministic truthfulness check.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

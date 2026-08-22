@@ -1772,6 +1772,7 @@ class PipelineService:
         the constructed goal's safe preset; the plan is built through the
         recipe library so every surface fixes the same plan.
         """
+        from veriformis.goals.catalog import resolve_operator_instruction
         from veriformis.goals.presets import resolve_recipe_settings
         from veriformis.recipes.library import build_default_finished_plan
 
@@ -1779,13 +1780,14 @@ class PipelineService:
         current = store.head()
         _require_group3_revision(current)
         recipe, result, inputs = _load_constructed_dataset(store, current)
-        if recipe.target_row_schema == "instruction_output":
-            if instruction is None or not instruction:
-                raise ValueError(
-                    "--instruction is required for instruction_output rows"
-                )
-        elif instruction is not None:
-            raise ValueError("--instruction is valid only for instruction_output rows")
+        try:
+            instruction = resolve_operator_instruction(
+                objective=recipe.objective.kind,
+                row_schema=recipe.target_row_schema,
+                instruction=instruction,
+            )
+        except GoalCatalogError as exc:
+            raise ValueError(exc.message) from exc
         try:
             settings = resolve_recipe_settings(
                 goal=goal,

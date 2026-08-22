@@ -152,6 +152,24 @@ class GoalCatalogError(VeriformisError):
     code = "goal-catalog-invalid"
 
 
+class InstructionRequiredError(GoalCatalogError):
+    """An instruction-and-output row was given an empty operator instruction."""
+
+    code = "instruction-required"
+
+
+class InstructionNotApplicableError(GoalCatalogError):
+    """An instruction was supplied for a representation that does not use one."""
+
+    code = "instruction-not-applicable"
+
+
+class InstructionTruthfulnessError(GoalCatalogError):
+    """An operator instruction fails the deterministic truthfulness check."""
+
+    code = "instruction-untruthful"
+
+
 class CompilePreflightError(VeriformisError):
     """Compile preflight cannot produce one complete truthful response."""
 

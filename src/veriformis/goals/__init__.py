@@ -17,6 +17,8 @@ from veriformis.goals.catalog import (
     representation_for_row_schema,
     require_goal_input_family,
     resolve_goal,
+    resolve_operator_instruction,
+    validate_instruction_text,
 )
 from veriformis.goals.preflight import (
     COMPILE_PREFLIGHT_SCHEMA_ID,
@@ -120,4 +122,6 @@ __all__ = [
     "representation_for_row_schema",
     "require_goal_input_family",
     "resolve_goal",
+    "resolve_operator_instruction",
+    "validate_instruction_text",
 ]

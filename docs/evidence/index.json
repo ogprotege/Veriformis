@@ -609,6 +609,70 @@
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-6-compile-preflight-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-abdd630e25e83ebf346316319caec892f4d64886",
+      "scope": "Independent-product Phase 6.5 compile preflight",
+      "grade": "recorded-local",
+      "summary": "The runtime-only veriformis.compile-preflight/v1 response passed 245 focused compile-preflight, matrix, pipeline, and recipe-surface tests, 1,593 full Python tests, and 1,581 standalone release tests with 1 deselected; full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation and both golden compile/external-digest/transport flows, CLI/workbench parity, 93 Mac tests, project tracking, lock, Ruff, structured JSON, and diff checks passed. Item 6.5 subsequently passed all 14 GitHub checks and merged as PR #64 at b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/goals",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-6-goal-acceptance-matrix-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5",
+      "scope": "Independent-product Phase 6.6 goal acceptance matrix",
+      "grade": "recorded-local",
+      "summary": "The frozen discovery-closed 74-cell veriformis.goal-acceptance-matrix/v1 fixture passed 297 matrix tests, 353 focused goal tests, 1,890 full Python tests, and 1,878 standalone release tests with 1 deselected; full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation and both golden compile/external-digest/transport flows, CLI/workbench parity, 97 Mac tests, project tracking, lock, Ruff, structured JSON, fixture byte equality, and diff checks passed. Item 6.6 subsequently passed all 14 GitHub checks and merged as PR #65 at 7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/goals tests/regressions/test_phase6_goal_acceptance_matrix.py",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "independent-product-phase-06-item-6-7",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5",
+      "scope": "Independent-product Phase 6.7 instruction truthfulness and Phase 6 closeout",
+      "grade": "recorded-local",
+      "summary": "Item 6.7 adds per-goal catalog instruction templates and a deterministic truthfulness check, judges usability criteria U1-U6, and writes the Phase 6 closeout. Observed local gate counts are recorded in the Phase 6 evidence packet. This Linux cloud VM cannot run XCTest; Mac gates are exercised by the macOS GitHub check. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 6.7 pull request.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "related": [
+        "docs/contracts/goal-catalog-v1.md",
+        "docs/contracts/recipe-preset-v1.md",
+        "docs/cli.md",
+        "docs/install.md",
+        "docs/current-status.md",
+        "dev/active/independent-product/phase-06-goal-first-recipes/closeout.md"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/goals",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "cmp src/veriformis/goals/catalog-v1.json tests/regressions/fixtures/phase6/goal-catalog.json",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
     }
   ]
 }

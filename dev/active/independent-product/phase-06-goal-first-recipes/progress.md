@@ -437,3 +437,57 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.6 pull request, require every GitHub check
 to pass, merge, and synchronize clean local `main` with `origin/main` before
 item 6.7 begins.
+
+## 2026-08-22 — Item 6.6 merged; item 6.7 started
+
+**Status:** Item 6.6 merged as PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5` after all 14 GitHub checks
+passed; clean local `main` equals `origin/main` at that commit. Branch
+`cursor/phase6-07-truthfulness-closeout-38f4` was created from it.
+
+Item 6.7 scope: per-goal static instruction templates as the only default
+instruction literals; a deterministic truthfulness check that admits an
+operator instruction only when it names the goal's task and contains no
+claim vocabulary for a transformation the goal does not perform; proofs that
+`messages` user turns are exact context and `instruction_output` instructions
+never claim summary, translation, answer, or another absent transformation;
+judgment of predeclared usability criteria U1–U6; and the Phase 6 closeout
+reconciliation.
+
+**Next action:** Finish the resolver, surface wiring, and U1–U6 proofs; run
+the complete admission gates; write the closeout; publish the item 6.7 pull
+request.
+
+## 2026-08-22 — Item 6.7 locally complete
+
+**Status:** Local implementation and admission gates passed; pull-request
+publication and merge pending.
+
+Every catalog goal now carries `instruction_template` and a unique
+`instruction_task`. The four supervised templates are byte-identical to the
+instruction literals already pinned by the 6.6 acceptance matrix. Omitted
+instructions on `instruction-and-output` resolve to the template through
+`resolve_operator_instruction`; empty or surrounding-whitespace text fails
+as `instruction-required`; a supplied instruction that lacks the task phrase
+or contains `summar`, `answer`, or `translat` fails as
+`instruction-untruthful`; an instruction on any other representation fails
+as `instruction-not-applicable`. `curate`, preflight, preview, CLI, MCP, the
+YAML runner, and the Mac bridge share that function. `messages` user turns
+remain the exact context field. Preflight no longer reports that
+truthfulness is pending.
+
+Usability criteria: U1 is enforced on catalog plain language and the new
+instruction fields; U2 remains the 6.3 preview span proofs; U3 remains the
+6.6 matrix; U4 is discovery `not_this` / `non_claims` plus preview carriage;
+U5 refuses ineligible families and untruthful instructions before a
+workspace exists; U6 is the documented pick → preflight → compile → preview
+→ export walkthrough, executed through `PipelineService` and through the Mac
+view-model compile/preflight argument projection.
+
+This Linux cloud VM cannot run XCTest or the Mac parity script; those gates
+are recorded as exercised by the macOS GitHub check. Observed Python gates
+are recorded in `evidence.md`.
+
+**Next action:** Publish the item 6.7 pull request, require every GitHub
+check to pass, merge, and synchronize clean local `main` with `origin/main`.
+Phase 6 then ends; Phase 7 may begin under its own packet.

@@ -260,11 +260,19 @@ def test_instruction_and_review_configuration_fail_before_source_access(
 ) -> None:
     missing = tmp_path / "not-read.txt"
 
-    instruction_required = SERVICE.preflight(
+    instruction_empty = SERVICE.preflight(
         [missing],
         source_root=tmp_path,
         goal="continue-a-passage",
         representation="instruction-and-output",
+        instruction="",
+    ).preflight
+    instruction_untruthful = SERVICE.preflight(
+        [missing],
+        source_root=tmp_path,
+        goal="continue-a-passage",
+        representation="instruction-and-output",
+        instruction="Summarize the supplied opening.",
     ).preflight
     instruction_not_applicable = SERVICE.preflight(
         [missing],
@@ -279,9 +287,13 @@ def test_instruction_and_review_configuration_fail_before_source_access(
         require_review=True,
     ).preflight
 
-    assert instruction_required is not None
-    assert [item.code for item in instruction_required.incompatibilities] == [
+    assert instruction_empty is not None
+    assert [item.code for item in instruction_empty.incompatibilities] == [
         "instruction-required"
+    ]
+    assert instruction_untruthful is not None
+    assert [item.code for item in instruction_untruthful.incompatibilities] == [
+        "instruction-untruthful"
     ]
     assert instruction_not_applicable is not None
     assert [item.code for item in instruction_not_applicable.incompatibilities] == [
@@ -291,7 +303,7 @@ def test_instruction_and_review_configuration_fail_before_source_access(
     assert [item.code for item in review_unavailable.incompatibilities] == [
         "review-evidence-unavailable"
     ]
-    assert instruction_required.sources == instruction_not_applicable.sources == ()
+    assert instruction_empty.sources == instruction_not_applicable.sources == ()
     assert review_unavailable.sources == ()
 
 
