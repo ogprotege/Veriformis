@@ -7,19 +7,19 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus independent-product Phases 0–3, merged Phase 4 items 4.1–4.6, and Phase
-4.7 private deterministic evidence in progress, version `0.1.0` development
+plus independent-product Phases 0–3, merged Phase 4 items 4.1–4.7, and Phase
+4.8 verified-export surfaces in progress, version `0.1.0` development
 alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–3 and Phase 4 items 4.1–4.6 on `main`; Phase 4.7 implemented on the
-current branch with all local gates green and GitHub review pending; maturity
-alpha; public Mac claim still owner-gated
+Phases 0–3 and Phase 4 items 4.1–4.7 on `main`; Phase 4.8 implemented on the
+current branch with every required local gate passing and GitHub review
+pending; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
 
-**Next review:** Phase 4.7 merge or Phase 4.8 public-surface work; beta
+**Next review:** Phase 4.8 merge or Phase 4.9 closeout work; beta
 label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -58,9 +58,9 @@ The six-axis product vocabulary and compile compatibility are governed by
 [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md).
 Consumer-neutral derivative evidence is governed by
 [Verified Export Contract v1](contracts/verified-export-v1.md). Its internal
-exact-byte publication foundation is implemented; renderer discovery, public
-surfaces, deterministic replay, and supported containers remain under Phase 4
-or later implementation.
+exact-byte publication, deterministic replay, and public surface foundation is
+implemented; production renderers and supported containers remain under later
+implementation.
 
 ## Ownership boundary
 
@@ -137,18 +137,22 @@ internal exact-byte-only publication: it re-verifies the source and plan,
 validates semantic membership and exact planned bytes, writes and independently
 reloads a canonical receipt in a closed private staging tree, and atomically
 promotes without replacement. It merged as PR #48 at
-`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The seventh increment locally
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The seventh increment
 renders twice from independent strict inputs. Exact profiles require identical
 normalized byte trees; semantic-only profiles require equal versioned canonical
 semantic preimages and reconstructed membership from both renders plus
 descriptor-reread staged replay. The service computes semantic digests rather
 than accepting hook assertions. All required local gates pass, including 14
 determinism, 158 export, 163 combined export/contract, 927 full Python, 915
-standalone-release with 1 deselected, and 38 Mac tests. GitHub review remains
-pending. The ten persisted v1 schemas and existing `publish` signature are
-unchanged. No renderer or semantic replayer, public export command, generic
-export container, or new trainer profile ships. Phase 4.8 public surfaces,
-Phase 4.9 closeout, and Phase 5 generic exports remain open.
+standalone-release with 1 deselected, and 38 Mac tests, and merged as PR #49 at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The eighth increment locally adds
+a private default-empty implementation catalog plus strict discovery, dry run,
+self-described inspect, operator-confirmed no-replace execute, and source-bound
+verify through `PipelineService`, CLI, MCP, and the CLI-backed Mac bridge. The
+ten persisted v1 schemas and existing `publish` signature are unchanged. No
+production renderer or semantic replayer, generic export container, or new
+trainer profile ships. Phase 4.9 closeout and Phase 5 generic exports remain
+open.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete

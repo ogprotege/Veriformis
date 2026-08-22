@@ -13,13 +13,14 @@ independent-product Phase 4 verified export foundation in progress with its
 typed internal service boundary, descriptor-anchored source view, and strict
 versioned persisted export models, plus trusted-by-default source admission
 with explicit lower-trust policy, read-only source-derived plan population, and
-normalized semantic membership enforcement, plus internal exact-byte atomic
-publication and independent closed-tree verification, plus private two-render
-exact-byte and semantic-content conformance with staged descriptor replay
+normalized semantic membership enforcement, internal exact-byte atomic
+publication and independent closed-tree verification, private two-render
+exact-byte and semantic-content conformance with staged descriptor replay, and
+strict production-empty export surfaces through Python, CLI, MCP, and Mac
 
-**Review date:** 2026-08-21 (independent-product Phase 4.7 deterministic evidence)
+**Review date:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
 
-**Next review:** Phase 4.7 GitHub review or merge; Phase 4.8 public-surface work;
+**Next review:** Phase 4.8 GitHub review or merge; Phase 4.9 closeout work;
 beta label cut, public-ready checklist, or any
 contract change
 
@@ -149,19 +150,23 @@ and exact bytes, writes a canonical receipt in private descriptor-anchored
 staging, independently verifies the closed tree, and performs one atomic
 no-replace promotion with explicit cancellation and visible-outcome reporting;
 it merged as PR #48 at
-`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The seventh slice locally invokes
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The seventh slice invokes
 the private conformance renderer twice from independent strict plan and row-set
 reloads. Exact profiles require identical normalized byte trees. Semantic-only
 profiles permit different physical bytes but require equal profile-versioned
 canonical semantic preimages, complete plan-equal reconstructed membership,
 service-computed digests, and descriptor-reread staged replay before promotion.
-Local gates pass: 14 determinism tests, 158 export tests, 163 combined
-export/contract tests, 927 full Python tests, 915 standalone-release tests with
-1 deselected, deterministic parity, and 38 Mac tests. GitHub review remains
-pending. The default service has no renderer or semantic replayer. The ten v1
-schemas record the profile claim and one published instance, not a rerender
-transcript. Public export commands, generic export containers, and planned
-trainer-specific profiles remain unimplemented.
+It merged as PR #49 at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The eighth
+slice locally adds a private, immutable, production-empty implementation
+catalog and typed discovery, destination-free dry run, self-described inspect,
+operator-confirmed no-replace execute, and source-bound verify operations.
+`PipelineService`, CLI, MCP, and the CLI-backed Mac bridge share one strict
+canonical protocol and frozen evidence fixture. The default service has no
+renderer or semantic replayer. Python publicly exports only the runtime
+publication outcome and visible-partial exception needed to use execution
+honestly; publication hooks remain private. The ten v1 schemas record the
+profile claim and one published instance, not a rerender transcript. Generic
+export containers and planned trainer-specific profiles remain unimplemented.
 
 ## Implemented interfaces
 
@@ -183,6 +188,11 @@ The installed console entry point is `veriformis`.
 | `package BUNDLE -o ARCHIVE --manifest-sha256 DIGEST` | Externally verifies and deterministically publishes the canonical six-file bundle as a no-replace transport archive | `*.vfbundle.zip`; archive and manifest digests |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
+| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response; production discovery is empty |
+| `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan without destination access | Canonical plan-summary response |
+| `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
+| `export execute --request-json JSON` | Re-derives and atomically publishes the operator-confirmed no-replace plan | Canonical receipt and verification response, or explicit cancellation/visible-partial status |
+| `export-verify --request-json JSON` | Re-verifies source authority, re-derives the confirmed plan, and independently verifies the destination | Canonical source-bound verification response |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
 | `list-recipes` | Lists named deterministic recipe library identifiers | Terminal output only |
@@ -195,12 +205,12 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration and read-only taxonomy discovery |
-| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including read-only taxonomy JSON |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy discovery, and verified-export discovery/dry-run/inspect/execute/verify operations |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy JSON and canonical verified-export responses |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
-| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy discovery registry |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy and verified-export service operations |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
-| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, and CLI-backed taxonomy help |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, and a strict canonical verified-export bridge |
 
 ## Workspace and identity status
 
@@ -503,7 +513,7 @@ See [docs/release.md](release.md).
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
-| Independent Phase 4 in progress | Items 4.1–4.6 merged at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`; Phase 4.7 locally adds private two-render exact-byte and semantic-content conformance plus descriptor-reread staged replay; no shipped renderer/replayer, public export command, production container, or support promotion |
+| Independent Phase 4 in progress | Items 4.1–4.7 merged at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`; Phase 4.8 locally adds production-empty verified-export discovery, dry run, inspect, execute, and verify surfaces; no shipped renderer/replayer, production container, or support promotion |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation in progress and later phases planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
@@ -558,21 +568,22 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–3 are complete. Phase 4 items 4.1–4.6 are merged
-at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. The completed
+Independent-product Phases 0–3 are complete. Phase 4 items 4.1–4.7 are merged
+at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The completed
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
 records the contract, compile compatibility, cross-surface discovery, public
 vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
 export foundation is in progress under its
 [active packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
-The current Phase 4.7 branch implements private two-render exact-byte and
-semantic-content conformance with every required local gate green. GitHub
-review remains pending. The private hooks are trusted conformance code, not an
+The current Phase 4.8 branch implements the strict cross-surface export API;
+every required local gate passes and GitHub review remains pending. The private
+hooks are trusted conformance code, not an
 untrusted plugin boundary, and semantic replay currently retains each complete
 produced file in memory. The statically bounded fixture does not establish a
 scalable public parser; any future shipped semantic profile must enforce
 explicit resource limits. The default service still has no renderer or semantic
-replayer, and no public command or supported derivative container exists.
+replayer, so shipped discovery is empty and no supported derivative container
+exists.
 Generic export containers and any new trainer-specific profiles are not current
 capabilities; the canonical and optional Aptus profiles remain the implemented
 profile set. A deliberate beta label and public Mac checklist remain separate

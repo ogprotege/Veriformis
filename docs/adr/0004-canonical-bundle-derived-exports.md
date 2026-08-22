@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic evidence remains faithful)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export surfaces remain faithful)
 
 **Decider:** Repository owner direction
 
@@ -15,7 +15,9 @@ manifest binds the exact dataset snapshot, partitions, provenance, validation,
 and attestation. Generic external exports and named trainer packs still have no
 shipped renderer or supported product container. Phase 4.6 supplies an internal
 atomic publisher and receipt verifier; Phase 4.7 adds only private two-render
-exact-byte and semantic-content conformance evidence.
+exact-byte and semantic-content conformance evidence. Phase 4.8 exposes the
+shared service through strict Python, CLI, MCP, and CLI-backed Mac operations,
+while its private production catalog remains empty.
 
 ## Decision
 
@@ -35,8 +37,11 @@ Users eventually receive both a trainer-friendly artifact and a verifiable
 relationship to the source bundle. Exact-byte destination enforcement, receipt
 replay, and atomic publication are implemented internally in Phase 4.6. Phase
 4.7 privately compares two exact byte trees or two reconstructed canonical
-semantic-preimage trees and replays staged semantic bytes. Public surfaces and
-supported containers remain later work.
+semantic-preimage trees and replays staged semantic bytes. Phase 4.8 fulfills
+the surface decision with strict discovery, dry run, self-described inspect,
+operator-confirmed no-replace execute, and source-bound verify operations. No
+production implementation is discoverable, so supported containers remain
+later work.
 
 ## Alternatives considered
 
@@ -74,8 +79,11 @@ membership, with service-computed digests and descriptor-reread staged replay.
 This adds no persisted rerender transcript or new schema. The private hooks are
 trusted conformance code, semantic replay currently retains complete files in
 memory, and the fixture is statically bounded. The default service has no
-renderer or semantic replayer; public surfaces remain Phase 4.8, closeout
-remains Phase 4.9, and generic containers remain Phase 5.
+renderer or semantic replayer. Phase 4.8 adds a private exact-selector catalog
+and shared strict surface protocol, but production discovery remains empty and
+adapters accept no caller-supplied plan, implementation, membership, or
+replacement authority. Closeout remains Phase 4.9, and generic containers
+remain Phase 5.
 
 ## Review triggers
 

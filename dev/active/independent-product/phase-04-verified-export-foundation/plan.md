@@ -75,8 +75,8 @@ semantic reconstruction of produced bytes enter only through the private Phase
 
 ### 4.7 Define deterministic evidence limits
 
-- **Implementation state:** Locally implemented; every required local gate
-  passes. Pull-request review is pending.
+- **Implementation state:** Complete; PR #49 passed every required check and
+  merged at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`.
 - [x] Distinguish portable exact-byte claims from semantic-content-only claims.
 - [x] Render twice from independent strict inputs and compare normalized exact-
       byte trees for exact profiles before destination access.
@@ -96,13 +96,15 @@ Phase 4.9 owns the complete adversarial closeout harness.
 
 ### 4.8 Expose export APIs on every surface
 
-- [ ] Add discovery, dry run, overwrite-policy, inspect, execute, and verify
+- **Implementation state:** Complete; every required local gate passes; pull-
+  request review pending.
+- [x] Add discovery, dry run, overwrite-policy, inspect, execute, and verify
       methods through `PipelineService`.
-- [ ] Add `veriformis export` and `veriformis export-verify` as thin adapters.
-- [ ] Add MCP tools over the same service.
-- [ ] Add strict CLI-backed Mac bridge support without a second registry or
+- [x] Add `veriformis export` and `veriformis export-verify` as thin adapters.
+- [x] Add MCP tools over the same service.
+- [x] Add strict CLI-backed Mac bridge support without a second registry or
       filesystem implementation.
-- [ ] Prove identical plans and digests across all surfaces.
+- [x] Prove identical plans and digests across all surfaces.
 
 ### 4.9 Complete the adversarial harness and closeout
 

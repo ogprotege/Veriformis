@@ -15,15 +15,17 @@ Phase 4.5 implements read-only normalized semantic membership reconstruction
 and exact comparison with the plan baseline. Phase 4.6 implemented
 exact-byte-only atomic publication and descriptor-anchored independent tree
 verification and merged as PR #48 at
-`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 locally implements
+`3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Phase 4.7 implements
 private two-render evidence for both determinism claims and descriptor-anchored
-semantic replay. Its required local gates and pull-request review are pending.
-It does not implement CLI or MCP export commands, workbench export controls, a
-public renderer or replayer registry, or a supported product export container.
+semantic replay and merged as PR #49 at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 locally implements the
+strict Python, CLI, MCP, and CLI-backed Mac surface boundary over a private
+production-empty catalog. It does not implement a public renderer or replayer
+registry or a supported product export container.
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 deterministic evidence)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export surfaces)
 
-**Next review:** Phase 4.7 gate completion, Phase 4.8 public surfaces, or any
+**Next review:** Phase 4.8 gate completion, Phase 4.9 closeout, or any
 export schema change
 
 ## Purpose
@@ -603,7 +605,10 @@ If parent-directory fsync fails after promotion, publication remains successful
 and visible; the outcome carries a warning that warning filters cannot turn
 into false rollback. `ExportPartialPublicationError` is a runtime exception
 carrying the visible outcome and original cause if later bookkeeping fails. It
-is not a persisted model or an additional verified-export v1 error code.
+is not a persisted model or an additional verified-export v1 error code. Phase
+4.8 exports both runtime types from `veriformis.exports` so Python callers can
+type successful execution and catch visible-partial publication without
+depending on an underscore-private module; publication hooks remain private.
 
 The independently callable filesystem verifier requires an out-of-band
 expected plan. It opens the visible root without following links, enforces the
@@ -614,7 +619,8 @@ requires the exact profile-bound replayer and recomputes canonical semantic
 preimages from descriptor-read bytes; absent replay support fails closed. It
 does not re-open the source bundle or rerender container bytes. Source
 reverification is part of publication; source-bound standalone verification
-and public inspect/verify surfaces remain Phase 4.8.
+and public inspect/verify surfaces are implemented by the Phase 4.8 service
+boundary described below.
 
 ## `ExportReceipt`
 
@@ -653,9 +659,10 @@ additionally requires descriptor-read semantic replay and comparison with the
 planned and preflight canonical preimages. Creating the model from an in-memory
 receipt alone is not evidence that a filesystem tree was inspected.
 
-The service re-verifies the source while publishing, but the standalone
-filesystem verifier accepts an independently supplied plan and does not reopen
-the source bundle. Public source-bound verification remains Phase 4.8.
+The service re-verifies the source while publishing. The private filesystem
+verifier accepts an independently supplied plan and does not reopen the source
+bundle; the Phase 4.8 public verification operation first re-derives that plan
+from the selected internal implementation and independently verified source.
 
 The persisted `determinism_claim` binds the container profile's claim; it is not
 a persisted attestation that two renderer invocations occurred. The ten v1
@@ -673,7 +680,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2–4.7 implementation boundary
+## Phase 4.2–4.8 implementation boundary
 
 Phase 4.2 implements:
 
@@ -728,8 +735,8 @@ Phase 4.6 was additionally implemented and merged as PR #48 at
   exact-byte directory verifier, and honest visible-publication outcomes; and
 - fail-closed deferral of `semantic_content_only` publication to Phase 4.7.
 
-Phase 4.7 additionally implements locally, with required gates and pull-request
-review pending:
+Phase 4.7 was additionally implemented and merged as PR #49 at
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`:
 
 - two private renderer invocations from independent strict plan and source-row-
   set reconstructions, with complete membership validation for each;
@@ -743,19 +750,57 @@ review pending:
 - explicit persisted-evidence limits: v1 verification binds the profile claim
   and one published instance, not a durable rerender transcript.
 
-Phase 4.2–4.7 do **not** implement:
+Phase 4.8 additionally implements locally, with every required local gate
+passing and pull-request review pending:
 
-- selecting or registering an export implementation;
-- `PipelineService` export operations, discovery, dry run, public inspection or
-  verification, CLI, MCP, or Mac surfaces (Phase 4.8); or
+- a private, immutable, default-empty implementation catalog selected by exact
+  container and optional consumer identifiers and versions;
+- `PipelineService` export operations for discovery, destination-free dry run,
+  self-described physical inspection, operator-confirmed execution, and source-
+  bound verification;
+- strict canonical `veriformis.export-surface-request/v1` and
+  `veriformis.export-surface-response/v1` transport envelopes for CLI, MCP, and
+  the CLI-backed Mac bridge; and
+- cooperative cancellation and explicit `ok`, `error`, `cancelled`, and
+  `visible_partial` runtime statuses without changing persisted evidence.
+
+The request envelope is operation-discriminated. Selected operations name only
+the source bundle path, exact catalog selector, source-trust policy and retained
+digest, and the literal overwrite policy `refuse`. Execute and verify also
+require the operator-confirmed dry-run `export_plan_id`; inspect names only a
+destination and returns `self_described_physical` evidence. No request may
+supply a profile, dependency graph, file plan, membership projection, renderer,
+semantic replayer, replacement policy, or force flag. Surface responses are
+bounded summaries and are not additional durable evidence schemas.
+
+The canonical UTF-8 bytes of one request MUST NOT exceed 1 MiB (1,048,576
+bytes). Every runtime bundle or destination path MUST be non-empty, contain no
+NUL, and occupy at most 32 KiB (32,768 bytes) in UTF-8. The canonical bytes of
+one response object MUST NOT exceed 1 MiB before transport framing. CLI stdout
+contains exactly those response bytes followed by one LF; diagnostics are
+written separately to stderr. The Mac process bridge retains up to 2 MiB for
+each stream independently, decodes only complete untruncated canonical stdout,
+and therefore retains the maximum response plus its one-byte CLI framing. MCP
+returns the same canonical response object without adding a durable evidence
+schema. An executable plan whose canonical dry-run response exceeds 256 KiB is
+refused before rendering or destination access; this reserves bounded room for
+the receipt and verification summaries of any later execute outcome. Public
+tree inspection and verification use an iterative descriptor walk and refuse a
+directory depth greater than 128 rather than entering unbounded recursion.
+
+Phase 4.2–4.8 do **not** implement:
+
+- a public registration or plugin API, or a shipped export implementation;
 - the complete tamper, traversal, race, cancellation, and partial-publication
   harness or Phase 4 closeout (Phase 4.9).
 
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2–4.7 MUST NOT add a generic export container or
-consumer profile to taxonomy discovery or the support registry. The existing
+not support claims. Phase 4.2–4.8 MUST NOT add a generic export container or
+consumer profile to taxonomy discovery or the support registry. Production
+export discovery is therefore empty until a later phase ships an internal
+implementation. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;
 named trainer profiles remain later work.

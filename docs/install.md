@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-21 (Phase 3 taxonomy discovery)
+**Last reviewed:** 2026-08-21 (Phase 4.8 verified-export surfaces)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -137,6 +137,11 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
 | `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
+| `veriformis export discover` | List executable verified-export implementations; production discovery is currently empty |
+| `veriformis export dry-run --request-json JSON` | Derive a source-anchored export plan without destination access |
+| `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |
+| `veriformis export execute --request-json JSON` | Publish one operator-confirmed plan with no-replace `refuse` |
+| `veriformis export-verify --request-json JSON` | Re-derive source authority and independently verify an export |
 | `veriformis handoff BUNDLE --manifest-sha256 HEX` | Build/write Aptus handoff |
 | `veriformis handoff-verify HANDOFF --bundle BUNDLE` | Consumer check |
 | `veriformis list-recipes` | Named recipes |

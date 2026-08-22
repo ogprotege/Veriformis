@@ -349,3 +349,75 @@ Observed implementation and release evidence:
 **Next action:** Open the Phase 4.7 pull request. Phase 4.8 may begin only after
 every GitHub check passes, the PR merges, and clean local `main` equals
 `origin/main`.
+
+## 2026-08-21 — Phase 4.7 merged and synchronized
+
+**Status:** Complete
+
+PR #49 passed all 14 GitHub checks and was squash-merged as
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Local `main` was fetched, clean,
+and exactly equal to `origin/main` before the Phase 4.8 branch was created.
+
+## 2026-08-21 — Phase 4.8 export surfaces implemented
+
+**Status:** Implementation complete; local gates in progress
+
+The export service now owns a private immutable catalog selected by exact
+container and optional consumer identifiers and versions. Production discovery
+is truthfully empty; only tests inject a conformance implementation. Dry run
+derives a source-anchored plan without destination access. Execute re-derives
+the plan and requires the operator-confirmed plan identity before rendering or
+destination access. Inspect proves only self-described physical closure, while
+verify separately re-verifies source authority and re-derives the plan.
+
+`PipelineService`, CLI, MCP, and the CLI-backed Mac bridge share strict bounded
+canonical request and response envelopes. The Mac process bridge captures
+stdout and stderr separately and decodes only stdout. No surface accepts a
+caller-built plan, profile, dependency graph, membership projection, renderer,
+semantic replayer, force, or replacement control; overwrite remains the
+literal `refuse`. The ten persisted v1 schemas, taxonomy, and support registry
+are unchanged, and no production container or consumer profile is advertised.
+
+**Next action:** Complete focused, full, release, Mac, parity, tracking,
+structure, link, diff, and independent-review gates before opening Phase 4.8
+PR. Phase 4.9 may begin only after every GitHub check passes, the PR merges, and
+clean local `main` equals `origin/main`.
+
+## 2026-08-21 — Phase 4.8 local gates complete
+
+**Status:** Implementation complete; every required local gate passes;
+pull-request review pending
+
+The strict production-empty implementation catalog and shared discovery, dry-
+run, inspect, execute, and verify protocol now pass end-to-end Python, CLI,
+MCP, and CLI-backed Mac conformance. Request authority remains source-derived,
+overwrite remains `refuse`, inspect remains self-described rather than source-
+verified, and execute requires the re-derived plan identity before rendering
+or destination access.
+
+Focused API/adapter (27), complete export (185), combined export/contract
+(190), full Python (954), standalone release (942 with 1 deselected), and Mac
+XCTest (52) gates passed. Full and release Python runs emitted only the
+expected exercised transport durability-warning regression warning. Clean-
+wheel installation, both objective goldens, external-digest verification,
+deterministic transport, parity, tracking, Ruff, lock integrity, 15 JSON files,
+10 shell files, 373 changed-document local links, and diff checks passed.
+
+Independent adversarial review found invalid-Unicode response serialization
+and recursive deep-tree traversal blockers. Error text is now safely bounded
+and sanitized, tree inspection is iterative and depth-bounded, adapters fail
+canonically, and executable plans prove the depth and response bounds before
+rendering. Re-review found no remaining Phase 4.8 blocker.
+
+The production catalog remains empty; no generic container, consumer profile,
+renderer, semantic replayer, registry API, force option, persisted-schema
+change, taxonomy change, or support promotion is included.
+
+A final public-boundary audit also found that typed Python execution exposed
+its success and visible-partial types only through an underscore module. Those
+two runtime types are now public exports, matching the honest execution API;
+render, replay, registration, and filesystem hooks remain private.
+
+**Next action:** Open the Phase 4.8 pull request. Phase 4.9 may begin only after
+every GitHub check passes, the PR merges, and clean local `main` equals
+`origin/main`.

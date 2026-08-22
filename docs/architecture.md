@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.7 deterministic boundary)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 surface boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -48,8 +48,10 @@ plus internal exact-byte atomic publication and independent closed-tree
 verification. Phase 4.7 adds private two-render evidence: exact profiles compare
 normalized byte trees, while semantic profiles compare versioned canonical
 preimages and reconstructed membership and replay descriptor-reread staged
-bytes. No renderer or semantic replayer, supported derivative container, or
-public export command ships. The macOS workbench lives
+bytes. Phase 4.8 adds a production-empty private implementation catalog and
+thin `PipelineService`, CLI, MCP, and CLI-backed Mac operations for discovery,
+dry run, self-described inspect, execute, and source-bound verify. No production
+renderer or semantic replayer or supported derivative container ships. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -155,9 +157,14 @@ name.vfbundle/
   normalized membership for both results, compares either complete byte trees
   or versioned canonical semantic preimages, and uses descriptor-anchored
   staging plus one atomic no-replace promotion. Semantic output is replayed from
-  staged descriptors before verification. The default service has no renderer
-  or semantic replayer; no adapter exposes publication, and no generic container
-  is supported.
+  staged descriptors before verification.
+- Phase 4.8 adds an exports-owned private implementation catalog plus strict
+  discovery, dry run, self-described inspect, operator-confirmed execute, and
+  source-bound verify operations through `PipelineService`, CLI, MCP, and the
+  CLI-backed Mac bridge. Execute reaches the same internal publisher; adapters
+  do not implement filesystem policy. The production catalog is empty, the
+  default service has no renderer or semantic replayer, and no generic
+  container is supported.
 
 ## Related documentation
 

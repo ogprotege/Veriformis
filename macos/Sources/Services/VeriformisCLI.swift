@@ -9,6 +9,12 @@ struct CLIProcessCancellation: Equatable, Sendable {
 
 struct CLIProcessResult: Equatable, Sendable {
     let exitCode: Int32
+    let standardOutputData: Data
+    let standardErrorData: Data
+    let standardOutput: String
+    let standardError: String
+    let standardOutputTruncated: Bool
+    let standardErrorTruncated: Bool
     let combinedOutput: String
     let outputTruncated: Bool
     let cancellation: CLIProcessCancellation?
@@ -21,6 +27,37 @@ enum CLIProcessError: LocalizedError, Equatable {
         switch self {
         case .alreadyRunning:
             return "A Veriformis child process is already running."
+        }
+    }
+}
+
+enum ExportCLIBridgeError: LocalizedError, Equatable, Sendable {
+    case outputTruncated(operation: ExportOperation)
+    case forcedTermination(operation: ExportOperation)
+    case cancelledWithoutResponse(operation: ExportOperation)
+    case commandFailed(operation: ExportOperation, exitCode: Int32, message: String)
+    case invalidResponse(operation: ExportOperation, message: String)
+    case inconsistentExitStatus(
+        operation: ExportOperation,
+        status: ExportResponseStatus,
+        exitCode: Int32
+    )
+
+    var errorDescription: String? {
+        switch self {
+        case .outputTruncated(let operation):
+            return "Export \(operation.rawValue) output was truncated; no response was accepted."
+        case .forcedTermination(let operation):
+            return "Export \(operation.rawValue) was force-terminated; destination state is ambiguous and must be inspected or verified."
+        case .cancelledWithoutResponse(let operation):
+            return "Export \(operation.rawValue) was cancelled without a complete authoritative response."
+        case .commandFailed(let operation, let exitCode, let message):
+            let detail = message.isEmpty ? "No diagnostic was returned." : message
+            return "Export \(operation.rawValue) failed (exit \(exitCode)): \(detail)"
+        case .invalidResponse(let operation, let message):
+            return "Export \(operation.rawValue) returned an invalid response: \(message)"
+        case .inconsistentExitStatus(let operation, let status, let exitCode):
+            return "Export \(operation.rawValue) returned status \(status.rawValue) with inconsistent exit \(exitCode)."
         }
     }
 }
@@ -279,18 +316,178 @@ struct VeriformisCLI: Sendable {
                 message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
             )
         }
-        guard !result.outputTruncated else {
+        guard !result.standardOutputTruncated else {
             throw TaxonomyDiscoveryError.outputTruncated
         }
         do {
             return try JSONDecoder().decode(
                 TaxonomyDiscovery.self,
-                from: Data(result.combinedOutput.utf8)
+                from: Data(result.standardOutput.utf8)
             )
         } catch let error as TaxonomyDiscoveryError {
             throw error
         } catch {
             throw TaxonomyDiscoveryError.invalidPayload(error.localizedDescription)
+        }
+    }
+
+    /// Discover only the export implementations registered by the Python composition root.
+    func discoverExports(
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportDiscovery> {
+        try await runExportCommand(
+            operation: .discover,
+            arguments: ["export", "discover"],
+            controller: controller
+        )
+    }
+
+    func dryRunExport(
+        _ request: ExportDryRunRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportDryRunResult> {
+        try await runExportCommand(
+            operation: .dryRun,
+            arguments: ["export", "dry-run", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
+    func inspectExport(
+        _ request: ExportInspectRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportInspectionResult> {
+        try await runExportCommand(
+            operation: .inspect,
+            arguments: ["export", "inspect", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
+    func executeExport(
+        _ request: ExportExecuteRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportExecutionResult> {
+        try await runExportCommand(
+            operation: .execute,
+            arguments: ["export", "execute", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
+    func verifyExport(
+        _ request: ExportVerifyRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportVerifyResult> {
+        try await runExportCommand(
+            operation: .verify,
+            arguments: ["export-verify", "--request-json", try request.canonicalJSON()],
+            controller: controller
+        )
+    }
+
+    private func runExportCommand<Result: ExportSurfaceResult>(
+        operation: ExportOperation,
+        arguments: [String],
+        controller: CLIProcessController
+    ) async throws -> ExportSurfaceResponse<Result> {
+        let processResult = try await run(
+            arguments: arguments,
+            controller: controller
+        )
+        guard !processResult.standardOutputTruncated else {
+            if processResult.cancellation?.terminationEscalated == true {
+                throw ExportCLIBridgeError.forcedTermination(operation: operation)
+            }
+            throw ExportCLIBridgeError.outputTruncated(operation: operation)
+        }
+
+        let response: ExportSurfaceResponse<Result>
+        do {
+            let responseData = try Self.canonicalExportResponseData(
+                from: processResult.standardOutputData
+            )
+            response = try JSONDecoder().decode(
+                ExportSurfaceResponse<Result>.self,
+                from: responseData
+            )
+        } catch {
+            if processResult.cancellation?.terminationEscalated == true {
+                throw ExportCLIBridgeError.forcedTermination(operation: operation)
+            }
+            if processResult.cancellation != nil {
+                throw ExportCLIBridgeError.cancelledWithoutResponse(operation: operation)
+            }
+            let diagnostic = processResult.standardError
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if processResult.exitCode != 0, !diagnostic.isEmpty {
+                throw ExportCLIBridgeError.commandFailed(
+                    operation: operation,
+                    exitCode: processResult.exitCode,
+                    message: diagnostic
+                )
+            }
+            throw ExportCLIBridgeError.invalidResponse(
+                operation: operation,
+                message: error.localizedDescription
+            )
+        }
+
+        if let cancellation = processResult.cancellation {
+            // Completed success/visibility evidence is authoritative even when
+            // cancellation raced process exit. A preprinted failure does not
+            // close publication state after SIGKILL.
+            if response.status == .ok || response.status == .visiblePartial {
+                return response
+            }
+            if cancellation.terminationEscalated {
+                throw ExportCLIBridgeError.forcedTermination(operation: operation)
+            }
+        }
+        guard Self.exitCode(processResult.exitCode, agreesWith: response.status) else {
+            throw ExportCLIBridgeError.inconsistentExitStatus(
+                operation: operation,
+                status: response.status,
+                exitCode: processResult.exitCode
+            )
+        }
+        return response
+    }
+
+    private static func canonicalExportResponseData(from output: Data) throws -> Data {
+        var received = output
+        if received.last == 0x0A {
+            received.removeLast()
+        }
+        guard !received.isEmpty else {
+            throw ExportSurfaceModelError.invalidValue("Export response stdout was empty.")
+        }
+        let object = try JSONSerialization.jsonObject(with: received)
+        guard JSONSerialization.isValidJSONObject(object) else {
+            throw ExportSurfaceModelError.invalidValue("Export response was not a JSON object.")
+        }
+        let canonical = try JSONSerialization.data(
+            withJSONObject: object,
+            options: [.sortedKeys, .withoutEscapingSlashes]
+        )
+        guard canonical == received else {
+            throw ExportSurfaceModelError.invalidValue(
+                "Export response stdout was not one canonical JSON object."
+            )
+        }
+        return received
+    }
+
+    private static func exitCode(_ exitCode: Int32, agreesWith status: ExportResponseStatus) -> Bool {
+        switch status {
+        case .ok:
+            return exitCode == 0
+        case .error:
+            return exitCode == 1 || exitCode == 2
+        case .cancelled:
+            return exitCode == 130
+        case .visiblePartial:
+            return exitCode == 1
         }
     }
 
@@ -345,7 +542,9 @@ private final class CLIProcessExecution: @unchecked Sendable {
     private let process = Process()
     private let stdout = Pipe()
     private let stderr = Pipe()
-    private let stream: BoundedLineStream
+    private let standardOutputStream: BoundedLineStream
+    private let standardErrorStream: BoundedLineStream
+    private let combinedStream: BoundedLineStream
     private let terminationGrace: TimeInterval
     private let lock = NSLock()
     private var continuation: CheckedContinuation<CLIProcessResult, Error>?
@@ -364,7 +563,15 @@ private final class CLIProcessExecution: @unchecked Sendable {
         onOutputLine: (@Sendable (String) -> Void)?
     ) {
         self.terminationGrace = terminationGrace
-        stream = BoundedLineStream(
+        standardOutputStream = BoundedLineStream(
+            maxRetainedBytes: maxRetainedOutputBytes,
+            onLine: nil
+        )
+        standardErrorStream = BoundedLineStream(
+            maxRetainedBytes: maxRetainedOutputBytes,
+            onLine: nil
+        )
+        combinedStream = BoundedLineStream(
             maxRetainedBytes: maxRetainedOutputBytes,
             onLine: onOutputLine
         )
@@ -406,6 +613,12 @@ private final class CLIProcessExecution: @unchecked Sendable {
         if cancelledBeforeLaunch {
             continuation.resume(returning: CLIProcessResult(
                 exitCode: -1,
+                standardOutputData: Data(),
+                standardErrorData: Data(),
+                standardOutput: "",
+                standardError: "",
+                standardOutputTruncated: false,
+                standardErrorTruncated: false,
                 combinedOutput: "",
                 outputTruncated: false,
                 cancellation: CLIProcessCancellation(
@@ -417,13 +630,21 @@ private final class CLIProcessExecution: @unchecked Sendable {
             return
         }
 
-        stdout.fileHandleForReading.readabilityHandler = { [stream] handle in
+        stdout.fileHandleForReading.readabilityHandler = {
+            [standardOutputStream, combinedStream] handle in
             let data = handle.availableData
-            if !data.isEmpty { stream.append(data) }
+            if !data.isEmpty {
+                standardOutputStream.append(data)
+                combinedStream.append(data)
+            }
         }
-        stderr.fileHandleForReading.readabilityHandler = { [stream] handle in
+        stderr.fileHandleForReading.readabilityHandler = {
+            [standardErrorStream, combinedStream] handle in
             let data = handle.availableData
-            if !data.isEmpty { stream.append(data) }
+            if !data.isEmpty {
+                standardErrorStream.append(data)
+                combinedStream.append(data)
+            }
         }
         process.terminationHandler = { [weak self] process in
             self?.complete(process)
@@ -497,11 +718,19 @@ private final class CLIProcessExecution: @unchecked Sendable {
         }
 
         stopReadingAndDrain()
-        let snapshot = stream.snapshot()
+        let standardOutputSnapshot = standardOutputStream.snapshot()
+        let standardErrorSnapshot = standardErrorStream.snapshot()
+        let combinedSnapshot = combinedStream.snapshot()
         continuation.resume(returning: CLIProcessResult(
             exitCode: process.terminationStatus,
-            combinedOutput: snapshot.output,
-            outputTruncated: snapshot.truncated,
+            standardOutputData: standardOutputSnapshot.data,
+            standardErrorData: standardErrorSnapshot.data,
+            standardOutput: standardOutputSnapshot.output,
+            standardError: standardErrorSnapshot.output,
+            standardOutputTruncated: standardOutputSnapshot.truncated,
+            standardErrorTruncated: standardErrorSnapshot.truncated,
+            combinedOutput: combinedSnapshot.output,
+            outputTruncated: combinedSnapshot.truncated,
             cancellation: wasCancelled
                 ? CLIProcessCancellation(
                     processIdentifier: pid,
@@ -530,9 +759,17 @@ private final class CLIProcessExecution: @unchecked Sendable {
         stderr.fileHandleForReading.readabilityHandler = nil
         let stdoutRemainder = stdout.fileHandleForReading.readDataToEndOfFile()
         let stderrRemainder = stderr.fileHandleForReading.readDataToEndOfFile()
-        if !stdoutRemainder.isEmpty { stream.append(stdoutRemainder) }
-        if !stderrRemainder.isEmpty { stream.append(stderrRemainder) }
-        stream.flushRemainder()
+        if !stdoutRemainder.isEmpty {
+            standardOutputStream.append(stdoutRemainder)
+            combinedStream.append(stdoutRemainder)
+        }
+        if !stderrRemainder.isEmpty {
+            standardErrorStream.append(stderrRemainder)
+            combinedStream.append(stderrRemainder)
+        }
+        standardOutputStream.flushRemainder()
+        standardErrorStream.flushRemainder()
+        combinedStream.flushRemainder()
     }
 }
 
@@ -554,7 +791,7 @@ private final class BoundedLineStream: @unchecked Sendable {
         self.onLine = onLine
     }
 
-    func snapshot() -> (output: String, truncated: Bool) {
+    func snapshot() -> (data: Data, output: String, truncated: Bool) {
         lock.withLock {
             var data = chunks.reduce(into: Data()) { result, chunk in
                 result.append(chunk)
@@ -564,7 +801,7 @@ private final class BoundedLineStream: @unchecked Sendable {
                 let allowed = max(0, maxRetainedBytes - marker.count)
                 data = marker + data.suffix(allowed)
             }
-            return (String(decoding: data, as: UTF8.self), wasTruncated)
+            return (data, String(decoding: data, as: UTF8.self), wasTruncated)
         }
     }
 

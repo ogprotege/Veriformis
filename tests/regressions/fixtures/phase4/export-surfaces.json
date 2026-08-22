@@ -1,0 +1,14 @@
+{
+  "exact": {
+    "export_plan_id": "export-plan-v1-ee4604d95c229ab0527241ae1192845e57aaf73f973633e8e44cc0b4fa17b5ef",
+    "export_receipt_id": "export-receipt-v1-ca923d4478b0f985d27bedf7707867490eec8f9b6a8a6a98d4e68195f9bf78cb",
+    "export_verification_id": "export-verification-v1-9a7df62cf95c10294147b062950bb7a6b3228690e00ea9e8641f8251a71e03f7",
+    "plan_canonical_sha256": "50dd6ca0160e7b674d9e87fd4c0c621fdeea1a9d6b6df5ab6499b1c7166f20d3",
+    "receipt_canonical_sha256": "0358a55786d23add2ebc1ca9b7e7b40fda95db00fcdfd30800b55ff4a557bb5b",
+    "verification_canonical_sha256": "8eaeabe4255e101a875133711969a7eeff062c161e510c180e45fc0ea175fb5c"
+  },
+  "fixture_version": 1,
+  "profile_scope": "phase4-test-conformance-only",
+  "source_fixture": "tests/regressions/fixtures/phase3/pre-taxonomy-full-text.vfbundle.json",
+  "source_manifest_sha256": "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
+}

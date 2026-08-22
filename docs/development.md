@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-21 (Phase 4.7 export-development boundary)
+**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface boundary)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -88,11 +88,11 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | `src/veriformis/construction/` | Objectives, recipes, constructors, lifecycle, replay |
 | `src/veriformis/datasets/` | Finished plan, curation, split, rows, 17-gate validation |
 | `src/veriformis/bundle/` | Six-file finished bundle + independent verifier |
-| `src/veriformis/exports/` | Verified-derivative models and internal exact-byte publication foundation |
+| `src/veriformis/exports/` | Verified-derivative models, source admission, planning, publication/verification, and strict surface protocol over a private production-empty implementation catalog |
 | `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
 | `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
-| `src/veriformis/mcp/` | Constrained local MCP adapter |
-| `macos/` | SwiftUI workbench (CLI shell) |
+| `src/veriformis/mcp/` | Constrained local MCP adapter, including canonical verified-export tools over `PipelineService` |
+| `macos/` | SwiftUI workbench and strict verified-export bridge (CLI shell) |
 | `src/veriformis/serializers/` | Legacy M1 serializers and chat templates |
 | `src/veriformis/validate/` | Legacy and shared gate helpers |
 
@@ -115,7 +115,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | MCP parity | `tests/mcp/` |
 | Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
 | Finished seal / verifier | `tests/bundle/` |
-| Verified export models, membership, and publication | `tests/exports/`, `tests/contracts/test_verified_export_contract.py` |
+| Verified export models, membership, publication, API, and adapter parity | `tests/exports/`, `tests/contracts/test_verified_export_contract.py`, `tests/regressions/fixtures/phase4/export-surfaces.json` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |
 | Group 9 release gates | `tests/regressions/test_group9_release_gates.py`, `scripts/release/` |
 | Program tracking and support claims | `tests/regressions/test_project_tracking.py`, `scripts/check_project_tracking.py` |
@@ -242,14 +242,20 @@ preimages and plan-equal normalized membership; the service computes each
 digest and replays descriptor-reread staged bytes before promotion.
 
 The default service intentionally has no renderer or semantic replayer. Tests
-may inject the private trusted conformance hooks, but those hooks are not an
-untrusted plugin boundary and contributors must not infer a supported container
-or add adapter-specific publication policy. Semantic replay currently retains
-each complete produced file in memory; the Phase 4.7 fixture is statically
-bounded. Any future shipped semantic profile must define and enforce explicit
-byte, record, nesting, and other applicable resource limits. Discovery and
-public CLI, MCP, Mac, inspect, or verify operations belong to Phase 4.8;
-adversarial closeout remains Phase 4.9 and generic containers remain Phase 5.
+may inject the private trusted conformance implementation, but that hook is not
+an untrusted plugin boundary and contributors must not infer a supported
+container or add adapter-specific publication policy. Semantic replay currently
+retains each complete produced file in memory; the Phase 4.7 fixture is
+statically bounded. Any future shipped semantic profile must define and enforce
+explicit byte, record, nesting, and other applicable resource limits.
+
+Phase 4.8 surfaces must call the typed `PipelineService` operations. Keep the
+production catalog private and empty until a later phase ships an implementation.
+CLI and MCP must share the canonical export request/response serializer; the
+Mac bridge shells those CLI commands and must decode stdout separately from
+stderr. Do not add caller-supplied profiles, dependencies, file plans,
+membership, renderers, replayers, replacement, or force controls. Adversarial
+closeout remains Phase 4.9 and generic containers remain Phase 5.
 
 ### Keep optional-integration claims accurate
 
