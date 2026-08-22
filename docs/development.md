@@ -73,7 +73,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | Path | Responsibility |
 | --- | --- |
 | `src/veriformis/pipeline/` | Typed `PipelineService` composition root |
-| `src/veriformis/cli.py` | Thin Typer adapter (stages + run/recipes/mcp/handoff) |
+| `src/veriformis/cli.py` | Thin Typer adapter (stages + run/recipes/mcp/handoff + export operations) |
 | `src/veriformis/workspace.py` | Immutable transactional revisions (layout 1, revision 3) |
 | `src/veriformis/identity.py` | Deterministic domain-separated identities |
 | `src/veriformis/sources.py` | Source registration and hash-pinned identity |

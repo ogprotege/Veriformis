@@ -991,6 +991,8 @@ def test_determinism_runtime_does_not_leak_to_public_or_support_surfaces() -> No
     assert hasattr(exports, "ExportPublicationOutcome")
     assert "ExportPartialPublicationError" in exports.__all__
     assert hasattr(exports, "ExportPartialPublicationError")
+    assert "CancellationCheck" in exports.__all__
+    assert hasattr(exports, "CancellationCheck")
 
     runtime_names = {
         "destination_root",

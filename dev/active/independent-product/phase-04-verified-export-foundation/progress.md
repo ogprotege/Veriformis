@@ -395,9 +395,9 @@ overwrite remains `refuse`, inspect remains self-described rather than source-
 verified, and execute requires the re-derived plan identity before rendering
 or destination access.
 
-Focused API/adapter (27), complete export (185), combined export/contract
-(190), full Python (954), standalone release (942 with 1 deselected), and Mac
-XCTest (52) gates passed. Full and release Python runs emitted only the
+Focused API/adapter (29), complete export (187), combined export/contract
+(192), full Python (956), standalone release (944 with 1 deselected), and Mac
+XCTest (54) gates passed. Full and release Python runs emitted only the
 expected exercised transport durability-warning regression warning. Clean-
 wheel installation, both objective goldens, external-digest verification,
 deterministic transport, parity, tracking, Ruff, lock integrity, 15 JSON files,
@@ -418,6 +418,13 @@ its success and visible-partial types only through an underscore module. Those
 two runtime types are now public exports, matching the honest execution API;
 render, replay, registration, and filesystem hooks remain private.
 
-**Next action:** Open the Phase 4.8 pull request. Phase 4.9 may begin only after
-every GitHub check passes, the PR merges, and clean local `main` equals
-`origin/main`.
+PR #50 review then found and verified corrections for failure-safe
+visible-partial reporting, concurrent large-receipt inspection memory,
+cancellation around source admission and planning, duplicated root anchoring,
+private MCP test dispatch, lossy taxonomy decoding, and the Mac-side UTF-8 path
+bound. `CancellationCheck` is now a public type alongside the two runtime
+publication types; no execution hook or registry became public.
+
+**Next action:** Push the Phase 4.8 review corrections and wait for every PR #50
+GitHub check and review to pass. Phase 4.9 may begin only after the PR merges
+and clean local `main` equals `origin/main`.

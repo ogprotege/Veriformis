@@ -15,6 +15,7 @@ from veriformis.errors import VeriformisError
 from veriformis.exports.api import (
     ExportOperationCancelled,
     ExportPartialPublicationError,
+    _EXPORT_SURFACE_EXCEPTIONS,
     export_discovery_response,
     export_dry_run_response,
     export_error_response,
@@ -57,18 +58,6 @@ def _jsonable(value: Any) -> Any:
 
 def _outcome_json(outcome: Any) -> str:
     return json.dumps(_jsonable(outcome), ensure_ascii=False, indent=2, sort_keys=True)
-
-
-_EXPORT_SURFACE_EXCEPTIONS = (
-    ExportPartialPublicationError,
-    ExportOperationCancelled,
-    VeriformisError,
-    OSError,
-    RecursionError,
-    UnicodeError,
-    ValueError,
-    TypeError,
-)
 
 
 def _export_tool_response(operation: str, response_builder, call) -> str:

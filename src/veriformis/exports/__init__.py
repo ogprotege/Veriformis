@@ -1,6 +1,7 @@
 """Consumer-neutral verified export foundation."""
 
 from veriformis.exports.api import (
+    CancellationCheck,
     EXPORT_DISCOVERY_SCHEMA,
     EXPORT_SURFACE_REQUEST_SCHEMA,
     EXPORT_SURFACE_RESPONSE_SCHEMA,
@@ -42,6 +43,7 @@ from veriformis.exports.models import (
 from veriformis.exports.service import DEFAULT_EXPORT_SERVICE, ExportService
 
 __all__ = [
+    "CancellationCheck",
     "DEFAULT_EXPORT_SERVICE",
     "EXPORT_DISCOVERY_SCHEMA",
     "EXPORT_RECEIPT_PATH",

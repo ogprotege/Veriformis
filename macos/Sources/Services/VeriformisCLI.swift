@@ -322,7 +322,7 @@ struct VeriformisCLI: Sendable {
         do {
             return try JSONDecoder().decode(
                 TaxonomyDiscovery.self,
-                from: Data(result.standardOutput.utf8)
+                from: result.standardOutputData
             )
         } catch let error as TaxonomyDiscoveryError {
             throw error

@@ -229,7 +229,11 @@ def test_phase_4_8_publication_runtime_is_public_without_publication_hooks():
     import veriformis.exports as exports
 
     assert importlib.util.find_spec("veriformis.exports.publication") is None
-    for name in ("ExportPublicationOutcome", "ExportPartialPublicationError"):
+    for name in (
+        "CancellationCheck",
+        "ExportPublicationOutcome",
+        "ExportPartialPublicationError",
+    ):
         assert name in exports.__all__
         assert hasattr(exports, name)
     for name in (

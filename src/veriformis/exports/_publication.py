@@ -14,6 +14,7 @@ import os
 import secrets
 import stat
 import sys
+import threading
 import warnings
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
@@ -52,6 +53,11 @@ _FILE_READ_FLAGS = (
 )
 _MAX_INSPECTION_RECEIPT_BYTES = 64 * 1024 * 1024
 _MAX_EXPORT_TREE_DEPTH = 128
+# Public inspection may be dispatched concurrently by multiple adapters.  Keep
+# the large, caller-controlled receipt read and strict parse inside one shared
+# process-wide slot so concurrent workers cannot each retain a 64 MiB receipt
+# plus its parser working set at the same time.
+_INSPECTION_RECEIPT_PARSE_SLOT = threading.BoundedSemaphore(value=1)
 _EntryFacts = tuple[int, int, int, int, int, int, int]
 CancellationCheck = Callable[[], None]
 _FileTree = tuple[tuple[str, bytes], ...]
@@ -164,6 +170,16 @@ def _path_matches_descriptor(path: Path, descriptor: int) -> bool:
 def _check_cancellation(check: CancellationCheck | None) -> None:
     if check is not None:
         check()
+
+
+def _acquire_inspection_receipt_parse_slot(
+    cancellation_check: CancellationCheck | None,
+) -> None:
+    """Wait cooperatively for the process-wide large-receipt parse slot."""
+    while True:
+        _check_cancellation(cancellation_check)
+        if _INSPECTION_RECEIPT_PARSE_SLOT.acquire(timeout=0.05):
+            return
 
 
 def _prepare_destination(
@@ -1132,16 +1148,12 @@ def _verify_staged_export(
     return receipt, verification, (final_files, final_directories)
 
 
-def _verify_export_directory(
+def _open_anchored_export_root(
     destination_root: str | os.PathLike[str],
     *,
-    expected_plan: ExportPlan,
-    cancellation_check: CancellationCheck | None = None,
-    semantic_replay: _SemanticReplay | None = None,
-) -> tuple[ExportReceipt, ExportVerification]:
-    """Independently inspect one already visible derivative directory."""
-    if cancellation_check is not None and not callable(cancellation_check):
-        raise ExportContractError("cancellation_check must be callable")
+    close_label: str,
+) -> tuple[Path, int]:
+    """Open one real export root and prove its path-to-descriptor identity."""
     try:
         root = Path(os.path.abspath(os.fspath(destination_root)))
         before = root.lstat()
@@ -1167,7 +1179,30 @@ def _verify_export_directory(
                 f"cannot inspect opened export directory root: {exc}"
             ) from exc
         if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
-            raise ExportVerificationError("export directory root changed while opening")
+            raise ExportVerificationError(
+                "export directory root changed while opening"
+            )
+        return root, descriptor
+    except BaseException:
+        _safe_close(descriptor, label=close_label)
+        raise
+
+
+def _verify_export_directory(
+    destination_root: str | os.PathLike[str],
+    *,
+    expected_plan: ExportPlan,
+    cancellation_check: CancellationCheck | None = None,
+    semantic_replay: _SemanticReplay | None = None,
+) -> tuple[ExportReceipt, ExportVerification]:
+    """Independently inspect one already visible derivative directory."""
+    if cancellation_check is not None and not callable(cancellation_check):
+        raise ExportContractError("cancellation_check must be callable")
+    root, descriptor = _open_anchored_export_root(
+        destination_root,
+        close_label="verified export root",
+    )
+    try:
         receipt, verification, _ = _verify_staged_export(
             descriptor,
             expected_plan=expected_plan,
@@ -1199,33 +1234,11 @@ def _inspect_export_directory(
     if cancellation_check is not None and not callable(cancellation_check):
         raise ExportContractError("cancellation_check must be callable")
     _check_cancellation(cancellation_check)
+    root, descriptor = _open_anchored_export_root(
+        destination_root,
+        close_label="inspected export root",
+    )
     try:
-        root = Path(os.path.abspath(os.fspath(destination_root)))
-        before = root.lstat()
-    except (OSError, TypeError, ValueError) as exc:
-        raise ExportVerificationError(
-            f"cannot inspect export directory root: {exc}"
-        ) from exc
-    if stat.S_ISLNK(before.st_mode) or not stat.S_ISDIR(before.st_mode):
-        raise ExportVerificationError(
-            "export directory root must be a real directory, not a symlink"
-        )
-    try:
-        descriptor = os.open(root, _DIRECTORY_FLAGS)
-    except OSError as exc:
-        raise ExportVerificationError(
-            f"cannot open export directory root {root}: {exc}"
-        ) from exc
-    try:
-        try:
-            after = os.fstat(descriptor)
-        except OSError as exc:
-            raise ExportVerificationError(
-                f"cannot inspect opened export directory root: {exc}"
-            ) from exc
-        if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
-            raise ExportVerificationError("export directory root changed while opening")
-
         files, directories = _collect_tree(
             descriptor,
             cancellation_check=cancellation_check,
@@ -1238,18 +1251,23 @@ def _inspect_export_directory(
             raise ExportVerificationError(
                 "export receipt exceeds the public inspection size limit"
             )
-        _, observed_receipt_size, receipt_bytes = _read_and_hash(
-            descriptor,
-            EXPORT_RECEIPT_PATH,
-            expected_facts=receipt_facts,
-            cancellation_check=cancellation_check,
-            retain_bytes=True,
-            retain_limit=_MAX_INSPECTION_RECEIPT_BYTES,
-        )
-        assert receipt_bytes is not None
-        if observed_receipt_size != receipt_size:
-            raise ExportVerificationError("export receipt changed while reading")
-        receipt = ExportReceipt.from_json_bytes(receipt_bytes)
+        _acquire_inspection_receipt_parse_slot(cancellation_check)
+        try:
+            _check_cancellation(cancellation_check)
+            _, observed_receipt_size, receipt_bytes = _read_and_hash(
+                descriptor,
+                EXPORT_RECEIPT_PATH,
+                expected_facts=receipt_facts,
+                cancellation_check=cancellation_check,
+                retain_bytes=True,
+                retain_limit=_MAX_INSPECTION_RECEIPT_BYTES,
+            )
+            assert receipt_bytes is not None
+            if observed_receipt_size != receipt_size:
+                raise ExportVerificationError("export receipt changed while reading")
+            receipt = ExportReceipt.from_json_bytes(receipt_bytes)
+        finally:
+            _INSPECTION_RECEIPT_PARSE_SLOT.release()
 
         expected_files = {item.path for item in receipt.files} | {
             EXPORT_RECEIPT_PATH
