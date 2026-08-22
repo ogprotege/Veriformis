@@ -299,9 +299,18 @@ missing-evidence diagnostics, target construction, supervision boundary,
 curation defaults, review policy, and closed non-claims; binds each
 representation to its compatible generic exports; and adds `input_family`
 as the seventh taxonomy axis (eight implemented recovery families plus
-`ocr-image` explicitly unsupported) under ADR-0008. Neither item adds an
-objective, row schema, construction behavior, preset, preview, preflight,
-Mac screen, trainer claim, or consumer profile.
+`ocr-image` explicitly unsupported) under ADR-0008; it merged as PR #61 at
+`81becfa676fd9111868b8d4b62549218a644d3e2` after all 14 GitHub checks passed.
+Phase 6.3 (in progress, unmerged) adds the runtime-only
+`veriformis.goal-preview/v1` response through `PipelineService.preview_goal`,
+CLI `goal-preview`, MCP `goal_preview`, the Swift bridge, and a workbench
+preview screen: per accepted record, the exact recovered source evidence and
+derivation lineage, context and target fields, the row exactly as `format`
+lowers it, the exact supervised span with its loss policy, and the curation
+decision and excluded records with reason codes, bounded like the Phase 5.6
+export preview. None of these items adds an objective, row schema,
+construction behavior, preset, preflight, persisted schema, trainer claim, or
+consumer profile.
 
 ## Implemented interfaces
 
@@ -326,6 +335,7 @@ The installed console entry point is `veriformis`.
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
+| `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
@@ -343,12 +353,12 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy and goal-catalog discovery, and verified-export discovery/dry-run/inspect/execute/verify operations |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy and goal-catalog discovery, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
 | CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy and goal-catalog JSON and canonical verified-export responses |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
 | MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, and verified-export service operations |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
-| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, a strict goal-catalog bridge, and a strict canonical verified-export bridge |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, strict goal-catalog and goal-preview bridges with a post-compile preview screen, and a strict canonical verified-export bridge |
 
 ## Workspace and identity status
 

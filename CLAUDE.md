@@ -20,8 +20,10 @@ merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14
 GitHub checks passed. Phase 6 (goal-first recipes and previews) is in progress
 under its standard packet. Item 6.1's plain-language goal catalog merged as
 PR #60 at `7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub
-checks passed; item 6.2 adds per-goal contracts and the seventh taxonomy axis
-`input_family`.
+checks passed; item 6.2's per-goal contracts and seventh taxonomy axis
+`input_family` merged as PR #61 at
+`81becfa676fd9111868b8d4b62549218a644d3e2`; item 6.3 adds the runtime-only
+goal preview.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

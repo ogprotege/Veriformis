@@ -11,7 +11,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import veriformis
 from veriformis.bundle import (
@@ -82,6 +82,7 @@ from veriformis.datasets import (
     validate_finished_dataset,
 )
 from veriformis.errors import (
+    MissingStageInputError,
     ConstructionError,
     InvalidSourceLocatorError,
     ParseError,
@@ -167,6 +168,9 @@ from veriformis.workspace import (
     Workspace,
     WorkspaceRevision,
 )
+
+if TYPE_CHECKING:
+    from veriformis.goals.preview import GoalPreview
 
 _CODE_EXTS = CODE_EXTENSIONS
 _STRATEGIES = {
@@ -308,6 +312,11 @@ class PreviewOutcome(StageOutcome):
 @dataclass(frozen=True)
 class VersionOutcome(StageOutcome):
     version: str = ""
+
+
+@dataclass(frozen=True)
+class GoalPreviewOutcome(StageOutcome):
+    preview: GoalPreview | None = None
 
 
 @dataclass(frozen=True)
@@ -1026,6 +1035,56 @@ class PipelineService:
         from veriformis.goals import discover_goals
 
         return discover_goals()
+
+    def preview_goal(
+        self,
+        workspace: Path,
+        *,
+        representation: str | None = None,
+        instruction: str | None = None,
+        record_ids: tuple[str, ...] = (),
+    ) -> GoalPreviewOutcome:
+        """Preview exactly what a goal's records are and what receives loss.
+
+        Read-only over a workspace at or beyond ``construct``; uses the
+        curation decisions and persisted instruction when ``curate`` has run.
+        Never opens a transaction, calls a renderer, or touches a destination.
+        """
+        from veriformis.goals import build_goal_preview
+        from veriformis.goals.preview import resolve_preview_representation
+
+        store = Workspace.open(workspace)
+        revision = store.head()
+        _require_group3_revision(revision)
+        if revision.stages["construct"].status != "complete":
+            raise MissingStageInputError(
+                "goal preview requires a completed construct stage; run "
+                "`veriformis construct WORKSPACE --objective OBJECTIVE` first"
+            )
+        # Resolve the goal and representation from the recipe alone so an
+        # incompatible selection fails before any record is read.
+        recipe = dataset_recipe_from_json_bytes(
+            _output_bytes(store, revision, "construct", "recipe")
+        )
+        resolve_preview_representation(recipe, representation)
+        recipe, result, inputs = _load_constructed_dataset(store, revision)
+        curation = None
+        persisted_instruction = None
+        if revision.stages["curate"].status == "complete":
+            curation = _load_curation_result(store, revision)
+            plan = _load_finished_plan(store, revision)
+            # Non-None only when the persisted row schema is instruction_output.
+            persisted_instruction = plan.serialization_plan.instruction_text
+        preview = build_goal_preview(
+            recipe=recipe,
+            result=result,
+            inputs=inputs,
+            curation=curation,
+            representation_id=representation,
+            instruction=instruction if instruction is not None else persisted_instruction,
+            record_ids=tuple(record_ids),
+        )
+        return GoalPreviewOutcome(preview=preview)
 
     def discover_exports(self) -> ExportDiscoveryOutcome:
         """Discover only executable export implementations in the service."""

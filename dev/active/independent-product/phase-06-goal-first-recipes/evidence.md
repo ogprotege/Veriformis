@@ -1,7 +1,7 @@
 # Phase 6 Evidence
 
-**Status:** Open — item 6.1 merged as PR #60; item 6.2 locally admitted
-without claiming its own pull-request result
+**Status:** Open — items 6.1 and 6.2 merged as PR #60 and PR #61; item 6.3
+locally admitted without claiming its own pull-request result
 
 **Opened:** 2026-08-22
 
@@ -100,5 +100,32 @@ for the before/after goal, a real heading with body for the section goal, a
 supported scalar on a non-synthetic node for the structural goal); the
 taxonomy suffix partition equals `DECLARED_V1_EXTENSIONS`.
 
+Item 6.2 subsequently passed all 14 GitHub checks on the first run and merged
+as PR #61 at `81becfa676fd9111868b8d4b62549218a644d3e2`.
+
+### Item 6.3 (2026-08-22, working tree on
+`81becfa676fd9111868b8d4b62549218a644d3e2`)
+
+| Gate | Observed |
+| --- | --- |
+| Focused preview tests (`tests/goals/test_goal_preview.py`) | 24 passed |
+| Full Python (`uv run pytest -q`) | 1,332 passed, 1 intentional durability warning |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 1,320 passed, 1 deselected |
+| `scripts/release/check_local.sh` | PASS (clean wheel, golden compile, external digest, transport) |
+| `macos/scripts/parity_check.sh` | PASS |
+| macOS XCTest target | 75 passed, `TEST SUCCEEDED` |
+| `scripts/check_project_tracking.py` and its regression | PASS |
+| `uv lock --check`, Ruff, structured JSON, fixture `cmp`, `git diff --check` | PASS |
+| Independent adversarial review | One blocker (response bound not enforced past the budget) and seven should-fix items; all corrected and re-verified on this tree |
+
+Proofs recorded by tests (usability criterion U2): for every goal and
+compatible representation the preview's rendered row equals the row
+`render_record_payload` produces and, after `curate`, `split`, and `format`,
+the persisted product row for the same record; the supervised span equals the
+whole target value; every recovered excerpt matches its digest and its source
+span; the preview never changes a workspace file; Python, CLI, and MCP emit
+identical ASCII-safe text; the transport never exceeds 262,144 bytes and
+fails closed when the skeleton cannot fit.
+
 These are local observations. They do not claim publication, GitHub checks,
-merge, or clean-main synchronization for the item 6.2 pull request.
+merge, or clean-main synchronization for the item 6.3 pull request.

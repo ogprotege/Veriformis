@@ -609,6 +609,40 @@ def goals() -> None:
     )
 
 
+@app.command(name="goal-preview")
+def goal_preview(
+    workspace: Path,
+    representation: str | None = typer.Option(
+        None,
+        "--representation",
+        help="Catalog representation id; defaults to the recipe's row schema.",
+    ),
+    instruction: str | None = typer.Option(
+        None,
+        "--instruction",
+        help="Operator instruction for the instruction-and-output representation.",
+    ),
+    record: list[str] | None = typer.Option(
+        None,
+        "--record",
+        help="Repeat an accepted record id to preview specific records.",
+    ),
+) -> None:
+    """Show exactly what each record is and which region receives loss."""
+
+    def run():
+        outcome = _SERVICE.preview_goal(
+            workspace,
+            representation=representation,
+            instruction=instruction,
+            record_ids=tuple(record or ()),
+        )
+        typer.echo(outcome.preview.transport_text())
+        return outcome
+
+    _run(run)
+
+
 @app.command(name="list-recipes")
 def list_recipes() -> None:
     """List named deterministic recipe library identifiers."""

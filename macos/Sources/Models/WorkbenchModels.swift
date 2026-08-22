@@ -2711,3 +2711,313 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
         }
     }
 }
+
+// MARK: - Goal preview (Phase 6.3)
+
+enum GoalPreviewError: LocalizedError, Equatable, Sendable {
+    case invalidKeySet(scope: String, missing: [String], unexpected: [String])
+    case invalidMetadata(String)
+    case commandFailed(exitCode: Int32, message: String)
+    case outputTruncated
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidKeySet(let scope, let missing, let unexpected):
+            return "Goal preview \(scope) keys are invalid (missing: \(missing); unexpected: \(unexpected))."
+        case .invalidMetadata(let key):
+            return "Goal preview field \(key) is invalid."
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "no output" : message
+            return "Goal preview failed (exit \(exitCode)): \(detail)"
+        case .outputTruncated:
+            return "Goal preview output was truncated."
+        case .invalidPayload(let message):
+            return "Goal preview returned invalid JSON: \(message)"
+        }
+    }
+}
+
+enum GoalPreviewState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(GoalPreview)
+    case unavailable(String)
+}
+
+struct GoalPreviewSpan: Equatable, Sendable {
+    let rowKey: String
+    let start: Int
+    let end: Int
+}
+
+struct GoalPreviewEvidence: Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "field", "kind", "source_id", "region_id", "start", "end", "text_sha256",
+        "excerpt", "derivation_kinds",
+    ]
+
+    let field: String
+    let kind: String
+    let sourceID: String
+    let regionID: String
+    let start: Int?
+    let end: Int?
+    let textSHA256: String
+    let excerpt: String?
+    let derivationKinds: [String]
+}
+
+struct GoalPreviewRecord: Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "record_id", "source_ids", "logical_paths", "chunk_ids", "pass_id",
+        "constructor_id", "constructor_version", "context", "target", "rendered_row",
+        "context_row_keys", "supervised", "recovered_source", "curation_status",
+        "curation_reason_codes", "omission_reason", "exact_size_bytes",
+    ]
+
+    let recordID: String
+    let sourceIDs: [String]
+    let logicalPaths: [String]
+    let chunkIDs: [String]
+    let passID: String
+    let constructorID: String
+    let constructorVersion: String
+    let context: [String: String]?
+    let target: [String: String]?
+    let renderedRow: [String: ExportPreviewJSONValue]?
+    let contextRowKeys: [String]
+    let supervised: GoalPreviewSpan
+    let recoveredSource: [GoalPreviewEvidence]
+    let curationStatus: String?
+    let curationReasonCodes: [String]
+    let omissionReason: String?
+    let exactSizeBytes: Int
+
+    /// The exact value that receives loss, located by the supervised row key.
+    var supervisedValue: String? {
+        guard let renderedRow else { return nil }
+        let key = supervised.rowKey
+        if key == "messages[1].content" {
+            guard case .array(let messages)? = renderedRow["messages"], messages.count == 2,
+                  case .object(let assistant) = messages[1],
+                  case .string(let content)? = assistant["content"]
+            else { return nil }
+            return content
+        }
+        guard case .string(let value)? = renderedRow[key] else { return nil }
+        return value
+    }
+}
+
+struct GoalPreviewExclusion: Equatable, Sendable {
+    let recordID: String
+    let sourceIDs: [String]
+    let status: String
+    let reasonCodes: [String]
+}
+
+struct GoalPreviewDiagnostic: Equatable, Sendable {
+    let code: String
+    let message: String
+    let passID: String
+    let sourceIDs: [String]
+    let chunkIDs: [String]
+}
+
+/// Strict workbench view of `veriformis goal-preview`.
+struct GoalPreview: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "schema_id", "goal_id", "title", "objective", "recipe_id", "recipe_library_id",
+        "representation_id", "row_schema", "loss_policy", "loss_boundary",
+        "supervised_region", "supervision_boundary", "not_this", "non_claims",
+        "sample_policy", "available_stages", "counts", "records", "exclusions",
+        "omitted_exclusion_count", "diagnostics", "omitted_diagnostic_count",
+    ]
+
+    let goalID: String
+    let title: String
+    let objective: TrainingObjective
+    let recipeID: String
+    let recipeLibraryID: String
+    let representationID: String
+    let rowSchema: String
+    let lossPolicy: String
+    let lossBoundary: String
+    let supervisedRegion: String
+    let supervisionBoundary: String
+    let notThis: [String]
+    let nonClaims: [String]
+    let availableStages: [String]
+    let counts: [String: Int]
+    let records: [GoalPreviewRecord]
+    let exclusions: [GoalPreviewExclusion]
+    let omittedExclusionCount: Int
+    let diagnostics: [GoalPreviewDiagnostic]
+    let omittedDiagnosticCount: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try Self.requireKeys(container, expected: Self.expectedKeys, scope: "preview")
+        guard try container.decode(String.self, forKey: GoalCatalogKey("schema_id"))
+            == "veriformis.goal-preview/v1"
+        else { throw GoalPreviewError.invalidMetadata("schema_id") }
+        guard try container.decode(String.self, forKey: GoalCatalogKey("sample_policy"))
+            == "first-accepted-record-per-primary-source"
+        else { throw GoalPreviewError.invalidMetadata("sample_policy") }
+        let objectiveValue = try Self.text(container, "objective")
+        guard let objective = TrainingObjective(rawValue: objectiveValue) else {
+            throw GoalPreviewError.invalidMetadata("objective")
+        }
+        self.objective = objective
+        goalID = try Self.text(container, "goal_id")
+        title = try Self.text(container, "title")
+        recipeID = try Self.text(container, "recipe_id")
+        recipeLibraryID = try Self.text(container, "recipe_library_id")
+        representationID = try Self.text(container, "representation_id")
+        rowSchema = try Self.text(container, "row_schema")
+        lossPolicy = try Self.text(container, "loss_policy")
+        lossBoundary = try Self.text(container, "loss_boundary")
+        supervisedRegion = try Self.text(container, "supervised_region")
+        supervisionBoundary = try Self.text(container, "supervision_boundary")
+        notThis = try container.decode([String].self, forKey: GoalCatalogKey("not_this"))
+        nonClaims = try container.decode([String].self, forKey: GoalCatalogKey("non_claims"))
+        guard !notThis.isEmpty, !nonClaims.isEmpty else {
+            throw GoalPreviewError.invalidMetadata("non_claims")
+        }
+        omittedDiagnosticCount = try container.decode(Int.self, forKey: GoalCatalogKey("omitted_diagnostic_count"))
+        availableStages = try container.decode([String].self, forKey: GoalCatalogKey("available_stages"))
+        guard availableStages.first == "construct" else {
+            throw GoalPreviewError.invalidMetadata("available_stages")
+        }
+        counts = try container.decode([String: Int].self, forKey: GoalCatalogKey("counts"))
+        omittedExclusionCount = try container.decode(Int.self, forKey: GoalCatalogKey("omitted_exclusion_count"))
+
+        var recordList = try container.nestedUnkeyedContainer(forKey: GoalCatalogKey("records"))
+        var records: [GoalPreviewRecord] = []
+        while !recordList.isAtEnd {
+            let item = try recordList.nestedContainer(keyedBy: GoalCatalogKey.self)
+            try Self.requireKeys(item, expected: GoalPreviewRecord.expectedKeys, scope: "record")
+            let span = try item.nestedContainer(keyedBy: GoalCatalogKey.self, forKey: GoalCatalogKey("supervised"))
+            try Self.requireKeys(span, expected: ["row_key", "start", "end"], scope: "supervised")
+            let supervised = GoalPreviewSpan(
+                rowKey: try Self.text(span, "row_key"),
+                start: try span.decode(Int.self, forKey: GoalCatalogKey("start")),
+                end: try span.decode(Int.self, forKey: GoalCatalogKey("end"))
+            )
+            guard supervised.start == 0, supervised.end >= supervised.start else {
+                throw GoalPreviewError.invalidMetadata("supervised")
+            }
+            var evidenceList = try item.nestedUnkeyedContainer(forKey: GoalCatalogKey("recovered_source"))
+            var evidence: [GoalPreviewEvidence] = []
+            while !evidenceList.isAtEnd {
+                let piece = try evidenceList.nestedContainer(keyedBy: GoalCatalogKey.self)
+                try Self.requireKeys(piece, expected: GoalPreviewEvidence.expectedKeys, scope: "evidence")
+                let kind = try Self.text(piece, "kind")
+                guard kind == "source_text" || kind == "ir_field" else {
+                    throw GoalPreviewError.invalidMetadata("kind")
+                }
+                evidence.append(
+                    GoalPreviewEvidence(
+                        field: try Self.text(piece, "field"),
+                        kind: kind,
+                        sourceID: try Self.text(piece, "source_id"),
+                        regionID: try Self.text(piece, "region_id"),
+                        start: try piece.decodeIfPresent(Int.self, forKey: GoalCatalogKey("start")),
+                        end: try piece.decodeIfPresent(Int.self, forKey: GoalCatalogKey("end")),
+                        textSHA256: try Self.text(piece, "text_sha256"),
+                        excerpt: try piece.decodeIfPresent(String.self, forKey: GoalCatalogKey("excerpt")),
+                        derivationKinds: try piece.decode([String].self, forKey: GoalCatalogKey("derivation_kinds"))
+                    )
+                )
+            }
+            let omission = try item.decodeIfPresent(String.self, forKey: GoalCatalogKey("omission_reason"))
+            let rendered = try item.decodeIfPresent(
+                [String: ExportPreviewJSONValue].self,
+                forKey: GoalCatalogKey("rendered_row")
+            )
+            guard omission != nil || rendered != nil else {
+                throw GoalPreviewError.invalidMetadata("rendered_row")
+            }
+            records.append(
+                GoalPreviewRecord(
+                    recordID: try Self.text(item, "record_id"),
+                    sourceIDs: try item.decode([String].self, forKey: GoalCatalogKey("source_ids")),
+                    logicalPaths: try item.decode([String].self, forKey: GoalCatalogKey("logical_paths")),
+                    chunkIDs: try item.decode([String].self, forKey: GoalCatalogKey("chunk_ids")),
+                    passID: try Self.text(item, "pass_id"),
+                    constructorID: try Self.text(item, "constructor_id"),
+                    constructorVersion: try Self.text(item, "constructor_version"),
+                    context: try item.decodeIfPresent([String: String].self, forKey: GoalCatalogKey("context")),
+                    target: try item.decodeIfPresent([String: String].self, forKey: GoalCatalogKey("target")),
+                    renderedRow: rendered,
+                    contextRowKeys: try item.decode([String].self, forKey: GoalCatalogKey("context_row_keys")),
+                    supervised: supervised,
+                    recoveredSource: evidence,
+                    curationStatus: try item.decodeIfPresent(String.self, forKey: GoalCatalogKey("curation_status")),
+                    curationReasonCodes: try item.decode([String].self, forKey: GoalCatalogKey("curation_reason_codes")),
+                    omissionReason: omission,
+                    exactSizeBytes: try item.decode(Int.self, forKey: GoalCatalogKey("exact_size_bytes"))
+                )
+            )
+        }
+        self.records = records
+
+        var exclusionList = try container.nestedUnkeyedContainer(forKey: GoalCatalogKey("exclusions"))
+        var exclusions: [GoalPreviewExclusion] = []
+        while !exclusionList.isAtEnd {
+            let item = try exclusionList.nestedContainer(keyedBy: GoalCatalogKey.self)
+            try Self.requireKeys(item, expected: ["record_id", "source_ids", "status", "reason_codes"], scope: "exclusion")
+            exclusions.append(
+                GoalPreviewExclusion(
+                    recordID: try Self.text(item, "record_id"),
+                    sourceIDs: try item.decode([String].self, forKey: GoalCatalogKey("source_ids")),
+                    status: try Self.text(item, "status"),
+                    reasonCodes: try item.decode([String].self, forKey: GoalCatalogKey("reason_codes"))
+                )
+            )
+        }
+        self.exclusions = exclusions
+
+        var diagnosticList = try container.nestedUnkeyedContainer(forKey: GoalCatalogKey("diagnostics"))
+        var diagnostics: [GoalPreviewDiagnostic] = []
+        while !diagnosticList.isAtEnd {
+            let item = try diagnosticList.nestedContainer(keyedBy: GoalCatalogKey.self)
+            try Self.requireKeys(item, expected: ["code", "message", "pass_id", "source_ids", "chunk_ids"], scope: "diagnostic")
+            diagnostics.append(
+                GoalPreviewDiagnostic(
+                    code: try Self.text(item, "code"),
+                    message: try Self.text(item, "message"),
+                    passID: try Self.text(item, "pass_id"),
+                    sourceIDs: try item.decode([String].self, forKey: GoalCatalogKey("source_ids")),
+                    chunkIDs: try item.decode([String].self, forKey: GoalCatalogKey("chunk_ids"))
+                )
+            )
+        }
+        self.diagnostics = diagnostics
+    }
+
+    private static func requireKeys(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        expected: Set<String>,
+        scope: String
+    ) throws {
+        let observed = Set(container.allKeys.map(\.stringValue))
+        guard observed == expected else {
+            throw GoalPreviewError.invalidKeySet(
+                scope: scope,
+                missing: Array(expected.subtracting(observed)).sorted(),
+                unexpected: Array(observed.subtracting(expected)).sorted()
+            )
+        }
+    }
+
+    private static func text(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String
+    ) throws -> String {
+        let value = try container.decode(String.self, forKey: GoalCatalogKey(key))
+        guard !value.isEmpty else { throw GoalPreviewError.invalidMetadata(key) }
+        return value
+    }
+}

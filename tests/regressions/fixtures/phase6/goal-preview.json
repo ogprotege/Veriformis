@@ -1,0 +1,115 @@
+{
+  "available_stages": [
+    "construct",
+    "curate"
+  ],
+  "counts": {
+    "accepted": 2,
+    "diagnostics": 0,
+    "excluded": 0,
+    "included": 2,
+    "omitted": 0,
+    "quarantined": 0,
+    "selected": 1
+  },
+  "diagnostics": [],
+  "exclusions": [],
+  "goal_id": "recover-a-section-from-its-heading",
+  "loss_boundary": "Only the final assistant message receives supervision.",
+  "loss_policy": "final-assistant-suffix",
+  "non_claims": [
+    "no-trainer-compatibility",
+    "no-generated-text",
+    "no-invented-target",
+    "no-fine-tuning-suitability-judgment"
+  ],
+  "not_this": [
+    "It does not generate a body for a heading that has none in the source.",
+    "It does not summarize, outline, or reorder sections."
+  ],
+  "objective": "section_reconstruction",
+  "omitted_diagnostic_count": 0,
+  "omitted_exclusion_count": 0,
+  "recipe_id": "rcp-v1-c0a24be95f2cc603edb958180a2e7fcb3c3d7a358371d3a1b46480d02811e3c6",
+  "recipe_library_id": "section_reconstruction.default",
+  "records": [
+    {
+      "chunk_ids": [
+        "chk-v1-e4387ea035dd7f1cc0b02d50e7c3f0843db85835905a5fef6bcc6edf11e41c9b"
+      ],
+      "constructor_id": "veriformis.constructor.section-reconstruction",
+      "constructor_version": "1",
+      "context": {
+        "heading": "Recovered heading"
+      },
+      "context_row_keys": [
+        "messages[0].content"
+      ],
+      "curation_reason_codes": [
+        "quality-passed"
+      ],
+      "curation_status": "included",
+      "exact_size_bytes": 1996,
+      "logical_paths": [
+        "guide.md"
+      ],
+      "omission_reason": null,
+      "pass_id": "pas-v1-14f26670caf842c09163b1245d1cf194dc68ac173a2a4354fe3f65d60d9e4e3b",
+      "record_id": "rec-v1-7e7bb5d46442ed9b2dab60bceaa6a6c385004dea4c49e2f9fb27755160a673df",
+      "recovered_source": [
+        {
+          "derivation_kinds": [],
+          "end": 17,
+          "excerpt": "Recovered heading",
+          "field": "heading",
+          "kind": "source_text",
+          "region_id": "body",
+          "source_id": "src-v1-251aed533ec868153b18aaa1e0d3787aad76c1bd66c5c0491c04d22e1d1b61b5",
+          "start": 0,
+          "text_sha256": "18b5a38c0044214907134a0961f89afb36a9f7e8d96360beadb8bfdca2a8c979"
+        },
+        {
+          "derivation_kinds": [],
+          "end": 62,
+          "excerpt": "Body text beneath the heading for recovery.",
+          "field": "section",
+          "kind": "source_text",
+          "region_id": "body",
+          "source_id": "src-v1-251aed533ec868153b18aaa1e0d3787aad76c1bd66c5c0491c04d22e1d1b61b5",
+          "start": 19,
+          "text_sha256": "dbb16d80517b72ec12594d25135acb64205c2a65ce9f8221d9d4ac08d22d8e6f"
+        }
+      ],
+      "rendered_row": {
+        "messages": [
+          {
+            "content": "Recovered heading",
+            "role": "user"
+          },
+          {
+            "content": "Body text beneath the heading for recovery.",
+            "role": "assistant"
+          }
+        ]
+      },
+      "source_ids": [
+        "src-v1-251aed533ec868153b18aaa1e0d3787aad76c1bd66c5c0491c04d22e1d1b61b5"
+      ],
+      "supervised": {
+        "end": 43,
+        "row_key": "messages[1].content",
+        "start": 0
+      },
+      "target": {
+        "section": "Body text beneath the heading for recovery."
+      }
+    }
+  ],
+  "representation_id": "conversation",
+  "row_schema": "messages",
+  "sample_policy": "first-accepted-record-per-primary-source",
+  "schema_id": "veriformis.goal-preview/v1",
+  "supervised_region": "The assistant turn only; the user turn is context.",
+  "supervision_boundary": "The heading is context; the section body is the target and is the only part trained on.",
+  "title": "Recover a section from its heading"
+}

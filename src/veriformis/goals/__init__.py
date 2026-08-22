@@ -17,9 +17,27 @@ from veriformis.goals.catalog import (
     representation_for_row_schema,
     resolve_goal,
 )
+from veriformis.goals.preview import (
+    GOAL_PREVIEW_SCHEMA_ID,
+    GoalPreview,
+    GoalPreviewDiagnostic,
+    GoalPreviewEvidence,
+    GoalPreviewExclusion,
+    GoalPreviewRecord,
+    GoalPreviewSpan,
+    build_goal_preview,
+)
 
 __all__ = [
     "GENERIC_EXPORT_CONTAINERS",
+    "GOAL_PREVIEW_SCHEMA_ID",
+    "GoalPreview",
+    "GoalPreviewDiagnostic",
+    "GoalPreviewEvidence",
+    "GoalPreviewExclusion",
+    "GoalPreviewRecord",
+    "GoalPreviewSpan",
+    "build_goal_preview",
     "GOAL_CATALOG_DATA_NAME",
     "NON_CLAIM_CODES",
     "REVIEW_POLICY_OPTIONS",
