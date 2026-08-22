@@ -174,15 +174,15 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Passed locally. Items 5.1–5.6 are implemented, admitted, and merged;
+**Result:** Passed. Items 5.1–5.6 are implemented, admitted, and merged;
 item 5.6 merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7's operator guidance and
 the Phase 5 capability, support, evidence, governance, and packet reconciliation
-are complete locally. Every compatible pair has the required round-trip and
-tamper evidence, and nested CSV retains its actionable pre-publication refusal.
-This result does not claim that the item 5.7 pull request has been published,
-that GitHub checks passed, that it merged, or that post-merge local `main` was
-synchronized. No later phase may begin until those sequential-PR gates occur.
+merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14
+GitHub checks passed; clean local `main` equals `origin/main` there. Every
+compatible pair has the required round-trip and tamper evidence, and nested CSV
+retains its actionable pre-publication refusal. Phase 6 opened on 2026-08-22
+under its own packet.
 
 ## Non-goals
 

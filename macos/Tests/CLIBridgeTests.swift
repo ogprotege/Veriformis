@@ -284,6 +284,250 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
+    // MARK: - Goal catalog (Phase 6.1)
+
+    func testGoalCatalogDecodesFrozenFixtureExactly() throws {
+        let catalog = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
+
+        XCTAssertEqual(catalog.schemaID, "veriformis.goal-catalog/v1")
+        XCTAssertEqual(catalog.contractID, "veriformis.goal-catalog")
+        XCTAssertEqual(catalog.contractVersion, 1)
+        XCTAssertEqual(catalog.goals.map(\.objective), TrainingObjective.allCases)
+        XCTAssertEqual(
+            catalog.goals.map(\.goalID),
+            [
+                "learn-the-text",
+                "continue-a-passage",
+                "recover-a-section-from-its-heading",
+                "reproduce-a-recorded-change",
+                "extract-a-structured-value",
+            ]
+        )
+        XCTAssertEqual(
+            catalog.representations.map(\.rowSchema),
+            GoalCatalog.rowSchemaOrder
+        )
+        for goal in catalog.goals {
+            XCTAssertTrue(goal.compatibleRepresentations.contains(goal.defaultRepresentation))
+            XCTAssertFalse(goal.notThis.isEmpty)
+            XCTAssertEqual(goal.state, "implemented")
+            XCTAssertNotNil(catalog.representation(withID: goal.defaultRepresentation))
+        }
+        let instruction = try XCTUnwrap(catalog.representation(withID: "instruction-and-output"))
+        XCTAssertTrue(instruction.requiresOperatorInstruction)
+        XCTAssertEqual(instruction.rowSchema, "instruction_output")
+        XCTAssertEqual(catalog.goal(withID: "learn-the-text")?.compatibleRepresentations, ["whole-text"])
+        XCTAssertNil(catalog.goal(withID: "summarize-the-document"))
+    }
+
+    func testGoalCatalogRejectsMissingExtraAndWrongMetadata() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { $0.removeValue(forKey: "representations") }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidKeySet(scope: "catalog", missing: ["representations"], unexpected: [])
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { $0["format"] = "jsonl" }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidKeySet(scope: "catalog", missing: [], unexpected: ["format"])
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { $0["schema_id"] = "veriformis.goal-catalog/v2" }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalCatalogError, .invalidMetadata("schema_id"))
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["summary"] = true
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidKeySet(scope: "goal", missing: [], unexpected: ["summary"])
+            )
+        }
+    }
+
+    func testGoalCatalogRejectsDuplicateGoalUnknownObjectiveAndOpenClosure() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[1]["goal_id"] = goals[0]["goal_id"]
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("duplicate goal_id"))
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["objective"] = "summary"
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("unknown objective summary"))
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals.removeLast()
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidGoals("goals must cover every objective exactly once in taxonomy order")
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["default_representation"] = "conversation"
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidGoals("goal learn-the-text representations are not closed over the catalog")
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var representations = payload["representations"] as! [[String: Any]]
+                    representations[3]["row_schema"] = "chat"
+                    payload["representations"] = representations
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidRepresentations(
+                    "row schemas must be exactly \(GoalCatalog.rowSchemaOrder) in order"
+                )
+            )
+        }
+    }
+
+    func testGoalCatalogRejectsInvalidIdentifiersAndControlCharacters() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["goal_id"] = "learn the text"
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("invalid goal_id learn the text"))
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["title"] = "Learn\nthe text"
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalCatalogError, .invalidMetadata("title"))
+        }
+        XCTAssertTrue(GoalCatalog.isIdentifier("learn-the-text"))
+        XCTAssertFalse(GoalCatalog.isIdentifier("Learn-The-Text"))
+        XCTAssertFalse(GoalCatalog.isIdentifier("learn--the"))
+        XCTAssertFalse(GoalCatalog.isIdentifier("-learn"))
+    }
+
+    func testDiscoverGoalsInvokesExactCLIArgument() async throws {
+        let root = temporaryTestDirectory("goals-argv")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let arguments = root.appendingPathComponent("arguments.txt")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf '%s\\n' "$@" > "\(arguments.path)"
+            cat "\(goalCatalogFixtureURL().path)"
+            """
+        )
+
+        let catalog = try await VeriformisCLI(
+            executableURL: executable,
+            prefixArguments: []
+        ).discoverGoals()
+
+        XCTAssertEqual(catalog.goals.count, 5)
+        XCTAssertEqual(
+            try String(contentsOf: arguments, encoding: .utf8),
+            "goals\n"
+        )
+    }
+
+    func testDiscoverGoalsReportsCommandFailureWithoutFabricatingGoals() async throws {
+        let root = temporaryTestDirectory("goals-failure")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            echo "error[goal-catalog-invalid]: goal catalog bytes are not canonical" >&2
+            exit 2
+            """
+        )
+
+        do {
+            _ = try await VeriformisCLI(executableURL: executable, prefixArguments: []).discoverGoals()
+            XCTFail("expected failure")
+        } catch let error as GoalCatalogError {
+            XCTAssertEqual(
+                error,
+                .commandFailed(
+                    exitCode: 2,
+                    message: "error[goal-catalog-invalid]: goal catalog bytes are not canonical"
+                )
+            )
+        }
+    }
+
     func testTaxonomyDiscoveryDecodesExactRegistryPayload() throws {
         let discovery = try JSONDecoder().decode(
             TaxonomyDiscovery.self,
@@ -2269,6 +2513,26 @@ final class CLIBridgeTests: XCTestCase {
             try await Task.sleep(nanoseconds: 10_000_000)
         }
         XCTFail("timed out waiting for \(url.path)")
+    }
+
+    private func goalCatalogFixtureURL() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("tests/regressions/fixtures/phase6/goal-catalog.json")
+    }
+
+    private func goalCatalogData(
+        mutating mutation: ((inout [String: Any]) -> Void)? = nil
+    ) throws -> Data {
+        let stored = try Data(contentsOf: goalCatalogFixtureURL())
+        guard mutation != nil else { return stored }
+        var payload = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: stored) as? [String: Any]
+        )
+        mutation?(&payload)
+        return try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
     }
 
     private func taxonomyData(

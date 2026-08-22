@@ -63,7 +63,12 @@ replayer ships. Phase 5.4, merged as PR #56 at
 `.vfexport.zip` using the deterministic codec shared in
 `_archive_transport.py`. `PipelineService.package` selects this profile only
 through the explicit receipt-digest argument. Export discovery and the
-MCP/Mac surfaces remain unchanged. The macOS workbench lives
+MCP/Mac surfaces remain unchanged. Phase 6.1 adds `goals/`: the packaged
+versioned goal catalog (`catalog-v1.json`) with strict models that resolve
+every plain-language goal to exactly one existing objective and named recipe,
+and every representation to one existing row schema and loss policy; the
+service, CLI, MCP, and Mac bridge expose it read-only and byte-identically.
+The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -227,7 +232,8 @@ name.vfbundle/
 - Phase 5.7 changes no architecture edge. Its
   [operator guide](generic-exports.md) documents how to choose an existing
   container without changing the bound objective, row schema, or consumer
-  compatibility, and the completed packet reconciles Phase 5 records.
+  compatibility, and the completed packet reconciles Phase 5 records. It
+  merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 
 ## Related documentation
 

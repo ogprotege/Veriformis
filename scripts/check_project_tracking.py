@@ -24,6 +24,7 @@ from veriformis.bundle.finished import (
 )
 from veriformis.cli import seal
 from veriformis.datasets.serialization import V1_ROW_SCHEMAS
+from veriformis.goals import goal_catalog
 from veriformis.mcp.server import create_mcp_server
 from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
 from veriformis.recipes.library import list_named_recipes
@@ -233,6 +234,17 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
     _require(
         training.get("implemented_objectives") == objective_names,
         "support objectives differ from the named recipe library",
+        errors,
+    )
+    goals = goal_catalog().goals
+    _require(
+        training.get("implemented_goals") == [goal.goal_id for goal in goals],
+        "support goals differ from the versioned goal catalog",
+        errors,
+    )
+    _require(
+        sorted(goal.objective for goal in goals) == objective_names,
+        "goal catalog objectives differ from the named recipe library",
         errors,
     )
     _require(
@@ -609,8 +621,8 @@ def main() -> int:
     print("Project tracking check: PASS")
     print("- 21 roadmap phases match program.json and WIP.md")
     print(
-        "- implemented inputs, taxonomy families, objectives, rows, loss policies, "
-        "containers, profiles, and handoff defaults match code"
+        "- implemented inputs, taxonomy families, objectives, goals, rows, loss "
+        "policies, containers, profiles, and handoff defaults match code"
     )
     print("- governed phase packets and evidence references are structurally complete")
     return 0

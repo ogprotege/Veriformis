@@ -1021,6 +1021,12 @@ class PipelineService:
         """Return a fresh, adapter-safe copy of implemented taxonomy discovery."""
         return dict(implemented_discovery())
 
+    def discover_goals(self) -> dict[str, Any]:
+        """Return a fresh, adapter-safe copy of the versioned goal catalog."""
+        from veriformis.goals import discover_goals
+
+        return discover_goals()
+
     def discover_exports(self) -> ExportDiscoveryOutcome:
         """Discover only executable export implementations in the service."""
         return ExportDiscoveryOutcome(

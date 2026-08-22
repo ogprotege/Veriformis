@@ -1,15 +1,15 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 5 locally complete; closeout publication
-and merge remain unclaimed
+**Status:** Independent-product Phase 5 complete; Phase 6 in progress with item
+6.1 (goal catalog) in progress
 
-**Review date:** 2026-08-22
+**Review date:** 2026-08-22 (independent-product Phase 6 opening)
 
-**Repository baseline:** Working tree based on Phase 5.6 PR #58 merge
-`cd017941090c7352cb1d10f9a383042b954d4f2e`
+**Repository baseline:** Working tree based on Phase 5.7 PR #59 merge
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
 
-**Next review:** Independent-product Phase 5 closeout publication or merge,
-Phase 6 start, or the next active-document behavior change
+**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
+item closeout, or the next active-document behavior change
 
 ## Scope examined
 
@@ -93,8 +93,8 @@ deprecated document must link its replacement and removal/review trigger.
 | Area | Assessment | Basis |
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
-| Current capability accuracy | Good within audited active scope; Phase 5 is locally complete and its closeout pull-request result remains unclaimed | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, exact preview evidence, operator guidance, and unchanged production discovery/support |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–5 packets, and Phase 6 still planned |
+| Current capability accuracy | Good within audited active scope; Phase 5 is complete with its closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, and Phase 6.1 is in progress | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, exact preview evidence, operator guidance, and unchanged production discovery/support |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–5 packets, and the active Phase 6 packet |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -103,8 +103,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Publish the Phase 5.7 guidance/closeout pull request, require every GitHub
-   check to pass, merge, and synchronize clean local `main` before Phase 6.
+1. Complete item 6.1 (goal catalog) under the Phase 6 packet as a green pull
+   request; merge and synchronize clean local `main` before item 6.2.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
@@ -137,8 +137,8 @@ destination access. It merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
 [operator guide](../generic-exports.md) closes the container-choice obligation
 without adding a runtime, importer, renderer, taxonomy, support, consumer, or
-trainer capability. The local closeout record does not claim its own GitHub or
-merge result.
+trainer capability. It passed all 14 GitHub checks and merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 Generic output does not establish trainer compatibility, and any future
 shipped semantic profile must enforce explicit resource limits.
 

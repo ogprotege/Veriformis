@@ -309,8 +309,9 @@ consumer/trainer claim. Item 5.6's focused, full, release, parity, Mac,
 tracking, lint, and review evidence passed; all 14 GitHub checks passed and PR
 #58 merged at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 adds
 only the [generic export operator guide](generic-exports.md) and Phase 5
-closeout reconciliation; do not infer a runtime, support, consumer, or trainer
-change from documentation completion.
+closeout reconciliation and merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`; do not infer a runtime, support,
+consumer, or trainer change from documentation completion.
 
 ### Keep optional-integration claims accurate
 

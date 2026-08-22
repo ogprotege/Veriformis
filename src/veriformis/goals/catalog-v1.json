@@ -1,0 +1,149 @@
+{
+  "contract_id": "veriformis.goal-catalog",
+  "contract_version": 1,
+  "goals": [
+    {
+      "compatible_representations": [
+        "whole-text"
+      ],
+      "default_representation": "whole-text",
+      "goal_id": "learn-the-text",
+      "not_this": [
+        "It does not teach the model to summarize, explain, or answer questions about the documents.",
+        "It does not shorten, rewrite, or paraphrase anything."
+      ],
+      "objective": "full_text",
+      "plain_language": "Teach the model the exact wording of my documents so it can reproduce them as written.",
+      "recipe_library_id": "full_text.default",
+      "state": "implemented",
+      "title": "Learn the text itself",
+      "training_family": "source-grounded-language-modeling",
+      "what_the_model_learns": "To reproduce the retained source passages as written. The whole passage is the training signal; nothing is held back as a question or prompt.",
+      "what_you_provide": "Documents whose cleaned text you want the model to learn. Nothing else is needed."
+    },
+    {
+      "compatible_representations": [
+        "prompt-and-completion",
+        "instruction-and-output",
+        "conversation"
+      ],
+      "default_representation": "prompt-and-completion",
+      "goal_id": "continue-a-passage",
+      "not_this": [
+        "It does not invent new endings; the target is always the real remainder from the source.",
+        "It is not a summary, an answer, or a rewrite."
+      ],
+      "objective": "continuation",
+      "plain_language": "Teach the model to keep writing a passage from a given starting point, in the document's own words.",
+      "recipe_library_id": "continuation.default",
+      "state": "implemented",
+      "title": "Continue a passage",
+      "training_family": "source-grounded-supervised-fine-tuning",
+      "what_the_model_learns": "Given the opening part of a real source passage, produce the exact remainder of that same passage.",
+      "what_you_provide": "Documents with passages long enough to split into an opening and a remainder."
+    },
+    {
+      "compatible_representations": [
+        "prompt-and-completion",
+        "instruction-and-output",
+        "conversation"
+      ],
+      "default_representation": "prompt-and-completion",
+      "goal_id": "recover-a-section-from-its-heading",
+      "not_this": [
+        "It does not generate a body for a heading that has none in the source.",
+        "It does not summarize, outline, or reorder sections."
+      ],
+      "objective": "section_reconstruction",
+      "plain_language": "Teach the model to write out a section's body when given that section's heading.",
+      "recipe_library_id": "section_reconstruction.default",
+      "state": "implemented",
+      "title": "Recover a section from its heading",
+      "training_family": "source-grounded-supervised-fine-tuning",
+      "what_the_model_learns": "Given an exact heading from the source, produce the exact section body beneath it.",
+      "what_you_provide": "Documents with real headings and the text under them, such as Markdown, HTML, or Word documents with heading structure."
+    },
+    {
+      "compatible_representations": [
+        "prompt-and-completion",
+        "instruction-and-output",
+        "conversation"
+      ],
+      "default_representation": "prompt-and-completion",
+      "goal_id": "reproduce-a-recorded-change",
+      "not_this": [
+        "It does not teach general editing, rewriting, or style transfer beyond the recorded deterministic change.",
+        "It is not translation or summarization."
+      ],
+      "objective": "before_after_transformation",
+      "plain_language": "Teach the model to apply a change that was actually recorded during cleaning, by showing the text before and after it.",
+      "recipe_library_id": "before_after_transformation.default",
+      "state": "implemented",
+      "title": "Reproduce a recorded change",
+      "training_family": "source-grounded-supervised-fine-tuning",
+      "what_the_model_learns": "Given the text exactly as it was before one recorded cleaning change, produce the text exactly as it was after that change.",
+      "what_you_provide": "Documents cleaned with rules that recorded at least one before-and-after change."
+    },
+    {
+      "compatible_representations": [
+        "prompt-and-completion",
+        "instruction-and-output",
+        "conversation"
+      ],
+      "default_representation": "prompt-and-completion",
+      "goal_id": "extract-a-structured-value",
+      "not_this": [
+        "It does not extract record fields, names, dates, or any value from the prose; only attributes that the recovered document structure explicitly records.",
+        "It does not infer, guess, or compute values that are not explicitly present in the source.",
+        "It is not question answering over the document."
+      ],
+      "objective": "structured_field",
+      "plain_language": "Teach the model to state one structural fact that the document's formatting explicitly records, such as a heading's level or a link's address.",
+      "recipe_library_id": "structured_field.default",
+      "state": "implemented",
+      "title": "Extract a structural attribute",
+      "training_family": "source-grounded-supervised-fine-tuning",
+      "what_the_model_learns": "Given the source context, emit exactly one attribute recorded during recovery: a heading level, a code block's language, a link or image address or title attribute, a math display flag, a citation key or locator, whether a list is ordered or an item is checked, or a table column alignment.",
+      "what_you_provide": "Documents with recoverable formatting, such as Markdown, HTML, or Word documents. Plain text, JSON, and CSV sources record none of these attributes and yield nothing for this goal."
+    }
+  ],
+  "representations": [
+    {
+      "loss_policy": "full-sequence",
+      "plain_language": "The passage itself is the training example. Every part of it is trained on.",
+      "representation_id": "whole-text",
+      "requires_operator_instruction": false,
+      "row_schema": "text",
+      "supervised_region": "The entire passage.",
+      "title": "Whole text"
+    },
+    {
+      "loss_policy": "completion-only",
+      "plain_language": "A starting context taken from the source, followed by the exact source text that should come next. Only the completion is trained on.",
+      "representation_id": "prompt-and-completion",
+      "requires_operator_instruction": false,
+      "row_schema": "prompt_completion",
+      "supervised_region": "The completion only; the prompt is context.",
+      "title": "Prompt and completion"
+    },
+    {
+      "loss_policy": "output-only",
+      "plain_language": "A short instruction you supply, the exact source context as input, and the exact source-derived output. Only the output is trained on, and the instruction must describe the real task.",
+      "representation_id": "instruction-and-output",
+      "requires_operator_instruction": true,
+      "row_schema": "instruction_output",
+      "supervised_region": "The output only; the instruction and input are context.",
+      "title": "Instruction and output"
+    },
+    {
+      "loss_policy": "final-assistant-suffix",
+      "plain_language": "A two-turn conversation: the user turn is the exact source context and the assistant turn is the exact source-derived target. Only the assistant turn is trained on.",
+      "representation_id": "conversation",
+      "requires_operator_instruction": false,
+      "row_schema": "messages",
+      "supervised_region": "The assistant turn only; the user turn is context.",
+      "title": "Conversation"
+    }
+  ],
+  "schema_id": "veriformis.goal-catalog/v1"
+}

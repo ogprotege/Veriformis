@@ -332,6 +332,38 @@ struct VeriformisCLI: Sendable {
         }
     }
 
+    /// Load the plain-language goal catalog from the CLI without blocking the main actor.
+    func discoverGoals(
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> GoalCatalog {
+        let result = try await run(
+            arguments: ["goals"],
+            controller: controller
+        )
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard result.exitCode == 0 else {
+            throw GoalCatalogError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        guard !result.standardOutputTruncated else {
+            throw GoalCatalogError.outputTruncated
+        }
+        do {
+            return try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: result.standardOutputData
+            )
+        } catch let error as GoalCatalogError {
+            throw error
+        } catch {
+            throw GoalCatalogError.invalidPayload(error.localizedDescription)
+        }
+    }
+
     /// Discover only the export implementations registered by the Python composition root.
     func discoverExports(
         controller: CLIProcessController = CLIProcessController()

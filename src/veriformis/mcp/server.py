@@ -184,6 +184,19 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def goals() -> str:
+        """Return the plain-language goal catalog from PipelineService."""
+        return (
+            json.dumps(
+                pipeline.discover_goals(),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
+        )
+
+    @server.tool()
     def export_discover() -> str:
         """Discover executable export profiles from PipelineService."""
 

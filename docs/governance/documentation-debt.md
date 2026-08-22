@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
 
-**Next review:** Independent-product Phase 5 closeout publication or merge,
-Phase 6 start, or any active-document behavior change
+**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
+item closeout, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
 | --- | --- | --- | --- | --- | --- |

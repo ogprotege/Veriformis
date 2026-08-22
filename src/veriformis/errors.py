@@ -146,6 +146,12 @@ class TaxonomyError(VeriformisError):
     code = "taxonomy-invalid"
 
 
+class GoalCatalogError(VeriformisError):
+    """The versioned goal catalog is malformed, tampered, or not closed over the taxonomy."""
+
+    code = "goal-catalog-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

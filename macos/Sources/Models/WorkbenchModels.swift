@@ -2342,3 +2342,274 @@ enum WorkbenchError: LocalizedError, Equatable {
         }
     }
 }
+
+// MARK: - Goal catalog (Phase 6.1)
+
+enum GoalCatalogError: LocalizedError, Equatable, Sendable {
+    case invalidKeySet(scope: String, missing: [String], unexpected: [String])
+    case invalidMetadata(String)
+    case invalidGoals(String)
+    case invalidRepresentations(String)
+    case commandFailed(exitCode: Int32, message: String)
+    case outputTruncated
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidKeySet(let scope, let missing, let unexpected):
+            return "Goal catalog \(scope) keys are invalid (missing: \(missing); unexpected: \(unexpected))."
+        case .invalidMetadata(let key):
+            return "Goal catalog metadata \(key) is invalid."
+        case .invalidGoals(let detail):
+            return "Goal catalog goals are invalid: \(detail)"
+        case .invalidRepresentations(let detail):
+            return "Goal catalog representations are invalid: \(detail)"
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "no output" : message
+            return "Goal discovery failed (exit \(exitCode)): \(detail)"
+        case .outputTruncated:
+            return "Goal discovery output was truncated."
+        case .invalidPayload(let message):
+            return "Goal discovery returned invalid JSON: \(message)"
+        }
+    }
+}
+
+private struct GoalCatalogKey: CodingKey {
+    let stringValue: String
+    var intValue: Int? { nil }
+    init?(stringValue: String) { self.stringValue = stringValue }
+    init?(intValue: Int) { nil }
+    init(_ value: String) { stringValue = value }
+}
+
+/// One plain-language goal bound to exactly one persisted objective.
+struct GoalCatalogGoal: Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "goal_id", "title", "plain_language", "what_the_model_learns",
+        "what_you_provide", "not_this", "objective", "training_family",
+        "recipe_library_id", "default_representation",
+        "compatible_representations", "state",
+    ]
+
+    let goalID: String
+    let title: String
+    let plainLanguage: String
+    let whatTheModelLearns: String
+    let whatYouProvide: String
+    let notThis: [String]
+    let objective: TrainingObjective
+    let trainingFamily: String
+    let recipeLibraryID: String
+    let defaultRepresentation: String
+    let compatibleRepresentations: [String]
+    let state: String
+}
+
+/// One plain-language representation bound to exactly one persisted row schema.
+struct GoalCatalogRepresentation: Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "representation_id", "title", "plain_language", "supervised_region",
+        "row_schema", "loss_policy", "requires_operator_instruction",
+    ]
+
+    let representationID: String
+    let title: String
+    let plainLanguage: String
+    let supervisedRegion: String
+    let rowSchema: String
+    let lossPolicy: String
+    let requiresOperatorInstruction: Bool
+}
+
+/// Strict workbench view of `veriformis goals` discovery.
+///
+/// The packaged Python catalog is authoritative. The workbench accepts the
+/// complete v1 shape or treats goals as unavailable; it never fills missing
+/// goals from Swift constants.
+struct GoalCatalog: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "schema_id", "contract_id", "contract_version", "goals", "representations",
+    ]
+    /// Taxonomy v1 row schemas in taxonomy order; Python discovery is authoritative.
+    static let rowSchemaOrder = ["text", "prompt_completion", "instruction_output", "messages"]
+
+    let schemaID: String
+    let contractID: String
+    let contractVersion: Int
+    let goals: [GoalCatalogGoal]
+    let representations: [GoalCatalogRepresentation]
+
+    func goal(withID goalID: String) -> GoalCatalogGoal? {
+        goals.first { $0.goalID == goalID }
+    }
+
+    func representation(withID representationID: String) -> GoalCatalogRepresentation? {
+        representations.first { $0.representationID == representationID }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try Self.requireKeys(container, expected: Self.expectedKeys, scope: "catalog")
+
+        guard try container.decode(String.self, forKey: GoalCatalogKey("schema_id"))
+            == "veriformis.goal-catalog/v1"
+        else { throw GoalCatalogError.invalidMetadata("schema_id") }
+        guard try container.decode(String.self, forKey: GoalCatalogKey("contract_id"))
+            == "veriformis.goal-catalog"
+        else { throw GoalCatalogError.invalidMetadata("contract_id") }
+        let version = try container.decode(Int.self, forKey: GoalCatalogKey("contract_version"))
+        guard version == 1 else { throw GoalCatalogError.invalidMetadata("contract_version") }
+
+        var representationList = try container.nestedUnkeyedContainer(
+            forKey: GoalCatalogKey("representations")
+        )
+        var representations: [GoalCatalogRepresentation] = []
+        while !representationList.isAtEnd {
+            let item = try representationList.nestedContainer(keyedBy: GoalCatalogKey.self)
+            try Self.requireKeys(
+                item,
+                expected: GoalCatalogRepresentation.expectedKeys,
+                scope: "representation"
+            )
+            let representation = GoalCatalogRepresentation(
+                representationID: try Self.text(item, "representation_id"),
+                title: try Self.text(item, "title"),
+                plainLanguage: try Self.text(item, "plain_language"),
+                supervisedRegion: try Self.text(item, "supervised_region"),
+                rowSchema: try Self.text(item, "row_schema"),
+                lossPolicy: try Self.text(item, "loss_policy"),
+                requiresOperatorInstruction: try item.decode(
+                    Bool.self,
+                    forKey: GoalCatalogKey("requires_operator_instruction")
+                )
+            )
+            representations.append(representation)
+        }
+        let representationIDs = representations.map(\.representationID)
+        guard representationIDs.count == Set(representationIDs).count else {
+            throw GoalCatalogError.invalidRepresentations("duplicate representation_id")
+        }
+        for identifier in representationIDs where !Self.isIdentifier(identifier) {
+            throw GoalCatalogError.invalidRepresentations("invalid representation_id \(identifier)")
+        }
+        guard representations.map(\.rowSchema) == Self.rowSchemaOrder else {
+            throw GoalCatalogError.invalidRepresentations(
+                "row schemas must be exactly \(Self.rowSchemaOrder) in order"
+            )
+        }
+        for representation in representations
+        where representation.requiresOperatorInstruction
+            != (representation.rowSchema == "instruction_output")
+        {
+            throw GoalCatalogError.invalidRepresentations(
+                "requires_operator_instruction drift for \(representation.representationID)"
+            )
+        }
+
+        var goalList = try container.nestedUnkeyedContainer(forKey: GoalCatalogKey("goals"))
+        var goals: [GoalCatalogGoal] = []
+        while !goalList.isAtEnd {
+            let item = try goalList.nestedContainer(keyedBy: GoalCatalogKey.self)
+            try Self.requireKeys(item, expected: GoalCatalogGoal.expectedKeys, scope: "goal")
+            let objectiveValue = try Self.text(item, "objective")
+            guard let objective = TrainingObjective(rawValue: objectiveValue) else {
+                throw GoalCatalogError.invalidGoals("unknown objective \(objectiveValue)")
+            }
+            let notThis = try item.decode([String].self, forKey: GoalCatalogKey("not_this"))
+            guard !notThis.isEmpty, notThis.allSatisfy(Self.isPlain) else {
+                throw GoalCatalogError.invalidGoals("not_this must be non-empty plain text")
+            }
+            let compatible = try item.decode(
+                [String].self,
+                forKey: GoalCatalogKey("compatible_representations")
+            )
+            let goal = GoalCatalogGoal(
+                goalID: try Self.text(item, "goal_id"),
+                title: try Self.text(item, "title"),
+                plainLanguage: try Self.text(item, "plain_language"),
+                whatTheModelLearns: try Self.text(item, "what_the_model_learns"),
+                whatYouProvide: try Self.text(item, "what_you_provide"),
+                notThis: notThis,
+                objective: objective,
+                trainingFamily: try Self.text(item, "training_family"),
+                recipeLibraryID: try Self.text(item, "recipe_library_id"),
+                defaultRepresentation: try Self.text(item, "default_representation"),
+                compatibleRepresentations: compatible,
+                state: try Self.text(item, "state")
+            )
+            guard goal.state == "implemented" else {
+                throw GoalCatalogError.invalidGoals("goal \(goal.goalID) state is not implemented")
+            }
+            guard !compatible.isEmpty, compatible.count == Set(compatible).count,
+                  compatible.allSatisfy({ representationIDs.contains($0) }),
+                  compatible.contains(goal.defaultRepresentation)
+            else {
+                throw GoalCatalogError.invalidGoals(
+                    "goal \(goal.goalID) representations are not closed over the catalog"
+                )
+            }
+            goals.append(goal)
+        }
+        let goalIDs = goals.map(\.goalID)
+        guard goalIDs.count == Set(goalIDs).count else {
+            throw GoalCatalogError.invalidGoals("duplicate goal_id")
+        }
+        for identifier in goalIDs where !Self.isIdentifier(identifier) {
+            throw GoalCatalogError.invalidGoals("invalid goal_id \(identifier)")
+        }
+        guard goals.map(\.objective) == TrainingObjective.allCases else {
+            throw GoalCatalogError.invalidGoals(
+                "goals must cover every objective exactly once in taxonomy order"
+            )
+        }
+
+        schemaID = "veriformis.goal-catalog/v1"
+        contractID = "veriformis.goal-catalog"
+        contractVersion = version
+        self.goals = goals
+        self.representations = representations
+    }
+
+    private static func requireKeys(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        expected: Set<String>,
+        scope: String
+    ) throws {
+        let observed = Set(container.allKeys.map(\.stringValue))
+        guard observed == expected else {
+            throw GoalCatalogError.invalidKeySet(
+                scope: scope,
+                missing: Array(expected.subtracting(observed)).sorted(),
+                unexpected: Array(observed.subtracting(expected)).sorted()
+            )
+        }
+    }
+
+    private static func text(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String
+    ) throws -> String {
+        let value = try container.decode(String.self, forKey: GoalCatalogKey(key))
+        guard isPlain(value) else {
+            throw GoalCatalogError.invalidMetadata(key)
+        }
+        return value
+    }
+
+    private static func isPlain(_ value: String) -> Bool {
+        !value.isEmpty
+            && value == value.trimmingCharacters(in: .whitespacesAndNewlines)
+            && value.unicodeScalars.allSatisfy { !CharacterSet.controlCharacters.contains($0) }
+    }
+
+    /// Catalog identifiers match `^[a-z0-9]+(-[a-z0-9]+)*$` exactly.
+    static func isIdentifier(_ value: String) -> Bool {
+        guard !value.isEmpty, !value.hasPrefix("-"), !value.hasSuffix("-"),
+              !value.contains("--")
+        else { return false }
+        return value.unicodeScalars.allSatisfy { scalar in
+            (scalar >= "a" && scalar <= "z") || (scalar >= "0" && scalar <= "9") || scalar == "-"
+        }
+    }
+}

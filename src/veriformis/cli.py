@@ -596,6 +596,19 @@ def taxonomy() -> None:
     )
 
 
+@app.command(name="goals")
+def goals() -> None:
+    """Print the plain-language goal catalog as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_goals(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="list-recipes")
 def list_recipes() -> None:
     """List named deterministic recipe library identifiers."""

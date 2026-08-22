@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
 
-**Next review:** Independent-product Phase 5 closeout publication or merge,
-Phase 6 start, any later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
+item closeout, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -68,8 +68,10 @@ response v2 without renderer or destination access. It passed all 14 GitHub
 checks and merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 publishes the
 [generic export operator guide](../generic-exports.md) and reconciles Phase 5
-closeout without a taxonomy or support promotion. Its own pull-request result
-is not claimed by the local closeout record.
+closeout without a taxonomy or support promotion. It passed all 14 GitHub
+checks and merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 Consumer compatibility still requires a separately admitted named profile.
-Phase 6 remains planned and requires its own packet after Phase 5 closeout
-publication and clean-main synchronization.
+Phase 6 (goal-first recipes and previews) is in progress under its
+[packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md);
+item 6.1 (goal catalog) is in progress.

@@ -56,8 +56,7 @@
 
 No Phase 5 contract or guidance decision remains pending. Item 5.6 merged as PR
 #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7's static guidance
-and decision reconciliation are complete locally under the accepted boundaries
-above. This record does not claim publication, GitHub checks, merge, or
-clean-main synchronization for the item 5.7 pull request. Later decisions
-remain scoped to their own sequential pull requests and cannot broaden these
-support claims.
+and decision reconciliation merged as PR #59 at
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b` under the accepted boundaries
+above. Later decisions remain scoped to their own sequential pull requests and
+cannot broaden these support claims.

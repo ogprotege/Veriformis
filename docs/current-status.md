@@ -28,12 +28,13 @@ as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`; Phase 5.6's exact bound
 dry-run preview merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`; and Phase 5.7 publishes the
 generic-export operator guide and completes Phase 5 reconciliation without a
-runtime, taxonomy, support, consumer-profile, or trainer claim change
+runtime, taxonomy, support, consumer-profile, or trainer claim change, merged
+as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
 
-**Review date:** 2026-08-22 (independent-product Phase 5 closeout)
+**Review date:** 2026-08-22 (independent-product Phase 6 opening)
 
-**Next review:** Phase 5 closeout publication or merge, Phase 6 packet opening,
-beta label cut, public-ready checklist, or any contract change
+**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
+label cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -284,6 +285,7 @@ physical container and consumer compatibility. It adds no runtime operation,
 importer, renderer, persisted schema, taxonomy entry, support promotion,
 consumer profile, or trainer claim. With that guidance and the reconciled
 packet/evidence/governance records, independent-product Phase 5 is complete.
+Item 5.7 merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 
 ## Implemented interfaces
 
@@ -307,6 +309,7 @@ The installed console entry point is `veriformis`.
 | `package-verify ARCHIVE --export-receipt-sha256 DIGEST` | Reconstructs only receipt-validated export paths, verifies the unchanged inner plan/receipt/file bindings, and proves canonical archive bytes | Receipt-anchored transport result; not source-bound export verification |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, and loss-policy registry as JSON | Read-only terminal output |
+| `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
@@ -324,12 +327,12 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy discovery, and verified-export discovery/dry-run/inspect/execute/verify operations |
-| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy JSON and canonical verified-export responses |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy and goal-catalog discovery, and verified-export discovery/dry-run/inspect/execute/verify operations |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy and goal-catalog JSON and canonical verified-export responses |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
-| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy and verified-export service operations |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, and verified-export service operations |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
-| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, and a strict canonical verified-export bridge |
+| macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, a strict goal-catalog bridge, and a strict canonical verified-export bridge |
 
 ## Workspace and identity status
 
@@ -641,7 +644,7 @@ See [docs/release.md](release.md).
 | Implemented and merged independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; PR #58 at `cd017941090c` |
 | Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–5 complete and Phase 6 planned under a future standard packet |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–5 complete and Phase 6 in progress under its [standard packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
