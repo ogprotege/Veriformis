@@ -313,3 +313,68 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.4 pull request, require every GitHub check
 to pass, merge, and synchronize clean
 local `main` with `origin/main` before item 6.5 begins.
+
+## 2026-08-22 — Item 6.4 merged; item 6.5 started
+
+**Status:** Item 6.4 merged as PR #63 at
+`abdd630e25e83ebf346316319caec892f4d64886` after all 14 GitHub checks
+passed; the pull request had no review threads and clean local `main` equaled
+`origin/main` at that commit. Branch `phase6/05-compile-preflight` was created
+from it.
+
+Item 6.5 scope is the bounded runtime-only
+`veriformis.compile-preflight/v1` response over raw source paths and one
+goal/preset/representation selection. It must capture each file once, replay
+the real parser, selected cleaning, preset segmentation, construction,
+curation, and split logic entirely in memory, report per-source parser and
+goal eligibility, exact missing-evidence diagnostics, expected exclusions,
+coverage and split blockers, and create no workspace, renderer, or
+destination. Python, CLI, MCP, and the Mac panel must agree exactly; the Mac
+must rerun preflight immediately before creating a workspace.
+
+The opening adversarial audit found a contract blocker in the existing real
+construction path: synthetic PDF `Page N` headings could produce section and
+structured-field records even though `pdf-text` is excluded for both goals.
+Item 6.5 therefore adds one shared goal/input-family gate used by preflight and
+real construction. The audit also requires the preflight probe to reach the
+pure split calculation, because a one-leakage-group dataset can pass curation
+and still fail the preset's required-evaluation policy.
+
+**Next action:** Complete the shared family gate and one-capture in-memory
+probe, expose the response through every surface, add the pre-workspace Mac
+panel and the goal-by-family/refusal matrix, then run the complete admission
+gates before publishing PR 6.5.
+
+## 2026-08-22 — Item 6.5 locally complete
+
+**Status:** Local implementation and admission gates passed; pull-request
+merge pending.
+
+`veriformis.compile-preflight/v1` is now the shared runtime-only admission
+report over raw sources. One root-pinned capture feeds the production parser,
+selected cleaning replay, preset segmentation, named construction, global
+curation, and leakage-group split entirely in memory. The service, CLI, MCP,
+Swift bridge, and workbench panel share the same closed response. The
+workbench invalidates stale reports and reruns preflight immediately before it
+may create a workspace, run sheet, or history entry. Real construction and
+preflight use the same goal/input-family gate.
+
+Observed gates on the reconciled working tree:
+
+- 245 focused compile-preflight, matrix, pipeline, and recipe-surface tests
+  passed; 1,593 full Python tests passed with only the intentional
+  durability-warning regression warning.
+- The standalone release run passed 1,581 tests with 1 deselected and the
+  same warning; clean-wheel installation and both golden
+  compile/external-digest/transport flows passed.
+- The workbench parity script passed and the complete macOS XCTest target
+  passed 93 tests with `TEST SUCCEEDED`.
+- Project tracking, lock, Ruff, structured JSON, and diff checks passed.
+- Independent consistency review passed after every concrete finding was
+  corrected and rechecked, including root retarget refusal, alias-before-read,
+  exact source identity/request binding, transport bounds and privacy, Swift
+  locator parity, exhaustive refusal codes, and exact catalog non-claims.
+
+**Next action:** Publish the item 6.5 pull request, require every GitHub check
+to pass, merge, and synchronize clean local `main` with `origin/main` before
+item 6.6 begins.

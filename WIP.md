@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
+**Implementation baseline reviewed:** `abdd630e25e83ebf346316319caec892f4d64886`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–5 complete), plus the current Phase 6.1
-goal-catalog work
+independent-product Phases 0–5 complete and Phase 6.1–6.4 merged), plus the
+current locally complete Phase 6.5 compile-preflight work awaiting its pull request
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.5 locally complete)
 
-**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
+**Next review:** Phase 6.5 pull-request merge, any Phase 6 item closeout, beta
 label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -73,8 +73,10 @@ local, offline, and free of LLM generation.
       contracts and `input_family` axis merged as PR #61 at
       `81becfa676fd9111868b8d4b62549218a644d3e2`, each after all 14 GitHub
       checks passed; item 6.3's goal preview merged as PR #62 at
-      `9cbab117e47cde6bd8850d67f0d363e03f0660ce`; item 6.4 (versioned
-      recipe presets and goal-first compile surfaces) is the current work.
+      `9cbab117e47cde6bd8850d67f0d363e03f0660ce`; item 6.4's versioned recipe
+      presets and goal-first compile surfaces merged as PR #63 at
+      `abdd630e25e83ebf346316319caec892f4d64886`; item 6.5 compile preflight
+      passed all local admission gates and awaits its pull request.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

@@ -1,7 +1,7 @@
 # Phase 6 Evidence
 
-**Status:** Open — items 6.1–6.3 merged as PR #60, PR #61, and PR #62; item
-6.4 locally admitted without claiming its own pull-request result
+**Status:** Open — items 6.1–6.4 merged as PR #60 through PR #63; item 6.5
+passed its local admission gates and awaits its pull request
 
 **Opened:** 2026-08-22
 
@@ -155,3 +155,44 @@ packaged split-ratio default.
 
 These are local observations. They do not claim publication, GitHub checks,
 merge, or clean-main synchronization for the item 6.4 pull request.
+
+Item 6.4 subsequently passed all 14 GitHub checks, had no review threads, and
+merged as PR #63 at `abdd630e25e83ebf346316319caec892f4d64886`; clean local
+`main` was synchronized with `origin/main` before item 6.5 began.
+
+### Item 6.5 (2026-08-22, working tree on
+`abdd630e25e83ebf346316319caec892f4d64886`)
+
+| Gate | Observed |
+| --- | --- |
+| Focused compile-preflight, matrix, pipeline, and recipe-surface tests | 245 passed |
+| Full Python (`uv run pytest -q`) | 1,593 passed, 1 intentional durability warning |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 1,581 passed, 1 deselected, 1 intentional warning |
+| `scripts/release/check_local.sh` | PASS (clean wheel, golden compile, external digest, transport) |
+| `macos/scripts/parity_check.sh` | PASS |
+| macOS XCTest target | 93 passed, `TEST SUCCEEDED` |
+| `scripts/check_project_tracking.py` | PASS |
+| `uv lock --check`, Ruff, structured JSON, and `git diff --check` | PASS |
+| Independent consistency review | PASS after all concrete findings were corrected and rechecked |
+
+Proofs recorded by tests (usability criterion U5): every one of the 40
+goal-by-input-family cells reaches the real parse, selected cleaning,
+segmentation, named construction, curation, and split logic over one captured
+snapshot; all closed selection and source-refusal codes are exercised; an
+eligible source compiles under the same family gate and an ineligible source
+is refused by the real construction stage. CLI and MCP return the service's
+exact bounded, ASCII-safe report; the Mac bridge decodes that contract,
+invalidates stale results, and reruns preflight before any workspace or history
+entry is created.
+
+The independent reviews found and closed typed-selection drift, split-ratio
+endpoint drift, diagnostic-bound and logical-path privacy defects, incomplete
+source identity/request digest binding, source-root retarget windows,
+hard-link alias reads before refusal, Swift logical-path whitespace drift,
+missing closed-refusal assertions, and incomplete non-claim codes. Root-pinned
+capture now rejects retargeting, detects aliases before reading bodies, reads
+each admitted body once, and retains exact unredacted size only in the bounded
+metadata field.
+
+These are local observations. They do not claim publication, GitHub checks,
+merge, or clean-main synchronization for the item 6.5 pull request.

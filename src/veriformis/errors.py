@@ -152,6 +152,12 @@ class GoalCatalogError(VeriformisError):
     code = "goal-catalog-invalid"
 
 
+class CompilePreflightError(VeriformisError):
+    """Compile preflight cannot produce one complete truthful response."""
+
+    code = "compile-preflight-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

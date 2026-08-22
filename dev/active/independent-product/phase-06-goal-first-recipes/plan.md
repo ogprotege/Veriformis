@@ -145,7 +145,7 @@ the repository requires. The widening is recorded in `decisions.md`.
 
 ### 6.5 Add compile preflight
 
-- [ ] Add `PipelineService.preflight` over raw source paths plus a goal,
+- [x] Add `PipelineService.preflight` over raw source paths plus a goal,
       representation, and preset, returning runtime-only
       `veriformis.compile-preflight/v1`: per-source input family and parser
       eligibility with the exact refusal reason, goal-by-family eligibility,
@@ -153,9 +153,9 @@ the repository requires. The widening is recorded in `decisions.md`.
       override), missing evidence for the goal (boundary, heading structure,
       scalar field), expected exclusions with reason codes, and known
       limitations, without creating or mutating a workspace.
-- [ ] Expose CLI `preflight`, MCP `preflight`, the Swift bridge, and a Mac
+- [x] Expose CLI `preflight`, MCP `preflight`, the Swift bridge, and a Mac
       preflight panel shown before compile.
-- [ ] Prove every goal-by-family cell, every refusal reason, and that a source
+- [x] Prove every goal-by-family cell, every refusal reason, and that a source
       reported eligible compiles and a source reported ineligible is refused by
       the real stages on the same inputs.
 

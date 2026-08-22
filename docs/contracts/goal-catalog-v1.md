@@ -12,11 +12,11 @@
 (goal catalog and read-only discovery), extended additively by Phase 6.2
 (per-goal contracts and input-family eligibility), Phase 6.3 (the
 runtime-only goal preview), and Phase 6.4 (goal and preset selection on every
-compile surface under the [Recipe Preset Contract v1](recipe-preset-v1.md)).
-Items 6.5–6.7 extend it further with preflight, the acceptance matrix, and
-instruction truthfulness.
+compile surface under the [Recipe Preset Contract v1](recipe-preset-v1.md)),
+and Phase 6.5 (the runtime-only compile preflight). Items 6.6–6.7 extend it
+further with the acceptance matrix and instruction truthfulness.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.4)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -261,6 +261,98 @@ Semantics:
 8. The preview never opens a workspace transaction, calls a renderer, or
    accesses a destination, and it changes no persisted model, request,
    discovery, selector, taxonomy, support, consumer, or trainer claim.
+
+## Compile preflight v1
+
+`veriformis.compile-preflight/v1` is a runtime-only, read-only response over
+explicit raw source paths plus one goal, preset, and representation selection.
+It is never written to a workspace, bundle, or export.
+
+| Surface | Operation |
+| --- | --- |
+| Python | `PipelineService.preflight(paths, source_root=..., goal=..., preset=..., representation=..., ...)` |
+| CLI | `veriformis preflight PATH... [--source-root ROOT] (--goal ID \| --preset ID) [--representation ID] [overrides...]` |
+| MCP | `preflight(paths, source_root, goal, preset, representation, ...)` |
+| Mac bridge | `VeriformisCLI.preflight`; the workbench presents the verdict before, and reruns it immediately before, creating a compile workspace |
+
+The response has the following closed top-level fields:
+
+| Field | Meaning |
+| --- | --- |
+| `schema_id` | Exactly `veriformis.compile-preflight/v1` |
+| `request_digest` | Digest of the complete selection, overrides, logical source arguments, and instruction digest |
+| `captured_source_digest` | Digest binding the sorted logical paths, raw SHA-256 values, and sizes from this one capture; absent before successful capture |
+| `evaluated_through` | Deepest completed boundary: `selection`, `capture`, `parse`, `family`, `construct`, `curate`, or `split` |
+| `admitted` | `true` only when selection is compatible, every source is admitted, curation has no source-coverage blocker, and required splitting succeeds |
+| `selection` | Requested identifiers and instruction-presence bit plus the completely resolved goal, preset, representation, recipe, row schema, settings, cleaning, construction, curation, and review-policy facts |
+| `counts` | Exact source, eligibility, candidate, record, decision, and inclusion counts |
+| `sources` | One ordered verdict per supplied source |
+| `incompatibilities` | Closed selection/override failures with implicated fields and actionable messages |
+| `missing_evidence` | The actual construction diagnostics proving goal evidence absent |
+| `expected_exclusion_counts`, `expected_exclusions` | Construction and curation decisions with their exact reason codes |
+| `coverage_blockers` | Per-source curation coverage failures |
+| `known_limitations` | Explicit non-claims and point-in-time limits |
+| omission counts | Counts of whole diagnostics or exclusions omitted only to satisfy transport bounds |
+
+Each source verdict carries its logical path, source identity and raw digest
+when captured, size, derived `input_family`, observed parser, parser status,
+parser eligibility, goal-family eligibility, evidence status, final admission,
+refusal reasons, diagnostic counts and bounded diagnostics, omission reason,
+and exact unredacted entry size. Refusal codes are
+`source-read-failed`, `unsupported-input`, `parser-refused`,
+`goal-input-family-ineligible`, `goal-evidence-unavailable`,
+`curation-coverage-blocked`, and
+`evaluation-partition-unavailable`. Incompatibility codes are
+`selection-required`, `goal-invalid`, `preset-incompatible`,
+`representation-incompatible`, `consumer-profile-incompatible`,
+`override-invalid`, `instruction-required`, `instruction-not-applicable`, and
+`review-evidence-unavailable`.
+
+Semantics:
+
+1. Selection and every explicit cleaning, segmentation, construction,
+   curation, and review override resolve through the same versioned recipe
+   settings as compile. An invalid selection is reported before source access.
+2. Logical paths are derived by the same source-root boundary as `parse`.
+   Repeated paths, duplicate logical locators, hard-link or case aliases with
+   the same filesystem identity, any symlink component beneath the chosen
+   root, paths outside the root, missing paths, directories, FIFOs, sockets,
+   and other non-regular inputs fail closed without a blocking read.
+   Capture walks from one pinned root directory descriptor with no-follow
+   opens, so a component retargeted after locator derivation cannot escape the
+   root.
+3. Every admitted raw source is captured exactly once. The captured bytes are
+   passed unchanged to the production parser and then through the same pure
+   cleaning-plan replay, chunking, named construction recipe, global curation,
+   and leakage-group split functions used by compile. No stage rereads a path.
+4. The logical suffix is the input-family authority and the observed parser
+   MUST be declared for that family. The same `require_goal_input_family`
+   gate runs in preflight and real construction. In particular, synthetic PDF
+   page labels cannot satisfy source-supplied section or structured-field
+   evidence.
+5. Parser refusal, missing source evidence, review-required recipes without
+   review evidence, curation coverage loss, and required-evaluation split
+   failure are negative verdicts with exact stable reason or diagnostic codes.
+   Expected exclusions remain reported even when compile can otherwise
+   proceed; preflight never silently turns an exclusion into admission.
+6. The instruction-and-output representation requires a non-empty operator
+   instruction. Phase 6.5 reports that Phase 6.7 has not yet validated the
+   instruction's truthfulness; it makes no semantic claim about the text.
+7. Bounds are measured on exact ASCII transport text. A source entry above
+   65,536 bytes drops only its diagnostic detail while preserving the complete
+   verdict and omission count. A response above 262,144 bytes drops source
+   diagnostic detail, missing-evidence detail, and individual exclusions while
+   retaining their counts and every mandatory verdict; if even that skeleton
+   cannot fit, preflight fails closed and instructs the caller to select fewer
+   sources. Values are never truncated or rewritten.
+8. `transport_text()` is ASCII-safe, two-space-indented JSON with sorted keys.
+   CLI prints it before exiting `0` for admission or `2` for a negative
+   verdict; MCP returns it unchanged.
+9. Preflight creates no workspace, opens no workspace transaction, calls no
+   renderer, accesses no destination, and changes no persisted contract,
+   support claim, consumer profile, or trainer claim. Its point-in-time
+   capture is not a publication guarantee: compile recaptures raw sources and
+   MUST rerun its own validation, sealing, and independent verification.
 
 ## Version and migration
 

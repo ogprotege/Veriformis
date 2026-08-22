@@ -49,16 +49,13 @@ capabilities owned by `PipelineService`.
 
 Phase 6 opened on 2026-08-22 from baseline
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` (PR #59, the Phase 5 closeout).
-Items 6.1–6.3 merged as PR #60 (`7316d94faf2d6c23b7abb6fe200f154da47d398c`),
-PR #61 (`81becfa676fd9111868b8d4b62549218a644d3e2`), and PR #62
-(`9cbab117e47cde6bd8850d67f0d363e03f0660ce`), each after all 14 GitHub
-checks passed. Item 6.4 is locally complete on branch
-`phase6/04-recipe-presets`: `veriformis.recipe-preset/v1` as the single
-versioned source of every recipe default and one safe preset per goal,
-`--goal`/`--preset`/`--representation` selection with explicit overrides on
-`chunk`, `construct`, and `curate` across Python, CLI, MCP, and YAML, the
-recipe library on the execution path, `presets` discovery, a catalog-driven
-workbench goal picker with a recipe-settings disclosure and no Swift recipe
-constants, and a tracking gate that refuses recipe default literals. Its pull
-request, GitHub checks, merge, and clean-main synchronization are not claimed
-by this packet.
+Items 6.1–6.4 merged sequentially as PR #60
+(`7316d94faf2d6c23b7abb6fe200f154da47d398c`), PR #61
+(`81becfa676fd9111868b8d4b62549218a644d3e2`), PR #62
+(`9cbab117e47cde6bd8850d67f0d363e03f0660ce`), and PR #63
+(`abdd630e25e83ebf346316319caec892f4d64886`), each after all 14 GitHub
+checks passed and clean-main synchronization. Item 6.5 is locally complete on
+`phase6/05-compile-preflight`, with its pull request pending: the bounded,
+runtime-only preflight evaluates one captured raw-source snapshot using the
+same parse, cleaning, chunking, construction, curation, and split semantics as
+compile and creates no workspace or destination.

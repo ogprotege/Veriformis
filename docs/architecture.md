@@ -77,6 +77,13 @@ from the objective field roles and taxonomy loss policy. Phase 6.4 adds
 recipe default and of each goal's safe preset, resolved through one function by
 the service, CLI, MCP, YAML runner, recipe library, and workbench, with the
 tracking checker refusing any recipe default literal in those surfaces.
+Phase 6.5 adds `goals/preflight.py`, a bounded runtime-only probe that captures
+each raw source once and composes the production parser, cleaning replay,
+chunking, named construction, global curation, and split functions in memory.
+The service, CLI, MCP, and Mac workbench share its exact response, while real
+construction shares the same goal/input-family gate so preflight and compile
+cannot disagree about source eligibility. It creates no workspace and accesses
+no renderer or destination.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

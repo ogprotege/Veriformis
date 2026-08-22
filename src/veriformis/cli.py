@@ -648,6 +648,73 @@ def presets() -> None:
     )
 
 
+@app.command(name="preflight")
+def preflight(
+    paths: list[Path],
+    source_root: Path | None = typer.Option(None, "--source-root"),
+    goal: str | None = typer.Option(None, "--goal", help="Plain-language goal id."),
+    preset: str | None = typer.Option(None, "--preset", help="Recipe preset id."),
+    representation: str | None = typer.Option(
+        None, "--representation", help="Catalog representation id."
+    ),
+    instruction: str | None = typer.Option(None, "--instruction"),
+    rules: str = typer.Option("", "--rules"),
+    custom: str = typer.Option("", "--custom"),
+    strategy: str | None = typer.Option(None, "--strategy"),
+    size: int | None = typer.Option(None, "--size"),
+    overlap: int | None = typer.Option(None, "--overlap"),
+    split_ratio_ppm: int | None = typer.Option(None, "--split-ratio-ppm"),
+    require_review: bool | None = typer.Option(
+        None, "--require-review/--no-require-review"
+    ),
+    consumer_profile: str | None = typer.Option(None, "--consumer-profile"),
+    minimum_target_characters: int | None = typer.Option(
+        None, "--minimum-target-characters"
+    ),
+    balance_mode: str | None = typer.Option(None, "--balance-mode"),
+    maximum_records_per_primary_source: int | None = typer.Option(
+        None, "--maximum-records-per-primary-source"
+    ),
+    evaluation_ratio_ppm: int | None = typer.Option(None, "--evaluation-ratio-ppm"),
+    evaluation_required: bool | None = typer.Option(
+        None, "--require-evaluation/--allow-empty-evaluation"
+    ),
+    split_seed: str | None = typer.Option(None, "--split-seed"),
+    review_policy: str | None = typer.Option(None, "--review-policy"),
+) -> None:
+    """Evaluate raw-source compile readiness without creating a workspace."""
+
+    def run():
+        outcome = _SERVICE.preflight(
+            paths,
+            source_root=source_root,
+            goal=goal,
+            preset=preset,
+            representation=representation,
+            instruction=instruction,
+            rules=rules,
+            custom=custom,
+            strategy=strategy,
+            size=size,
+            overlap=overlap,
+            split_ratio_ppm=split_ratio_ppm,
+            require_review=require_review,
+            consumer_profile=consumer_profile,
+            minimum_target_characters=minimum_target_characters,
+            balance_mode=balance_mode,
+            maximum_records_per_primary_source=maximum_records_per_primary_source,
+            evaluation_ratio_ppm=evaluation_ratio_ppm,
+            evaluation_required=evaluation_required,
+            split_seed=split_seed,
+            review_policy=review_policy,
+        )
+        assert outcome.preflight is not None
+        typer.echo(outcome.preflight.transport_text())
+        return outcome
+
+    _run(run)
+
+
 @app.command(name="goal-preview")
 def goal_preview(
     workspace: Path,

@@ -11,24 +11,53 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var destination: SidebarDestination = .compile
 
     // Compile form
-    @Published var sourceURLs: [URL] = []
-    @Published var sourceRootURL: URL?
+    @Published var sourceURLs: [URL] = [] {
+        didSet {
+            if oldValue != sourceURLs { invalidateCompilePreflight() }
+        }
+    }
+    @Published var sourceRootURL: URL? {
+        didSet {
+            if oldValue != sourceRootURL { invalidateCompilePreflight() }
+        }
+    }
     private var userPinnedSourceRoot = false
     @Published var outputDirectoryURL: URL?
     /// Plain-language goal and preset selection (Phase 6.4). Recipe defaults
     /// are never Swift constants: they come from `veriformis presets`.
-    @Published var selectedGoalID: String?
-    @Published var selectedPresetID: String?
+    @Published var selectedGoalID: String? {
+        didSet {
+            if oldValue != selectedGoalID { invalidateCompilePreflight() }
+        }
+    }
+    @Published var selectedPresetID: String? {
+        didSet {
+            if oldValue != selectedPresetID { invalidateCompilePreflight() }
+        }
+    }
     /// `--allow-empty-evaluation` is an explicit per-run opt-in, never a
     /// silent default; the CLI preset data requires evaluation otherwise.
-    @Published var allowEmptyEvaluation = false
+    @Published var allowEmptyEvaluation = false {
+        didSet {
+            if oldValue != allowEmptyEvaluation { invalidateCompilePreflight() }
+        }
+    }
     /// Operator override for `--split-ratio-ppm`; nil means the preset value.
-    @Published var splitRatioPPM: Int?
-    @Published var writeAptusHandoff = defaultWriteAptusHandoff
+    @Published var splitRatioPPM: Int? {
+        didSet {
+            if oldValue != splitRatioPPM { invalidateCompilePreflight() }
+        }
+    }
+    @Published var writeAptusHandoff = defaultWriteAptusHandoff {
+        didSet {
+            if oldValue != writeAptusHandoff { invalidateCompilePreflight() }
+        }
+    }
     @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
     @Published private(set) var goalCatalogState: GoalCatalogState = .idle
     @Published private(set) var recipePresetState: RecipePresetState = .idle
     @Published private(set) var goalPreviewState: GoalPreviewState = .idle
+    @Published private(set) var compilePreflightState: CompilePreflightState = .idle
 
     // Run state
     @Published var isRunning = false
@@ -52,7 +81,9 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var resolvedCLIDescription: String = "(not resolved)"
     @Published var defaultOutputPath: String = ""
 
-    private var cli: VeriformisCLI?
+    private var cli: VeriformisCLI? {
+        didSet { invalidateCompilePreflight() }
+    }
     private let defaults: UserDefaults
     private let supportDirectoryOverride: URL?
     private let historyKey = "veriformis.workbench.runHistory.v1"
@@ -73,13 +104,25 @@ final class WorkbenchViewModel: ObservableObject {
     private var pendingLegacyObjective: String?
     private var goalPreviewTask: Task<Void, Never>?
     private var goalPreviewController: CLIProcessController?
+    private var compilePreflightTask: Task<Void, Never>?
+    private var compilePreflightController: CLIProcessController?
+    private var compilePreflightRequestSnapshot: CompilePreflightRequest?
 
     var canCompile: Bool {
-        !isRunning
-            && cli != nil
-            && !sourceURLs.isEmpty
-            && resolvedSourceRoot != nil
-            && outputDirectoryURL != nil
+        guard !isRunning,
+              cli != nil,
+              !sourceURLs.isEmpty,
+              resolvedSourceRoot != nil,
+              outputDirectoryURL != nil,
+              let request = currentCompilePreflightRequest(),
+              compilePreflightRequestSnapshot == request,
+              case .ready(let report) = compilePreflightState
+        else { return false }
+        return report.admitted
+    }
+
+    var canPreflight: Bool {
+        !isRunning && currentCompilePreflightRequest() != nil
     }
 
     var compileBlockedReason: String? {
@@ -90,6 +133,20 @@ final class WorkbenchViewModel: ObservableObject {
         if outputDirectoryURL == nil { return "Choose an output folder (or set a default in Settings)." }
         if selectedGoalID == nil || selectedPresetID == nil {
             return "Goal catalog and recipe presets are not loaded yet."
+        }
+        switch compilePreflightState {
+        case .idle:
+            return "Check the current sources and recipe before compiling."
+        case .loading:
+            return "Compile preflight is still running."
+        case .unavailable:
+            return "Compile preflight is unavailable; retry it before compiling."
+        case .ready(let report) where !report.admitted:
+            return "Compile preflight found blockers. Resolve them and check again."
+        case .ready:
+            if compilePreflightRequestSnapshot != currentCompilePreflightRequest() {
+                return "The compile configuration changed; run preflight again."
+            }
         }
         return nil
     }
@@ -136,6 +193,7 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     func refreshGoalCatalog() {
+        invalidateCompilePreflight()
         goalCatalogTask?.cancel()
         goalCatalogController?.cancel()
         goalCatalogTask = nil
@@ -167,6 +225,7 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     func refreshRecipePresets() {
+        invalidateCompilePreflight()
         recipePresetTask?.cancel()
         recipePresetController?.cancel()
         recipePresetTask = nil
@@ -200,6 +259,7 @@ final class WorkbenchViewModel: ObservableObject {
     /// Apply already-decoded catalogs (tests and deterministic startup paths),
     /// cancelling any in-flight discovery so a late result cannot replace them.
     func applyCatalogs(goals: GoalCatalog, presets: RecipePresetCatalog) {
+        invalidateCompilePreflight()
         goalCatalogTask?.cancel()
         goalCatalogController?.cancel()
         goalCatalogTask = nil
@@ -350,6 +410,89 @@ final class WorkbenchViewModel: ObservableObject {
         }
     }
 
+    /// Cancel a raw-source preflight and discard its report. A report is valid
+    /// only for the exact immutable form snapshot that produced it.
+    func cancelCompilePreflight() {
+        compilePreflightTask?.cancel()
+        compilePreflightController?.cancel()
+        compilePreflightTask = nil
+        compilePreflightController = nil
+        compilePreflightRequestSnapshot = nil
+        compilePreflightState = .idle
+    }
+
+    /// Check the current source and recipe selection without creating a workspace.
+    func refreshCompilePreflight() {
+        cancelCompilePreflight()
+        guard !isRunning else { return }
+        guard let cli else {
+            compilePreflightState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let request = currentCompilePreflightRequest() else {
+            compilePreflightState = .idle
+            return
+        }
+
+        let controller = CLIProcessController()
+        compilePreflightController = controller
+        compilePreflightState = .loading
+        compilePreflightTask = Task { [weak self] in
+            let nextState: CompilePreflightState
+            do {
+                let report = try await cli.preflight(request, controller: controller)
+                try Task.checkCancellation()
+                nextState = .ready(report)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self,
+                  self.compilePreflightController === controller,
+                  self.currentCompilePreflightRequest() == request
+            else { return }
+            self.compilePreflightState = nextState
+            if case .ready = nextState {
+                self.compilePreflightRequestSnapshot = request
+            } else {
+                self.compilePreflightRequestSnapshot = nil
+            }
+            self.compilePreflightController = nil
+            self.compilePreflightTask = nil
+        }
+    }
+
+    private func invalidateCompilePreflight() {
+        compilePreflightTask?.cancel()
+        compilePreflightController?.cancel()
+        compilePreflightTask = nil
+        compilePreflightController = nil
+        compilePreflightRequestSnapshot = nil
+        compilePreflightState = .idle
+    }
+
+    private func currentCompilePreflightRequest() -> CompilePreflightRequest? {
+        guard !sourceURLs.isEmpty,
+              let sourceRoot = resolvedSourceRoot,
+              let goal = selectedGoalID,
+              let presetID = selectedPresetID,
+              let preset = selectedPreset,
+              preset.presetID == presetID,
+              preset.goalID == goal
+        else { return nil }
+        return CompilePreflightRequest(
+            sources: sourceURLs,
+            sourceRoot: sourceRoot,
+            goal: goal,
+            preset: presetID,
+            representation: preset.representationID,
+            splitRatioPPM: splitRatioPPM,
+            consumerProfile: writeAptusHandoff ? "aptus-handoff-v1" : nil,
+            evaluationRequired: allowEmptyEvaluation ? false : nil
+        )
+    }
+
     func addSources(_ urls: [URL]) {
         let existing = Set(sourceURLs.map(\.path))
         for url in urls where !existing.contains(url.path) {
@@ -447,7 +590,7 @@ final class WorkbenchViewModel: ObservableObject {
         progressPercent = 0
         logLines = []
         logExpanded = true
-        runStatusMessage = "Starting…"
+        runStatusMessage = "Checking sources and recipe…"
 
         guard !sourceURLs.isEmpty else {
             lastError = WorkbenchError.noSources.localizedDescription
@@ -466,17 +609,21 @@ final class WorkbenchViewModel: ObservableObject {
             return
         }
 
+        guard let goalSnapshot = selectedGoalID, let presetSnapshot = selectedPresetID else {
+            lastError = "Goal catalog and recipe presets are not loaded yet."
+            return
+        }
+        guard let preflightRequest = currentCompilePreflightRequest() else {
+            lastError = "The selected goal, preset, and representation are not ready for preflight."
+            return
+        }
+        cancelCompilePreflight()
+        compilePreflightState = .loading
         isRunning = true
-        showRunSheet = true
+        showRunSheet = false
         let startedAt = Date()
         let sourcesSnapshot = sourceURLs
         let sourceRootSnapshot = sourceRoot
-        guard let goalSnapshot = selectedGoalID, let presetSnapshot = selectedPresetID else {
-            lastError = "Goal catalog and recipe presets are not loaded yet."
-            isRunning = false
-            showRunSheet = false
-            return
-        }
         let objectiveSnapshot = selectedGoal?.objective ?? .fullText
         let allowEmptySnapshot = allowEmptyEvaluation
         let handoffSnapshot = writeAptusHandoff
@@ -500,9 +647,51 @@ final class WorkbenchViewModel: ObservableObject {
             var bundle = outputDirectory
             var transportArchive = outputDirectory
             var logFileURL: URL?
+            let cli: VeriformisCLI
             do {
-                let cli = try self.cli ?? VeriformisCLI.resolve()
-                self.cli = cli
+                cli = try self.cli ?? VeriformisCLI.resolve()
+                if self.cli == nil {
+                    self.cli = cli
+                    self.compilePreflightState = .loading
+                }
+                let report = try await cli.preflight(
+                    preflightRequest,
+                    controller: processController
+                )
+                try Task.checkCancellation()
+                guard currentCompilePreflightRequest() == preflightRequest else {
+                    compilePreflightRequestSnapshot = nil
+                    compilePreflightState = .idle
+                    runStatusMessage = "Configuration changed; check it again"
+                    return
+                }
+                compilePreflightRequestSnapshot = preflightRequest
+                compilePreflightState = .ready(report)
+                guard report.admitted else {
+                    runStatusMessage = "Preflight found blockers"
+                    return
+                }
+            } catch is CancellationError {
+                if currentCompilePreflightRequest() == preflightRequest {
+                    compilePreflightRequestSnapshot = nil
+                    compilePreflightState = .idle
+                }
+                runStatusMessage = "Preflight cancelled"
+                return
+            } catch {
+                if currentCompilePreflightRequest() == preflightRequest {
+                    compilePreflightRequestSnapshot = nil
+                    compilePreflightState = .unavailable(error.localizedDescription)
+                }
+                runStatusMessage = "Preflight unavailable"
+                lastError = error.localizedDescription
+                return
+            }
+
+            showRunSheet = true
+            runStatusMessage = "Starting compile…"
+            appendLog("Preflight admitted the current captured source snapshot.")
+            do {
 
                 let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
                 workspace = outputDirectory.appendingPathComponent("workspace-\(stamp)", isDirectory: true)
@@ -768,7 +957,11 @@ final class WorkbenchViewModel: ObservableObject {
         if cancellationRequestedAt == nil {
             cancellationRequestedAt = Date()
             runStatusMessage = "Cancelling…"
-            appendLog("Cancellation requested; preserving the current workspace…")
+            if showRunSheet {
+                appendLog("Cancellation requested; preserving the current workspace…")
+            } else {
+                appendLog("Cancellation requested before workspace creation…")
+            }
         }
         compileTask?.cancel()
         activeProcessController?.cancel()

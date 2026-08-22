@@ -2590,7 +2590,7 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 splitSeed: try Self.text(defaultsContainer, "split_seed")
             )
             guard curationDefaults.minimumTargetCharacters >= 1,
-                  (0 ... 1_000_000).contains(curationDefaults.evaluationRatioPPM)
+                  (1 ... 999_999).contains(curationDefaults.evaluationRatioPPM)
             else {
                 throw GoalCatalogError.invalidGoals("curation_defaults out of range")
             }
@@ -3209,7 +3209,7 @@ struct RecipePresetCatalog: Decodable, Equatable, Sendable {
             evaluationRequired: try nested.decode(Bool.self, forKey: GoalCatalogKey("evaluation_required")),
             splitSeed: try text(nested, "split_seed")
         )
-        guard settings.minimumTargetCharacters >= 1, (0 ... 1_000_000).contains(settings.evaluationRatioPPM) else {
+        guard settings.minimumTargetCharacters >= 1, (1 ... 999_999).contains(settings.evaluationRatioPPM) else {
             throw RecipePresetError.invalidMetadata("curation")
         }
         return settings
@@ -3254,4 +3254,720 @@ enum GoalCatalogState: Equatable, Sendable {
     case loading
     case ready(GoalCatalog)
     case unavailable(String)
+}
+
+// MARK: - Compile preflight (Phase 6.5)
+
+enum CompilePreflightError: LocalizedError, Equatable, Sendable {
+    case invalidKeySet(scope: String, missing: [String], unexpected: [String])
+    case invalidMetadata(String)
+    case commandFailed(exitCode: Int32, message: String)
+    case outputTruncated
+    case invalidPayload(String)
+    case inconsistentExitStatus(exitCode: Int32, admitted: Bool)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidKeySet(let scope, let missing, let unexpected):
+            return "Compile preflight \(scope) keys are invalid (missing: \(missing); unexpected: \(unexpected))."
+        case .invalidMetadata(let key):
+            return "Compile preflight field \(key) is invalid."
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "no output" : message
+            return "Compile preflight failed (exit \(exitCode)): \(detail)"
+        case .outputTruncated:
+            return "Compile preflight output was truncated."
+        case .invalidPayload(let message):
+            return "Compile preflight returned invalid JSON: \(message)"
+        case .inconsistentExitStatus(let exitCode, let admitted):
+            return "Compile preflight returned admitted=\(admitted) with inconsistent exit \(exitCode)."
+        }
+    }
+}
+
+/// One complete invocation of the raw-source compile preflight surface.
+/// Nil fields mean the versioned preset remains authoritative.
+struct CompilePreflightRequest: Equatable, Sendable {
+    let sources: [URL]
+    let sourceRoot: URL
+    let goal: String
+    let preset: String
+    let representation: String
+    let instruction: String?
+    let rules: String
+    let custom: String
+    let strategy: String?
+    let size: Int?
+    let overlap: Int?
+    let splitRatioPPM: Int?
+    let requireReview: Bool?
+    let consumerProfile: String?
+    let minimumTargetCharacters: Int?
+    let balanceMode: String?
+    let maximumRecordsPerPrimarySource: Int?
+    let evaluationRatioPPM: Int?
+    let evaluationRequired: Bool?
+    let splitSeed: String?
+    let reviewPolicy: String?
+
+    init(
+        sources: [URL],
+        sourceRoot: URL,
+        goal: String,
+        preset: String,
+        representation: String,
+        instruction: String? = nil,
+        rules: String = "",
+        custom: String = "",
+        strategy: String? = nil,
+        size: Int? = nil,
+        overlap: Int? = nil,
+        splitRatioPPM: Int? = nil,
+        requireReview: Bool? = nil,
+        consumerProfile: String? = nil,
+        minimumTargetCharacters: Int? = nil,
+        balanceMode: String? = nil,
+        maximumRecordsPerPrimarySource: Int? = nil,
+        evaluationRatioPPM: Int? = nil,
+        evaluationRequired: Bool? = nil,
+        splitSeed: String? = nil,
+        reviewPolicy: String? = nil
+    ) {
+        self.sources = sources
+        self.sourceRoot = sourceRoot
+        self.goal = goal
+        self.preset = preset
+        self.representation = representation
+        self.instruction = instruction
+        self.rules = rules
+        self.custom = custom
+        self.strategy = strategy
+        self.size = size
+        self.overlap = overlap
+        self.splitRatioPPM = splitRatioPPM
+        self.requireReview = requireReview
+        self.consumerProfile = consumerProfile
+        self.minimumTargetCharacters = minimumTargetCharacters
+        self.balanceMode = balanceMode
+        self.maximumRecordsPerPrimarySource = maximumRecordsPerPrimarySource
+        self.evaluationRatioPPM = evaluationRatioPPM
+        self.evaluationRequired = evaluationRequired
+        self.splitSeed = splitSeed
+        self.reviewPolicy = reviewPolicy
+    }
+}
+
+enum CompilePreflightState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(CompilePreflight)
+    case unavailable(String)
+}
+
+enum CompilePreflightEvaluatedThrough: String, Decodable, Equatable, Sendable {
+    case selection
+    case capture
+    case parse
+    case family
+    case construct
+    case curate
+    case split
+}
+
+enum CompilePreflightParserStatus: String, Decodable, Equatable, Sendable {
+    case notEvaluated = "not-evaluated"
+    case complete
+    case degraded
+    case refused
+    case error
+}
+
+enum CompilePreflightEvidenceStatus: String, Decodable, Equatable, Sendable {
+    case notEvaluated = "not-evaluated"
+    case available
+    case missing
+}
+
+enum CompilePreflightOmissionReason: String, Decodable, Equatable, Sendable {
+    case sourceLimit = "exact-source-exceeds-preflight-limit"
+    case responseBudget = "exact-source-exceeds-response-budget"
+}
+
+enum CompilePreflightRefusalCode: String, Decodable, Equatable, Sendable {
+    case sourceReadFailed = "source-read-failed"
+    case unsupportedInput = "unsupported-input"
+    case parserRefused = "parser-refused"
+    case goalInputFamilyIneligible = "goal-input-family-ineligible"
+    case goalEvidenceUnavailable = "goal-evidence-unavailable"
+    case curationCoverageBlocked = "curation-coverage-blocked"
+    case evaluationPartitionUnavailable = "evaluation-partition-unavailable"
+}
+
+enum CompilePreflightIncompatibilityCode: String, Decodable, Equatable, Sendable {
+    case selectionRequired = "selection-required"
+    case goalInvalid = "goal-invalid"
+    case presetIncompatible = "preset-incompatible"
+    case representationIncompatible = "representation-incompatible"
+    case consumerProfileIncompatible = "consumer-profile-incompatible"
+    case overrideInvalid = "override-invalid"
+    case instructionRequired = "instruction-required"
+    case instructionNotApplicable = "instruction-not-applicable"
+    case reviewEvidenceUnavailable = "review-evidence-unavailable"
+}
+
+enum CompilePreflightExclusionStage: String, Decodable, Equatable, Sendable {
+    case construct
+    case curate
+}
+
+enum CompilePreflightExclusionStatus: String, Decodable, Equatable, Sendable {
+    case pendingReview = "pending_review"
+    case rejected
+    case excluded
+    case quarantined
+}
+
+enum CompilePreflightReviewPolicy: String, Decodable, Equatable, Sendable {
+    case none
+    case required
+}
+
+struct CompilePreflightSelection: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "requested_goal", "requested_preset", "requested_representation",
+        "instruction_supplied", "resolved",
+    ]
+
+    let requestedGoal: String?
+    let requestedPreset: String?
+    let requestedRepresentation: String?
+    let instructionSupplied: Bool
+    let resolved: CompilePreflightResolvedSelection?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "selection")
+        requestedGoal = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("requested_goal"))
+        requestedPreset = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("requested_preset"))
+        requestedRepresentation = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("requested_representation"))
+        instructionSupplied = try container.decode(Bool.self, forKey: GoalCatalogKey("instruction_supplied"))
+        resolved = try container.decodeIfPresent(
+            CompilePreflightResolvedSelection.self,
+            forKey: GoalCatalogKey("resolved")
+        )
+    }
+}
+
+struct CompilePreflightResolvedSelection: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "goal_id", "preset_id", "representation_id", "objective", "row_schema",
+        "recipe_library_id", "consumer_profile", "settings_digest",
+        "cleaning_config_digest", "segmentation", "construction", "curation",
+        "review_policy",
+    ]
+
+    let goalID: String
+    let presetID: String
+    let representationID: String
+    let objective: TrainingObjective
+    let rowSchema: String
+    let recipeLibraryID: String
+    let consumerProfile: String
+    let settingsDigest: String
+    let cleaningConfigDigest: String
+    let segmentation: RecipeSegmentationSettings
+    let construction: RecipeConstructionSettings
+    let curation: GoalCurationDefaults
+    let reviewPolicy: CompilePreflightReviewPolicy
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "resolved selection")
+        goalID = try CompilePreflightDecoding.text(container, "goal_id")
+        presetID = try CompilePreflightDecoding.text(container, "preset_id")
+        representationID = try CompilePreflightDecoding.text(container, "representation_id")
+        objective = try container.decode(TrainingObjective.self, forKey: GoalCatalogKey("objective"))
+        rowSchema = try CompilePreflightDecoding.text(container, "row_schema")
+        guard GoalCatalog.rowSchemaOrder.contains(rowSchema) else {
+            throw CompilePreflightError.invalidMetadata("row_schema")
+        }
+        recipeLibraryID = try CompilePreflightDecoding.text(container, "recipe_library_id")
+        consumerProfile = try CompilePreflightDecoding.text(container, "consumer_profile")
+        settingsDigest = try CompilePreflightDecoding.text(container, "settings_digest")
+        cleaningConfigDigest = try CompilePreflightDecoding.text(container, "cleaning_config_digest")
+        segmentation = try CompilePreflightDecoding.segmentation(container)
+        construction = try CompilePreflightDecoding.construction(container)
+        curation = try CompilePreflightDecoding.curation(container)
+        reviewPolicy = try container.decode(
+            CompilePreflightReviewPolicy.self,
+            forKey: GoalCatalogKey("review_policy")
+        )
+    }
+}
+
+struct CompilePreflightRefusal: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = ["code", "detail_codes", "message"]
+
+    let code: CompilePreflightRefusalCode
+    let detailCodes: [String]
+    let message: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "refusal")
+        code = try container.decode(CompilePreflightRefusalCode.self, forKey: GoalCatalogKey("code"))
+        detailCodes = try container.decode([String].self, forKey: GoalCatalogKey("detail_codes"))
+        message = try CompilePreflightDecoding.text(container, "message")
+    }
+}
+
+struct CompilePreflightDiagnostic: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "diagnostic_id", "code", "message", "pass_id", "source_ids", "chunk_ids",
+    ]
+
+    let diagnosticID: String
+    let code: String
+    let message: String
+    let passID: String
+    let sourceIDs: [String]
+    let chunkIDs: [String]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "diagnostic")
+        diagnosticID = try CompilePreflightDecoding.text(container, "diagnostic_id")
+        code = try CompilePreflightDecoding.text(container, "code")
+        message = try CompilePreflightDecoding.text(container, "message")
+        passID = try CompilePreflightDecoding.text(container, "pass_id")
+        sourceIDs = try container.decode([String].self, forKey: GoalCatalogKey("source_ids"))
+        chunkIDs = try container.decode([String].self, forKey: GoalCatalogKey("chunk_ids"))
+    }
+}
+
+struct CompilePreflightCodeCount: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = ["code", "count"]
+
+    let code: String
+    let count: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "diagnostic count")
+        code = try CompilePreflightDecoding.text(container, "code")
+        count = try container.decode(Int.self, forKey: GoalCatalogKey("count"))
+        guard count >= 0 else { throw CompilePreflightError.invalidMetadata("diagnostic count") }
+    }
+}
+
+struct CompilePreflightParserDiagnostic: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "diagnostic_id", "code", "severity", "disposition", "loss_kind", "message",
+    ]
+
+    let diagnosticID: String
+    let code: String
+    let severity: String
+    let disposition: String
+    let lossKind: String
+    let message: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "parser diagnostic")
+        diagnosticID = try CompilePreflightDecoding.text(container, "diagnostic_id")
+        code = try CompilePreflightDecoding.text(container, "code")
+        severity = try CompilePreflightDecoding.oneOf(
+            container,
+            "severity",
+            allowed: ["info", "warning", "error"]
+        )
+        disposition = try CompilePreflightDecoding.oneOf(
+            container,
+            "disposition",
+            allowed: ["preserved", "normalized", "omitted", "refused"]
+        )
+        lossKind = try CompilePreflightDecoding.oneOf(
+            container,
+            "loss_kind",
+            allowed: ["none", "presentation", "metadata", "structure", "text", "unknown"]
+        )
+        message = try CompilePreflightDecoding.text(container, "message")
+    }
+}
+
+struct CompilePreflightSource: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "logical_path", "source_id", "sha256", "size", "input_family", "parser_id",
+        "parser_status", "parser_eligible", "goal_family_eligible", "evidence_status",
+        "admitted", "refusal_reasons", "diagnostic_counts", "diagnostics",
+        "omitted_diagnostic_count", "omission_reason", "exact_size_bytes",
+    ]
+
+    let logicalPath: String
+    let sourceID: String?
+    let sha256: String?
+    let size: Int?
+    let inputFamily: String?
+    let parserID: String?
+    let parserStatus: CompilePreflightParserStatus
+    let parserEligible: Bool
+    let goalFamilyEligible: Bool?
+    let evidenceStatus: CompilePreflightEvidenceStatus
+    let admitted: Bool
+    let refusalReasons: [CompilePreflightRefusal]
+    let diagnosticCounts: [CompilePreflightCodeCount]
+    let diagnostics: [CompilePreflightParserDiagnostic]
+    let omittedDiagnosticCount: Int
+    let omissionReason: CompilePreflightOmissionReason?
+    let exactSizeBytes: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "source")
+        logicalPath = try CompilePreflightDecoding.logicalPath(container, "logical_path")
+        sourceID = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("source_id"))
+        sha256 = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("sha256"))
+        size = try container.decodeIfPresent(Int.self, forKey: GoalCatalogKey("size"))
+        inputFamily = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("input_family"))
+        parserID = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("parser_id"))
+        parserStatus = try container.decode(CompilePreflightParserStatus.self, forKey: GoalCatalogKey("parser_status"))
+        parserEligible = try container.decode(Bool.self, forKey: GoalCatalogKey("parser_eligible"))
+        goalFamilyEligible = try container.decodeIfPresent(Bool.self, forKey: GoalCatalogKey("goal_family_eligible"))
+        evidenceStatus = try container.decode(CompilePreflightEvidenceStatus.self, forKey: GoalCatalogKey("evidence_status"))
+        admitted = try container.decode(Bool.self, forKey: GoalCatalogKey("admitted"))
+        refusalReasons = try container.decode([CompilePreflightRefusal].self, forKey: GoalCatalogKey("refusal_reasons"))
+        diagnosticCounts = try container.decode([CompilePreflightCodeCount].self, forKey: GoalCatalogKey("diagnostic_counts"))
+        diagnostics = try container.decode([CompilePreflightParserDiagnostic].self, forKey: GoalCatalogKey("diagnostics"))
+        omittedDiagnosticCount = try container.decode(Int.self, forKey: GoalCatalogKey("omitted_diagnostic_count"))
+        omissionReason = try container.decodeIfPresent(CompilePreflightOmissionReason.self, forKey: GoalCatalogKey("omission_reason"))
+        exactSizeBytes = try container.decode(Int.self, forKey: GoalCatalogKey("exact_size_bytes"))
+        guard size.map({ $0 >= 0 }) ?? true,
+              omittedDiagnosticCount >= 0,
+              exactSizeBytes >= 0
+        else { throw CompilePreflightError.invalidMetadata("source counts") }
+    }
+}
+
+struct CompilePreflightIncompatibility: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = ["code", "fields", "message"]
+
+    let code: CompilePreflightIncompatibilityCode
+    let fields: [String]
+    let message: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "incompatibility")
+        code = try container.decode(CompilePreflightIncompatibilityCode.self, forKey: GoalCatalogKey("code"))
+        fields = try container.decode([String].self, forKey: GoalCatalogKey("fields"))
+        message = try CompilePreflightDecoding.text(container, "message")
+    }
+}
+
+struct CompilePreflightExclusionCount: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = ["stage", "status", "reason_code", "count"]
+
+    let stage: CompilePreflightExclusionStage
+    let status: CompilePreflightExclusionStatus
+    let reasonCode: String
+    let count: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "exclusion count")
+        stage = try container.decode(CompilePreflightExclusionStage.self, forKey: GoalCatalogKey("stage"))
+        status = try container.decode(CompilePreflightExclusionStatus.self, forKey: GoalCatalogKey("status"))
+        reasonCode = try CompilePreflightDecoding.text(container, "reason_code")
+        count = try container.decode(Int.self, forKey: GoalCatalogKey("count"))
+        guard count >= 0 else { throw CompilePreflightError.invalidMetadata("exclusion count") }
+    }
+}
+
+struct CompilePreflightExclusion: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "stage", "subject_id", "source_ids", "status", "reason_codes",
+    ]
+
+    let stage: CompilePreflightExclusionStage
+    let subjectID: String
+    let sourceIDs: [String]
+    let status: CompilePreflightExclusionStatus
+    let reasonCodes: [String]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "expected exclusion")
+        stage = try container.decode(CompilePreflightExclusionStage.self, forKey: GoalCatalogKey("stage"))
+        subjectID = try CompilePreflightDecoding.text(container, "subject_id")
+        sourceIDs = try container.decode([String].self, forKey: GoalCatalogKey("source_ids"))
+        status = try container.decode(CompilePreflightExclusionStatus.self, forKey: GoalCatalogKey("status"))
+        reasonCodes = try container.decode([String].self, forKey: GoalCatalogKey("reason_codes"))
+    }
+}
+
+struct CompilePreflightCoverageBlocker: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = ["source_id", "blocker_codes"]
+
+    let sourceID: String
+    let blockerCodes: [String]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "coverage blocker")
+        sourceID = try CompilePreflightDecoding.text(container, "source_id")
+        blockerCodes = try container.decode([String].self, forKey: GoalCatalogKey("blocker_codes"))
+    }
+}
+
+struct CompilePreflightLimitation: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = ["code", "message", "source_ids"]
+
+    let code: String
+    let message: String
+    let sourceIDs: [String]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "known limitation")
+        code = try CompilePreflightDecoding.text(container, "code")
+        message = try CompilePreflightDecoding.text(container, "message")
+        sourceIDs = try container.decode([String].self, forKey: GoalCatalogKey("source_ids"))
+    }
+}
+
+struct CompilePreflightCounts: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "source_count", "parser_eligible_source_count", "family_eligible_source_count",
+        "evidence_eligible_source_count", "admitted_source_count", "candidate_count",
+        "record_count", "pending_review_count", "included_count", "excluded_count",
+        "quarantined_count",
+    ]
+
+    let sourceCount: Int
+    let parserEligibleSourceCount: Int
+    let familyEligibleSourceCount: Int
+    let evidenceEligibleSourceCount: Int
+    let admittedSourceCount: Int
+    let candidateCount: Int
+    let recordCount: Int
+    let pendingReviewCount: Int
+    let includedCount: Int
+    let excludedCount: Int
+    let quarantinedCount: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "counts")
+        sourceCount = try container.decode(Int.self, forKey: GoalCatalogKey("source_count"))
+        parserEligibleSourceCount = try container.decode(Int.self, forKey: GoalCatalogKey("parser_eligible_source_count"))
+        familyEligibleSourceCount = try container.decode(Int.self, forKey: GoalCatalogKey("family_eligible_source_count"))
+        evidenceEligibleSourceCount = try container.decode(Int.self, forKey: GoalCatalogKey("evidence_eligible_source_count"))
+        admittedSourceCount = try container.decode(Int.self, forKey: GoalCatalogKey("admitted_source_count"))
+        candidateCount = try container.decode(Int.self, forKey: GoalCatalogKey("candidate_count"))
+        recordCount = try container.decode(Int.self, forKey: GoalCatalogKey("record_count"))
+        pendingReviewCount = try container.decode(Int.self, forKey: GoalCatalogKey("pending_review_count"))
+        includedCount = try container.decode(Int.self, forKey: GoalCatalogKey("included_count"))
+        excludedCount = try container.decode(Int.self, forKey: GoalCatalogKey("excluded_count"))
+        quarantinedCount = try container.decode(Int.self, forKey: GoalCatalogKey("quarantined_count"))
+        let all = [
+            sourceCount, parserEligibleSourceCount, familyEligibleSourceCount,
+            evidenceEligibleSourceCount, admittedSourceCount, candidateCount, recordCount,
+            pendingReviewCount, includedCount, excludedCount, quarantinedCount,
+        ]
+        guard all.allSatisfy({ $0 >= 0 }) else {
+            throw CompilePreflightError.invalidMetadata("counts")
+        }
+    }
+}
+
+/// Strict, runtime-only workbench view of `veriformis preflight`.
+struct CompilePreflight: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "schema_id", "request_digest", "captured_source_digest", "evaluated_through",
+        "admitted", "selection", "counts", "sources", "incompatibilities",
+        "missing_evidence", "expected_exclusion_counts", "expected_exclusions",
+        "omitted_expected_exclusion_count", "coverage_blockers", "known_limitations",
+        "omitted_diagnostic_count",
+    ]
+
+    let schemaID: String
+    let requestDigest: String
+    let capturedSourceDigest: String?
+    let evaluatedThrough: CompilePreflightEvaluatedThrough
+    let admitted: Bool
+    let selection: CompilePreflightSelection
+    let counts: CompilePreflightCounts
+    let sources: [CompilePreflightSource]
+    let incompatibilities: [CompilePreflightIncompatibility]
+    let missingEvidence: [CompilePreflightDiagnostic]
+    let expectedExclusionCounts: [CompilePreflightExclusionCount]
+    let expectedExclusions: [CompilePreflightExclusion]
+    let omittedExpectedExclusionCount: Int
+    let coverageBlockers: [CompilePreflightCoverageBlocker]
+    let knownLimitations: [CompilePreflightLimitation]
+    let omittedDiagnosticCount: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try CompilePreflightDecoding.requireKeys(container, expected: Self.expectedKeys, scope: "response")
+        schemaID = try CompilePreflightDecoding.text(container, "schema_id")
+        guard schemaID == "veriformis.compile-preflight/v1" else {
+            throw CompilePreflightError.invalidMetadata("schema_id")
+        }
+        requestDigest = try CompilePreflightDecoding.text(container, "request_digest")
+        capturedSourceDigest = try container.decodeIfPresent(String.self, forKey: GoalCatalogKey("captured_source_digest"))
+        evaluatedThrough = try container.decode(CompilePreflightEvaluatedThrough.self, forKey: GoalCatalogKey("evaluated_through"))
+        admitted = try container.decode(Bool.self, forKey: GoalCatalogKey("admitted"))
+        selection = try container.decode(CompilePreflightSelection.self, forKey: GoalCatalogKey("selection"))
+        counts = try container.decode(CompilePreflightCounts.self, forKey: GoalCatalogKey("counts"))
+        sources = try container.decode([CompilePreflightSource].self, forKey: GoalCatalogKey("sources"))
+        incompatibilities = try container.decode([CompilePreflightIncompatibility].self, forKey: GoalCatalogKey("incompatibilities"))
+        missingEvidence = try container.decode([CompilePreflightDiagnostic].self, forKey: GoalCatalogKey("missing_evidence"))
+        expectedExclusionCounts = try container.decode([CompilePreflightExclusionCount].self, forKey: GoalCatalogKey("expected_exclusion_counts"))
+        expectedExclusions = try container.decode([CompilePreflightExclusion].self, forKey: GoalCatalogKey("expected_exclusions"))
+        omittedExpectedExclusionCount = try container.decode(Int.self, forKey: GoalCatalogKey("omitted_expected_exclusion_count"))
+        coverageBlockers = try container.decode([CompilePreflightCoverageBlocker].self, forKey: GoalCatalogKey("coverage_blockers"))
+        knownLimitations = try container.decode([CompilePreflightLimitation].self, forKey: GoalCatalogKey("known_limitations"))
+        omittedDiagnosticCount = try container.decode(Int.self, forKey: GoalCatalogKey("omitted_diagnostic_count"))
+        guard omittedExpectedExclusionCount >= 0,
+              omittedDiagnosticCount >= 0
+        else { throw CompilePreflightError.invalidMetadata("counts") }
+        guard counts.sourceCount == sources.count else {
+            throw CompilePreflightError.invalidMetadata("source_count")
+        }
+        let hasBlocker = !incompatibilities.isEmpty
+            || !coverageBlockers.isEmpty
+            || sources.contains(where: { !$0.admitted })
+        guard admitted != hasBlocker else {
+            throw CompilePreflightError.invalidMetadata("admitted")
+        }
+    }
+}
+
+private enum CompilePreflightDecoding {
+    static func requireKeys(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        expected: Set<String>,
+        scope: String
+    ) throws {
+        let observed = Set(container.allKeys.map(\.stringValue))
+        guard observed == expected else {
+            throw CompilePreflightError.invalidKeySet(
+                scope: scope,
+                missing: Array(expected.subtracting(observed)).sorted(),
+                unexpected: Array(observed.subtracting(expected)).sorted()
+            )
+        }
+    }
+
+    static func text(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String
+    ) throws -> String {
+        let value = try container.decode(String.self, forKey: GoalCatalogKey(key))
+        guard !value.isEmpty, value == value.trimmingCharacters(in: .whitespacesAndNewlines) else {
+            throw CompilePreflightError.invalidMetadata(key)
+        }
+        return value
+    }
+
+    static func logicalPath(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String
+    ) throws -> String {
+        let value = try container.decode(String.self, forKey: GoalCatalogKey(key))
+        let parts = value.split(separator: "/", omittingEmptySubsequences: false)
+        let startsWithWindowsDrive = value.count >= 2
+            && value[value.index(after: value.startIndex)] == ":"
+            && value.first.map { character in
+                character.isASCII && character.isLetter
+            } == true
+        guard !value.isEmpty,
+              !value.contains("\0"),
+              !value.contains("\\"),
+              !value.hasPrefix("/"),
+              !startsWithWindowsDrive,
+              value == value.precomposedStringWithCanonicalMapping,
+              !parts.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." })
+        else { throw CompilePreflightError.invalidMetadata(key) }
+        return value
+    }
+
+    static func oneOf(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String,
+        allowed: Set<String>
+    ) throws -> String {
+        let value = try text(container, key)
+        guard allowed.contains(value) else {
+            throw CompilePreflightError.invalidMetadata(key)
+        }
+        return value
+    }
+
+    static func segmentation(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>
+    ) throws -> RecipeSegmentationSettings {
+        let nested = try container.nestedContainer(
+            keyedBy: GoalCatalogKey.self,
+            forKey: GoalCatalogKey("segmentation")
+        )
+        try requireKeys(nested, expected: ["strategy", "size", "overlap"], scope: "segmentation")
+        let value = RecipeSegmentationSettings(
+            strategy: try text(nested, "strategy"),
+            size: try nested.decode(Int.self, forKey: GoalCatalogKey("size")),
+            overlap: try nested.decode(Int.self, forKey: GoalCatalogKey("overlap"))
+        )
+        guard value.size >= 1, value.overlap >= 0, value.overlap < value.size else {
+            throw CompilePreflightError.invalidMetadata("segmentation")
+        }
+        return value
+    }
+
+    static func construction(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>
+    ) throws -> RecipeConstructionSettings {
+        let nested = try container.nestedContainer(
+            keyedBy: GoalCatalogKey.self,
+            forKey: GoalCatalogKey("construction")
+        )
+        try requireKeys(
+            nested,
+            expected: ["split_ratio_ppm", "require_review", "consumer_profile"],
+            scope: "construction"
+        )
+        let value = RecipeConstructionSettings(
+            splitRatioPPM: try nested.decode(Int.self, forKey: GoalCatalogKey("split_ratio_ppm")),
+            requireReview: try nested.decode(Bool.self, forKey: GoalCatalogKey("require_review")),
+            consumerProfile: try text(nested, "consumer_profile")
+        )
+        guard (1 ... 999_999).contains(value.splitRatioPPM) else {
+            throw CompilePreflightError.invalidMetadata("split_ratio_ppm")
+        }
+        return value
+    }
+
+    static func curation(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>
+    ) throws -> GoalCurationDefaults {
+        let nested = try container.nestedContainer(
+            keyedBy: GoalCatalogKey.self,
+            forKey: GoalCatalogKey("curation")
+        )
+        try requireKeys(nested, expected: GoalCurationDefaults.expectedKeys, scope: "curation")
+        let value = GoalCurationDefaults(
+            minimumTargetCharacters: try nested.decode(Int.self, forKey: GoalCatalogKey("minimum_target_characters")),
+            balanceMode: try text(nested, "balance_mode"),
+            maximumRecordsPerPrimarySource: try nested.decodeIfPresent(Int.self, forKey: GoalCatalogKey("maximum_records_per_primary_source")),
+            evaluationRatioPPM: try nested.decode(Int.self, forKey: GoalCatalogKey("evaluation_ratio_ppm")),
+            evaluationRequired: try nested.decode(Bool.self, forKey: GoalCatalogKey("evaluation_required")),
+            splitSeed: try text(nested, "split_seed")
+        )
+        guard value.minimumTargetCharacters >= 1,
+              (1 ... 999_999).contains(value.evaluationRatioPPM),
+              value.maximumRecordsPerPrimarySource.map({ $0 >= 1 }) ?? true
+        else { throw CompilePreflightError.invalidMetadata("curation") }
+        return value
+    }
 }
