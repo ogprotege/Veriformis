@@ -17,6 +17,9 @@ explicitly selects it as training content.
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
 > independent-product Phases 0–4, plus Phase 5.1–5.3's supported generic
 > `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 exports.
+> Phase 5.3 merged as PR #55 at
+> `c6d7fc13a09a`; Phase 5.4's receipt-anchored export-pack transport is
+> locally admitted, with pull-request publication and merge still pending.
 > This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
@@ -58,6 +61,11 @@ Version `0.1.0` provides:
 - authoritative train and evaluation assignment by complete transitive leakage groups;
 - deterministic, externally anchored `.vfbundle.zip` transport that preserves
   the strict six-file canonical bundle without becoming a trainer export;
+- a locally admitted Phase 5.4 optional receipt-anchored
+  `.vfexport.zip` transport around one unchanged, already-published generic
+  export directory; it reuses `package` / `package-verify`, is not a fourth
+  export renderer or source-bound export verification, and remains pending
+  pull-request publication and merge;
 - a verified `split-jsonl-directory` v1 derivative with canonical train and
   evaluation JSONL, a deterministic README and data card, an export receipt,
   and aligned provenance by default;
@@ -85,6 +93,8 @@ sources into a sealed `.vfbundle` and verified Finder-safe `.vfbundle.zip` by
 shelling the same `veriformis` CLI as the terminal. It keeps process work off
 the main actor, bounds displayed/output retention, supports accountable
 cancellation, and records manifest and transport digests in history.
+It does not expose the Phase 5.4 `.vfexport.zip` packaging path as a Mac UI
+action.
 
 ```bash
 # From the repo (preferred private-beta launch):
@@ -246,7 +256,10 @@ source paths.
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
 **private beta workbench Phases 0–2**, **independent-product Phases 0–4**, and
-**independent-product Phase 5.1–5.3**.
+**independent-product Phase 5.1–5.3**. Phase 5.3 merged as PR #55 at
+`c6d7fc13a09a`. Phase 5.4 is locally implemented and admitted on the current
+working tree; pull-request publication, GitHub evidence, and merge remain
+pending.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
@@ -273,6 +286,13 @@ That empty catalog is a completed Phase 4 fact. Phase 5.1–5.3 install three
 production exact-byte renderers: `split-jsonl-directory`, canonical `json`,
 and `constrained-csv` v1, all with no consumer profile or trainer-compatibility
 claim.
+Phase 5.4 does not add a renderer. It adds the optional
+`deterministic-export-pack-zip-v1` transport after directory publication:
+`package` and `package-verify` require a separately retained canonical
+`export-receipt.json` SHA-256 and wrap the receipt plus its exact bound file
+set as `.vfexport.zip`. Archive verification preserves the embedded source
+trust grade and is not source-bound export verification. Export discovery,
+request schemas, persisted export models, and the Mac UI remain unchanged.
 Historical request v1 remains unchanged: it selects split JSONL's `train` /
 `evaluation` filenames with aligned provenance and the canonical JSON fixed
 tree, or constrained CSV's fixed quoted-CSV tree. Request v2 applies only to
@@ -308,6 +328,7 @@ reading paths. The map:
   - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
   - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
   - [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
+  - [Deterministic Archive Transport v1](docs/contracts/bundle-transport-v1.md)
   - [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
   - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
   - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)

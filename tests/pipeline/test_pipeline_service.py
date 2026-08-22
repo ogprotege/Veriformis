@@ -351,3 +351,79 @@ def test_construct_rejects_invalid_taxonomy_before_opening_workspace(tmp_path):
         )
 
     assert not missing.exists()
+
+
+@pytest.mark.parametrize("operation", ("package", "package_verify"))
+@pytest.mark.parametrize(
+    ("manifest_sha256", "export_receipt_sha256"),
+    (
+        (None, None),
+        ("a" * 64, "b" * 64),
+    ),
+)
+def test_package_transport_requires_exactly_one_anchor_before_path_access(
+    tmp_path: Path,
+    operation: str,
+    manifest_sha256: str | None,
+    export_receipt_sha256: str | None,
+) -> None:
+    service = PipelineService()
+    missing = tmp_path / "must-not-be-opened"
+    target = tmp_path / "must-not-be-created.vfexport.zip"
+    call = getattr(service, operation)
+    args = (missing, target) if operation == "package" else (missing,)
+
+    with pytest.raises(ValueError, match="requires exactly one"):
+        call(
+            *args,
+            manifest_sha256=manifest_sha256,
+            export_receipt_sha256=export_receipt_sha256,
+        )
+
+    assert not missing.exists()
+    assert not target.exists()
+
+
+def test_package_preserves_legacy_bundle_keyword_before_path_access(
+    tmp_path: Path,
+) -> None:
+    service = PipelineService()
+    missing = tmp_path / "must-not-be-opened"
+    target = tmp_path / "must-not-be-created.vfbundle.zip"
+
+    with pytest.raises(ValueError, match="requires exactly one"):
+        service.package(
+            bundle=missing,
+            out=target,
+            manifest_sha256=None,
+            export_receipt_sha256=None,
+        )
+
+    assert not missing.exists()
+    assert not target.exists()
+
+
+@pytest.mark.parametrize("include_both", (False, True))
+def test_package_cli_refuses_ambiguous_anchor_selection_before_path_access(
+    tmp_path: Path,
+    include_both: bool,
+) -> None:
+    missing = tmp_path / "must-not-be-opened"
+    target = tmp_path / "must-not-be-created.vfexport.zip"
+    arguments = ["package", str(missing), "-o", str(target)]
+    if include_both:
+        arguments.extend(
+            [
+                "--manifest-sha256",
+                "a" * 64,
+                "--export-receipt-sha256",
+                "b" * 64,
+            ]
+        )
+
+    result = runner.invoke(app, arguments)
+
+    assert result.exit_code == 1
+    assert "requires exactly one" in result.output
+    assert not missing.exists()
+    assert not target.exists()

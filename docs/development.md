@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -252,6 +252,14 @@ production semantic replayer ships. Any future shipped semantic profile must
 define and enforce explicit byte, record, nesting, and other applicable
 resource limits.
 
+Locally admitted Phase 5.4 work is transport after publication, not another renderer.
+`exports/archive.py` must validate the separately retained canonical receipt
+digest, preserve the exact inner plan/receipt/file set and source trust grade,
+and call the deterministic codec shared with bundle transport. Archive digest,
+size, member count, and durability warning stay runtime facts. Do not add them
+to the ten persisted export v1 models or describe receipt-anchored archive
+verification as source-bound.
+
 Verified-export surfaces must call the typed `PipelineService` operations. Keep
 the production catalog private and descriptor-driven; its current entries are
 `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 with no
@@ -270,8 +278,12 @@ only `text`, `prompt_completion`, and `instruction_output`, and refuse nested
 dependencies, file plans, membership, renderers, replayers, replacement, or
 force controls. Filename and provenance options must never mutate rows,
 ordering, curation, split policy, or partition membership. The Phase 4.9
-adversarial closeout harness remains test-only; archive integration and later
-generic work remain later Phase 5 work.
+adversarial closeout harness remains test-only. The Phase 5.4
+`.vfexport.zip` path remains outside the export request/discovery protocol:
+`package` / `package-verify` require exactly one manifest or receipt anchor,
+legacy bundle behavior must remain byte-compatible, and no MCP or Mac UI
+operation is added. Item 5.4's local gates passed; pull-request publication,
+GitHub evidence, and merge remain pending. Items 5.5–5.7 remain later work.
 
 ### Keep optional-integration claims accurate
 
@@ -385,6 +397,7 @@ retained manifest digest.
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Deterministic Archive Transport v1](contracts/bundle-transport-v1.md)
 - [Split JSONL Export Contract v1](contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](contracts/constrained-csv-export-v1.md)

@@ -1,5 +1,12 @@
 """Consumer-neutral verified export foundation."""
 
+from veriformis.exports.archive import (
+    EXPORT_PACK_ARCHIVE_SUFFIX,
+    EXPORT_PACK_TRANSPORT_PROFILE,
+    ExportPackArchiveReceipt,
+    verify_export_pack_archive,
+    write_export_pack_archive,
+)
 from veriformis.exports.api import (
     CancellationCheck,
     EXPORT_DISCOVERY_SCHEMA,
@@ -107,6 +114,8 @@ __all__ = [
     "ConstrainedCsvPartition",
     "DEFAULT_EXPORT_SERVICE",
     "EXPORT_DISCOVERY_SCHEMA",
+    "EXPORT_PACK_ARCHIVE_SUFFIX",
+    "EXPORT_PACK_TRANSPORT_PROFILE",
     "EXPORT_RECEIPT_PATH",
     "EXPORT_SURFACE_REQUEST_SCHEMA",
     "EXPORT_SURFACE_REQUEST_SCHEMA_V2",
@@ -126,6 +135,7 @@ __all__ = [
     "ExportMembershipEntry",
     "ExportMembershipProjection",
     "ExportOperationCancelled",
+    "ExportPackArchiveReceipt",
     "ExportPartialPublicationError",
     "ExportPlan",
     "ExportProfileDescriptor",
@@ -155,4 +165,6 @@ __all__ = [
     "export_request_from_json_bytes",
     "export_response_json",
     "export_verify_response",
+    "verify_export_pack_archive",
+    "write_export_pack_archive",
 ]

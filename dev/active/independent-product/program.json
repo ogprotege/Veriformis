@@ -72,7 +72,7 @@
       "packet": "dev/active/independent-product/phase-05-generic-local-exports",
       "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Complete and merge item 5.3 constrained CSV through the verified export service before beginning item 5.4."
+      "next_gate": "Complete and merge item 5.4 deterministic export-pack transport through the existing package path before beginning item 5.5."
     },
     {
       "number": 6,

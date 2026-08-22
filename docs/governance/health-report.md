@@ -1,13 +1,13 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 5.3 local admission reconciled
+**Status:** Independent-product Phase 5.4 locally admitted; publication pending
 
 **Review date:** 2026-08-22
 
-**Repository baseline:** Working tree based on
-`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`
+**Repository baseline:** Working tree based on Phase 5.3 merge
+`c6d7fc13a09a`
 
-**Next review:** Independent-product Phase 5.3 merge, Phase 5.4 or Phase 6
+**Next review:** Independent-product Phase 5.4 merge or Phase 5.5, Phase 6
 start, or the next active-document behavior change
 
 ## Scope examined
@@ -80,13 +80,15 @@ deprecated document must link its replacement and removal/review trigger.
 | Phase 5.1 changed production discovery and physical-container support from the Phase 4 empty baseline | Split JSONL implementation, request-v2 configuration, four-schema round trips, tamper evidence, and current contracts | Promoted exactly `split-jsonl-directory` v1, retained historical request/discovery/response and persisted export v1 contracts, and reconciled current architecture, operator, support, evidence, and packet records without adding a trainer profile |
 | Phase 5.2 added a second exact-byte generic container while active docs still described JSON as planned | Canonical JSON implementation, strict dataset/provenance models, four-schema admission suite, source-row-set closure regression, and container contract | Promoted exactly canonical `json` v1 alongside split JSONL; retained request/discovery/response and persisted export v1 contracts, fixed the tree, refused request v2, and reconciled active product, architecture, operator, support, and packet records without claiming CSV, previews, archives, or trainer compatibility |
 | Phase 5.3 added a third exact-byte generic container while active docs still described CSV as planned | Constrained CSV implementation, frozen flat-schema dialect/tree, strict reload and tamper checks, nested-`messages` refusal, support admission, and container contract | Promoted exactly `constrained-csv` v1 for `text`, `prompt_completion`, and `instruction_output`; retained request/discovery/response and persisted export v1 contracts, refused request v2 before source or destination access, refused `messages` after source admission but before destination access or publication, and reconciled active product, architecture, operator, support, and packet records without claiming previews, archives, trainer, or spreadsheet compatibility |
+| PR #55 merged while active records still described Phase 5.3 as local and Phase 5.4 as blocked or unimplemented | PR #55 at `c6d7fc13a09a`; ADR-0006; receipt-anchored export-pack implementation and transport contract | Recorded the Phase 5.3 merge and Phase 5.4 active local boundary across root, packet, product, architecture, development, and governance narratives; described `.vfexport.zip` as post-export receipt-anchored transport while withholding test counts, completion, source-bound, fourth-renderer, trainer, MCP, and Mac UI claims |
+| Phase 5.4 local implementation initially lacked complete promotion proof and path-stable verification | Independent contract and code reviews; all-three-container matrix; archive-path replacement and legacy bundle-compatibility regressions | Added the missing matrix and exact-only governance requirement, corrected trust output and stale authority text, restored shipped bundle behavior, held one no-follow archive descriptor through verification, and recorded the green local admission without claiming GitHub or phase completion |
 
 ## Current health assessment
 
 | Area | Assessment | Basis |
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
-| Current capability accuracy | Good within audited active scope | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, release boundary, and Mac guide |
+| Current capability accuracy | Good within audited active scope; Phase 5.4 locally admitted and publication pending | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, and the explicit no-Mac-UI boundary |
 | Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–4 packets, and one active Phase 5 packet |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
@@ -96,8 +98,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Publish independently reviewed Phase 5.3, merge only when every required
-   GitHub check is green, and synchronize local `main` before item 5.4.
+1. Publish Phase 5.4, require every GitHub check to pass, merge, and synchronize
+   clean local `main` before beginning item 5.5.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
@@ -113,6 +115,12 @@ current support records agree. Canonical JSON validation reconstructs the
 source row set so top-level identity, split metadata, payload arrays, and
 provenance must close together. Constrained CSV admits only the three flat
 schemas and refuses nested `messages` with an exact JSON alternative.
+Phase 5.3 merged as PR #55 at `c6d7fc13a09a`. Phase 5.4 is locally admitted as
+the receipt-anchored `deterministic-export-pack-zip-v1` transport. It wraps
+an unchanged published directory rather than adding a renderer, preserves the
+embedded source trust grade, and adds no MCP or Mac UI operation. Its admission
+evidence and independent reviews are recorded; publication and merge remain
+pending.
 Generic output does not establish trainer compatibility, and any future
 shipped semantic profile must enforce explicit resource limits.
 

@@ -98,12 +98,15 @@ from veriformis.exports import (
     ExportExecuteRequestV2,
     ExportInspectRequest,
     ExportInspection,
+    ExportPackArchiveReceipt,
     ExportPublicationOutcome,
     ExportPlan,
     ExportService,
     ExportVerifiedOutcome,
     ExportVerifyRequest,
     ExportVerifyRequestV2,
+    verify_export_pack_archive,
+    write_export_pack_archive,
 )
 from veriformis.diagnostics import (
     parse_report_from_dict,
@@ -269,7 +272,7 @@ class VerifyOutcome(StageOutcome):
 
 @dataclass(frozen=True)
 class PackageOutcome(StageOutcome):
-    receipt: BundleArchiveReceipt | None = None
+    receipt: BundleArchiveReceipt | ExportPackArchiveReceipt | None = None
 
 
 class SealPartialPublicationError(Exception):
@@ -2076,18 +2079,22 @@ class PipelineService:
         bundle: Path,
         out: Path,
         *,
-        manifest_sha256: str,
+        manifest_sha256: str | None = None,
+        export_receipt_sha256: str | None = None,
     ) -> PackageOutcome:
-        """Publish a deterministic transport archive of an anchored bundle."""
-        receipt = write_bundle_archive(
-            bundle,
-            out,
-            expected_manifest_sha256=manifest_sha256,
-        )
-        return PackageOutcome(
-            receipt=receipt,
-            durability_warning=receipt.durability_warning,
-            messages=(
+        """Publish one explicitly anchored deterministic transport archive."""
+        if (manifest_sha256 is None) == (export_receipt_sha256 is None):
+            raise ValueError(
+                "package requires exactly one of manifest_sha256 or "
+                "export_receipt_sha256"
+            )
+        if manifest_sha256 is not None:
+            receipt = write_bundle_archive(
+                bundle,
+                out,
+                expected_manifest_sha256=manifest_sha256,
+            )
+            messages = (
                 ServiceMessage(f"transport archive: {receipt.archive_path}"),
                 ServiceMessage(f"archive SHA-256: {receipt.archive_sha256}"),
                 ServiceMessage(f"manifest SHA-256: {receipt.manifest_sha256}"),
@@ -2095,23 +2102,54 @@ class PipelineService:
                     f"verification grade: {receipt.verification.trust_grade}"
                 ),
                 ServiceMessage(f"archive members: {receipt.member_count}"),
-            ),
+            )
+        else:
+            assert export_receipt_sha256 is not None
+            receipt = write_export_pack_archive(
+                bundle,
+                out,
+                expected_export_receipt_sha256=export_receipt_sha256,
+            )
+            messages = (
+                ServiceMessage(f"transport archive: {receipt.archive_path}"),
+                ServiceMessage(f"archive SHA-256: {receipt.archive_sha256}"),
+                ServiceMessage(
+                    f"export receipt SHA-256: {receipt.export_receipt_sha256}"
+                ),
+                ServiceMessage(f"export receipt: {receipt.export_receipt_id}"),
+                ServiceMessage(f"export plan: {receipt.export_plan_id}"),
+                ServiceMessage(
+                    "output content root SHA-256: "
+                    f"{receipt.output_content_root_sha256}"
+                ),
+                ServiceMessage(f"source trust grade: {receipt.source_trust_grade}"),
+                ServiceMessage(f"archive members: {receipt.member_count}"),
+            )
+        return PackageOutcome(
+            receipt=receipt,
+            durability_warning=receipt.durability_warning,
+            messages=messages,
         )
 
     def package_verify(
         self,
         archive: Path,
         *,
-        manifest_sha256: str,
+        manifest_sha256: str | None = None,
+        export_receipt_sha256: str | None = None,
     ) -> PackageOutcome:
-        """Independently verify a deterministic transport archive."""
-        receipt = verify_bundle_archive(
-            archive,
-            expected_manifest_sha256=manifest_sha256,
-        )
-        return PackageOutcome(
-            receipt=receipt,
-            messages=(
+        """Independently verify one explicitly anchored transport archive."""
+        if (manifest_sha256 is None) == (export_receipt_sha256 is None):
+            raise ValueError(
+                "package-verify requires exactly one of manifest_sha256 or "
+                "export_receipt_sha256"
+            )
+        if manifest_sha256 is not None:
+            receipt = verify_bundle_archive(
+                archive,
+                expected_manifest_sha256=manifest_sha256,
+            )
+            messages = (
                 ServiceMessage("transport archive status: accepted"),
                 ServiceMessage(f"archive SHA-256: {receipt.archive_sha256}"),
                 ServiceMessage(f"manifest SHA-256: {receipt.manifest_sha256}"),
@@ -2119,7 +2157,31 @@ class PipelineService:
                     f"verification grade: {receipt.verification.trust_grade}"
                 ),
                 ServiceMessage(f"archive members: {receipt.member_count}"),
-            ),
+            )
+        else:
+            assert export_receipt_sha256 is not None
+            receipt = verify_export_pack_archive(
+                archive,
+                expected_export_receipt_sha256=export_receipt_sha256,
+            )
+            messages = (
+                ServiceMessage("transport archive status: accepted"),
+                ServiceMessage(f"archive SHA-256: {receipt.archive_sha256}"),
+                ServiceMessage(
+                    f"export receipt SHA-256: {receipt.export_receipt_sha256}"
+                ),
+                ServiceMessage(f"export receipt: {receipt.export_receipt_id}"),
+                ServiceMessage(f"export plan: {receipt.export_plan_id}"),
+                ServiceMessage(
+                    "output content root SHA-256: "
+                    f"{receipt.output_content_root_sha256}"
+                ),
+                ServiceMessage(f"source trust grade: {receipt.source_trust_grade}"),
+                ServiceMessage(f"archive members: {receipt.member_count}"),
+            )
+        return PackageOutcome(
+            receipt=receipt,
+            messages=messages,
         )
 
     def preview(

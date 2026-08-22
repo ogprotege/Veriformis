@@ -138,6 +138,8 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
 | `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
+| `veriformis package EXPORT -o EXPORT.vfexport.zip --export-receipt-sha256 HEX` | Deterministic receipt-anchored transport of an unchanged generic export directory |
+| `veriformis package-verify ARCHIVE --export-receipt-sha256 HEX` | Verify receipt-bound export members and canonical transport bytes |
 | `veriformis export discover` | List executable verified-export implementations; includes `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `veriformis export dry-run --request-json JSON` | Derive a source-anchored export plan without destination access |
 | `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |

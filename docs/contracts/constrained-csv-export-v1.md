@@ -12,7 +12,7 @@
 
 **Determinism claim:** `portable_exact_bytes`
 
-**Status:** Implemented and locally admitted in independent-product Phase 5.3
+**Status:** Implemented and merged in independent-product Phase 5.3 (PR #55)
 
 **Last reviewed:** 2026-08-22
 
@@ -311,15 +311,14 @@ Admission requires all of the following evidence:
 10. Python 3.11, 3.12, and 3.13 evidence demonstrates that explicit dialect
     configuration produces identical golden bytes.
 
-The local Phase 5.3 admission record satisfies the implementation-side items
-above. GitHub's Python 3.11–3.13 matrix remains the cross-version publication
-gate; the local Python 3.12, release, parity, Mac, tracking, and review results
-are recorded in the active Phase 5 evidence packet.
+The Phase 5.3 admission and PR #55 publication records satisfy the items above,
+including GitHub's Python 3.11–3.13 matrix. The local Python 3.12, release,
+parity, Mac, tracking, and review results are recorded in the active Phase 5
+evidence packet.
 
 The shared Phase 5 round-trip matrix remains roadmap item 5.5. That later
 consolidation does not weaken the container-specific admission evidence
-required here, and Phase 5.3 MUST NOT be promoted before its own evidence is
-recorded.
+required here. Phase 5.3 was promoted only after that evidence was recorded.
 
 ## Dependency, license, security, and resource boundary
 

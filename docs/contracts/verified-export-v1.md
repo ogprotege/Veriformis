@@ -29,11 +29,13 @@ supported product export container. Phase 5.1 adds one reviewed internal
 `split-jsonl-directory` v1 implementation and an additive configured request
 v2 surface. Phase 5.2 adds canonical `json` v1 under historical request v1;
 Phase 5.3 adds flat-schema-only `constrained-csv` v1 under historical request
-v1. The ten persisted models, discovery v1, and response v1 remain unchanged.
+v1. Phase 5.4 adds an optional receipt-anchored deterministic transport around
+an already-published export directory. The ten persisted models, request and
+discovery schemas, production selectors, and response v1 remain unchanged.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV admission)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport)
 
-**Next review:** Phase 5.4 or any export schema change
+**Next review:** Phase 5.5 or any export or receipt schema change
 
 ## Purpose
 
@@ -825,6 +827,35 @@ Phase 5.3 additionally installs the third reviewed production implementation:
 - the normative rules and admission evidence in
   [Constrained CSV Export v1](constrained-csv-export-v1.md).
 
+Phase 5.4 adds no production export implementation. It applies the existing
+deterministic archive transport after one export directory has already passed
+publication:
+
+- transport profile `deterministic-export-pack-zip-v1`, suffix
+  `.vfexport.zip`;
+- exactly the unchanged planned files plus canonical `export-receipt.json`,
+  with no wrapper or additional member;
+- a separately retained SHA-256 of the canonical receipt as the external
+  archive-content anchor;
+- the ADR-0005 deterministic ZIP codec, canonical rerender verification, and
+  no-replace publication path under the complementary ADR-0006 decision; and
+- runtime archive digest, size, member-count, inner plan/receipt identities,
+  content root, retained source trust grade, and durability-warning evidence.
+
+This wrapper does not change the inner `ExportPlan`, `ExportReceipt`,
+`ExportVerification`, file bindings, or their identities. Its outer digest is
+not inserted into a persisted model because the receipt is itself an archive
+member. Archive verification proves receipt-anchored transport integrity; it
+MUST NOT be described as source-bound export verification and MUST NOT upgrade
+the embedded source trust grade. Source-bound verification still re-admits the
+source and rederives the exact expected plan through `verify_export`.
+
+The existing `package` / `package-verify` command family selects bundle or
+export-pack transport through mutually exclusive external manifest- or
+receipt-digest flags. It is separate from the strict export request protocol:
+there is no request v3, archive option, fourth catalog selector, ZIP-valued
+`destination_root`, MCP operation, or Mac UI promise.
+
 The request envelope is operation-discriminated. Selected operations name only
 the source bundle path, exact catalog selector, source-trust policy and retained
 digest, and the literal overwrite policy `refuse`. Execute and verify also
@@ -876,9 +907,10 @@ now ship three consumer-neutral implementations, `split-jsonl-directory`,
 canonical `json`, and `constrained-csv` v1, under their separate container
 contracts. Split JSONL and canonical JSON admit all four current row schemas;
 constrained CSV admits the three flat schemas and refuses nested `messages`.
-The existing
-`minimal-v1` bundle and deterministic bundle transport remain canonical and
-transport containers respectively. Named trainer profiles remain later work.
+The existing `minimal-v1` bundle remains canonical. The
+`deterministic-vfbundle-zip-v1` and `deterministic-export-pack-zip-v1` physical
+containers are transport profiles rather than row renderers and do not appear
+in export discovery. Named trainer profiles remain later work.
 Shipping generic JSONL, JSON, or constrained CSV does not create or imply a
 consumer profile or trainer/spreadsheet compatibility.
 

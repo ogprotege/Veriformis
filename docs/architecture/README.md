@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
 
 **Next review:** Any architecture documentation change
 
@@ -238,6 +238,15 @@ tree with mandatory aligned provenance for the three flat row schemas. It
 refuses request v2 before source access; after source admission reveals nested
 `messages`, it refuses the schema before destination access with a JSON
 alternative.
+Phase 5.4 locally admits an orthogonal post-export path rather than another
+catalog entry. `exports/archive.py` consumes one canonical receipt-bound
+directory and `_archive_transport.py` supplies the deterministic stored-ZIP
+codec shared with bundle transport. `PipelineService.package` and
+`package_verify` select the `.vfexport.zip` path only from an explicit external
+receipt digest. The inner plan, receipt, source trust grade, and three export
+selectors remain unchanged. Archive verification is receipt-anchored rather
+than source-bound, and no MCP or Mac UI operation is added. Local admission
+evidence is recorded; pull-request publication and merge remain pending.
 The default service still has no semantic replayer. The CLI exposes the nine
 stage commands plus maintenance, inspection, recipe automation, MCP, optional
 Aptus handoff, version, and verified-export surfaces.
@@ -281,7 +290,9 @@ code computes.
 - [Integrity Contract v1](../contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](../contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](../contracts/finished-dataset-v1.md)
+- [Deterministic Archive Transport v1](../contracts/bundle-transport-v1.md)
 - [Split JSONL Export Contract v1](../contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](../contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](../contracts/constrained-csv-export-v1.md)
+- [ADR-0006: Receipt-Anchored Export-Pack Transport](../adr/0006-receipt-anchored-export-pack-transport.md)
 - [Independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)

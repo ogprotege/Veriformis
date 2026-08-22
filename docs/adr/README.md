@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-20
+**Last reviewed:** 2026-08-22
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -27,6 +27,7 @@ not substitutes for implementation or tests.
 | [0003](0003-four-axis-dataset-model.md) | Four-axis dataset model | Accepted | Persisted taxonomy or loss-policy design |
 | [0004](0004-canonical-bundle-derived-exports.md) | Canonical bundle and derived exports | Accepted | Export contract or bundle-profile implementation |
 | [0005](0005-deterministic-bundle-transport.md) | Deterministic immutable bundle transport | Accepted | Bundle profile, packaging, compression, or trust-envelope change |
+| [0006](0006-receipt-anchored-export-pack-transport.md) | Receipt-anchored deterministic export-pack transport | Accepted | Export receipt, archive profile, packaging, or trust-envelope change |
 
 ## ADR template
 

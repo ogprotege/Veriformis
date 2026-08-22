@@ -11,10 +11,12 @@ Before changing code, read:
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
 - [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
+- [Deterministic Archive Transport v1](docs/contracts/bundle-transport-v1.md)
 - [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
 - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
+- [ADR-0006: Receipt-Anchored Export-Pack Transport](docs/adr/0006-receipt-anchored-export-pack-transport.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -58,6 +60,12 @@ requests. Constrained CSV admits the flat `text`, `prompt_completion`, and
 `instruction_output` schemas and refuses `messages` before publication with a
 split JSONL or canonical JSON alternative. No surface may
 change rows, ordering, curation, split policy, or partition membership.
+Item 5.3 merged as PR #55 at `c6d7fc13a09a`. Phase 5.4 is locally admitted:
+`deterministic-export-pack-zip-v1` packages one unchanged, already-published
+export directory as `.vfexport.zip` under an externally retained canonical
+receipt digest. It is not a fourth renderer, source-bound verification,
+consumer/trainer profile, MCP operation, or Mac UI promise. Pull-request
+publication, GitHub evidence, and merge remain pending.
 Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)
@@ -172,3 +180,5 @@ phase packet when one is active. `split-jsonl-directory`, canonical `json`,
 and `constrained-csv` v1 are the supported generic containers. Every new
 trainer-specific profile remains planned until its own roadmap gates pass.
 This does not erase the existing canonical or optional Aptus profiles.
+The separate `deterministic-export-pack-zip-v1` physical container is an
+optional post-export transport and does not appear in export discovery.

@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-22 (Phase 5.3 constrained CSV export)
+**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
 
 **Next review:** Any entry-point or architecture change
 
@@ -154,6 +154,15 @@ injected the conformance implementation. Phase 5.1–5.3 add the first productio
 entries, `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1,
 with no consumer profile and no semantic replayer.
 
+Phase 5.4 locally admits an extension to the existing `package` and
+`package-verify`
+commands without adding a root command. Exactly one
+`--manifest-sha256` or `--export-receipt-sha256` selects the legacy bundle or
+new export-pack transport profile; both or neither fail. The export-pack form
+packages one unchanged directory as `.vfexport.zip` after validating the
+separately retained canonical receipt digest. It is a Python/CLI transport
+surface, not an `export` subcommand, MCP tool, or Mac UI action.
+
 `veriformis export discover`, `export dry-run`, `export inspect`,
 `export execute`, and top-level `export-verify` are thin adapters. The latter
 four take one strict canonical request through `--request-json`. Historical
@@ -184,8 +193,10 @@ membership, and none makes a trainer-compatibility claim. The private
 hooks remain trusted implementation code, not an untrusted plugin boundary;
 semantic replay retains complete files in memory and its fixture is statically
 bounded, but no production semantic replayer ships. Phase 4.9 remains the
-historical consolidated adversarial closeout; archive integration and later
-generic work remain later Phase 5 work.
+historical consolidated adversarial closeout. Phase 5.4's locally admitted
+receipt-anchored transport leaves those renderer and surface claims unchanged;
+its pull-request publication and merge remain pending. Later generic work
+remains in items 5.5–5.7.
 
 ## Preview, recipes, and optional integrations
 
@@ -219,6 +230,7 @@ pipeline.
 - [Data flow](data-flow.md)
 - [Architecture hub](../architecture.md)
 - [CLI reference](../cli.md)
+- [Deterministic Archive Transport v1](../contracts/bundle-transport-v1.md)
 - [Split JSONL Export Contract v1](../contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](../contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](../contracts/constrained-csv-export-v1.md)

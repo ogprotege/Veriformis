@@ -1,6 +1,7 @@
 # Phase 5 Evidence
 
-**Status:** In progress — items 5.1–5.3 locally admitted
+**Status:** In progress — items 5.1–5.3 merged; item 5.4 locally admitted,
+pull-request publication and merge pending
 
 **Opened:** 2026-08-21
 
@@ -21,6 +22,8 @@ container.
 | Safe publication, receipt replay, membership equality, and independent verification are available from Phase 4 | `source-verified` | Phase 4 packet and verified-export sources |
 | At baseline `a76e0fe`, production discovery contains no renderer/replayer and generic containers remain planned | `source-verified` | Phase 4 closeout, support registry, and implementation catalog at the opening baseline |
 | The existing deterministic archive transport is the only archive contract Phase 5 may integrate | `source-verified` | ADR-0005 and roadmap work item 5.4 |
+| Item 5.3 merged as PR #55 at `c6d7fc13a09a` before item 5.4 began | `source-verified` | Git commit and Phase 5 progress record |
+| ADR-0006 defines `deterministic-export-pack-zip-v1` as a receipt-anchored post-export wrapper while preserving ADR-0005 and the three export selectors | `source-verified` | ADR-0006 and deterministic archive contract |
 
 ## Required item 5.1 evidence
 
@@ -48,7 +51,7 @@ container.
       container with identical semantic rows and logical partitions.
 - [ ] Tampering fails verification for every supported container.
 - [ ] Nested CSV is refused before publication with an actionable alternative.
-- [ ] Generic export-pack archives reuse the existing deterministic transport
+- [x] Generic export-pack archives reuse the existing deterministic transport
       and verifier.
 - [ ] Dry-run sample rows and destination trees match execution.
 - [ ] Operator guidance separates container choice, training objective, and
@@ -85,6 +88,40 @@ container.
       parity retain the shared verified-export contracts.
 - [x] Capability/support, current-status, tracking, and packet records are
       reconciled without claiming trainer or spreadsheet compatibility.
+
+## Required item 5.4 evidence
+
+- [x] The profile ID, `.vfexport.zip` suffix, external canonical-receipt
+      digest, exact no-wrapper member set, deterministic ZIP encoding, and
+      runtime-only archive receipt are frozen by ADR-0006 and the single
+      deterministic archive contract.
+- [x] Each of the three current generic export directories packages twice to
+      identical archive bytes without changing its inner plan, receipt, file
+      bindings, source trust grade, rows, ordering, or logical partitions.
+- [x] Only `portable_exact_bytes` plans are admitted; source packaging and
+      archive verification both refuse `semantic_content_only` until an exact
+      profile-bound semantic replayer exists.
+- [x] `package` and `package-verify` require exactly one manifest or export-
+      receipt digest, select no profile by suffix, and retain legacy
+      `.vfbundle.zip` bytes and behavior.
+- [x] Missing, extra, duplicate, wrapper, traversal, alias, link, directory,
+      comment, encryption, compression, metadata, size, CRC, receipt-anchor,
+      member-digest, canonical-byte, target-inside-source, existing-target,
+      cleanup, and durability-warning cases satisfy the frozen failure boundary.
+- [x] Verification reconstructs only receipt-validated paths, streams member
+      bytes under explicit limits, and reuses expected-plan export-directory
+      verification without a general extraction operation.
+- [x] Runtime output reports archive identity and embedded plan/receipt facts
+      without adding a persisted schema, upgrading source trust, or calling the
+      result source-bound.
+- [x] Taxonomy and support identify a transport physical container while
+      production export discovery remains exactly `split-jsonl-directory`,
+      `json`, and `constrained-csv` v1.
+- [x] Focused, required repository, legacy transport, governance, and
+      independent-review results are observed and recorded before item 5.4 is
+      called complete or published.
+- [x] Documentation makes no trainer, consumer, MCP, Mac UI, signing,
+      encryption, compression, remote-publication, or maturity claim.
 
 ## Observed results
 
@@ -157,6 +194,30 @@ The dedicated tests cover all three admitted flat schemas, independent literal
 headers, exact quote-all bytes, embedded CR/LF/CRLF and Unicode, null and
 empty-field distinctions, header-only evaluation, strict data-card/provenance
 reconstruction, actionable `messages` and request-v2 refusal, repeated
-rendering, every-file tamper, and closed-tree verification. Item 5.3 still
-requires the GitHub-green merge and local `main` synchronization gate before
-item 5.4 begins.
+rendering, every-file tamper, and closed-tree verification. Item 5.3 merged as
+PR #55 at `c6d7fc13a09a` after this local record. The historical
+counts above remain local evidence and are not rewritten as GitHub results.
+
+### Item 5.4 local admission — 2026-08-22
+
+Item 5.4 is implemented and locally admitted as the receipt-anchored
+`.vfexport.zip` transport. The following results are local observations, not
+GitHub results; pull-request publication and merge remain pending.
+
+| Evidence | Result | Grade | Limitation |
+| --- | --- | --- | --- |
+| Dedicated export-pack suites | 66 passed | `recorded-local` | Focused transport, CLI, and adversarial coverage |
+| Export/taxonomy/CLI integration | 448 passed | `recorded-local` | Integrated exports, taxonomy, verified-contract, Pipeline, CLI, and transport scope |
+| Full Python | 1,195 passed; one intentional durability-warning regression warning | `recorded-local` | Local Python run; no GitHub matrix result is claimed |
+| Standalone release | 1,183 passed, 1 deselected; lock, clean wheel, and both golden flows passed | `recorded-local` | Optional Aptus integration remains separate |
+| CLI/workbench parity | PASS | `recorded-local` | No new Mac export-pack UI operation exists |
+| macOS XCTest | 58 passed; `TEST SUCCEEDED` | `recorded-local` | Local unsigned Debug test build |
+| Governance and structure | Tracking, Ruff, JSON validity, and diff checks passed | `recorded-local` | Scoped local reconciliation checks |
+| Independent contract review | Found an all-three-container coverage gap and stale/exact-only records; both were corrected | `recorded-local` | Review findings were resolved before local admission |
+| Independent code review | Found bundle-compatibility and archive path-stability blockers; both were corrected and re-reviewed clear | `recorded-local` | Clear re-review is local, not a GitHub review claim |
+
+This evidence covers all three current exact-byte export directories,
+`portable_exact_bytes`-only admission, the receipt-derived closed archive,
+legacy bundle byte compatibility, path stability, tamper/refusal behavior, and
+the unchanged three-renderer discovery boundary. Items 5.5–5.7 and the
+phase-wide exit proof remain open.

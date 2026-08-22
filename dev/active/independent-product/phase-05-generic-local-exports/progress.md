@@ -148,3 +148,64 @@ corrected before publication.
 
 **Next action:** Publish item 5.3, require every GitHub check to pass, merge,
 and synchronize clean local `main` before item 5.4.
+
+## 2026-08-22 — Item 5.3 merged; item 5.4 started
+
+**Status:** Item 5.3 merged as PR #55 at `c6d7fc13a09a`. Item 5.4 local
+implementation and admission are in progress; publication and merge remain
+pending.
+
+The synchronized item 5.3 baseline retains exactly three production export
+renderers: `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1.
+Item 5.4 defines `deterministic-export-pack-zip-v1` as an optional post-export
+transport with suffix `.vfexport.zip`. Packaging requires the separately
+retained SHA-256 of canonical `export-receipt.json` and includes exactly that
+receipt plus its complete bound file set under the deterministic stored-ZIP
+envelope shared with ADR-0005.
+
+The integration extends the existing `package` / `package-verify` family under
+ADR-0006 and the single deterministic archive contract. It does not add an
+export selector, request version, persisted export field, trainer or consumer
+profile, source-bound archive verification, MCP operation, or Mac UI action.
+The embedded source trust grade must remain unchanged, and legacy manifest-
+anchored `.vfbundle.zip` behavior must remain byte-compatible.
+
+No item 5.4 test counts or admission results are recorded yet.
+
+**Next action:** Complete the focused transport, adversarial, legacy-
+compatibility, tracking, and required repository gates; record exact observed
+results; resolve independent review findings; then publish and merge only after
+every required check is green.
+
+## 2026-08-22 — Item 5.4 locally admitted
+
+**Status:** Local implementation, evidence, and independent-review
+reconciliation complete; pull-request publication, GitHub evidence, and merge
+remain pending.
+
+`deterministic-export-pack-zip-v1` is locally admitted as an optional
+receipt-anchored post-export transport with suffix `.vfexport.zip`. It admits
+only `portable_exact_bytes`, archives exactly canonical
+`export-receipt.json` plus the receipt-declared files, requires the separately
+retained canonical receipt digest, and preserves the embedded source trust
+grade. The ten persisted export v1 models, three renderer selectors, export
+request/discovery surfaces, MCP surface, and Mac UI remain unchanged. Legacy
+manifest-anchored `.vfbundle.zip` arguments, behavior, and bytes remain
+compatible.
+
+The dedicated export-pack suites passed 66 tests. The integrated
+export/taxonomy/CLI gate passed 448. Full Python passed 1,195 with one
+intentional durability-warning regression warning. The standalone release
+gate passed 1,183 with one deselection, plus lock validation, a clean wheel,
+and both golden flows. CLI/workbench parity passed. The complete Mac target
+passed 58 tests with `TEST SUCCEEDED`. Tracking, Ruff, JSON validity, and diff
+checks were green.
+
+Independent contract review found an all-three-container coverage gap and
+stale/exact-only records; both were corrected. Independent code review found
+bundle-compatibility and archive path-stability blockers; both were corrected
+and the re-review was clear. These are local results, not GitHub evidence.
+
+**Next action:** Publish the item 5.4 pull request, require every GitHub check
+to pass, merge, and synchronize clean local `main` before item 5.5. Items
+5.5–5.7 and Phase 5 closeout remain open.

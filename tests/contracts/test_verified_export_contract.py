@@ -292,6 +292,7 @@ def test_phase5_generic_containers_are_the_only_promoted_exports() -> None:
     assert IMPLEMENTED_PHYSICAL_CONTAINERS == (
         "minimal-v1",
         "deterministic-vfbundle-zip-v1",
+        "deterministic-export-pack-zip-v1",
         "split-jsonl-directory",
         "json",
         "constrained-csv",
