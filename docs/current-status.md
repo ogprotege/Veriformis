@@ -301,16 +301,24 @@ representation to its compatible generic exports; and adds `input_family`
 as the seventh taxonomy axis (eight implemented recovery families plus
 `ocr-image` explicitly unsupported) under ADR-0008; it merged as PR #61 at
 `81becfa676fd9111868b8d4b62549218a644d3e2` after all 14 GitHub checks passed.
-Phase 6.3 (in progress, unmerged) adds the runtime-only
+Phase 6.3 adds the runtime-only
 `veriformis.goal-preview/v1` response through `PipelineService.preview_goal`,
 CLI `goal-preview`, MCP `goal_preview`, the Swift bridge, and a workbench
 preview screen: per accepted record, the exact recovered source evidence and
 derivation lineage, context and target fields, the row exactly as `format`
 lowers it, the exact supervised span with its loss policy, and the curation
 decision and excluded records with reason codes, bounded like the Phase 5.6
-export preview. None of these items adds an objective, row schema,
-construction behavior, preset, preflight, persisted schema, trainer claim, or
-consumer profile.
+export preview; it merged as PR #62 at
+`9cbab117e47cde6bd8850d67f0d363e03f0660ce`. Phase 6.4 (in progress,
+unmerged) adds `veriformis.recipe-preset/v1`: packaged versioned data that is
+the single source of every recipe default and of one safe preset per goal;
+`chunk`, `construct`, and `curate` on Python, CLI, MCP, and YAML select by
+`--goal`/`--preset` with explicit overrides only, the recipe library is on the
+execution path so every selection yields one `recipe_id`, the workbench offers
+a plain-language goal picker with an Advanced disclosure and holds no recipe
+constant, and the tracking checker refuses recipe default literals. None of
+these items adds an objective, row schema, construction behavior, preflight,
+persisted schema, trainer claim, or consumer profile.
 
 ## Implemented interfaces
 
@@ -322,7 +330,7 @@ The installed console entry point is `veriformis`.
 | `clean WORKSPACE` | Plans, replays, and commits deterministic cleaning for every source | `transforms`; per-source `document`, `cleaning-plan`, and `block-derivations` |
 | `chunk WORKSPACE` | Runs one of five evidence-bearing chunk strategies | `chunks` |
 | `upgrade-workspace WORKSPACE` | Migrates a verified revision-v1 or revision-v2 workspace through every supported migration | One new migration revision per required schema step, or no change when current |
-| `construct WORKSPACE --objective OBJECTIVE` | Constructs candidates, decisions, diagnostics, and immutable accepted records for one exact source set | `recipe`, `result` |
+| `construct WORKSPACE (--goal GOAL \| --preset PRESET \| --objective OBJECTIVE)` | Resolves the selection and explicit overrides through the versioned preset data, builds the recipe through the named recipe library, and constructs candidates, decisions, diagnostics, and immutable accepted records for one exact source set | `recipe`, `result` |
 | `curate WORKSPACE` | Fixes the complete finished plan and applies ordered deterministic curation | `plan`, `result` |
 | `split WORKSPACE` | Assigns complete transitive leakage groups to train and evaluation | `result` |
 | `format WORKSPACE` | Lowers included records into the row schema bound by the plan | `row-set`, `train`, `evaluation`, `provenance` |
@@ -335,6 +343,7 @@ The installed console entry point is `veriformis`.
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
+| `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |

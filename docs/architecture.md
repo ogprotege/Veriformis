@@ -72,7 +72,11 @@ Phase 6.2 adds per-goal contracts and the seventh taxonomy axis
 `input_family`; Phase 6.3 adds `goals/preview.py`, a runtime-only read-only
 view over a constructed workspace that renders each record through the same
 row-lowering function `format` uses and derives the exact supervised span
-from the objective field roles and taxonomy loss policy.
+from the objective field roles and taxonomy loss policy. Phase 6.4 adds
+`goals/presets.py` and `presets-v1.json`: the single versioned source of every
+recipe default and of each goal's safe preset, resolved through one function by
+the service, CLI, MCP, YAML runner, recipe library, and workbench, with the
+tracking checker refusing any recipe default literal in those surfaces.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

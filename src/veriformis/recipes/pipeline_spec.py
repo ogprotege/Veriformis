@@ -41,10 +41,13 @@ _TOP_LEVEL_KEYS = frozenset(
 _STAGE_CONFIG_KEYS: dict[str, frozenset[str]] = {
     "parse": frozenset(),
     "clean": frozenset({"rules", "custom"}),
-    "chunk": frozenset({"strategy", "size", "overlap"}),
+    "chunk": frozenset({"strategy", "size", "overlap", "goal", "preset"}),
     "construct": frozenset(
         {
             "objective",
+            "goal",
+            "preset",
+            "representation",
             "source",
             "target_row_schema",
             "split_ratio_ppm",
@@ -54,6 +57,8 @@ _STAGE_CONFIG_KEYS: dict[str, frozenset[str]] = {
     ),
     "curate": frozenset(
         {
+            "goal",
+            "preset",
             "evaluation_required",
             "allow_empty_evaluation",
             "minimum_target_characters",

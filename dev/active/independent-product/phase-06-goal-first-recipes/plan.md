@@ -122,25 +122,25 @@ the repository requires. The widening is recorded in `decisions.md`.
 
 ### 6.4 Add versioned recipe presets and the advanced editor
 
-- [ ] Freeze `veriformis.recipe-preset/v1` as packaged versioned data: one
+- [x] Freeze `veriformis.recipe-preset/v1` as packaged versioned data: one
       `safe` preset per goal carrying segmentation, construction parameters,
       representation, curation policy, split policy, and review policy.
-- [ ] Make the preset data the single source of every default consumed by
+- [x] Make the preset data the single source of every default consumed by
       CLI options, MCP tool defaults, `PipelineService`, the YAML runner, the
       recipe library, and the Swift workbench; delete the duplicated literals
       and add a test that fails when any surface reintroduces one.
-- [ ] Put the named recipe library on the execution path: `construct --goal
+- [x] Put the named recipe library on the execution path: `construct --goal
       GOAL [--preset PRESET]`, MCP `construct(goal=…)`, YAML
       `goal:`/`preset:`,
       and `PipelineService.construct` build the `DatasetRecipe` through the
       library; retire or wire `build_default_finished_plan`; unify the
       `balance_mode` spelling.
-- [ ] Add the advanced editor as explicit, schema-validated overrides over a
+- [x] Add the advanced editor as explicit, schema-validated overrides over a
       preset (CLI flags, MCP fields, YAML keys, and a Mac disclosure group).
-- [ ] Replace the Mac workbench's hard-coded objective picker and copy with a
+- [x] Replace the Mac workbench's hard-coded objective picker and copy with a
       catalog-driven goal picker whose titles, descriptions, presets, and
       defaults come from discovery.
-- [ ] Prove identical `recipe_id` for every goal/preset across Python, CLI,
+- [x] Prove identical `recipe_id` for every goal/preset across Python, CLI,
       MCP, YAML, and the Mac argv plan; prove preset tampering fails closed.
 
 ### 6.5 Add compile preflight

@@ -22,8 +22,10 @@ under its standard packet. Item 6.1's plain-language goal catalog merged as
 PR #60 at `7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub
 checks passed; item 6.2's per-goal contracts and seventh taxonomy axis
 `input_family` merged as PR #61 at
-`81becfa676fd9111868b8d4b62549218a644d3e2`; item 6.3 adds the runtime-only
-goal preview.
+`81becfa676fd9111868b8d4b62549218a644d3e2`; item 6.3's runtime-only goal
+preview merged as PR #62 at `9cbab117e47cde6bd8850d67f0d363e03f0660ce`; item
+6.4 adds versioned recipe presets as the single source of every recipe default
+and goal/preset selection on every compile surface.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -89,8 +91,9 @@ Read these current authorities before changing code:
 8. `docs/contracts/verified-export-v1.md`
 9. `docs/contracts/split-jsonl-export-v1.md`
 10. `docs/contracts/canonical-json-export-v1.md`
-11. `docs/contracts/constrained-csv-export-v1.md` and
-    `docs/contracts/goal-catalog-v1.md`
+11. `docs/contracts/constrained-csv-export-v1.md`,
+    `docs/contracts/goal-catalog-v1.md`, and
+    `docs/contracts/recipe-preset-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`, and
     `docs/adr/0008-input-family-taxonomy-axis.md`
@@ -161,8 +164,9 @@ Key modules under `src/veriformis/` are:
   shared with bundle transport;
 - `pipeline/` for surface-neutral stage orchestration (`PipelineService`);
 - `recipes/` for named recipe builders, statistics, and YAML pipeline specs;
-- `goals/` for the packaged versioned goal catalog and its strict models that
-  resolve plain-language goals to existing objectives and row schemas;
+- `goals/` for the packaged versioned goal catalog, recipe presets, and goal
+  preview, whose strict models resolve plain-language goals and presets to
+  existing objectives, row schemas, and executable recipe settings;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

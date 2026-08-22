@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from dataclasses import dataclass
 from pathlib import Path
 
 from veriformis.pipeline.service import PipelineService, StageOutcome
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.recipes.pipeline_spec import PipelineSpec, PipelineSpecError
-from veriformis.taxonomy import CANONICAL_CONSUMER_PROFILE
 from veriformis.workspace import Workspace
 
 
@@ -17,6 +18,18 @@ class PipelineRunResult:
     outcomes: tuple[StageOutcome, ...]
     workspace: Path
     bundle: Path | None = None
+
+
+def _optional_str(value: Any) -> str | None:
+    return None if value is None else str(value)
+
+
+def _optional_int(value: Any) -> int | None:
+    return None if value is None else int(value)
+
+
+def _optional_bool(value: Any) -> bool | None:
+    return None if value is None else bool(value)
 
 
 def run_pipeline_spec(
@@ -50,63 +63,75 @@ def run_pipeline_spec(
             outcomes.append(
                 pipeline.chunk(
                     spec.workspace,
-                    strategy=str(config.get("strategy", "paragraph")),
-                    size=int(config.get("size", 1000)),
-                    overlap=int(config.get("overlap", 100)),
+                    strategy=_optional_str(config.get("strategy")),
+                    size=_optional_int(config.get("size")),
+                    overlap=_optional_int(config.get("overlap")),
+                    goal=_optional_str(config.get("goal")),
+                    preset=_optional_str(config.get("preset")),
                 )
             )
         elif stage == "construct":
             objective = config.get("objective")
-            if objective is None and spec.recipe_library_id:
+            goal = _optional_str(config.get("goal"))
+            preset = _optional_str(config.get("preset"))
+            if spec.recipe_library_id:
                 if spec.recipe_library_id not in RECIPE_LIBRARY_IDS:
                     raise PipelineSpecError(
                         f"unknown recipe_library_id {spec.recipe_library_id!r}; "
                         f"expected one of {list(RECIPE_LIBRARY_IDS)!r}"
                     )
-                objective = spec.recipe_library_id.split(".", 1)[0]
-            if not isinstance(objective, str) or not objective:
+                library_objective = spec.recipe_library_id.split(".", 1)[0]
+                if objective is not None and objective != library_objective:
+                    raise PipelineSpecError(
+                        f"construct objective {objective!r} conflicts with "
+                        f"recipe_library_id {spec.recipe_library_id!r}"
+                    )
+                # Always pass the library objective so a conflicting stage goal or
+                # preset fails closed in resolution instead of being ignored.
+                objective = library_objective
+            if objective is None and goal is None and preset is None:
                 raise PipelineSpecError(
-                    "construct stage requires objective or top-level recipe_library_id"
+                    "construct stage requires objective, goal, preset, or top-level "
+                    "recipe_library_id"
                 )
+            if objective is not None and (not isinstance(objective, str) or not objective):
+                raise PipelineSpecError("construct objective must be a non-empty string")
             outcomes.append(
                 pipeline.construct(
                     spec.workspace,
                     objective=objective,
+                    goal=goal,
+                    preset=preset,
+                    representation=_optional_str(config.get("representation")),
                     source=list(config["source"])
                     if isinstance(config.get("source"), list)
                     else None,
                     target_row_schema=config.get("target_row_schema"),
-                    split_ratio_ppm=int(config.get("split_ratio_ppm", 500_000)),
-                    require_review=bool(config.get("require_review", False)),
-                    consumer_profile=str(
-                        config.get(
-                            "consumer_profile",
-                            CANONICAL_CONSUMER_PROFILE,
-                        )
-                    ),
+                    split_ratio_ppm=_optional_int(config.get("split_ratio_ppm")),
+                    require_review=_optional_bool(config.get("require_review")),
+                    consumer_profile=_optional_str(config.get("consumer_profile")),
                 )
             )
         elif stage == "curate":
-            evaluation_required = config.get("evaluation_required")
-            if evaluation_required is None:
+            evaluation_required = _optional_bool(config.get("evaluation_required"))
+            if evaluation_required is None and "allow_empty_evaluation" in config:
                 # YAML may use allow_empty_evaluation like the CLI flag sense.
-                if "allow_empty_evaluation" in config:
-                    evaluation_required = not bool(config["allow_empty_evaluation"])
-                else:
-                    evaluation_required = True
+                evaluation_required = not bool(config["allow_empty_evaluation"])
             outcomes.append(
                 pipeline.curate(
                     spec.workspace,
-                    minimum_target_characters=int(
-                        config.get("minimum_target_characters", 1)
+                    goal=_optional_str(config.get("goal")),
+                    preset=_optional_str(config.get("preset")),
+                    minimum_target_characters=_optional_int(
+                        config.get("minimum_target_characters")
                     ),
-                    balance_mode=str(config.get("balance_mode", "none")),
+                    balance_mode=_optional_str(config.get("balance_mode")),
                     maximum_records_per_primary_source=config.get(
                         "maximum_records_per_primary_source"
                     ),
-                    evaluation_ratio_ppm=int(config.get("evaluation_ratio_ppm", 500_000)),
-                    evaluation_required=bool(evaluation_required),
-                    split_seed=str(config.get("split_seed", "veriformis-v1")),
+                    evaluation_ratio_ppm=_optional_int(config.get("evaluation_ratio_ppm")),
+                    evaluation_required=evaluation_required,
+                    split_seed=_optional_str(config.get("split_seed")),
                     instruction=config.get("instruction"),
                 )
             )

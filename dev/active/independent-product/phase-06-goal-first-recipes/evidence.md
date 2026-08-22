@@ -1,7 +1,7 @@
 # Phase 6 Evidence
 
-**Status:** Open — items 6.1 and 6.2 merged as PR #60 and PR #61; item 6.3
-locally admitted without claiming its own pull-request result
+**Status:** Open — items 6.1–6.3 merged as PR #60, PR #61, and PR #62; item
+6.4 locally admitted without claiming its own pull-request result
 
 **Opened:** 2026-08-22
 
@@ -127,5 +127,31 @@ span; the preview never changes a workspace file; Python, CLI, and MCP emit
 identical ASCII-safe text; the transport never exceeds 262,144 bytes and
 fails closed when the skeleton cannot fit.
 
+Item 6.3 subsequently passed all 14 GitHub checks on the first run and merged
+as PR #62 at `9cbab117e47cde6bd8850d67f0d363e03f0660ce`.
+
+### Item 6.4 (2026-08-22, working tree on
+`9cbab117e47cde6bd8850d67f0d363e03f0660ce`)
+
+| Gate | Observed |
+| --- | --- |
+| Focused goal/preset/surface-identity/defect-closure tests | 138 passed |
+| Full Python (`uv run pytest -q`) | 1,371 passed, 1 intentional durability warning |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 1,359 passed, 1 deselected |
+| `scripts/release/check_local.sh` | PASS (clean wheel, golden compile, external digest, transport) |
+| `macos/scripts/parity_check.sh` (goal-first sequence) | PASS |
+| macOS XCTest target | 79 passed, `TEST SUCCEEDED` |
+| `scripts/check_project_tracking.py` and its regression | PASS (presets bound; no recipe default literal in surfaces or workbench) |
+| `uv lock --check`, Ruff, structured JSON, fixture `cmp`, `git diff --check` | PASS |
+| Independent adversarial review | No blocker; seven should-fix items (CLI reference tables, YAML `recipe_library_id` conflict detection, review-policy consistency in data and overrides, the `unknown strategy` message, the workbench opening-share label, legacy re-run restore before catalogs load, a dead test block); all corrected and re-verified |
+
+Proofs recorded by tests (usability criterion U3): objective, goal, and
+preset selections with equal overrides yield one `recipe_id` and one finished
+plan; CLI, MCP, and YAML compiles match the service recipe; `construct
+--preset` refuses mismatched chunks; every surface executes the packaged
+defaults; `presets` is byte-identical on CLI and MCP; no surface source file
+holds a recipe default literal; the constructor's replay fallback equals the
+packaged split-ratio default.
+
 These are local observations. They do not claim publication, GitHub checks,
-merge, or clean-main synchronization for the item 6.3 pull request.
+merge, or clean-main synchronization for the item 6.4 pull request.

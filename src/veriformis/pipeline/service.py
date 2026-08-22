@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import veriformis
+from pydantic import ValidationError
+
 from veriformis.bundle import (
     BundleArchiveReceipt,
     BundleAttestation,
@@ -38,12 +40,9 @@ from veriformis.chunkers.strategies import (
 )
 from veriformis.construction import (
     ConstructionInputs,
-    ConstructionPass,
     DatasetRecipe,
     IRArtifactInput,
     ReviewEvidence,
-    SegmentationPolicy,
-    TrainingObjective,
     construct_dataset,
     construction_result_from_json_bytes,
     construction_result_to_dict,
@@ -59,12 +58,9 @@ from veriformis.contracts import (
     VALIDATION_STAGE_SCHEMA_ID,
 )
 from veriformis.datasets import (
-    CurationPolicy,
     DatasetValidationReport,
     FinishedDatasetPlan,
     SerializationOutput,
-    SerializationPlan,
-    SplitPolicy,
     curate_dataset,
     curation_result_from_json_bytes,
     curation_result_to_dict,
@@ -82,6 +78,7 @@ from veriformis.datasets import (
     validate_finished_dataset,
 )
 from veriformis.errors import (
+    GoalCatalogError,
     MissingStageInputError,
     ConstructionError,
     InvalidSourceLocatorError,
@@ -156,10 +153,8 @@ from veriformis.rules.derivations import (
 from veriformis.rules.library import rules_from_clean_config, select_rules
 from veriformis.sources import ParseResult, SourceRef
 from veriformis.taxonomy import (
-    CANONICAL_CONSUMER_PROFILE,
-    assert_compile_combination,
-    default_row_schema,
     implemented_discovery,
+    require_identifier,
 )
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
@@ -1036,6 +1031,12 @@ class PipelineService:
 
         return discover_goals()
 
+    def discover_presets(self) -> dict[str, Any]:
+        """Return a fresh, adapter-safe copy of the versioned recipe presets."""
+        from veriformis.goals import discover_presets
+
+        return discover_presets()
+
     def preview_goal(
         self,
         workspace: Path,
@@ -1405,11 +1406,46 @@ class PipelineService:
         self,
         workspace: Path,
         *,
-        strategy: str = "paragraph",
-        size: int = 1000,
-        overlap: int = 100,
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
     ) -> ChunkOutcome:
-        """Chunk cleaned documents with exact reconstructible source evidence."""
+        """Chunk cleaned documents with exact reconstructible source evidence.
+
+        Omitted settings come from the selected goal's preset, or from the
+        recipe-wide preset defaults when no goal or preset is selected.
+        """
+        from veriformis.goals.presets import (
+            SegmentationSettings,
+            recipe_defaults,
+            resolve_recipe_settings,
+        )
+
+        if strategy is not None and strategy not in _STRATEGIES:
+            raise ValueError(
+                f"unknown strategy: {strategy} (have: {sorted(_STRATEGIES)})"
+            )
+        try:
+            if goal is not None or preset is not None:
+                segmentation = resolve_recipe_settings(
+                    goal=goal, preset=preset, strategy=strategy, size=size, overlap=overlap
+                ).segmentation
+            else:
+                base = recipe_defaults().segmentation
+                segmentation = SegmentationSettings(
+                    strategy=base.strategy if strategy is None else strategy,
+                    size=base.size if size is None else size,
+                    overlap=base.overlap if overlap is None else overlap,
+                )
+        except GoalCatalogError as exc:
+            raise ValueError(exc.message) from exc
+        except ValidationError as exc:
+            raise ValueError(f"invalid chunk settings: {exc}") from exc
+        strategy = segmentation.strategy
+        size = segmentation.size
+        overlap = segmentation.overlap
         if strategy not in _STRATEGIES:
             raise ValueError(
                 f"unknown strategy: {strategy} (have: {sorted(_STRATEGIES)})"
@@ -1517,30 +1553,49 @@ class PipelineService:
         self,
         workspace: Path,
         *,
-        objective: str,
+        objective: str | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
+        representation: str | None = None,
         source: list[str] | None = None,
         target_row_schema: str | None = None,
-        split_ratio_ppm: int = 500_000,
-        require_review: bool = False,
-        consumer_profile: str = CANONICAL_CONSUMER_PROFILE,
+        split_ratio_ppm: int | None = None,
+        require_review: bool | None = None,
+        consumer_profile: str | None = None,
     ) -> ConstructOutcome:
-        """Construct evidence-bearing candidates and immutable accepted records."""
+        """Construct evidence-bearing candidates and immutable accepted records.
+
+        Select the goal by plain-language ``goal``, by ``preset``, or by the
+        persisted ``objective`` kind; omitted settings come from the preset
+        data. The recipe is always built through the named recipe library, so
+        every selection path yields the same ``recipe_id`` for the same
+        effective settings.
+        """
+        from veriformis.goals.presets import resolve_recipe_settings
+        from veriformis.recipes.library import build_named_recipe
+
         try:
-            row_schema = (
-                default_row_schema(objective)
-                if target_row_schema is None
-                else target_row_schema
-            )
-            assert_compile_combination(
-                objective,
-                row_schema,
-                profile=consumer_profile,
-            )
+            if objective is not None:
+                require_identifier("objective", objective)
+            if target_row_schema is not None:
+                require_identifier("semantic_row", target_row_schema)
         except TaxonomyError as exc:
             raise ConstructionError(exc.message) from exc
-        if not 1 <= split_ratio_ppm <= 999_999:
-            raise ConstructionError("split ratio must be from 1 to 999999 ppm")
-
+        try:
+            settings = resolve_recipe_settings(
+                goal=goal,
+                preset=preset,
+                representation=representation,
+                objective=objective,
+                target_row_schema=target_row_schema,
+                split_ratio_ppm=split_ratio_ppm,
+                require_review=require_review,
+                consumer_profile=consumer_profile,
+            )
+        except GoalCatalogError as exc:
+            raise ConstructionError(exc.message) from exc
+        objective = settings.objective
+        row_schema = settings.row_schema
         store = Workspace.open(workspace)
         current = store.head()
         if "construct" not in current.stages:
@@ -1550,35 +1605,34 @@ class PipelineService:
             )
         source_ids = _select_construction_sources(current, source)
         inputs = _load_construction_inputs(store, current, source_ids)
-        objective_value = TrainingObjective.create(objective)
-        parameters = (
-            {"split_ratio_ppm": split_ratio_ppm}
-            if objective == "continuation"
-            else None
-        )
-        construction_pass = ConstructionPass.create(
-            sequence=1,
-            objective_kind=objective,
-            parameters=parameters,
-        )
         chunk_config = current.stages["chunk"].config
-        try:
-            recipe = DatasetRecipe.create(
-                objective=objective_value,
-                source_ids=source_ids,
-                cleaning_config_digest=current.stages["clean"].config_digest,
-                segmentation=SegmentationPolicy(
-                    schema_version="veriformis.segmentation-policy/v1",
-                    strategy=chunk_config["strategy"],
-                    size=chunk_config["size"],
-                    overlap=chunk_config["overlap"],
-                ),
-                passes=(construction_pass,),
-                target_row_schema=row_schema,
-                review_policy="required" if require_review else "none",
-            )
-        except (TypeError, ValueError) as exc:
-            raise ConstructionError(f"invalid dataset recipe: {exc}") from exc
+        if preset is not None:
+            expected = settings.segmentation.model_dump()
+            observed = {
+                "strategy": chunk_config["strategy"],
+                "size": chunk_config["size"],
+                "overlap": chunk_config["overlap"],
+            }
+            if observed != expected:
+                raise ConstructionError(
+                    f"workspace chunks were produced with {observed!r}, but preset "
+                    f"{preset!r} expects {expected!r}; re-run `veriformis chunk "
+                    f"WORKSPACE --preset {preset}` first"
+                )
+        recipe = build_named_recipe(
+            settings.recipe_library_id,
+            source_ids=source_ids,
+            cleaning_config_digest=current.stages["clean"].config_digest,
+            segmentation={
+                "strategy": chunk_config["strategy"],
+                "size": chunk_config["size"],
+                "overlap": chunk_config["overlap"],
+            },
+            split_ratio_ppm=settings.construction.split_ratio_ppm,
+            require_review=settings.construction.require_review,
+            target_row_schema=row_schema,
+            consumer_profile=settings.construction.consumer_profile,
+        )
         result = construct_dataset(recipe, inputs)
         config = {
             "schema_version": CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
@@ -1636,17 +1690,25 @@ class PipelineService:
         self,
         workspace: Path,
         *,
-        minimum_target_characters: int = 1,
-        balance_mode: str = "none",
+        goal: str | None = None,
+        preset: str | None = None,
+        minimum_target_characters: int | None = None,
+        balance_mode: str | None = None,
         maximum_records_per_primary_source: int | None = None,
-        evaluation_ratio_ppm: int = 500_000,
-        evaluation_required: bool = True,
-        split_seed: str = "veriformis-v1",
+        evaluation_ratio_ppm: int | None = None,
+        evaluation_required: bool | None = None,
+        split_seed: str | None = None,
         instruction: str | None = None,
     ) -> CurateOutcome:
-        """Fix the complete dataset plan, then curate constructed records."""
-        if balance_mode not in {"none", "primary-source-cap"}:
-            raise ValueError("balance mode must be 'none' or 'primary-source-cap'")
+        """Fix the complete dataset plan, then curate constructed records.
+
+        Omitted settings come from the selected preset or, by default, from
+        the constructed goal's safe preset; the plan is built through the
+        recipe library so every surface fixes the same plan.
+        """
+        from veriformis.goals.presets import resolve_recipe_settings
+        from veriformis.recipes.library import build_default_finished_plan
+
         store = Workspace.open(workspace)
         current = store.head()
         _require_group3_revision(current)
@@ -1658,30 +1720,33 @@ class PipelineService:
                 )
         elif instruction is not None:
             raise ValueError("--instruction is valid only for instruction_output rows")
-        curation_policy = CurationPolicy.create(
-            minimum_target_characters=minimum_target_characters,
-            balance_mode=(
-                "primary_source_cap"
-                if balance_mode == "primary-source-cap"
-                else "none"
-            ),
-            maximum_records_per_primary_source=(maximum_records_per_primary_source),
-        )
-        split_policy = SplitPolicy.create(
-            evaluation_ratio_ppm=evaluation_ratio_ppm,
-            evaluation_required=evaluation_required,
-            seed=split_seed,
-        )
-        serialization_plan = SerializationPlan.create(
-            row_schema=recipe.target_row_schema,
-            instruction_text=instruction,
-        )
-        plan = FinishedDatasetPlan.create(
+        try:
+            settings = resolve_recipe_settings(
+                goal=goal,
+                preset=preset,
+                objective=recipe.objective.kind,
+                target_row_schema=recipe.target_row_schema,
+                minimum_target_characters=minimum_target_characters,
+                balance_mode=balance_mode,
+                maximum_records_per_primary_source=maximum_records_per_primary_source,
+                evaluation_ratio_ppm=evaluation_ratio_ppm,
+                evaluation_required=evaluation_required,
+                split_seed=split_seed,
+            )
+        except GoalCatalogError as exc:
+            raise ValueError(exc.message) from exc
+        curation = settings.curation
+        plan = build_default_finished_plan(
             recipe_id=recipe.recipe_id,
             construction_result_id=result.result_id,
-            curation_policy=curation_policy,
-            split_policy=split_policy,
-            serialization_plan=serialization_plan,
+            target_row_schema=recipe.target_row_schema,
+            minimum_target_characters=curation.minimum_target_characters,
+            balance_mode=curation.balance_mode,
+            maximum_records_per_primary_source=curation.maximum_records_per_primary_source,
+            evaluation_ratio_ppm=curation.evaluation_ratio_ppm,
+            evaluation_required=curation.evaluation_required,
+            split_seed=curation.split_seed,
+            instruction=instruction,
         )
         curated = curate_dataset(plan, recipe, inputs, result)
         config = _finished_stage_config(CURATION_STAGE_SCHEMA_ID, plan.plan_id)

@@ -6,12 +6,6 @@ import UniformTypeIdentifiers
 @MainActor
 final class WorkbenchViewModel: ObservableObject {
     nonisolated static let defaultWriteAptusHandoff = false
-    /// Match the CLI curate default (`--require-evaluation`): fail closed when
-    /// the evaluation partition would be empty. Empty-evaluation is an
-    /// explicit per-run opt-in, never a silent GUI default.
-    nonisolated static let defaultAllowEmptyEvaluation = false
-    /// Match the CLI construct default for `--split-ratio-ppm`.
-    nonisolated static let defaultSplitRatioPPM = 500_000
 
     // Navigation
     @Published var destination: SidebarDestination = .compile
@@ -21,11 +15,19 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var sourceRootURL: URL?
     private var userPinnedSourceRoot = false
     @Published var outputDirectoryURL: URL?
-    @Published var objective: TrainingObjective = .fullText
-    @Published var allowEmptyEvaluation = defaultAllowEmptyEvaluation
-    @Published var splitRatioPPM = defaultSplitRatioPPM
+    /// Plain-language goal and preset selection (Phase 6.4). Recipe defaults
+    /// are never Swift constants: they come from `veriformis presets`.
+    @Published var selectedGoalID: String?
+    @Published var selectedPresetID: String?
+    /// `--allow-empty-evaluation` is an explicit per-run opt-in, never a
+    /// silent default; the CLI preset data requires evaluation otherwise.
+    @Published var allowEmptyEvaluation = false
+    /// Operator override for `--split-ratio-ppm`; nil means the preset value.
+    @Published var splitRatioPPM: Int?
     @Published var writeAptusHandoff = defaultWriteAptusHandoff
     @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
+    @Published private(set) var goalCatalogState: GoalCatalogState = .idle
+    @Published private(set) var recipePresetState: RecipePresetState = .idle
     @Published private(set) var goalPreviewState: GoalPreviewState = .idle
 
     // Run state
@@ -63,6 +65,12 @@ final class WorkbenchViewModel: ObservableObject {
     private var runFinishedCallbacks: [() -> Void] = []
     private var taxonomyHelpTask: Task<Void, Never>?
     private var taxonomyHelpController: CLIProcessController?
+    private var goalCatalogTask: Task<Void, Never>?
+    private var goalCatalogController: CLIProcessController?
+    private var recipePresetTask: Task<Void, Never>?
+    private var recipePresetController: CLIProcessController?
+    /// A legacy history entry's objective awaiting a loaded goal catalog.
+    private var pendingLegacyObjective: String?
     private var goalPreviewTask: Task<Void, Never>?
     private var goalPreviewController: CLIProcessController?
 
@@ -80,7 +88,129 @@ final class WorkbenchViewModel: ObservableObject {
         if sourceURLs.isEmpty { return "Add at least one source file." }
         if resolvedSourceRoot == nil { return "Source root directory is missing." }
         if outputDirectoryURL == nil { return "Choose an output folder (or set a default in Settings)." }
+        if selectedGoalID == nil || selectedPresetID == nil {
+            return "Goal catalog and recipe presets are not loaded yet."
+        }
         return nil
+    }
+
+    /// The selected goal's catalog entry, when the catalog is loaded.
+    var selectedGoal: GoalCatalogGoal? {
+        guard case .ready(let catalog) = goalCatalogState, let selectedGoalID else { return nil }
+        return catalog.goal(withID: selectedGoalID)
+    }
+
+    /// The selected preset entry, when the presets are loaded.
+    var selectedPreset: RecipePresetEntry? {
+        guard case .ready(let catalog) = recipePresetState, let selectedPresetID else { return nil }
+        return catalog.preset(withID: selectedPresetID)
+    }
+
+    /// Choose a goal and move the preset to that goal's safe preset.
+    func selectGoal(_ goalID: String) {
+        selectedGoalID = goalID
+        if case .ready(let catalog) = recipePresetState {
+            selectedPresetID = catalog.safePreset(forGoal: goalID)?.presetID
+        }
+    }
+
+    private func adoptLoadedSelection() {
+        guard case .ready(let goals) = goalCatalogState,
+              case .ready(let presets) = recipePresetState
+        else { return }
+        if let pending = pendingLegacyObjective,
+           let goal = goals.goals.first(where: { $0.objective.rawValue == pending })
+        {
+            pendingLegacyObjective = nil
+            selectedGoalID = goal.goalID
+            selectedPresetID = nil
+        }
+        if selectedGoalID == nil || goals.goal(withID: selectedGoalID ?? "") == nil {
+            selectedGoalID = goals.goals.first?.goalID
+        }
+        if let goalID = selectedGoalID,
+           selectedPresetID == nil || presets.preset(withID: selectedPresetID ?? "")?.goalID != goalID
+        {
+            selectedPresetID = presets.safePreset(forGoal: goalID)?.presetID
+        }
+    }
+
+    func refreshGoalCatalog() {
+        goalCatalogTask?.cancel()
+        goalCatalogController?.cancel()
+        goalCatalogTask = nil
+        goalCatalogController = nil
+        guard let cli else {
+            goalCatalogState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        let controller = CLIProcessController()
+        goalCatalogController = controller
+        goalCatalogState = .loading
+        goalCatalogTask = Task { [weak self] in
+            let nextState: GoalCatalogState
+            do {
+                let catalog = try await cli.discoverGoals(controller: controller)
+                try Task.checkCancellation()
+                nextState = .ready(catalog)
+            } catch is CancellationError {
+                nextState = .unavailable("Goal discovery was cancelled.")
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.goalCatalogController === controller else { return }
+            self.goalCatalogState = nextState
+            self.goalCatalogController = nil
+            self.goalCatalogTask = nil
+            self.adoptLoadedSelection()
+        }
+    }
+
+    func refreshRecipePresets() {
+        recipePresetTask?.cancel()
+        recipePresetController?.cancel()
+        recipePresetTask = nil
+        recipePresetController = nil
+        guard let cli else {
+            recipePresetState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        let controller = CLIProcessController()
+        recipePresetController = controller
+        recipePresetState = .loading
+        recipePresetTask = Task { [weak self] in
+            let nextState: RecipePresetState
+            do {
+                let catalog = try await cli.discoverPresets(controller: controller)
+                try Task.checkCancellation()
+                nextState = .ready(catalog)
+            } catch is CancellationError {
+                nextState = .unavailable("Recipe preset discovery was cancelled.")
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.recipePresetController === controller else { return }
+            self.recipePresetState = nextState
+            self.recipePresetController = nil
+            self.recipePresetTask = nil
+            self.adoptLoadedSelection()
+        }
+    }
+
+    /// Apply already-decoded catalogs (tests and deterministic startup paths),
+    /// cancelling any in-flight discovery so a late result cannot replace them.
+    func applyCatalogs(goals: GoalCatalog, presets: RecipePresetCatalog) {
+        goalCatalogTask?.cancel()
+        goalCatalogController?.cancel()
+        goalCatalogTask = nil
+        goalCatalogController = nil
+        recipePresetTask?.cancel()
+        recipePresetController?.cancel()
+        recipePresetTask = nil
+        recipePresetController = nil
+        goalCatalogState = .ready(goals)
+        recipePresetState = .ready(presets)
+        adoptLoadedSelection()
     }
 
     var resolvedSourceRoot: URL? {
@@ -127,9 +257,13 @@ final class WorkbenchViewModel: ObservableObject {
             appendLog("CLI ready: \(resolvedCLIDescription)")
             runStatusMessage = "CLI ready"
             refreshTaxonomyHelp()
+            refreshGoalCatalog()
+            refreshRecipePresets()
         } catch {
             cli = nil
             refreshTaxonomyHelp()
+            refreshGoalCatalog()
+            refreshRecipePresets()
             resolvedCLIDescription = "(missing)"
             lastError = error.localizedDescription
             appendLog("error: \(error.localizedDescription)")
@@ -337,7 +471,13 @@ final class WorkbenchViewModel: ObservableObject {
         let startedAt = Date()
         let sourcesSnapshot = sourceURLs
         let sourceRootSnapshot = sourceRoot
-        let objectiveSnapshot = objective
+        guard let goalSnapshot = selectedGoalID, let presetSnapshot = selectedPresetID else {
+            lastError = "Goal catalog and recipe presets are not loaded yet."
+            isRunning = false
+            showRunSheet = false
+            return
+        }
+        let objectiveSnapshot = selectedGoal?.objective ?? .fullText
         let allowEmptySnapshot = allowEmptyEvaluation
         let handoffSnapshot = writeAptusHandoff
         let splitSnapshot = splitRatioPPM
@@ -376,7 +516,8 @@ final class WorkbenchViewModel: ObservableObject {
                     sourceRoot: sourceRootSnapshot,
                     workspace: workspace,
                     bundle: bundle,
-                    objective: objectiveSnapshot,
+                    goal: goalSnapshot,
+                    preset: presetSnapshot,
                     allowEmptyEvaluation: allowEmptySnapshot,
                     splitRatioPPM: splitSnapshot,
                     includeHandoff: handoffSnapshot
@@ -515,6 +656,8 @@ final class WorkbenchViewModel: ObservableObject {
                     allowEmptyEvaluation: allowEmptySnapshot,
                     writeAptusHandoff: handoffSnapshot,
                     splitRatioPPM: splitSnapshot,
+                    goalID: goalSnapshot,
+                    presetID: presetSnapshot,
                     workspace: workspace,
                     bundle: bundle,
                     handoff: lastResult?.handoffURL,
@@ -549,6 +692,8 @@ final class WorkbenchViewModel: ObservableObject {
                     allowEmptyEvaluation: allowEmptySnapshot,
                     writeAptusHandoff: handoffSnapshot,
                     splitRatioPPM: splitSnapshot,
+                    goalID: goalSnapshot,
+                    presetID: presetSnapshot,
                     workspace: workspace,
                     bundle: bundle,
                     handoff: nil,
@@ -590,6 +735,8 @@ final class WorkbenchViewModel: ObservableObject {
                     allowEmptyEvaluation: allowEmptySnapshot,
                     writeAptusHandoff: handoffSnapshot,
                     splitRatioPPM: splitSnapshot,
+                    goalID: goalSnapshot,
+                    presetID: presetSnapshot,
                     workspace: workspace,
                     bundle: bundle,
                     handoff: nil,
@@ -638,14 +785,25 @@ final class WorkbenchViewModel: ObservableObject {
             userPinnedSourceRoot = false
             sourceRootURL = Self.defaultSourceRoot(for: sourceURLs)
         }
-        if let objective = TrainingObjective(rawValue: entry.objective) {
-            self.objective = objective
+        if let goalID = entry.goalID {
+            selectGoal(goalID)
+            if let presetID = entry.presetID {
+                selectedPresetID = presetID
+            }
+        } else if case .ready(let catalog) = goalCatalogState,
+                  let goal = catalog.goals.first(where: { $0.objective.rawValue == entry.objective })
+        {
+            // Legacy entries recorded only the objective; map it to its goal.
+            selectGoal(goal.goalID)
+        } else {
+            // Catalog not loaded yet: apply the legacy objective once it is.
+            pendingLegacyObjective = entry.objective
         }
-        // Legacy entries without recorded values fall back to the current
-        // fail-closed defaults; explicitly recorded opt-ins are preserved.
-        allowEmptyEvaluation = entry.allowEmptyEvaluation ?? Self.defaultAllowEmptyEvaluation
+        // Legacy entries without recorded values fall back to the fail-closed
+        // opt-in state and the preset value; explicit overrides are preserved.
+        allowEmptyEvaluation = entry.allowEmptyEvaluation ?? false
         writeAptusHandoff = entry.requestsAptusHandoff
-        splitRatioPPM = entry.splitRatioPPM ?? Self.defaultSplitRatioPPM
+        splitRatioPPM = entry.splitRatioPPM
         let parent = URL(fileURLWithPath: entry.workspacePath).deletingLastPathComponent()
         if FileManager.default.fileExists(atPath: parent.path) {
             outputDirectoryURL = parent
@@ -879,7 +1037,9 @@ final class WorkbenchViewModel: ObservableObject {
         objective: TrainingObjective,
         allowEmptyEvaluation: Bool,
         writeAptusHandoff: Bool,
-        splitRatioPPM: Int,
+        splitRatioPPM: Int?,
+        goalID: String? = nil,
+        presetID: String? = nil,
         workspace: URL,
         bundle: URL,
         handoff: URL?,
@@ -912,6 +1072,8 @@ final class WorkbenchViewModel: ObservableObject {
             allowEmptyEvaluation: allowEmptyEvaluation,
             writeAptusHandoff: writeAptusHandoff,
             splitRatioPPM: splitRatioPPM,
+            goalID: goalID,
+            presetID: presetID,
             failedStage: failedStage,
             exitCode: exitCode,
             cancellationReceipt: cancellationReceipt,

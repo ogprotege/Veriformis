@@ -2275,6 +2275,9 @@ struct RunHistoryEntry: Identifiable, Codable, Equatable {
     let allowEmptyEvaluation: Bool?
     let writeAptusHandoff: Bool?
     let splitRatioPPM: Int?
+    /// Goal-first selection (Phase 6.4); optional so older history decodes.
+    let goalID: String?
+    let presetID: String?
     let failedStage: String?
     let exitCode: Int?
     /// Optional so pre-Phase-2 history remains decodable.
@@ -3020,4 +3023,235 @@ struct GoalPreview: Decodable, Equatable, Sendable {
         guard !value.isEmpty else { throw GoalPreviewError.invalidMetadata(key) }
         return value
     }
+}
+
+// MARK: - Recipe presets (Phase 6.4)
+
+enum RecipePresetError: LocalizedError, Equatable, Sendable {
+    case invalidKeySet(scope: String, missing: [String], unexpected: [String])
+    case invalidMetadata(String)
+    case commandFailed(exitCode: Int32, message: String)
+    case outputTruncated
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidKeySet(let scope, let missing, let unexpected):
+            return "Recipe preset \(scope) keys are invalid (missing: \(missing); unexpected: \(unexpected))."
+        case .invalidMetadata(let key):
+            return "Recipe preset field \(key) is invalid."
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "no output" : message
+            return "Recipe preset discovery failed (exit \(exitCode)): \(detail)"
+        case .outputTruncated:
+            return "Recipe preset discovery output was truncated."
+        case .invalidPayload(let message):
+            return "Recipe preset discovery returned invalid JSON: \(message)"
+        }
+    }
+}
+
+struct RecipeSegmentationSettings: Equatable, Sendable {
+    let strategy: String
+    let size: Int
+    let overlap: Int
+}
+
+struct RecipeConstructionSettings: Equatable, Sendable {
+    let splitRatioPPM: Int
+    let requireReview: Bool
+    let consumerProfile: String
+}
+
+struct RecipeDefaultSettings: Equatable, Sendable {
+    let segmentation: RecipeSegmentationSettings
+    let construction: RecipeConstructionSettings
+    let curation: GoalCurationDefaults
+    let reviewPolicy: String
+}
+
+struct RecipePresetEntry: Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "preset_id", "goal_id", "representation_id", "title", "plain_language",
+        "segmentation", "construction", "curation", "review_policy",
+    ]
+
+    let presetID: String
+    let goalID: String
+    let representationID: String
+    let title: String
+    let plainLanguage: String
+    let segmentation: RecipeSegmentationSettings
+    let construction: RecipeConstructionSettings
+    let curation: GoalCurationDefaults
+    let reviewPolicy: String
+}
+
+/// Strict workbench view of `veriformis presets`: the single source of defaults.
+struct RecipePresetCatalog: Decodable, Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "schema_id", "contract_id", "contract_version", "defaults", "presets",
+    ]
+
+    let defaults: RecipeDefaultSettings
+    let presets: [RecipePresetEntry]
+
+    func presets(forGoal goalID: String) -> [RecipePresetEntry] {
+        presets.filter { $0.goalID == goalID }
+    }
+
+    func safePreset(forGoal goalID: String) -> RecipePresetEntry? {
+        presets.first { $0.presetID == "\(goalID).safe" }
+    }
+
+    func preset(withID presetID: String) -> RecipePresetEntry? {
+        presets.first { $0.presetID == presetID }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: GoalCatalogKey.self)
+        try Self.requireKeys(container, expected: Self.expectedKeys, scope: "presets")
+        guard try container.decode(String.self, forKey: GoalCatalogKey("schema_id"))
+            == "veriformis.recipe-preset/v1"
+        else { throw RecipePresetError.invalidMetadata("schema_id") }
+        guard try container.decode(String.self, forKey: GoalCatalogKey("contract_id"))
+            == "veriformis.recipe-preset"
+        else { throw RecipePresetError.invalidMetadata("contract_id") }
+        guard try container.decode(Int.self, forKey: GoalCatalogKey("contract_version")) == 1 else {
+            throw RecipePresetError.invalidMetadata("contract_version")
+        }
+        let defaultsContainer = try container.nestedContainer(
+            keyedBy: GoalCatalogKey.self, forKey: GoalCatalogKey("defaults")
+        )
+        try Self.requireKeys(
+            defaultsContainer,
+            expected: ["segmentation", "construction", "curation", "review_policy"],
+            scope: "defaults"
+        )
+        defaults = RecipeDefaultSettings(
+            segmentation: try Self.segmentation(defaultsContainer),
+            construction: try Self.construction(defaultsContainer),
+            curation: try Self.curation(defaultsContainer),
+            reviewPolicy: try Self.text(defaultsContainer, "review_policy")
+        )
+        var list = try container.nestedUnkeyedContainer(forKey: GoalCatalogKey("presets"))
+        var presets: [RecipePresetEntry] = []
+        while !list.isAtEnd {
+            let item = try list.nestedContainer(keyedBy: GoalCatalogKey.self)
+            try Self.requireKeys(item, expected: RecipePresetEntry.expectedKeys, scope: "preset")
+            let presetID = try Self.text(item, "preset_id")
+            let goalID = try Self.text(item, "goal_id")
+            guard GoalCatalog.isIdentifier(goalID), presetID.hasPrefix(goalID + ".") else {
+                throw RecipePresetError.invalidMetadata("preset_id")
+            }
+            presets.append(
+                RecipePresetEntry(
+                    presetID: presetID,
+                    goalID: goalID,
+                    representationID: try Self.text(item, "representation_id"),
+                    title: try Self.text(item, "title"),
+                    plainLanguage: try Self.text(item, "plain_language"),
+                    segmentation: try Self.segmentation(item),
+                    construction: try Self.construction(item),
+                    curation: try Self.curation(item),
+                    reviewPolicy: try Self.text(item, "review_policy")
+                )
+            )
+        }
+        guard !presets.isEmpty, presets.count == Set(presets.map(\.presetID)).count else {
+            throw RecipePresetError.invalidMetadata("presets")
+        }
+        self.presets = presets
+    }
+
+    private static func segmentation(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>
+    ) throws -> RecipeSegmentationSettings {
+        let nested = try container.nestedContainer(keyedBy: GoalCatalogKey.self, forKey: GoalCatalogKey("segmentation"))
+        try requireKeys(nested, expected: ["strategy", "size", "overlap"], scope: "segmentation")
+        let settings = RecipeSegmentationSettings(
+            strategy: try text(nested, "strategy"),
+            size: try nested.decode(Int.self, forKey: GoalCatalogKey("size")),
+            overlap: try nested.decode(Int.self, forKey: GoalCatalogKey("overlap"))
+        )
+        guard settings.size >= 1, settings.overlap >= 0, settings.overlap < settings.size else {
+            throw RecipePresetError.invalidMetadata("segmentation")
+        }
+        return settings
+    }
+
+    private static func construction(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>
+    ) throws -> RecipeConstructionSettings {
+        let nested = try container.nestedContainer(keyedBy: GoalCatalogKey.self, forKey: GoalCatalogKey("construction"))
+        try requireKeys(nested, expected: ["split_ratio_ppm", "require_review", "consumer_profile"], scope: "construction")
+        let settings = RecipeConstructionSettings(
+            splitRatioPPM: try nested.decode(Int.self, forKey: GoalCatalogKey("split_ratio_ppm")),
+            requireReview: try nested.decode(Bool.self, forKey: GoalCatalogKey("require_review")),
+            consumerProfile: try text(nested, "consumer_profile")
+        )
+        guard (1 ... 999_999).contains(settings.splitRatioPPM) else {
+            throw RecipePresetError.invalidMetadata("split_ratio_ppm")
+        }
+        return settings
+    }
+
+    private static func curation(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>
+    ) throws -> GoalCurationDefaults {
+        let nested = try container.nestedContainer(keyedBy: GoalCatalogKey.self, forKey: GoalCatalogKey("curation"))
+        try requireKeys(nested, expected: GoalCurationDefaults.expectedKeys, scope: "curation")
+        let settings = GoalCurationDefaults(
+            minimumTargetCharacters: try nested.decode(Int.self, forKey: GoalCatalogKey("minimum_target_characters")),
+            balanceMode: try text(nested, "balance_mode"),
+            maximumRecordsPerPrimarySource: try nested.decodeIfPresent(Int.self, forKey: GoalCatalogKey("maximum_records_per_primary_source")),
+            evaluationRatioPPM: try nested.decode(Int.self, forKey: GoalCatalogKey("evaluation_ratio_ppm")),
+            evaluationRequired: try nested.decode(Bool.self, forKey: GoalCatalogKey("evaluation_required")),
+            splitSeed: try text(nested, "split_seed")
+        )
+        guard settings.minimumTargetCharacters >= 1, (0 ... 1_000_000).contains(settings.evaluationRatioPPM) else {
+            throw RecipePresetError.invalidMetadata("curation")
+        }
+        return settings
+    }
+
+    private static func requireKeys(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        expected: Set<String>,
+        scope: String
+    ) throws {
+        let observed = Set(container.allKeys.map(\.stringValue))
+        guard observed == expected else {
+            throw RecipePresetError.invalidKeySet(
+                scope: scope,
+                missing: Array(expected.subtracting(observed)).sorted(),
+                unexpected: Array(observed.subtracting(expected)).sorted()
+            )
+        }
+    }
+
+    private static func text(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String
+    ) throws -> String {
+        let value = try container.decode(String.self, forKey: GoalCatalogKey(key))
+        guard !value.isEmpty, value == value.trimmingCharacters(in: .whitespacesAndNewlines) else {
+            throw RecipePresetError.invalidMetadata(key)
+        }
+        return value
+    }
+}
+
+enum RecipePresetState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(RecipePresetCatalog)
+    case unavailable(String)
+}
+
+enum GoalCatalogState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(GoalCatalog)
+    case unavailable(String)
 }

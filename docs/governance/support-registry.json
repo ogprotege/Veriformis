@@ -84,6 +84,13 @@
       "reproduce-a-recorded-change",
       "extract-a-structured-value"
     ],
+    "implemented_presets": [
+      "learn-the-text.safe",
+      "continue-a-passage.safe",
+      "recover-a-section-from-its-heading.safe",
+      "reproduce-a-recorded-change.safe",
+      "extract-a-structured-value.safe"
+    ],
     "implemented_row_schemas": [
       "instruction_output",
       "messages",
@@ -117,6 +124,8 @@
       "src/veriformis/taxonomy.py",
       "src/veriformis/goals/catalog.py",
       "src/veriformis/goals/catalog-v1.json",
+      "src/veriformis/goals/presets.py",
+      "src/veriformis/goals/presets-v1.json",
       "docs/contracts/dataset-construction-v1.md",
       "docs/contracts/taxonomy-v1.md",
       "docs/contracts/goal-catalog-v1.md"

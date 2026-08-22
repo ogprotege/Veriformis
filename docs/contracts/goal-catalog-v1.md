@@ -10,11 +10,13 @@
 
 **Implementation status:** Implemented in independent-product Phase 6.1
 (goal catalog and read-only discovery), extended additively by Phase 6.2
-(per-goal contracts and input-family eligibility) and Phase 6.3 (the
-runtime-only goal preview). Items 6.4–6.7 extend it further with presets,
-preflight, the acceptance matrix, and instruction truthfulness.
+(per-goal contracts and input-family eligibility), Phase 6.3 (the
+runtime-only goal preview), and Phase 6.4 (goal and preset selection on every
+compile surface under the [Recipe Preset Contract v1](recipe-preset-v1.md)).
+Items 6.5–6.7 extend it further with preflight, the acceptance matrix, and
+instruction truthfulness.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.3)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.4)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -82,7 +84,7 @@ Top-level object:
 | `required_evidence_diagnostics` | The construction diagnostic codes that report that evidence missing; a subset of `V1_CONSTRUCTION_DIAGNOSTIC_CODES` |
 | `target_construction` | Plain-language statement of exactly how context and target are derived |
 | `supervision_boundary` | Plain-language statement of which part is context and which receives loss |
-| `curation_defaults` | Object with `minimum_target_characters`, `balance_mode`, `maximum_records_per_primary_source`, `evaluation_ratio_ppm`, `evaluation_required`, `split_seed`; validated as an executable `CurationPolicy`; equal to the defaults every surface executes until Phase 6.4 presets own them. `balance_mode` uses the persisted `CurationPolicy` spelling (`none`, `primary_source_cap`); the CLI and MCP hyphenated surface spelling is unified in 6.4 |
+| `curation_defaults` | Object with `minimum_target_characters`, `balance_mode`, `maximum_records_per_primary_source`, `evaluation_ratio_ppm`, `evaluation_required`, `split_seed`; validated as an executable `CurationPolicy`; equal to the recipe-wide defaults in the [Recipe Preset Contract v1](recipe-preset-v1.md), which every surface executes. `balance_mode` uses the persisted `CurationPolicy` spelling (`none`, `primary_source_cap`); surfaces accept only the documented hyphenated `primary-source-cap` |
 | `review_policy_default` | `none` or `required` |
 | `review_policy_options` | Exactly `["none", "required"]` |
 | `non_claims` | Exactly the closed v1 codes `no-trainer-compatibility`, `no-generated-text`, `no-invented-target`, `no-fine-tuning-suitability-judgment` |
@@ -143,10 +145,10 @@ Top-level object:
    `required_evidence_diagnostics` MUST include `source-chunks-unavailable`
    for every goal because construction reports it for every objective. Item
    6.6 proves every named family end to end.
-9. `curation_defaults` MUST equal the defaults executed by
-   `PipelineService.curate`, CLI `curate`, MCP `curate`, and the recipe
-   library; a test enforces the equality until Phase 6.4 presets become the
-   single executing source.
+9. `curation_defaults` MUST equal the recipe-wide defaults of the Recipe
+   Preset Contract v1, which `PipelineService`, the CLI, MCP, the YAML runner,
+   the recipe library, and the workbench all resolve through one function; a
+   test enforces the equality.
 10. `compatible_generic_exports` MUST equal the production export catalog's
     admitted containers for the representation's row schema; a test derives
     it from `PipelineService.discover_exports()`.
