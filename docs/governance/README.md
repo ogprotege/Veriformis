@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
 
-**Next review:** Independent-product Phase 4.8 merge or Phase 4.9 closeout, any
+**Next review:** Independent-product Phase 5 or Phase 6 packet opening, any
 later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -21,7 +21,7 @@ claims from drifting away from code and evidence.
 | [ADR index](../adr/README.md) | Durable architectural and product decisions |
 | [Evidence index](../evidence/index.json) | Machine-readable evidence records and evidence grades |
 | [Program ledger](../../dev/active/independent-product/program.json) | Machine-readable phase status and dependencies |
-| [Active Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, and evidence |
+| [Completed Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, evidence, and closeout |
 
 Run the governance drift check with:
 
@@ -41,12 +41,12 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, Phase 4 items 4.1–4.7 are merged at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 locally adds the strict
-verified-export surface boundary through `PipelineService`, CLI, MCP, and the
-CLI-backed Mac bridge; every required local gate passes and GitHub review
-remains pending. Because production discovery is empty and no renderer,
-replayer, supported container, or consumer profile was added, the support
-registry and taxonomy do not change. Phase 4.9 may begin only after the Phase
-4.8 PR passes every GitHub check, merges, and clean local `main` equals
-`origin/main`.
+At this review, Phase 4 is complete. Its surface implementation merged as PR
+#50 at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, and its review corrections
+merged as PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9
+consolidates the adversarial harness and reconciles this program. Production
+discovery is empty and no renderer, replayer, supported container, or consumer
+profile was added. The support registry closes only the resolved generic-export-
+service foundation gap; its capability lists and the taxonomy remain unchanged.
+Phases 5 and 6 may begin only under their own packets after the closeout pull
+request merges and clean local `main` equals `origin/main`.

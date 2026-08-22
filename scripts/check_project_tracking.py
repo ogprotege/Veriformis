@@ -438,9 +438,8 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         if isinstance(gap, dict) and gap.get("id") == "gap-generic-export-service"
     ]
     _require(
-        len(generic_export_gaps) == 1
-        and generic_export_gaps[0].get("state") == "verified-open",
-        "generic export service gap must remain verified-open before Phase 4",
+        not generic_export_gaps,
+        "completed Phase 4 cannot retain the generic export service foundation gap",
         errors,
     )
 

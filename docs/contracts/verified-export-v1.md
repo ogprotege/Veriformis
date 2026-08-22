@@ -20,12 +20,16 @@ private two-render evidence for both determinism claims and descriptor-anchored
 semantic replay and merged as PR #49 at
 `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 implements the
 strict Python, CLI, MCP, and CLI-backed Mac surface boundary over a private
-production-empty catalog. It does not implement a public renderer or replayer
-registry or a supported product export container.
+production-empty catalog and merged as PR #50 at
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; its review corrections merged as
+PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9 completes the
+consolidated adversarial harness and closeout without changing a persisted
+schema. Phase 4 does not implement a public renderer or replayer registry or a
+supported product export container.
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export surfaces)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout)
 
-**Next review:** Phase 4.9 closeout or any export schema change
+**Next review:** Phase 5 implementation or any export schema change
 
 ## Purpose
 
@@ -679,7 +683,7 @@ derivative. The verification MUST independently recompute
 `source_verification_id` from its complete flattened source bindings and reject
 an unrelated source-verification identity.
 
-## Phase 4.2–4.8 implementation boundary
+## Phase 4.2–4.9 implementation boundary
 
 Phase 4.2 implements:
 
@@ -762,6 +766,17 @@ Phase 4.8 additionally implements:
 - cooperative cancellation and explicit `ok`, `error`, `cancelled`, and
   `visible_partial` runtime statuses without changing persisted evidence.
 
+Phase 4.9 additionally implements one consolidated adversarial harness over a
+private, test-injected exact conformance implementation. It proves canonical
+contract and identity replay; tamper and unexpected-file rejection; traversal,
+Unicode/case-alias, link, special-file, and destination-race refusal; source-
+digest and source-tamper refusal before visibility; complete membership-mutation
+failure including ordinal mutation; final cancellation ordering; and honest,
+independently verifiable visible-partial reporting. Balancing has no independent
+export representation: it necessarily changes the exact membership projection
+or order and fails the same gate. Production discovery remains empty
+throughout.
+
 The request envelope is operation-discriminated. Selected operations name only
 the source bundle path, exact catalog selector, source-trust policy and retained
 digest, and the literal overwrite policy `refuse`. Execute and verify also
@@ -789,19 +804,17 @@ tree inspection and verification use an iterative descriptor walk and refuse
 an observed directory depth greater than 128 rather than entering unbounded
 recursion.
 
-Phase 4.2–4.8 do **not** implement:
-
-- a public registration or plugin API, or a shipped export implementation;
-- the complete tamper, traversal, race, cancellation, and partial-publication
-  harness or Phase 4 closeout (Phase 4.9).
+Phase 4 does **not** implement a public registration or plugin API or a shipped
+export implementation.
 
 ## Support and discovery
 
 Persisted profile selectors and a test-injected conformance implementation are
-not support claims. Phase 4.2–4.8 MUST NOT add a generic export container or
-consumer profile to taxonomy discovery or the support registry. Production
-export discovery is therefore empty until a later phase ships an internal
-implementation. The existing
+not support claims. Phase 4 MUST NOT add a generic export container or consumer
+profile to taxonomy discovery or the support capability lists, and it did not
+do so.
+Production export discovery is therefore empty until a later phase ships an
+internal implementation. The existing
 `minimal-v1` bundle and deterministic bundle transport remain the only shipped
 physical containers. Generic split JSONL, JSON, and CSV remain Phase 5 work;
 named trainer profiles remain later work.

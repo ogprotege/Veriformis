@@ -28,21 +28,22 @@ Before changing code, read:
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented. Independent
-product Phases 0–3 are complete. Phase 4, verified export foundation, is
-`in_progress`; consult its
-[active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
-and the machine ledger before changing that boundary. The typed service,
+product Phases 0–4 are complete; consult the
+[completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
+and the machine ledger before changing the verified-export boundary. The typed
+service,
 verified source view, strict v1 model contracts, source-trust admission, and
 read-only source-derived plan population and semantic-membership enforcement are
-merged through item 4.7 at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Phase 4.8 locally adds a private
+merged through item 4.7. Phase 4.8 adds a private
 production-empty implementation catalog and strict discovery, dry run,
 self-described inspect, operator-confirmed no-replace execute, and source-bound
 verify operations through `PipelineService`, CLI, MCP, and the CLI-backed Mac
-bridge. Every required local gate passes and GitHub review remains pending. This does
-not authorize a shipped renderer or semantic replayer, supported generic export
-container, or trainer-specific profile; production discovery is empty. Closeout
-remains Phase 4.9, and generic exports remain Phase 5.
+bridge. It merged as PR #50 at
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
+at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 completes the
+adversarial closeout. This does not authorize a shipped renderer or semantic
+replayer, supported generic export container, or trainer-specific profile;
+production discovery is empty and generic exports remain Phase 5.
 Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)

@@ -4,9 +4,9 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
 
-**Next review:** Independent-product Phase 4.8 merge, Phase 4.9 closeout, or any
+**Next review:** Independent-product Phase 5 or Phase 6 packet opening, or any
 program-state, evidence-grade, or completion-rule change
 
 ## Purpose

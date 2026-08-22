@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
 
 **Next review:** Any architecture or dependency change
 

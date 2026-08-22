@@ -15,8 +15,8 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–3, merged Phase 4 items 4.1–4.7, and the current
-> Phase 4.8 verified-export surface foundation. This is **not** a public
+> independent-product Phases 0–4, including the verified-export foundation and
+> its production-empty cross-surface API. This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 > Install: [docs/install.md](docs/install.md). Status:
@@ -234,10 +234,8 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-**private beta workbench Phases 0–2**, **independent-product Phases 0–3**, and
-Phase 4 items 4.1–4.7 at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`; Phase 4 verified export foundation
-is in progress. Its opening slice adds a
+**private beta workbench Phases 0–2**, and **independent-product Phases 0–4**.
+The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
 versioned export plan, profile, membership, file-binding, receipt, and
@@ -249,13 +247,16 @@ strict profile, dependency, and file-plan evidence. Its fifth slice fresh-
 reconstructs normalized candidate semantic rows and provenance and requires
 their row-set and complete membership projection to match that baseline. The
 sixth slice adds internal exact-byte atomic publication and independent closed-
-tree verification. The seventh, merged at the commit above, adds private two-
+tree verification. The seventh adds private two-
 render conformance: exact profiles require identical
 normalized byte trees, while semantic-only profiles require equal versioned
 canonical semantic preimages, complete reconstructed membership, service-
-computed digests, and descriptor-reread staged replay. The current Phase 4.8
-branch adds strict discovery, dry-run, inspect, execute, and source-bound verify
-operations through `PipelineService`, CLI, MCP, and a CLI-backed Mac bridge.
+computed digests, and descriptor-reread staged replay. Phase 4.8 adds strict
+discovery, dry-run, inspect, execute, and source-bound verify operations through
+`PipelineService`, CLI, MCP, and a CLI-backed Mac bridge; it merged as PR #50 at
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
+at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9 completes the
+adversarial harness and closeout reconciliation.
 Production discovery remains empty: no renderer, semantic replayer, generic
 export container, or trainer-specific profile ships. The ten persisted v1
 schemas and existing `ExportService.publish` call signature remain unchanged.
@@ -298,6 +299,7 @@ reading paths. The map:
   - [Completed Phase 1 packet](dev/active/independent-product/phase-01-standalone-independence/README.md)
   - [Completed Phase 2 packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md)
   - [Completed Phase 3 packet](dev/active/independent-product/phase-03-taxonomy/README.md)
+  - [Completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
   - [Historical private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
   - [Historical build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)

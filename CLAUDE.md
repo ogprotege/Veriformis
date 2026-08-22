@@ -7,9 +7,9 @@ This file gives coding-agent guidance for the current Veriformis repository.
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
-(thin SwiftUI over CLI); and independent-product Phases 0–3, including the
-implemented taxonomy contract and discovery surfaces. Phase 4 verified export
-foundation is in progress. Its opening slice introduces the typed internal
+(thin SwiftUI over CLI); and independent-product Phases 0–4, including the
+implemented taxonomy contract/discovery surfaces and the completed verified-
+export foundation. Phase 4 introduces the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
 view. Strict verified-export v1 models and trusted-by-default source admission
 with explicit lower trust are implemented. Read-only plan population now
@@ -17,12 +17,14 @@ derives all source identities and the source membership baseline from that
 immutable view; callers provide only strict profile, dependency, and file-plan
 evidence. Read-only derivative enforcement fresh-reconstructs normalized
 candidate semantic rows, provenance, row-set identity, and membership and
-requires exact plan-baseline equality. Items 4.1–4.7 are merged at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. On the current Phase 4.8 branch, a
-private production-empty implementation catalog backs strict discovery, dry
+requires exact plan-baseline equality. A private production-empty
+implementation catalog backs strict discovery, dry
 run, self-described inspect, operator-confirmed no-replace execute, and source-
 bound verify operations through `PipelineService`, CLI, MCP, and the CLI-backed
-Mac bridge. Every required local gate passes and GitHub review remains pending.
+Mac bridge. Phase 4.8 merged as PR #50 at
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
+at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 completes the
+adversarial harness and closeout reconciliation.
 Private render/replay hooks are trusted conformance code, not a plugin boundary,
 and semantic replay currently retains each complete produced file in memory. No
 production renderer or semantic replayer, generic export container, or planned

@@ -237,11 +237,6 @@
   ],
   "known_current_gaps": [
     {
-      "id": "gap-generic-export-service",
-      "state": "verified-open",
-      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
-    },
-    {
       "id": "gap-existing-dataset-row-mapping",
       "state": "verified-open",
       "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"

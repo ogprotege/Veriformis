@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
 
 **Next review:** Any architecture or data-flow change
 
@@ -234,8 +234,8 @@ The private render/replay hooks remain trusted conformance code, and semantic
 replay currently retains each complete file in memory. No production renderer,
 replayer, or generic container exists; shipped discovery is empty. The export
 boundary therefore changes neither the canonical six-file bundle nor the nine-
-stage workspace graph. Phase 4.9 owns closeout, and Phase 5 owns generic
-containers.
+stage workspace graph. Phase 4.9 closes the boundary with consolidated
+adversarial proof; Phase 5 owns generic containers.
 
 ## Persistence: the workspace revision store
 

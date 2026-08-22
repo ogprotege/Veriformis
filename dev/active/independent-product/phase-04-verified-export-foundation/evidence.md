@@ -1,8 +1,7 @@
 # Phase 4 Evidence
 
-**Evidence status:** In progress — Phases 4.1–4.7 merged; Phase 4.8 is locally
-implemented with every required local gate passing and pull-request review
-pending
+**Evidence status:** Complete — Phases 4.1–4.8 merged and synchronized; the
+Phase 4.9 adversarial harness and closeout reconciliation pass
 
 **Predecessor:** [Phase 3 closeout](../phase-03-taxonomy/closeout.md)
 
@@ -28,8 +27,8 @@ pending
 - [x] Atomic, path-safe, cancelable, no-replace publication.
 - [x] Exact-byte and semantic-only evidence limits.
 - [x] Discovery, dry run, inspect, execute, and verify parity across surfaces.
-- [ ] Contract/property, tamper, path, race, and partial-publication harness.
-- [ ] Full Phase 4 exit and reconciliation gates.
+- [x] Contract/property, tamper, path, race, and partial-publication harness.
+- [x] Full Phase 4 exit and reconciliation gates.
 
 Observed results are appended only after the commands complete.
 
@@ -333,3 +332,70 @@ generic export container, or consumer profile and changes none of the ten
 persisted verified-export v1 schemas, the taxonomy, or the support registry.
 It is not Phase 4 exit evidence; the complete adversarial closeout harness and
 reconciliation remain Phase 4.9.
+
+PR #50 passed its required GitHub checks and merged at
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`. Its review-correction PR #51
+passed its required GitHub checks and merged at
+`d91542fe12c5a492de578ad060836a7d65999e42`. Clean local `main` was synchronized
+to that commit before Phase 4.9 began.
+
+## 2026-08-21 — Phase 4.9 adversarial harness and closeout
+
+- One private exact conformance implementation exercises the complete service
+  boundary while production discovery remains empty.
+- Canonical plan, receipt, and verification replay rejects noncanonical bytes,
+  unsupported versions, and forged identities.
+- The conformance JSONL bytes are canonical encodings of the verified source
+  row payloads. Destination tamper, missing expected files, unexpected files or
+  directories, traversal, noncanonical Unicode paths, Unicode/case aliases,
+  ancestor collisions, symlinks, hard links, FIFOs, and a destination-winner
+  race fail closed without escaping or replacing data.
+- Mismatched retained source digest and post-plan source tamper fail before
+  rendering or destination visibility.
+- Omission, coherent addition, duplication, reorder, ordinal mutation, target
+  mutation, assignment substitution, leakage-group substitution,
+  repartitioning, and resplitting all fail the complete derivative-membership
+  gate. Export has no independent balancing representation; any balancing
+  change reduces to a covered membership or ordering mutation.
+- Cancellation immediately before visibility leaves no destination. A signal
+  concurrent with successful promotion preserves and verifies success. A
+  post-rename failure reports `visible_partial` with complete receipt and
+  verification evidence and the visible tree independently verifies.
+- The generic-export-service foundation gap is closed while every generic
+  container and new trainer profile remains unimplemented and production
+  discovery remains empty.
+- The local Mac directly exercises symlink, hard-link, FIFO, and actual
+  fullwidth-Unicode alias refusal. Privileged device nodes and sandbox-blocked
+  Unix sockets are not constructed; FIFO reaches the same non-regular-entry
+  rejection branch. Case-insensitive APFS prevents distinct case-only entries,
+  so the local test proves they resolve to one file while the strict model test
+  independently rejects their portable alias.
+
+Observed final results:
+
+- Focused Phase 4.9 closeout harness: 36 passed.
+- Complete export suite: 223 passed.
+- Combined export and verified-export contract suite: 228 passed.
+- Full Python suite: 992 passed with the expected exercised transport
+  durability-warning regression warning.
+- Standalone release gate, clean wheel, goldens, external digest, and
+  deterministic transport: 980 passed, 1 deselected, with the same expected
+  warning; every remaining release step passed. The retained golden manifest
+  SHA-256 values remained
+  `2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733`
+  (`full_text`) and
+  `58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b`
+  (`continuation`).
+- macOS XCTest: 54 passed.
+- CLI/workbench parity and project tracking: passed.
+- Lock, Ruff, structured files, shell syntax, active local links, and diff:
+  passed for the checked lock, all source/tests, 15 tracked JSON files, 10
+  tracked shell files, 378 changed-document local links, and `git diff
+  --check`.
+- Independent security, documentation, and final diff reviews found no
+  remaining blocker. Review findings added the literal ordinal and missing-file
+  cases, and changed the conformance output from placeholders to canonical
+  payload JSONL derived from the verified source rows.
+
+This record reports the final local reconciled-tree commands. It does not claim
+GitHub status for the Phase 4.9 pull request.
