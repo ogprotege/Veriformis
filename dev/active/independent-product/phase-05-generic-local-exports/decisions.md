@@ -36,10 +36,16 @@
 | `package` / `package-verify` select bundle or export-pack transport through mutually exclusive manifest- or receipt-digest flags; legacy bundle bytes and behavior remain unchanged | Accepted | One command family and backward-compatibility gate |
 | Export-pack archive verification preserves the embedded source trust grade and is receipt-anchored, not source-bound; the archive digest is identity, not authority | Accepted | ADR-0006 trust boundary |
 | Item 5.4 adds no MCP operation or Mac UI action | Accepted | Bounded post-export CLI/Python transport scope |
+| Item 5.5 is a frozen conformance fixture, not a production importer, public import operation, or reusable replay API | Accepted | First-class existing-dataset import belongs to Phase 7 |
+| The consolidated matrix is discovery-closed over the current production catalog and row-schema taxonomy | Accepted | New containers or schemas must fail the fixture until their compatible pair is explicitly admitted |
+| The current compatibility matrix contains 11 positive pairs and one negative pair: constrained CSV with `messages` | Accepted | JSONL and JSON admit all four schemas; constrained CSV admits only the three flat schemas |
+| Round-trip proof starts from ordinary emitted files and preserves separate ordered train/evaluation partitions, aligned provenance, and exact `RowSet` identity | Accepted | Phase 5 exit semantics without inventing an import product surface |
+| Constrained CSV proof uses its strict contract loader and never the general ingest CSV recovery parser | Accepted | Recovery parsing trims, normalizes, drops, or pads inputs outside the exact export contract |
+| Item 5.5 adds one canonical semantic tamper case per current container while exhaustive byte/member tampering remains in the container suites | Accepted | Consolidated semantic closure without duplicating existing adversarial coverage |
 
-No item 5.1, 5.2, 5.3, or 5.4 contract decision remains pending. Item 5.3
-merged as PR #55 at `c6d7fc13a09a`. Item 5.4 is locally admitted after its
-required evidence passed and both independent reviews were corrected and
-re-reviewed clear. Pull-request publication, GitHub evidence, merge, and
-clean-main synchronization remain pending. Later decisions remain scoped to
+No item 5.1, 5.2, 5.3, 5.4, or 5.5 contract decision remains pending. Item 5.4
+merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
+Item 5.5 is locally admitted after its required evidence and independent review
+passed. Pull-request publication, GitHub evidence, merge, and clean-main
+synchronization for item 5.5 remain pending. Later decisions remain scoped to
 their own sequential pull requests and cannot broaden these support claims.

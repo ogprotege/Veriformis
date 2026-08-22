@@ -57,11 +57,16 @@ standard packet from that clean baseline. Item 5.1 merged as PR #53 at
 merged as PR #54 at `f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3's
 consumer-neutral `constrained-csv` v1 merged as PR #55 at
 `c6d7fc13a09a` for the three flat row schemas; it refuses nested `messages`
-before publication. Item 5.4 is locally admitted as the optional
-`deterministic-export-pack-zip-v1` transport. It wraps one unchanged export
+before publication. Item 5.4's optional
+`deterministic-export-pack-zip-v1` transport merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. It wraps one unchanged export
 directory as receipt-anchored `.vfexport.zip` without adding a fourth renderer,
-trainer claim, source-bound archive verification, or Mac UI. Pull-request
-publication, GitHub evidence, and merge remain pending.
+trainer claim, source-bound archive verification, or Mac UI. Item 5.5 is
+locally admitted as a test-only consolidated eleven-pair ordinary-file semantic
+round-trip matrix with one tamper case per container and the actionable
+constrained-CSV/`messages` refusal. It adds no product importer, replayer, API,
+taxonomy, support, or trainer promotion; its pull-request merge remains the
+gate before item 5.6.
 Phase 6 remains planned and requires its own packet before work begins.
 
 ## State change procedure

@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
 
-**Next review:** Independent-product Phase 5.4 merge or Phase 5.5, Phase 6
+**Next review:** Independent-product Phase 5.5 merge or Phase 5.6, Phase 6
 start, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
@@ -20,10 +20,14 @@ start, or any active-document behavior change
 The Phase 5.1–5.3 reviews identified no new documentation debt. Their admitted
 split JSONL, canonical JSON, and constrained CSV contracts are reconciled in
 the active packet, and item 5.3 merged as PR #55 at `c6d7fc13a09a`. Phase
-5.4's receipt-anchored export-pack transport is locally admitted, not a fourth
-renderer, trainer profile, source-bound verification path, or Mac UI action.
-Its publication and merge remain pending. Shared round trips,
-previews, and final guidance remain explicit later roadmap work.
+5.4's receipt-anchored export-pack transport merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`; it is not a fourth renderer,
+trainer profile, source-bound verification path, or Mac UI action. Phase 5.5's
+locally admitted test-only matrix introduces no new documentation debt: its
+frozen fixture proves all eleven compatible ordinary-file round trips, three
+container tamper failures, and the existing constrained-CSV/`messages` refusal
+without adding a product importer or support claim. Exact previews and final
+operator guidance remain explicit items 5.6 and 5.7.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

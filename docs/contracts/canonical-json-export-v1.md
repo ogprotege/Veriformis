@@ -14,7 +14,7 @@
 
 **Status:** Implemented in independent-product Phase 5.2
 
-**Last reviewed:** 2026-08-22
+**Last reviewed:** 2026-08-22 (Phase 5.5 consolidated semantic round-trip)
 
 ## Purpose and authority
 
@@ -191,9 +191,13 @@ provenance mutation, reconstructed row-set and split closure, request-version
 refusal, every-file tamper, missing and unexpected files, and
 receipt/source/plan mismatch.
 
-The shared Phase 5 round-trip matrix remains roadmap item 5.5; that later
-consolidation does not weaken the container-specific admission evidence
-required here.
+Phase 5.5 adds a test-only consolidated semantic round-trip fixture matrix. It
+reloads this container's ordinary files for all four current row schemas and
+reconstructs the identical ordered train and evaluation payloads, complete
+provenance, and source `RowSet` identity. The shared matrix also exercises one
+canonical semantic tamper for this container. It does not add a product
+importer, semantic replayer, API, taxonomy entry, support promotion, or trainer
+claim, and it does not weaken the container-specific admission evidence above.
 
 ## Dependency, license, security, and resource boundary
 

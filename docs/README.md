@@ -5,9 +5,9 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
 
-**Next review:** Phase 5.4 merge, Phase 5.5 start, Phase 6 packet opening,
+**Next review:** Phase 5.5 merge, Phase 5.6 start, Phase 6 packet opening,
 beta label cut, public-ready checklist, or any contract change
 
 ## Start here
@@ -56,7 +56,7 @@ beta label cut, public-ready checklist, or any contract change
 | [Archive Transport Contract v1](contracts/bundle-transport-v1.md) | Shared deterministic ZIP envelope for manifest-anchored `.vfbundle.zip` and receipt-anchored `.vfexport.zip` profiles | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
 | [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Implemented contract |
-| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, verification evidence, and unchanged optional export-pack transport boundary | Phase 4 foundation plus Phase 5.1–5.3 generic containers and Phase 5.4 receipt-anchored transport; no trainer profile |
+| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, verification evidence, and unchanged optional export-pack transport boundary | Phase 4 foundation plus Phase 5.1–5.3 generic containers, merged Phase 5.4 receipt-anchored transport, and Phase 5.5 consolidated semantic round-trip evidence; no trainer profile |
 | [Split JSONL Export v1](contracts/split-jsonl-export-v1.md) | Canonical split payload JSONL, safe configuration, aligned provenance, data card, and receipt | Implemented Phase 5.1 generic container |
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
 | [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
@@ -78,7 +78,7 @@ beta label cut, public-ready checklist, or any contract change
 | [Phase 2 packet](../dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) | Reliability and artifact-boundary packet and closeout | Completed implementation record |
 | [Phase 3 packet](../dev/active/independent-product/phase-03-taxonomy/README.md) | Taxonomy contract, registry, discovery, and compatibility closeout | Completed implementation record |
 | [Phase 4 packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export contracts, service, surfaces, adversarial evidence, and closeout | Completed implementation record |
-| [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and pending closeout | Active implementation record; items 5.1–5.3 are merged, item 5.4 is locally admitted pending publication, and items 5.5–5.7 remain open |
+| [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and pending closeout | Active implementation record; items 5.1–5.4 are merged, item 5.5 is locally admitted pending publication, and items 5.6–5.7 remain open |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |

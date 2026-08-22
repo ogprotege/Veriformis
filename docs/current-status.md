@@ -20,14 +20,15 @@ strict initially production-empty export surfaces through Python, CLI, MCP,
 and Mac, plus the consolidated adversarial closeout harness; independent-
 product Phase 5.1–5.3 implement and admit `split-jsonl-directory`, canonical
 `json`, and `constrained-csv` v1 as the first three production generic
-exports, without a consumer or trainer profile; independent-product Phase 5.4
-locally admits the optional receipt-anchored deterministic `.vfexport.zip`
-post-export transport without adding a fourth renderer, MCP operation, or Mac
-UI action
+exports, without a consumer or trainer profile; independent-product Phase 5.4's
+optional receipt-anchored deterministic `.vfexport.zip` post-export transport
+merged as PR #56 without adding a fourth renderer, MCP operation, or Mac UI
+action; Phase 5.5 is locally admitted as test-only consolidated semantic
+round-trip evidence over the unchanged three-container catalog
 
-**Review date:** 2026-08-22 (independent-product Phase 5.4 local admission)
+**Review date:** 2026-08-22 (independent-product Phase 5.5 local admission)
 
-**Next review:** Phase 5.4 merge or Phase 5.5;
+**Next review:** Phase 5.5 merge or Phase 5.6;
 beta label cut, public-ready checklist, or any
 contract change
 
@@ -243,6 +244,21 @@ before source or destination access. Nested `messages` is refused with a split
 JSONL or canonical JSON alternative. The derivative changes no row or logical
 partition and claims neither trainer nor spreadsheet compatibility. All new
 trainer-specific profiles remain unimplemented.
+
+Phase 5.4's `deterministic-export-pack-zip-v1` transport merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. It remains an optional
+receipt-anchored post-export wrapper around one unchanged published directory,
+not a fourth semantic renderer or a source-bound verification path.
+
+Phase 5.5 is locally admitted as test-only consolidated evidence. One frozen
+ordinary-file fixture closes the discovery-derived matrix at eleven compatible
+container/schema pairs: all four current rows for split JSONL and canonical
+JSON, and the three flat rows for constrained CSV. Every pairing reloads the
+identical ordered train and evaluation payloads, complete provenance, and
+source `RowSet`; one canonical semantic tamper per container fails, and the
+twelfth current pairing retains constrained CSV's actionable pre-publication
+`messages` refusal. This adds no product importer, semantic replayer, API,
+taxonomy or support promotion, trainer claim, or new runtime behavior.
 
 ## Implemented interfaces
 
@@ -595,9 +611,10 @@ See [docs/release.md](release.md).
 | Implemented independent Phase 5.1 | Production `split-jsonl-directory` v1 exact-byte export, request-v1 defaults, strict configured request v2, canonical payload JSONL, deterministic README/data card, optional aligned provenance, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.2 | Production canonical `json` v1 exact-byte export, fixed dataset/provenance object tree, explicit split/schema metadata, mandatory aligned provenance, receipt, and no trainer claim or membership change |
 | Implemented independent Phase 5.3 | Production `constrained-csv` v1 exact-byte export for the three flat row schemas, fixed quoted CSV/data-card/provenance tree, nested-`messages` refusal, receipt, and no trainer claim or membership change |
-| Locally admitted independent Phase 5.4 | Optional `deterministic-export-pack-zip-v1` post-export transport with `.vfexport.zip`, an external canonical-receipt digest, exact receipt-bound members, shared deterministic ZIP/no-replace machinery, preserved source trust, and no fourth renderer, MCP operation, or Mac UI action; pull-request publication remains |
+| Implemented independent Phase 5.4 | Optional `deterministic-export-pack-zip-v1` post-export transport with `.vfexport.zip`, an external canonical-receipt digest, exact receipt-bound members, shared deterministic ZIP/no-replace machinery, preserved source trust, and no fourth renderer, MCP operation, or Mac UI action; merged as PR #56 at `499d61fa2e7d` |
+| Locally admitted independent Phase 5.5 | Test-only consolidated ordinary-file semantic round-trip fixture covering all 11 compatible container/schema pairs, canonical semantic tamper for each container, and actionable pre-publication constrained-CSV/`messages` refusal; no importer, replayer, API, taxonomy, support, or trainer promotion |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete, items 5.1–5.3 merged, item 5.4 locally admitted pending publication, and items 5.5–5.7 planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete, items 5.1–5.4 merged, item 5.5 locally admitted pending publication, and items 5.6–5.7 planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -672,8 +689,11 @@ replayer. Shipped discovery lists `constrained-csv`, `json`, and
 and strict v2 options change only derivative filenames and provenance
 inclusion; canonical JSON and constrained CSV have fixed v1 trees and no
 options. None changes dataset membership. Constrained CSV's supported-schema
-subset excludes nested `messages`. New trainer-specific profiles are not
-current capabilities; the canonical and optional Aptus
+subset excludes nested `messages`. Phase 5.4's post-export transport is merged,
+and Phase 5.5's test-only consolidated matrix now proves the eleven compatible
+ordinary-file round trips and three container tamper failures without adding an
+importer or replayer. New trainer-specific profiles are not current
+capabilities; the canonical and optional Aptus
 profiles remain the implemented profile set. A deliberate beta label and
 public Mac checklist remain separate decisions.
 

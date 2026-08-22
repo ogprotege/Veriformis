@@ -1,0 +1,123 @@
+{
+  "compatible_row_schemas": {
+    "constrained-csv": [
+      "instruction_output",
+      "prompt_completion",
+      "text"
+    ],
+    "json": [
+      "instruction_output",
+      "messages",
+      "prompt_completion",
+      "text"
+    ],
+    "split-jsonl-directory": [
+      "instruction_output",
+      "messages",
+      "prompt_completion",
+      "text"
+    ]
+  },
+  "fixture_version": 1,
+  "partitions": {
+    "instruction_output": {
+      "evaluation": [
+        {
+          "input": "evaluation-0 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+          "instruction": "Preserve evaluation-0 exactly.",
+          "output": "evaluation-0 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        },
+        {
+          "input": "evaluation-1 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+          "instruction": "Preserve evaluation-1 exactly.",
+          "output": "evaluation-1 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        }
+      ],
+      "train": [
+        {
+          "input": "train-0 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+          "instruction": "Preserve train-0 exactly.",
+          "output": "train-0 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        }
+      ]
+    },
+    "messages": {
+      "evaluation": [
+        {
+          "messages": [
+            {
+              "content": "evaluation-0 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+              "role": "user"
+            },
+            {
+              "content": "evaluation-0 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+              "role": "assistant"
+            }
+          ]
+        },
+        {
+          "messages": [
+            {
+              "content": "evaluation-1 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+              "role": "user"
+            },
+            {
+              "content": "evaluation-1 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+              "role": "assistant"
+            }
+          ]
+        }
+      ],
+      "train": [
+        {
+          "messages": [
+            {
+              "content": "train-0 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+              "role": "user"
+            },
+            {
+              "content": "train-0 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+              "role": "assistant"
+            }
+          ]
+        }
+      ]
+    },
+    "prompt_completion": {
+      "evaluation": [
+        {
+          "completion": "evaluation-0 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+          "prompt": "evaluation-0 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        },
+        {
+          "completion": "evaluation-1 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+          "prompt": "evaluation-1 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        }
+      ],
+      "train": [
+        {
+          "completion": "train-0 target, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀",
+          "prompt": "train-0 context, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        }
+      ]
+    },
+    "text": {
+      "evaluation": [
+        {
+          "text": "evaluation-0 text, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        },
+        {
+          "text": "evaluation-1 text, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        }
+      ],
+      "train": [
+        {
+          "text": "train-0 text, \"quoted\"\t leading and trailing \u0000 CR=\r LF=\n CRLF=\r\n formula==1+1 composed=é decomposed=é nonbmp=😀"
+        }
+      ]
+    }
+  },
+  "schema_version": "veriformis.phase5-generic-export-semantic-round-trip/v1",
+  "source_fixture": "tests/regressions/fixtures/phase3/pre-taxonomy-full-text.vfbundle.json",
+  "source_manifest_sha256": "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
+}

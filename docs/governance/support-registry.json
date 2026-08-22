@@ -167,7 +167,9 @@
         "evidence": [
           "src/veriformis/exports/split_jsonl.py",
           "docs/contracts/split-jsonl-export-v1.md",
-          "tests/exports/test_split_jsonl.py"
+          "tests/exports/test_split_jsonl.py",
+          "tests/exports/test_semantic_round_trip.py",
+          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
         ]
       },
       {
@@ -187,7 +189,9 @@
         "evidence": [
           "src/veriformis/exports/canonical_json.py",
           "docs/contracts/canonical-json-export-v1.md",
-          "tests/exports/test_canonical_json.py"
+          "tests/exports/test_canonical_json.py",
+          "tests/exports/test_semantic_round_trip.py",
+          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
         ]
       },
       {
@@ -206,7 +210,9 @@
         "evidence": [
           "src/veriformis/exports/constrained_csv.py",
           "docs/contracts/constrained-csv-export-v1.md",
-          "tests/exports/test_constrained_csv.py"
+          "tests/exports/test_constrained_csv.py",
+          "tests/exports/test_semantic_round_trip.py",
+          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
         ]
       },
       {

@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
 
 **Next review:** Any entry-point or architecture change
 
@@ -154,9 +154,9 @@ injected the conformance implementation. Phase 5.1–5.3 add the first productio
 entries, `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1,
 with no consumer profile and no semantic replayer.
 
-Phase 5.4 locally admits an extension to the existing `package` and
-`package-verify`
-commands without adding a root command. Exactly one
+Phase 5.4, merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`, extends the existing `package`
+and `package-verify` commands without adding a root command. Exactly one
 `--manifest-sha256` or `--export-receipt-sha256` selects the legacy bundle or
 new export-pack transport profile; both or neither fail. The export-pack form
 packages one unchanged directory as `.vfexport.zip` after validating the
@@ -193,10 +193,12 @@ membership, and none makes a trainer-compatibility claim. The private
 hooks remain trusted implementation code, not an untrusted plugin boundary;
 semantic replay retains complete files in memory and its fixture is statically
 bounded, but no production semantic replayer ships. Phase 4.9 remains the
-historical consolidated adversarial closeout. Phase 5.4's locally admitted
-receipt-anchored transport leaves those renderer and surface claims unchanged;
-its pull-request publication and merge remain pending. Later generic work
-remains in items 5.5–5.7.
+historical consolidated adversarial closeout. Phase 5.4's merged
+receipt-anchored transport leaves those renderer and surface claims unchanged.
+Phase 5.5 likewise adds no entry point: its locally admitted eleven-pair
+ordinary-file reload matrix, three semantic-tamper cases, and constrained-CSV
+`messages` refusal are test evidence only. Later generic work remains in items
+5.6–5.7.
 
 ## Preview, recipes, and optional integrations
 

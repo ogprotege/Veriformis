@@ -29,9 +29,11 @@ Post-export transport must consume that unchanged receipt-bound result through
 the existing package boundary. Packet opening alone was not support evidence.
 The separately admitted Phase 5.1 and 5.2 implementations support split JSONL
 and canonical JSON respectively. Item 5.3's constrained CSV for the three flat
-row schemas merged as PR #55. Item
-5.4's receipt-anchored post-export transport is locally admitted;
-pull-request publication, GitHub evidence, and merge remain pending.
+row schemas merged as PR #55. Item 5.4's receipt-anchored post-export transport
+merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
+Item 5.5's discovery-closed semantic round-trip fixture is locally admitted;
+pull-request publication, GitHub evidence, and merge remain pending. It is
+test proof, not a production importer or replayer.
 
 ## Packet contents
 
@@ -58,7 +60,8 @@ Every field is quoted with the frozen UTF-8/LF dialect. It admits `text`,
 actionable JSON alternative, has no options, consumer, or trainer claim, and
 changes no source row or logical partition.
 
-Item 5.4 is implemented and locally admitted on the current working tree. Its
+Item 5.4 merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Its
 `deterministic-export-pack-zip-v1` profile wraps one unchanged,
 already-published export directory as `.vfexport.zip` under a separately
 retained canonical `export-receipt.json` SHA-256. It reuses the existing
@@ -68,7 +71,16 @@ archive verification, or Mac UI action. Local gates passed with 66 dedicated
 tests, 448 integrated export/taxonomy/CLI tests, 1,195 full Python tests, 1,183
 standalone release tests with one deselection and both golden flows, parity,
 Mac 58-test, tracking, Ruff, JSON, diff, and corrected independent-review
-evidence. Pull-request
-publication, GitHub evidence, and merge remain pending. See the
+evidence. See the
 [deterministic archive contract](../../../../docs/contracts/bundle-transport-v1.md)
 and [ADR-0006](../../../../docs/adr/0006-receipt-anchored-export-pack-transport.md).
+
+Item 5.5 is locally admitted on the working tree based on that synchronized
+merge. Its frozen fixture closes over the current catalog and current row
+schemas: 11 compatible pairs strictly reload ordered, separate train and
+evaluation payloads plus aligned provenance to the exact source `RowSet`, while
+constrained CSV with `messages` refuses before publication and names both JSON
+alternatives. One canonical semantic tamper per container fails strict reload.
+Focused 16, integrated 453, full 1,211, standalone release 1,199 with one
+deselection, parity, and 58 Mac tests passed. The fixture adds no public import
+operation, production replayer, schema, taxonomy, or support change.

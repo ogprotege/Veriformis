@@ -14,7 +14,7 @@
 
 **Status:** Implemented and merged in independent-product Phase 5.3 (PR #55)
 
-**Last reviewed:** 2026-08-22
+**Last reviewed:** 2026-08-22 (Phase 5.5 consolidated semantic round-trip)
 
 ## Purpose and authority
 
@@ -316,9 +316,17 @@ including GitHub's Python 3.11–3.13 matrix. The local Python 3.12, release,
 parity, Mac, tracking, and review results are recorded in the active Phase 5
 evidence packet.
 
-The shared Phase 5 round-trip matrix remains roadmap item 5.5. That later
-consolidation does not weaken the container-specific admission evidence
-required here. Phase 5.3 was promoted only after that evidence was recorded.
+Phase 5.5 adds a test-only consolidated semantic round-trip fixture matrix. It
+reloads this container's ordinary files for all three compatible flat row
+schemas and reconstructs the identical ordered train and evaluation payloads,
+complete provenance, and source `RowSet` identity. The same suite proves one
+canonical semantic tamper fails and that nested `messages` remains the sole
+incompatible current pairing, with actionable split-JSONL and canonical-JSON
+alternatives before publication. It does not use the permissive ingest CSV
+parser or add a product importer, semantic replayer, API, taxonomy entry,
+support promotion, or trainer claim. This consolidation does not weaken the
+container-specific admission evidence required here; Phase 5.3 was promoted
+only after that evidence was recorded.
 
 ## Dependency, license, security, and resource boundary
 

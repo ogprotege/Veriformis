@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
 
-**Next review:** Independent-product Phase 5.4 merge or Phase 5.5, Phase 6
+**Next review:** Independent-product Phase 5.5 merge or Phase 5.6, Phase 6
 start, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -51,12 +51,17 @@ baseline under its own standard packet. Item 5.1 merged as PR #53 at
 schemas with fixed exact bytes, mandatory provenance, nested-`messages`
 refusal, and no consumer or trainer claim.
 
-Item 5.4 is locally admitted as
-`deterministic-export-pack-zip-v1`. The optional `.vfexport.zip` transport
-wraps one unchanged, already-published export directory under a separately
-retained canonical receipt digest. It is not a fourth renderer, source-bound
-export verification, consumer/trainer profile, MCP operation, or Mac UI action.
-Its required local evidence and independent review are recorded; pull-request
-publication, GitHub evidence, and merge remain pending.
+Item 5.4's `deterministic-export-pack-zip-v1` merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. The optional `.vfexport.zip`
+transport wraps one unchanged, already-published export directory under a
+separately retained canonical receipt digest. It is not a fourth renderer,
+source-bound export verification, consumer/trainer profile, MCP operation, or
+Mac UI action.
+Item 5.5 is locally admitted as a test-only frozen ordinary-file fixture that
+closes all eleven compatible current container/schema pairs, proves one
+canonical semantic tamper fails per container, and retains constrained CSV's
+actionable pre-publication `messages` refusal. It adds no importer, replayer,
+API, taxonomy, support state, or trainer claim; its pull-request merge is the
+next gate before item 5.6.
 Consumer compatibility still requires a separately admitted named profile.
 Phase 6 remains planned and requires its own packet before work begins.
