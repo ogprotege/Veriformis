@@ -18,6 +18,7 @@ from veriformis.exports.api import (
     EXPORT_SURFACE_REQUEST_SCHEMA,
     EXPORT_SURFACE_REQUEST_SCHEMA_V2,
     ExportDiscovery,
+    ExportDryRunRequest,
     ExportDryRunRequestV2,
     ExportInspectRequest,
     ExportOperationCancelled,
@@ -28,6 +29,13 @@ from veriformis.exports.api import (
     export_inspection_response,
     export_response_json,
     export_verify_response,
+)
+from veriformis.exports.canonical_json import (
+    CANONICAL_JSON_CONTAINER_ID,
+    CANONICAL_JSON_CONTAINER_VERSION,
+    CANONICAL_JSON_DATASET_PATH,
+    CANONICAL_JSON_PROVENANCE_PATH,
+    CANONICAL_JSON_README_PATH,
 )
 from veriformis.exports.split_jsonl import (
     SPLIT_JSONL_CONTAINER_ID,
@@ -659,3 +667,56 @@ def test_production_split_jsonl_v2_dry_run_has_python_cli_mcp_parity(
         "data/score.jsonl",
         "metadata/dataset-card.json",
     }
+
+
+def test_production_canonical_json_v1_dry_run_has_python_cli_mcp_parity(
+    tmp_path,
+    monkeypatch,
+):
+    bundle = _materialize_bundle(tmp_path)
+    pipeline = PipelineService()
+    monkeypatch.setattr(cli_module, "_SERVICE", pipeline)
+    server = create_mcp_server(pipeline)
+    request = ExportDryRunRequest(
+        schema_version=EXPORT_SURFACE_REQUEST_SCHEMA,
+        operation="dry_run",
+        bundle=str(bundle),
+        container_id=CANONICAL_JSON_CONTAINER_ID,
+        container_version=CANONICAL_JSON_CONTAINER_VERSION,
+        consumer_id=None,
+        consumer_profile_version=None,
+        source_trust_policy="require_external_digest",
+        expected_manifest_sha256=(
+            "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
+        ),
+        overwrite_policy="refuse",
+    )
+    request_json = request.canonical_bytes().decode("utf-8")
+    assert "container_options" not in request_json
+
+    python_outcome = pipeline.dry_run_export(request)
+    assert python_outcome.plan is not None
+    expected = export_dry_run_response(python_outcome.plan)
+
+    cli_result = CliRunner().invoke(
+        app,
+        ["export", "dry-run", "--request-json", request_json],
+    )
+    assert cli_result.exit_code == 0, cli_result.output
+    mcp_result = _call_tool(
+        server,
+        "export_dry_run",
+        {"request_json": request_json},
+    )
+
+    assert json.loads(cli_result.stdout) == json.loads(mcp_result) == expected
+    files = {
+        item["path"]: item for item in expected["result"]["plan"]["files"]
+    }
+    assert set(files) == {
+        CANONICAL_JSON_README_PATH,
+        CANONICAL_JSON_DATASET_PATH,
+        CANONICAL_JSON_PROVENANCE_PATH,
+    }
+    assert files[CANONICAL_JSON_DATASET_PATH]["membership_scope"] == "all"
+    assert files[CANONICAL_JSON_PROVENANCE_PATH]["membership_scope"] == "none"

@@ -71,6 +71,7 @@ from veriformis.exports._implementation import (
     _RenderedDerivative,
     _ReplayedDerivative,
 )
+from veriformis.exports.canonical_json import CANONICAL_JSON_IMPLEMENTATION
 from veriformis.exports.paths import validate_export_relative_path
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
 from veriformis.identity import lossless_json_bytes, sha256_digest
@@ -99,7 +100,8 @@ class ExportService:
     private two-render exact comparison and semantic reconstruction without
     changing that boundary. Phase 4.8 exposes only the typed operations through
     the composition root and a private implementation catalog. Phase 5.1 adds
-    the first reviewed generic container to that catalog.
+    the first reviewed generic container to that catalog. Phase 5.2 adds
+    canonical JSON without changing the service boundary.
     """
 
     def __init__(
@@ -109,7 +111,7 @@ class ExportService:
     ) -> None:
         """Build one immutable private catalog from reviewed implementations."""
         implementations = (
-            (SPLIT_JSONL_IMPLEMENTATION,)
+            (SPLIT_JSONL_IMPLEMENTATION, CANONICAL_JSON_IMPLEMENTATION)
             if _implementations is None
             else tuple(_implementations)
         )

@@ -258,16 +258,19 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
     assert first is not second
     assert first.to_dict() == second.to_dict()
     assert first.schema_version == EXPORT_DISCOVERY_SCHEMA
-    assert [item.selector for item in first.profiles] == [
-        ("split-jsonl-directory", 1, None, None)
+    expected_production = [
+        ("json", 1, None, None),
+        ("split-jsonl-directory", 1, None, None),
     ]
-    assert first.profiles[0].supported_row_schemas == (
-        "instruction_output",
-        "messages",
-        "prompt_completion",
-        "text",
-    )
-    assert first.profiles[0].overwrite_policies == ("refuse",)
+    assert [item.selector for item in first.profiles] == expected_production
+    for profile in first.profiles:
+        assert profile.supported_row_schemas == (
+            "instruction_output",
+            "messages",
+            "prompt_completion",
+            "text",
+        )
+        assert profile.overwrite_policies == ("refuse",)
     assert export_discovery_response(first) == {
         "error": None,
         "operation": "discover",
@@ -282,7 +285,7 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
     ]
     assert [
         item.selector for item in DEFAULT_EXPORT_SERVICE.discover_exports().profiles
-    ] == [("split-jsonl-directory", 1, None, None)]
+    ] == expected_production
 
     consumerless = ExportProfileDescriptor(
         container_profile=_descriptor().container_profile,

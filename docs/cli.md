@@ -18,7 +18,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -43,7 +43,7 @@ examples below use the installed name.
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
-| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes `split-jsonl-directory` v1 |
+| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL and canonical JSON v1 |
 | Read-only | `verify`, `preview`, `taxonomy` | Nothing |
 | Meta | `version` | Nothing |
 
@@ -544,16 +544,18 @@ veriformis export-verify --request-json JSON
 ```
 
 `discover` accepts no request and lists only executable implementations from the
-private service catalog. Phase 4 closed with that catalog empty. Phase 5.1 now
-advertises exactly one production selector: `split-jsonl-directory` version 1,
-`portable_exact_bytes`, all four current row schemas, and no consumer profile.
+private service catalog. Phase 4 closed with that catalog empty. Phase 5.1–5.2
+now advertise two production selectors: `split-jsonl-directory` and canonical
+`json`, both version 1, `portable_exact_bytes`, all four current row schemas,
+and no consumer profile.
 Tests may also inject the bounded conformance implementation used for the
 historical cross-surface evidence; that remains private test code.
 
-Dry run, execute, and source-bound verify accept either the exact historical
-`veriformis.export-surface-request/v1` shape or the configured
-`veriformis.export-surface-request/v2` shape. Request v1 is unchanged and, for
-split JSONL, selects this complete safe default options object:
+Dry run, execute, and source-bound verify accept the exact historical
+`veriformis.export-surface-request/v1` shape for both containers. Split JSONL
+also accepts the configured `veriformis.export-surface-request/v2` shape.
+Request v1 is unchanged and, for split JSONL, selects this complete safe
+default options object:
 
 ```json
 {"evaluation_partition_name":"evaluation","include_provenance":true,"schema_version":"veriformis.split-jsonl-options/v1","train_partition_name":"train"}
@@ -565,6 +567,9 @@ filename stems and Boolean provenance choice changed as needed. An empty,
 partial, unknown-field, or noncanonical options object is refused. The same
 options must be repeated unchanged for dry run, execute, and source-bound
 verify because the exact paths and bytes bind the plan ID.
+
+Canonical `json` v1 has no options. Request v1 selects its fixed tree; request
+v2 is refused for that selector even when `container_options` is empty.
 
 Dry run verifies the selected source and derives a plan without destination
 access. Execute re-derives that plan, requires the operator-confirmed
@@ -591,6 +596,23 @@ Payload rows remain canonical payload-only copies of their authoritative
 partitions. No option filters, reorders, curates, resplits, or changes
 membership, and the container claims compatibility with no trainer. See
 [Split JSONL Export v1](contracts/split-jsonl-export-v1.md).
+
+The canonical-JSON derivative tree is exactly:
+
+```text
+README.md
+dataset.json
+export-receipt.json
+metadata/row-provenance.json
+```
+
+`dataset.json` is the sole membership-bearing file. It contains explicit
+schema, objective, loss-policy, row-set, split-result, partition-order, and
+count metadata plus payload-only `train` and `evaluation` arrays. The mandatory
+provenance object contains the complete train-then-evaluation sequence. The
+fixed tree changes neither row semantics nor partition membership and claims
+compatibility with no trainer. See
+[Canonical JSON Export v1](contracts/canonical-json-export-v1.md).
 
 Requests are limited to 1 MiB of canonical UTF-8 JSON, and each runtime path is
 limited to 32 KiB of UTF-8. Responses are one canonical
@@ -857,6 +879,8 @@ stage-command redesign is planned solely for packaging.
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Split JSONL Export Contract v1](contracts/split-jsonl-export-v1.md)
+- [Canonical JSON Export Contract v1](contracts/canonical-json-export-v1.md)
 - [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)
 - [Current implementation status](current-status.md)
 - [Install guide](install.md)

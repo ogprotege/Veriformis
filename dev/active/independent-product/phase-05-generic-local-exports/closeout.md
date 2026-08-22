@@ -2,13 +2,14 @@
 
 **Status:** Incomplete
 
-**Last reviewed:** 2026-08-21
+**Last reviewed:** 2026-08-22
 
 ## Judgment
 
-Phase 5 is in progress. Item 5.1 is locally implemented and admitted as the
-supported `split-jsonl-directory` v1 container, but one completed container
-does not satisfy the phase-wide roadmap exit gate. Items 5.2–5.7 remain open.
+Phase 5 is in progress. Items 5.1 and 5.2 implement and admit the
+`split-jsonl-directory` v1 and `json` v1 containers, but two completed
+containers do not satisfy the phase-wide roadmap exit gate. Items 5.3–5.7
+remain open.
 
 ## Required before completion
 
@@ -27,9 +28,9 @@ does not satisfy the phase-wide roadmap exit gate. Items 5.2–5.7 remain open.
 
 ## Current exclusions and boundaries
 
-- Split JSONL is complete locally in item 5.1; JSON, CSV, generic export-pack
-  archives, phase-wide round trips, previews, and final guidance remain later
-  Phase 5 work.
+- Split JSONL and canonical JSON are implemented in items 5.1 and 5.2. CSV,
+  generic export-pack archives, phase-wide round trips, previews, and final
+  guidance remain later Phase 5 work.
 - Generic output is not evidence of Aptus, MLX-LM, TRL, or any other trainer
   compatibility.
 - Phase 5 does not add construction, curation, balancing, splitting, public

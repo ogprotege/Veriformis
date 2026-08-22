@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.evidence-index/v1",
-  "last_updated": "2026-08-21",
+  "last_updated": "2026-08-22",
   "evidence_grades": {
     "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
     "test-verified": "Claim is exercised by an automated passing test.",
@@ -371,6 +371,28 @@
         "uv run python scripts/check_project_tracking.py",
         "uv lock --check",
         "uv run ruff check src tests scripts",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-5-canonical-json-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-4f12a55063c2721993b65cfbe30e68eaad55f87f",
+      "scope": "Independent-product Phase 5.2 lossless generic canonical JSON export",
+      "grade": "recorded-local",
+      "summary": "The second production generic export container, canonical JSON (`json`) v1, passed 33 dedicated contract tests, 322 focused export/taxonomy/verified-contract tests, 1,073 full Python tests, 1,061 standalone core tests with 1 deselected, and 57 Mac tests. Full and standalone Python emitted only the expected transport durability-warning regression warning. Clean-wheel installation, both golden compile/external-digest/transport flows, request-v1 Python/CLI/MCP/Mac parity, project tracking, lock, Ruff, JSON validity, and diff checks passed. Evidence covers all four current row schemas, a fixed exact-byte tree, explicit split/schema/objective/loss/row-set metadata, payload-only train/evaluation arrays, complete separate train-then-evaluation provenance, strict source RowSet reconstruction and identity closure, empty evaluation, request-v2 refusal before source/destination access, deterministic README/receipt bytes, every-file tamper failure, and closed-tree verification. The ten persisted export v1 models, request v1, discovery v1, response v1, source bundle, and membership remain unchanged; no trainer profile or compatibility claim is added. Final code, security, and documentation reviews found no blocker; GitHub results remain separate publication evidence.",
+      "details": "dev/active/independent-product/phase-05-generic-local-exports/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/exports/test_canonical_json.py",
+        "uv run pytest -q tests/exports tests/contracts/test_taxonomy_contract.py tests/contracts/test_verified_export_contract.py",
+        "uv run pytest -q",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase5-02-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests scripts",
+        "python3 -m json.tool docs/governance/corpus-demand-matrix.json",
         "git diff --check"
       ]
     }

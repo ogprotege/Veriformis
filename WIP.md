@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`
+**Implementation baseline reviewed:** `4f12a55063c2721993b65cfbe30e68eaad55f87f`
 on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
 workbench Phases 0–2; independent-product Phases 0–4 complete), plus the
-current Phase 5.1 split JSONL branch
+current Phase 5.2 canonical JSON branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.2 local admission)
 
-**Next review:** Phase 5.1 pull-request merge or Phase 5.2 start; beta
+**Next review:** Phase 5.2 pull-request merge or Phase 5.3 start; beta
 label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -177,29 +177,33 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 
 At Phase 4 closeout, the foundation shipped without a production
 implementation: discovery was empty and tests alone injected the conformance
-exporter. Phase 5.1 now installs one reviewed exact-byte renderer,
-`split-jsonl-directory` v1, and promotes only that consumer-neutral physical
-container. No semantic replayer or trainer-specific profile ships. The ten
-persisted export v1 models remain unchanged; additive request v2 carries the
-container's strict configuration.
+exporter. Phase 5.1–5.2 install reviewed exact-byte renderers for
+`split-jsonl-directory` and canonical `json` v1 and promote only those
+consumer-neutral physical containers. No semantic replayer or trainer-specific
+profile ships. The ten persisted export v1 models remain unchanged; additive
+request v2 carries only split JSONL's strict configuration.
 
 ### Active Phase 5 status
 
 - [x] Standard Phase 5 packet created and machine/human phase state changed to
       `in_progress` from baseline
       `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
-- [x] Phase 5.1 — generic split JSONL v1 is locally implemented and verified
-      only through the export service; merge/remote gates remain the next step.
-- [ ] Phase 5.2 — canonical JSON with explicit split/schema metadata.
+- [x] Phase 5.1 — generic split JSONL v1 merged as PR #53 at
+      `4f12a55063c2721993b65cfbe30e68eaad55f87f`.
+- [x] Phase 5.2 — canonical JSON v1 with explicit split/schema metadata is
+      implemented only through the export service; independent code,
+      security, and documentation reviews found no blocker, and only the
+      remote-green merge gate remains.
 - [ ] Phase 5.3 — structurally lossless CSV with nested-value refusal.
 - [ ] Phase 5.4 — deterministic generic export-pack archive integration.
 - [ ] Phase 5.5 — semantic import-round-trip fixtures.
 - [ ] Phase 5.6 — exact sample-row and destination-tree dry-run previews.
 - [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
 
-The Phase 5.1 implementation and admission evidence support the split JSONL
-promotion. Phase 5 remains in progress; later containers and every trainer
-profile remain unimplemented.
+The Phase 5.1–5.2 implementation and admission evidence support the split
+JSONL and canonical JSON promotions. Phase 5 remains in progress; CSV,
+export-pack integration, shared round-trip fixtures, previews, final guidance,
+and every trainer profile remain unimplemented.
 
 The current stage-command runtime is:
 
@@ -549,6 +553,8 @@ pytest totals; they grow.
 - [Integrity Contract v1](docs/contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
+- [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
+- [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Architecture](docs/architecture.md)
 - [Architecture tree](docs/architecture/README.md)

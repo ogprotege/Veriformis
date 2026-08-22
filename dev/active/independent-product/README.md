@@ -52,10 +52,13 @@ adversarial harness and reconciles the program under the completed
 Phase 4 shipped no production renderer or semantic replayer, generic export
 container, or trainer-specific profile. Its closeout merged as PR #52 at
 `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 then opened under its own
-standard packet from that clean baseline. Item 5.1 now has local implementation
-and admission evidence for `split-jsonl-directory` v1; its remote-green merge
-gate remains before item 5.2. Phase 6 remains planned and requires its own
-packet before work begins.
+standard packet from that clean baseline. Item 5.1 merged as PR #53 at
+`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 implements canonical
+`json` v1 with explicit split/schema metadata, complete separately aligned
+provenance, exact-byte publication, and no trainer profile; independent
+security/documentation review and its remote-green merge gate remain before
+item 5.3. Phase 6 remains planned and requires its own packet before work
+begins.
 
 ## State change procedure
 

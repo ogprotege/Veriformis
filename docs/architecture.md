@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 5.1)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.2)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -51,11 +51,11 @@ preimages and reconstructed membership and replay descriptor-reread staged
 bytes. Phase 4.8 adds an initially production-empty private implementation
 catalog and thin `PipelineService`, CLI, MCP, and CLI-backed Mac operations for
 discovery, dry run, self-described inspect, execute, and source-bound verify.
-Phase 5.1 installs the catalog's first production exact-byte renderer,
-`split-jsonl-directory` v1. It copies authoritative semantic partitions without
-changing rows or membership and adds only deterministic evidence sidecars; it
-has no consumer profile or trainer-compatibility claim. No production semantic
-replayer ships. The macOS workbench lives
+Phase 5.1–5.2 install the catalog's first two production exact-byte renderers,
+`split-jsonl-directory` and canonical `json` v1. They copy authoritative
+semantic partitions without changing rows or membership and add only
+deterministic evidence sidecars; neither has a consumer profile or trainer-
+compatibility claim. No production semantic replayer ships. The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
 
@@ -167,13 +167,16 @@ name.vfbundle/
   source-bound verify operations through `PipelineService`, CLI, MCP, and the
   CLI-backed Mac bridge. Execute reaches the same internal publisher; adapters
   do not implement filesystem policy. At the Phase 4 exit the production
-  catalog is empty. Phase 5.1 adds only the exact-byte
-  `split-jsonl-directory` v1 implementation. Its request-v1 defaults write
+  catalog is empty. Phase 5.1 adds the exact-byte `split-jsonl-directory` v1
+  implementation. Its request-v1 defaults write
   canonical `data/train.jsonl`, `data/evaluation.jsonl`, aligned provenance, a
   deterministic README/data card, and the receipt. Configured request v2 must
   provide the complete `veriformis.split-jsonl-options/v1` object and may only
   change the two safe filename stems or omit provenance. Those layout choices
-  do not mutate rows, ordering, curation, split policy, or membership. The
+  do not mutate rows, ordering, curation, split policy, or membership. Phase
+  5.2 adds canonical `json` v1: request v1 selects a fixed tree containing one
+  explicit split/schema-bearing `dataset.json`, mandatory separately aligned
+  provenance, deterministic README, and receipt; request v2 is refused. The
   default service still has no semantic replayer and discovery advertises no
   consumer or trainer profile.
 
@@ -183,8 +186,9 @@ name.vfbundle/
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Split JSONL Export v1](contracts/split-jsonl-export-v1.md)
+- [Canonical JSON Export v1](contracts/canonical-json-export-v1.md)
 - [Verified Export Contract v1](contracts/verified-export-v1.md)
-- [Split JSONL Export Contract v1](contracts/split-jsonl-export-v1.md)
 - [Current implementation status](current-status.md)
 - [CLI reference](cli.md)
 - [Development guide](development.md)

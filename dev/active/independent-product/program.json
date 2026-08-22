@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-21",
+  "last_updated": "2026-08-22",
   "status_values": [
     "planned",
     "in_progress",
@@ -72,7 +72,7 @@
       "packet": "dev/active/independent-product/phase-05-generic-local-exports",
       "started_on": "2026-08-21",
       "completed_on": null,
-      "next_gate": "Complete and merge item 5.1 split JSONL through the verified export service before beginning item 5.2."
+      "next_gate": "Complete and merge item 5.2 canonical JSON through the verified export service before beginning item 5.3."
     },
     {
       "number": 6,

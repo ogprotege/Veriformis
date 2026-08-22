@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.2 local admission)
 
-**Next review:** Independent-product Phase 5.1 merge, Phase 5.2 or Phase 6
+**Next review:** Independent-product Phase 5.2 merge, Phase 5.3 or Phase 6
 start, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
@@ -17,10 +17,10 @@ start, or any active-document behavior change
 | DOC-006 | Open | Medium | Existing status/release documents record the pre-independent program vocabulary and group numbering alongside the new program. | Current historical implementation record | Retain for history; progressively distinguish historical groups from current phases |
 | DOC-007 | Open | Medium | The generic v1 row-shape validator persists under the consumer-specific ID `aptus-row-shape`. | `V1_FINISHED_DATASET_GATES` and persisted plan/report identities | Rename only through a versioned contract and report migration; until then document that the ID imports no adapter and proves no live compatibility |
 
-The Phase 5.1 review identified no new documentation debt. The admitted split
-JSONL contract and evidence are reconciled in the active packet; later Phase 5
-containers, previews, and guidance remain explicit roadmap work rather than
-current capability claims.
+The Phase 5.1–5.2 reviews identified no new documentation debt. The admitted
+split JSONL and canonical JSON contracts are reconciled in the active packet;
+CSV, export-pack integration, shared round trips, previews, and final guidance
+remain explicit roadmap work rather than current capability claims.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

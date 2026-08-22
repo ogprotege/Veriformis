@@ -293,11 +293,14 @@ def test_split_jsonl_discovery_and_v1_v2_defaults_are_compatible(
     service = ExportService()
     profiles = service.discover_exports().profiles
 
-    assert [profile.selector for profile in profiles] == [
-        (SPLIT_JSONL_CONTAINER_ID, SPLIT_JSONL_CONTAINER_VERSION, None, None)
-    ]
-    assert profiles[0].supported_row_schemas == ROW_SCHEMAS
-    assert profiles[0].container_profile.determinism_claim == "portable_exact_bytes"
+    profile = next(
+        item
+        for item in profiles
+        if item.selector
+        == (SPLIT_JSONL_CONTAINER_ID, SPLIT_JSONL_CONTAINER_VERSION, None, None)
+    )
+    assert profile.supported_row_schemas == ROW_SCHEMAS
+    assert profile.container_profile.determinism_claim == "portable_exact_bytes"
 
     v1 = service.dry_run_export(_dry_v1(bundle))
     explicit_v2 = service.dry_run_export(_dry_v2(bundle, _options()))

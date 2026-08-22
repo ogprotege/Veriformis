@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL admission)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
 
 **Next review:** Any architecture or data-flow change
 
@@ -232,9 +232,12 @@ envelopes over those `PipelineService` operations.
 
 The private render/replay hooks remain trusted implementation code, and
 semantic replay currently retains each complete file in memory. Phase 4 closed
-with no production entry; Phase 5.1 now installs one exact-byte renderer,
-`split-jsonl-directory` v1, while no production semantic replayer or trainer
-profile exists. The export boundary changes neither the canonical six-file
+with no production entry; Phase 5.1–5.2 now install exact-byte renderers for
+`split-jsonl-directory` and canonical `json` v1, while no production semantic
+replayer or trainer profile exists. Split JSONL preserves payload-only
+partition files; canonical JSON preserves the same logical partitions as
+explicit arrays and keeps complete aligned provenance in a separate object.
+The export boundary changes neither the canonical six-file
 bundle nor the nine-stage workspace graph. Phase 4.9 supplied consolidated
 adversarial foundation proof; each Phase 5 container requires separate
 admission evidence.

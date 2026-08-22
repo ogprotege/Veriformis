@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-21 (Phase 3 closeout)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON admission)
 
 **Next review:** Any taxonomy, loss-policy, or compatibility-matrix change
 
@@ -128,7 +128,7 @@ not determine the objective or loss.
 | `minimal-v1` | implemented | Canonical six-file Veriformis bundle |
 | `deterministic-vfbundle-zip-v1` | implemented | Finder-safe transport of that bundle; not a trainer export |
 | `split-jsonl-directory` | implemented | Phase 5 consumer-neutral generic export; contract v1 |
-| `json` | planned | Phase 5 generic export |
+| `json` | implemented | Phase 5 consumer-neutral canonical JSON export; contract v1 |
 | `constrained-csv` | planned | Phase 5 generic export |
 | `parquet` | planned | Phase 9 |
 | `arrow` | planned | Phase 9 |

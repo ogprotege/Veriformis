@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
 
 **Next review:** Any layering or architecture change
 
@@ -212,9 +212,11 @@ catalog, typed `PipelineService` operations, and thin CLI/MCP/Mac adapters
 without a second registry or filesystem implementation. Phase 5.1 adds the
 exact-byte `split-jsonl-directory` v1 planner and renderer inside this same
 axial layer. Its request-v1 defaults and fully specified request-v2 layout
-options affect derivative paths and provenance inclusion only; normalized rows,
+options affect derivative paths and provenance inclusion only. Phase 5.2 adds
+the exact-byte canonical `json` v1 planner and renderer in the same layer, with
+a fixed request-v1 dataset/provenance tree and no options. Normalized rows,
 ordering, curation, split policy, and membership remain source-derived and
-plan-equal. It adds no workspace stage, consumer profile, trainer claim,
+plan-equal. Neither adds a workspace stage, consumer profile, trainer claim,
 semantic replayer, or second filesystem implementation.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.

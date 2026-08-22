@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -88,7 +88,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | `src/veriformis/construction/` | Objectives, recipes, constructors, lifecycle, replay |
 | `src/veriformis/datasets/` | Finished plan, curation, split, rows, 17-gate validation |
 | `src/veriformis/bundle/` | Six-file finished bundle + independent verifier |
-| `src/veriformis/exports/` | Verified-derivative models, source admission, planning, publication/verification, strict surface protocol, and the production exact-byte `split-jsonl-directory` v1 implementation |
+| `src/veriformis/exports/` | Verified-derivative models, source admission, planning, publication/verification, strict surface protocol, and production exact-byte split JSONL/canonical JSON implementations |
 | `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
 | `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
 | `src/veriformis/mcp/` | Constrained local MCP adapter, including canonical verified-export tools over `PipelineService` |
@@ -242,8 +242,8 @@ preimages and plan-equal normalized membership; the service computes each
 digest and replays descriptor-reread staged bytes before promotion.
 
 Phase 4 intentionally closed with no production renderer or semantic replayer.
-Phase 5.1 adds one reviewed production exact-byte renderer for
-`split-jsonl-directory` v1; it does not make the private implementation hook an
+Phase 5.1–5.2 add reviewed production exact-byte renderers for
+`split-jsonl-directory` and canonical `json` v1; they do not make the private implementation hook an
 untrusted plugin boundary. Tests may still inject the bounded trusted
 conformance implementation. Semantic replay currently retains each complete
 produced file in memory; the Phase 4.7 fixture is statically bounded, and no
@@ -252,20 +252,21 @@ define and enforce explicit byte, record, nesting, and other applicable
 resource limits.
 
 Verified-export surfaces must call the typed `PipelineService` operations. Keep
-the production catalog private and descriptor-driven; its only current entry is
-`split-jsonl-directory` v1 with no consumer profile.
+the production catalog private and descriptor-driven; its current entries are
+`split-jsonl-directory` and canonical `json` v1 with no consumer profiles.
 CLI and MCP must share the canonical export request/response serializer; the
 Mac bridge shells those CLI commands and must decode stdout separately from
 stderr. Preserve request v1 exactly: for split JSONL it chooses the safe
 `train` / `evaluation` names and includes aligned provenance. Configured dry
 run, execute, and source-bound verify use request v2 and require the complete
 canonical `veriformis.split-jsonl-options/v1` object; it may change only the two
-safe stems or omit provenance. Do not add caller-supplied profiles,
+safe stems or omit provenance. Canonical JSON uses request v1's fixed tree and
+refuses request v2. Do not add caller-supplied profiles,
 dependencies, file plans, membership, renderers, replayers, replacement, or
 force controls. Filename and provenance options must never mutate rows,
 ordering, curation, split policy, or partition membership. The Phase 4.9
-adversarial closeout harness remains test-only; other generic containers remain
-later Phase 5 work.
+adversarial closeout harness remains test-only; CSV and later generic work
+remain later Phase 5 work.
 
 ### Keep optional-integration claims accurate
 
@@ -379,6 +380,8 @@ retained manifest digest.
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)
 - [Finished Dataset Contract v1](contracts/finished-dataset-v1.md)
+- [Split JSONL Export Contract v1](contracts/split-jsonl-export-v1.md)
+- [Canonical JSON Export Contract v1](contracts/canonical-json-export-v1.md)
 - [Current implementation status](current-status.md)
 - [Project tracking and evidence policy](governance/project-tracking.md)
 - [Support registry](governance/support-registry.json)

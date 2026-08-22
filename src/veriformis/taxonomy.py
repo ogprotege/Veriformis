@@ -55,9 +55,9 @@ IMPLEMENTED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "minimal-v1",
     "deterministic-vfbundle-zip-v1",
     "split-jsonl-directory",
+    "json",
 )
 PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
-    "json",
     "constrained-csv",
     "parquet",
     "arrow",

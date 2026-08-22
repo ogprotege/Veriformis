@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 5.1 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.2 local admission)
 
-**Next review:** Independent-product Phase 5.1 pull-request merge, Phase 5.2 or
+**Next review:** Independent-product Phase 5.2 pull-request merge, Phase 5.3 or
 Phase 6 start, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -44,8 +44,11 @@ of proof.
 
 At this review, Phase 4 is complete and its closeout merged as PR #52 at
 `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 opened from that clean
-baseline under its own standard packet. Item 5.1 now has locally passing code,
-admission tests, support/evidence records, and current-status reconciliation
-for exactly `split-jsonl-directory` v1; its remote-green merge gate remains.
+baseline under its own standard packet. Item 5.1 merged as PR #53 at
+`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 has locally implemented
+code, admission tests, passing local repository gates, support/evidence
+records, and current-status reconciliation for canonical `json` v1;
+independent code, security, and documentation reviews found no blocker, and
+its remote-green merge gate remains.
 Consumer compatibility still requires a separately admitted named profile.
 Phase 6 remains planned and requires its own packet before work begins.

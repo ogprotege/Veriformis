@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-21 (Phase 5.1 split JSONL export)
+**Last reviewed:** 2026-08-22 (Phase 5.2 canonical JSON export)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -138,7 +138,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
 | `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
-| `veriformis export discover` | List executable verified-export implementations; includes `split-jsonl-directory` v1 |
+| `veriformis export discover` | List executable verified-export implementations; includes `split-jsonl-directory` and canonical `json` v1 |
 | `veriformis export dry-run --request-json JSON` | Derive a source-anchored export plan without destination access |
 | `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |
 | `veriformis export execute --request-json JSON` | Publish one operator-confirmed plan with no-replace `refuse` |
@@ -170,6 +170,24 @@ partial options are refused. These choices do not change row content, order,
 curation, split policy, or train/evaluation membership. The container advertises
 no trainer compatibility. See the [CLI reference](cli.md) and
 [Split JSONL Export v1](contracts/split-jsonl-export-v1.md).
+
+### Verified canonical JSON derivative
+
+Canonical `json` v1 uses request v1 and publishes a fixed closed tree:
+
+```text
+README.md
+dataset.json
+export-receipt.json
+metadata/row-provenance.json
+```
+
+`dataset.json` contains explicit schema/objective/loss/split metadata and
+payload-only `train` and `evaluation` arrays. The mandatory provenance object
+contains the complete aligned train-then-evaluation sequence. This selector has
+no container options, so request v2 is refused. It preserves rows and logical
+partitions and advertises no trainer compatibility. See
+[Canonical JSON Export v1](contracts/canonical-json-export-v1.md).
 
 ### Minimal terminal compile (same path as the GUI)
 
