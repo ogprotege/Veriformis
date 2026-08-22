@@ -364,12 +364,26 @@ def test_mcp_blocking_export_tools_wait_for_cooperative_cleanup_before_cancel(
                 {"request_json": _cancellable_request(operation)},
             )
         )
-        await _wait_for_thread_event(service.started)
-        escape = asyncio.get_running_loop().call_later(1.0, service.escape.set)
-        task.cancel()
-        with pytest.raises(asyncio.CancelledError):
-            await task
-        escape.cancel()
+        escape = None
+        try:
+            await _wait_for_thread_event(service.started)
+            escape = asyncio.get_running_loop().call_later(
+                1.0,
+                service.escape.set,
+            )
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+        finally:
+            if escape is not None:
+                escape.cancel()
+            if not task.done():
+                task.cancel()
+            service.escape.set()
+            try:
+                await task
+            except (asyncio.CancelledError, Exception):
+                pass
 
     asyncio.run(exercise())
 
@@ -406,11 +420,20 @@ def test_mcp_cancellation_race_preserves_visible_publication_outcome(
                 },
             )
         )
-        await _wait_for_thread_event(service.visible)
-        task.cancel()
-        await asyncio.sleep(0)
-        service.release.set()
-        return await task
+        try:
+            await _wait_for_thread_event(service.visible)
+            task.cancel()
+            await asyncio.sleep(0)
+            service.release.set()
+            return await task
+        finally:
+            service.release.set()
+            if not task.done():
+                task.cancel()
+            try:
+                await task
+            except (asyncio.CancelledError, Exception):
+                pass
 
     payload = json.loads(asyncio.run(exercise()))
 

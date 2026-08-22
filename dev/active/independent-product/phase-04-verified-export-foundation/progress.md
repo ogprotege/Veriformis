@@ -425,6 +425,6 @@ private MCP test dispatch, lossy taxonomy decoding, and the Mac-side UTF-8 path
 bound. `CancellationCheck` is now a public type alongside the two runtime
 publication types; no execution hook or registry became public.
 
-**Next action:** Push the Phase 4.8 review corrections and wait for every PR #50
-GitHub check and review to pass. Phase 4.9 may begin only after the PR merges
-and clean local `main` equals `origin/main`.
+**Next action:** Wait for every GitHub check and review on the Phase 4.8
+corrective PR to pass. Phase 4.9 may begin only after that PR merges and clean
+local `main` equals `origin/main`.
