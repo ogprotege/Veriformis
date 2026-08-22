@@ -54,7 +54,7 @@ Version `0.1.0` provides:
 - five deterministic training objectives: `full_text`, `continuation`,
   `section_reconstruction`, `before_after_transformation`, and
   `structured_field`;
-- a versioned six-axis dataset taxonomy, shared compile-compatibility policy,
+- a versioned seven-axis dataset taxonomy, shared compile-compatibility policy,
   and read-only discovery through `PipelineService`, CLI, MCP, and workbench
   help;
 - field-level evidence, candidate decisions, optional review evidence, and

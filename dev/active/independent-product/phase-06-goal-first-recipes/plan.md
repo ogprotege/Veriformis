@@ -81,22 +81,22 @@ the repository requires. The widening is recorded in `decisions.md`.
 
 ### 6.2 Define goal contracts and the input-family axis
 
-- [ ] Extend each catalog goal with `required_source_evidence`,
+- [x] Extend each catalog goal with `required_source_evidence`,
       `target_construction`, `supervision_boundary` (per representation, the
       loss policy and its plain-language boundary), `curation_defaults`,
       `review_policy`, `compatible_generic_exports` (derived from the
       production export catalog, so constrained CSV excludes `messages`), and
       `non_claims`.
-- [ ] Add the seventh taxonomy axis `input_family` under ADR-0008: versioned
+- [x] Add the seventh taxonomy axis `input_family` under ADR-0008: versioned
       families over the existing parser kinds and declared suffixes
       (`plain-text`, `markdown`, `source-code`, `word-document`, `html`,
       `pdf-text`, `delimited-table`, `json-records`) with
       `ocr-image` recorded `explicitly_unsupported`; extend discovery, the Swift
       decoder, the support registry, and the tracking checker without changing
       the taxonomy contract version.
-- [ ] Bind each goal to its `eligible_input_families` and prove the binding
+- [x] Bind each goal to its `eligible_input_families` and prove the binding
       against the existing parser and constructor diagnostics.
-- [ ] Extend `docs/contracts/goal-catalog-v1.md` and
+- [x] Extend `docs/contracts/goal-catalog-v1.md` and
       `docs/contracts/taxonomy-v1.md`; update the frozen discovery fixtures.
 
 ### 6.3 Add goal-specific preview

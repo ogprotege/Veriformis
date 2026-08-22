@@ -14,21 +14,24 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.2: input-family axis)
 
-**Next review:** Any taxonomy, loss-policy, or compatibility-matrix change
+**Next review:** Any taxonomy, input-family, loss-policy, or
+compatibility-matrix change
 
 ## Purpose
 
 This contract gives every later input and output feature a truthful semantic
-home. It defines six independent axes:
+home. It defines seven independent axes:
 
 1. training family;
 2. training objective;
 3. semantic row schema;
 4. physical container;
 5. consumer profile;
-6. loss policy.
+6. loss policy;
+7. input family (added additively by Phase 6.2 under
+   [ADR-0008](../adr/0008-input-family-taxonomy-axis.md)).
 
 UI, APIs, recipes, and docs MUST NOT collapse more than one axis into a single
 “format” value. A physical container such as JSONL does not state what is
@@ -175,6 +178,31 @@ A consumer profile MAY refuse a row schema or add a stricter masking
 expectation. It MUST NOT silently change the loss policy ID of an accepted
 row. The Aptus profile’s refusal of plain `text` is such a constraint.
 
+### Input family
+
+An input family is the recovery-side kind of a raw source. It classifies what
+a parser recovers; it never states what is learned, which row schema applies,
+or which container is produced. Each declared v1 suffix belongs to exactly one
+implemented family, and each family names the parser kinds that produce its
+sources.
+
+| Family ID | State | Suffixes | Parser kinds | What recovery supplies |
+| --- | --- | --- | --- | --- |
+| `plain-text` | implemented | `.txt` | `text` | Paragraph text only |
+| `source-code` | implemented | `.c`, `.cpp`, `.go`, `.java`, `.js`, `.py`, `.rb`, `.rs`, `.sh`, `.ts` | `text` | One code block carrying its language |
+| `markdown` | implemented | `.markdown`, `.md` | `markdown` | Headings, paragraphs, code blocks, links, images, lists, tables, math, citations |
+| `word-document` | implemented | `.docx` | `docx` | Headings, paragraphs, code blocks, links, images, lists, tables, math, citations |
+| `html` | implemented | `.htm`, `.html` | `html` | Headings and paragraphs |
+| `pdf-text` | implemented | `.pdf` | `pdf` | Paragraphs from the embedded text layer under synthetic per-page labels (`Page N` headings); image-only pages refuse |
+| `delimited-table` | implemented | `.csv` | `csv` | One table without alignment attributes |
+| `json-records` | implemented | `.json`, `.jsonl` | `json`, `jsonl` | Paragraph text per flattened textual field |
+| `ocr-image` | explicitly_unsupported | — | — | No OCR recovery exists; image-only PDFs fail closed |
+
+Goal eligibility per family is bound in the
+[Goal Catalog Contract v1](goal-catalog-v1.md). Adding a family, moving a
+suffix between families, or promoting `ocr-image` requires a roadmap step
+(Phases 11 and 12) and a support-registry change in the same pull request.
+
 ## Compatibility
 
 The following objective/row pairs are the only valid v1 combinations:
@@ -200,9 +228,9 @@ Default row schema when the caller omits one:
 `veriformis-canonical-v1` accepts every valid objective/row pair.
 `aptus-handoff-v1` accepts those pairs except `text`.
 
-Unknown family, objective, row, container, profile, or loss-policy identifiers
-MUST fail closed. Planned and explicitly unsupported identifiers MUST NOT be
-selected for compile.
+Unknown family, objective, row, container, profile, loss-policy, or
+input-family identifiers MUST fail closed. Planned and explicitly unsupported
+identifiers MUST NOT be selected for compile.
 
 ## Discovery and vocabulary
 
@@ -217,10 +245,12 @@ labels MAY be friendlier if they remain bound to those identifiers.
 ## Version and migration
 
 The taxonomy catalog uses schema `veriformis.taxonomy/v1`. Adding a planned
-name or promoting an admitted identifier from planned to implemented does not
-by itself change the schema version. Changing the meaning of an existing
-identifier, allowed combination, or loss boundary requires a new taxonomy
-schema version and a migration test.
+name, promoting an admitted identifier from planned to implemented, or adding
+an independent axis whose identifiers are never persisted in a recipe, row, or
+seal (as Phase 6.2 did for `input_family`) does not by itself change the schema
+version; discovery consumers MUST be updated in the same change. Changing the
+meaning of an existing identifier, allowed combination, or loss boundary
+requires a new taxonomy schema version and a migration test.
 
 Historical construction, finished-dataset, bundle, and handoff schemas remain
 readable through their own loaders. This contract does not replace them.

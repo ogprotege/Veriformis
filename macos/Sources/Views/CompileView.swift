@@ -187,6 +187,7 @@ struct CompileView: View {
                 taxonomyAxis("Physical containers", values: discovery.physicalContainers)
                 taxonomyAxis("Consumer profiles", values: discovery.consumerProfiles)
                 taxonomyAxis("Loss policies", values: discovery.lossPolicies)
+                taxonomyAxis("Input families", values: discovery.inputFamilies)
             }
         case .unavailable(let message):
             VStack(alignment: .leading, spacing: 6) {

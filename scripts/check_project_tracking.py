@@ -31,7 +31,10 @@ from veriformis.recipes.library import list_named_recipes
 from veriformis.taxonomy import (
     CANONICAL_CONSUMER_PROFILE,
     CANDIDATE_CONSUMER_PROFILES,
+    EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES,
     EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES,
+    IMPLEMENTED_INPUT_FAMILIES,
+    INPUT_FAMILY_SUFFIXES,
     IMPLEMENTED_CONSUMER_PROFILES,
     IMPLEMENTED_PHYSICAL_CONTAINERS,
     IMPLEMENTED_TRAINING_FAMILIES,
@@ -230,6 +233,30 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         "support input extensions differ from DECLARED_V1_EXTENSIONS",
         errors,
     )
+    _require(
+        inputs.get("implemented_families") == list(IMPLEMENTED_INPUT_FAMILIES),
+        "support input families differ from IMPLEMENTED_INPUT_FAMILIES",
+        errors,
+    )
+    owned_suffixes = sorted(
+        suffix for suffixes in INPUT_FAMILY_SUFFIXES.values() for suffix in suffixes
+    )
+    _require(
+        owned_suffixes == sorted(DECLARED_V1_EXTENSIONS),
+        "taxonomy input-family suffixes do not partition DECLARED_V1_EXTENSIONS",
+        errors,
+    )
+    unsupported_inputs = inputs.get("explicitly_unsupported")
+    if not isinstance(unsupported_inputs, list):
+        errors.append("support inputs.explicitly_unsupported must be a list")
+    else:
+        _require(
+            [entry.get("family") for entry in unsupported_inputs if isinstance(entry, dict)]
+            == list(EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES),
+            "support unsupported input families differ from "
+            "EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES",
+            errors,
+        )
     objective_names = sorted(item["objective"] for item in list_named_recipes())
     _require(
         training.get("implemented_objectives") == objective_names,
@@ -621,8 +648,8 @@ def main() -> int:
     print("Project tracking check: PASS")
     print("- 21 roadmap phases match program.json and WIP.md")
     print(
-        "- implemented inputs, taxonomy families, objectives, goals, rows, loss "
-        "policies, containers, profiles, and handoff defaults match code"
+        "- implemented inputs, input families, taxonomy families, objectives, goals, "
+        "rows, loss policies, containers, profiles, and handoff defaults match code"
     )
     print("- governed phase packets and evidence references are structurally complete")
     return 0

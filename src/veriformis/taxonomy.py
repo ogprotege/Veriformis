@@ -33,6 +33,58 @@ TAXONOMY_AXES: Final[tuple[str, ...]] = (
     "physical_container",
     "consumer_profile",
     "loss_policy",
+    "input_family",
+)
+
+# Seventh axis (Phase 6.2, ADR-0008): the recovery-side input family. Each
+# declared v1 suffix belongs to exactly one family, and each family names the
+# parser kinds that produce its sources. Families classify recovery only; they
+# never state what is learned.
+IMPLEMENTED_INPUT_FAMILIES: Final[tuple[str, ...]] = (
+    "plain-text",
+    "source-code",
+    "markdown",
+    "word-document",
+    "html",
+    "pdf-text",
+    "delimited-table",
+    "json-records",
+)
+EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES: Final[tuple[str, ...]] = ("ocr-image",)
+INPUT_FAMILY_SUFFIXES: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType(
+    {
+        "plain-text": (".txt",),
+        "source-code": (
+            ".c",
+            ".cpp",
+            ".go",
+            ".java",
+            ".js",
+            ".py",
+            ".rb",
+            ".rs",
+            ".sh",
+            ".ts",
+        ),
+        "markdown": (".markdown", ".md"),
+        "word-document": (".docx",),
+        "html": (".htm", ".html"),
+        "pdf-text": (".pdf",),
+        "delimited-table": (".csv",),
+        "json-records": (".json", ".jsonl"),
+    }
+)
+INPUT_FAMILY_PARSERS: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType(
+    {
+        "plain-text": ("text",),
+        "source-code": ("text",),
+        "markdown": ("markdown",),
+        "word-document": ("docx",),
+        "html": ("html",),
+        "pdf-text": ("pdf",),
+        "delimited-table": ("csv",),
+        "json-records": ("json", "jsonl"),
+    }
 )
 
 IMPLEMENTED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
@@ -187,6 +239,9 @@ def _known_identifiers() -> dict[str, set[str]]:
             + CANDIDATE_CONSUMER_PROFILES
         ),
         "loss_policy": set(LOSS_POLICY_IDS),
+        "input_family": set(
+            IMPLEMENTED_INPUT_FAMILIES + EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES
+        ),
     }
 
 
@@ -209,6 +264,33 @@ def require_identifier(axis: str, identifier: str) -> str:
     if identifier not in known:
         raise TaxonomyError(f"unknown {axis.replace('_', ' ')} {identifier!r}")
     return identifier
+
+
+def input_family_for_suffix(suffix: str) -> str:
+    """Return the implemented input family that owns one declared suffix.
+
+    Accepts a bare or dotted suffix in any letter case, mirroring parser
+    dispatch, and fails closed for anything no implemented family owns.
+    """
+    normalized = suffix.lower()
+    if not normalized.startswith("."):
+        normalized = f".{normalized}"
+    for family, suffixes in INPUT_FAMILY_SUFFIXES.items():
+        if normalized in suffixes:
+            return family
+    raise TaxonomyError(f"no implemented input family owns suffix {suffix!r}")
+
+
+def input_family_for_parser(parser: str) -> tuple[str, ...]:
+    """Return every implemented input family produced by one parser kind."""
+    families = tuple(
+        family
+        for family, parsers in INPUT_FAMILY_PARSERS.items()
+        if parser in parsers
+    )
+    if not families:
+        raise TaxonomyError(f"no implemented input family is produced by parser {parser!r}")
+    return families
 
 
 def family_for_objective(objective: str) -> str:
@@ -311,6 +393,12 @@ def catalog() -> tuple[TaxonomyEntry, ...]:
         entries.append(TaxonomyEntry("consumer_profile", identifier, "candidate"))
     for identifier in LOSS_POLICY_IDS:
         entries.append(TaxonomyEntry("loss_policy", identifier, "implemented"))
+    for identifier in IMPLEMENTED_INPUT_FAMILIES:
+        entries.append(TaxonomyEntry("input_family", identifier, "implemented"))
+    for identifier in EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES:
+        entries.append(
+            TaxonomyEntry("input_family", identifier, "explicitly_unsupported")
+        )
     return tuple(entries)
 
 
@@ -327,6 +415,7 @@ def implemented_discovery() -> Mapping[str, tuple[str, ...]]:
             "physical_container": IMPLEMENTED_PHYSICAL_CONTAINERS,
             "consumer_profile": IMPLEMENTED_CONSUMER_PROFILES,
             "loss_policy": LOSS_POLICY_IDS,
+            "input_family": IMPLEMENTED_INPUT_FAMILIES,
         }
     )
 
@@ -335,8 +424,12 @@ __all__ = [
     "CANONICAL_CONSUMER_PROFILE",
     "CANDIDATE_CONSUMER_PROFILES",
     "DEFAULT_ROW_SCHEMA",
+    "EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES",
     "EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES",
     "IMPLEMENTED_CONSUMER_PROFILES",
+    "IMPLEMENTED_INPUT_FAMILIES",
+    "INPUT_FAMILY_PARSERS",
+    "INPUT_FAMILY_SUFFIXES",
     "IMPLEMENTED_PHYSICAL_CONTAINERS",
     "IMPLEMENTED_TRAINING_FAMILIES",
     "LOSS_POLICY_BOUNDARIES",
@@ -358,6 +451,8 @@ __all__ = [
     "compatible_row_schemas",
     "default_row_schema",
     "family_for_objective",
+    "input_family_for_parser",
+    "input_family_for_suffix",
     "implemented_discovery",
     "loss_boundary",
     "loss_policy_for_row",

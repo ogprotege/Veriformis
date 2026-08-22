@@ -6,8 +6,32 @@
       "compatible_representations": [
         "whole-text"
       ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
       "default_representation": "whole-text",
+      "eligible_input_families": [
+        "plain-text",
+        "source-code",
+        "markdown",
+        "word-document",
+        "html",
+        "pdf-text",
+        "delimited-table",
+        "json-records"
+      ],
       "goal_id": "learn-the-text",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
       "not_this": [
         "It does not teach the model to summarize, explain, or answer questions about the documents.",
         "It does not shorten, rewrite, or paraphrase anything."
@@ -15,7 +39,18 @@
       "objective": "full_text",
       "plain_language": "Teach the model the exact wording of my documents so it can reproduce them as written.",
       "recipe_library_id": "full_text.default",
+      "required_evidence_diagnostics": [
+        "source-chunks-unavailable"
+      ],
+      "required_source_evidence": "At least one cleaned passage of text recovered from the document.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
       "state": "implemented",
+      "supervision_boundary": "There is no separate context. The whole passage is the target and every part of it is trained on.",
+      "target_construction": "Each cleaned passage is copied exactly as the training target; nothing is added, removed, or reordered.",
       "title": "Learn the text itself",
       "training_family": "source-grounded-language-modeling",
       "what_the_model_learns": "To reproduce the retained source passages as written. The whole passage is the training signal; nothing is held back as a question or prompt.",
@@ -27,8 +62,32 @@
         "instruction-and-output",
         "conversation"
       ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
       "default_representation": "prompt-and-completion",
+      "eligible_input_families": [
+        "plain-text",
+        "source-code",
+        "markdown",
+        "word-document",
+        "html",
+        "pdf-text",
+        "delimited-table",
+        "json-records"
+      ],
       "goal_id": "continue-a-passage",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
       "not_this": [
         "It does not invent new endings; the target is always the real remainder from the source.",
         "It is not a summary, an answer, or a rewrite."
@@ -36,7 +95,19 @@
       "objective": "continuation",
       "plain_language": "Teach the model to keep writing a passage from a given starting point, in the document's own words.",
       "recipe_library_id": "continuation.default",
+      "required_evidence_diagnostics": [
+        "source-chunks-unavailable",
+        "continuation-boundary-unavailable"
+      ],
+      "required_source_evidence": "A cleaned passage of at least two characters, so it can be split into an opening and a remainder.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
       "state": "implemented",
+      "supervision_boundary": "The opening is context; the remainder is the target and is the only part trained on.",
+      "target_construction": "The passage is split part-way through its characters (half by default); the opening becomes the context and the exact remainder becomes the target.",
       "title": "Continue a passage",
       "training_family": "source-grounded-supervised-fine-tuning",
       "what_the_model_learns": "Given the opening part of a real source passage, produce the exact remainder of that same passage.",
@@ -48,8 +119,27 @@
         "instruction-and-output",
         "conversation"
       ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
       "default_representation": "prompt-and-completion",
+      "eligible_input_families": [
+        "markdown",
+        "word-document",
+        "html"
+      ],
       "goal_id": "recover-a-section-from-its-heading",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
       "not_this": [
         "It does not generate a body for a heading that has none in the source.",
         "It does not summarize, outline, or reorder sections."
@@ -57,11 +147,23 @@
       "objective": "section_reconstruction",
       "plain_language": "Teach the model to write out a section's body when given that section's heading.",
       "recipe_library_id": "section_reconstruction.default",
+      "required_evidence_diagnostics": [
+        "source-chunks-unavailable",
+        "section-structure-unavailable"
+      ],
+      "required_source_evidence": "A real heading followed by body text beneath it in the recovered document structure.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
       "state": "implemented",
+      "supervision_boundary": "The heading is context; the section body is the target and is the only part trained on.",
+      "target_construction": "The exact heading text becomes the context and the exact body text beneath it becomes the target.",
       "title": "Recover a section from its heading",
       "training_family": "source-grounded-supervised-fine-tuning",
       "what_the_model_learns": "Given an exact heading from the source, produce the exact section body beneath it.",
-      "what_you_provide": "Documents with real headings and the text under them, such as Markdown, HTML, or Word documents with heading structure."
+      "what_you_provide": "Documents with real headings and the text under them: Markdown, HTML, or Word documents with heading structure. PDF recovery supplies only per-page labels, not real headings."
     },
     {
       "compatible_representations": [
@@ -69,8 +171,31 @@
         "instruction-and-output",
         "conversation"
       ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
       "default_representation": "prompt-and-completion",
+      "eligible_input_families": [
+        "plain-text",
+        "markdown",
+        "word-document",
+        "html",
+        "pdf-text",
+        "delimited-table",
+        "json-records"
+      ],
       "goal_id": "reproduce-a-recorded-change",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
       "not_this": [
         "It does not teach general editing, rewriting, or style transfer beyond the recorded deterministic change.",
         "It is not translation or summarization."
@@ -78,11 +203,24 @@
       "objective": "before_after_transformation",
       "plain_language": "Teach the model to apply a change that was actually recorded during cleaning, by showing the text before and after it.",
       "recipe_library_id": "before_after_transformation.default",
+      "required_evidence_diagnostics": [
+        "source-chunks-unavailable",
+        "transformation-pair-unavailable",
+        "transformation-pair-empty-or-unchanged"
+      ],
+      "required_source_evidence": "At least one cleaning rule that recorded a before-and-after change in which the text actually changed and neither side is empty.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
       "state": "implemented",
+      "supervision_boundary": "The text before the change is context; the text after the change is the target and is the only part trained on.",
+      "target_construction": "The text before the recorded change becomes the context and the exact text after that change becomes the target.",
       "title": "Reproduce a recorded change",
       "training_family": "source-grounded-supervised-fine-tuning",
       "what_the_model_learns": "Given the text exactly as it was before one recorded cleaning change, produce the text exactly as it was after that change.",
-      "what_you_provide": "Documents cleaned with rules that recorded at least one before-and-after change."
+      "what_you_provide": "Documents cleaned with rules that recorded at least one before-and-after change. Source-code files are never edited by cleaning, so they cannot supply one."
     },
     {
       "compatible_representations": [
@@ -90,8 +228,28 @@
         "instruction-and-output",
         "conversation"
       ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
       "default_representation": "prompt-and-completion",
+      "eligible_input_families": [
+        "source-code",
+        "markdown",
+        "word-document",
+        "html"
+      ],
       "goal_id": "extract-a-structured-value",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
       "not_this": [
         "It does not extract record fields, names, dates, or any value from the prose; only attributes that the recovered document structure explicitly records.",
         "It does not infer, guess, or compute values that are not explicitly present in the source.",
@@ -100,15 +258,35 @@
       "objective": "structured_field",
       "plain_language": "Teach the model to state one structural fact that the document's formatting explicitly records, such as a heading's level or a link's address.",
       "recipe_library_id": "structured_field.default",
+      "required_evidence_diagnostics": [
+        "source-chunks-unavailable",
+        "structured-ir-artifact-unavailable",
+        "structured-field-unavailable",
+        "structured-field-chunk-unavailable",
+        "structured-field-empty-value"
+      ],
+      "required_source_evidence": "A recovered document element whose formatting records a supported attribute, together with the passage that covers it.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
       "state": "implemented",
+      "supervision_boundary": "The covering passage is context; the single attribute value is the target and is the only part trained on.",
+      "target_construction": "The passage covering the element becomes the context and the attribute's exact recorded value becomes the target.",
       "title": "Extract a structural attribute",
       "training_family": "source-grounded-supervised-fine-tuning",
       "what_the_model_learns": "Given the source context, emit exactly one attribute recorded during recovery: a heading level, a code block's language, a link or image address or title attribute, a math display flag, a citation key or locator, whether a list is ordered or an item is checked, or a table column alignment.",
-      "what_you_provide": "Documents with recoverable formatting, such as Markdown, HTML, or Word documents. Plain text, JSON, and CSV sources record none of these attributes and yield nothing for this goal."
+      "what_you_provide": "Documents with recoverable formatting, such as Markdown, HTML, or Word documents, or source-code files whose language is recorded. Plain text, PDF, JSON, and CSV sources record none of these attributes and yield nothing for this goal."
     }
   ],
   "representations": [
     {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json",
+        "constrained-csv"
+      ],
       "loss_policy": "full-sequence",
       "plain_language": "The passage itself is the training example. Every part of it is trained on.",
       "representation_id": "whole-text",
@@ -118,6 +296,11 @@
       "title": "Whole text"
     },
     {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json",
+        "constrained-csv"
+      ],
       "loss_policy": "completion-only",
       "plain_language": "A starting context taken from the source, followed by the exact source text that should come next. Only the completion is trained on.",
       "representation_id": "prompt-and-completion",
@@ -127,6 +310,11 @@
       "title": "Prompt and completion"
     },
     {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json",
+        "constrained-csv"
+      ],
       "loss_policy": "output-only",
       "plain_language": "A short instruction you supply, the exact source context as input, and the exact source-derived output. Only the output is trained on, and the instruction must describe the real task.",
       "representation_id": "instruction-and-output",
@@ -136,6 +324,10 @@
       "title": "Instruction and output"
     },
     {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json"
+      ],
       "loss_policy": "final-assistant-suffix",
       "plain_language": "A two-turn conversation: the user turn is the exact source context and the assistant turn is the exact source-derived target. Only the assistant turn is trained on.",
       "representation_id": "conversation",

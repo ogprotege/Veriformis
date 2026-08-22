@@ -109,6 +109,7 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
         "physical_container",
         "consumer_profile",
         "loss_policy",
+        "input_family",
     ]
 
     let contractID: String
@@ -120,6 +121,7 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
     let physicalContainers: [String]
     let consumerProfiles: [String]
     let lossPolicies: [String]
+    let inputFamilies: [String]
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -153,6 +155,7 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
         let physicalContainers = try Self.requireAxis("physical_container", in: payload)
         let consumerProfiles = try Self.requireAxis("consumer_profile", in: payload)
         let lossPolicies = try Self.requireAxis("loss_policy", in: payload)
+        let inputFamilies = try Self.requireAxis("input_family", in: payload)
 
         let expectedObjectives = Set(TrainingObjective.allCases.map(\.rawValue))
         guard objectives.count == expectedObjectives.count,
@@ -170,6 +173,7 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
         self.physicalContainers = physicalContainers
         self.consumerProfiles = consumerProfiles
         self.lossPolicies = lossPolicies
+        self.inputFamilies = inputFamilies
     }
 
     private static func requireSingleton(
@@ -2389,7 +2393,10 @@ struct GoalCatalogGoal: Equatable, Sendable {
         "goal_id", "title", "plain_language", "what_the_model_learns",
         "what_you_provide", "not_this", "objective", "training_family",
         "recipe_library_id", "default_representation",
-        "compatible_representations", "state",
+        "compatible_representations", "eligible_input_families",
+        "required_source_evidence", "required_evidence_diagnostics",
+        "target_construction", "supervision_boundary", "curation_defaults",
+        "review_policy_default", "review_policy_options", "non_claims", "state",
     ]
 
     let goalID: String
@@ -2403,7 +2410,32 @@ struct GoalCatalogGoal: Equatable, Sendable {
     let recipeLibraryID: String
     let defaultRepresentation: String
     let compatibleRepresentations: [String]
+    let eligibleInputFamilies: [String]
+    let requiredSourceEvidence: String
+    let requiredEvidenceDiagnostics: [String]
+    let targetConstruction: String
+    let supervisionBoundary: String
+    let curationDefaults: GoalCurationDefaults
+    let reviewPolicyDefault: String
+    let reviewPolicyOptions: [String]
+    let nonClaims: [String]
     let state: String
+}
+
+/// Documented curation and split defaults a goal executes with (6.2).
+struct GoalCurationDefaults: Equatable, Sendable {
+    static let expectedKeys: Set<String> = [
+        "minimum_target_characters", "balance_mode",
+        "maximum_records_per_primary_source", "evaluation_ratio_ppm",
+        "evaluation_required", "split_seed",
+    ]
+
+    let minimumTargetCharacters: Int
+    let balanceMode: String
+    let maximumRecordsPerPrimarySource: Int?
+    let evaluationRatioPPM: Int
+    let evaluationRequired: Bool
+    let splitSeed: String
 }
 
 /// One plain-language representation bound to exactly one persisted row schema.
@@ -2411,6 +2443,7 @@ struct GoalCatalogRepresentation: Equatable, Sendable {
     static let expectedKeys: Set<String> = [
         "representation_id", "title", "plain_language", "supervised_region",
         "row_schema", "loss_policy", "requires_operator_instruction",
+        "compatible_generic_exports",
     ]
 
     let representationID: String
@@ -2420,6 +2453,7 @@ struct GoalCatalogRepresentation: Equatable, Sendable {
     let rowSchema: String
     let lossPolicy: String
     let requiresOperatorInstruction: Bool
+    let compatibleGenericExports: [String]
 }
 
 /// Strict workbench view of `veriformis goals` discovery.
@@ -2482,6 +2516,9 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 requiresOperatorInstruction: try item.decode(
                     Bool.self,
                     forKey: GoalCatalogKey("requires_operator_instruction")
+                ),
+                compatibleGenericExports: try Self.identifiers(
+                    item, "compatible_generic_exports"
                 )
             )
             representations.append(representation)
@@ -2524,6 +2561,42 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 [String].self,
                 forKey: GoalCatalogKey("compatible_representations")
             )
+            let defaultsContainer = try item.nestedContainer(
+                keyedBy: GoalCatalogKey.self,
+                forKey: GoalCatalogKey("curation_defaults")
+            )
+            try Self.requireKeys(
+                defaultsContainer,
+                expected: GoalCurationDefaults.expectedKeys,
+                scope: "curation_defaults"
+            )
+            let curationDefaults = GoalCurationDefaults(
+                minimumTargetCharacters: try defaultsContainer.decode(
+                    Int.self, forKey: GoalCatalogKey("minimum_target_characters")
+                ),
+                balanceMode: try Self.text(defaultsContainer, "balance_mode"),
+                maximumRecordsPerPrimarySource: try defaultsContainer.decodeIfPresent(
+                    Int.self, forKey: GoalCatalogKey("maximum_records_per_primary_source")
+                ),
+                evaluationRatioPPM: try defaultsContainer.decode(
+                    Int.self, forKey: GoalCatalogKey("evaluation_ratio_ppm")
+                ),
+                evaluationRequired: try defaultsContainer.decode(
+                    Bool.self, forKey: GoalCatalogKey("evaluation_required")
+                ),
+                splitSeed: try Self.text(defaultsContainer, "split_seed")
+            )
+            guard curationDefaults.minimumTargetCharacters >= 1,
+                  (0 ... 1_000_000).contains(curationDefaults.evaluationRatioPPM)
+            else {
+                throw GoalCatalogError.invalidGoals("curation_defaults out of range")
+            }
+            let reviewOptions = try Self.identifiers(item, "review_policy_options")
+            let reviewDefault = try Self.text(item, "review_policy_default")
+            guard reviewOptions == ["none", "required"], reviewOptions.contains(reviewDefault)
+            else {
+                throw GoalCatalogError.invalidGoals("review policy options drift")
+            }
             let goal = GoalCatalogGoal(
                 goalID: try Self.text(item, "goal_id"),
                 title: try Self.text(item, "title"),
@@ -2536,6 +2609,17 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 recipeLibraryID: try Self.text(item, "recipe_library_id"),
                 defaultRepresentation: try Self.text(item, "default_representation"),
                 compatibleRepresentations: compatible,
+                eligibleInputFamilies: try Self.identifiers(item, "eligible_input_families"),
+                requiredSourceEvidence: try Self.text(item, "required_source_evidence"),
+                requiredEvidenceDiagnostics: try Self.identifiers(
+                    item, "required_evidence_diagnostics"
+                ),
+                targetConstruction: try Self.text(item, "target_construction"),
+                supervisionBoundary: try Self.text(item, "supervision_boundary"),
+                curationDefaults: curationDefaults,
+                reviewPolicyDefault: reviewDefault,
+                reviewPolicyOptions: reviewOptions,
+                nonClaims: try Self.identifiers(item, "non_claims"),
                 state: try Self.text(item, "state")
             )
             guard goal.state == "implemented" else {
@@ -2584,6 +2668,20 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 unexpected: Array(observed.subtracting(expected)).sorted()
             )
         }
+    }
+
+    /// A non-empty, unique identifier list; each member matches the identifier grammar.
+    private static func identifiers(
+        _ container: KeyedDecodingContainer<GoalCatalogKey>,
+        _ key: String
+    ) throws -> [String] {
+        let values = try container.decode([String].self, forKey: GoalCatalogKey(key))
+        guard !values.isEmpty, values.count == Set(values).count,
+              values.allSatisfy(isIdentifier)
+        else {
+            throw GoalCatalogError.invalidMetadata(key)
+        }
+        return values
     }
 
     private static func text(

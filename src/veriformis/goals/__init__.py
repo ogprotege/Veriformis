@@ -1,7 +1,11 @@
 """Goal-first catalog: plain-language goals resolved to existing objectives."""
 
 from veriformis.goals.catalog import (
+    GENERIC_EXPORT_CONTAINERS,
     GOAL_CATALOG_DATA_NAME,
+    NON_CLAIM_CODES,
+    REVIEW_POLICY_OPTIONS,
+    CurationDefaults,
     Goal,
     GoalCatalog,
     GoalRepresentation,
@@ -15,7 +19,11 @@ from veriformis.goals.catalog import (
 )
 
 __all__ = [
+    "GENERIC_EXPORT_CONTAINERS",
     "GOAL_CATALOG_DATA_NAME",
+    "NON_CLAIM_CODES",
+    "REVIEW_POLICY_OPTIONS",
+    "CurationDefaults",
     "Goal",
     "GoalCatalog",
     "GoalRepresentation",

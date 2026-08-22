@@ -33,6 +33,16 @@
       ".ts",
       ".txt"
     ],
+    "implemented_families": [
+      "plain-text",
+      "source-code",
+      "markdown",
+      "word-document",
+      "html",
+      "pdf-text",
+      "delimited-table",
+      "json-records"
+    ],
     "implemented_modes": [
       "document-source-compilation"
     ],
@@ -42,6 +52,7 @@
     ],
     "explicitly_unsupported": [
       {
+        "family": "ocr-image",
         "capability": "ocr",
         "reason": "Image-only and empty-text PDFs fail closed with a named limitation.",
         "evidence": "docs/beta-limitations.md"
@@ -49,7 +60,9 @@
     ],
     "evidence": [
       "src/veriformis/parsers/dispatch.py",
-      "tests/regressions/test_group5_declared_format_pipeline.py"
+      "src/veriformis/taxonomy.py",
+      "tests/regressions/test_group5_declared_format_pipeline.py",
+      "tests/contracts/test_taxonomy_contract.py"
     ]
   },
   "training": {

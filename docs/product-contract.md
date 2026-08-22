@@ -59,7 +59,7 @@ constants, and executable acceptance fixtures. Steps 7 through 10 are governed
 by [Dataset Construction Contract v1](contracts/dataset-construction-v1.md).
 Steps 11 through 16 are governed by
 [Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
-The six-axis product vocabulary and compile compatibility are governed by
+The seven-axis product vocabulary and compile compatibility are governed by
 [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md).
 Consumer-neutral derivative evidence is governed by
 [Verified Export Contract v1](contracts/verified-export-v1.md). Its internal
