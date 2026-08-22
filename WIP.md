@@ -72,7 +72,9 @@ local, offline, and free of LLM generation.
       `7316d94faf2d6c23b7abb6fe200f154da47d398c` and item 6.2's goal
       contracts and `input_family` axis merged as PR #61 at
       `81becfa676fd9111868b8d4b62549218a644d3e2`, each after all 14 GitHub
-      checks passed; item 6.3 (goal-specific preview) is the current work.
+      checks passed; item 6.3's goal preview merged as PR #62 at
+      `9cbab117e47cde6bd8850d67f0d363e03f0660ce`; item 6.4 (versioned
+      recipe presets and goal-first compile surfaces) is the current work.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

@@ -246,3 +246,70 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.3 pull request, require every GitHub
 check to pass, merge, and synchronize clean local `main` with `origin/main`
 before item 6.4 begins.
+
+## 2026-08-22 — Item 6.3 merged; item 6.4 started
+
+**Status:** Item 6.3 merged as PR #62 at
+`9cbab117e47cde6bd8850d67f0d363e03f0660ce` after all 14 GitHub checks passed
+on the first run; clean local `main` equals `origin/main` at that commit.
+Branch `phase6/04-recipe-presets` was created from it.
+
+Item 6.4 scope: `veriformis.recipe-preset/v1` as packaged versioned data
+holding the recipe-wide defaults and one safe preset per goal; one resolution
+function used by the service, CLI, MCP, YAML runner, and recipe library so
+every surface executes the same defaults and every selection path yields one
+`recipe_id`; `--goal`, `--preset`, and `--representation` selection on
+`chunk`, `construct`, and `curate` with explicit overrides only; the recipe
+library on the execution path; `presets` discovery on CLI and MCP; a
+catalog-driven workbench goal picker with an Advanced disclosure and no Swift
+recipe constants; and a tracking gate that refuses recipe default literals.
+
+**Next action:** Finish the workbench and tests, run the complete admission
+gates, record evidence, and publish the item 6.4 pull request.
+
+## 2026-08-22 — Item 6.4 locally complete
+
+**Status:** Local implementation and admission gates passed; pull-request
+merge pending.
+
+`presets-v1.json` is the single versioned source of every recipe default and
+of one safe preset per goal. `resolve_recipe_settings` is the only resolution
+path: the service, CLI, MCP, YAML runner, and recipe library default every
+setting parameter to `None` and resolve omitted values through the data, so a
+goal, its safe preset, and its objective with equal overrides yield one
+settings digest, one `recipe_id`, and one finished plan. `construct` builds
+the recipe through the named recipe library; `construct --preset` fails closed
+when the workspace chunks were not produced with the preset's segmentation.
+The workbench discovers goals and presets at startup, offers a plain-language
+goal picker with the goal's safe preset and a recipe-settings disclosure, and
+passes only the selection and explicit overrides; it holds no recipe constant.
+The tracking checker binds `implemented_presets` to the data and refuses a
+recipe default literal in any surface source or the workbench. The workbench
+parity script now exercises the goal-first sequence.
+
+A defect-closure regression required that surfaces reject the persisted
+`primary_source_cap` spelling; the resolver was narrowed to the documented
+hyphenated spelling while the library keeps accepting the persisted value it
+receives from resolved settings.
+
+Observed gates on the reconciled working tree:
+
+- 138 focused goal, preset, surface-identity, and defect-closure tests passed;
+  1,371 full Python tests passed with only the intentional durability-warning
+  regression warning; 1,359 standalone release tests passed with 1 deselected
+  and the same warning.
+- Clean-wheel installation and both golden compile/external-digest/transport
+  flows passed; the goal-first standalone CLI/workbench parity passed.
+- The complete macOS XCTest target passed 79 tests with `TEST SUCCEEDED`.
+- Project tracking (presets and the literal gate), its regression test, lock,
+  Ruff, structured JSON, fixture byte equality, and diff checks passed.
+- The independent adversarial review found no blocker and proved recipe
+  identity byte-for-byte against the pre-change construction for all five
+  objectives; its seven should-fix items (CLI reference tables, YAML
+  `recipe_library_id` conflict detection, review-policy consistency, the
+  `unknown strategy` message, the workbench label, legacy re-run restore, a
+  dead test block) were corrected and re-verified.
+
+**Next action:** Publish the item 6.4 pull request, require every GitHub check
+to pass, merge, and synchronize clean
+local `main` with `origin/main` before item 6.5 begins.

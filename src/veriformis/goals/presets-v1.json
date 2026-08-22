@@ -1,0 +1,158 @@
+{
+  "contract_id": "veriformis.recipe-preset",
+  "contract_version": 1,
+  "defaults": {
+    "construction": {
+      "consumer_profile": "veriformis-canonical-v1",
+      "require_review": false,
+      "split_ratio_ppm": 500000
+    },
+    "curation": {
+      "balance_mode": "none",
+      "evaluation_ratio_ppm": 500000,
+      "evaluation_required": true,
+      "maximum_records_per_primary_source": null,
+      "minimum_target_characters": 1,
+      "split_seed": "veriformis-v1"
+    },
+    "review_policy": "none",
+    "segmentation": {
+      "overlap": 100,
+      "size": 1000,
+      "strategy": "paragraph"
+    }
+  },
+  "presets": [
+    {
+      "construction": {
+        "consumer_profile": "veriformis-canonical-v1",
+        "require_review": false,
+        "split_ratio_ppm": 500000
+      },
+      "curation": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "goal_id": "learn-the-text",
+      "plain_language": "Paragraph passages of up to 1,000 characters; every passage is trained on; half of the data is held out for evaluation.",
+      "preset_id": "learn-the-text.safe",
+      "representation_id": "whole-text",
+      "review_policy": "none",
+      "segmentation": {
+        "overlap": 100,
+        "size": 1000,
+        "strategy": "paragraph"
+      },
+      "title": "Learn the text itself (safe)"
+    },
+    {
+      "construction": {
+        "consumer_profile": "veriformis-canonical-v1",
+        "require_review": false,
+        "split_ratio_ppm": 500000
+      },
+      "curation": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "goal_id": "continue-a-passage",
+      "plain_language": "Paragraph passages split half-way; only the remainder is trained on; half of the data is held out for evaluation.",
+      "preset_id": "continue-a-passage.safe",
+      "representation_id": "prompt-and-completion",
+      "review_policy": "none",
+      "segmentation": {
+        "overlap": 100,
+        "size": 1000,
+        "strategy": "paragraph"
+      },
+      "title": "Continue a passage (safe)"
+    },
+    {
+      "construction": {
+        "consumer_profile": "veriformis-canonical-v1",
+        "require_review": false,
+        "split_ratio_ppm": 500000
+      },
+      "curation": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "goal_id": "recover-a-section-from-its-heading",
+      "plain_language": "Heading-delimited sections; only the section body is trained on; half of the data is held out for evaluation.",
+      "preset_id": "recover-a-section-from-its-heading.safe",
+      "representation_id": "prompt-and-completion",
+      "review_policy": "none",
+      "segmentation": {
+        "overlap": 100,
+        "size": 1000,
+        "strategy": "structure"
+      },
+      "title": "Recover a section from its heading (safe)"
+    },
+    {
+      "construction": {
+        "consumer_profile": "veriformis-canonical-v1",
+        "require_review": false,
+        "split_ratio_ppm": 500000
+      },
+      "curation": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "goal_id": "reproduce-a-recorded-change",
+      "plain_language": "Single-block passages with one recorded cleaning change; only the text after the change is trained on; half of the data is held out for evaluation.",
+      "preset_id": "reproduce-a-recorded-change.safe",
+      "representation_id": "prompt-and-completion",
+      "review_policy": "none",
+      "segmentation": {
+        "overlap": 100,
+        "size": 1000,
+        "strategy": "paragraph"
+      },
+      "title": "Reproduce a recorded change (safe)"
+    },
+    {
+      "construction": {
+        "consumer_profile": "veriformis-canonical-v1",
+        "require_review": false,
+        "split_ratio_ppm": 500000
+      },
+      "curation": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "goal_id": "extract-a-structured-value",
+      "plain_language": "Passages covering one recorded attribute; only the attribute value is trained on; half of the data is held out for evaluation.",
+      "preset_id": "extract-a-structured-value.safe",
+      "representation_id": "prompt-and-completion",
+      "review_policy": "none",
+      "segmentation": {
+        "overlap": 100,
+        "size": 1000,
+        "strategy": "paragraph"
+      },
+      "title": "Extract a structural attribute (safe)"
+    }
+  ],
+  "schema_id": "veriformis.recipe-preset/v1"
+}

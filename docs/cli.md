@@ -9,10 +9,10 @@ the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
-`handoff-verify`), taxonomy discovery (`taxonomy`), goal discovery and
-preview (`goals`, `goal-preview`), local MCP (`mcp`), verified
+`handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
+and preview (`goals`, `presets`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-25 commands; `export` contains four subcommands.
+26 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
@@ -45,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, and constrained CSV v1 |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `goal-preview` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `goal-preview` | Nothing |
 | Meta | `version` | Nothing |
 
 ## Supported inputs
@@ -187,18 +187,22 @@ custom expression, or an empty effective selection; `missing-stage-input` /
 Chunk cleaned documents with exact reconstructible source evidence.
 
 ```text
-veriformis chunk WORKSPACE [--strategy STRATEGY] [--size N] [--overlap N]
+veriformis chunk WORKSPACE [--goal GOAL | --preset PRESET] \
+  [--strategy STRATEGY] [--size N] [--overlap N]
 ```
 
-| Option | Default | Effect |
+| Option | When omitted | Effect |
 | --- | --- | --- |
-| `--strategy` | `paragraph` | One of `paragraph`, `fixed`, `sliding`, `sentence`, `structure` |
-| `--size` | `1000` | Target chunk size in characters |
-| `--overlap` | `100` | Overlap in characters; used only by `fixed` and `sliding` |
+| `--goal` / `--preset` | recipe-wide preset defaults | Select the goal's safe preset (or the named preset) whose segmentation applies |
+| `--strategy` | preset value | One of `paragraph`, `fixed`, `sliding`, `sentence`, `structure` |
+| `--size` | preset value | Target chunk size in characters |
+| `--overlap` | preset value | Overlap in characters; used only by `fixed` and `sliding` |
 
-`size` must be at least 1 and `overlap` must satisfy `0 <= overlap < size`;
-violations pass through the shared CLI error funnel as
-`error[invalid-data]: ...` and exit 2.
+Every setting option is an explicit override; the values themselves live in
+the versioned [Recipe Preset Contract v1](contracts/recipe-preset-v1.md)
+data (`veriformis presets` prints them). `size` must be at least 1 and
+`overlap` must satisfy `0 <= overlap < size`; violations pass through the
+shared CLI error funnel as `error[invalid-data]: ...` and exit 2.
 
 - `paragraph` groups blocks without exceeding `size` when possible.
 - `fixed` creates fixed character windows with optional overlap.
@@ -221,19 +225,29 @@ Construct evidence-bearing candidates and immutable accepted records. Makes no
 LLM call; there is no `summary` objective.
 
 ```text
-veriformis construct WORKSPACE --objective OBJECTIVE [--source SELECTOR]... \
-  [--target-row-schema SCHEMA] [--consumer-profile PROFILE] \
-  [--split-ratio-ppm PPM] [--require-review]
+veriformis construct WORKSPACE (--goal GOAL | --preset PRESET | --objective OBJECTIVE) \
+  [--representation ID] [--source SELECTOR]... [--target-row-schema SCHEMA] \
+  [--consumer-profile PROFILE] [--split-ratio-ppm PPM] \
+  [--require-review | --no-require-review]
 ```
 
-| Option | Default | Effect |
+| Option | When omitted | Effect |
 | --- | --- | --- |
-| `--objective` | (required) | One of the five deterministic objectives below |
+| `--goal` | — | Plain-language goal id from `veriformis goals`; resolves through the goal's safe preset |
+| `--preset` | — | Recipe preset id from `veriformis presets`; implies its goal and representation, and fails closed unless the workspace chunks match its segmentation |
+| `--objective` | — | Persisted objective kind (legacy selection); resolves through its goal's safe preset |
+| `--representation` | preset value | Catalog representation id; must be compatible with the goal |
 | `--source` | all current sources | Repeatable; selects an exact subset by source ID or logical path |
-| `--target-row-schema` | `text` for `full_text`, else `prompt_completion` | Product row schema: `text`, `prompt_completion`, `instruction_output`, or `messages` |
-| `--consumer-profile` | `veriformis-canonical-v1` | Compile-time compatibility constraint; implemented profiles are canonical v1 and `aptus-handoff-v1` |
-| `--split-ratio-ppm` | `500000` | Prompt/completion boundary for `continuation` only; 1–999999 |
-| `--require-review` | off | Leaves construction-integrity decisions pending instead of accepting valid candidates |
+| `--target-row-schema` | preset value | Legacy row-schema selection: `text`, `prompt_completion`, `instruction_output`, or `messages` |
+| `--consumer-profile` | preset value | Compile-time compatibility constraint; implemented profiles are canonical v1 and `aptus-handoff-v1` |
+| `--split-ratio-ppm` | preset value | Opening share for `continuation` only; 1–999999 |
+| `--require-review` / `--no-require-review` | preset value | Leaves construction-integrity decisions pending instead of accepting valid candidates |
+
+Exactly one selection path is required. `--goal` and `--objective` adopt the
+workspace's existing chunk configuration; `--preset` requires it to equal the
+preset's segmentation (re-run `chunk --preset` otherwise). The recipe is built
+through the named recipe library, so the same effective settings yield the
+same `recipe_id` from every path and every surface.
 
 | Objective | Fields |
 | --- | --- |
@@ -258,31 +272,33 @@ and requires exact semantic equality with a fresh construction replay.
 - **Writes:** canonical `recipe` and `result` artifacts.
 
 Failure modes (exit 2): `construction-invalid` for an unsupported objective,
-an invalid row-schema/profile combination, an out-of-range ratio, or a replay
-mismatch; `source-evidence-invalid` for unknown or duplicate source
-selection; `unsupported-workspace-version` when the workspace predates schema
-2 (run `upgrade-workspace` first).
+an unknown goal or preset, an incompatible representation, an invalid
+row-schema/profile combination, an out-of-range ratio, a preset/chunk
+mismatch, or a replay mismatch; `source-evidence-invalid` for unknown or
+duplicate source selection; `unsupported-workspace-version` when the
+workspace predates schema 2 (run `upgrade-workspace` first).
 
 ### `curate`
 
 Fix the complete `FinishedDatasetPlan`, then apply its curation policy.
 
 ```text
-veriformis curate WORKSPACE [--minimum-target-characters N] \
-  [--balance-mode none|primary-source-cap] \
+veriformis curate WORKSPACE [--goal GOAL | --preset PRESET] \
+  [--minimum-target-characters N] [--balance-mode none|primary-source-cap] \
   [--maximum-records-per-primary-source N] [--evaluation-ratio-ppm PPM] \
   [--require-evaluation | --allow-empty-evaluation] [--split-seed SEED] \
   [--instruction TEXT]
 ```
 
-| Option | Default | Effect |
+| Option | When omitted | Effect |
 | --- | --- | --- |
-| `--minimum-target-characters` | `1` | Excludes records whose target fields are shorter |
-| `--balance-mode` | `none` | `none` or `primary-source-cap` |
-| `--maximum-records-per-primary-source` | none | Cap per primary source; required (positive) with `primary-source-cap`, invalid with `none` |
-| `--evaluation-ratio-ppm` | `500000` | Requested evaluation partition ratio, 1–999999 |
-| `--require-evaluation` / `--allow-empty-evaluation` | required | Permits a sole leakage group to remain entirely in train |
-| `--split-seed` | `veriformis-v1` | Seed entering the deterministic group order |
+| `--goal` / `--preset` | the constructed goal's safe preset | Must agree with the constructed recipe's objective |
+| `--minimum-target-characters` | preset value | Excludes records whose target fields are shorter |
+| `--balance-mode` | preset value | `none` or `primary-source-cap` (the persisted spelling is rejected at the surface) |
+| `--maximum-records-per-primary-source` | preset value | Cap per primary source; required (positive) with `primary-source-cap`, invalid with `none` |
+| `--evaluation-ratio-ppm` | preset value | Requested evaluation partition ratio, 1–999999 |
+| `--require-evaluation` / `--allow-empty-evaluation` | preset value (required) | Permits a sole leakage group to remain entirely in train |
+| `--split-seed` | preset value | Seed entering the deterministic group order |
 | `--instruction` | none | Required when the recipe selected `instruction_output`; rejected for all other row schemas |
 
 Curation runs minimum-target filtering, source-scoped conflict quarantine,
@@ -748,6 +764,22 @@ Each representation binds to exactly one row schema and its loss policy. The
 catalog adds no objective or row schema; see the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md). The command accepts
 no workspace and writes no state.
+
+### `presets`
+
+Print the versioned recipe presets and recipe-wide defaults as read-only JSON.
+
+```text
+veriformis presets
+```
+
+The output is the exact packaged `veriformis.recipe-preset/v1` data: the
+defaults every surface executes when a setting is omitted, and one `safe`
+preset per goal. `chunk`, `construct`, and `curate` accept `--goal GOAL` and
+`--preset PRESET`; every other setting option is an explicit override with no
+literal default, so the same selection yields the same recipe on the CLI,
+MCP, YAML, Python, and the workbench. See the
+[Recipe Preset Contract v1](contracts/recipe-preset-v1.md).
 
 ### `goal-preview`
 

@@ -43,7 +43,6 @@ from veriformis.pipeline.service import (
     _output_bytes,
     _parse_one,
 )
-from veriformis.taxonomy import CANONICAL_CONSUMER_PROFILE
 
 # Re-export private loaders for regression tests and monkeypatch targets.
 __all__ = [
@@ -216,9 +215,13 @@ def clean(
 @app.command()
 def chunk(
     workspace: Path,
-    strategy: str = typer.Option("paragraph", "--strategy"),
-    size: int = typer.Option(1000, "--size"),
-    overlap: int = typer.Option(100, "--overlap"),
+    strategy: str | None = typer.Option(
+        None, "--strategy", help="Chunk strategy; defaults come from the preset data."
+    ),
+    size: int | None = typer.Option(None, "--size"),
+    overlap: int | None = typer.Option(None, "--overlap"),
+    goal: str | None = typer.Option(None, "--goal", help="Plain-language goal id."),
+    preset: str | None = typer.Option(None, "--preset", help="Recipe preset id."),
 ) -> None:
     """Chunk cleaned documents with exact reconstructible source evidence."""
     _run(
@@ -227,6 +230,8 @@ def chunk(
             strategy=strategy,
             size=size,
             overlap=overlap,
+            goal=goal,
+            preset=preset,
         )
     )
 
@@ -240,7 +245,14 @@ def upgrade_workspace(workspace: Path) -> None:
 @app.command()
 def construct(
     workspace: Path,
-    objective: str = typer.Option(..., "--objective"),
+    objective: str | None = typer.Option(
+        None, "--objective", help="Persisted objective kind (legacy selection)."
+    ),
+    goal: str | None = typer.Option(None, "--goal", help="Plain-language goal id."),
+    preset: str | None = typer.Option(None, "--preset", help="Recipe preset id."),
+    representation: str | None = typer.Option(
+        None, "--representation", help="Catalog representation id."
+    ),
     source: list[str] | None = typer.Option(
         None,
         "--source",
@@ -250,10 +262,14 @@ def construct(
         None,
         "--target-row-schema",
     ),
-    split_ratio_ppm: int = typer.Option(500_000, "--split-ratio-ppm"),
-    require_review: bool = typer.Option(False, "--require-review"),
-    consumer_profile: str = typer.Option(
-        CANONICAL_CONSUMER_PROFILE,
+    split_ratio_ppm: int | None = typer.Option(
+        None, "--split-ratio-ppm", help="Override; defaults come from the preset data."
+    ),
+    require_review: bool | None = typer.Option(
+        None, "--require-review/--no-require-review"
+    ),
+    consumer_profile: str | None = typer.Option(
+        None,
         "--consumer-profile",
     ),
 ) -> None:
@@ -262,6 +278,9 @@ def construct(
         lambda: _SERVICE.construct(
             workspace,
             objective=objective,
+            goal=goal,
+            preset=preset,
+            representation=representation,
             source=source,
             target_row_schema=target_row_schema,
             split_ratio_ppm=split_ratio_ppm,
@@ -274,27 +293,34 @@ def construct(
 @app.command()
 def curate(
     workspace: Path,
-    minimum_target_characters: int = typer.Option(
-        1,
-        "--minimum-target-characters",
+    goal: str | None = typer.Option(None, "--goal", help="Plain-language goal id."),
+    preset: str | None = typer.Option(None, "--preset", help="Recipe preset id."),
+    minimum_target_characters: int | None = typer.Option(
+        None, "--minimum-target-characters"
     ),
-    balance_mode: str = typer.Option("none", "--balance-mode"),
+    balance_mode: str | None = typer.Option(None, "--balance-mode"),
     maximum_records_per_primary_source: int | None = typer.Option(
         None,
         "--maximum-records-per-primary-source",
     ),
-    evaluation_ratio_ppm: int = typer.Option(500_000, "--evaluation-ratio-ppm"),
-    evaluation_required: bool = typer.Option(
-        True,
+    evaluation_ratio_ppm: int | None = typer.Option(None, "--evaluation-ratio-ppm"),
+    evaluation_required: bool | None = typer.Option(
+        None,
         "--require-evaluation/--allow-empty-evaluation",
     ),
-    split_seed: str = typer.Option("veriformis-v1", "--split-seed"),
+    split_seed: str | None = typer.Option(None, "--split-seed"),
     instruction: str | None = typer.Option(None, "--instruction"),
 ) -> None:
-    """Fix the complete dataset plan, then curate constructed records."""
+    """Fix the complete dataset plan, then curate constructed records.
+
+    Omitted settings come from the selected preset or the constructed goal's
+    safe preset; every surface executes the same versioned defaults.
+    """
     _run(
         lambda: _SERVICE.curate(
             workspace,
+            goal=goal,
+            preset=preset,
             minimum_target_characters=minimum_target_characters,
             balance_mode=balance_mode,
             maximum_records_per_primary_source=maximum_records_per_primary_source,
@@ -602,6 +628,19 @@ def goals() -> None:
     typer.echo(
         json.dumps(
             _SERVICE.discover_goals(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
+@app.command(name="presets")
+def presets() -> None:
+    """Print the versioned recipe presets and defaults as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_presets(),
             ensure_ascii=False,
             indent=2,
             sort_keys=True,

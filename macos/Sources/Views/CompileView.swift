@@ -3,6 +3,7 @@ import SwiftUI
 struct CompileView: View {
     @EnvironmentObject private var workbench: WorkbenchViewModel
     @State private var showAdvanced = false
+    @State private var showRecipeSettings = false
     @State private var showIntegrations = false
     @State private var showTaxonomy = false
 
@@ -74,44 +75,17 @@ struct CompileView: View {
             Text("Configuration")
                 .font(.headline)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Picker("Objective", selection: $workbench.objective) {
-                    ForEach(TrainingObjective.allCases) { objective in
-                        Text(objective.title).tag(objective)
-                    }
-                }
-                Text(workbench.objective.subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            goalSelection
 
             DisclosureGroup("Dataset taxonomy", isExpanded: $showTaxonomy) {
                 taxonomyHelpContent
                     .padding(.top, 4)
             }
 
-            if workbench.objective == .continuation {
-                HStack {
-                    Text("Train share (ppm)")
-                    TextField(
-                        "500000",
-                        value: $workbench.splitRatioPPM,
-                        format: .number
-                    )
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 100)
-                }
-                Text("Parts per million of rows for train (500000 ≈ 50% train, the CLI default).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            DisclosureGroup("Recipe settings", isExpanded: $showRecipeSettings) {
+                advancedEditor
+                    .padding(.top, 4)
             }
-
-            Toggle("Allow empty evaluation partition", isOn: $workbench.allowEmptyEvaluation)
-            Text("Off by default: compiles fail closed when evaluation would be empty, matching the CLI. Enable only when a single leakage group leaves evaluation empty.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
 
             HStack {
                 Button("Output folder…") { workbench.chooseOutputDirectory() }
@@ -199,6 +173,106 @@ struct CompileView: View {
                     .fixedSize(horizontal: false, vertical: true)
                 Button("Retry") { workbench.refreshTaxonomyHelp() }
                     .controlSize(.small)
+            }
+        }
+    }
+
+    /// Plain-language goal and preset selection driven by `veriformis goals`
+    /// and `veriformis presets`; the workbench holds no recipe constants.
+    @ViewBuilder
+    private var goalSelection: some View {
+        switch (workbench.goalCatalogState, workbench.recipePresetState) {
+        case (.ready(let goals), .ready(let presets)):
+            VStack(alignment: .leading, spacing: 6) {
+                Picker(
+                    "What should the model learn?",
+                    selection: Binding(
+                        get: { workbench.selectedGoalID ?? goals.goals.first?.goalID ?? "" },
+                        set: { workbench.selectGoal($0) }
+                    )
+                ) {
+                    ForEach(goals.goals, id: \.goalID) { goal in
+                        Text(goal.title).tag(goal.goalID)
+                    }
+                }
+                if let goal = workbench.selectedGoal {
+                    Text(goal.plainLanguage)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(goal.whatTheModelLearns)
+                        .font(.caption)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ForEach(goal.notThis, id: \.self) { claim in
+                        Text("Not this: \(claim)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    let options = presets.presets(forGoal: goal.goalID)
+                    Picker(
+                        "Preset",
+                        selection: Binding(
+                            get: { workbench.selectedPresetID ?? options.first?.presetID ?? "" },
+                            set: { workbench.selectedPresetID = $0 }
+                        )
+                    ) {
+                        ForEach(options, id: \.presetID) { preset in
+                            Text(preset.title).tag(preset.presetID)
+                        }
+                    }
+                    if let preset = workbench.selectedPreset {
+                        Text(preset.plainLanguage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        case (.unavailable(let message), _), (_, .unavailable(let message)):
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+        default:
+            ProgressView("Loading goals and presets…")
+        }
+    }
+
+    /// Explicit operator overrides on top of the selected preset.
+    @ViewBuilder
+    private var advancedEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let preset = workbench.selectedPreset {
+                if workbench.selectedGoal?.objective == .continuation {
+                    HStack {
+                        Text("Opening share (ppm)")
+                        TextField(
+                            String(preset.construction.splitRatioPPM),
+                            value: $workbench.splitRatioPPM,
+                            format: .number
+                        )
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 110)
+                    }
+                    Text("Leave empty to use the preset value \(preset.construction.splitRatioPPM) ppm of the passage as the opening.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Toggle("Allow empty evaluation partition", isOn: $workbench.allowEmptyEvaluation)
+                Text("Off by default: the preset requires an evaluation partition (\(preset.curation.evaluationRatioPPM) ppm held out), so compiles fail closed when it would be empty. Enable only when a single leakage group leaves evaluation empty.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("Segmentation \(preset.segmentation.strategy) · size \(preset.segmentation.size) · overlap \(preset.segmentation.overlap) · minimum target \(preset.curation.minimumTargetCharacters) · seed \(preset.curation.splitSeed)")
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Text("Advanced settings appear once presets are loaded.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
     }

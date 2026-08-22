@@ -101,7 +101,7 @@ locator fields — as a correctness mechanism, not a style preference.
 ```mermaid
 flowchart TB
     subgraph entry["Adapters and Composition"]
-        CLI["cli.py — thin Typer adapter, 25 commands"]
+        CLI["cli.py — thin Typer adapter, 26 commands"]
         MCP["mcp/ — local stdio adapter"]
         MAC["macOS workbench — shells the CLI"]
         PIP["pipeline/ — PipelineService composition root"]

@@ -567,7 +567,7 @@
       "commit": "working-tree-on-81becfa676fd9111868b8d4b62549218a644d3e2",
       "scope": "Independent-product Phase 6.3 goal-specific preview",
       "grade": "recorded-local",
-      "summary": "The runtime-only veriformis.goal-preview/v1 response passed 24 focused preview tests, 1,332 full Python tests, and 1,320 standalone release tests with 1 deselected; full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation and both golden compile/external-digest/transport flows, CLI/workbench parity, 75 Mac tests, project tracking, the tracking regression, lock, Ruff, structured JSON, fixture byte equality, and diff checks passed. Evidence covers every goal and compatible representation over real workspaces: the rendered row equals both render_record_payload and the persisted product row after curate, split, and format; the supervised span equals the whole target value in Unicode code points; every recovered excerpt matches its digest and source span or strict-IR pointer; curation decisions and excluded records carry reason codes; the persisted instruction is reused; incompatible representations, unknown or repeated record ids, missing construct stages, and legacy revision-v1 workspaces fail closed; over-limit records and records beyond the response budget are omitted whole with exact reasons; the transport never exceeds 262,144 bytes and fails closed when the skeleton cannot fit; no workspace file changes; Python, CLI, and MCP emit identical ASCII-safe text; and the Swift bridge decodes the shared frozen fixture strictly with exact CLI arguments. An independent adversarial review found one blocker (the response bound was not enforced past the budget) and seven should-fix items; all were corrected and re-verified on this tree. The item adds no objective, row schema, construction behavior, preset, preflight, persisted schema, trainer claim, or consumer profile. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 6.3 pull request.",
+      "summary": "The runtime-only veriformis.goal-preview/v1 response passed 24 focused preview tests, 1,332 full Python tests, and 1,320 standalone release tests with 1 deselected; full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation and both golden compile/external-digest/transport flows, CLI/workbench parity, 75 Mac tests, project tracking, the tracking regression, lock, Ruff, structured JSON, fixture byte equality, and diff checks passed. Evidence covers every goal and compatible representation over real workspaces: the rendered row equals both render_record_payload and the persisted product row after curate, split, and format; the supervised span equals the whole target value in Unicode code points; every recovered excerpt matches its digest and source span or strict-IR pointer; curation decisions and excluded records carry reason codes; the persisted instruction is reused; incompatible representations, unknown or repeated record ids, missing construct stages, and legacy revision-v1 workspaces fail closed; over-limit records and records beyond the response budget are omitted whole with exact reasons; the transport never exceeds 262,144 bytes and fails closed when the skeleton cannot fit; no workspace file changes; Python, CLI, and MCP emit identical ASCII-safe text; and the Swift bridge decodes the shared frozen fixture strictly with exact CLI arguments. An independent adversarial review found one blocker (the response bound was not enforced past the budget) and seven should-fix items; all were corrected and re-verified on this tree. The item adds no objective, row schema, construction behavior, preset, preflight, persisted schema, trainer claim, or consumer profile. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 6.3 pull request. Item 6.3 subsequently passed all 14 GitHub checks on the first run and merged as PR #62 at 9cbab117e47cde6bd8850d67f0d363e03f0660ce.",
       "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
       "rerun": [
         "uv run pytest -q tests/goals/test_goal_preview.py",
@@ -581,6 +581,31 @@
         "uv lock --check",
         "uv run ruff check src tests scripts",
         "python3 -m json.tool tests/regressions/fixtures/phase6/goal-preview.json",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-6-recipe-presets-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-9cbab117e47cde6bd8850d67f0d363e03f0660ce",
+      "scope": "Independent-product Phase 6.4 versioned recipe presets and goal-first compile surfaces",
+      "grade": "recorded-local",
+      "summary": "The packaged veriformis.recipe-preset/v1 data, its single resolution function, and goal/preset selection on every compile surface passed 138 focused goal, preset, surface-identity, and defect-closure tests, 1,371 full Python tests, and 1,359 standalone release tests with 1 deselected; full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation and both golden compile/external-digest/transport flows, the goal-first CLI/workbench parity sequence, 79 Mac tests, project tracking with the preset binding and the recipe-default literal gate, the tracking regression, lock, Ruff, structured JSON, fixture byte equality, and diff checks passed. Evidence covers one recipe_id and one finished plan for objective, goal, and preset selections with equal overrides; CLI, MCP, and YAML compiles equal to the service recipe; preset-versus-chunk refusal; every surface executing the packaged defaults; byte-identical presets discovery; no recipe default literal in any surface source or the workbench; the constructor replay fallback bound to the packaged default; and strict Swift decoding of the shared frozen fixture with goal-first compile arguments. An independent adversarial review found no blocker, proved recipe identity byte-for-byte against the pre-change construction for all five objectives, and raised seven should-fix items that were corrected and re-verified. The item adds no objective, row schema, construction behavior, preflight, persisted schema, trainer claim, or consumer profile. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 6.4 pull request.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/goals tests/recipes tests/regressions/test_defectclose_datasets.py",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase6-04-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q tests/regressions/test_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests scripts",
+        "python3 -m json.tool src/veriformis/goals/presets-v1.json",
+        "cmp src/veriformis/goals/presets-v1.json tests/regressions/fixtures/phase6/recipe-presets.json",
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]

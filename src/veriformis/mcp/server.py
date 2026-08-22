@@ -33,7 +33,6 @@ from veriformis.pipeline.service import (
     SealPartialPublicationError,
 )
 from veriformis.recipes import list_named_recipes, load_pipeline_spec, run_pipeline_spec
-from veriformis.taxonomy import CANONICAL_CONSUMER_PROFILE
 
 
 def _jsonable(value: Any) -> Any:
@@ -197,6 +196,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def presets() -> str:
+        """Return the versioned recipe presets and defaults from PipelineService."""
+        return json.dumps(
+            pipeline.discover_presets(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def goal_preview(
         workspace: str,
         representation: str | None = None,
@@ -336,9 +345,11 @@ def create_mcp_server(
     @server.tool()
     def chunk(
         workspace: str,
-        strategy: str = "paragraph",
-        size: int = 1000,
-        overlap: int = 100,
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
     ) -> str:
         """Chunk cleaned documents with reconstructible evidence."""
         return _outcome_json(
@@ -347,24 +358,32 @@ def create_mcp_server(
                 strategy=strategy,
                 size=size,
                 overlap=overlap,
+                goal=goal,
+                preset=preset,
             )
         )
 
     @server.tool()
     def construct(
         workspace: str,
-        objective: str,
+        objective: str | None = None,
         source: list[str] | None = None,
         target_row_schema: str | None = None,
-        split_ratio_ppm: int = 500_000,
-        require_review: bool = False,
-        consumer_profile: str = CANONICAL_CONSUMER_PROFILE,
+        split_ratio_ppm: int | None = None,
+        require_review: bool | None = None,
+        consumer_profile: str | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
+        representation: str | None = None,
     ) -> str:
-        """Construct candidates and accepted records for one objective."""
+        """Construct candidates and accepted records for one goal or objective."""
         return _outcome_json(
             pipeline.construct(
                 Path(workspace),
                 objective=objective,
+                goal=goal,
+                preset=preset,
+                representation=representation,
                 source=source,
                 target_row_schema=target_row_schema,
                 split_ratio_ppm=split_ratio_ppm,
@@ -376,18 +395,22 @@ def create_mcp_server(
     @server.tool()
     def curate(
         workspace: str,
-        minimum_target_characters: int = 1,
-        balance_mode: str = "none",
+        minimum_target_characters: int | None = None,
+        balance_mode: str | None = None,
         maximum_records_per_primary_source: int | None = None,
-        evaluation_ratio_ppm: int = 500_000,
-        evaluation_required: bool = True,
-        split_seed: str = "veriformis-v1",
+        evaluation_ratio_ppm: int | None = None,
+        evaluation_required: bool | None = None,
+        split_seed: str | None = None,
         instruction: str | None = None,
+        goal: str | None = None,
+        preset: str | None = None,
     ) -> str:
         """Fix the finished plan and curate constructed records."""
         return _outcome_json(
             pipeline.curate(
                 Path(workspace),
+                goal=goal,
+                preset=preset,
                 minimum_target_characters=minimum_target_characters,
                 balance_mode=balance_mode,
                 maximum_records_per_primary_source=maximum_records_per_primary_source,

@@ -51,24 +51,27 @@ def _defaults_of(callable_obj, *, option_info: bool = False) -> dict:
 
 
 def test_every_goal_states_the_defaults_every_surface_executes() -> None:
-    """Until 6.4 presets own defaults, the catalog must mirror the executing ones."""
-    service_defaults = _defaults_of(PipelineService.curate)
-    library_defaults = _defaults_of(build_default_finished_plan)
-    cli_defaults = _defaults_of(cli_curate, option_info=True)
+    """Surfaces carry no literal defaults; omitted settings resolve from the data."""
+    from veriformis.goals import recipe_defaults, resolve_recipe_settings
+
+    for surface in (PipelineService.curate, build_default_finished_plan, cli_curate):
+        observed = _defaults_of(surface, option_info=surface is cli_curate)
+        assert all(value is None for value in observed.values()), surface
     mcp_curate = next(
         tool.fn
         for tool in create_mcp_server()._tool_manager.list_tools()
         if tool.name == "curate"
     )
-    mcp_defaults = _defaults_of(mcp_curate)
-    assert service_defaults == library_defaults == cli_defaults == mcp_defaults
+    assert all(value is None for value in _defaults_of(mcp_curate).values())
+    data = recipe_defaults().curation.model_dump(mode="json")
     for goal in goal_catalog().goals:
         stated = goal.curation_defaults.model_dump(mode="json")
-        assert stated == service_defaults, goal.goal_id
+        assert stated == data, goal.goal_id
+        effective = resolve_recipe_settings(goal=goal.goal_id).curation.model_dump(mode="json")
+        assert effective == stated, goal.goal_id
         assert goal.review_policy_default == "none"
         assert goal.review_policy_options == REVIEW_POLICY_OPTIONS
         assert goal.non_claims == NON_CLAIM_CODES
-
 
 def test_representation_exports_equal_the_production_export_catalog() -> None:
     discovery = PipelineService().discover_exports().discovery

@@ -257,6 +257,10 @@ final class CLIBridgeTests: XCTestCase {
             workbench.sourceURLs = [source]
             workbench.sourceRootURL = root
             workbench.outputDirectoryURL = output
+            workbench.applyCatalogs(
+                goals: try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData()),
+                presets: try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+            )
             workbench.compile()
 
             var reachedStage = false
@@ -282,6 +286,89 @@ final class CLIBridgeTests: XCTestCase {
             )
             XCTAssertTrue(workbench.lastCancellation?.workspaceRetained == true)
         }
+    }
+
+    // MARK: - Recipe presets (Phase 6.4)
+
+    func testRecipePresetsDecodeFrozenFixtureExactly() throws {
+        let catalog = try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+        XCTAssertEqual(catalog.defaults.segmentation, RecipeSegmentationSettings(strategy: "paragraph", size: 1000, overlap: 100))
+        XCTAssertEqual(catalog.defaults.construction.splitRatioPPM, 500_000)
+        XCTAssertEqual(catalog.defaults.curation.splitSeed, "veriformis-v1")
+        XCTAssertEqual(catalog.presets.count, 5)
+        let section = try XCTUnwrap(catalog.safePreset(forGoal: "recover-a-section-from-its-heading"))
+        XCTAssertEqual(section.segmentation.strategy, "structure")
+        XCTAssertEqual(section.representationID, "prompt-and-completion")
+        XCTAssertEqual(catalog.presets(forGoal: "learn-the-text").map(\.presetID), ["learn-the-text.safe"])
+    }
+
+    func testRecipePresetsRejectDriftAndMissingKeys() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                RecipePresetCatalog.self,
+                from: recipePresetsData { $0.removeValue(forKey: "defaults") }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? RecipePresetError,
+                .invalidKeySet(scope: "presets", missing: ["defaults"], unexpected: [])
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                RecipePresetCatalog.self,
+                from: recipePresetsData { payload in
+                    var presets = payload["presets"] as! [[String: Any]]
+                    var segmentation = presets[0]["segmentation"] as! [String: Any]
+                    segmentation["overlap"] = 1000
+                    presets[0]["segmentation"] = segmentation
+                    payload["presets"] = presets
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? RecipePresetError, .invalidMetadata("segmentation"))
+        }
+    }
+
+    func testDiscoverPresetsInvokesExactCLIArgument() async throws {
+        let root = temporaryTestDirectory("presets-argv")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let arguments = root.appendingPathComponent("arguments.txt")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf '%s\\n' "$@" > "\(arguments.path)"
+            cat "\(recipePresetsFixtureURL().path)"
+            """
+        )
+        let catalog = try await VeriformisCLI(executableURL: executable, prefixArguments: []).discoverPresets()
+        XCTAssertEqual(catalog.presets.count, 5)
+        XCTAssertEqual(try String(contentsOf: arguments, encoding: .utf8), "presets\n")
+    }
+
+    @MainActor
+    func testWorkbenchAdoptsFirstGoalAndSafePresetFromCatalogs() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-goal-selection-\(UUID().uuidString)")
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(defaults: defaults, supportDirectory: support)
+        XCTAssertNil(workbench.selectedGoalID)
+        let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
+        let presets = try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+        workbench.applyCatalogs(goals: goals, presets: presets)
+        XCTAssertEqual(workbench.selectedGoalID, "learn-the-text")
+        XCTAssertEqual(workbench.selectedPresetID, "learn-the-text.safe")
+        workbench.selectGoal("recover-a-section-from-its-heading")
+        XCTAssertEqual(workbench.selectedPresetID, "recover-a-section-from-its-heading.safe")
+        XCTAssertEqual(workbench.selectedGoal?.objective, .sectionReconstruction)
+        XCTAssertEqual(workbench.selectedPreset?.segmentation.strategy, "structure")
     }
 
     // MARK: - Goal preview (Phase 6.3)
@@ -1989,7 +2076,8 @@ final class CLIBridgeTests: XCTestCase {
             sourceRoot: root,
             workspace: workspace,
             bundle: bundle,
-            objective: .continuation,
+            goal: "continue-a-passage",
+            preset: "continue-a-passage.safe",
             allowEmptyEvaluation: true,
             splitRatioPPM: 400_000,
             includeHandoff: true
@@ -2000,14 +2088,17 @@ final class CLIBridgeTests: XCTestCase {
         ])
         XCTAssertEqual(plan[0].arguments.first, "parse")
         XCTAssertTrue(plan[0].arguments.contains("--source-root"))
+        XCTAssertEqual(plan[2].arguments, ["chunk", workspace.path, "--preset", "continue-a-passage.safe"])
         XCTAssertEqual(
             plan[3].arguments,
             [
-                "construct", workspace.path, "--objective", "continuation",
+                "construct", workspace.path, "--goal", "continue-a-passage",
+                "--preset", "continue-a-passage.safe",
                 "--consumer-profile", "aptus-handoff-v1",
                 "--split-ratio-ppm", "400000",
             ]
         )
+        XCTAssertEqual(plan[4].arguments.prefix(4), ["curate", workspace.path, "--preset", "continue-a-passage.safe"])
         XCTAssertTrue(plan[4].arguments.contains("--allow-empty-evaluation"))
         XCTAssertEqual(plan[6].stage.rawValue, "format")
         XCTAssertEqual(plan[6].arguments, ["format", workspace.path])
@@ -2025,9 +2116,10 @@ final class CLIBridgeTests: XCTestCase {
             sourceRoot: URL(fileURLWithPath: "/data"),
             workspace: workspace,
             bundle: bundle,
-            objective: .fullText,
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
             allowEmptyEvaluation: false,
-            splitRatioPPM: 500_000
+            splitRatioPPM: nil
         )
         XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path])
         XCTAssertFalse(
@@ -2037,8 +2129,6 @@ final class CLIBridgeTests: XCTestCase {
 
     @MainActor
     func testDefaultCompileFailsClosedAndMatchesCLISplitDefault() throws {
-        XCTAssertFalse(WorkbenchViewModel.defaultAllowEmptyEvaluation)
-        XCTAssertEqual(WorkbenchViewModel.defaultSplitRatioPPM, 500_000)
 
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("veriformis-defaults-\(UUID().uuidString)")
@@ -2051,10 +2141,11 @@ final class CLIBridgeTests: XCTestCase {
         defaults.set(output.path, forKey: "veriformis.workbench.defaultOutput")
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        // A fresh workbench must start from the CLI's fail-closed defaults.
+        // A fresh workbench holds no recipe constant: it starts fail-closed and
+        // with no split-ratio override, so the CLI preset data supplies both.
         let workbench = WorkbenchViewModel(defaults: defaults, supportDirectory: support)
         XCTAssertFalse(workbench.allowEmptyEvaluation)
-        XCTAssertEqual(workbench.splitRatioPPM, 500_000)
+        XCTAssertNil(workbench.splitRatioPPM)
 
         // The default compile plan must never weaken the curate gate…
         let workspace = URL(fileURLWithPath: "/tmp/ws")
@@ -2063,7 +2154,8 @@ final class CLIBridgeTests: XCTestCase {
             sourceRoot: URL(fileURLWithPath: "/data"),
             workspace: workspace,
             bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
-            objective: .continuation,
+            goal: "continue-a-passage",
+            preset: "continue-a-passage.safe",
             allowEmptyEvaluation: workbench.allowEmptyEvaluation,
             splitRatioPPM: workbench.splitRatioPPM
         )
@@ -2071,12 +2163,11 @@ final class CLIBridgeTests: XCTestCase {
             plan.flatMap(\.arguments).contains("--allow-empty-evaluation"),
             "default GUI compile must match the CLI --require-evaluation default"
         )
-        // …and a continuation plan must carry the CLI's split-ratio default.
+        // …and with no override the plan passes no split ratio at all: the
+        // CLI's versioned preset data supplies it.
         let construct = try XCTUnwrap(plan.first { $0.stage == .construct })
-        guard let flagIndex = construct.arguments.firstIndex(of: "--split-ratio-ppm") else {
-            return XCTFail("continuation plan must pass --split-ratio-ppm")
-        }
-        XCTAssertEqual(construct.arguments[construct.arguments.index(after: flagIndex)], "500000")
+        XCTAssertFalse(construct.arguments.contains("--split-ratio-ppm"))
+        XCTAssertEqual(construct.arguments.prefix(6), ["construct", workspace.path, "--goal", "continue-a-passage", "--preset", "continue-a-passage.safe"])
     }
 
     func testWorkbenchAndLegacyHistoryDefaultToStandalone() throws {
@@ -2274,6 +2365,8 @@ final class CLIBridgeTests: XCTestCase {
             allowEmptyEvaluation: true,
             writeAptusHandoff: writeAptusHandoff,
             splitRatioPPM: 400_000,
+            goalID: nil,
+            presetID: nil,
             failedStage: failedStage,
             exitCode: nil,
             cancellationReceipt: nil,
@@ -2682,6 +2775,24 @@ final class CLIBridgeTests: XCTestCase {
             try await Task.sleep(nanoseconds: 10_000_000)
         }
         XCTFail("timed out waiting for \(url.path)")
+    }
+
+    private func recipePresetsFixtureURL() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("tests/regressions/fixtures/phase6/recipe-presets.json")
+    }
+
+    private func recipePresetsData(
+        mutating mutation: ((inout [String: Any]) -> Void)? = nil
+    ) throws -> Data {
+        let stored = try Data(contentsOf: recipePresetsFixtureURL())
+        guard mutation != nil else { return stored }
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: stored) as? [String: Any])
+        mutation?(&payload)
+        return try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
     }
 
     private func goalPreviewFixtureURL() -> URL {

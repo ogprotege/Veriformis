@@ -26,9 +26,9 @@ run_sequence() {
 
   uv run veriformis parse "$RAW/doc.txt" -o "$ws" --source-root "$RAW" >/dev/null
   uv run veriformis clean "$ws" >/dev/null
-  uv run veriformis chunk "$ws" >/dev/null
-  uv run veriformis construct "$ws" --objective continuation --split-ratio-ppm 400000 >/dev/null
-  uv run veriformis curate "$ws" --allow-empty-evaluation >/dev/null
+  uv run veriformis chunk "$ws" --goal continue-a-passage >/dev/null
+  uv run veriformis construct "$ws" --goal continue-a-passage --split-ratio-ppm 400000 >/dev/null
+  uv run veriformis curate "$ws" --goal continue-a-passage --allow-empty-evaluation >/dev/null
   uv run veriformis split "$ws" >/dev/null
   uv run veriformis format "$ws" >/dev/null
   uv run veriformis validate "$ws" >/dev/null

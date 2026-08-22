@@ -18,7 +18,6 @@ from veriformis.datasets import (
 )
 from veriformis.errors import ConstructionError, TaxonomyError
 from veriformis.taxonomy import (
-    CANONICAL_CONSUMER_PROFILE,
     assert_compile_combination,
     default_row_schema,
 )
@@ -53,18 +52,36 @@ def list_named_recipes() -> tuple[dict[str, str], ...]:
     )
 
 
+def _defaults():
+    # Lazy: the preset data module depends on this library's identifiers.
+    from veriformis.goals.presets import recipe_defaults
+
+    return recipe_defaults()
+
+
 def build_named_recipe(
     recipe_library_id: str,
     *,
     source_ids: tuple[str, ...],
     cleaning_config_digest: str,
     segmentation: SegmentationPolicy | Mapping[str, Any] | None = None,
-    split_ratio_ppm: int = 500_000,
-    require_review: bool = False,
+    split_ratio_ppm: int | None = None,
+    require_review: bool | None = None,
     target_row_schema: str | None = None,
-    consumer_profile: str = CANONICAL_CONSUMER_PROFILE,
+    consumer_profile: str | None = None,
 ) -> DatasetRecipe:
-    """Build one versioned DatasetRecipe from a library id and workspace facts."""
+    """Build one versioned DatasetRecipe from a library id and workspace facts.
+
+    Omitted settings come from the packaged recipe preset data, never from
+    literals in this module.
+    """
+    defaults = _defaults()
+    if split_ratio_ppm is None:
+        split_ratio_ppm = defaults.construction.split_ratio_ppm
+    if require_review is None:
+        require_review = defaults.construction.require_review
+    if consumer_profile is None:
+        consumer_profile = defaults.construction.consumer_profile
     if recipe_library_id not in _OBJECTIVE_BY_RECIPE:
         raise ConstructionError(
             f"unknown recipe library id {recipe_library_id!r}; "
@@ -85,20 +102,15 @@ def build_named_recipe(
     except TaxonomyError as exc:
         raise ConstructionError(exc.message) from exc
     if segmentation is None:
-        if objective_kind == "section_reconstruction":
-            segmentation = SegmentationPolicy(
-                schema_version="veriformis.segmentation-policy/v1",
-                strategy="structure",
-                size=1000,
-                overlap=100,
-            )
-        else:
-            segmentation = SegmentationPolicy(
-                schema_version="veriformis.segmentation-policy/v1",
-                strategy="paragraph",
-                size=1000,
-                overlap=100,
-            )
+        from veriformis.goals.presets import resolve_recipe_settings
+
+        preset_segmentation = resolve_recipe_settings(objective=objective_kind).segmentation
+        segmentation = SegmentationPolicy(
+            schema_version="veriformis.segmentation-policy/v1",
+            strategy=preset_segmentation.strategy,  # type: ignore[arg-type]
+            size=preset_segmentation.size,
+            overlap=preset_segmentation.overlap,
+        )
     elif not isinstance(segmentation, SegmentationPolicy):
         segmentation = SegmentationPolicy(
             schema_version="veriformis.segmentation-policy/v1",
@@ -135,15 +147,34 @@ def build_default_finished_plan(
     recipe_id: str,
     construction_result_id: str,
     target_row_schema: str,
-    minimum_target_characters: int = 1,
-    balance_mode: str = "none",
+    minimum_target_characters: int | None = None,
+    balance_mode: str | None = None,
     maximum_records_per_primary_source: int | None = None,
-    evaluation_ratio_ppm: int = 500_000,
-    evaluation_required: bool = True,
-    split_seed: str = "veriformis-v1",
+    evaluation_ratio_ppm: int | None = None,
+    evaluation_required: bool | None = None,
+    split_seed: str | None = None,
     instruction: str | None = None,
 ) -> FinishedDatasetPlan:
-    """Build a finished-dataset plan with library defaults."""
+    """Build a finished-dataset plan; omitted settings come from the preset data."""
+    from veriformis.goals.presets import SURFACE_BALANCE_MODES
+
+    # The library sits below the surfaces: it accepts the surface spelling and
+    # the persisted spelling that resolved settings already carry.
+    accepted = {**SURFACE_BALANCE_MODES, "primary_source_cap": "primary_source_cap"}
+    curation = _defaults().curation
+    if minimum_target_characters is None:
+        minimum_target_characters = curation.minimum_target_characters
+    if balance_mode is None:
+        balance_mode = curation.balance_mode
+    if balance_mode not in accepted:
+        raise ConstructionError(f"balance mode must be one of {sorted(accepted)!r}")
+    balance_mode = accepted[balance_mode]
+    if evaluation_ratio_ppm is None:
+        evaluation_ratio_ppm = curation.evaluation_ratio_ppm
+    if evaluation_required is None:
+        evaluation_required = curation.evaluation_required
+    if split_seed is None:
+        split_seed = curation.split_seed
     curation_policy = CurationPolicy.create(
         minimum_target_characters=minimum_target_characters,
         balance_mode=balance_mode,  # type: ignore[arg-type]

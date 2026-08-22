@@ -24,7 +24,7 @@ from veriformis.bundle.finished import (
 )
 from veriformis.cli import seal
 from veriformis.datasets.serialization import V1_ROW_SCHEMAS
-from veriformis.goals import goal_catalog
+from veriformis.goals import goal_catalog, preset_catalog, recipe_defaults
 from veriformis.mcp.server import create_mcp_server
 from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
 from veriformis.recipes.library import list_named_recipes
@@ -274,6 +274,13 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
         "goal catalog objectives differ from the named recipe library",
         errors,
     )
+    presets = preset_catalog().presets
+    _require(
+        training.get("implemented_presets") == [preset.preset_id for preset in presets],
+        "support presets differ from the versioned recipe presets",
+        errors,
+    )
+    _check_no_recipe_default_literals(errors)
     _require(
         training.get("implemented_row_schemas") == sorted(V1_ROW_SCHEMAS),
         "support row schemas differ from V1_ROW_SCHEMAS",
@@ -560,6 +567,41 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
     )
 
 
+_RECIPE_LITERAL_PATTERNS = (
+    re.compile(r"\b500[_]?000\b"),
+    re.compile(r"\"veriformis-v1\""),
+)
+_RECIPE_LITERAL_FREE_SOURCES = (
+    "src/veriformis/cli.py",
+    "src/veriformis/mcp/server.py",
+    "src/veriformis/pipeline/service.py",
+    "src/veriformis/recipes/runner.py",
+    "src/veriformis/recipes/library.py",
+    "macos/Sources/ViewModels/WorkbenchViewModel.swift",
+    "macos/Sources/Views/CompileView.swift",
+    "macos/Sources/Services/VeriformisCLI.swift",
+)
+
+
+def _check_no_recipe_default_literals(errors: list[str]) -> None:
+    """Roadmap 6.4: recipe defaults are versioned data, not CLI/Swift constants."""
+    defaults = recipe_defaults()
+    _require(
+        defaults.construction.split_ratio_ppm == 500_000
+        and defaults.curation.split_seed == "veriformis-v1",
+        "recipe preset defaults changed; update the literal scan and contracts together",
+        errors,
+    )
+    for relative in _RECIPE_LITERAL_FREE_SOURCES:
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        for pattern in _RECIPE_LITERAL_PATTERNS:
+            _require(
+                pattern.search(text) is None,
+                f"{relative} holds a recipe default literal matching {pattern.pattern}",
+                errors,
+            )
+
+
 def _check_evidence_index(evidence: dict[str, Any], errors: list[str]) -> None:
     _require(
         evidence.get("schema_version") == "veriformis.evidence-index/v1",
@@ -649,7 +691,8 @@ def main() -> int:
     print("- 21 roadmap phases match program.json and WIP.md")
     print(
         "- implemented inputs, input families, taxonomy families, objectives, goals, "
-        "rows, loss policies, containers, profiles, and handoff defaults match code"
+        "presets, rows, loss policies, containers, profiles, and handoff defaults "
+        "match code; surfaces hold no recipe default literal"
     )
     print("- governed phase packets and evidence references are structurally complete")
     return 0

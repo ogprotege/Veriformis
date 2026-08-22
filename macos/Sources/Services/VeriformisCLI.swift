@@ -240,29 +240,35 @@ struct VeriformisCLI: Sendable {
         prefixArguments + stageArguments
     }
 
+    /// The goal-first compile sequence. Every recipe default comes from the
+    /// CLI's versioned preset data: the workbench passes only the selection
+    /// (goal and preset) and explicit operator overrides.
     static func compilePlan(
         sources: [URL],
         sourceRoot: URL,
         workspace: URL,
         bundle: URL,
-        objective: TrainingObjective,
+        goal: String,
+        preset: String,
         allowEmptyEvaluation: Bool,
-        splitRatioPPM: Int,
+        splitRatioPPM: Int?,
         includeHandoff: Bool = false
     ) -> [StageCommand] {
         var parseArgs = ["parse"]
         parseArgs.append(contentsOf: sources.map(\.path))
         parseArgs.append(contentsOf: ["-o", workspace.path, "--source-root", sourceRoot.path])
 
-        var constructArgs = ["construct", workspace.path, "--objective", objective.rawValue]
+        let chunkArgs = ["chunk", workspace.path, "--preset", preset]
+
+        var constructArgs = ["construct", workspace.path, "--goal", goal, "--preset", preset]
         if includeHandoff {
             constructArgs.append(contentsOf: ["--consumer-profile", "aptus-handoff-v1"])
         }
-        if objective == .continuation {
+        if let splitRatioPPM {
             constructArgs.append(contentsOf: ["--split-ratio-ppm", String(splitRatioPPM)])
         }
 
-        var curateArgs = ["curate", workspace.path]
+        var curateArgs = ["curate", workspace.path, "--preset", preset]
         if allowEmptyEvaluation {
             curateArgs.append("--allow-empty-evaluation")
         }
@@ -275,7 +281,7 @@ struct VeriformisCLI: Sendable {
         return [
             StageCommand(stage: .parse, arguments: parseArgs),
             StageCommand(stage: .clean, arguments: ["clean", workspace.path]),
-            StageCommand(stage: .chunk, arguments: ["chunk", workspace.path]),
+            StageCommand(stage: .chunk, arguments: chunkArgs),
             StageCommand(stage: .construct, arguments: constructArgs),
             StageCommand(stage: .curate, arguments: curateArgs),
             StageCommand(stage: .split, arguments: ["split", workspace.path]),
@@ -361,6 +367,32 @@ struct VeriformisCLI: Sendable {
             throw error
         } catch {
             throw GoalCatalogError.invalidPayload(error.localizedDescription)
+        }
+    }
+
+    /// Load the versioned recipe presets and defaults from the CLI.
+    func discoverPresets(
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> RecipePresetCatalog {
+        let result = try await run(arguments: ["presets"], controller: controller)
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard result.exitCode == 0 else {
+            throw RecipePresetError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        guard !result.standardOutputTruncated else {
+            throw RecipePresetError.outputTruncated
+        }
+        do {
+            return try JSONDecoder().decode(RecipePresetCatalog.self, from: result.standardOutputData)
+        } catch let error as RecipePresetError {
+            throw error
+        } catch {
+            throw RecipePresetError.invalidPayload(error.localizedDescription)
         }
     }
 
