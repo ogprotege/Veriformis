@@ -67,12 +67,12 @@
     {
       "number": 5,
       "title": "Ship lossless generic local exports",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [4],
       "packet": "dev/active/independent-product/phase-05-generic-local-exports",
       "started_on": "2026-08-21",
-      "completed_on": null,
-      "next_gate": "Publish and merge locally admitted item 5.6 exact dry-run previews, then synchronize clean main before beginning item 5.7 operator guidance."
+      "completed_on": "2026-08-22",
+      "next_gate": "Completed; publish and merge the Phase 5 closeout and synchronize clean main before Phase 6 begins under its own standard packet."
     },
     {
       "number": 6,

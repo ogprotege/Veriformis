@@ -49,10 +49,15 @@
 | Preview transport is ASCII-safe while decoding to the exact payload values, without Unicode normalization or content rewriting | Accepted | Canonical response transport and semantic fidelity |
 | The sorted root-relative tree is derived from the plan and adds only the known `export-receipt.json`; preview never calls a renderer or accesses a destination | Accepted | One plan semantics and a side-effect-free dry run |
 | Item 5.6 changes no persisted schema, request, discovery, selector, taxonomy, support state, renderer, destination policy, trainer, or consumer claim | Accepted | Bounded roadmap item and compatibility discipline |
+| Training objective and semantic row schema are fixed by construction and the finished-dataset plan before generic export; a physical container only encodes those completed rows and partitions | Accepted | Taxonomy axis separation and derivative-only export contract |
+| Consumer compatibility is independent of file extension and requires a separately admitted named profile; all three generic export descriptors retain a null consumer profile | Accepted | Taxonomy claim discipline and current production discovery |
+| Operators choose split JSONL for one-record-per-line readers and nested rows, canonical JSON for one explicit dataset object, and constrained CSV only for exact flat columns under its frozen dialect | Accepted | Roadmap item 5.7 and the Generic Export Operator Guide |
+| Item 5.7 is documentation and reconciliation only; it changes no runtime behavior, persisted schema, request, response, discovery, selector, taxonomy entry, support state, renderer, trainer profile, or consumer profile | Accepted | Bounded closeout scope and current contract review |
 
-No item 5.1–5.6 contract decision remains pending. Item 5.5 merged as PR #57 at
-`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Item 5.6 implementation and local
-admission evidence passed under the accepted contract above; pull-request
-publication, GitHub evidence, merge, and clean-main synchronization remain
-open. Later decisions remain scoped to their own sequential pull
-requests and cannot broaden these support claims.
+No Phase 5 contract or guidance decision remains pending. Item 5.6 merged as PR
+#58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7's static guidance
+and decision reconciliation are complete locally under the accepted boundaries
+above. This record does not claim publication, GitHub checks, merge, or
+clean-main synchronization for the item 5.7 pull request. Later decisions
+remain scoped to their own sequential pull requests and cannot broaden these
+support claims.

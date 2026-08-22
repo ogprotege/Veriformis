@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–4 complete; Phase 5 in progress; Phase 6 planned
+**Status:** Active program — Phases 0–5 complete; Phase 6 planned
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -20,7 +20,7 @@ with roadmap headings.
 - [Phase 2 — Reliability and artifact boundary](phase-02-reliability-artifact-boundary/README.md) — completed
 - [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
 - [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — completed
-- [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — in progress
+- [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — completed
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -66,9 +66,15 @@ test-only consolidated eleven-pair ordinary-file semantic round-trip matrix
 merged as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1` with one tamper
 case per container and the actionable constrained-CSV/`messages` refusal. It
 adds no product importer, replayer, API, taxonomy, support, or trainer
-promotion. Item 5.6's exact bounded runtime preview is implemented and locally
-admitted; publication and merge remain open before item 5.7.
-Phase 6 remains planned and requires its own packet before work begins.
+promotion. Item 5.6's exact bounded runtime preview passed all 14 GitHub checks
+and merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`; clean local `main` was
+synchronized before item 5.7. The final item publishes the generic-export
+operator guide, keeps container choice separate from objective, schema, and
+consumer compatibility, and reconciles the completed Phase 5 packet without
+changing runtime or support state. Its local closeout does not claim the result
+of its own pull request. Phase 6 remains planned and requires its own packet
+after Phase 5 closeout publication and clean-main synchronization.
 
 ## State change procedure
 

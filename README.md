@@ -15,13 +15,13 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–4, plus Phase 5.1–5.4's supported generic
-> `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 exports.
-> Phase 5.4 merged as PR #56 at
-> `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`; Phase 5.5's test-only semantic
-> round-trip matrix merged as PR #57 at
-> `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 exact dry-run previews
-> are implemented and locally admitted; publication and merge remain open.
+> independent-product Phases 0–4 and Phase 5.1–5.6 on `main`. The supported
+> generic exports are `split-jsonl-directory`, canonical `json`, and
+> `constrained-csv` v1. Phase 5.6's exact dry-run previews merged as PR #58 at
+> `cd017941090c7352cb1d10f9a383042b954d4f2e`. The current working tree adds the
+> Phase 5.7 [generic export operator guide](docs/generic-exports.md) and closeout,
+> making Phase 5 locally complete; Phase 5.7 pull-request publication, GitHub
+> evidence, and merge are not yet claimed.
 > This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
@@ -77,6 +77,9 @@ Version `0.1.0` provides:
   `prompt_completion`, and `instruction_output`, with fixed fully quoted
   train/evaluation CSV, mandatory aligned provenance, and nested-`messages`
   refusal;
+- a [generic export operator guide](docs/generic-exports.md) that keeps JSONL,
+  JSON, or CSV container choice separate from the already-bound training
+  objective, row schema, and any independently admitted consumer profile;
 - one-to-one lowering into `text`, `prompt_completion`,
   `instruction_output`, or structured `messages` rows;
 - payload-only partition JSONL plus an aligned provenance stream;
@@ -257,10 +260,11 @@ source paths.
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
 **private beta workbench Phases 0–2**, **independent-product Phases 0–4**, and
-**independent-product Phase 5.1–5.5**. Phase 5.5 merged as PR #57 at
-`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6's exact dry-run preview
-is implemented and locally admitted on the current working tree; publication,
-GitHub evidence, and merge remain pending.
+**independent-product Phase 5.1–5.6**. Phase 5.6's exact dry-run preview merged
+as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. The current working
+tree completes Phase 5.7's operator guidance and Phase 5 closeout. Phase 5 is
+therefore locally complete, while this final pull request, its GitHub checks,
+and its merge remain unclaimed.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
@@ -353,6 +357,7 @@ reading paths. The map:
   - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
   - [Install guide](docs/install.md)
+  - [Generic export operator guide](docs/generic-exports.md)
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
   - [Release guide](docs/release.md)
@@ -366,7 +371,7 @@ reading paths. The map:
   - [Completed Phase 2 packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md)
   - [Completed Phase 3 packet](dev/active/independent-product/phase-03-taxonomy/README.md)
   - [Completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
-  - [Active Phase 5 packet](dev/active/independent-product/phase-05-generic-local-exports/README.md)
+  - [Completed Phase 5 packet](dev/active/independent-product/phase-05-generic-local-exports/README.md)
   - [Historical private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
   - [Historical build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)

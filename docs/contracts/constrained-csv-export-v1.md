@@ -14,7 +14,7 @@
 
 **Status:** Implemented and merged in independent-product Phase 5.3 (PR #55)
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
 ## Purpose and authority
 
@@ -313,7 +313,7 @@ Admission requires all of the following evidence:
 
 The Phase 5.3 admission and PR #55 publication records satisfy the items above,
 including GitHub's Python 3.11–3.13 matrix. The local Python 3.12, release,
-parity, Mac, tracking, and review results are recorded in the active Phase 5
+parity, Mac, tracking, and review results are recorded in the completed Phase 5
 evidence packet.
 
 Phase 5.5 adds a test-only consolidated semantic round-trip fixture matrix. It

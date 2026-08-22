@@ -1,6 +1,6 @@
 # Phase 5 Execution Plan
 
-**Status:** In progress
+**Status:** Completed
 
 **Last updated:** 2026-08-22
 
@@ -149,15 +149,23 @@ UTF-8 JSON exceeds 65,536 bytes or the bounded response budget, and never
 truncates or rewrites decoded values. Its destination tree is sorted,
 root-relative, derived from the unchanged plan, and includes
 `export-receipt.json`. Implementation and all required local admission evidence
-passed; publication and merge are tracked separately.
+passed. Item 5.6 then merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e` before item 5.7 began.
 
 ### 5.7 Publish generic export operator guidance
 
-- [ ] Explain when to use JSONL, JSON, or CSV.
-- [ ] Keep container choice separate from training objective and consumer
+- [x] Explain when to use JSONL, JSON, or CSV.
+- [x] Keep container choice separate from training objective and consumer
       compatibility.
-- [ ] Reconcile all current capability, support, evidence, and governance
+- [x] Reconcile all current capability, support, evidence, and governance
       records before closeout.
+
+The [Generic Export Operator Guide](../../../../docs/generic-exports.md) chooses
+split JSONL for one-record-per-line readers and nested rows, canonical JSON for
+one explicit dataset object, and constrained CSV only for exact flat columns
+under its frozen dialect. It states that export does not choose or
+change the training objective or row schema and that consumer compatibility
+requires a separately admitted named profile.
 
 ## Exit gate
 
@@ -166,11 +174,15 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Items 5.1–5.5 are implemented, admitted, and merged. Item 5.5 merged
-as PR #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Item 5.6's exact runtime
-preview is implemented and locally admitted; publication, GitHub evidence,
-merge, and clean-main synchronization remain open. Item 5.7 and final guidance
-reconciliation remain open.
+**Result:** Passed locally. Items 5.1–5.6 are implemented, admitted, and merged;
+item 5.6 merged as PR #58 at
+`cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7's operator guidance and
+the Phase 5 capability, support, evidence, governance, and packet reconciliation
+are complete locally. Every compatible pair has the required round-trip and
+tamper evidence, and nested CSV retains its actionable pre-publication refusal.
+This result does not claim that the item 5.7 pull request has been published,
+that GitHub checks passed, that it merged, or that post-merge local `main` was
+synchronized. No later phase may begin until those sequential-PR gates occur.
 
 ## Non-goals
 

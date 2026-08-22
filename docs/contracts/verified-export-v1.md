@@ -35,15 +35,16 @@ an already-published export directory and merged as PR #56 at
 consolidated ordinary-file semantic round-trip fixture matrix over those three
 existing renderers and merged as PR #57 at
 `c72b8e9ec7bc2746d74404226aa086d497e15db1`. Phase 5.6 adds one bounded,
-runtime-only exact dry-run preview under additive surface response v2. The ten
+runtime-only exact dry-run preview under additive surface response v2 and
+merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`. The ten
 persisted models, request and discovery schemas, production selectors,
 taxonomy, and support state remain unchanged; response v1 remains unchanged for
 non-dry-run operations.
 
-**Last reviewed:** 2026-08-22 (Phase 5.6 exact dry-run preview contract)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
-**Next review:** Phase 5.6 publication/merge, Phase 5.7, or any export or receipt schema
-change
+**Next review:** Any export, receipt, preview, selector, or consumer-profile
+schema change
 
 ## Purpose
 

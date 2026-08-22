@@ -2,18 +2,18 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `c72b8e9ec7bc2746d74404226aa086d497e15db1`
+**Implementation baseline reviewed:** `cd017941090c7352cb1d10f9a383042b954d4f2e`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–4 and items 5.1–5.5 complete), plus the current
-Phase 5.6 exact dry-run preview work
+independent-product Phases 0–4 and items 5.1–5.6 complete), plus the current
+Phase 5.7 operator-guidance and closeout work
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.6 locally admitted)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
 
-**Next review:** Phase 5.6 pull-request publication or merge; beta
-label cut, public Mac evidence, or any listed-item status change
+**Next review:** Phase 5 closeout publication or merge, Phase 6 packet opening,
+beta label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -60,10 +60,12 @@ local, offline, and free of LLM generation.
       [program.json](dev/active/independent-product/program.json).
 - [x] Independent product Phase 4 is complete. Its closeout merged as PR #52
       at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
-- [ ] Independent product Phase 5 is in progress under its
-      [active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
-      Items 5.1–5.5 are merged; item 5.6's runtime preview is implemented and
-      locally admitted, with publication and merge pending.
+- [x] Independent product Phase 5 is complete under its
+      [completed packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
+      Item 5.6 merged as PR #58 at
+      `cd017941090c7352cb1d10f9a383042b954d4f2e`; item 5.7 publishes the
+      operator guide and reconciles the local phase closeout without claiming
+      its own pull-request result.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -81,7 +83,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
 | 4 | Build the verified export foundation | Completed | [Completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
-| 5 | Ship lossless generic local exports | In progress | [Active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md) |
+| 5 | Ship lossless generic local exports | Completed | [Completed packet](dev/active/independent-product/phase-05-generic-local-exports/README.md) |
 | 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -187,7 +189,7 @@ ships. The ten persisted export v1 models remain unchanged; additive request v2
 carries only split JSONL's strict configuration. Constrained CSV admits the
 three flat row schemas and refuses `messages` before publication.
 
-### Active Phase 5 status
+### Completed Phase 5 status
 
 - [x] Standard Phase 5 packet created and machine/human phase state changed to
       `in_progress` from baseline
@@ -204,13 +206,17 @@ three flat row schemas and refuses `messages` before publication.
 - [x] Phase 5.5 — the test-only semantic import-round-trip matrix merged as PR
       #57 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`. It adds no production
       importer or replayer.
-- [x] Phase 5.6 — exact sample-row and destination-tree dry-run previews are
-      implemented and locally admitted; publication and merge remain open.
-- [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
+- [x] Phase 5.6 — exact sample-row and destination-tree dry-run previews merged
+      as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e` after all 14
+      GitHub checks passed; local `main` was synchronized before item 5.7.
+- [x] Phase 5.7 — the
+      [generic export operator guide](docs/generic-exports.md) separates
+      container choice from objective, schema, and consumer compatibility, and
+      the phase closeout records are reconciled locally.
 
-The Phase 5.1–5.6 implementation and admission evidence support the split
-JSONL, canonical JSON, and constrained CSV promotions. Phase 5 remains in
-progress. Phase 5.4 ships
+The Phase 5.1–5.7 implementation, guidance, and admission evidence support the
+split JSONL, canonical JSON, and constrained CSV promotions. Phase 5 is
+complete. Phase 5.4 ships
 `deterministic-export-pack-zip-v1` through the existing `package` /
 `package-verify` family and adds no fourth renderer, trainer compatibility,
 source-bound archive verification, or Mac UI. Phase 5.5's merged,
@@ -218,9 +224,10 @@ discovery-closed fixture proves the 11 compatible pairs, the sole nested-CSV
 refusal, and per-container semantic tampering without adding a production
 importer or replayer. Item 5.6 adds only runtime response v2
 with the unchanged plan, exact whole-or-omitted ordinal-zero partition samples,
-and a normalized plan-derived tree plus receipt. Its local evidence passed;
-publication, merge, final guidance, and every trainer profile remain later
-work.
+and a normalized plan-derived tree plus receipt. Item 5.7 adds guidance and
+closeout only. It changes no runtime contract, selector, taxonomy, support
+state, consumer profile, or trainer claim; trainer-specific profiles remain
+later work.
 
 The current stage-command runtime is:
 
@@ -551,7 +558,10 @@ pytest totals; they grow.
 
 ## Maintenance rules
 
-1. Check an item only after its implementation and exit gate merge to `main`.
+1. Check an item only after its deliverable, verification, evidence, and
+   documentation satisfy the local completion rule. Do not treat that check as
+   proof of its own pull-request result; where execution is sequential, merge
+   the item and synchronize clean `main` before starting the next item or phase.
 2. Update this file in the same change that alters a listed status.
 3. Keep completed items visible. They preserve execution history.
 4. Do not duplicate contract details that belong in a versioned contract.
@@ -574,6 +584,7 @@ pytest totals; they grow.
 - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
+- [Generic Export Operator Guide](docs/generic-exports.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Architecture](docs/architecture.md)
 - [Architecture tree](docs/architecture/README.md)
