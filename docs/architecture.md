@@ -68,6 +68,11 @@ versioned goal catalog (`catalog-v1.json`) with strict models that resolve
 every plain-language goal to exactly one existing objective and named recipe,
 and every representation to one existing row schema and loss policy; the
 service, CLI, MCP, and Mac bridge expose it read-only and byte-identically.
+Phase 6.2 adds per-goal contracts and the seventh taxonomy axis
+`input_family`; Phase 6.3 adds `goals/preview.py`, a runtime-only read-only
+view over a constructed workspace that renders each record through the same
+row-lowering function `format` uses and derives the exact supervised span
+from the objective field roles and taxonomy loss policy.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

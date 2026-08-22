@@ -174,3 +174,75 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.2 pull request, require every GitHub
 check to pass, merge, and synchronize clean local `main` with `origin/main`
 before item 6.3 begins.
+
+## 2026-08-22 — Item 6.2 merged; item 6.3 started
+
+**Status:** Item 6.2 merged as PR #61 at
+`81becfa676fd9111868b8d4b62549218a644d3e2` after all 14 GitHub checks passed
+on the first run; clean local `main` equals `origin/main` at that commit.
+Branch `phase6/03-goal-preview` was created from it.
+
+Item 6.3 scope: `veriformis.goal-preview/v1`, a runtime-only read-only
+response over a workspace at or beyond `construct`, through
+`PipelineService.preview_goal`, CLI `goal-preview`, MCP `goal_preview`, the
+Swift bridge, and a post-compile workbench preview screen. Per selected
+record it carries derivation lineage, exact recovered evidence (source spans
+or strict-IR scalars), context and target, the row rendered through the same
+function `format` uses, the exact supervised span and loss policy, and the
+curation decision; excluded records carry their reason codes. Bounds mirror
+the Phase 5.6 export preview.
+
+**Next action:** Finish the Swift bridge, decoder, and preview screen; run the
+complete admission gates; record evidence; publish the item 6.3 pull request.
+
+## 2026-08-22 — Item 6.3 locally complete
+
+**Status:** Local implementation and admission gates passed; pull-request
+merge pending.
+
+`veriformis.goal-preview/v1` is implemented as a runtime-only, read-only
+response over a workspace at or beyond `construct`, through
+`PipelineService.preview_goal`, CLI `goal-preview`, MCP `goal_preview`, the
+strict Swift bridge `previewGoal`, and a post-compile workbench preview
+screen. Per selected record it carries derivation lineage, exact recovered
+evidence (source spans or strict-IR scalars, each digest-bound to its
+excerpt), context and target fields, the row rendered through the same
+function `format` uses, the exact supervised span in Unicode code points with
+its loss policy, the curation decision, and the goal's non-claims; excluded
+records carry their reason codes. The response is assembled skeleton-first
+and bounded on its exact ASCII transport at 64 KiB per record and 256 KiB per
+response, failing closed with an exact reason when even the skeleton cannot
+fit.
+
+An independent adversarial review found one blocker: past the response
+budget the first implementation kept appending redacted record skeletons and
+never budgeted diagnostics, so a 320-source corpus produced a 350 KB response
+under a 256 KiB claim. The assembly was rewritten skeleton-first with the
+bound measured on the transport text and proved by a test over forty sources
+under a reduced budget, including the fail-closed path. Seven should-fix
+items were also corrected: a legacy revision-v1 workspace now fails closed
+with the upgrade instruction instead of a `KeyError`; the representation is
+resolved from the persisted recipe before any record is read; strict-IR
+evidence digests are the SHA-256 of the exact excerpt; span units are stated
+as Unicode code points on every surface; the preview carries `not_this` and
+`non_claims` (U4); a stale workbench preview can no longer land after a new
+run starts; and the rendered row is proved equal to the persisted product row
+for the same record after `curate`, `split`, and `format`.
+
+Observed gates on the reconciled working tree:
+
+- 24 focused preview tests passed (13 goal-by-representation cells plus
+  curation, instruction, omission, bound, duplicate-id, legacy-workspace,
+  product-row equality, parity, and frozen-fixture proofs); 1,332 full Python
+  tests passed with only the intentional durability-warning regression
+  warning; 1,320 standalone release tests passed with 1 deselected and the
+  same warning.
+- Clean-wheel installation and both golden compile/external-digest/transport
+  flows passed; standalone CLI/workbench parity passed.
+- The complete macOS XCTest target passed 75 tests with `TEST SUCCEEDED`.
+- Project tracking, its regression test, lock, Ruff, structured JSON, fixture
+  byte equality, and diff checks passed.
+
+**Next action:** Publish the item 6.3 pull request, require every GitHub
+check to pass, merge, and synchronize clean local `main` with `origin/main`
+before item 6.4 begins.

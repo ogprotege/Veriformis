@@ -26,6 +26,7 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var splitRatioPPM = defaultSplitRatioPPM
     @Published var writeAptusHandoff = defaultWriteAptusHandoff
     @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
+    @Published private(set) var goalPreviewState: GoalPreviewState = .idle
 
     // Run state
     @Published var isRunning = false
@@ -62,6 +63,8 @@ final class WorkbenchViewModel: ObservableObject {
     private var runFinishedCallbacks: [() -> Void] = []
     private var taxonomyHelpTask: Task<Void, Never>?
     private var taxonomyHelpController: CLIProcessController?
+    private var goalPreviewTask: Task<Void, Never>?
+    private var goalPreviewController: CLIProcessController?
 
     var canCompile: Bool {
         !isRunning
@@ -172,6 +175,47 @@ final class WorkbenchViewModel: ObservableObject {
         }
     }
 
+    /// Cancel any in-flight goal preview so a stale result cannot land later.
+    func cancelGoalPreview() {
+        goalPreviewTask?.cancel()
+        goalPreviewController?.cancel()
+        goalPreviewTask = nil
+        goalPreviewController = nil
+    }
+
+    /// Load the goal-specific preview for one constructed workspace (Phase 6.3).
+    func refreshGoalPreview(workspace: URL) {
+        cancelGoalPreview()
+
+        guard let cli else {
+            goalPreviewState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+
+        let controller = CLIProcessController()
+        goalPreviewController = controller
+        goalPreviewState = .loading
+        goalPreviewTask = Task { [weak self] in
+            let nextState: GoalPreviewState
+            do {
+                let preview = try await cli.previewGoal(workspace: workspace, controller: controller)
+                try Task.checkCancellation()
+                nextState = .ready(preview)
+            } catch is CancellationError {
+                nextState = .unavailable("Goal preview was cancelled.")
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+
+            guard let self, self.goalPreviewController === controller else {
+                return
+            }
+            self.goalPreviewState = nextState
+            self.goalPreviewController = nil
+            self.goalPreviewTask = nil
+        }
+    }
+
     func addSources(_ urls: [URL]) {
         let existing = Set(sourceURLs.map(\.path))
         for url in urls where !existing.contains(url.path) {
@@ -261,6 +305,8 @@ final class WorkbenchViewModel: ObservableObject {
         lastFailure = nil
         lastCancellation = nil
         lastResult = nil
+        cancelGoalPreview()
+        goalPreviewState = .idle
         lastCopiedNotice = nil
         completedStages = []
         currentStage = nil
@@ -458,6 +504,7 @@ final class WorkbenchViewModel: ObservableObject {
                 if let logFileURL {
                     appendToLogFile(logFileURL, text: "Compile complete.\n")
                 }
+                refreshGoalPreview(workspace: workspace)
 
                 recordHistory(
                     startedAt: startedAt,

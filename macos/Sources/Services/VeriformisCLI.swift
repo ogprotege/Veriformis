@@ -364,6 +364,42 @@ struct VeriformisCLI: Sendable {
         }
     }
 
+    /// Load the goal-specific preview for a constructed workspace without blocking the main actor.
+    func previewGoal(
+        workspace: URL,
+        representation: String? = nil,
+        instruction: String? = nil,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> GoalPreview {
+        var arguments = ["goal-preview", workspace.path]
+        if let representation {
+            arguments += ["--representation", representation]
+        }
+        if let instruction {
+            arguments += ["--instruction", instruction]
+        }
+        let result = try await run(arguments: arguments, controller: controller)
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard result.exitCode == 0 else {
+            throw GoalPreviewError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        guard !result.standardOutputTruncated else {
+            throw GoalPreviewError.outputTruncated
+        }
+        do {
+            return try JSONDecoder().decode(GoalPreview.self, from: result.standardOutputData)
+        } catch let error as GoalPreviewError {
+            throw error
+        } catch {
+            throw GoalPreviewError.invalidPayload(error.localizedDescription)
+        }
+    }
+
     /// Discover only the export implementations registered by the Python composition root.
     func discoverExports(
         controller: CLIProcessController = CLIProcessController()

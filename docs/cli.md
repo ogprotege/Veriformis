@@ -9,9 +9,10 @@ the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
-`handoff-verify`), taxonomy discovery (`taxonomy`), goal discovery (`goals`), local MCP (`mcp`), verified
+`handoff-verify`), taxonomy discovery (`taxonomy`), goal discovery and
+preview (`goals`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-24 commands; `export` contains four subcommands.
+25 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
@@ -44,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, and constrained CSV v1 |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `goal-preview` | Nothing |
 | Meta | `version` | Nothing |
 
 ## Supported inputs
@@ -747,6 +748,27 @@ Each representation binds to exactly one row schema and its loss policy. The
 catalog adds no objective or row schema; see the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md). The command accepts
 no workspace and writes no state.
+
+### `goal-preview`
+
+Show exactly what each accepted record is and which region receives loss.
+
+```text
+veriformis goal-preview WORKSPACE [--representation ID] [--instruction TEXT] [--record ID]...
+```
+
+Reads a workspace whose `construct` stage is complete and prints the
+runtime-only `veriformis.goal-preview/v1` response as ASCII-safe JSON: the
+resolved goal and representation, and for the first accepted record of each
+source (or the records named by `--record`) the recovered source evidence,
+context and target fields, the row exactly as `format` would lower it, and the
+exact supervised span with its loss policy. When `curate` has run, each record
+carries its curation decision and every excluded record is listed with its
+reason codes. `--representation` must be compatible with the goal;
+`--instruction` supplies the instruction-and-output instruction when none is
+persisted. Records above 64 KiB or beyond the 256 KiB response budget are
+omitted whole with an exact reason. The command writes no state. See the
+[Goal Catalog Contract v1](contracts/goal-catalog-v1.md#goal-preview-v1).
 
 ### `verify`
 

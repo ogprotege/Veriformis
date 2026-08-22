@@ -101,7 +101,7 @@ the repository requires. The widening is recorded in `decisions.md`.
 
 ### 6.3 Add goal-specific preview
 
-- [ ] Add `PipelineService.preview_goal` over a workspace at or beyond the
+- [x] Add `PipelineService.preview_goal` over a workspace at or beyond the
       `construct` stage returning runtime-only `veriformis.goal-preview/v1`:
       for each selected record, the exact recovered source span(s) with
       offsets, derivation lineage (source, chunk, pass, constructor), context
@@ -109,13 +109,13 @@ the repository requires. The widening is recorded in `decisions.md`.
       exact supervised character span(s) within that row with the loss policy
       and its plain-language boundary, and, when curation exists, every
       excluded record with its stable reason codes.
-- [ ] Bound the response exactly as the Phase 5.6 preview does (64 KiB per
+- [x] Bound the response exactly as the Phase 5.6 preview does (64 KiB per
       payload, 256 KiB response, whole-value omission with an exact reason,
       ASCII-safe transport).
-- [ ] Expose CLI `goal-preview`, MCP `goal_preview`, the Swift bridge, and a
+- [x] Expose CLI `goal-preview`, MCP `goal_preview`, the Swift bridge, and a
       Mac preview screen that highlights context, target, and the supervised
       region in plain words.
-- [ ] Prove, for every objective and compatible representation, that the
+- [x] Prove, for every objective and compatible representation, that the
       supervised span equals the serialized target exactly, that excluded
       records carry the curation reason codes, that the workspace is unchanged,
       and that Python, CLI, MCP, and the Mac bridge agree.

@@ -284,6 +284,111 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
+    // MARK: - Goal preview (Phase 6.3)
+
+    func testGoalPreviewDecodesFrozenFixtureExactly() throws {
+        let preview = try JSONDecoder().decode(GoalPreview.self, from: goalPreviewData())
+
+        XCTAssertEqual(preview.goalID, "recover-a-section-from-its-heading")
+        XCTAssertEqual(preview.objective, .sectionReconstruction)
+        XCTAssertEqual(preview.representationID, "conversation")
+        XCTAssertEqual(preview.rowSchema, "messages")
+        XCTAssertEqual(preview.lossPolicy, "final-assistant-suffix")
+        XCTAssertEqual(preview.availableStages, ["construct", "curate"])
+        XCTAssertEqual(preview.records.count, 1)
+        let record = try XCTUnwrap(preview.records.first)
+        XCTAssertNil(record.omissionReason)
+        XCTAssertEqual(record.supervised.rowKey, "messages[1].content")
+        XCTAssertEqual(record.supervised.start, 0)
+        let value = try XCTUnwrap(record.supervisedValue)
+        XCTAssertEqual(value.unicodeScalars.count, record.supervised.end)
+        XCTAssertFalse(preview.notThis.isEmpty)
+        XCTAssertEqual(preview.nonClaims.count, 4)
+        XCTAssertEqual(preview.omittedDiagnosticCount, 0)
+        XCTAssertEqual(record.target?["section"], value)
+        XCTAssertEqual(record.context?["heading"], "Recovered heading")
+        XCTAssertEqual(record.curationStatus, "included")
+        XCTAssertFalse(record.recoveredSource.isEmpty)
+        XCTAssertTrue(record.recoveredSource.allSatisfy { $0.kind == "source_text" && $0.excerpt != nil })
+        XCTAssertEqual(preview.counts["included"], 2)
+        XCTAssertTrue(preview.exclusions.isEmpty)
+    }
+
+    func testGoalPreviewRejectsMissingKeysWrongSchemaAndRenderedRowDrift() throws {
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalPreview.self,
+                from: goalPreviewData { $0.removeValue(forKey: "exclusions") }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalPreviewError,
+                .invalidKeySet(scope: "preview", missing: ["exclusions"], unexpected: [])
+            )
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalPreview.self,
+                from: goalPreviewData { $0["schema_id"] = "veriformis.goal-preview/v2" }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalPreviewError, .invalidMetadata("schema_id"))
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalPreview.self,
+                from: goalPreviewData { payload in
+                    var records = payload["records"] as! [[String: Any]]
+                    records[0]["rendered_row"] = NSNull()
+                    payload["records"] = records
+                }
+            )
+        ) { error in
+            XCTAssertEqual(error as? GoalPreviewError, .invalidMetadata("rendered_row"))
+        }
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalPreview.self,
+                from: goalPreviewData { payload in
+                    var records = payload["records"] as! [[String: Any]]
+                    records[0]["loss"] = "everything"
+                    payload["records"] = records
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalPreviewError,
+                .invalidKeySet(scope: "record", missing: [], unexpected: ["loss"])
+            )
+        }
+    }
+
+    func testPreviewGoalInvokesExactCLIArguments() async throws {
+        let root = temporaryTestDirectory("goal-preview-argv")
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let arguments = root.appendingPathComponent("arguments.txt")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf '%s\\n' "$@" > "\(arguments.path)"
+            cat "\(goalPreviewFixtureURL().path)"
+            """
+        )
+
+        let workspace = root.appendingPathComponent("workspace")
+        let preview = try await VeriformisCLI(executableURL: executable, prefixArguments: [])
+            .previewGoal(workspace: workspace, representation: "conversation")
+
+        XCTAssertEqual(preview.records.count, 1)
+        XCTAssertEqual(
+            try String(contentsOf: arguments, encoding: .utf8),
+            "goal-preview\n\(workspace.path)\n--representation\nconversation\n"
+        )
+    }
+
     // MARK: - Goal catalog (Phase 6.1)
 
     func testGoalCatalogDecodesFrozenFixtureExactly() throws {
@@ -2577,6 +2682,26 @@ final class CLIBridgeTests: XCTestCase {
             try await Task.sleep(nanoseconds: 10_000_000)
         }
         XCTFail("timed out waiting for \(url.path)")
+    }
+
+    private func goalPreviewFixtureURL() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("tests/regressions/fixtures/phase6/goal-preview.json")
+    }
+
+    private func goalPreviewData(
+        mutating mutation: ((inout [String: Any]) -> Void)? = nil
+    ) throws -> Data {
+        let stored = try Data(contentsOf: goalPreviewFixtureURL())
+        guard mutation != nil else { return stored }
+        var payload = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: stored) as? [String: Any]
+        )
+        mutation?(&payload)
+        return try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
     }
 
     private func goalCatalogFixtureURL() -> URL {

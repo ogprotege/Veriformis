@@ -50,12 +50,13 @@ capabilities owned by `PipelineService`.
 Phase 6 opened on 2026-08-22 from baseline
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` (PR #59, the Phase 5 closeout).
 Item 6.1's plain-language goal catalog merged as PR #60 at
-`7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub checks passed.
-Item 6.2 is locally complete on branch `phase6/02-goal-contracts`: per-goal
-contracts (eligible input families, required evidence and its diagnostics,
-target construction, supervision boundary, curation defaults, review policy,
-closed non-claims), per-representation generic-export compatibility, and
-`input_family` as the seventh taxonomy axis under ADR-0008, with discovery,
-the Swift decoders and compile-view disclosure, golden fixtures, the support
-registry, and the tracking checker updated. Its pull request, GitHub checks,
-merge, and clean-main synchronization are not claimed by this packet.
+`7316d94faf2d6c23b7abb6fe200f154da47d398c` and item 6.2's goal contracts and
+`input_family` axis merged as PR #61 at
+`81becfa676fd9111868b8d4b62549218a644d3e2`, each after all 14 GitHub checks
+passed. Item 6.3 is locally complete on branch `phase6/03-goal-preview`: the
+runtime-only `veriformis.goal-preview/v1` response through
+`PipelineService.preview_goal`, CLI `goal-preview`, MCP `goal_preview`, the
+strict Swift bridge, and a post-compile workbench preview screen, bounded
+exactly on its ASCII transport and proved against the persisted product rows.
+Its pull request, GitHub checks, merge, and clean-main synchronization are not
+claimed by this packet.

@@ -69,9 +69,10 @@ local, offline, and free of LLM generation.
 - [ ] Independent product Phase 6 is in progress under its
       [active packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md).
       Item 6.1's plain-language goal catalog merged as PR #60 at
-      `7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub checks
-      passed; item 6.2 (goal contracts and the `input_family` taxonomy axis)
-      is the current work.
+      `7316d94faf2d6c23b7abb6fe200f154da47d398c` and item 6.2's goal
+      contracts and `input_family` axis merged as PR #61 at
+      `81becfa676fd9111868b8d4b62549218a644d3e2`, each after all 14 GitHub
+      checks passed; item 6.3 (goal-specific preview) is the current work.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

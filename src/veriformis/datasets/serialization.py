@@ -948,6 +948,15 @@ def _validate_input_relationships(
             )
 
 
+def render_record_payload(
+    serialization_plan: SerializationPlan,
+    recipe: DatasetRecipe,
+    record: DatasetRecord,
+) -> dict[str, Any]:
+    """Render one accepted record exactly as `format` lowers it (read-only)."""
+    return _record_payload(serialization_plan, recipe, record)
+
+
 def _record_payload(
     serialization_plan: SerializationPlan,
     recipe: DatasetRecipe,
@@ -1120,6 +1129,7 @@ def serialize_dataset(
 
 
 __all__ = [
+    "render_record_payload",
     "V1_PARTITION_ORDER",
     "V1_ROW_SCHEMAS",
     "ProductRow",

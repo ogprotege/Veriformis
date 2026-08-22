@@ -21,6 +21,9 @@
 | `curation_defaults` in the catalog mirror the executing defaults of the service, CLI, MCP, and recipe library and are test-bound until Phase 6.4 presets become the single executing source | Accepted | Roadmap item 4; avoids a second default authority before presets exist |
 | `compatible_generic_exports` is stored per representation and test-derived from the production export catalog | Accepted | Discovery-closed truth without a runtime export dependency inside the catalog loader |
 | The Phase 5.6 cancellation-race thread budget is widened to thirty seconds inside item 6.2 as a declared test-robustness fix | Accepted | One observed CI timing failure on a slow runner; the race is event-ordered |
+| The goal preview renders rows through the same `render_record_payload` function `format` uses and derives the supervised span as the whole target value under the taxonomy loss policy; nothing is persisted | Accepted | One row semantics; decision "derive, do not persist" |
+| Preview sample policy is `first-accepted-record-per-primary-source`, with explicit `record_ids` as the only override; bounds are 64 KiB per record and 256 KiB per response with whole-record omission | Accepted | Phase 5.6 precedent; deterministic, side-effect-free |
+| Strict-IR field evidence is reported by JSON pointer with the exact encoded value; it has no character span | Accepted | `structured_field` evidence is an IR scalar, not source text |
 | Post-#59 reconciliation cites PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` in every active record while leaving dated historical entries unchanged | Accepted | Project-tracking claim discipline |
 
 No Phase 6 decision is pending. Later items remain scoped to their own

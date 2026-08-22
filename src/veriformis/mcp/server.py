@@ -197,6 +197,22 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def goal_preview(
+        workspace: str,
+        representation: str | None = None,
+        instruction: str | None = None,
+        record_ids: list[str] | None = None,
+    ) -> str:
+        """Show exactly what each record is and which region receives loss."""
+        outcome = pipeline.preview_goal(
+            Path(workspace),
+            representation=representation,
+            instruction=instruction,
+            record_ids=tuple(record_ids or ()),
+        )
+        return outcome.preview.transport_text()
+
+    @server.tool()
     def export_discover() -> str:
         """Discover executable export profiles from PipelineService."""
 

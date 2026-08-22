@@ -9,12 +9,12 @@
 **Execution profile:** `offline-deterministic-v1`
 
 **Implementation status:** Implemented in independent-product Phase 6.1
-(goal catalog and read-only discovery) and extended additively by Phase 6.2
-(per-goal contracts and input-family eligibility). Items 6.3–6.7 extend it
-further with previews, presets, preflight, the acceptance matrix, and
-instruction truthfulness.
+(goal catalog and read-only discovery), extended additively by Phase 6.2
+(per-goal contracts and input-family eligibility) and Phase 6.3 (the
+runtime-only goal preview). Items 6.4–6.7 extend it further with presets,
+preflight, the acceptance matrix, and instruction truthfulness.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.2)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.3)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -189,6 +189,76 @@ representation identifiers are never persisted in a recipe, row, or bundle.
 
 The frozen fixture `tests/regressions/fixtures/phase6/goal-catalog.json`
 MUST equal the packaged bytes and is decoded by the Swift tests.
+
+## Goal preview v1
+
+`veriformis.goal-preview/v1` is a runtime-only, read-only response over a
+workspace whose `construct` stage is complete. It is not one of the persisted
+schemas and is never written to a workspace, bundle, or export.
+
+| Surface | Operation |
+| --- | --- |
+| Python | `PipelineService.preview_goal(workspace, representation=None, instruction=None, record_ids=())` |
+| CLI | `veriformis goal-preview WORKSPACE [--representation ID] [--instruction TEXT] [--record ID]...` |
+| MCP | `goal_preview(workspace, representation, instruction, record_ids)` |
+| Mac bridge | `VeriformisCLI.previewGoal`; the workbench shows the preview after a compile |
+
+Semantics:
+
+1. The goal is the catalog goal of the recipe's objective. The representation
+   defaults to the recipe's `target_row_schema`; an explicit representation
+   MUST be compatible with the goal, otherwise the preview fails closed after
+   reading only the persisted recipe and before any record is read. A
+   workspace below revision schema 3 fails closed with the upgrade
+   instruction.
+2. Sample policy `first-accepted-record-per-primary-source` selects the first
+   accepted record of each primary source (the first entry of the record's
+   sorted `source_ids`) in persisted order; explicit `record_ids` select
+   exactly those accepted records in the requested order, and unknown or
+   repeated ids fail closed.
+3. For each selected record the preview reports its derivation lineage
+   (`source_ids`, `logical_paths`, `chunk_ids`, `pass_id`, `constructor_id`,
+   `constructor_version`), its `context` fields by objective field role (empty
+   for the whole-text representation) and its `target` field, every piece of
+   `recovered_source` evidence (an exact span of the recovered source stream
+   with its digest and derivation kinds, or one strict-IR scalar by JSON
+   pointer whose exact encoded value is the field value; in both cases
+   `text_sha256` is the SHA-256 of the exact `excerpt`), the `rendered_row`
+   exactly as `format` lowers it through the same function (proved against
+   the persisted product rows), the `context_row_keys`, and the `supervised`
+   span: the row key and the range, in Unicode code points (not bytes, UTF-16
+   units, grapheme clusters, or tokens), that receives loss. The supervised
+   span is derived from the objective field roles and the taxonomy loss
+   policy; it always equals the whole target value and is never persisted.
+   The preview also carries the goal's `not_this` and `non_claims` so every
+   surface that shows a goal shows its non-claims (usability criterion U4).
+4. When `curate` is complete the preview carries each selected record's
+   decision status and reason codes, lists every excluded or quarantined
+   record with its reason codes under `exclusions`, counts included, excluded,
+   and quarantined records, and reuses the persisted instruction text for the
+   instruction-and-output representation unless the caller supplies one.
+5. `instruction-and-output` without an instruction (persisted or supplied)
+   reports `operator-instruction-required` and omits the rendered row while
+   keeping lineage, evidence, target, and supervised span; this is not counted
+   in `counts.omitted`, which counts only size omissions.
+6. Bounds mirror the Phase 5.6 export preview and are measured on the exact
+   ASCII transport text: a record whose entry exceeds 65,536 bytes is omitted
+   whole with `exact-record-exceeds-preview-limit`; the response is assembled
+   skeleton-first (every record omitted, no exclusions, no diagnostics) and
+   fails closed with an exact reason if even that cannot fit 262,144 bytes;
+   records are then filled in order while the whole response fits, and the
+   rest are omitted whole with `exact-record-exceeds-response-budget`;
+   omission removes excerpts, context, target, and the rendered row but keeps
+   identities, digests, spans, and `exact_size_bytes`. Exclusions and
+   diagnostics that no longer fit are counted in `omitted_exclusion_count` and
+   `omitted_diagnostic_count`. The emitted text never exceeds 262,144 bytes
+   and values are never truncated or rewritten.
+7. Transport is `transport_text()`: ASCII-safe, two-space-indented JSON with
+   sorted keys that decodes to the exact Unicode values; the CLI prints it and
+   MCP returns it unchanged.
+8. The preview never opens a workspace transaction, calls a renderer, or
+   accesses a destination, and it changes no persisted model, request,
+   discovery, selector, taxonomy, support, consumer, or trainer claim.
 
 ## Version and migration
 
