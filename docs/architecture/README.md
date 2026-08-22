@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
 
 **Next review:** Any architecture documentation change
 
@@ -238,15 +238,20 @@ tree with mandatory aligned provenance for the three flat row schemas. It
 refuses request v2 before source access; after source admission reveals nested
 `messages`, it refuses the schema before destination access with a JSON
 alternative.
-Phase 5.4 locally admits an orthogonal post-export path rather than another
+Phase 5.4, merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`, adds an orthogonal post-export
+path rather than another
 catalog entry. `exports/archive.py` consumes one canonical receipt-bound
 directory and `_archive_transport.py` supplies the deterministic stored-ZIP
 codec shared with bundle transport. `PipelineService.package` and
 `package_verify` select the `.vfexport.zip` path only from an explicit external
 receipt digest. The inner plan, receipt, source trust grade, and three export
 selectors remain unchanged. Archive verification is receipt-anchored rather
-than source-bound, and no MCP or Mac UI operation is added. Local admission
-evidence is recorded; pull-request publication and merge remain pending.
+than source-bound, and no MCP or Mac UI operation is added. Phase 5.5 adds only
+test-owned consolidated ordinary-file reload evidence for the eleven compatible
+current container/schema pairs, three container tamper cases, and the existing
+constrained-CSV/`messages` refusal. It adds no runtime importer, semantic
+replayer, surface, taxonomy, support state, or trainer claim.
 The default service still has no semantic replayer. The CLI exposes the nine
 stage commands plus maintenance, inspection, recipe automation, MCP, optional
 Aptus handoff, version, and verified-export surfaces.

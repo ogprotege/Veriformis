@@ -9,18 +9,19 @@ optional consumer integrations
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
 plus completed independent-product Phases 0–4 and Phase 5.1–5.3's supported
 generic `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
-derivatives; Phase 5.4 receipt-anchored export-pack transport is locally
-admitted with publication and merge pending, version `0.1.0` development alpha
+derivatives; Phase 5.4 receipt-anchored export-pack transport merged as PR #56,
+and Phase 5.5's test-only consolidated semantic round-trip matrix is locally
+admitted, version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–4 complete; Phase 5.1–5.3 implemented and merged; Phase 5.4 locally
+Phases 0–4 complete; Phase 5.1–5.4 implemented and merged; Phase 5.5 locally
 admitted with publication and merge pending; maturity alpha; public Mac claim
 still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
 
-**Next review:** Phase 5.4 pull-request publication or merge; beta label cut, public-ready
+**Next review:** Phase 5.5 pull-request publication or merge; beta label cut, public-ready
 checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -196,16 +197,25 @@ compatibility with neither a trainer nor a spreadsheet. All new trainer
 profiles remain open later work. Item 5.3 merged as PR #55 at
 `c6d7fc13a09a`.
 
-Phase 5.4 is locally admitted as
-`deterministic-export-pack-zip-v1`. The optional post-export transport uses the
-existing `package` / `package-verify` command family to wrap canonical
-`export-receipt.json` plus its exact bound file set as `.vfexport.zip` under a
-separately retained receipt digest. It consumes the existing embedded plan and
-receipt without changing the ten persisted verified-export v1 models or the
-three production selectors. Receipt-anchored archive verification preserves
-the embedded source trust grade and is not source-bound export verification.
-It adds no consumer/trainer profile, request version, MCP operation, or Mac UI
-action. Pull-request publication, GitHub evidence, and merge remain pending.
+Phase 5.4's `deterministic-export-pack-zip-v1` merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. The optional post-export
+transport uses the existing `package` / `package-verify` command family to wrap
+canonical `export-receipt.json` plus its exact bound file set as `.vfexport.zip`
+under a separately retained receipt digest. It consumes the existing embedded
+plan and receipt without changing the ten persisted verified-export v1 models
+or the three production selectors. Receipt-anchored archive verification
+preserves the embedded source trust grade and is not source-bound export
+verification. It adds no consumer/trainer profile, request version, MCP
+operation, or Mac UI action.
+
+Phase 5.5 is locally admitted as test-only consolidated evidence over the
+unchanged three production selectors. A frozen ordinary-file fixture reloads
+all eleven compatible container/schema pairs to the identical ordered train and
+evaluation payloads, complete provenance, and source `RowSet`. It also proves a
+canonical semantic tamper fails for each container and preserves constrained
+CSV's actionable pre-publication refusal for nested `messages`. The fixture is
+not a product importer or public semantic replayer and changes no API, persisted
+schema, taxonomy, support state, consumer profile, or trainer claim.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete

@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
 
 **Next review:** Any architecture or data-flow change
 
@@ -241,17 +241,23 @@ Constrained CSV preserves the three flat row schemas as fully quoted partition
 records with exact ordered headers and keeps complete aligned provenance in a
 separate JSONL sidecar. Nested `messages` fails before publication and must use
 one of the exact JSON containers.
-Phase 5.4's locally admitted transport begins from the already-published
-directory, not from
-source rows or a new export request. The operator retains the SHA-256 of its
+Phase 5.4's transport, merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`, begins from the
+already-published directory, not from source rows or a new export request. The
+operator retains the SHA-256 of its
 canonical `export-receipt.json`, and `package` validates that closed directory
 before writing `.vfexport.zip` containing exactly the receipt plus its bound
 files. `package-verify` reconstructs only validated receipt paths and proves
 the file bindings and canonical archive bytes. That flow preserves the
 embedded source trust grade; it does not re-admit the source or become
 source-bound export verification. No archive fact flows back into the persisted
-plan or receipt, and no MCP or Mac UI edge is added. Pull-request publication
-and merge remain pending.
+plan or receipt, and no MCP or Mac UI edge is added.
+Phase 5.5 adds no production data-flow edge. A test-only fixture independently
+reloads ordinary files for all eleven discovery-compatible container/schema
+pairs and compares exact train/evaluation payloads, provenance, and `RowSet`
+identity. Canonical semantic tamper fails for every container, and nested
+`messages` still stops at the constrained-CSV selection boundary before
+publication.
 The export boundary changes neither the canonical six-file
 bundle nor the nine-stage workspace graph. Phase 4.9 supplied consolidated
 adversarial foundation proof; each Phase 5 container requires separate

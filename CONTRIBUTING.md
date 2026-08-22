@@ -47,10 +47,10 @@ bridge. It merged as PR #50 at
 `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
 at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 completes the
 adversarial closeout. Those remain historical Phase 4 facts: its production
-catalog closed empty. Phase 5.1–5.3 now install exact-byte
+catalog closed empty. Phase 5.1–5.3 install exact-byte
 `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
-implementations without adding
-a semantic replayer or trainer-specific profile. Request v1 uses split JSONL's
+implementations; Phase 5.4 adds only their post-export archive transport.
+Neither adds a semantic replayer or trainer-specific profile. Request v1 uses split JSONL's
 `train` / `evaluation` names and aligned provenance and canonical JSON's fixed
 tree; it also selects constrained CSV's fixed quoted-CSV tree. Request v2
 applies only to split JSONL and must provide the complete
@@ -60,12 +60,17 @@ requests. Constrained CSV admits the flat `text`, `prompt_completion`, and
 `instruction_output` schemas and refuses `messages` before publication with a
 split JSONL or canonical JSON alternative. No surface may
 change rows, ordering, curation, split policy, or partition membership.
-Item 5.3 merged as PR #55 at `c6d7fc13a09a`. Phase 5.4 is locally admitted:
+Item 5.4 merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`:
 `deterministic-export-pack-zip-v1` packages one unchanged, already-published
 export directory as `.vfexport.zip` under an externally retained canonical
 receipt digest. It is not a fourth renderer, source-bound verification,
-consumer/trainer profile, MCP operation, or Mac UI promise. Pull-request
-publication, GitHub evidence, and merge remain pending.
+consumer/trainer profile, MCP operation, or Mac UI promise. Phase 5.5's
+locally admitted fixture is test proof only: it strictly reloads all compatible
+container/schema pairs from ordinary files and adds no production importer,
+replayer, public surface, persisted schema, taxonomy, or support claim.
+Pull-request publication, GitHub evidence, and merge for item 5.5 remain
+pending.
 Maturity remains
 development **alpha**. Do not describe the
 product as public-ready without [docs/beta-limitations.md](docs/beta-limitations.md)

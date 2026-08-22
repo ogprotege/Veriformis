@@ -130,9 +130,9 @@ next item begins.
 
 ### 5.5 Add semantic import-round-trip fixtures
 
-- [ ] Reload each supported container to identical semantic rows and logical
+- [x] Reload each supported container to identical semantic rows and logical
       partitions.
-- [ ] Cover every supported current row schema and incompatible-container
+- [x] Cover every supported current row schema and incompatible-container
       refusal.
 
 ### 5.6 Expose exact dry-run previews
@@ -156,12 +156,13 @@ container, reloads to identical semantic rows and logical partitions, and
 detects tampering. Unsupported nested CSV fails before publication with an
 actionable alternative.
 
-**Result:** Phases 5.1–5.3 are implemented, admitted, and merged; item 5.3
-merged as PR #55 at `c6d7fc13a09a`. Item 5.4 is implemented and locally
-admitted after its required repository evidence and corrected independent
-reviews passed. Pull-request publication, GitHub evidence, merge, and
-clean-main synchronization remain open. Items 5.5–5.7 and the phase-wide exit
-proof also remain open.
+**Result:** Items 5.1–5.4 are implemented, admitted, and merged; item 5.4
+merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
+Item 5.5 is locally admitted as a test-only, discovery-closed semantic
+round-trip matrix after its required repository evidence and independent
+review passed. Pull-request publication, GitHub evidence, merge, and clean-main
+synchronization for item 5.5 remain open. Items 5.6–5.7 and the remaining
+phase-wide preview and guidance proof also remain open.
 
 ## Non-goals
 

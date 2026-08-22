@@ -7,11 +7,13 @@ This file gives coding-agent guidance for the current Veriformis repository.
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
-(thin SwiftUI over CLI); independent-product Phases 0–4; and Phase 5.1–5.3's
+(thin SwiftUI over CLI); independent-product Phases 0–4; and Phase 5.1–5.4's
 supported generic `split-jsonl-directory`, canonical `json`, and
-`constrained-csv` v1 exports. Phase 5.3 merged as PR #55 at
-`c6d7fc13a09a`. Phase 5.4's receipt-anchored export-pack transport is locally
-admitted; pull-request publication, GitHub evidence, and merge remain pending.
+`constrained-csv` v1 exports plus receipt-anchored export-pack transport.
+Phase 5.4 merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5's consolidated
+semantic round-trip matrix is locally admitted; pull-request publication,
+GitHub evidence, and merge remain pending.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -50,7 +52,11 @@ schema: `deterministic-export-pack-zip-v1` uses the existing
 `package` / `package-verify` family to wrap one unchanged export directory as
 `.vfexport.zip` under a separately retained canonical receipt digest. It
 preserves the embedded source trust grade, is not source-bound export
-verification, and adds no MCP or Mac UI operation. Do not claim public
+verification, and adds no MCP or Mac UI operation. Phase 5.5 adds only a
+frozen, discovery-closed test fixture that strictly reloads ordinary emitted
+files for all 11 compatible container/schema pairs, proves the sole nested-CSV
+refusal, and exercises semantic tampering. It adds no production importer,
+replayer, request, schema, taxonomy, or support claim. Do not claim public
 beta or production readiness without the checklists in
 `docs/beta-limitations.md` and `docs/release.md`.
 

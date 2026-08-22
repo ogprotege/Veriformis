@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -252,7 +252,7 @@ production semantic replayer ships. Any future shipped semantic profile must
 define and enforce explicit byte, record, nesting, and other applicable
 resource limits.
 
-Locally admitted Phase 5.4 work is transport after publication, not another renderer.
+Merged Phase 5.4 work is transport after publication, not another renderer.
 `exports/archive.py` must validate the separately retained canonical receipt
 digest, preserve the exact inner plan/receipt/file set and source trust grade,
 and call the deterministic codec shared with bundle transport. Archive digest,
@@ -282,8 +282,17 @@ adversarial closeout harness remains test-only. The Phase 5.4
 `.vfexport.zip` path remains outside the export request/discovery protocol:
 `package` / `package-verify` require exactly one manifest or receipt anchor,
 legacy bundle behavior must remain byte-compatible, and no MCP or Mac UI
-operation is added. Item 5.4's local gates passed; pull-request publication,
-GitHub evidence, and merge remain pending. Items 5.5–5.7 remain later work.
+operation is added. Item 5.4 merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
+
+Phase 5.5's locally admitted consolidation is test-only. Keep its frozen
+ordinary-file fixture and strict reload helpers under `tests/`; derive the
+matrix from production discovery, cover all eleven compatible current
+container/schema pairs, rebuild the exact ordered partitions, provenance, and
+source `RowSet`, and retain constrained CSV's actionable `messages` refusal.
+Exercise one canonical semantic tamper per container. Do not turn these fixtures
+into a product importer, semantic replayer, new API, taxonomy or support state,
+or trainer claim. Items 5.6–5.7 remain later work.
 
 ### Keep optional-integration claims accurate
 

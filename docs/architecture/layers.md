@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport local admission)
+**Last reviewed:** 2026-08-22 (Phase 5.5 semantic round-trip local admission)
 
 **Next review:** Any layering or architecture change
 
@@ -222,14 +222,16 @@ alternative. Normalized rows,
 ordering, curation, split policy, and membership remain source-derived and
 plan-equal. None adds a workspace stage, consumer profile, trainer claim,
 semantic replayer, or second filesystem implementation.
-Phase 5.4's locally admitted work remains in the axial transport boundary
-rather than the
-renderer catalog. `exports/archive.py` validates one existing receipt-bound
-directory, while `_archive_transport.py` holds the deterministic ZIP codec
-shared with `bundle/transport.py`. `PipelineService` and the CLI select the
-profile from an explicit external receipt digest. This adds no workspace stage,
-persisted export model, renderer, MCP adapter, or Mac UI policy; pull-request
-publication and merge remain pending.
+Phase 5.4's work, merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`, remains in the axial transport
+boundary rather than the renderer catalog. `exports/archive.py` validates one
+existing receipt-bound directory, while `_archive_transport.py` holds the
+deterministic ZIP codec shared with `bundle/transport.py`. `PipelineService` and
+the CLI select the profile from an explicit external receipt digest. This adds
+no workspace stage, persisted export model, renderer, MCP adapter, or Mac UI
+policy. Phase 5.5 adds only test-layer fixtures and strict reload assertions for
+the existing container/schema matrix; no production layer, dependency,
+importer, replayer, or surface changes.
 `cli.py` imports the pipeline service and translates Typer arguments, outcomes,
 and failures; `mcp/server.py` exposes the same service as local stdio tools.
 The workbench remains outside the Python graph and shells the CLI.

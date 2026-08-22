@@ -1,6 +1,6 @@
 # Phase 5 Evidence
 
-**Status:** In progress — items 5.1–5.3 merged; item 5.4 locally admitted,
+**Status:** In progress — items 5.1–5.4 merged; item 5.5 locally admitted,
 pull-request publication and merge pending
 
 **Opened:** 2026-08-21
@@ -24,6 +24,7 @@ container.
 | The existing deterministic archive transport is the only archive contract Phase 5 may integrate | `source-verified` | ADR-0005 and roadmap work item 5.4 |
 | Item 5.3 merged as PR #55 at `c6d7fc13a09a` before item 5.4 began | `source-verified` | Git commit and Phase 5 progress record |
 | ADR-0006 defines `deterministic-export-pack-zip-v1` as a receipt-anchored post-export wrapper while preserving ADR-0005 and the three export selectors | `source-verified` | ADR-0006 and deterministic archive contract |
+| Item 5.4 merged as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8` before item 5.5 began | `source-verified` | Git commit and Phase 5 progress record |
 
 ## Required item 5.1 evidence
 
@@ -47,10 +48,10 @@ container.
 
 ## Required phase exit evidence
 
-- [ ] Every supported row schema round-trips through every compatible generic
+- [x] Every supported row schema round-trips through every compatible generic
       container with identical semantic rows and logical partitions.
-- [ ] Tampering fails verification for every supported container.
-- [ ] Nested CSV is refused before publication with an actionable alternative.
+- [x] Tampering fails verification for every supported container.
+- [x] Nested CSV is refused before publication with an actionable alternative.
 - [x] Generic export-pack archives reuse the existing deterministic transport
       and verifier.
 - [ ] Dry-run sample rows and destination trees match execution.
@@ -122,6 +123,29 @@ container.
       called complete or published.
 - [x] Documentation makes no trainer, consumer, MCP, Mac UI, signing,
       encryption, compression, remote-publication, or maturity claim.
+
+## Required item 5.5 evidence
+
+- [x] A frozen fixture defines explicit train and evaluation payloads for all
+      four current row schemas and pins its canonical SHA-256.
+- [x] Discovery closure proves exactly 11 compatible current
+      container/schema pairs and the sole constrained-CSV/`messages` negative.
+- [x] Every positive case materializes production-rendered bytes as ordinary
+      files and strictly reloads separate ordered train and evaluation rows,
+      aligned provenance, and the exact source `RowSet` and `row_set_id`.
+- [x] Split JSONL uses a strict independent test loader; canonical JSON uses its
+      strict contract models plus independent `RowSet` reconstruction;
+      constrained CSV uses its exact contract loader rather than the ingest
+      recovery parser.
+- [x] The incompatible CSV case refuses before publication, leaves the
+      destination absent, and names split JSONL v1 and canonical JSON v1.
+- [x] One canonical semantic payload tamper per current container fails strict
+      reload while exhaustive file/member tampering remains in each container's
+      dedicated suite.
+- [x] Focused, integrated, full, release, parity, Mac, tracking, lock, lint,
+      structured-file, diff, and independent-review gates pass without adding
+      a production importer, replayer, public surface, persisted schema,
+      taxonomy entry, or support claim.
 
 ## Observed results
 
@@ -200,9 +224,10 @@ counts above remain local evidence and are not rewritten as GitHub results.
 
 ### Item 5.4 local admission — 2026-08-22
 
-Item 5.4 is implemented and locally admitted as the receipt-anchored
-`.vfexport.zip` transport. The following results are local observations, not
-GitHub results; pull-request publication and merge remain pending.
+Item 5.4 was implemented and locally admitted as the receipt-anchored
+`.vfexport.zip` transport. The following results remain local observations,
+not GitHub results. Item 5.4 subsequently merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
 
 | Evidence | Result | Grade | Limitation |
 | --- | --- | --- | --- |
@@ -219,5 +244,31 @@ GitHub results; pull-request publication and merge remain pending.
 This evidence covers all three current exact-byte export directories,
 `portable_exact_bytes`-only admission, the receipt-derived closed archive,
 legacy bundle byte compatibility, path stability, tamper/refusal behavior, and
-the unchanged three-renderer discovery boundary. Items 5.5–5.7 and the
-phase-wide exit proof remain open.
+the unchanged three-renderer discovery boundary.
+
+### Item 5.5 local admission — 2026-08-22
+
+Item 5.5 is locally admitted as a frozen, discovery-closed conformance fixture.
+The following results are local observations, not GitHub results; pull-request
+publication and merge remain pending.
+
+| Evidence | Result | Grade | Limitation |
+| --- | --- | --- | --- |
+| Dedicated semantic round-trip matrix | 16 passed | `recorded-local` | Test-only conformance proof, not a production importer or replayer |
+| Export/taxonomy/verified-contract/tracking integration | 453 passed | `recorded-local` | Covers the shared export surface and consolidated matrix |
+| Full Python | 1,211 passed; one intentional durability-warning regression warning | `recorded-local` | Local Python run; no GitHub matrix result is claimed |
+| Standalone release | 1,199 passed, 1 deselected; lock, clean wheel, and both golden flows passed | `recorded-local` | Optional Aptus integration remains separate |
+| CLI/workbench parity | PASS | `recorded-local` | Item 5.5 adds no CLI, MCP, or Mac operation |
+| macOS XCTest | 58 passed; `TEST SUCCEEDED` | `recorded-local` | Local unsigned Debug test build |
+| Governance and structure | Tracking, lock, Ruff, fixture/evidence JSON validity, and diff checks passed | `recorded-local` | Documentation-only reconciliation followed the executable gates |
+| Independent adversarial review | No blockers; focused 16-test result reproduced | `recorded-local` | Review is local, not a GitHub review claim |
+
+The matrix covers split JSONL and canonical JSON across `text`,
+`prompt_completion`, `instruction_output`, and `messages`, plus constrained
+CSV across the three flat schemas: 11 positive pairs total. It also covers the
+sole constrained-CSV/`messages` refusal. Each positive case writes ordinary
+files, reloads separate ordered train/evaluation payloads and complete aligned
+provenance, and reconstructs the exact source `RowSet` identity. The fixture
+includes comma, quote, tab, NUL, CR/LF/CRLF, formula-looking, NFC/NFD, and
+non-BMP strings. One semantic tamper per container fails. Items 5.6–5.7 and the
+phase-wide preview and operator-guidance proof remain open.

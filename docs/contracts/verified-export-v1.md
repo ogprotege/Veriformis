@@ -30,12 +30,15 @@ supported product export container. Phase 5.1 adds one reviewed internal
 v2 surface. Phase 5.2 adds canonical `json` v1 under historical request v1;
 Phase 5.3 adds flat-schema-only `constrained-csv` v1 under historical request
 v1. Phase 5.4 adds an optional receipt-anchored deterministic transport around
-an already-published export directory. The ten persisted models, request and
-discovery schemas, production selectors, and response v1 remain unchanged.
+an already-published export directory and merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5 adds only a
+consolidated ordinary-file semantic round-trip fixture matrix over those three
+existing renderers. The ten persisted models, request and discovery schemas,
+production selectors, and response v1 remain unchanged.
 
-**Last reviewed:** 2026-08-22 (Phase 5.4 export-pack transport)
+**Last reviewed:** 2026-08-22 (Phase 5.5 consolidated semantic round-trip)
 
-**Next review:** Phase 5.5 or any export or receipt schema change
+**Next review:** Phase 5.6 or any export or receipt schema change
 
 ## Purpose
 
@@ -841,6 +844,18 @@ publication:
   no-replace publication path under the complementary ADR-0006 decision; and
 - runtime archive digest, size, member-count, inner plan/receipt identities,
   content root, retained source trust grade, and durability-warning evidence.
+
+Phase 5.5 likewise adds no production export implementation or semantic
+replayer. Its test-only fixture closes the current discovery-derived matrix at
+eleven compatible container/schema pairs: four each for split JSONL and
+canonical JSON, and the three flat schemas for constrained CSV. Each ordinary
+file tree reloads to the identical ordered train and evaluation payloads,
+complete provenance, and source `RowSet`; one canonical semantic tamper per
+container fails reconstruction. The twelfth current pairing, constrained CSV
+with nested `messages`, retains its actionable pre-publication refusal. This is
+consolidated evidence for the existing contracts, not a first-class dataset
+importer, public replay API, taxonomy change, support promotion, or consumer
+compatibility claim.
 
 This wrapper does not change the inner `ExportPlan`, `ExportReceipt`,
 `ExportVerification`, file bindings, or their identities. Its outer digest is

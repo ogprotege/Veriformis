@@ -15,11 +15,12 @@ explicitly selects it as training content.
 > **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
 > automated release gates, beta-prep docs, and a **private beta Mac workbench**
 > (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–4, plus Phase 5.1–5.3's supported generic
+> independent-product Phases 0–4, plus Phase 5.1–5.4's supported generic
 > `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 exports.
-> Phase 5.3 merged as PR #55 at
-> `c6d7fc13a09a`; Phase 5.4's receipt-anchored export-pack transport is
-> locally admitted, with pull-request publication and merge still pending.
+> Phase 5.4 merged as PR #56 at
+> `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`; Phase 5.5's test-only semantic
+> round-trip matrix is locally admitted, with pull-request publication and
+> merge still pending.
 > This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
@@ -61,11 +62,10 @@ Version `0.1.0` provides:
 - authoritative train and evaluation assignment by complete transitive leakage groups;
 - deterministic, externally anchored `.vfbundle.zip` transport that preserves
   the strict six-file canonical bundle without becoming a trainer export;
-- a locally admitted Phase 5.4 optional receipt-anchored
+- a Phase 5.4 optional receipt-anchored
   `.vfexport.zip` transport around one unchanged, already-published generic
   export directory; it reuses `package` / `package-verify`, is not a fourth
-  export renderer or source-bound export verification, and remains pending
-  pull-request publication and merge;
+  export renderer or source-bound export verification, and merged as PR #56;
 - a verified `split-jsonl-directory` v1 derivative with canonical train and
   evaluation JSONL, a deterministic README and data card, an export receipt,
   and aligned provenance by default;
@@ -256,10 +256,10 @@ source paths.
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
 **private beta workbench Phases 0–2**, **independent-product Phases 0–4**, and
-**independent-product Phase 5.1–5.3**. Phase 5.3 merged as PR #55 at
-`c6d7fc13a09a`. Phase 5.4 is locally implemented and admitted on the current
-working tree; pull-request publication, GitHub evidence, and merge remain
-pending.
+**independent-product Phase 5.1–5.4**. Phase 5.4 merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Phase 5.5's test-only semantic
+round-trip matrix is locally admitted on the current working tree;
+pull-request publication, GitHub evidence, and merge remain pending.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
@@ -293,6 +293,12 @@ Phase 5.4 does not add a renderer. It adds the optional
 set as `.vfexport.zip`. Archive verification preserves the embedded source
 trust grade and is not source-bound export verification. Export discovery,
 request schemas, persisted export models, and the Mac UI remain unchanged.
+The locally admitted Phase 5.5 fixture then exercises all 11 compatible
+container/current-row-schema pairs by materializing and strictly reloading
+ordinary files, plus the one actionable constrained-CSV/`messages` refusal
+and one semantic tamper per container. This is proof infrastructure only: it
+does not ship a production importer or replayer and changes no public surface,
+taxonomy, support claim, or persisted schema.
 Historical request v1 remains unchanged: it selects split JSONL's `train` /
 `evaluation` filenames with aligned provenance and the canonical JSON fixed
 tree, or constrained CSV's fixed quoted-CSV tree. Request v2 applies only to

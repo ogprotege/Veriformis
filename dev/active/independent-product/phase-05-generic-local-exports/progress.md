@@ -209,3 +209,58 @@ and the re-review was clear. These are local results, not GitHub evidence.
 **Next action:** Publish the item 5.4 pull request, require every GitHub check
 to pass, merge, and synchronize clean local `main` before item 5.5. Items
 5.5–5.7 and Phase 5 closeout remain open.
+
+## 2026-08-22 — Item 5.4 merged; item 5.5 started
+
+**Status:** Item 5.4 merged as PR #56 at
+`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. Item 5.5 implementation and
+admission began from clean local `main` equal to `origin/main` at that commit.
+
+The item 5.5 boundary is conformance proof only. It may freeze a consolidated
+fixture and strict test loaders for ordinary emitted files, but it may not add
+a production importer, replayer, public operation, request field, persisted
+schema, taxonomy entry, or support promotion. First-class import remains Phase
+7 work.
+
+The required matrix is discovery-closed over the three current production
+containers and four current row schemas. Split JSONL and canonical JSON pair
+with all four schemas; constrained CSV pairs with the three flat schemas and
+must refuse `messages` before publication with both JSON alternatives. Every
+positive case must preserve separate ordered train/evaluation payloads,
+complete aligned provenance, and exact `RowSet` identity from ordinary files.
+
+**Next action:** Implement the frozen matrix, run focused and complete required
+repository gates, reconcile active records, and publish only after independent
+review finds no blocker.
+
+## 2026-08-22 — Item 5.5 locally admitted
+
+**Status:** Local implementation, evidence, and independent-review gates
+passed; pull-request publication, GitHub evidence, and merge remain pending.
+
+The frozen fixture pins explicit train and evaluation payloads across all four
+current row schemas, including comma, quote, tab, NUL, CR/LF/CRLF,
+formula-looking, NFC/NFD, and non-BMP strings. Its canonical SHA-256 is pinned.
+The test matrix derives and closes over exactly 11 compatible catalog/schema
+pairs, materializes production-rendered bytes as ordinary files, and strictly
+reloads separate ordered partitions, aligned provenance, and the exact source
+`RowSet` and `row_set_id`. The sole constrained-CSV/`messages` case refuses
+before publication, leaves no destination, and names split JSONL v1 and
+canonical JSON v1. One canonical semantic tamper per container fails reload.
+
+The dedicated matrix passed 16 tests; the integrated
+export/taxonomy/verified-contract/tracking gate passed 453. Full Python passed
+1,211 with the one intentional durability-warning regression warning. The
+standalone release gate passed 1,199 with one deselection plus lock, clean
+wheel, and both golden flows. CLI/workbench parity passed, and the complete Mac
+target passed 58 tests with `TEST SUCCEEDED`. Tracking, lock, Ruff, fixture and
+evidence JSON validity, and diff checks passed. Independent adversarial review
+found no blocker and reproduced the 16 focused tests.
+
+No production source or public surface changed. The helpers and fixture remain
+under `tests/`; no importer, replayer, schema, taxonomy, support, trainer, or
+consumer claim was added.
+
+**Next action:** Publish item 5.5, require every GitHub check to pass, merge,
+and synchronize clean local `main` before item 5.6. Items 5.6–5.7 and Phase 5
+closeout remain open.

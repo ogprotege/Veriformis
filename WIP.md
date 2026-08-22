@@ -2,16 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `c6d7fc13a09a` on `main` (Groups 1–7;
+**Implementation baseline reviewed:** `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`
+on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–4 and items 5.1–5.3 complete), plus the current
-locally admitted Phase 5.4 receipt-anchored export-pack transport
+independent-product Phases 0–4 and items 5.1–5.4 complete), plus the current
+locally admitted Phase 5.5 semantic round-trip matrix
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5.4 local admission)
+**Last reviewed:** 2026-08-22 (independent-product Phase 5.5 local admission)
 
-**Next review:** Phase 5.4 pull-request publication or merge; beta label cut,
+**Next review:** Phase 5.5 pull-request publication or merge; beta label cut,
 public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -61,8 +62,8 @@ local, offline, and free of LLM generation.
       at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
 - [ ] Independent product Phase 5 is in progress under its
       [active packet](dev/active/independent-product/phase-05-generic-local-exports/README.md).
-      Items 5.1–5.3 own the first three generic local containers; item 5.4's
-      receipt-anchored transport is locally admitted and awaits publication.
+      Items 5.1–5.4 are merged; item 5.5's test-only semantic round-trip matrix
+      is locally admitted and awaits publication.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -179,12 +180,12 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 At Phase 4 closeout, the foundation shipped without a production
 implementation: discovery was empty and tests alone injected the conformance
 exporter. Phase 5.1–5.3 install reviewed exact-byte renderers for
-`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 and
-promote only those
-consumer-neutral physical containers. No semantic replayer or trainer-specific
-profile ships. The ten persisted export v1 models remain unchanged; additive
-request v2 carries only split JSONL's strict configuration. Constrained CSV
-admits the three flat row schemas and refuses `messages` before publication.
+`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1 and promote
+only those consumer-neutral physical containers. Phase 5.4 adds their
+post-export archive transport. No semantic replayer or trainer-specific profile
+ships. The ten persisted export v1 models remain unchanged; additive request v2
+carries only split JSONL's strict configuration. Constrained CSV admits the
+three flat row schemas and refuses `messages` before publication.
 
 ### Active Phase 5 status
 
@@ -198,23 +199,24 @@ admits the three flat row schemas and refuses `messages` before publication.
 - [x] Phase 5.3 — constrained CSV v1 for `text`, `prompt_completion`, and
       `instruction_output` merged as PR #55 at `c6d7fc13a09a`; `messages` is
       refused before publication.
-- [x] Phase 5.4 — deterministic generic export-pack archive integration is
-      locally admitted. The `.vfexport.zip` wrapper is anchored by the
-      separately retained canonical export-receipt digest; pull-request
-      publication, GitHub evidence, and merge remain pending.
-- [ ] Phase 5.5 — semantic import-round-trip fixtures.
+- [x] Phase 5.4 — deterministic generic export-pack archive integration merged
+      as PR #56 at `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`.
+- [x] Phase 5.5 — the test-only semantic import-round-trip matrix is locally
+      admitted; pull-request publication, GitHub evidence, and merge remain
+      pending. It adds no production importer or replayer.
 - [ ] Phase 5.6 — exact sample-row and destination-tree dry-run previews.
 - [ ] Phase 5.7 — operator guidance and phase closeout reconciliation.
 
-The Phase 5.1–5.3 implementation and admission evidence support the split
+The Phase 5.1–5.4 implementation and admission evidence support the split
 JSONL, canonical JSON, and constrained CSV promotions. Phase 5 remains in
-progress. Phase 5.4 locally admits
+progress. Phase 5.4 ships
 `deterministic-export-pack-zip-v1` through the existing `package` /
-`package-verify` family; pull-request publication, GitHub evidence, and merge
-remain open. It
-adds no fourth renderer, trainer compatibility, source-bound archive
-verification, or Mac UI. Shared round-trip fixtures, previews, final guidance,
-and every trainer profile remain later work.
+`package-verify` family and adds no fourth renderer, trainer compatibility,
+source-bound archive verification, or Mac UI. Phase 5.5's locally admitted,
+discovery-closed fixture proves the 11 compatible pairs, the sole nested-CSV
+refusal, and per-container semantic tampering without adding a production
+importer or replayer. Its publication and merge, previews, final guidance, and
+every trainer profile remain later work.
 
 The current stage-command runtime is:
 
