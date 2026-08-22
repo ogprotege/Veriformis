@@ -4,7 +4,7 @@
 
 **Date:** 2026-08-11
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export surfaces remain faithful)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout remains faithful)
 
 **Decider:** Repository owner direction
 
@@ -82,8 +82,10 @@ memory, and the fixture is statically bounded. The default service has no
 renderer or semantic replayer. Phase 4.8 adds a private exact-selector catalog
 and shared strict surface protocol, but production discovery remains empty and
 adapters accept no caller-supplied plan, implementation, membership, or
-replacement authority. Closeout remains Phase 4.9, and generic containers
-remain Phase 5.
+replacement authority. Phase 4.9 consolidates adversarial contract, tamper,
+path, link, source-trust, membership, race, cancellation, and partial-
+publication proof. The roadmap exit gate passes without a shipped
+implementation; generic containers remain Phase 5.
 
 ## Review triggers
 

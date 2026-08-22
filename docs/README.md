@@ -5,9 +5,9 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
 
-**Next review:** Phase 4.8 merge or Phase 4.9 closeout work; beta
+**Next review:** Phase 5 or Phase 6 packet opening; beta
 label cut, public-ready checklist, or any contract change
 
 ## Start here
@@ -53,7 +53,7 @@ label cut, public-ready checklist, or any contract change
 | [Bundle Transport Contract v1](contracts/bundle-transport-v1.md) | Deterministic `.vfbundle.zip` transport and archive verification | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
 | [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Implemented contract |
-| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Private two-render exact/semantic conformance and strict production-empty surfaces implemented locally; no shipped renderer/replayer or supported container |
+| [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, and verification evidence | Completed Phase 4 foundation with private two-render conformance, strict production-empty surfaces, and adversarial closeout; no shipped renderer/replayer or supported container |
 | [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0005) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
@@ -71,6 +71,7 @@ label cut, public-ready checklist, or any contract change
 | [Phase 1 packet](../dev/active/independent-product/phase-01-standalone-independence/README.md) | Standalone-independence packet and closeout | Completed implementation record |
 | [Phase 2 packet](../dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) | Reliability and artifact-boundary packet and closeout | Completed implementation record |
 | [Phase 3 packet](../dev/active/independent-product/phase-03-taxonomy/README.md) | Taxonomy contract, registry, discovery, and compatibility closeout | Completed implementation record |
+| [Phase 4 packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export contracts, service, surfaces, adversarial evidence, and closeout | Completed implementation record |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |

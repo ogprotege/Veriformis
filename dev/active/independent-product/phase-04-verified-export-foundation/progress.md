@@ -428,3 +428,57 @@ publication types; no execution hook or registry became public.
 **Next action:** Wait for every GitHub check and review on the Phase 4.8
 corrective PR to pass. Phase 4.9 may begin only after that PR merges and clean
 local `main` equals `origin/main`.
+
+## 2026-08-21 — Phase 4.8 merged, corrected, and synchronized
+
+**Status:** Complete
+
+PR #50 passed its required GitHub checks and was squash-merged as
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`. The follow-up review-correction
+PR #51 passed its required GitHub checks and was squash-merged as
+`d91542fe12c5a492de578ad060836a7d65999e42`. Local `main` was fetched, clean,
+and exactly equal to `origin/main` at that commit before the Phase 4.9 branch
+was created.
+
+## 2026-08-21 — Phase 4.9 adversarial closeout
+
+**Status:** Complete
+
+The consolidated closeout harness exercises one private, test-injected exact
+conformance implementation without changing production discovery. It covers
+canonical contract and identity replay, tampering, unexpected files, traversal,
+Unicode and case aliases, symlinks, hard links, special files, source-digest
+mismatch and source tampering, every complete membership mutation, destination
+races, cancellation immediately before and after visibility, and verifiable
+visible-partial reporting.
+
+The membership matrix explicitly covers omission, coherent addition,
+duplication, reorder, ordinal mutation, target mutation, assignment and
+leakage-group substitution, repartitioning, and resplitting. Export has no
+independent balancing representation: a balancing change necessarily appears
+as one of the covered membership or ordering mutations.
+
+The production catalog remains empty and the shipped taxonomy still contains
+only `minimal-v1` and `deterministic-vfbundle-zip-v1` as implemented physical
+containers and the existing canonical/Aptus consumer profiles. The stale
+generic-export-service foundation gap is closed without promoting a generic
+container or trainer profile. The packet, program ledger, WIP, current status,
+product contract, verified-export contract, architecture, governance records,
+and evidence index are reconciled.
+
+**Observed closeout gates:** 36 focused closeout, 223 export, 228 combined
+export/verified-contract, and 992 full Python tests passed; the full run emitted
+only the expected exercised transport durability-warning regression warning.
+The exact standalone release gate passed 980 core tests with 1 deselected and
+the same expected warning, then passed lock, clean-wheel installation, both
+golden compiles, external-digest verification, and deterministic transport.
+The complete Mac target passed 54 tests. CLI/workbench parity, project tracking,
+Ruff, lock integrity, 15 tracked JSON files, 10 shell files, 378 changed-
+document local links, and `git diff --check` passed. Independent security,
+documentation, and final diff reviews found no remaining blocker after adding
+literal ordinal and missing-file cases and deriving the conformance bytes from
+the verified source rows.
+
+**Next action:** Open the Phase 4.9 closeout pull request, require every GitHub
+check to pass, merge, and synchronize clean local `main` to `origin/main`.
+Phases 5 and 6 may begin only afterward and only under their own packets.

@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface boundary)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout boundary)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -249,13 +249,15 @@ retains each complete produced file in memory; the Phase 4.7 fixture is
 statically bounded. Any future shipped semantic profile must define and enforce
 explicit byte, record, nesting, and other applicable resource limits.
 
-Phase 4.8 surfaces must call the typed `PipelineService` operations. Keep the
-production catalog private and empty until a later phase ships an implementation.
+Verified-export surfaces must call the typed `PipelineService` operations. Keep
+the production catalog private and empty until a later phase ships an
+implementation.
 CLI and MCP must share the canonical export request/response serializer; the
 Mac bridge shells those CLI commands and must decode stdout separately from
 stderr. Do not add caller-supplied profiles, dependencies, file plans,
-membership, renderers, replayers, replacement, or force controls. Adversarial
-closeout remains Phase 4.9 and generic containers remain Phase 5.
+membership, renderers, replayers, replacement, or force controls. The Phase 4.9
+adversarial closeout harness must remain test-only; generic containers remain
+Phase 5.
 
 ### Keep optional-integration claims accurate
 

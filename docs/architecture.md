@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 surface boundary)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -40,7 +40,7 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `construction/`, `datasets/`, `bundle/` — flanked by axial modules:
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
 `exports/` (consumer-neutral verified-derivative composition boundary);
-`handoff/`; `mcp/`; and `cli.py` (Typer adapter). Phase 4 currently adds the
+`handoff/`; `mcp/`; and `cli.py` (Typer adapter). Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
 source-derived plan population and normalized semantic membership enforcement,

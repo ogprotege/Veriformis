@@ -18,7 +18,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 verified-export surfaces)
+**Last reviewed:** 2026-08-21 (Phase 4 verified-export closeout)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -544,7 +544,7 @@ veriformis export-verify --request-json JSON
 ```
 
 `discover` accepts no request and lists only executable implementations from the
-private service catalog. The production catalog is empty in Phase 4.8, so no
+private service catalog. Phase 4 closes with the production catalog empty, so no
 generic container or consumer profile is advertised. Tests inject the bounded
 conformance implementation used for cross-surface evidence.
 

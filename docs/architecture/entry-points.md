@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
 
 **Next review:** Any entry-point or architecture change
 
@@ -157,14 +157,15 @@ operations and canonical response envelope. The Mac bridge shells those CLI
 commands, decodes stdout separately from diagnostics, and does not enumerate,
 rewrite, or verify destination files itself. No surface accepts a plan,
 profile, renderer, replayer, membership projection, replacement mode, or force
-flag. Python callers import the frozen publication outcome and visible-partial
-exception from `veriformis.exports`; publication hooks remain private.
+flag. Python callers import the cancellation callback, frozen publication
+outcome, and visible-partial exception from `veriformis.exports`; publication
+hooks remain private.
 
 There is still no shipped renderer or semantic replayer and no generic
 derivative container. The private hooks are trusted conformance code, not an
 untrusted plugin boundary; semantic replay retains complete files in memory and
-its fixture is statically bounded. Adversarial closeout remains Phase 4.9, and
-generic containers remain Phase 5.
+its fixture is statically bounded. Phase 4.9 supplies the consolidated
+adversarial closeout; generic containers remain Phase 5.
 
 ## Preview, recipes, and optional integrations
 

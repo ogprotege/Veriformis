@@ -7,19 +7,17 @@ optional consumer integrations
 
 **Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
-plus independent-product Phases 0–3, merged Phase 4 items 4.1–4.7, and Phase
-4.8 verified-export surfaces in progress, version `0.1.0` development
-alpha
+plus completed independent-product Phases 0–4, including the verified-export
+foundation and its production-empty cross-surface operations, version `0.1.0`
+development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–3 and Phase 4 items 4.1–4.7 on `main`; Phase 4.8 implemented on the
-current branch with every required local gate passing and GitHub review
-pending; maturity alpha; public Mac claim still owner-gated
+Phases 0–4 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
 
-**Next review:** Phase 4.8 merge or Phase 4.9 closeout work; beta
+**Next review:** Phase 5 or Phase 6 packet opening; beta
 label cut, public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
@@ -120,7 +118,7 @@ Optional Group 8 (model-assisted construction) remains owner-gated.
 Independent-product Phases 0–3 add the tracking and claim-control foundation,
 standalone defaults, deterministic bundle transport, reliability controls, and
 the implemented taxonomy and discovery registry without changing existing v1
-persisted meanings. Phase 4 verified export foundation is in progress. Its
+persisted meanings. Phase 4 verified export foundation is complete. Its
 opening implementation adds a typed internal service boundary and a
 descriptor-anchored view of an independently verified finished bundle without
 changing existing persisted meanings. Its second increment adds strict
@@ -145,14 +143,17 @@ descriptor-reread staged replay. The service computes semantic digests rather
 than accepting hook assertions. All required local gates pass, including 14
 determinism, 158 export, 163 combined export/contract, 927 full Python, 915
 standalone-release with 1 deselected, and 38 Mac tests, and merged as PR #49 at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The eighth increment locally adds
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The eighth increment adds
 a private default-empty implementation catalog plus strict discovery, dry run,
 self-described inspect, operator-confirmed no-replace execute, and source-bound
-verify through `PipelineService`, CLI, MCP, and the CLI-backed Mac bridge. The
+verify through `PipelineService`, CLI, MCP, and the CLI-backed Mac bridge. It
+merged as PR #50 at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review
+corrections in PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. The ninth
+increment consolidates adversarial contract, tamper, path, link, source-trust,
+membership, race, cancellation, and partial-publication closeout evidence. The
 ten persisted v1 schemas and existing `publish` signature are unchanged. No
 production renderer or semantic replayer, generic export container, or new
-trainer profile ships. Phase 4.9 closeout and Phase 5 generic exports remain
-open.
+trainer profile ships. Phase 5 generic exports remain open.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
 untrusted plugin boundary. Semantic replay currently retains each complete

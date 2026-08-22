@@ -57,12 +57,12 @@
     {
       "number": 4,
       "title": "Build the verified export foundation",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [3],
       "packet": "dev/active/independent-product/phase-04-verified-export-foundation",
       "started_on": "2026-08-21",
-      "completed_on": null,
-      "next_gate": "Open the Phase 4.8 pull request, require every GitHub check to pass, merge, and synchronize clean local main before beginning Phase 4.9 adversarial closeout."
+      "completed_on": "2026-08-21",
+      "next_gate": "Completed; Phases 5 and 6 may begin under separate standard packets, with every Phase 5 implementation using the verified export service."
     },
     {
       "number": 5,

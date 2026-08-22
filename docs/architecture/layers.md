@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-21 (Phase 4.8 export-surface reconciliation)
+**Last reviewed:** 2026-08-21 (Phase 4 closeout reconciliation)
 
 **Next review:** Any layering or architecture change
 

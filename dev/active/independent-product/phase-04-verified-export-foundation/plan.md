@@ -1,6 +1,6 @@
 # Phase 4 Execution Plan
 
-**Status:** In progress
+**Status:** Completed
 
 **Last updated:** 2026-08-21
 
@@ -96,8 +96,10 @@ Phase 4.9 owns the complete adversarial closeout harness.
 
 ### 4.8 Expose export APIs on every surface
 
-- **Implementation state:** Complete; every required local gate passes; pull-
-  request review pending.
+- **Implementation state:** Complete; PR #50 passed its required checks and
+  merged at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; the review-correction
+  PR #51 passed its required checks and merged at
+  `d91542fe12c5a492de578ad060836a7d65999e42`.
 - [x] Add discovery, dry run, overwrite-policy, inspect, execute, and verify
       methods through `PipelineService`.
 - [x] Add `veriformis export` and `veriformis export-verify` as thin adapters.
@@ -108,14 +110,14 @@ Phase 4.9 owns the complete adversarial closeout harness.
 
 ### 4.9 Complete the adversarial harness and closeout
 
-- [ ] Cover contract properties, tampering, unexpected files, traversal,
+- [x] Cover contract properties, tampering, unexpected files, traversal,
       Unicode/case aliases, links, races, cancellation, and partial publication.
-- [ ] Prove source-digest mismatch and every membership mutation fail closed.
-- [ ] Run the complete Python, release, Mac, parity, tracking, structure, link,
+- [x] Prove source-digest mismatch and every membership mutation fail closed.
+- [x] Run the complete Python, release, Mac, parity, tracking, structure, link,
       and diff gates.
-- [ ] Reconcile current status, architecture, support, evidence, WIP, program
+- [x] Reconcile current status, architecture, support, evidence, WIP, program
       ledger, and this packet.
-- [ ] Mark Phase 4 complete only after its roadmap exit evidence passes.
+- [x] Mark Phase 4 complete only after its roadmap exit evidence passes.
 
 ## Exit gate
 
@@ -123,6 +125,11 @@ An injected generic conformance exporter creates an atomic, receipt-bound
 derivative. Tampering, unexpected files, source-digest mismatch, membership
 change, and partial publication fail verification. Python, CLI, MCP, and the
 CLI-backed Mac bridge produce identical plans and digests.
+
+**Result:** Passed. The consolidated Phase 4.9 harness and final reconciliation
+evidence are recorded in [evidence.md](evidence.md) and
+[closeout.md](closeout.md). Final observed command totals are filled from the
+closeout run before merge rather than inferred from earlier increments.
 
 ## Non-goals
 

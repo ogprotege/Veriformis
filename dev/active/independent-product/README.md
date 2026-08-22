@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–3 complete; Phase 4 in progress
+**Status:** Active program — Phases 0–4 complete; Phases 5 and 6 planned
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -19,7 +19,7 @@ with roadmap headings.
 - [Phase 1 — Standalone independence](phase-01-standalone-independence/README.md) — completed
 - [Phase 2 — Reliability and artifact boundary](phase-02-reliability-artifact-boundary/README.md) — completed
 - [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
-- [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — in progress
+- [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — completed
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -39,13 +39,19 @@ verification, cancellation, and one atomic no-replace promotion, and merged as
 PR #48 at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`. Item 4.7 implements
 private two-render exact-byte and semantic-content evidence plus descriptor-
 reread staged semantic replay and merged as PR #49 at
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Item 4.8 locally implements a
-production-empty private catalog and strict discovery, dry run, inspect,
-execute, and verify operations through `PipelineService`, CLI, MCP, and the
-CLI-backed Mac bridge, with every required local gate passing and pull-request
-review pending. It ships no production renderer or semantic replayer, generic
-export container, or trainer-specific profile. Phase 4.9 closeout and Phase 5
-generic exports remain open.
+`6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Item 4.8 implements a production-
+empty private catalog and strict discovery, dry run, inspect, execute, and
+verify operations through `PipelineService`, CLI, MCP, and the CLI-backed Mac
+bridge. It merged as PR #50 at
+`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; its review corrections merged as
+PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Item 4.9 completes the
+adversarial harness and reconciles the program under the completed
+[Phase 4 packet](phase-04-verified-export-foundation/README.md).
+
+Phase 4 ships no production renderer or semantic replayer, generic export
+container, or trainer-specific profile. Production discovery remains empty.
+Phases 5 and 6 may begin only under their own standard packets after the Phase
+4 closeout pull request merges and clean local `main` equals `origin/main`.
 
 ## State change procedure
 

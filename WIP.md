@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `6c3f0aff2e35edaa7920a0964270c410bf53f47b`
+**Implementation baseline reviewed:** `d91542fe12c5a492de578ad060836a7d65999e42`
 on `main` (Groups 1–7; Group 9 automated gates; beta-prep; private beta
-workbench Phases 0–2; independent-product Phases 0–3 complete; Phase 4 items
-4.1–4.7 merged), plus the current Phase 4.8 export-surfaces branch
+workbench Phases 0–2; independent-product Phases 0–3 complete; Phase 4.8 merged
+and corrected), plus the current Phase 4.9 closeout branch
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
+**Last reviewed:** 2026-08-21 (independent-product Phase 4 closeout)
 
-**Next review:** Independent-roadmap Phase 4.8 GitHub review and merge; Phase 4.9
-closeout; beta label cut, public Mac evidence, or any
+**Next review:** Independent-roadmap Phase 5 or Phase 6 packet opening; beta
+label cut, public Mac evidence, or any
 listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -58,11 +58,10 @@ local, offline, and free of LLM generation.
       KISS shell, and debugger power).
 - [ ] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
-- [ ] Independent product Phase 4 is in progress; items 4.1–4.7 are merged at
-      `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. Item 4.8 locally implements
-      strict discovery, dry-run, inspect, execute, and verify operations across
-      Python, CLI, MCP, and the CLI-backed Mac bridge; every required local gate
-      passes and GitHub review remains pending.
+- [x] Independent product Phase 4 is complete. Item 4.8 merged as PR #50 at
+      `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; its review corrections merged
+      as PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. Item 4.9 completes the
+      consolidated adversarial harness and closeout reconciliation.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -79,7 +78,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 1 | Enforce standalone independence | Completed | [Completed packet](dev/active/independent-product/phase-01-standalone-independence/README.md) |
 | 2 | Close known reliability and artifact-boundary defects | Completed | [Completed packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md) |
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
-| 4 | Build the verified export foundation | In progress | [Active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
+| 4 | Build the verified export foundation | Completed | [Completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
 | 5 | Ship lossless generic local exports | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 6 | Deliver goal-first recipes and previews | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -143,7 +142,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 - [x] Taxonomy golden round-trip and pre-taxonomy workspace/bundle compatibility proof.
 - [x] Full Phase 3 closeout gates and status/support/evidence reconciliation.
 
-### Active Phase 4 status
+### Completed Phase 4 status
 
 - [x] Phase 4.1 — typed `ExportService` and descriptor-anchored verified source
       inspection are implemented.
@@ -167,18 +166,21 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
       complete plan-equal membership, service-computed digests, and staged
       descriptor replay. PR #49 passed all 14 GitHub checks and merged at
       `6c3f0aff2e35edaa7920a0964270c410bf53f47b`.
-- [ ] Phase 4.8 — a private production-empty implementation catalog and strict
+- [x] Phase 4.8 — a private production-empty implementation catalog and strict
       cross-surface discovery, dry-run, inspect, execute, and verify operations
-      are locally implemented; every required local gate passes and GitHub
-      review remains.
-- [ ] Phase 4.9 — adversarial closeout remains open in the
-      [active packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
+      merged as PR #50 at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; review
+      corrections merged as PR #51 at
+      `d91542fe12c5a492de578ad060836a7d65999e42`.
+- [x] Phase 4.9 — the consolidated adversarial harness, full exit gate, and
+      active-document reconciliation are complete in the
+      [completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md).
 
-Phase 4.8 exposes the foundation without shipping an implementation: production
+Phase 4 exposes the foundation without shipping an implementation: production
 discovery is empty and tests alone inject the conformance exporter. The default
 service ships no renderer or semantic replayer, supported generic export
 container, or trainer-specific profile. The ten persisted v1 schemas, taxonomy,
-and support registry remain unchanged.
+and support capability lists remain unchanged. Closing the stale generic-export-
+service foundation gap is not a container or profile promotion.
 
 The current stage-command runtime is:
 

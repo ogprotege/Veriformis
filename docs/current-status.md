@@ -9,18 +9,19 @@ and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated);
 independent-product Phase 3 completed with taxonomy discovery, public
 vocabulary cleanup, and persisted-v1 compatibility proof;
-independent-product Phase 4 verified export foundation in progress with its
+independent-product Phase 4 verified export foundation completed with its
 typed internal service boundary, descriptor-anchored source view, and strict
 versioned persisted export models, plus trusted-by-default source admission
 with explicit lower-trust policy, read-only source-derived plan population, and
 normalized semantic membership enforcement, internal exact-byte atomic
 publication and independent closed-tree verification, private two-render
 exact-byte and semantic-content conformance with staged descriptor replay, and
-strict production-empty export surfaces through Python, CLI, MCP, and Mac
+strict production-empty export surfaces through Python, CLI, MCP, and Mac,
+plus the consolidated adversarial closeout harness
 
-**Review date:** 2026-08-21 (independent-product Phase 4.8 export surfaces)
+**Review date:** 2026-08-21 (independent-product Phase 4 closeout)
 
-**Next review:** Phase 4.8 GitHub review or merge; Phase 4.9 closeout work;
+**Next review:** Phase 5 or Phase 6 packet opening;
 beta label cut, public-ready checklist, or any
 contract change
 
@@ -128,7 +129,7 @@ compile-compatibility checks, and read-only discovery through
 `PipelineService`, CLI, MCP, and CLI-backed workbench help. Ambiguous public
 taxonomy wording is reconciled without changing persisted stage IDs; the
 taxonomy golden and persisted-v1 workspace/bundle compatibility proofs pass.
-Phase 4, verified export foundation, is in progress. Its opening slice adds a
+Phase 4, verified export foundation, is complete. Its opening slice adds a
 typed internal `ExportService`, owned by `PipelineService`, and a
 descriptor-anchored verified source view that returns the already checked
 manifest, validation report, row set, and verification result from one pass.
@@ -157,14 +158,19 @@ profiles permit different physical bytes but require equal profile-versioned
 canonical semantic preimages, complete plan-equal reconstructed membership,
 service-computed digests, and descriptor-reread staged replay before promotion.
 It merged as PR #49 at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The eighth
-slice locally adds a private, immutable, production-empty implementation
+slice adds a private, immutable, production-empty implementation
 catalog and typed discovery, destination-free dry run, self-described inspect,
 operator-confirmed no-replace execute, and source-bound verify operations.
 `PipelineService`, CLI, MCP, and the CLI-backed Mac bridge share one strict
 canonical protocol and frozen evidence fixture. The default service has no
-renderer or semantic replayer. Python publicly exports only the runtime
-publication outcome and visible-partial exception needed to use execution
-honestly; publication hooks remain private. The ten v1 schemas record the
+renderer or semantic replayer. Python publicly exports only the cancellation
+callback, runtime publication outcome, and visible-partial exception needed to
+use execution honestly; publication hooks remain private. The eighth slice
+merged as PR #50 at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review
+corrections in PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`. The ninth
+slice consolidates contract, tamper, path, link, source-trust, complete
+membership-mutation, race, cancellation, and visible-partial closeout evidence.
+The ten v1 schemas record the
 profile claim and one published instance, not a rerender transcript. Generic
 export containers and planned trainer-specific profiles remain unimplemented.
 
@@ -513,9 +519,9 @@ See [docs/release.md](release.md).
 | Implemented Group 9 + independent Phase 1 defaults | CI matrix, lock check, clean-wheel installed golden proof, standalone golden compile/verify, optional non-blocking Aptus adapter proof, release runbook |
 | Implemented independent Phase 2 | Bounded async Mac process runner, cancellation/quit recovery receipts, deterministic no-replace transport, archive re-verification, Mac and Linux acceptance evidence |
 | Implemented independent Phase 3 | Versioned taxonomy, shared compile compatibility, read-only discovery through `PipelineService.discover_taxonomy()`, `veriformis taxonomy`, MCP, and CLI-backed workbench help, axis-specific public copy, a display-only `Lower rows` stage alias, canonical taxonomy golden, and frozen pre-taxonomy workspace/bundle compatibility proof |
-| Independent Phase 4 in progress | Items 4.1–4.7 merged at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`; Phase 4.8 locally adds production-empty verified-export discovery, dry run, inspect, execute, and verify surfaces; no shipped renderer/replayer, production container, or support promotion |
+| Implemented independent Phase 4 | Verified-export contracts, source trust, source-derived plans, complete derivative membership, atomic publication, exact/semantic evidence limits, production-empty cross-surface operations, and adversarial closeout; no shipped renderer/replayer, production container, or support promotion |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phase 4 verified export foundation in progress and later phases planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–4 complete and later phases planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -568,16 +574,14 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–3 are complete. Phase 4 items 4.1–4.7 are merged
-at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`. The completed
+Independent-product Phases 0–4 are complete. The completed
 [taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
 records the contract, compile compatibility, cross-surface discovery, public
-vocabulary cleanup, and persisted-v1 compatibility evidence. Phase 4 verified
-export foundation is in progress under its
-[active packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
-The current Phase 4.8 branch implements the strict cross-surface export API;
-every required local gate passes and GitHub review remains pending. The private
-hooks are trusted conformance code, not an
+vocabulary cleanup, and persisted-v1 compatibility evidence. The completed
+Phase 4 verified-export foundation is recorded in its
+[closeout packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
+Its strict cross-surface export API and adversarial closeout harness preserve
+the boundary: private hooks are trusted conformance code, not an
 untrusted plugin boundary, and semantic replay currently retains each complete
 produced file in memory. The statically bounded fixture does not establish a
 scalable public parser; any future shipped semantic profile must enforce

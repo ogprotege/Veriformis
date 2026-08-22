@@ -1,14 +1,13 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 4.8 export surfaces reconciled; every
-required local gate passes and GitHub review remains pending
+**Status:** Independent-product Phase 4 closeout reconciled
 
 **Review date:** 2026-08-21
 
 **Repository baseline:** Working tree based on
-`6c3f0aff2e35edaa7920a0964270c410bf53f47b`
+`d91542fe12c5a492de578ad060836a7d65999e42`
 
-**Next review:** Independent-product Phase 4.8 merge, Phase 4.9 closeout, or the
+**Next review:** Independent-product Phase 5 or Phase 6 packet opening, or the
 next active-document behavior change
 
 ## Scope examined
@@ -30,7 +29,7 @@ next active-document behavior change
   release, and beta-limitations documents.
 - Independent product analysis and roadmap.
 - Project governance, support registry, evidence index, ADRs, documentation
-  debt, WIP, the completed Phase 0–3 packets, and the active Phase 4 packet.
+  debt, WIP, and the completed Phase 0–4 packets.
 - Versioned integrity, construction, finished-dataset, verified-export, and
   optional Aptus handoff contracts, plus the implemented taxonomy contract.
 
@@ -74,6 +73,8 @@ deprecated document must link its replacement and removal/review trigger.
 | Active docs still said no derivative writer or destination verifier existed after Phase 4.6 landed locally | `ExportService.publish`, private publication helper, verified-export contract, focused Python suite (150 tests), full Python suite (914 tests) | Reconciled the internal exact-byte publisher and independent closed-tree verifier while preserving the no-renderer, no-public-surface, no-supported-container, and Phase 4.7 semantic/rerender boundaries |
 | Active docs still described Phase 4.6 as pending and Phase 4.7 rerender/semantic replay as absent | PR #48 merge at `3da0a7f4f8243a1e3a7390e6969c2ee67d7c65af`; private two-render service path; 14 determinism, 158 export, 163 combined export/contract, and 927 full Python tests | Reconciled current status, product, architecture, development, governance, program, WIP, and evidence records to Phase 4.7 locally green/PR pending while retaining the trusted-private-hook, whole-file-memory, no-public-surface, no-supported-container, and unchanged-schema limits |
 | Active docs still described Phase 4.7 as local and export surfaces as absent after its merge | PR #49 merge at `6c3f0aff2e35edaa7920a0964270c410bf53f47b`; strict production-empty discovery and Python/CLI/MCP/Mac adapters | Reconciled the merged Phase 4.7 baseline and locally implemented Phase 4.8 surfaces while preserving the no-shipped-implementation, no-supported-container/profile, unchanged-taxonomy, and unchanged-persisted-schema limits |
+| Active docs still described Phase 4.8 as pending after both its feature and review-correction merges | PR #50 at `fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`; PR #51 at `d91542fe12c5a492de578ad060836a7d65999e42`; Phase 4.9 adversarial harness | Reconciled the packet, product/status, architecture, governance, program, WIP, and evidence records to completed Phase 4 while preserving the empty production catalog and no-container/profile limits |
+| The support registry and drift checker still required `gap-generic-export-service` to remain open “before Phase 4” after the foundation landed | Completed typed service, strict public operations, production-empty discovery, and Phase 4 exit harness | Close the resolved service-foundation gap and its stale checker assertion without promoting a generic container or consumer profile; Phase 5 retains implementation support |
 
 ## Current health assessment
 
@@ -81,7 +82,7 @@ deprecated document must link its replacement and removal/review trigger.
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
 | Current capability accuracy | Good within audited active scope | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, release boundary, and Mac guide |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–3 packets, and active Phase 4 packet with items 4.1–4.7 merged, 4.8 locally implemented with every required local gate passing, and GitHub review plus 4.9 open |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, and completed Phase 0–4 packets; no later phase is started by closeout |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -90,21 +91,22 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Open the Phase 4.8 pull request, merge only when every GitHub check is green,
-   synchronize local `main`, and begin Phase 4.9 only afterward.
+1. Open the Phase 4.9 closeout pull request, merge only when every GitHub check
+   is green, and synchronize local `main` before opening a Phase 5 or Phase 6
+   packet.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
    historical subtree; propose moves before execution.
 4. Add pinned offline Mermaid validation only after dependency review.
 
-Phase 4.8 exposes strict export operations across Python, CLI, MCP, and the
+Phase 4 exposes strict export operations across Python, CLI, MCP, and the
 CLI-backed Mac bridge, but production discovery is empty and the conformance
 implementation remains test-injected private code. A shipped renderer/replayer,
 supported generic export container, and trainer profile remain outside the
 current claim. Any future shipped semantic profile must enforce explicit
-resource limits. Phase 4.9 and Phase 5 retain their closeout and generic-
-container boundaries respectively.
+resource limits. Phase 4.9 closes the foundation; Phase 5 retains the generic-
+container boundary.
 
 The detailed open list is maintained in
 [Documentation Debt](documentation-debt.md). This report summarizes health; it
