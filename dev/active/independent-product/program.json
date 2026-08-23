@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.3 merged as PR #73. Item 7.4 proposes mapping plans from packaged detectors and requires confirmation before map mutates a workspace."
+      "next_gate": "Item 7.4 merged as PR #74. Item 7.5 binds mapping provenance and replay so a silent mapping edit cannot reuse a prior seal."
     },
     {
       "number": 8,
