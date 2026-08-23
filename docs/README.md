@@ -6,10 +6,10 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–7 complete).
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
 
-**Next review:** Phase 8 packet opening, beta label cut, public-ready
-checklist, or any contract change
+**Next review:** Phase 8.1 pull-request merge, item 8.2, beta label cut,
+public-ready checklist, or any contract change
 
 ## Start here
 
@@ -70,7 +70,7 @@ checklist, or any contract change
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
 | [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
 | [Generic export operator guide](generic-exports.md) | When to use split JSONL, canonical JSON, or constrained CSV without conflating container, objective, row schema, or consumer compatibility | Implemented Phase 5.7 operator guidance; merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
-| [ADR index](adr/README.md) | Accepted product-boundary, catalog, and mapping decisions (0001–0008, 0010–0011) | Decision records |
+| [ADR index](adr/README.md) | Accepted product-boundary, catalog, mapping, and profile-adapter decisions (0001–0008, 0010–0012) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
@@ -91,6 +91,7 @@ checklist, or any contract change
 | [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and closeout | Completed implementation record; item 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and item 5.7 guidance/closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
 | [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal catalog, contracts, previews, presets, preflight, matrix, truthfulness, and closeout | Completed implementation record; item 6.7 merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d` |
 | [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping contracts, and closeout | Completed implementation record |
+| [Phase 8 packet](../dev/active/independent-product/phase-08-consumer-profiles/README.md) | First consumer profiles (TRL, MLX-LM) as optional adapters | Active implementation packet |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -100,6 +100,9 @@ semantic rows; workspace revision v4 with stage `map`; JSON/CSV capture;
 rejection reports; and packaged mapping templates. Mode is not a taxonomy
 axis. Imported fields carry `mapped_value` evidence and seal through ordinary
 `ProductRow` v1.
+Phase 8.1 records that a consumer profile is an optional adapter over that
+bundle (ADR-0012). `trl` and `mlx-lm` stay planned; generic export discovery
+still has a null consumer profile.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

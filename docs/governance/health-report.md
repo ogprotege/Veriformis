@@ -1,13 +1,13 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phases 0–7 complete
+**Status:** Independent-product Phases 0–7 complete; Phase 8 in progress
 
-**Review date:** 2026-08-23 (independent-product Phase 7 complete)
+**Review date:** 2026-08-23 (independent-product Phase 8.1 opening)
 
-**Repository baseline:** Working tree based on Phase 7.10 PR #80 merge
-`b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`
+**Repository baseline:** Working tree based on PR #81 merge
+`64a7799c27d1a489f01d77d8ba399910c95c0712`
 
-**Next review:** Independent-product Phase 8 packet opening, or the next
+**Next review:** Independent-product Phase 8.1 pull-request merge, or the next
 active-document behavior change
 
 ## Scope examined
@@ -102,8 +102,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Phase 8 consumer profiles may begin under their own packet when the
-   operator asks. Do not start Phase 9 or 13 from the Phase 7 closeout.
+1. Finish Phase 8.1, then 8.2 admission pins. Do not start Phase 9, 10, or
+   13 from this packet. Do not advertise TRL or MLX-LM as implemented.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a

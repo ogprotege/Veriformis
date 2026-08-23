@@ -11,7 +11,9 @@ train/evaluation split.
 **Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 Imported dataset-row bundles use these same three containers. Mapping does
-not add a fourth renderer or a trainer profile.
+not add a fourth renderer or a trainer profile. Named TRL and MLX-LM
+profiles remain planned (Phase 8); selecting them as `consumer_id` fails
+closed until the matching item.
 
 **Next review:** Any generic-export selector, row-schema compatibility,
 consumer-profile, request, receipt, or transport change

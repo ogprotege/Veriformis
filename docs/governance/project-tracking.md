@@ -4,9 +4,9 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
 
-**Next review:** Independent-product Phase 8 packet opening, or any
+**Next review:** Independent-product Phase 8.1 pull-request merge, or any
 program-state, evidence-grade, or completion-rule change
 
 ## Purpose
