@@ -31,10 +31,6 @@
     {
       "container_id": "hugging-face-dataset",
       "executable_item": "9.6"
-    },
-    {
-      "container_id": "parquet",
-      "executable_item": "9.4"
     }
   ],
   "round_trip": false,

@@ -63,3 +63,16 @@ passed.
 - [x] Focused fingerprint, schema, and isolation tests passed (26). Tracking,
       Ruff, lock, and diff check passed. Core pytest: 2027 passed, 3
       deselected, expected transport warning.
+- [x] Item 9.3 merged as PR #91 at
+      `f4c35e12fcc4453e65e30e87266583727d5f6cd2` after all 16 GitHub checks
+      passed.
+
+## Required item 9.4 evidence
+
+- [x] Selector `parquet` v1, `consumer_id` null, `semantic_content_only`.
+- [x] Dry-run plans train/evaluation Parquet fingerprints without importing
+      PyArrow. Execute fails closed naming extra `columnar` when PyArrow is
+      absent.
+- [x] Nested `messages` is in the supported schema list. Taxonomy stays
+      planned. Extra `columnar` stays empty.
+- [x] Core pytest: 2030 passed, 3 deselected, expected transport warning.

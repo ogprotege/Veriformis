@@ -46,13 +46,11 @@ merged as PR #82 through PR #87. Item 8.7 promotes `trl` and `mlx-lm` to
 implemented optional adapters, names accepted/transformed/rejected goals and
 rows, and closes the phase. The exporter does not train. Phase 9 (columnar
 and Hugging Face dataset containers) is in progress under its standard
-packet. Item 9.1 merged as PR #89 at
-`719c961da3346c3102f26ebd03ddf7af01fded54`. Item 9.2 merged as PR #90 at
-`2f31526e15f1fe3d2df394d959a92a124b909258` with Arrow and Hugging Face
-feature schema pins. Item 9.3 defines `semantic_content_only` fingerprints
-over ordered product payloads. Extra `columnar` stays empty. Those three
-`container_id` values remain planned. Do not start Phase 10 or 13 from this
-packet.
+packet. Items 9.1–9.3 merged as PR #89–#91. Item 9.4 emits generic Parquet
+v1 with `semantic_content_only`. Extra `columnar` stays empty. Taxonomy
+still lists `parquet`, `arrow`, and `hugging-face-dataset` as planned;
+Arrow and Hugging Face Dataset still refuse. Do not start Phase 10 or 13
+from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -125,6 +123,7 @@ Read these current authorities before changing code:
     `docs/contracts/profile-admission-v1.md`,
     `docs/contracts/columnar-schema-v1.md`,
     `docs/contracts/columnar-fingerprint-v1.md`,
+    `docs/contracts/parquet-export-v1.md`,
     `docs/contracts/trl-export-v1.md`, and
     `docs/contracts/mlx-lm-export-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,

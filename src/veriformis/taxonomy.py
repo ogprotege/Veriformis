@@ -118,7 +118,6 @@ PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
 )
 UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
     {
-        "parquet": "9.4",
         "arrow": "9.5",
         "hugging-face-dataset": "9.6",
     }

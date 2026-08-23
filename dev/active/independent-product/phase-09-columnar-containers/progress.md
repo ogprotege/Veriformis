@@ -48,3 +48,17 @@ Extra `columnar` stays empty. Taxonomy stays planned.
 
 **Next action:** Publish the item 9.3 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.4.
+
+## 2026-08-23 — Item 9.3 merged; item 9.4 in progress
+
+**Status:** Item 9.3 merged as PR #91 at
+`f4c35e12fcc4453e65e30e87266583727d5f6cd2` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.4 emits generic Parquet v1 with `consumer_id` null and
+`semantic_content_only`. Dry-run plans fingerprints without PyArrow.
+Execute fails closed if PyArrow is absent. Extra `columnar` stays empty.
+Taxonomy stays planned.
+
+**Next action:** Publish the item 9.4 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 9.5.
