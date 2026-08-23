@@ -18,15 +18,15 @@ merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
 goal-first recipes and previews complete, closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; Phase 7 existing-dataset import
 and mapping complete; Phase 8 consumer-profile packet open with TRL and
-MLX-LM still planned; version `0.1.0` development alpha
+MLX-LM admission pins packaged and still planned; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–7 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
-**Next review:** Phase 8.1 pull-request merge, item 8.2, beta label cut,
+**Next review:** Phase 8.2 pull-request merge, item 8.3, beta label cut,
 public-ready checklist, or any product-contract change. Do not start Phase 9,
 10, or 13 from this packet.
 

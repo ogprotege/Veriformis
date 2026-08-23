@@ -96,8 +96,13 @@ def test_planned_consumer_id_refusal_is_visible_on_the_cli() -> None:
     assert "planned for item 8.3" in result.output
 
 
-def test_core_optional_extras_remain_only_test() -> None:
+def test_optional_profile_extras_are_declared_empty() -> None:
     text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'trl =' not in text
-    assert "mlx-lm" not in text
+    assert "trl = []" in text
+    assert "mlx-lm = []" in text
     assert 'test = ["pytest>=8.0", "ruff==0.16.0"]' in text
+    lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
+    assert 'name = "trl"\n' not in lock
+    assert 'name = "mlx-lm"\n' not in lock
+    assert 'name = "torch"\n' not in lock
+    assert 'name = "mlx"\n' not in lock

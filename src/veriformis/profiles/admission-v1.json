@@ -1,0 +1,155 @@
+{
+  "contract_id": "veriformis.consumer-profile-admission",
+  "contract_version": 1,
+  "records": [
+    {
+      "admitted_row_schemas": [
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+        "text"
+      ],
+      "deprecation_policy": "A new admission-record version is required when TRL SFT dataset types or column names change.",
+      "docs_reviewed_on": "2026-08-23",
+      "executable_item": "8.3",
+      "extra": "trl",
+      "license": "Apache-2.0",
+      "loader": "datasets.Dataset.from_list and DatasetDict; conformance in item 8.5",
+      "loss_notes": "SFTTrainer language-modeling supervises the full sequence; prompt-completion concatenates prompt and completion. The profile must not change Veriformis loss-policy IDs.",
+      "package": "trl",
+      "partition_mapping": {
+        "evaluation": "evaluation split of a DatasetDict",
+        "train": "train split of a DatasetDict"
+      },
+      "primary_docs_url": "https://huggingface.co/docs/trl/main/en/dataset_formats",
+      "profile_id": "trl",
+      "refused_dataset_types": [
+        "preference",
+        "prompt-only",
+        "stepwise-supervision",
+        "tools",
+        "unpaired-preference",
+        "vision"
+      ],
+      "round_trip": false,
+      "row_mappings": [
+        {
+          "destination_format": "prompt-completion-standard",
+          "destination_keys": [
+            "completion",
+            "prompt"
+          ],
+          "mapping_kind": "assemble-prompt",
+          "notes": "prompt is instruction, or instruction plus a newline and input when input is nonempty; completion is output.",
+          "source_row_schema": "instruction_output"
+        },
+        {
+          "destination_format": "language-modeling-conversational",
+          "destination_keys": [
+            "messages"
+          ],
+          "mapping_kind": "identity",
+          "notes": "SFT conversational language-modeling. Veriformis messages remain two turns, user then assistant.",
+          "source_row_schema": "messages"
+        },
+        {
+          "destination_format": "prompt-completion-standard",
+          "destination_keys": [
+            "completion",
+            "prompt"
+          ],
+          "mapping_kind": "identity",
+          "notes": "SFTTrainer prompt-completion type with string prompt and completion.",
+          "source_row_schema": "prompt_completion"
+        },
+        {
+          "destination_format": "language-modeling-standard",
+          "destination_keys": [
+            "text"
+          ],
+          "mapping_kind": "identity",
+          "notes": "SFTTrainer language-modeling type with a text column.",
+          "source_row_schema": "text"
+        }
+      ],
+      "state": "planned",
+      "version_range": ">=0.15.0,<1.0.0",
+      "workflow": "Export a verified Veriformis bundle as TRL SFT Dataset or DatasetDict-compatible local JSON without preference, stepwise, tools, or vision types."
+    },
+    {
+      "admitted_row_schemas": [
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+        "text"
+      ],
+      "deprecation_policy": "A new admission-record version is required when mlx-lm LoRA JSONL formats or required filenames change.",
+      "docs_reviewed_on": "2026-08-23",
+      "executable_item": "8.4",
+      "extra": "mlx-lm",
+      "license": "MIT",
+      "loader": "mlx_lm.lora JSONL data directory; conformance in item 8.5",
+      "loss_notes": "Default mlx-lm LoRA loss covers every token. --mask-prompt is the documented completion-only option for chat and completions datasets and must stay aligned with Veriformis loss-policy IDs.",
+      "package": "mlx-lm",
+      "partition_mapping": {
+        "evaluation": "valid.jsonl when the evaluation partition is nonempty; omitted when empty",
+        "train": "train.jsonl (required)"
+      },
+      "primary_docs_url": "https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md",
+      "profile_id": "mlx-lm",
+      "refused_dataset_types": [
+        "preference",
+        "prompt-only",
+        "stepwise-supervision",
+        "tools",
+        "unpaired-preference",
+        "vision"
+      ],
+      "round_trip": false,
+      "row_mappings": [
+        {
+          "destination_format": "completions",
+          "destination_keys": [
+            "completion",
+            "prompt"
+          ],
+          "mapping_kind": "assemble-prompt",
+          "notes": "prompt is instruction, or instruction plus a newline and input when input is nonempty; completion is output.",
+          "source_row_schema": "instruction_output"
+        },
+        {
+          "destination_format": "chat",
+          "destination_keys": [
+            "messages"
+          ],
+          "mapping_kind": "identity",
+          "notes": "mlx-lm chat JSONL. Veriformis messages remain two turns, user then assistant. Tools format is refused.",
+          "source_row_schema": "messages"
+        },
+        {
+          "destination_format": "completions",
+          "destination_keys": [
+            "completion",
+            "prompt"
+          ],
+          "mapping_kind": "identity",
+          "notes": "mlx-lm completions JSONL with prompt and completion keys.",
+          "source_row_schema": "prompt_completion"
+        },
+        {
+          "destination_format": "text",
+          "destination_keys": [
+            "text"
+          ],
+          "mapping_kind": "identity",
+          "notes": "mlx-lm text JSONL with a text key.",
+          "source_row_schema": "text"
+        }
+      ],
+      "state": "planned",
+      "version_range": ">=0.22.0,<1.0.0",
+      "workflow": "Export a verified Veriformis bundle as an mlx-lm LoRA data directory with required train.jsonl and optional valid.jsonl. mlx-lm test.jsonl is the --test file and is not mapped from Veriformis evaluation."
+    }
+  ],
+  "schema_id": "veriformis.profile-admission-discovery/v1"
+}

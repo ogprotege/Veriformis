@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
-**Next review:** Independent-product Phase 8.1 pull-request merge, item 8.2,
+**Next review:** Independent-product Phase 8.2 pull-request merge, item 8.3,
 any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -46,8 +46,8 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–7 are complete on `main` and
-Phase 8 is in progress under item 8.1. Phase 7 closeout merged as PR #80 at
-`b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks
-passed. `trl` and `mlx-lm` remain planned; generic export discovery still
-has a null consumer profile. Historical Phase 4–6 merge SHAs remain in those
+Phase 8 is in progress under item 8.2. Item 8.1 merged as PR #82 at
+`799d56f` after all 14 GitHub checks passed. `trl` and `mlx-lm` remain
+planned with packaged admission pins; generic export discovery still has a
+null consumer profile. Historical Phase 4–7 merge SHAs remain in those
 packets and in `docs/current-status.md`.

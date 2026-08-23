@@ -793,6 +793,19 @@ def mapping_contracts() -> None:
     )
 
 
+@app.command(name="profile-admissions")
+def profile_admissions() -> None:
+    """Print planned consumer-profile admission pins as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_profile_admissions(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="preflight")
 def preflight(
     paths: list[Path],

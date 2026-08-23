@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -45,7 +45,8 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
 `exports/` (consumer-neutral verified-derivative composition boundary);
 `handoff/`; `mcp/`; `goals/`; `mapping/` (compiler-path modes, capture,
-confirmed mapping, templates); and `cli.py` (Typer adapter). Phase 4 establishes the
+confirmed mapping, templates); `profiles/` (planned TRL and MLX-LM admission
+pins); and `cli.py` (Typer adapter). Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
 source-derived plan population and normalized semantic membership enforcement,
@@ -101,8 +102,9 @@ rejection reports; and packaged mapping templates. Mode is not a taxonomy
 axis. Imported fields carry `mapped_value` evidence and seal through ordinary
 `ProductRow` v1.
 Phase 8.1 records that a consumer profile is an optional adapter over that
-bundle (ADR-0012). `trl` and `mlx-lm` stay planned; generic export discovery
-still has a null consumer profile.
+bundle (ADR-0012). Item 8.2 packages planned TRL and MLX-LM admission pins
+under `profiles/` with empty extras; both remain non-executable. Generic
+export discovery still has a null consumer profile.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

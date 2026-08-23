@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -92,6 +92,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
 | `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
 | `src/veriformis/mcp/` | Constrained local MCP adapter, including canonical verified-export tools over `PipelineService` |
+| `src/veriformis/profiles/` | Planned TRL and MLX-LM admission pins; empty extras; not executable |
 | `macos/` | SwiftUI workbench and strict verified-export bridge (CLI shell) |
 | `src/veriformis/serializers/` | Legacy M1 serializers and chat templates |
 | `src/veriformis/validate/` | Legacy and shared gate helpers |
@@ -114,6 +115,8 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | Recipes / YAML | `tests/recipes/` |
 | MCP parity | `tests/mcp/` |
 | Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
+| Planned consumer-profile admission pins | `tests/profiles/` |
+| Optional TRL/MLX-LM loader checks | `profile_integration` marker (none until item 8.5) |
 | Finished seal / verifier | `tests/bundle/` |
 | Verified export models, membership, publication, API, and adapter parity | `tests/exports/`, `tests/contracts/test_verified_export_contract.py`, `tests/regressions/fixtures/phase4/export-surfaces.json` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |

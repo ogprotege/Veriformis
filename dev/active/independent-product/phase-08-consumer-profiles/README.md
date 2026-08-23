@@ -11,7 +11,8 @@
 **Predecessor:** [Phase 7 closeout](../phase-07-existing-dataset-import/closeout.md),
 merged as PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14
 GitHub checks passed; active-doc continuity merged as PR #81 at
-`64a7799c27d1a489f01d77d8ba399910c95c0712`
+`64a7799c27d1a489f01d77d8ba399910c95c0712`; item 8.1 merged as PR #82 at
+`799d56f` after all 14 GitHub checks passed
 
 ## Purpose
 
@@ -28,8 +29,9 @@ no fourth generic container, no Parquet/Arrow (Phase 9), no Axolotl /
 LLaMA-Factory / Unsloth / Aptus-as-profile (Phase 10), and no training
 launcher.
 
-Item 8.1 opens the packet, publishes ADR-0012, and keeps `trl` and `mlx-lm`
-planned and non-executable.
+Item 8.1 opened the packet and published ADR-0012. Item 8.2 pins official
+TRL and MLX-LM admission records as packaged data with empty extras. Both
+profiles remain planned and non-executable.
 
 ## Packet contents
 
@@ -41,8 +43,11 @@ planned and non-executable.
 | [risks.md](risks.md) | Risk register and controls |
 | [evidence.md](evidence.md) | Starting facts and observed proof |
 | [closeout.md](closeout.md) | Exit-gate judgment |
+| [SESSION.md](SESSION.md) | Crash-recovery pointer for the current item |
 
 ## Current state
 
-Item 8.1 is opening the packet. TRL and MLX-LM remain planned taxonomy
-identifiers. Generic export discovery still has a null consumer profile.
+Item 8.1 merged as PR #82. Item 8.2 is pinning official TRL and MLX-LM
+admission records. Both remain planned taxonomy identifiers. Generic export
+discovery still has a null consumer profile. Empty extras do not install
+trainer packages.

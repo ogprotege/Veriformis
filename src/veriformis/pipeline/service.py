@@ -1056,6 +1056,12 @@ class PipelineService:
 
         return mapping_template_catalog().model_dump(mode="json")
 
+    def discover_profile_admissions(self) -> dict[str, Any]:
+        """Return planned consumer-profile admission pins. Not executable."""
+        from veriformis.profiles import discover_profile_admissions
+
+        return discover_profile_admissions()
+
     def detect_mapping(
         self,
         path: Path,

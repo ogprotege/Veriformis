@@ -83,8 +83,8 @@ was synchronized before Phase 6 opened. Phase 6 completed under its
 [packet](phase-07-existing-dataset-import/README.md); closeout merged as
 PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
 checks passed. Phase 8 opened on 2026-08-23 under its
-[packet](phase-08-consumer-profiles/README.md); item 8.1 (packet and
-ADR-0012) is in progress.
+[packet](phase-08-consumer-profiles/README.md); item 8.1 merged as PR #82;
+item 8.2 pins planned TRL and MLX-LM admission records.
 
 ## State change procedure
 

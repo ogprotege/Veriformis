@@ -10,16 +10,16 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-34 commands; `export` contains four subcommands.
+35 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -45,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, and constrained CSV v1 |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
@@ -784,6 +784,22 @@ literal default, so the same selection yields the same recipe on the CLI,
 MCP, YAML, Python, and the workbench. See the
 [Recipe Preset Contract v1](contracts/recipe-preset-v1.md).
 
+### `profile-admissions`
+
+Print planned TRL and MLX-LM admission pins as read-only JSON.
+
+```text
+veriformis profile-admissions
+```
+
+The output is the exact packaged `veriformis.profile-admission-discovery/v1`
+data that `PipelineService` and MCP `profile_admissions` also emit. Each
+record pins official docs, a review date, license, empty extra name, version
+range, admitted row schemas, refused dataset types, partition mapping, and
+row mappings. Both records remain `planned`. The command does not emit
+trainer files and does not import TRL or MLX-LM. See
+[Consumer Profile Admission v1](contracts/profile-admission-v1.md).
+
 ### `preflight`
 
 Evaluate raw-source compile readiness without creating a workspace.
@@ -1070,6 +1086,7 @@ stage-command redesign is planned solely for packaging.
 - [Split JSONL Export Contract v1](contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](contracts/constrained-csv-export-v1.md)
+- [Consumer Profile Admission v1](contracts/profile-admission-v1.md)
 - [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)
 - [Current implementation status](current-status.md)
 - [Install guide](install.md)

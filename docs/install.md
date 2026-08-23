@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -129,6 +129,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis taxonomy` | Print the implemented training taxonomy as read-only JSON |
 | `veriformis goals` | Print the versioned goal catalog |
 | `veriformis presets` | Print versioned recipe presets |
+| `veriformis profile-admissions` | Print planned TRL and MLX-LM admission pins; not executable |
 | `veriformis preflight PATH... --goal ID` | Raw-source compile admission without a workspace |
 | `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |
 | `veriformis clean WORKSPACE` | Cleaning plan + apply |
