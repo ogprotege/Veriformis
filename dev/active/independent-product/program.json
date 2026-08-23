@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.4 merged as PR #74. Item 7.5 binds mapping provenance and replay so a silent mapping edit cannot reuse a prior seal."
+      "next_gate": "Item 7.5 merged as PR #75. Item 7.6 previews mapping across the full file without workspace mutation."
     },
     {
       "number": 8,

@@ -704,6 +704,25 @@ def modes() -> None:
     )
 
 
+@app.command(name="mapping-preview")
+def mapping_preview(
+    path: Path,
+    plan: Path = typer.Option(..., "--plan"),
+    source_root: Path | None = typer.Option(None, "--source-root"),
+) -> None:
+    """Preview mapping across the full JSONL file without writing a workspace."""
+    try:
+        payload = _SERVICE.preview_mapping(
+            path,
+            json.loads(plan.read_text(encoding="utf-8")),
+            source_root=source_root,
+        )
+    except VeriformisError as exc:
+        _echo_error(exc)
+        return
+    typer.echo(json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True))
+
+
 @app.command(name="mapping-detect")
 def mapping_detect(
     path: Path,

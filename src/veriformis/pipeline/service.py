@@ -1072,6 +1072,33 @@ class PipelineService:
             representation_id=representation,
         )
 
+    def preview_mapping(
+        self,
+        path: Path,
+        mapping_plan: MappingPlan | dict[str, Any],
+        *,
+        source_root: Path | None = None,
+    ) -> dict[str, Any]:
+        """Preview mapping across the full file without writing a workspace."""
+        from veriformis.mapping.models import MappingPlan as MappingPlanModel
+        from veriformis.mapping.preview import preview_mapping
+        from veriformis.sources import capture_source_batch
+
+        plan = (
+            mapping_plan
+            if isinstance(mapping_plan, MappingPlanModel)
+            else MappingPlanModel.model_validate(mapping_plan)
+        )
+        captures = capture_source_batch([path], source_root=source_root)
+        capture = captures[0]
+        if capture.error is not None:
+            raise capture.error
+        return preview_mapping(
+            path,
+            plan,
+            logical_path=capture.logical_path,
+        )
+
     def preflight(
         self,
         paths: list[Path],
