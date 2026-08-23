@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 

@@ -1,6 +1,6 @@
 # Phase 7 Evidence
 
-**Status:** Open — item 7.8 JSON/CSV round trips
+**Status:** Complete — item 7.10 closeout observed on GitHub
 
 **Opened:** 2026-08-23
 
@@ -70,3 +70,6 @@ The completion stamp merged as PR #69 at
       phases, not an open Phase 7 gap.
 - [x] Phase 7 marked completed. Do not start Phase 8, 9, or 13.
 - [x] Core pytest: 1956 passed, 1 deselected, expected transport warning.
+- [x] After the Actions spending limit was increased, PR #80 passed all 14
+      GitHub checks and `main` `ci` run 32617948069 succeeded on
+      `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`.

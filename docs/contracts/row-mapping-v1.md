@@ -8,7 +8,7 @@
 
 **Status:** Models, discovery, JSONL/JSON/CSV capture, mapping execution,
 detection, preview, membership policy, mixed mode, and the dataset-row seal
-path are implemented through Phase 7.8. Mapping templates remain item 7.10.
+path are implemented through Phase 7.10, including packaged mapping templates.
 
 **Last reviewed:** 2026-08-23
 

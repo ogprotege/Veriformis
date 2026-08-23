@@ -12,27 +12,21 @@ the difficult path from source capture through the finished bundle. Cleaned
 text is an accountable intermediate state, except when a `full_text` recipe
 explicitly selects it as training content.
 
-> **Development alpha (`0.1.0`):** M1 core, roadmap Groups 1–7, Group 9
-> automated release gates, beta-prep docs, and a **private beta Mac workbench**
-> (Phases 0–2: KISS shell and debugger tools over the CLI), plus completed
-> independent-product Phases 0–5 on `main`. The supported
-> generic exports are `split-jsonl-directory`, canonical `json`, and
-> `constrained-csv` v1. Phase 5.6's exact dry-run previews merged as PR #58 at
-> `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
-> [generic export operator guide](docs/generic-exports.md) and Phase 5 closeout
-> merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`. Phase 6
-> (goal-first recipes and previews) is complete; closeout merged as PR #67 at
-> `6995d17bef0d09f235b1c464e947c38c63dd313d`.
-> This is **not** a public
-> beta or production
-> label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
-> Install: [docs/install.md](docs/install.md). Status:
+> **Development alpha (`0.1.0`):** M1 core, Groups 1–7, Group 9 automated
+> release gates, beta-prep docs, and a **private beta Mac workbench**
+> (Phases 0–2 over the CLI), plus completed independent-product Phases 0–7
+> on `main`. Generic exports are `split-jsonl-directory`, canonical `json`,
+> and `constrained-csv` v1. Goal-first recipes (Phase 6) and existing-dataset
+> import/mapping (Phase 7) are implemented. Consumer profiles (Phase 8) are
+> not started. This is **not** a public beta or production label. Limits:
+> [docs/beta-limitations.md](docs/beta-limitations.md). Install:
+> [docs/install.md](docs/install.md). Status:
 > [docs/current-status.md](docs/current-status.md).
 
 ## What works today
 
-The active compiler path runs nine stage-gated stages from raw files to a
-sealed bundle, verified by a separate command:
+The default **document-source** compiler path runs nine stage-gated stages
+from raw files to a sealed bundle, verified by a separate command:
 
 ```mermaid
 flowchart LR
@@ -41,6 +35,16 @@ flowchart LR
     split --> format[format] --> validate[validate] --> seal[seal]
     seal --> bundle[Sealed .vfbundle] --> verify[verify]
     verify --> package[deterministic .vfbundle.zip] --> packageVerify[package-verify]
+```
+
+Existing JSONL, JSON, or compatible CSV training rows use the opt-in
+**dataset-row** path (`parse --mode dataset-row` then `map`). That path does
+not run `clean`, `chunk`, or `construct`. Operator guide:
+[docs/mapping.md](docs/mapping.md).
+
+```text
+parse --mode dataset-row -> map -> curate -> split
+      -> format -> validate -> seal -> verify
 ```
 
 Version `0.1.0` provides:
@@ -78,6 +82,10 @@ Version `0.1.0` provides:
   `prompt_completion`, and `instruction_output`, with fixed fully quoted
   train/evaluation CSV, mandatory aligned provenance, and nested-`messages`
   refusal;
+- confirmed mapping of existing JSONL, JSON, and compatible CSV rows into the
+  four current semantic schemas, with `mapped_value` evidence, rejection
+  reports, and packaged templates; imported rows seal through ordinary
+  `ProductRow` v1 and the same generic exports;
 - a [generic export operator guide](docs/generic-exports.md) that keeps JSONL,
   JSON, or CSV container choice separate from the already-bound training
   objective, row schema, and any independently admitted consumer profile;
@@ -119,7 +127,7 @@ the [private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.m
 | Word | `.docx` |
 | Web | `.html`, `.htm` |
 | Digitally-born PDF | `.pdf` (image-only/OCR input fails closed) |
-| Structured data | `.csv`, `.json`, `.jsonl` |
+| Structured data | `.csv`, `.json`, `.jsonl` (document recovery by default; `--mode dataset-row` maps existing training rows instead) |
 | Source code | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` |
 
 Other extensions fail with an `unsupported-input` error.
@@ -159,8 +167,10 @@ Optional Aptus adapter self-conformance is invoked separately with
 
 ## Raw source to verified bundle
 
-The GUI runs this same stage sequence. Use at least two independent sources when
-you need a non-empty evaluation partition under default split rules:
+The GUI runs this same document-source sequence. Use at least two independent
+sources when you need a non-empty evaluation partition under default split
+rules. For files that already contain training rows, see
+[docs/mapping.md](docs/mapping.md).
 
 ```bash
 uv run veriformis parse source-a.txt source-b.txt -o build/workspace
@@ -242,15 +252,19 @@ rows; it does not define core dataset correctness or release readiness.
 
 ## Workspace integrity
 
-The physical workspace layout remains schema 1. Active revisions use schema 3
-and the full stage graph. `HEAD` selects one immutable revision, and that
-revision maps logical outputs to content-addressed objects under
+The physical workspace layout remains schema 1. Document-source revisions use
+schema 3 (`parse → clean → chunk → construct → curate → split → format →
+validate → seal`). Dataset-row revisions use schema 4 (`parse → map → curate
+→ split → format → validate → seal`). `HEAD` selects one immutable revision,
+and that revision maps logical outputs to content-addressed objects under
 `objects/sha256/`.
 
 Use `upgrade-workspace` to migrate a verified revision-v1 or revision-v2
-workspace through every supported migration. The v2 to v3 migration preserves
-parse, clean, chunk, and construct history. It retires legacy downstream state
-instead of reinterpreting chunk projections as finished-dataset evidence.
+workspace through every supported migration onto schema 3. The v2 to v3
+migration preserves parse, clean, chunk, and construct history. It retires
+legacy downstream state instead of reinterpreting chunk projections as
+finished-dataset evidence. Schema 4 is opened by `parse --mode dataset-row`;
+it is not a migration of a document-source workspace.
 
 Persisted artifact JSON and durable identity payloads preserve exact Unicode
 strings and object-key sequences. NFC normalization applies only to explicit
@@ -260,13 +274,18 @@ source paths.
 ## Current boundary
 
 On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-**private beta workbench Phases 0–2**, and **independent-product Phases 0–5**.
+**private beta workbench Phases 0–2**, and **independent-product Phases 0–7**.
 Phase 5.6's exact dry-run preview merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's operator guidance and
 Phase 5 closeout merged as PR #59 at
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14 GitHub checks passed.
 Phase 6 (goal-first recipes and previews) is complete under its packet;
 closeout merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d`.
+Phase 7 (existing-dataset import and mapping) is complete; closeout merged as
+PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
+checks passed. Phase 8 consumer profiles are planned and not started.
+The following paragraphs retain Phase 4–5 export-boundary facts that still
+bind generic exports.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,
@@ -356,9 +375,13 @@ reading paths. The map:
   - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
   - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
   - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
+  - [Goal Catalog v1](docs/contracts/goal-catalog-v1.md)
+  - [Recipe Preset v1](docs/contracts/recipe-preset-v1.md)
+  - [Row Mapping v1](docs/contracts/row-mapping-v1.md)
   - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - **Reference and plans**
   - [Install guide](docs/install.md)
+  - [Existing-dataset import](docs/mapping.md)
   - [Generic export operator guide](docs/generic-exports.md)
   - [CLI reference](docs/cli.md)
   - [Development guide](docs/development.md)
@@ -374,6 +397,8 @@ reading paths. The map:
   - [Completed Phase 3 packet](dev/active/independent-product/phase-03-taxonomy/README.md)
   - [Completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
   - [Completed Phase 5 packet](dev/active/independent-product/phase-05-generic-local-exports/README.md)
+  - [Completed Phase 6 packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md)
+  - [Completed Phase 7 packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md)
   - [Historical private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
   - [Historical build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
   - [Contributing](CONTRIBUTING.md)

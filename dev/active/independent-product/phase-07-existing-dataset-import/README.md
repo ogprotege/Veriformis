@@ -43,6 +43,6 @@ executable.
 
 ## Current state
 
-Phase 7 completed on 2026-08-23. Items 7.1–7.9 merged as PR #71–#79. Item 7.10
-adds mapping templates, the operator guide, U1–U7 judgment, and closeout.
-GitHub Actions remained budget-blocked; merges used local admission evidence.
+Phase 7 completed on 2026-08-23. Items 7.1–7.10 merged as PR #71–#80.
+Closeout merged as PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`
+after all 14 GitHub checks passed.

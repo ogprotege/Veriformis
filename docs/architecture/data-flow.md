@@ -1,11 +1,11 @@
 # Data flow
 
-How data changes shape across the nine stages: immutable content-addressed
+How data changes shape across the compiler stages: immutable content-addressed
 shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 **Next review:** Any architecture or data-flow change
 
@@ -19,9 +19,11 @@ numbers, and NFC normalization applied only to logical locators
 (`src/veriformis/identity.py:104-112`, `src/veriformis/identity.py:137-149`,
 `src/veriformis/identity.py:169-190`). Because every persisted model derives
 its identity from its complete semantic payload and revalidates that identity
-on load, the shape evolution across the nine stages is simultaneously the
+on load, the shape evolution across the compiler stages is simultaneously the
 coupling graph between modules: any upstream drift propagates as an identity
-mismatch at the next boundary rather than as silent corruption.
+mismatch at the next boundary rather than as silent corruption. Dataset-row
+capture never enters document IR; confirmed mapping emits imported records
+that lower through the same `format` → `validate` → `seal` path.
 
 ## Ingress: from raw bytes to canonical IR
 

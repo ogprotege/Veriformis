@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-22 (Phase 5 generic export guidance and closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -17,10 +17,11 @@ the hood (usually via the repo’s `.venv` or `uv`).
 
 | Piece | Role |
 | --- | --- |
-| **`veriformis` CLI** | Real product: parse → … → seal / verify |
+| **`veriformis` CLI** | Real product: document-source `parse → … → seal` or dataset-row `parse --mode dataset-row` → `map` → … → seal / verify |
 | **Mac workbench** (optional) | Thin GUI over that CLI |
 | **Sealed `.vfbundle`** | Finished dataset product |
 | **Generic export derivatives** | Verified split JSONL, canonical JSON, or compatible flat CSV; no trainer profile |
+| **Existing-dataset import** | Confirmed mapping of JSONL, JSON, or compatible CSV rows; [mapping.md](mapping.md) |
 
 There is not yet a notarized App Store–style installer. Private beta means:
 install the CLI on your machine, optionally build/open the Debug app.

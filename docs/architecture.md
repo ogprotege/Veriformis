@@ -19,13 +19,17 @@ layouts; the overview and four citation-backed deep dives live under
 
 ```mermaid
 flowchart LR
-    subgraph stages["Nine replay-gated stages"]
+    subgraph documentSource["Document-source stages (revision v3)"]
         P[parse] --> C[clean] --> K[chunk] --> N[construct] --> U[curate] --> X[split] --> F[format] --> V[validate] --> L[seal]
     end
     raw["raw bytes"] --> P
     L --> B["six-file bundle"]
-    W["workspace: content-addressed revisions, atomic HEAD"] -. "commit + replay" .-> stages
+    W["workspace: content-addressed revisions, atomic HEAD"] -. "commit + replay" .-> documentSource
 ```
+
+Dataset-row workspaces (revision v4) skip `clean`, `chunk`, and `construct`:
+`parse --mode dataset-row` → `map` → `curate` → `split` → `format` →
+`validate` → `seal`. Both paths publish the same six-file bundle.
 
 Clean corpus state is intermediate unless `full_text` selects it as the exact
 training target; other objectives derive explicit context and target fields.
@@ -40,8 +44,8 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `construction/`, `datasets/`, `bundle/` — flanked by axial modules:
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
 `exports/` (consumer-neutral verified-derivative composition boundary);
-`handoff/`; `mcp/`; `mapping/` (compiler-path modes, later row mapping);
-and `cli.py` (Typer adapter). Phase 4 establishes the
+`handoff/`; `mcp/`; `goals/`; `mapping/` (compiler-path modes, capture,
+confirmed mapping, templates); and `cli.py` (Typer adapter). Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
 source-derived plan population and normalized semantic membership enforcement,

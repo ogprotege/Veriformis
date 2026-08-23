@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Independent-product Phase 7 packet opening, or any
+**Next review:** Independent-product Phase 8 packet opening, or any
 active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
@@ -39,6 +39,13 @@ debt promotion. DOC-002, DOC-003, DOC-006, and DOC-007 remain open.
 Item 6.7 adds no new documentation debt: instruction templates live in the
 existing catalog contract, the walkthrough is recorded in `docs/install.md`,
 and DOC-002, DOC-003, DOC-006, and DOC-007 remain open.
+
+Phase 7 closeout adds no new open debt: the operator guide is
+[mapping.md](../mapping.md) and the contract is
+[row-mapping-v1.md](../contracts/row-mapping-v1.md). A 2026-08-23 continuity
+pass aligned active README, status, CLI, architecture, governance, and agent
+guidance with Phases 0–7 complete. DOC-002, DOC-003, DOC-006, and DOC-007
+remain open.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

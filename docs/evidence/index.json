@@ -673,6 +673,30 @@
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "independent-product-phase-07-item-7-10",
+      "date": "2026-08-23",
+      "commit": "b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f",
+      "scope": "Independent-product Phase 7.10 mapping templates, Phase 7 closeout, and active-doc continuity",
+      "grade": "recorded-local",
+      "summary": "Item 7.10 ships digest-bound mapping templates, the operator guide, U1-U7 judgment, and Phase 7 closeout. After the Actions spending limit was increased, PR #80 passed all 14 GitHub checks and merged at b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f. A follow-on continuity pass aligned active README, status, CLI, architecture, governance, and agent guidance with Phases 0-7 complete. Do not start Phase 8 until the operator asks.",
+      "details": "dev/active/independent-product/phase-07-existing-dataset-import/evidence.md",
+      "related": [
+        "docs/contracts/row-mapping-v1.md",
+        "docs/mapping.md",
+        "docs/cli.md",
+        "docs/current-status.md",
+        "dev/active/independent-product/phase-07-existing-dataset-import/closeout.md"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/mapping",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
     }
   ]
 }

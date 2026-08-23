@@ -8,7 +8,10 @@ train/evaluation split.
 
 **Status:** Implemented in development alpha `0.1.0`
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+
+Imported dataset-row bundles use these same three containers. Mapping does
+not add a fourth renderer or a trainer profile.
 
 **Next review:** Any generic-export selector, row-schema compatibility,
 consumer-profile, request, receipt, or transport change

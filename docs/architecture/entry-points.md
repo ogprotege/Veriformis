@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 **Next review:** Any entry-point or architecture change
 
@@ -28,22 +28,27 @@ transition regardless of the adapter that initiated it.
 
 ## CLI command surface
 
-The CLI exposes 23 root commands. Nine map one-to-one onto the workspace stages:
-`parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`,
-`validate`, and `seal`. The remaining commands are `upgrade-workspace`,
-`verify`, `preview`, `package`, `package-verify`, `taxonomy`, the `export` group
-with four subcommands, `export-verify`, `run`, `list-recipes`, `mcp`, `handoff`,
-`handoff-verify`, and `version`. Ordering is enforced by the workspace dependency
-table, not by Typer.
+The CLI exposes 34 root names (33 `@app.command` entries plus the `export`
+Typer group). Ten names are workspace stages: `parse`, `clean`, `chunk`,
+`construct`, `map`, `curate`, `split`, `format`, `validate`, and `seal`.
+Document-source uses nine of them (no `map`). Dataset-row uses `parse`,
+`map`, then `curate` through `seal`. The remaining commands are
+`upgrade-workspace`, `verify`, `preview`, `package`, `package-verify`,
+`taxonomy`, `goals`, `presets`, `modes`, `mapping-contracts`,
+`mapping-templates`, `mapping-detect`, `mapping-preview`,
+`mapping-rejections`, `preflight`, `goal-preview`, the `export` group with
+four subcommands, `export-verify`, `run`, `list-recipes`, `mcp`, `handoff`,
+`handoff-verify`, and `version`. Ordering is enforced by the workspace
+dependency table, not by Typer.
 
 ```mermaid
 flowchart TD
-    script["console script: veriformis"] --> cli["cli.py: 23-command Typer adapter"]
+    script["console script: veriformis"] --> cli["cli.py: 34-name Typer adapter"]
     mcp["mcp/server.py: local stdio adapter"] --> service["PipelineService composition root"]
     cli --> service
     mac["SwiftUI workbench"] --> cli
     service --> workspace["workspace revisions and transactions"]
-    service --> domains["parsers, rules, chunkers, construction, datasets, bundle"]
+    service --> domains["parsers, rules, chunkers, construction, mapping, datasets, bundle"]
     service --> exports["ExportService — verified derivative source"]
     exports --> verifier
     service --> verifier["workspace-independent bundle verifier"]
@@ -62,7 +67,7 @@ then atomically promotes `HEAD`. A changed base raises
 
 The service owns `_load_sources`, `_load_documents`, `_load_chunks`, and the
 other replay helpers. CLI and MCP therefore translate inputs and outcomes but
-do not reimplement parse, construction, split, validation, or recovery policy.
+do not reimplement parse, mapping, construction, split, validation, or recovery policy.
 
 ## Seal and independent verification
 

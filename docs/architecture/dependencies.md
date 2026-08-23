@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 **Next review:** Any architecture or dependency change
 
@@ -15,8 +15,10 @@ foundation (`errors`, `contracts`, `identity`) through the canonical model and
 pipeline domains (`ir`, `sources`, `evidence`, `parsers`, `rules`, `chunkers`,
 `construction`, `datasets`, `bundle`) through `exports.ExportService` to the
 `PipelineService` composition root. `exports/` depends on the bundle verifier
-but is not a tenth workspace stage. CLI and MCP are adapters over the pipeline
-root; recipes and the optional Aptus handoff are bounded integration modules.
+but is not a tenth workspace stage. `goals/` and `mapping/` are axial packages
+over existing construction and finished-dataset contracts. CLI and MCP are
+adapters over the pipeline root; recipes and the optional Aptus handoff are
+bounded integration modules.
 The SwiftUI workbench is outside the Python graph and shells the CLI.
 No lower layer imports a higher one, and every cross-package edge targets
 either a layer below or a sibling within the same layer. This shape is not

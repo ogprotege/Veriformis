@@ -1,14 +1,15 @@
 # Veriformis Documentation
 
 This documentation describes the development-alpha compiler from raw source
-capture through a verified finished-dataset bundle, plus local automation and
-the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
-gates, workbench Phases 0–2).
+capture or existing dataset rows through a verified finished-dataset bundle,
+plus local automation and the private beta Mac workbench (Groups 1–7 product
+path, Group 9 automated gates, workbench Phases 0–2, independent-product
+Phases 0–7 complete).
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Phase 7 packet opening, beta
-label cut, public-ready checklist, or any contract change
+**Next review:** Phase 8 packet opening, beta label cut, public-ready
+checklist, or any contract change
 
 ## Start here
 
@@ -28,7 +29,8 @@ label cut, public-ready checklist, or any contract change
   → [project tracking](governance/project-tracking.md) →
   [development guide](development.md) → [architecture hub](architecture.md).
 - **CLI operator:** [install.md](install.md) →
-  [generic export operator guide](generic-exports.md) →
+  [generic export operator guide](generic-exports.md) or
+  [existing-dataset import](mapping.md) →
   [CLI reference](cli.md) →
   [Finished Dataset Contract v1](contracts/finished-dataset-v1.md).
 - **Optional Aptus integration:** [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md).
@@ -41,9 +43,10 @@ label cut, public-ready checklist, or any contract change
   [macOS workbench](../macos/README.md) →
   [private beta plan](plans/2026-08-06-private-beta-workbench.md).
 - **Contract reviewer:** [product contract](product-contract.md), then Integrity,
-  Dataset Construction, Finished Dataset, Dataset Taxonomy, Verified Export,
-  Split JSONL Export, Canonical JSON Export, Constrained CSV Export, Bundle Transport,
-  and Aptus Handoff contracts plus the [ADR index](adr/README.md), with
+  Dataset Construction, Finished Dataset, Dataset Taxonomy, Goal Catalog,
+  Recipe Preset, Row Mapping, Verified Export, Split JSONL Export, Canonical
+  JSON Export, Constrained CSV Export, Bundle Transport, and Aptus Handoff
+  contracts plus the [ADR index](adr/README.md), with
   [current status](current-status.md) for evidence.
 
 ## Active documentation
@@ -58,13 +61,16 @@ label cut, public-ready checklist, or any contract change
 | [Finished Dataset Contract v1](contracts/finished-dataset-v1.md) | Curation, split, rows, validation, seal, verify | Implemented contract |
 | [Archive Transport Contract v1](contracts/bundle-transport-v1.md) | Shared deterministic ZIP envelope for manifest-anchored `.vfbundle.zip` and receipt-anchored `.vfexport.zip` profiles | Implemented contract |
 | [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md) | Sibling handoff descriptor and consumer checks | Implemented contract |
-| [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, and loss policies | Implemented contract |
+| [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md) | Families, rows, containers, profiles, loss policies, and input families | Implemented contract |
+| [Goal Catalog v1](contracts/goal-catalog-v1.md) | Plain-language goals bound to existing objectives and row schemas | Implemented contract |
+| [Recipe Preset v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and per-goal presets | Implemented contract |
+| [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
 | [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, verification evidence, optional export-pack transport, and bounded exact dry-run previews | Phase 4 foundation plus Phase 5.1–5.3 generic containers, merged Phase 5.4 transport and Phase 5.5 semantic evidence, with Phase 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`; no trainer profile |
 | [Split JSONL Export v1](contracts/split-jsonl-export-v1.md) | Canonical split payload JSONL, safe configuration, aligned provenance, data card, and receipt | Implemented Phase 5.1 generic container |
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
 | [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
 | [Generic export operator guide](generic-exports.md) | When to use split JSONL, canonical JSON, or constrained CSV without conflating container, objective, row schema, or consumer compatibility | Implemented Phase 5.7 operator guidance; merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
-| [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0006) | Decision records |
+| [ADR index](adr/README.md) | Accepted product-boundary, catalog, and mapping decisions (0001–0008, 0010–0011) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
