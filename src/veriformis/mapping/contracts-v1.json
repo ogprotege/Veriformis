@@ -1,0 +1,58 @@
+{
+  "admitted_containers": [
+    "jsonl"
+  ],
+  "coercion_rules": [
+    "refuse"
+  ],
+  "contract_id": "veriformis.row-mapping",
+  "contract_version": 1,
+  "invalid_row_rules": [
+    "refuse"
+  ],
+  "membership_policies": [
+    "replaced"
+  ],
+  "missing_value_rules": [
+    "refuse"
+  ],
+  "payload_keys": {
+    "instruction_output": [
+      "instruction",
+      "input",
+      "output"
+    ],
+    "messages": [
+      "messages"
+    ],
+    "prompt_completion": [
+      "prompt",
+      "completion"
+    ],
+    "text": [
+      "text"
+    ]
+  },
+  "reserved_containers": [
+    "json",
+    "csv"
+  ],
+  "review_policies": [
+    "none",
+    "required"
+  ],
+  "row_schemas": [
+    "text",
+    "prompt_completion",
+    "instruction_output",
+    "messages"
+  ],
+  "schema_id": "veriformis.mapping-contract-discovery/v1",
+  "schema_versions": [
+    "veriformis.field-mapping/v1",
+    "veriformis.imported-record/v1",
+    "veriformis.mapped-value-evidence/v1",
+    "veriformis.mapping-plan/v1",
+    "veriformis.row-source/v1"
+  ]
+}

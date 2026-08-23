@@ -23,3 +23,9 @@ Publication remains pending.
 **Next action:** Publish the item 7.1 pull request. GitHub Actions may refuse
 jobs while the spending budget is exhausted; do not treat that as a product
 failure.
+
+## 2026-08-23 — Item 7.1 merged; item 7.2 in progress
+
+Item 7.1 merged as PR #71 at `caf4b1551d099d3b0d5d4de048ba057ea87050a4`.
+GitHub Actions remained budget-blocked; merge followed local admission
+evidence. Item 7.2 freezes mapping contracts without capture or execution.

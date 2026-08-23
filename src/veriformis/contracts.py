@@ -36,6 +36,10 @@ INPUT_MODE_CONTRACT_ID: Final = "veriformis.input-mode"
 INPUT_MODE_CONTRACT_VERSION: Final = 1
 INPUT_MODE_SCHEMA_ID: Final = "veriformis.input-mode-discovery/v1"
 
+MAPPING_CONTRACT_ID: Final = "veriformis.row-mapping"
+MAPPING_CONTRACT_VERSION: Final = 1
+MAPPING_DISCOVERY_SCHEMA_ID: Final = "veriformis.mapping-contract-discovery/v1"
+
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
 
@@ -360,6 +364,9 @@ __all__ = [
     "INPUT_MODE_CONTRACT_ID",
     "INPUT_MODE_CONTRACT_VERSION",
     "INPUT_MODE_SCHEMA_ID",
+    "MAPPING_CONTRACT_ID",
+    "MAPPING_CONTRACT_VERSION",
+    "MAPPING_DISCOVERY_SCHEMA_ID",
     "RECIPE_PRESET_CONTRACT_ID",
     "RECIPE_PRESET_CONTRACT_VERSION",
     "RECIPE_PRESET_SCHEMA_ID",
