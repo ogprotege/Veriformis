@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -33,6 +33,7 @@ not substitutes for implementation or tests.
 | 0009 | Not issued | — | Number skipped; 0010 follows 0008 |
 | [0010](0010-input-mode-as-compiler-path.md) | Input mode as a compiler path | Accepted | Any new compiler path beyond document-source, dataset-row, and mixed |
 | [0011](0011-imported-records-and-mapping-evidence.md) | Imported records and mapped-value evidence | Accepted | Any new field-evidence kind, membership policy, or admitted row container |
+| [0012](0012-consumer-profile-as-optional-adapter.md) | Consumer profile as optional adapter over a verified bundle | Accepted | Item 8.3 TRL execution; item 8.4 MLX-LM execution; any required trainer extra |
 
 ## ADR template
 

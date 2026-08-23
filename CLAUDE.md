@@ -40,9 +40,11 @@ PR #71 through PR #80. Closeout merged as PR #80 at
 `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks
 passed. Dataset-row compilation is opt-in: `parse --mode dataset-row` then
 `map` on revision v4, with confirmed mapping plans, `mapped_value` evidence,
-JSON/CSV/JSONL capture, rejection reports, and packaged templates. Do not
-start Phase 8, 9, or 13 until the operator asks. Phase 8 is planned as
-versioned TRL and MLX-LM consumer profiles over verified bundles.
+JSON/CSV/JSONL capture, rejection reports, and packaged templates. Phase 8
+(first consumer profiles) is in progress under its standard packet. Item 8.1
+opens the packet and publishes ADR-0012: a profile is an optional adapter
+over a verified bundle. `trl` and `mlx-lm` remain planned and refuse export
+with items 8.3 and 8.4. Do not start Phase 9, 10, or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -115,8 +117,9 @@ Read these current authorities before changing code:
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
-    `docs/adr/0010-input-mode-as-compiler-path.md`, and
-    `docs/adr/0011-imported-records-and-mapping-evidence.md`
+    `docs/adr/0010-input-mode-as-compiler-path.md`,
+    `docs/adr/0011-imported-records-and-mapping-evidence.md`, and
+    `docs/adr/0012-consumer-profile-as-optional-adapter.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

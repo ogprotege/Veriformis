@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–7 complete
+**Status:** Active program — Phases 0–7 complete; Phase 8 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -23,6 +23,7 @@ with roadmap headings.
 - [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — completed
 - [Phase 6 — Goal-first recipes and previews](phase-06-goal-first-recipes/README.md) — completed
 - [Phase 7 — Existing-dataset import and mapping](phase-07-existing-dataset-import/README.md) — completed
+- [Phase 8 — First consumer profiles](phase-08-consumer-profiles/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -81,7 +82,9 @@ was synchronized before Phase 6 opened. Phase 6 completed under its
 `6995d17bef0d09f235b1c464e947c38c63dd313d`. Phase 7 completed under its
 [packet](phase-07-existing-dataset-import/README.md); closeout merged as
 PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
-checks passed. Phase 8 consumer profiles remain planned.
+checks passed. Phase 8 opened on 2026-08-23 under its
+[packet](phase-08-consumer-profiles/README.md); item 8.1 (packet and
+ADR-0012) is in progress.
 
 ## State change procedure
 

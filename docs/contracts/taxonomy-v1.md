@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.2: input-family axis)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.1: planned TRL/MLX-LM remain non-executable)
 
 **Next review:** Any taxonomy, input-family, loss-policy, or
 compatibility-matrix change

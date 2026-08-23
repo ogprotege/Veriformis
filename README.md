@@ -17,8 +17,9 @@ explicitly selects it as training content.
 > (Phases 0–2 over the CLI), plus completed independent-product Phases 0–7
 > on `main`. Generic exports are `split-jsonl-directory`, canonical `json`,
 > and `constrained-csv` v1. Goal-first recipes (Phase 6) and existing-dataset
-> import/mapping (Phase 7) are implemented. Consumer profiles (Phase 8) are
-> not started. This is **not** a public beta or production label. Limits:
+> import/mapping (Phase 7) are implemented. Phase 8 consumer-profile work is
+> open; TRL and MLX-LM remain planned and non-executable. This is **not** a
+> public beta or production label. Limits:
 > [docs/beta-limitations.md](docs/beta-limitations.md). Install:
 > [docs/install.md](docs/install.md). Status:
 > [docs/current-status.md](docs/current-status.md).
@@ -283,7 +284,8 @@ Phase 6 (goal-first recipes and previews) is complete under its packet;
 closeout merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d`.
 Phase 7 (existing-dataset import and mapping) is complete; closeout merged as
 PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
-checks passed. Phase 8 consumer profiles are planned and not started.
+checks passed. Phase 8 is in progress under ADR-0012; TRL and MLX-LM remain
+planned and non-executable.
 The following paragraphs retain Phase 4–5 export-boundary facts that still
 bind generic exports.
 The completed Phase 4 verified-export foundation adds a

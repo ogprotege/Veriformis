@@ -126,6 +126,12 @@ PLANNED_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "trl",
     "mlx-lm",
 )
+PLANNED_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
+    {
+        "trl": "8.3",
+        "mlx-lm": "8.4",
+    }
+)
 CANDIDATE_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "axolotl",
     "llama-factory",
@@ -436,6 +442,7 @@ __all__ = [
     "LOSS_POLICY_IDS",
     "OBJECTIVE_FAMILY",
     "OBJECTIVE_ROW_COMPATIBILITY",
+    "PLANNED_CONSUMER_PROFILE_ITEMS",
     "PLANNED_CONSUMER_PROFILES",
     "PLANNED_PHYSICAL_CONTAINERS",
     "PLANNED_TRAINING_FAMILIES",

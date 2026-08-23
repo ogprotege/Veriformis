@@ -39,6 +39,10 @@ from veriformis.errors import (
     ExportVerificationError,
     VeriformisError,
 )
+from veriformis.taxonomy import (
+    CANDIDATE_CONSUMER_PROFILES,
+    PLANNED_CONSUMER_PROFILE_ITEMS,
+)
 from veriformis.exports.models import (
     ExportConsumerProfile,
     ExportContainerProfile,
@@ -304,6 +308,7 @@ class ExportService:
         self,
         request: _SelectedExportRequest,
     ) -> _ExportImplementation:
+        _refuse_unexecutable_consumer_id(request.consumer_id)
         selector = (
             request.container_id,
             request.container_version,
@@ -1136,6 +1141,23 @@ def _plan_from_source_evidence(
         file_plans=file_plans,
     )
     return plan, row_set
+
+
+def _refuse_unexecutable_consumer_id(consumer_id: str | None) -> None:
+    """Fail closed on planned or candidate trainer profiles before catalog lookup."""
+    if consumer_id is None:
+        return
+    later_item = PLANNED_CONSUMER_PROFILE_ITEMS.get(consumer_id)
+    if later_item is not None:
+        raise ExportContractError(
+            f"consumer profile {consumer_id!r} is planned for item {later_item}; "
+            "generic exports keep consumer_id null until that item"
+        )
+    if consumer_id in CANDIDATE_CONSUMER_PROFILES:
+        raise ExportContractError(
+            f"consumer profile {consumer_id!r} is a Phase 10 candidate; "
+            "it is not executable"
+        )
 
 
 def _export_row_set_from_bytes(data: bytes) -> RowSet | ImportedBundleRowSet:

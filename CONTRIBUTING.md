@@ -21,6 +21,7 @@ Before changing code, read:
 - [Row Mapping v1](docs/contracts/row-mapping-v1.md)
 - [Existing-dataset import](docs/mapping.md)
 - [ADR-0006: Receipt-Anchored Export-Pack Transport](docs/adr/0006-receipt-anchored-export-pack-transport.md)
+- [ADR-0012: Consumer Profile as Optional Adapter](docs/adr/0012-consumer-profile-as-optional-adapter.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -38,8 +39,9 @@ Before changing code, read:
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
 Independent-product Phases 0–7 are complete on `main` (Phase 7 closeout
-PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`). Phase 8 consumer
-profiles are planned and not started. Consult the
+PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`). Phase 8 is in
+progress: a consumer profile is an optional adapter (ADR-0012); TRL and
+MLX-LM remain planned. Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed
 service,

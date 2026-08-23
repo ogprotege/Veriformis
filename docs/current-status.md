@@ -35,14 +35,15 @@ as PR #60 through PR #65 and PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is
 complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 #71 through PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all
-14 GitHub checks passed. Phase 8 consumer profiles are planned and not
-started.
+14 GitHub checks passed. Phase 8 consumer profiles are in progress under
+item 8.1: ADR-0012 is published, and `trl` / `mlx-lm` remain planned and
+non-executable.
 
-**Review date:** 2026-08-23 (independent-product Phase 7 complete)
+**Review date:** 2026-08-23 (independent-product Phase 8.1 opening)
 
-**Next review:** Phase 8 packet opening, beta label cut, public-ready
-checklist, or any contract change. Do not start Phase 8, 9, or 13 until the
-operator asks.
+**Next review:** Phase 8.1 pull-request merge, item 8.2, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 9, 10,
+or 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -724,7 +725,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 6 | Goal catalog, contracts, preview, presets, preflight, acceptance matrix, instruction truthfulness; closeout PR #67 at `6995d17bef` |
 | Completed independent Phase 7 | Existing-dataset import/mapping: modes, contracts, JSONL/JSON/CSV capture, confirmation, provenance, preview, partitions, rejections, templates; closeout PR #80 at `b7bb7f0c2046` after all 14 GitHub checks passed |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–7 complete under its [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–7 complete and Phase 8 in progress under its [Phase 8 packet](../dev/active/independent-product/phase-08-consumer-profiles/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
