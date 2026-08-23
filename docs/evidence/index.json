@@ -652,7 +652,7 @@
       "commit": "working-tree-on-7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5",
       "scope": "Independent-product Phase 6.7 instruction truthfulness and Phase 6 closeout",
       "grade": "recorded-local",
-      "summary": "Item 6.7 adds per-goal catalog instruction templates and a deterministic truthfulness check, judges usability criteria U1-U6, and writes the Phase 6 closeout. Focused goal tests passed 373; standalone release passed 1,898 with 1 deselected and the intentional transport durability warning; the only full-suite first-run failure was the matrix catalog digest, corrected by pinning catalog_sha256. Project tracking, lock, Ruff, structured JSON, fixture equality, and diff checks passed. This Linux cloud VM cannot run XCTest; Mac gates are exercised by the macOS GitHub check. This is local evidence only and does not claim publication, GitHub checks, merge, or clean-main synchronization for the item 6.7 pull request.",
+      "summary": "Item 6.7 adds per-goal catalog instruction templates and a deterministic truthfulness check, judges usability criteria U1-U6, and writes the Phase 6 closeout. Focused goal tests passed 373; standalone release passed 1,898 with 1 deselected and the intentional transport durability warning; the only full-suite first-run failure was the matrix catalog digest, corrected by pinning catalog_sha256. Project tracking, lock, Ruff, structured JSON, fixture equality, and diff checks passed. Item 6.7 subsequently passed all 14 GitHub checks and merged as PR #67 at 6995d17bef0d09f235b1c464e947c38c63dd313d.",
       "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
       "related": [
         "docs/contracts/goal-catalog-v1.md",

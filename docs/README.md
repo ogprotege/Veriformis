@@ -5,9 +5,9 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 locally complete)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
 
-**Next review:** Phase 6.7 pull-request merge, beta
+**Next review:** Phase 7 packet opening, beta
 label cut, public-ready checklist, or any contract change
 
 ## Start here

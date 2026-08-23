@@ -21,8 +21,8 @@ explicitly selects it as training content.
 > `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's
 > [generic export operator guide](docs/generic-exports.md) and Phase 5 closeout
 > merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`. Phase 6
-> (goal-first recipes and previews) is locally complete through item 6.6 on
-> `main` (PR #65); item 6.7 closeout is pending.
+> (goal-first recipes and previews) is complete; closeout merged as PR #67 at
+> `6995d17bef0d09f235b1c464e947c38c63dd313d`.
 > This is **not** a public
 > beta or production
 > label. Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
@@ -265,8 +265,8 @@ Phase 5.6's exact dry-run preview merged as PR #58 at
 `cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's operator guidance and
 Phase 5 closeout merged as PR #59 at
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14 GitHub checks passed.
-Phase 6 (goal-first recipes and previews) is locally complete under its
-packet through item 6.6 on `main` (PR #65); item 6.7 closeout is pending.
+Phase 6 (goal-first recipes and previews) is complete under its packet;
+closeout merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d`.
 The completed Phase 4 verified-export foundation adds a
 typed internal `ExportService` boundary and descriptor-anchored inspection of
 an already verified finished bundle. Its second slice defines strict,

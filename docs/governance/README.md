@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 locally complete)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
 
-**Next review:** Independent-product Phase 6.7 pull-request merge, any Phase 6
-item closeout, any later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 7 packet opening, any later phase
+closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -72,6 +72,7 @@ closeout without a taxonomy or support promotion. It passed all 14 GitHub
 checks and merged as PR #59 at
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 Consumer compatibility still requires a separately admitted named profile.
-Phase 6 (goal-first recipes and previews) is locally complete under its
+Phase 6 (goal-first recipes and previews) is complete under its
 [packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md);
-items 6.1–6.6 are on `main` and item 6.7 closeout awaits its merge.
+closeout merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d`.

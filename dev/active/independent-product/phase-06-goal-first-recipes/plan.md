@@ -1,6 +1,6 @@
 # Phase 6 Execution Plan
 
-**Status:** Locally complete; item 6.7 closeout awaits its green merge
+**Status:** Completed
 
 **Last updated:** 2026-08-22
 
@@ -211,13 +211,14 @@ A non-developer can select each supported goal from plain language and
 inspect exactly what receives training loss; all surfaces resolve to the same
 recipe identifiers and outputs.
 
-**Result:** Passed locally. A person can select each supported goal from
+**Result:** Passed. A person can select each supported goal from
 plain language, inspect the exact supervised span, and receive identical
 recipe identifiers and outputs on every surface. Instruction templates are
 the only default instruction literals; operator instructions fail closed
 unless they name the goal's task and claim no absent transformation.
-This closeout pull request is the Phase 6 exit. GitHub-check and merge
-evidence will be recorded after the pull request is green.
+Item 6.7 merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
+passed.
 
 ## Non-goals
 

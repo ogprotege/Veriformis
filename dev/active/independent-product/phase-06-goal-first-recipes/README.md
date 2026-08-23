@@ -1,10 +1,10 @@
 # Phase 6 — Goal-First Recipes and Previews
 
-**Status:** Locally complete; item 6.7 closeout awaits its green merge
+**Status:** Completed
 
 **Started:** 2026-08-22
 
-**Completed:** —
+**Completed:** 2026-08-22
 
 **Roadmap phase:** [Phase 6](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-6--deliver-goal-first-recipes-and-previews)
 
@@ -56,10 +56,8 @@ Items 6.1–6.6 merged sequentially as PR #60
 (`abdd630e25e83ebf346316319caec892f4d64886`), PR #64
 (`b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`), and PR #65
 (`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`), each after all 14 GitHub
-checks passed and clean-main synchronization. Item 6.7 is locally complete:
-every goal now carries a static instruction template and task phrase; omitted
-`instruction-and-output` instructions resolve to that template; operator
-instructions fail closed unless they name the goal's task and claim no
-absent transformation; `messages` user turns remain exact context; and the
-predeclared usability criteria U1–U6 are judged with recorded evidence.
-This closeout pull request is the Phase 6 exit.
+checks passed and clean-main synchronization. Item 6.7 added per-goal
+instruction templates and the deterministic truthfulness check, judged
+U1–U6, and wrote the closeout; it merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
+passed. Phase 6 is complete. Phase 7 may begin under its own packet.

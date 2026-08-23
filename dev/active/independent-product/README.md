@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–5 complete; Phase 6 locally complete, closeout awaiting merge
+**Status:** Active program — Phases 0–6 complete
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -21,7 +21,7 @@ with roadmap headings.
 - [Phase 3 — Goal, schema, container, and profile taxonomy](phase-03-taxonomy/README.md) — completed
 - [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — completed
 - [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — completed
-- [Phase 6 — Goal-first recipes and previews](phase-06-goal-first-recipes/README.md) — locally complete; closeout awaiting merge
+- [Phase 6 — Goal-first recipes and previews](phase-06-goal-first-recipes/README.md) — completed
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active

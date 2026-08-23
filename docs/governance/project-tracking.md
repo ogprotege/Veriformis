@@ -4,10 +4,10 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 locally complete)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
 
-**Next review:** Independent-product Phase 6.7 pull-request merge, any Phase 6
-item closeout, or any program-state, evidence-grade, or completion-rule change
+**Next review:** Independent-product Phase 7 packet opening, or any
+program-state, evidence-grade, or completion-rule change
 
 ## Purpose
 
