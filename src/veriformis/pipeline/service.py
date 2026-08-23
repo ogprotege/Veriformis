@@ -1048,6 +1048,30 @@ class PipelineService:
 
         return mapping_contract_discovery()
 
+    def detect_mapping(
+        self,
+        path: Path,
+        *,
+        source_root: Path | None = None,
+        goal: str | None = None,
+        representation: str | None = None,
+    ) -> dict[str, Any]:
+        """Propose mapping plans for one JSONL file without mutating a workspace."""
+        from veriformis.mapping.detect import detect_mapping
+        from veriformis.sources import capture_source_batch
+
+        captures = capture_source_batch([path], source_root=source_root)
+        capture = captures[0]
+        if capture.error is not None:
+            raise capture.error
+        logical_path = capture.logical_path
+        return detect_mapping(
+            path,
+            logical_path=logical_path,
+            goal_id=goal,
+            representation_id=representation,
+        )
+
     def preflight(
         self,
         paths: list[Path],
@@ -1971,6 +1995,8 @@ class PipelineService:
                 f"mapping plan representation {plan.representation_id!r} does not match "
                 f"requested {representation!r}"
             )
+        from veriformis.mapping.detect import confirm_mapping_plan
+
         store = Workspace.open(workspace)
         current = store.head()
         if not is_import_revision(current.schema_version):
@@ -1980,6 +2006,13 @@ class PipelineService:
         source_ids = tuple(sorted(current.sources))
         if not source_ids:
             raise MappingError("map requires at least one captured row source")
+        confirm_mapping_plan(
+            plan,
+            tuple(
+                (current.sources[source_id].logical_path, current.sources[source_id].sha256)
+                for source_id in source_ids
+            ),
+        )
         recipe = MappingRecipe.create(plan=plan, source_ids=source_ids)
         mapped_records = []
         row_source_ids = []

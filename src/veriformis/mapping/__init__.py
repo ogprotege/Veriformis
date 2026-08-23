@@ -1,6 +1,13 @@
 """Existing-dataset mapping: compiler-path modes, contracts, and JSONL execution."""
 
 from veriformis.mapping.capture import JsonlCapture, capture_jsonl
+from veriformis.mapping.detect import (
+    confirm_mapping_plan,
+    detect_mapping,
+    mapping_confirmation_digest,
+    mapping_detector_catalog,
+    mapping_detector_catalog_json,
+)
 from veriformis.mapping.execute import execute_mapping, replay_mapping
 from veriformis.mapping.finish import (
     FinishedImportPlan,
@@ -80,6 +87,11 @@ __all__ = [
     "require_executable_mode",
     "JsonlCapture",
     "capture_jsonl",
+    "confirm_mapping_plan",
+    "detect_mapping",
+    "mapping_confirmation_digest",
+    "mapping_detector_catalog",
+    "mapping_detector_catalog_json",
     "execute_mapping",
     "replay_mapping",
     "MAPPING_STAGE_SCHEMA_ID",

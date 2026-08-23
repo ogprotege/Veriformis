@@ -2382,6 +2382,36 @@ enum GoalCatalogError: LocalizedError, Equatable, Sendable {
     }
 }
 
+enum MappingDetectError: LocalizedError, Equatable, Sendable {
+    case outputTruncated
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .outputTruncated:
+            return "Mapping detection output was truncated."
+        case .invalidPayload(let message):
+            return "Mapping detection returned invalid JSON: \(message)"
+        }
+    }
+}
+
+/// Runtime-only mapping proposals from `veriformis mapping-detect`.
+/// Confirmation is required before `map`; the workbench never auto-publishes.
+struct MappingDetectResponse: Decodable, Equatable, Sendable {
+    let schemaVersion: String
+    let proposals: [MappingPlanProposal]
+    let refusal: String?
+}
+
+struct MappingPlanProposal: Decodable, Equatable, Sendable {
+    let mappingPlanId: String
+    let goalId: String
+    let representationId: String
+    let rowSchema: String
+    let confirmationDigest: String
+}
+
 private struct GoalCatalogKey: CodingKey {
     let stringValue: String
     var intValue: Int? { nil }

@@ -704,6 +704,29 @@ def modes() -> None:
     )
 
 
+@app.command(name="mapping-detect")
+def mapping_detect(
+    path: Path,
+    source_root: Path | None = typer.Option(None, "--source-root"),
+    goal: str | None = typer.Option(None, "--goal"),
+    representation: str | None = typer.Option(None, "--representation"),
+) -> None:
+    """Propose mapping plans for one JSONL file without writing a workspace."""
+    try:
+        payload = _SERVICE.detect_mapping(
+            path,
+            source_root=source_root,
+            goal=goal,
+            representation=representation,
+        )
+    except VeriformisError as exc:
+        _echo_error(exc)
+        return
+    typer.echo(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+    if payload.get("refusal"):
+        raise typer.Exit(code=2)
+
+
 @app.command(name="mapping-contracts")
 def mapping_contracts() -> None:
     """Print row-mapping contract discovery as deterministic JSON."""

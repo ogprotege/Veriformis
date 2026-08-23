@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.2 merged as PR #72. Item 7.3 maps JSONL into the four semantic rows on workspace revision v4 with stage map, then curate/split/format/validate/seal over imported records."
+      "next_gate": "Item 7.3 merged as PR #73. Item 7.4 proposes mapping plans from packaged detectors and requires confirmation before map mutates a workspace."
     },
     {
       "number": 8,

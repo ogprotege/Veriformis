@@ -21,6 +21,7 @@ from veriformis.mapping import (
     MappingPlan,
     capture_jsonl,
     execute_mapping,
+    mapping_confirmation_digest,
 )
 from veriformis.mapping.result import MappingRecipe
 from veriformis.mcp.server import create_mcp_server
@@ -30,7 +31,7 @@ from veriformis.workspace import IMPORT_REVISION_SCHEMA_VERSION, Workspace, is_i
 FIXTURES = Path(__file__).parents[1] / "regressions" / "fixtures" / "phase7"
 RUNNER = CliRunner()
 SERVICE = PipelineService()
-CONFIRM = sha256_digest("phase7-03-confirmation")
+CONFIRM = sha256_digest("phase7-03-unconfirmed")
 
 SCHEMA_CASES = (
     (
@@ -68,17 +69,37 @@ SCHEMA_CASES = (
 )
 
 
-def _plan(goal: str, representation: str, row_schema: str, pairs: tuple) -> MappingPlan:
+def _plan(
+    goal: str,
+    representation: str,
+    row_schema: str,
+    pairs: tuple,
+    *,
+    source_digests: tuple[tuple[str, str], ...] | None = None,
+    confirmation: str | None = None,
+) -> MappingPlan:
+    mappings = [
+        FieldMapping.create(source_path=source, target_key=target)
+        for source, target in pairs
+    ]
+    if confirmation is None:
+        if source_digests is None:
+            confirmation = CONFIRM
+        else:
+            confirmation = mapping_confirmation_digest(
+                goal_id=goal,
+                representation_id=representation,
+                row_schema=row_schema,
+                field_mappings=mappings,
+                source_digests=source_digests,
+            )
     return MappingPlan.create(
         goal_id=goal,
         representation_id=representation,
         row_schema=row_schema,
         container_kind="jsonl",
-        confirmation_digest=CONFIRM,
-        field_mappings=[
-            FieldMapping.create(source_path=source, target_key=target)
-            for source, target in pairs
-        ],
+        confirmation_digest=confirmation,
+        field_mappings=mappings,
     )
 
 
@@ -164,10 +185,18 @@ def _compile_import(
         source_root=tmp_path,
         mode="dataset-row",
     )
-    assert is_import_revision(
-        Workspace.open(workspace).head().schema_version
+    head = Workspace.open(workspace).head()
+    assert is_import_revision(head.schema_version)
+    source_digests = tuple(
+        (item.logical_path, item.sha256) for item in head.sources.values()
     )
-    plan = _plan(goal, representation, row_schema, pairs)
+    plan = _plan(
+        goal,
+        representation,
+        row_schema,
+        pairs,
+        source_digests=source_digests,
+    )
     mapped = service.map_rows(
         workspace,
         goal=goal,
@@ -249,27 +278,35 @@ def test_python_cli_mcp_parity_on_text_fixture(tmp_path: Path) -> None:
     source.write_bytes((FIXTURES / fixture).read_bytes())
     workspace = cli_dir / "ws"
     bundle = cli_dir / "bundle"
-    plan = _plan(goal, representation, row_schema, pairs)
+    parse_cli = RUNNER.invoke(
+        app,
+        [
+            "parse",
+            str(source),
+            "-o",
+            str(workspace),
+            "--source-root",
+            str(cli_dir),
+            "--mode",
+            "dataset-row",
+        ],
+    )
+    assert parse_cli.exit_code == 0, parse_cli.output
+    head = Workspace.open(workspace).head()
+    source_digests = tuple(
+        (item.logical_path, item.sha256) for item in head.sources.values()
+    )
+    plan = _plan(
+        goal,
+        representation,
+        row_schema,
+        pairs,
+        source_digests=source_digests,
+    )
     plan_path = cli_dir / "plan.json"
     plan_path.write_text(
         json.dumps(plan.model_dump(mode="json"), ensure_ascii=False),
         encoding="utf-8",
-    )
-    assert (
-        RUNNER.invoke(
-            app,
-            [
-                "parse",
-                str(source),
-                "-o",
-                str(workspace),
-                "--source-root",
-                str(cli_dir),
-                "--mode",
-                "dataset-row",
-            ],
-        ).exit_code
-        == 0
     )
     mapped = RUNNER.invoke(
         app,
@@ -310,12 +347,22 @@ def test_python_cli_mcp_parity_on_text_fixture(tmp_path: Path) -> None:
         str(mcp_dir),
         "dataset-row",
     )
+    mcp_head = Workspace.open(mcp_ws).head()
+    mcp_plan = _plan(
+        goal,
+        representation,
+        row_schema,
+        pairs,
+        source_digests=tuple(
+            (item.logical_path, item.sha256) for item in mcp_head.sources.values()
+        ),
+    )
     mapped_mcp = json.loads(
         tools["map_rows"](
             str(mcp_ws),
             goal,
             representation,
-            json.dumps(plan.model_dump(mode="json")),
+            json.dumps(mcp_plan.model_dump(mode="json")),
         )
     )
     tools["curate"](str(mcp_ws), goal=goal)
@@ -346,7 +393,13 @@ def test_map_refuses_document_workspace(tmp_path: Path) -> None:
     source.write_text("A document paragraph.\n", encoding="utf-8")
     workspace = tmp_path / "ws"
     SERVICE.parse([source], workspace, source_root=tmp_path)
-    plan = _plan("learn-the-text", "whole-text", "text", (("text", "text"),))
+    plan = _plan(
+        "learn-the-text",
+        "whole-text",
+        "text",
+        (("text", "text"),),
+        confirmation=CONFIRM,
+    )
     with pytest.raises(UnsupportedWorkspaceVersionError, match="dataset-row"):
         SERVICE.map_rows(
             workspace,
