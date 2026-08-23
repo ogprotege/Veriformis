@@ -704,6 +704,27 @@ def modes() -> None:
     )
 
 
+@app.command(name="mapping-rejections")
+def mapping_rejections(
+    path: Path,
+    plan: Path = typer.Option(..., "--plan"),
+    output: Path = typer.Option(..., "--output", help="Directory for the report."),
+    source_root: Path | None = typer.Option(None, "--source-root"),
+) -> None:
+    """Write a content-addressed mapping rejection report. Not a verified export."""
+    try:
+        payload = _SERVICE.export_mapping_rejections(
+            path,
+            json.loads(plan.read_text(encoding="utf-8")),
+            output,
+            source_root=source_root,
+        )
+    except VeriformisError as exc:
+        _echo_error(exc)
+        return
+    typer.echo(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+
+
 @app.command(name="mapping-preview")
 def mapping_preview(
     path: Path,

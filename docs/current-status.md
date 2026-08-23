@@ -33,12 +33,12 @@ as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
 independent-product Phase 6 complete, with items 6.1–6.7 merged sequentially
 as PR #60 through PR #65 and PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is in
-progress at item 7.8 (JSON and compatible CSV import with production round
-trips). Items 7.1–7.7 merged as PR #71 through PR #77.
+progress at item 7.9 (row-level mapping rejection export). Items 7.1–7.8
+merged as PR #71 through PR #78.
 
-**Review date:** 2026-08-23 (independent-product Phase 7.8 JSON/CSV mapping)
+**Review date:** 2026-08-23 (independent-product Phase 7.9 mapping rejections)
 
-**Next review:** Phase 7.8 pull-request merge, item 7.9, beta label
+**Next review:** Phase 7.9 pull-request merge, item 7.10, beta label
 cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -373,6 +373,7 @@ The installed console entry point is `veriformis`.
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
 | `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
 | `mapping-preview PATH --plan PLAN.json` | Walks the full JSONL file and reports per-row accept/reject samples without writing a workspace | Runtime-only `veriformis.mapping-preview/v1` JSON; 64 KiB sample / 256 KiB response bounds |
+| `mapping-rejections PATH --plan PLAN.json --output DIR` | Writes a content-addressed mapping rejection report beside a directory; `map` also writes one beside the workspace | `veriformis.mapping-rejection-report/v1` JSON; not a verified export |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |

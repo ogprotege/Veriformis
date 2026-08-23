@@ -58,9 +58,33 @@ def execute_mapping(
     """Map every captured object under one confirmed plan.
 
     Extra unmapped object keys, missing required keys, empty required strings,
-    and invalid messages shapes fail closed. Replay from the same bytes and
-    plan reconstructs the same imported-record identities.
+    and invalid messages shapes refuse that row. A file with no accepted rows
+    still fails closed. Replay from the same bytes and plan reconstructs the
+    same imported-record identities.
     """
+    mapped, _rejected = execute_mapping_rows(
+        plan,
+        capture,
+        source_id=source_id,
+        recipe=recipe,
+    )
+    return mapped
+
+
+def execute_mapping_rows(
+    plan: MappingPlan,
+    capture: JsonlCapture,
+    *,
+    source_id: str,
+    recipe: MappingRecipe,
+) -> tuple[tuple[ImportedRecord, ...], tuple[Any, ...]]:
+    """Map each captured object independently.
+
+    Accepted rows are returned. Rejected rows become mapping-rejection records
+    instead of failing the whole file. Zero accepted rows still fail closed.
+    """
+    from veriformis.mapping.reject import rejection_from_error
+
     if plan.mapping_plan_id != recipe.mapping_plan_id:
         raise MappingError("mapping recipe names another mapping plan")
     if plan.row_schema != recipe.row_schema:
@@ -73,16 +97,33 @@ def execute_mapping(
             f"match plan container {plan.container_kind!r}"
         )
     mapped: list[ImportedRecord] = []
+    rejected: list[Any] = []
+    last_error: MappingError | None = None
     for record in capture.records:
-        mapped.append(
-            _map_one(
-                plan,
-                record,
-                source_id=source_id,
-                recipe=recipe,
+        try:
+            mapped.append(
+                _map_one(
+                    plan,
+                    record,
+                    source_id=source_id,
+                    recipe=recipe,
+                )
             )
-        )
-    return tuple(mapped)
+        except MappingError as exc:
+            last_error = exc
+            rejected.append(
+                rejection_from_error(
+                    record=record,
+                    logical_path=capture.row_source.logical_path,
+                    mapping_plan_id=plan.mapping_plan_id,
+                    message=exc.message,
+                )
+            )
+    if not mapped:
+        if last_error is not None:
+            raise last_error
+        raise MappingError("mapping produced no records")
+    return tuple(mapped), tuple(rejected)
 
 
 def replay_mapping(

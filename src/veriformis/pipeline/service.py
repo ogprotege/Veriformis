@@ -244,6 +244,8 @@ class MapOutcome(StageOutcome):
     recipe_id: str | None = None
     result_id: str | None = None
     imported_record_ids: tuple[str, ...] = ()
+    rejection_report_path: str | None = None
+    rejected_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -1096,6 +1098,35 @@ class PipelineService:
         return preview_mapping(
             path,
             plan,
+            logical_path=capture.logical_path,
+        )
+
+    def export_mapping_rejections(
+        self,
+        path: Path,
+        mapping_plan: MappingPlan | dict[str, Any],
+        destination: Path,
+        *,
+        source_root: Path | None = None,
+    ) -> dict[str, Any]:
+        """Write a content-addressed mapping rejection report. No workspace mutation."""
+        from veriformis.mapping.models import MappingPlan as MappingPlanModel
+        from veriformis.mapping.reject import export_mapping_rejections
+        from veriformis.sources import capture_source_batch
+
+        plan = (
+            mapping_plan
+            if isinstance(mapping_plan, MappingPlanModel)
+            else MappingPlanModel.model_validate(mapping_plan)
+        )
+        captures = capture_source_batch([path], source_root=source_root)
+        capture = captures[0]
+        if capture.error is not None:
+            raise capture.error
+        return export_mapping_rejections(
+            path,
+            plan,
+            destination,
             logical_path=capture.logical_path,
         )
 
@@ -2013,7 +2044,11 @@ class PipelineService:
     ) -> MapOutcome:
         """Map captured row sources into imported records."""
         from veriformis.mapping.capture import capture_row_source
-        from veriformis.mapping.execute import execute_mapping
+        from veriformis.mapping.execute import execute_mapping_rows
+        from veriformis.mapping.reject import (
+            MappingRejectionReport,
+            write_mapping_rejection_report,
+        )
         from veriformis.mapping.models import MappingPlan as MappingPlanModel
         from veriformis.mapping.result import MappingRecipe, MappingResult
 
@@ -2054,6 +2089,7 @@ class PipelineService:
         recipe = MappingRecipe.create(plan=plan, source_ids=source_ids)
         mapped_records = []
         row_source_ids = []
+        rejections = []
         for source_id in source_ids:
             descriptor = current.sources[source_id]
             if descriptor.raw_artifact_id is None:
@@ -2065,14 +2101,14 @@ class PipelineService:
                 raw_bytes=raw_bytes,
             )
             row_source_ids.append(capture.row_source.row_source_id)
-            mapped_records.extend(
-                execute_mapping(
-                    plan,
-                    capture,
-                    source_id=source_id,
-                    recipe=recipe,
-                )
+            accepted, rejected = execute_mapping_rows(
+                plan,
+                capture,
+                source_id=source_id,
+                recipe=recipe,
             )
+            mapped_records.extend(accepted)
+            rejections.extend(rejected)
         result = MappingResult.create(
             plan=plan,
             recipe=recipe,
@@ -2123,6 +2159,16 @@ class PipelineService:
                 },
                 config=config,
             )
+        report = MappingRejectionReport.create(
+            mapping_plan_id=plan.mapping_plan_id,
+            accepted_count=len(result.records),
+            rejections=rejections,
+        )
+        report_path = write_mapping_rejection_report(
+            report,
+            workspace.parent,
+            workspace_name=workspace.name,
+        )
         record_ids = tuple(record.record_id for record in result.records)
         return MapOutcome(
             record_count=len(result.records),
@@ -2130,13 +2176,17 @@ class PipelineService:
             recipe_id=recipe.recipe_id,
             result_id=result.result_id,
             imported_record_ids=record_ids,
+            rejection_report_path=str(report_path),
+            rejected_count=report.rejected_count,
             revision_id=revision.revision_id,
             durability_warning=store.last_commit_durability_warning,
             messages=(
                 ServiceMessage(
                     f"mapped {len(result.records)} imported record(s); "
+                    f"rejected {report.rejected_count}; "
                     f"plan {plan.mapping_plan_id}; revision {revision.revision_id}"
                 ),
+                ServiceMessage(f"mapping rejection report: {report_path}"),
             ),
         )
 

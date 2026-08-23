@@ -44,7 +44,9 @@ evidence, workspace revision v4 with stage `map`, and seal through ordinary
 Item 7.5 binds mapping provenance and replay (PR #75). Item 7.6 adds full-file
 mapping preview (PR #76). Item 7.7 honors imported partitions and admits mixed
 mode with distinct provenances (PR #77). Item 7.8 admits JSON and compatible
-CSV capture and proves production map → seal → generic-export round trips.
+CSV capture and proves production map → seal → generic-export round trips
+(PR #78). Item 7.9 exports row-level mapping rejections as a content-addressed
+project artifact.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

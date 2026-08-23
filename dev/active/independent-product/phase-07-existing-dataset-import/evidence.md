@@ -49,3 +49,12 @@ The completion stamp merged as PR #69 at
 - [x] Round-trip matrix: JSONL × 4 schemas, JSON × 4, CSV × 3 flat, using
       production mapping plus existing generic export, not Phase 5.5 loaders.
 - [x] Core pytest: 1951 passed, 1 deselected, expected transport warning.
+
+## Required item 7.9 evidence
+
+- [x] Rejection report `veriformis.mapping-rejection-report/v1` is content-addressed
+      and ordered by row index.
+- [x] Accepted rows still seal; rejected rows never appear in emitted partitions.
+- [x] Tampering the report does not change the sealed bundle digest.
+- [x] A corrected source produces a new mapping-plan id.
+- [x] Python, CLI, and MCP write the same report identity.
