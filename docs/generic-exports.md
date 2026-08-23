@@ -13,7 +13,7 @@ train/evaluation split.
 Imported dataset-row bundles use these same three containers. Mapping does
 not add a fourth renderer or a trainer profile. Named TRL and MLX-LM
 adapters are optional split-JSONL profiles; generic selectors stay
-`consumer_id` null. Taxonomy remains planned until item 8.7.
+`consumer_id` null.
 
 **Next review:** Any generic-export selector, row-schema compatibility,
 consumer-profile, request, receipt, or transport change

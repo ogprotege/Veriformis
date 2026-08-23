@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–7 complete; Phase 8 in progress
+**Status:** Active program — Phases 0–8 complete
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -23,7 +23,7 @@ with roadmap headings.
 - [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — completed
 - [Phase 6 — Goal-first recipes and previews](phase-06-goal-first-recipes/README.md) — completed
 - [Phase 7 — Existing-dataset import and mapping](phase-07-existing-dataset-import/README.md) — completed
-- [Phase 8 — First consumer profiles](phase-08-consumer-profiles/README.md) — in progress
+- [Phase 8 — First consumer profiles](phase-08-consumer-profiles/README.md) — completed
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -83,8 +83,8 @@ was synchronized before Phase 6 opened. Phase 6 completed under its
 [packet](phase-07-existing-dataset-import/README.md); closeout merged as
 PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
 checks passed. Phase 8 opened on 2026-08-23 under its
-[packet](phase-08-consumer-profiles/README.md); item 8.1 merged as PR #82;
-item 8.2 pins planned TRL and MLX-LM admission records.
+[packet](phase-08-consumer-profiles/README.md); items 8.1–8.6 merged as
+PR #82–#87; item 8.7 closes the phase with implemented TRL and MLX-LM.
 
 ## State change procedure
 

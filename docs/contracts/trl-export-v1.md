@@ -2,9 +2,9 @@
 
 **Selector:** `split-jsonl-directory` v1 + `consumer_id=trl` v1
 
-**Status:** Executable adapter. Taxonomy `trl` remains `planned` until item
-8.7. Loader conformance is item 8.5. Launch sidecar is item 8.6. No
-training launch.
+**Status:** Implemented optional adapter. Taxonomy `trl` is `implemented`.
+Loader conformance is item 8.5. Launch sidecar is item 8.6. No training
+launch.
 
 **Last reviewed:** 2026-08-23
 

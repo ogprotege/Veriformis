@@ -1,4 +1,4 @@
-"""Phase 8.2: planned TRL and MLX-LM admission pins. No emission."""
+"""Phase 8.2/8.7: TRL and MLX-LM admission pins."""
 
 from __future__ import annotations
 
@@ -27,7 +27,10 @@ from veriformis.profiles import (
     profile_admission_catalog,
     profile_admission_catalog_json,
 )
-from veriformis.taxonomy import PLANNED_CONSUMER_PROFILE_ITEMS, PLANNED_CONSUMER_PROFILES
+from veriformis.taxonomy import (
+    EXPORT_CONSUMER_PROFILE_ITEMS,
+    IMPLEMENTED_EXPORT_CONSUMER_PROFILES,
+)
 
 DATA_PATH = (
     Path(__file__).resolve().parents[2]
@@ -87,17 +90,29 @@ def test_packaged_admission_catalog_is_canonical_and_shared() -> None:
     assert first == second and first is not second
 
 
-def test_catalog_closes_over_planned_profiles_only() -> None:
+def test_catalog_closes_over_implemented_export_profiles() -> None:
     catalog = profile_admission_catalog()
     assert isinstance(catalog, ProfileAdmissionCatalog)
-    assert tuple(record.profile_id for record in catalog.records) == PLANNED_CONSUMER_PROFILES
-    assert PLANNED_CONSUMER_PROFILES == ("trl", "mlx-lm")
+    assert (
+        tuple(record.profile_id for record in catalog.records)
+        == IMPLEMENTED_EXPORT_CONSUMER_PROFILES
+    )
+    assert IMPLEMENTED_EXPORT_CONSUMER_PROFILES == ("trl", "mlx-lm")
     for record in catalog.records:
-        assert record.state == "planned"
+        assert record.state == "implemented"
         assert record.round_trip is False
         assert record.extra == record.profile_id
-        assert record.executable_item == PLANNED_CONSUMER_PROFILE_ITEMS[record.profile_id]
+        assert record.executable_item == EXPORT_CONSUMER_PROFILE_ITEMS[record.profile_id]
         assert record.admitted_row_schemas == tuple(sorted(V1_ROW_SCHEMA_KINDS))
+        assert record.transformed_row_schemas == ("instruction_output",)
+        assert record.rejected_goals == ()
+        assert record.accepted_goals == (
+            "before_after_transformation",
+            "continuation",
+            "full_text",
+            "section_reconstruction",
+            "structured_field",
+        )
         assert record.refused_dataset_types == TRL_REFUSED
         assert record.docs_reviewed_on == "2026-08-23"
         assert tuple(sorted(record.partition_mapping)) == ("evaluation", "train")
@@ -135,7 +150,7 @@ def test_admission_models_refuse_unknown_profiles_and_round_trip_claims() -> Non
     payload = profile_admission_catalog().model_dump(mode="json")
     first = dict(payload["records"][0])
     first["profile_id"] = "axolotl"
-    with pytest.raises(ExportContractError, match="not a planned consumer"):
+    with pytest.raises(ExportContractError, match="not an implemented export profile"):
         ProfileAdmission.model_validate(first)
     first = dict(payload["records"][0])
     first["round_trip"] = True

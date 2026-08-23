@@ -2,9 +2,9 @@
 
 **Selector:** `split-jsonl-directory` v1 + `consumer_id=mlx-lm` v1
 
-**Status:** Executable adapter. Taxonomy `mlx-lm` remains `planned` until
-item 8.7. Loader conformance is item 8.5. Launch sidecar is item 8.6. No
-training launch.
+**Status:** Implemented optional adapter. Taxonomy `mlx-lm` is
+`implemented`. Loader conformance is item 8.5. Launch sidecar is item 8.6.
+No training launch.
 
 **Last reviewed:** 2026-08-23
 

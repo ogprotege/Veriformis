@@ -129,7 +129,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis taxonomy` | Print the implemented training taxonomy as read-only JSON |
 | `veriformis goals` | Print the versioned goal catalog |
 | `veriformis presets` | Print versioned recipe presets |
-| `veriformis profile-admissions` | Print planned TRL and MLX-LM admission pins; not executable |
+| `veriformis profile-admissions` | Print implemented TRL and MLX-LM admission pins |
 | `veriformis preflight PATH... --goal ID` | Raw-source compile admission without a workspace |
 | `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |
 | `veriformis clean WORKSPACE` | Cleaning plan + apply |

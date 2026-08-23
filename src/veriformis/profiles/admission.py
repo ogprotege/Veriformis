@@ -1,4 +1,4 @@
-"""Section-5 admission pins for planned consumer profiles. No emission."""
+"""Section-5 admission pins for implemented TRL and MLX-LM export profiles."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from veriformis.contracts import (
+    DETERMINISTIC_V1_OBJECTIVE_KINDS,
     PROFILE_ADMISSION_CONTRACT_ID,
     PROFILE_ADMISSION_CONTRACT_VERSION,
     PROFILE_ADMISSION_SCHEMA_ID,
@@ -18,7 +19,11 @@ from veriformis.contracts import (
 )
 from veriformis.errors import ExportContractError
 from veriformis.identity import sha256_digest
-from veriformis.taxonomy import PLANNED_CONSUMER_PROFILE_ITEMS, PLANNED_CONSUMER_PROFILES
+from veriformis.taxonomy import (
+    EXPORT_CONSUMER_PROFILE_ITEMS,
+    IMPLEMENTED_EXPORT_CONSUMER_PROFILES,
+    OBJECTIVE_ROW_COMPATIBILITY,
+)
 
 ADMISSION_DATA_NAME = "admission-v1.json"
 RowSchema = Literal["instruction_output", "messages", "prompt_completion", "text"]
@@ -61,6 +66,7 @@ class RowMappingPin(_StrictModel):
 
 
 class ProfileAdmission(_StrictModel):
+    accepted_goals: tuple[str, ...]
     admitted_row_schemas: tuple[RowSchema, ...]
     deprecation_policy: str
     docs_reviewed_on: str
@@ -74,24 +80,34 @@ class ProfileAdmission(_StrictModel):
     primary_docs_url: str
     profile_id: str
     refused_dataset_types: tuple[str, ...]
+    rejected_goals: tuple[str, ...]
     round_trip: bool
     row_mappings: tuple[RowMappingPin, ...]
-    state: Literal["planned"]
+    state: Literal["implemented"]
+    transformed_row_schemas: tuple[RowSchema, ...]
     version_range: str
     workflow: str
 
-    @field_validator("admitted_row_schemas", "refused_dataset_types", "row_mappings", mode="before")
+    @field_validator(
+        "accepted_goals",
+        "admitted_row_schemas",
+        "refused_dataset_types",
+        "rejected_goals",
+        "row_mappings",
+        "transformed_row_schemas",
+        mode="before",
+    )
     @classmethod
     def _tuple_fields(cls, value: Any) -> Any:
         return tuple(value) if isinstance(value, list) else value
 
     @model_validator(mode="after")
     def _closed(self) -> ProfileAdmission:
-        if self.profile_id not in PLANNED_CONSUMER_PROFILES:
+        if self.profile_id not in IMPLEMENTED_EXPORT_CONSUMER_PROFILES:
             raise ExportContractError(
-                f"admission profile {self.profile_id!r} is not a planned consumer"
+                f"admission profile {self.profile_id!r} is not an implemented export profile"
             )
-        expected_item = PLANNED_CONSUMER_PROFILE_ITEMS[self.profile_id]
+        expected_item = EXPORT_CONSUMER_PROFILE_ITEMS[self.profile_id]
         if self.executable_item != expected_item:
             raise ExportContractError(
                 f"admission {self.profile_id!r} must name item {expected_item}"
@@ -105,6 +121,26 @@ class ProfileAdmission(_StrictModel):
         mapped = tuple(item.source_row_schema for item in self.row_mappings)
         if mapped != self.admitted_row_schemas:
             raise ExportContractError("row_mappings must cover admitted schemas in order")
+        transformed = tuple(
+            item.source_row_schema
+            for item in self.row_mappings
+            if item.mapping_kind == "assemble-prompt"
+        )
+        if self.transformed_row_schemas != transformed:
+            raise ExportContractError(
+                "transformed_row_schemas must match assemble-prompt mappings"
+            )
+        expected_goals = tuple(
+            sorted(
+                objective
+                for objective in DETERMINISTIC_V1_OBJECTIVE_KINDS
+                if set(OBJECTIVE_ROW_COMPATIBILITY[objective]) & set(self.admitted_row_schemas)
+            )
+        )
+        if self.accepted_goals != expected_goals:
+            raise ExportContractError("accepted_goals must match admitted row schemas")
+        if self.rejected_goals != ():
+            raise ExportContractError("no implemented goal is rejected by these profiles")
         expected_partitions = ("evaluation", "train")
         if tuple(sorted(self.partition_mapping)) != expected_partitions:
             raise ExportContractError("partition_mapping must name train and evaluation")
@@ -146,9 +182,9 @@ class ProfileAdmissionCatalog(_StrictModel):
         if self.contract_version != PROFILE_ADMISSION_CONTRACT_VERSION:
             raise ExportContractError("admission catalog contract_version mismatch")
         ids = tuple(record.profile_id for record in self.records)
-        if ids != PLANNED_CONSUMER_PROFILES:
+        if ids != IMPLEMENTED_EXPORT_CONSUMER_PROFILES:
             raise ExportContractError(
-                "admission records must match planned consumer profiles in order"
+                "admission records must match implemented export profiles in order"
             )
         return self
 
@@ -184,3 +220,29 @@ def discover_profile_admissions() -> dict[str, Any]:
 
 def profile_admission_digest() -> str:
     return sha256_digest(profile_admission_catalog_json())
+
+
+def require_profile_messages_payload(payload: MappingABC[str, Any]) -> None:
+    """Refuse system roles, extra turns, tools, and nested non-string content."""
+    if set(payload) != {"messages"}:
+        raise ExportContractError("messages payload extra keys are refused")
+    messages = payload["messages"]
+    if not isinstance(messages, list) or len(messages) != 2:
+        raise ExportContractError(
+            "messages export requires exactly two user then assistant turns"
+        )
+    expected_roles = ("user", "assistant")
+    for index, (message, role) in enumerate(zip(messages, expected_roles)):
+        if not isinstance(message, MappingABC):
+            raise ExportContractError(f"messages turn {index} has an invalid shape")
+        extra = set(message) - {"content", "role"}
+        if extra:
+            raise ExportContractError("messages extra keys are refused")
+        if message.get("role") != role:
+            raise ExportContractError(
+                f"messages turn {index} must have role {role!r}; "
+                "system roles and extra assistant turns are refused"
+            )
+        content = message.get("content")
+        if not isinstance(content, str) or not content:
+            raise ExportContractError("messages content must be a nonempty string")

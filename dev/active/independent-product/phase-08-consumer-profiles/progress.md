@@ -102,3 +102,19 @@ intentional transport durability warning.
 
 **Next action:** Publish the item 8.6 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 8.7.
+
+## 2026-08-23 — Item 8.6 merged; item 8.7 closeout in progress
+
+**Status:** Item 8.6 merged as PR #87 at
+`2381802ff62ca9019bc1c1d1cedbb7134a7df2d2` after all 16 GitHub checks
+passed. Local `main` equals `origin/main`.
+
+Item 8.7 promotes `trl` and `mlx-lm` to implemented, names accepted,
+transformed, and rejected goals and rows in admission discovery, refuses
+system roles and extra assistant turns in Veriformis, and closes Phase 8.
+
+Tracking, Ruff, lock, and diff check passed. Core pytest passed 2001 with
+3 deselected and the intentional transport durability warning.
+
+**Next action:** Publish the item 8.7 pull request. Require green GitHub
+checks, merge, and synchronize clean main. Do not start Phase 9, 10, or 13.

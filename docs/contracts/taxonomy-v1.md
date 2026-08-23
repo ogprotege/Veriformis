@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.1: planned TRL/MLX-LM remain non-executable)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.7: TRL and MLX-LM implemented)
 
 **Next review:** Any taxonomy, input-family, loss-policy, or
 compatibility-matrix change
@@ -153,8 +153,8 @@ change record membership.
 | --- | --- | --- |
 | `veriformis-canonical-v1` | implemented | No destination adaptation; the verified bundle is the product |
 | `aptus-handoff-v1` | implemented | Optional sibling descriptor; default surfaces do not write it |
-| `trl` | planned | Phase 8 |
-| `mlx-lm` | planned | Phase 8 |
+| `trl` | implemented | Optional SFT export adapter over split JSONL |
+| `mlx-lm` | implemented | Optional LoRA export adapter over split JSONL |
 | `axolotl` | candidate | Phase 10 |
 | `llama-factory` | candidate | Phase 10 |
 | `unsloth` | candidate | Phase 10 |
@@ -227,6 +227,9 @@ Default row schema when the caller omits one:
 
 `veriformis-canonical-v1` accepts every valid objective/row pair.
 `aptus-handoff-v1` accepts those pairs except `text`.
+`trl` and `mlx-lm` accept every valid objective/row pair as optional export
+adapters. `instruction_output` is transformed to prompt/completion columns.
+They refuse preference, tools, and vision types.
 
 Unknown family, objective, row, container, profile, loss-policy, or
 input-family identifiers MUST fail closed. Planned and explicitly unsupported

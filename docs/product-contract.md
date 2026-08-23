@@ -17,17 +17,16 @@ merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, completing Phases 0–5; Phase 6
 goal-first recipes and previews complete, closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; Phase 7 existing-dataset import
-and mapping complete; Phase 8 consumer-profile packet open with TRL and
-MLX-LM adapters executable, launch sidecars present, and taxonomy still
-planned; version `0.1.0` development alpha
+and mapping complete; Phase 8 consumer profiles complete with implemented
+TRL and MLX-LM optional adapters; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–7 complete; maturity alpha; public Mac claim still owner-gated
+Phases 0–8 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.6 launch sidecars)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.7 closeout)
 
-**Next review:** Phase 8.6 pull-request merge, item 8.7, beta label cut,
+**Next review:** Phase 8.7 pull-request merge, beta label cut,
 public-ready checklist, or any product-contract change. Do not start Phase 9,
 10, or 13 from this packet.
 
@@ -331,8 +330,10 @@ self-conformance, not compatibility with a live named Aptus build. Live
 training execution remains outside Veriformis. The independent product ships
 three consumer-neutral generic containers, `split-jsonl-directory`, canonical
 `json`, and `constrained-csv` v1, under separate versioned contracts. None
-selects a trainer or claims trainer compatibility. Versioned optional trainer
-profiles and columnar/Hugging Face containers remain planned.
+selects a trainer or claims trainer compatibility. TRL and MLX-LM are
+implemented optional adapters. Columnar/Hugging Face containers remain
+Phase 9. Axolotl, LLaMA-Factory, Unsloth, and Aptus-as-profile remain
+Phase 10.
 
 ## Fail-closed seal
 

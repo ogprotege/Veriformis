@@ -41,13 +41,11 @@ PR #71 through PR #80. Closeout merged as PR #80 at
 passed. Dataset-row compilation is opt-in: `parse --mode dataset-row` then
 `map` on revision v4, with confirmed mapping plans, `mapped_value` evidence,
 JSON/CSV/JSONL capture, rejection reports, and packaged templates. Phase 8
-(first consumer profiles) is in progress under its standard packet. Item 8.1
-merged as PR #82 at `799d56f` after all 14 GitHub checks passed. Item 8.2
-pins official TRL and MLX-LM admission records as packaged data with empty
-extras. Item 8.3 emits the TRL SFT adapter. Item 8.4 emits the MLX-LM LoRA adapter.
-Item 8.5 adds official-schema harnesses and optional profile-integration CI.
-Item 8.6 emits dataset-only launch sidecars; the exporter does not train.
-Taxonomy remains planned. Do not start Phase 9, 10, or 13 from this packet.
+(first consumer profiles) is complete under its standard packet. Items 8.1–8.6
+merged as PR #82 through PR #87. Item 8.7 promotes `trl` and `mlx-lm` to
+implemented optional adapters, names accepted/transformed/rejected goals and
+rows, and closes the phase. The exporter does not train. Do not start Phase 9,
+10, or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -197,7 +195,7 @@ Key modules under `src/veriformis/` are:
   preview, and compile preflight, whose strict models resolve plain-language
   goals and presets to existing objectives, row schemas, and executable recipe
   settings, and probe raw sources without workspace mutation;
-- `profiles/` for planned TRL and MLX-LM admission pins (not executable);
+- `profiles/` for implemented TRL and MLX-LM admission pins and adapters;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

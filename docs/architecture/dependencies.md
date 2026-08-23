@@ -17,7 +17,7 @@ pipeline domains (`ir`, `sources`, `evidence`, `parsers`, `rules`, `chunkers`,
 `PipelineService` composition root. `exports/` depends on the bundle verifier
 but is not a tenth workspace stage. `goals/` and `mapping/` are axial packages
 over existing construction and finished-dataset contracts. `profiles/` holds
-planned consumer-profile admission pins and must not import trainer libraries.
+implemented consumer-profile admission pins and adapters and must not import trainer libraries.
 CLI and MCP are adapters over the pipeline root; recipes and the optional
 Aptus handoff are bounded integration modules.
 The SwiftUI workbench is outside the Python graph and shells the CLI.

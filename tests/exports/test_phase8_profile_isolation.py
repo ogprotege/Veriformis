@@ -1,4 +1,4 @@
-"""Phase 8.1: planned consumer profiles refuse; generic exports stay null."""
+"""Phase 8 isolation: generic exports stay null; candidates refuse as Phase 10."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from veriformis.exports.split_jsonl import (
 from veriformis.pipeline import PipelineService
 from veriformis.taxonomy import (
     CANDIDATE_CONSUMER_PROFILES,
+    IMPLEMENTED_EXPORT_CONSUMER_PROFILES,
     PLANNED_CONSUMER_PROFILE_ITEMS,
     PLANNED_CONSUMER_PROFILES,
     UNEXECUTABLE_CONSUMER_PROFILE_ITEMS,
@@ -53,20 +54,19 @@ def _planned_request(consumer_id: str) -> ExportDryRunRequest:
     )
 
 
-def test_planned_profile_item_map_is_closed_over_the_taxonomy() -> None:
-    assert PLANNED_CONSUMER_PROFILES == ("trl", "mlx-lm")
-    assert tuple(PLANNED_CONSUMER_PROFILE_ITEMS) == PLANNED_CONSUMER_PROFILES
-    assert PLANNED_CONSUMER_PROFILE_ITEMS["trl"] == "8.3"
-    assert PLANNED_CONSUMER_PROFILE_ITEMS["mlx-lm"] == "8.4"
+def test_planned_profile_item_map_is_empty_after_promotion() -> None:
+    assert PLANNED_CONSUMER_PROFILES == ()
+    assert dict(PLANNED_CONSUMER_PROFILE_ITEMS) == {}
+    assert IMPLEMENTED_EXPORT_CONSUMER_PROFILES == ("trl", "mlx-lm")
     assert UNEXECUTABLE_CONSUMER_PROFILE_ITEMS == {}
 
 
-def test_taxonomy_still_lists_trl_and_mlx_lm_as_planned() -> None:
+def test_taxonomy_lists_trl_and_mlx_lm_as_implemented() -> None:
     entries = {
         (entry.axis, entry.identifier): entry.state for entry in catalog()
     }
-    assert entries[("consumer_profile", "trl")] == "planned"
-    assert entries[("consumer_profile", "mlx-lm")] == "planned"
+    assert entries[("consumer_profile", "trl")] == "implemented"
+    assert entries[("consumer_profile", "mlx-lm")] == "implemented"
     for identifier in CANDIDATE_CONSUMER_PROFILES:
         assert entries[("consumer_profile", identifier)] == "candidate"
 

@@ -12,6 +12,7 @@
 | Aptus stays the existing optional handoff in Phase 8 | Accepted | Roadmap Phase 10 item 7 |
 | The exporter does not launch training | Accepted | Roadmap Phase 8 non-goal |
 | Sidecars are dataset-path fragments with `launches_training: false`; they omit model and hyperparameters | Accepted | Item 8.6; official TRL SFT and mlx-lm LoRA docs reviewed 2026-08-23 |
+| `trl` and `mlx-lm` are implemented export adapters after 8.7; compile-time recipes still default to the canonical profile | Accepted | Item 8.7 discovery truthfulness |
 | Extra names exist in 8.2 as empty lists; version ranges live in admission data; packages install in 8.5 | Accepted | Keep `uv lock` free of torch/mlx |
 | MLX-LM evaluation maps to optional `valid.jsonl`; `test.jsonl` is mlx-lm `--test` and is not Veriformis evaluation | Accepted | Official LORA.md; reviewed 2026-08-23 |
 | TRL v1 admits SFT language-modeling and prompt-completion only | Accepted | Official TRL dataset_formats; reviewed 2026-08-23 |

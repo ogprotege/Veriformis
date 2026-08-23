@@ -239,7 +239,7 @@ def test_mlx_lm_render_maps_every_schema_without_changing_counts(tmp_path: Path)
         assert card.loss_policy == loss_policy_for_row(row_schema)
         assert card.trainer_compatibility_claimed is False
         assert meta.round_trip is False
-        assert meta.taxonomy_state == "planned"
+        assert meta.taxonomy_state == "implemented"
         assert files[MLX_LM_README_PATH].endswith(b"\n")
         assert b"does not claim that mlx-lm has loaded" in files[MLX_LM_README_PATH]
         assert b"test.jsonl" in files[MLX_LM_README_PATH]
