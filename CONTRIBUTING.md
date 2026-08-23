@@ -41,8 +41,9 @@ The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
 Independent-product Phases 0–8 are complete on `main` (Phase 8 closeout
 PR #88 at `199e16eeabd8c624b571add9d28034830b3b92da`). Phase 9 is in
-progress under ADR-0013; item 9.2 pins Arrow and Hugging Face feature
-schemas while Parquet, Arrow, and Hugging Face Dataset remain planned.
+progress under ADR-0013; items 9.2–9.3 pin Arrow/feature schemas and
+semantic fingerprints while Parquet, Arrow, and Hugging Face Dataset remain
+planned.
 Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed

@@ -38,13 +38,14 @@ complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 14 GitHub checks passed. Phase 8 consumer profiles are complete: TRL SFT and
 MLX-LM LoRA are implemented optional adapters with official-schema harnesses
 and dataset-only launch sidecars. The exporter does not launch training.
-Phase 9 columnar containers are in progress under item 9.2: Arrow and
-Hugging Face feature schemas are pinned. Parquet, Arrow, and Hugging Face
-Dataset remain planned and refuse with the later item.
+Phase 9 columnar containers are in progress under item 9.3: Arrow and
+Hugging Face feature schemas and semantic fingerprints are pinned.
+Parquet, Arrow, and Hugging Face Dataset remain planned and refuse with
+the later item.
 
-**Review date:** 2026-08-23 (independent-product Phase 9.2 schema pins)
+**Review date:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
 
-**Next review:** Phase 9.2 pull-request merge, item 9.3, beta label cut,
+**Next review:** Phase 9.3 pull-request merge, item 9.4, beta label cut,
 public-ready checklist, or any contract change. Do not start Phase 10 or
 13 from this packet.
 

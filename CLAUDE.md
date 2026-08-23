@@ -47,10 +47,12 @@ implemented optional adapters, names accepted/transformed/rejected goals and
 rows, and closes the phase. The exporter does not train. Phase 9 (columnar
 and Hugging Face dataset containers) is in progress under its standard
 packet. Item 9.1 merged as PR #89 at
-`719c961da3346c3102f26ebd03ddf7af01fded54`. Item 9.2 pins Arrow and
-Hugging Face feature schemas for every v1 row, including nested
-`messages`. Extra `columnar` stays empty. Those three `container_id`
-values remain planned. Do not start Phase 10 or 13 from this packet.
+`719c961da3346c3102f26ebd03ddf7af01fded54`. Item 9.2 merged as PR #90 at
+`2f31526e15f1fe3d2df394d959a92a124b909258` with Arrow and Hugging Face
+feature schema pins. Item 9.3 defines `semantic_content_only` fingerprints
+over ordered product payloads. Extra `columnar` stays empty. Those three
+`container_id` values remain planned. Do not start Phase 10 or 13 from this
+packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -122,6 +124,7 @@ Read these current authorities before changing code:
     `docs/contracts/row-mapping-v1.md`,
     `docs/contracts/profile-admission-v1.md`,
     `docs/contracts/columnar-schema-v1.md`,
+    `docs/contracts/columnar-fingerprint-v1.md`,
     `docs/contracts/trl-export-v1.md`, and
     `docs/contracts/mlx-lm-export-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,

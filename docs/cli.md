@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
