@@ -44,11 +44,11 @@
       "json-records"
     ],
     "implemented_modes": [
-      "document-source-compilation"
+      "document-source"
     ],
     "planned_modes": [
-      "existing-dataset-row-mapping",
-      "mixed-document-and-dataset-project"
+      "dataset-row",
+      "mixed"
     ],
     "explicitly_unsupported": [
       {

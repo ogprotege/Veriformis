@@ -25,6 +25,7 @@ from veriformis.bundle.finished import (
 from veriformis.cli import seal
 from veriformis.datasets.serialization import V1_ROW_SCHEMAS
 from veriformis.goals import goal_catalog, preset_catalog, recipe_defaults
+from veriformis.mapping import IMPLEMENTED_INPUT_MODES, PLANNED_INPUT_MODES
 from veriformis.mcp.server import create_mcp_server
 from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
 from veriformis.recipes.library import list_named_recipes
@@ -236,6 +237,16 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
     _require(
         inputs.get("implemented_families") == list(IMPLEMENTED_INPUT_FAMILIES),
         "support input families differ from IMPLEMENTED_INPUT_FAMILIES",
+        errors,
+    )
+    _require(
+        inputs.get("implemented_modes") == list(IMPLEMENTED_INPUT_MODES),
+        "support implemented modes differ from executable input modes",
+        errors,
+    )
+    _require(
+        inputs.get("planned_modes") == list(PLANNED_INPUT_MODES),
+        "support planned modes differ from named non-executable input modes",
         errors,
     )
     owned_suffixes = sorted(
@@ -690,9 +701,9 @@ def main() -> int:
     print("Project tracking check: PASS")
     print("- 21 roadmap phases match program.json and WIP.md")
     print(
-        "- implemented inputs, input families, taxonomy families, objectives, goals, "
-        "presets, rows, loss policies, containers, profiles, and handoff defaults "
-        "match code; surfaces hold no recipe default literal"
+        "- implemented inputs, input families, input modes, taxonomy families, "
+        "objectives, goals, presets, rows, loss policies, containers, profiles, "
+        "and handoff defaults match code; surfaces hold no recipe default literal"
     )
     print("- governed phase packets and evidence references are structurally complete")
     return 0

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -40,7 +40,8 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `construction/`, `datasets/`, `bundle/` — flanked by axial modules:
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
 `exports/` (consumer-neutral verified-derivative composition boundary);
-`handoff/`; `mcp/`; and `cli.py` (Typer adapter). Phase 4 establishes the
+`handoff/`; `mcp/`; `mapping/` (compiler-path modes, later row mapping);
+and `cli.py` (Typer adapter). Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
 source-derived plan population and normalized semantic membership enforcement,
@@ -89,6 +90,10 @@ Phase 6.7 stores one static instruction template and unique task phrase per
 goal in the catalog; omitted `instruction-and-output` instructions resolve to
 that template, and a supplied instruction is admitted only after the
 deterministic truthfulness check.
+Phase 7.1 adds `mapping/modes.py` and packaged
+`veriformis.input-mode-discovery/v1`: compiler paths `document-source`,
+`dataset-row`, and `mixed`. Only document-source executes; the others refuse
+with the later item named in the reason. Mode is not a taxonomy axis.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

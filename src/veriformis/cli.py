@@ -192,9 +192,14 @@ def parse(
     paths: list[Path],
     out: Path = typer.Option(..., "-o"),
     source_root: Path | None = typer.Option(None, "--source-root"),
+    mode: str | None = typer.Option(
+        None,
+        "--mode",
+        help="Compiler path: document-source (default), dataset-row, or mixed.",
+    ),
 ) -> None:
     """Capture raw files and commit one canonical parse revision."""
-    _run(lambda: _SERVICE.parse(paths, out, source_root=source_root))
+    _run(lambda: _SERVICE.parse(paths, out, source_root=source_root, mode=mode))
 
 
 @app.command()
@@ -272,6 +277,11 @@ def construct(
         None,
         "--consumer-profile",
     ),
+    mode: str | None = typer.Option(
+        None,
+        "--mode",
+        help="Compiler path: document-source (default), dataset-row, or mixed.",
+    ),
 ) -> None:
     """Construct evidence-bearing candidates and immutable accepted records."""
     _run(
@@ -286,6 +296,7 @@ def construct(
             split_ratio_ppm=split_ratio_ppm,
             require_review=require_review,
             consumer_profile=consumer_profile,
+            mode=mode,
         )
     )
 
@@ -655,6 +666,19 @@ def presets() -> None:
     )
 
 
+@app.command(name="modes")
+def modes() -> None:
+    """Print compiler-path input modes as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_modes(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="preflight")
 def preflight(
     paths: list[Path],
@@ -695,6 +719,11 @@ def preflight(
     ),
     split_seed: str | None = typer.Option(None, "--split-seed"),
     review_policy: str | None = typer.Option(None, "--review-policy"),
+    mode: str | None = typer.Option(
+        None,
+        "--mode",
+        help="Compiler path: document-source (default), dataset-row, or mixed.",
+    ),
 ) -> None:
     """Evaluate raw-source compile readiness without creating a workspace."""
 
@@ -721,6 +750,7 @@ def preflight(
             evaluation_required=evaluation_required,
             split_seed=split_seed,
             review_policy=review_policy,
+            mode=mode,
         )
         assert outcome.preflight is not None
         typer.echo(outcome.preflight.transport_text())

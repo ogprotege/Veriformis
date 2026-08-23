@@ -146,6 +146,12 @@ class TaxonomyError(VeriformisError):
     code = "taxonomy-invalid"
 
 
+class InputModeError(VeriformisError):
+    """An input mode is unknown, malformed, or not yet executable."""
+
+    code = "input-mode-unavailable"
+
+
 class GoalCatalogError(VeriformisError):
     """The versioned goal catalog is malformed, tampered, or not closed over the taxonomy."""
 

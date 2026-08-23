@@ -1,0 +1,32 @@
+{
+  "contract_id": "veriformis.input-mode",
+  "contract_version": 1,
+  "default_mode": "document-source",
+  "modes": [
+    {
+      "executable": true,
+      "mode_id": "document-source",
+      "opens_in": null,
+      "plain_language": "Compile documents into training rows.",
+      "refusal": null,
+      "state": "implemented"
+    },
+    {
+      "executable": false,
+      "mode_id": "dataset-row",
+      "opens_in": "7.3",
+      "plain_language": "Map existing training rows into current semantic schemas.",
+      "refusal": "dataset-row mode is named but not executable until item 7.3 maps JSONL rows.",
+      "state": "planned"
+    },
+    {
+      "executable": false,
+      "mode_id": "mixed",
+      "opens_in": "7.7",
+      "plain_language": "Keep document construction and imported-row provenance distinct in one project.",
+      "refusal": "mixed mode is named but not executable until item 7.7 admits mixed projects.",
+      "state": "planned"
+    }
+  ],
+  "schema_id": "veriformis.input-mode-discovery/v1"
+}

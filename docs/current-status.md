@@ -32,11 +32,12 @@ runtime, taxonomy, support, consumer-profile, or trainer claim change, merged
 as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
 independent-product Phase 6 complete, with items 6.1–6.7 merged sequentially
 as PR #60 through PR #65 and PR #67 at
-`6995d17bef0d09f235b1c464e947c38c63dd313d`
+`6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is in
+progress at item 7.1 (compiler-path modes)
 
-**Review date:** 2026-08-22 (independent-product Phase 6 complete)
+**Review date:** 2026-08-23 (independent-product Phase 7.1 opening)
 
-**Next review:** Phase 7 packet opening, beta label
+**Next review:** Phase 7.1 pull-request merge, item 7.2, beta label
 cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -365,6 +366,7 @@ The installed console entry point is `veriformis`.
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
+| `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source` executable, `dataset-row` and `mixed` named and refused | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
@@ -702,7 +704,7 @@ See [docs/release.md](release.md).
 | Implemented and merged independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; PR #58 at `cd017941090c` |
 | Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–6 complete under the [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–6 complete and Phase 7 in progress under its [standard packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

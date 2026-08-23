@@ -206,6 +206,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def modes() -> str:
+        """Return compiler-path input modes from PipelineService."""
+        return json.dumps(
+            pipeline.discover_modes(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def preflight(
         paths: list[str],
         source_root: str | None = None,
@@ -228,6 +238,7 @@ def create_mcp_server(
         evaluation_required: bool | None = None,
         split_seed: str | None = None,
         review_policy: str | None = None,
+        mode: str | None = None,
     ) -> str:
         """Evaluate raw-source compile readiness without creating a workspace."""
         outcome = pipeline.preflight(
@@ -252,6 +263,7 @@ def create_mcp_server(
             evaluation_required=evaluation_required,
             split_seed=split_seed,
             review_policy=review_policy,
+            mode=mode,
         )
         assert outcome.preflight is not None
         return outcome.preflight.transport_text()
@@ -379,11 +391,21 @@ def create_mcp_server(
         return json.dumps(list(list_named_recipes()), ensure_ascii=False, indent=2)
 
     @server.tool()
-    def parse(paths: list[str], out: str, source_root: str | None = None) -> str:
+    def parse(
+        paths: list[str],
+        out: str,
+        source_root: str | None = None,
+        mode: str | None = None,
+    ) -> str:
         """Capture and parse source files into a workspace."""
         root = Path(source_root) if source_root else None
         return _outcome_json(
-            pipeline.parse([Path(p) for p in paths], Path(out), source_root=root)
+            pipeline.parse(
+                [Path(p) for p in paths],
+                Path(out),
+                source_root=root,
+                mode=mode,
+            )
         )
 
     @server.tool()
@@ -426,6 +448,7 @@ def create_mcp_server(
         goal: str | None = None,
         preset: str | None = None,
         representation: str | None = None,
+        mode: str | None = None,
     ) -> str:
         """Construct candidates and accepted records for one goal or objective."""
         return _outcome_json(
@@ -440,6 +463,7 @@ def create_mcp_server(
                 split_ratio_ppm=split_ratio_ppm,
                 require_review=require_review,
                 consumer_profile=consumer_profile,
+                mode=mode,
             )
         )
 

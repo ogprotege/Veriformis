@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
 
-**Next review:** Independent-product Phase 7 packet opening, any later phase
-closeout, or governance-schema change
+**Next review:** Independent-product Phase 7.1 pull-request merge, item 7.2,
+any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -23,6 +23,8 @@ claims from drifting away from code and evidence.
 | [Program ledger](../../dev/active/independent-product/program.json) | Machine-readable phase status and dependencies |
 | [Completed Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, evidence, and closeout |
 | [Completed Phase 5 packet](../../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Generic local export checklist, decisions, risks, evidence, operator guidance, and closeout |
+| [Completed Phase 6 packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal-first checklist, decisions, risks, usability evidence, and closeout |
+| [Active Phase 7 packet](../../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping plan, and closeout; item 7.1 opening |
 
 Run the governance drift check with:
 
