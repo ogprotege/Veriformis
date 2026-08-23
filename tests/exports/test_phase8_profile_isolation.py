@@ -23,6 +23,7 @@ from veriformis.taxonomy import (
     CANDIDATE_CONSUMER_PROFILES,
     PLANNED_CONSUMER_PROFILE_ITEMS,
     PLANNED_CONSUMER_PROFILES,
+    UNEXECUTABLE_CONSUMER_PROFILE_ITEMS,
     catalog,
 )
 
@@ -57,6 +58,7 @@ def test_planned_profile_item_map_is_closed_over_the_taxonomy() -> None:
     assert tuple(PLANNED_CONSUMER_PROFILE_ITEMS) == PLANNED_CONSUMER_PROFILES
     assert PLANNED_CONSUMER_PROFILE_ITEMS["trl"] == "8.3"
     assert PLANNED_CONSUMER_PROFILE_ITEMS["mlx-lm"] == "8.4"
+    assert UNEXECUTABLE_CONSUMER_PROFILE_ITEMS == {"mlx-lm": "8.4"}
 
 
 def test_taxonomy_still_lists_trl_and_mlx_lm_as_planned() -> None:
@@ -72,16 +74,20 @@ def test_taxonomy_still_lists_trl_and_mlx_lm_as_planned() -> None:
 def test_generic_export_discovery_keeps_a_null_consumer_profile() -> None:
     discovery = PipelineService().discover_exports().discovery
     assert discovery is not None
-    assert discovery.profiles
-    assert all(profile.consumer_profile is None for profile in discovery.profiles)
+    generic = [
+        profile for profile in discovery.profiles if profile.consumer_profile is None
+    ]
+    named = [
+        profile for profile in discovery.profiles if profile.consumer_profile is not None
+    ]
+    assert generic
+    assert all(profile.consumer_profile is None for profile in generic)
+    assert {(profile.consumer_profile.consumer_id if profile.consumer_profile else None) for profile in named} == {"trl"}
 
 
-@pytest.mark.parametrize("consumer_id,item", [("trl", "8.3"), ("mlx-lm", "8.4")])
-def test_planned_consumer_id_refuses_before_catalog_lookup(
-    consumer_id: str, item: str
-) -> None:
-    with pytest.raises(ExportContractError, match=rf"planned for item {item}"):
-        ExportService().dry_run_export(_planned_request(consumer_id))
+def test_planned_consumer_id_refuses_before_catalog_lookup() -> None:
+    with pytest.raises(ExportContractError, match="planned for item 8.4"):
+        ExportService().dry_run_export(_planned_request("mlx-lm"))
 
 
 def test_candidate_consumer_id_refuses_as_phase_10() -> None:
@@ -90,10 +96,10 @@ def test_candidate_consumer_id_refuses_as_phase_10() -> None:
 
 
 def test_planned_consumer_id_refusal_is_visible_on_the_cli() -> None:
-    payload = _planned_request("trl").canonical_bytes().decode("utf-8")
+    payload = _planned_request("mlx-lm").canonical_bytes().decode("utf-8")
     result = RUNNER.invoke(app, ["export", "dry-run", "--request-json", payload])
     assert result.exit_code != 0
-    assert "planned for item 8.3" in result.output
+    assert "planned for item 8.4" in result.output
 
 
 def test_optional_profile_extras_are_declared_empty() -> None:

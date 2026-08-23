@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.3 TRL emission)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -103,8 +103,9 @@ axis. Imported fields carry `mapped_value` evidence and seal through ordinary
 `ProductRow` v1.
 Phase 8.1 records that a consumer profile is an optional adapter over that
 bundle (ADR-0012). Item 8.2 packages planned TRL and MLX-LM admission pins
-under `profiles/` with empty extras; both remain non-executable. Generic
-export discovery still has a null consumer profile.
+under `profiles/` with empty extras. Item 8.3 emits the TRL SFT adapter as
+`split-jsonl-directory` v1 with `consumer_id=trl`. Generic export selectors
+stay `consumer_id` null. MLX-LM remains non-executable.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

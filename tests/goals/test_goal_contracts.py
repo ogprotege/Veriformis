@@ -76,14 +76,16 @@ def test_every_goal_states_the_defaults_every_surface_executes() -> None:
 def test_representation_exports_equal_the_production_export_catalog() -> None:
     discovery = PipelineService().discover_exports().discovery
     assert discovery is not None
+    generic = [
+        profile for profile in discovery.profiles if profile.consumer_profile is None
+    ]
     supported: dict[str, list[str]] = {}
-    for profile in discovery.profiles:
+    for profile in generic:
         container = profile.container_profile.container_id
-        assert profile.consumer_profile is None
         for row_schema in profile.supported_row_schemas:
             supported.setdefault(row_schema, []).append(container)
     assert set(GENERIC_EXPORT_CONTAINERS) == {
-        profile.container_profile.container_id for profile in discovery.profiles
+        profile.container_profile.container_id for profile in generic
     }
     for rep in goal_catalog().representations:
         expected = tuple(

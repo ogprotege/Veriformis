@@ -2,15 +2,15 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `799d56f` on `main` after PR #82
+**Implementation baseline reviewed:** `7351904` on `main` after PR #83
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–7 complete; Phase 8.2 admission pins)
+Phases 0–2; independent-product Phases 0–7 complete; Phase 8.3 TRL emission)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.3 TRL emission)
 
-**Next review:** Phase 8.2 pull-request merge, item 8.3, beta label cut, or
+**Next review:** Phase 8.3 pull-request merge, item 8.4, beta label cut, or
 any listed-item status change. Do not start Phase 9, 10, or 13 from this
 packet.
 
@@ -88,8 +88,8 @@ local, offline, and free of LLM generation.
       passed.
 - [ ] Independent product Phase 8 is in progress under its
       [packet](dev/active/independent-product/phase-08-consumer-profiles/README.md).
-      Item 8.1 merged as PR #82. Item 8.2 pins planned TRL and MLX-LM
-      admission records with empty extras; both remain non-executable.
+      Item 8.1 merged as PR #82; item 8.2 as PR #83. Item 8.3 emits the TRL
+      SFT adapter. Taxonomy `trl` remains planned; MLX-LM is not executable.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

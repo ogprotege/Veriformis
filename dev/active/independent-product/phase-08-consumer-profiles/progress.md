@@ -35,3 +35,20 @@ deselected and the intentional transport durability warning.
 
 **Next action:** Publish the item 8.2 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 8.3.
+
+## 2026-08-23 — Item 8.2 merged; item 8.3 in progress
+
+**Status:** Item 8.2 merged as PR #83 at
+`7351904e58c67c925a3a878af350335620306260` after all 14 GitHub checks
+passed. Local `main` equals `origin/main`.
+
+Item 8.3 emits the TRL SFT adapter over `split-jsonl-directory` v1 with
+`consumer_id=trl`. Mapped JSONL plus profile metadata. Taxonomy remains
+planned. Core does not import TRL. MLX-LM still refuses.
+
+Focused TRL and discovery tests passed. Tracking, Ruff, JSON, and diff
+check passed. Core pytest passed 1975 with 1 deselected and the
+intentional transport durability warning.
+
+**Next action:** Publish the item 8.3 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 8.4.

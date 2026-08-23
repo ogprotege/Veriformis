@@ -30,8 +30,9 @@ LLaMA-Factory / Unsloth / Aptus-as-profile (Phase 10), and no training
 launcher.
 
 Item 8.1 opened the packet and published ADR-0012. Item 8.2 pins official
-TRL and MLX-LM admission records as packaged data with empty extras. Both
-profiles remain planned and non-executable.
+TRL and MLX-LM admission records as packaged data with empty extras. Item
+8.3 emits the TRL SFT adapter. Taxonomy `trl` remains planned. MLX-LM is
+not executable.
 
 ## Packet contents
 
@@ -47,7 +48,6 @@ profiles remain planned and non-executable.
 
 ## Current state
 
-Item 8.1 merged as PR #82. Item 8.2 is pinning official TRL and MLX-LM
-admission records. Both remain planned taxonomy identifiers. Generic export
-discovery still has a null consumer profile. Empty extras do not install
-trainer packages.
+Item 8.2 merged as PR #83. Item 8.3 emits the TRL SFT adapter. Taxonomy
+`trl` remains planned. Generic export selectors stay `consumer_id` null.
+MLX-LM remains non-executable. Empty extras do not install trainer packages.

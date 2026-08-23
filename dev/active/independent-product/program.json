@@ -102,7 +102,7 @@
       "packet": "dev/active/independent-product/phase-08-consumer-profiles",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 8.2: pin TRL and MLX-LM admission records and empty extras; keep both planned and non-executable."
+      "next_gate": "Item 8.3: emit the TRL SFT profile; keep taxonomy planned; do not import TRL."
     },
     {
       "number": 9,

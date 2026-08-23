@@ -44,7 +44,7 @@ examples below use the installed name.
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
-| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, and constrained CSV v1 |
+| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV v1, and the TRL SFT adapter |
 | Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
@@ -594,10 +594,13 @@ veriformis export-verify --request-json JSON
 
 `discover` accepts no request and lists only executable implementations from the
 private service catalog. Phase 4 closed with that catalog empty. Phase 5.1–5.3
-now advertise three production selectors: `split-jsonl-directory`, canonical
-`json`, and `constrained-csv`, all version 1, `portable_exact_bytes`, and with
-no consumer profile. Split JSONL and canonical JSON support all four current
-row schemas; constrained CSV supports the three flat schemas only.
+now advertise three production generic selectors: `split-jsonl-directory`,
+canonical `json`, and `constrained-csv`, all version 1, `portable_exact_bytes`,
+and with no consumer profile, plus the optional TRL SFT adapter
+(`split-jsonl-directory` v1 with `consumer_id=trl` v1). Split JSONL, canonical
+JSON, and the TRL adapter support all four current row schemas; constrained
+CSV supports the three flat schemas only. The TRL adapter does not claim
+loader conformance (item 8.5). `mlx-lm` remains planned for item 8.4.
 Tests may also inject the bounded conformance implementation used for the
 historical cross-surface evidence; that remains private test code.
 
@@ -619,7 +622,8 @@ options must be repeated unchanged for dry run, execute, and source-bound
 verify because the exact paths and bytes bind the plan ID.
 
 Canonical `json` v1 has no options. Request v1 selects its fixed tree; request
-v2 is refused for that selector even when `container_options` is empty.
+v2 is refused for that selector even when `container_options` is empty. The
+TRL adapter is request v1 only; request v2 is refused.
 Constrained `constrained-csv` v1 has the same request boundary: request v1
 selects its fixed tree, while request v2 and every options object are refused.
 
@@ -1087,6 +1091,7 @@ stage-command redesign is planned solely for packaging.
 - [Canonical JSON Export Contract v1](contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](contracts/constrained-csv-export-v1.md)
 - [Consumer Profile Admission v1](contracts/profile-admission-v1.md)
+- [TRL SFT Export v1](contracts/trl-export-v1.md)
 - [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)
 - [Current implementation status](current-status.md)
 - [Install guide](install.md)

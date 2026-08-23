@@ -719,6 +719,26 @@
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "independent-product-phase-08-item-8-3",
+      "date": "2026-08-23",
+      "commit": "working-tree-on-7351904",
+      "scope": "Independent-product Phase 8.3 TRL SFT emission",
+      "grade": "recorded-local",
+      "summary": "Item 8.3 emits the TRL SFT adapter over split-jsonl-directory with consumer_id=trl. Mapped JSONL plus profile metadata. Taxonomy remains planned. Core does not import TRL. MLX-LM still refuses.",
+      "details": "dev/active/independent-product/phase-08-consumer-profiles/evidence.md",
+      "related": [
+        "docs/contracts/trl-export-v1.md",
+        "src/veriformis/profiles/trl.py"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/profiles tests/exports/test_phase8_profile_isolation.py",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "git diff --check"
+      ]
     }
   ]
 }
