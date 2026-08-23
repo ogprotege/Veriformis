@@ -143,6 +143,7 @@ class MappingResult(_StrictModel):
     objective_id: str
     row_schema: RowSchema
     container_kind: Literal["jsonl"]
+    membership_policy: Literal["authoritative", "advisory", "replaced"]
     source_ids: tuple[str, ...]
     row_source_ids: tuple[str, ...]
     records: tuple[ImportedRecord, ...]
@@ -222,6 +223,7 @@ class MappingResult(_StrictModel):
             "objective_id": recipe.objective_id,
             "row_schema": plan.row_schema,
             "container_kind": plan.container_kind,
+            "membership_policy": plan.membership_policy,
             "source_ids": list(recipe.source_ids),
             "row_source_ids": list(sorted(set(row_source_ids))),
             "records": [

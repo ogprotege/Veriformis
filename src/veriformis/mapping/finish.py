@@ -1094,6 +1094,65 @@ def _target_token(record: ImportedRecord, row_schema: str) -> Any:
     return payload["messages"][1]["content"]
 
 
+def _split_imported_membership(
+    plan: FinishedImportPlan,
+    mapping_result: MappingResult,
+    curation: ImportedCurationResult,
+    included: tuple[ImportedRecord, ...],
+    raw_digests: Mapping[str, str],
+) -> ImportedSplitResult:
+    if any(record.partition_hint not in {"train", "evaluation"} for record in included):
+        raise SplitError(
+            "authoritative membership requires partition train or evaluation on every row"
+        )
+    train = tuple(record for record in included if record.partition_hint == "train")
+    evaluation = tuple(
+        record for record in included if record.partition_hint == "evaluation"
+    )
+    if not train:
+        raise SplitError("authoritative membership requires a non-empty train partition")
+    train_sources = {record.source_id for record in train}
+    evaluation_sources = {record.source_id for record in evaluation}
+    leaked = sorted(train_sources & evaluation_sources)
+    if leaked:
+        raise SplitError(
+            "authoritative imported partitions violate leakage policy for "
+            f"sources {leaked!r}"
+        )
+    groups = tuple(
+        ImportedLeakageGroup.create(
+            record_ids=(record.record_id,),
+            source_ids=(record.source_id,),
+            raw_sha256_values=(raw_digests[record.source_id],),
+            exact_record_fingerprints=(exact_imported_fingerprint(record),),
+        )
+        for record in included
+    )
+    group_by_record = {
+        record_id: group.group_id for group in groups for record_id in group.record_ids
+    }
+    policy = plan.split_policy
+    assignments = tuple(
+        ImportedRecordAssignment.create(
+            policy_id=policy.policy_id,
+            record_id=record.record_id,
+            group_id=group_by_record[record.record_id],
+            partition=record.partition_hint,  # type: ignore[arg-type]
+        )
+        for record in included
+    )
+    return ImportedSplitResult.create(
+        policy_id=policy.policy_id,
+        plan_id=plan.plan_id,
+        mapping_result_id=mapping_result.result_id,
+        curation_result_id=curation.result_id,
+        input_record_ids=curation.included_record_ids,
+        groups=groups,
+        assignments=assignments,
+        requested_evaluation_record_count=len(evaluation),
+    )
+
+
 def split_imported_records(
     plan: FinishedImportPlan,
     mapping_result: MappingResult,
@@ -1110,6 +1169,14 @@ def split_imported_records(
     included = tuple(records[record_id] for record_id in curation.included_record_ids)
     if not included:
         raise SplitError("splitting requires at least one curation-included record")
+    if mapping_result.membership_policy == "authoritative":
+        return _split_imported_membership(
+            plan,
+            mapping_result,
+            curation,
+            included,
+            raw_digests,
+        )
     groups = tuple(
         ImportedLeakageGroup.create(
             record_ids=(record.record_id,),

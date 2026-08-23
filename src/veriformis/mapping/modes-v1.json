@@ -20,12 +20,12 @@
       "state": "implemented"
     },
     {
-      "executable": false,
+      "executable": true,
       "mode_id": "mixed",
-      "opens_in": "7.7",
+      "opens_in": null,
       "plain_language": "Keep document construction and imported-row provenance distinct in one project.",
-      "refusal": "mixed mode is named but not executable until item 7.7 admits mixed projects.",
-      "state": "planned"
+      "refusal": null,
+      "state": "implemented"
     }
   ],
   "schema_id": "veriformis.input-mode-discovery/v1"

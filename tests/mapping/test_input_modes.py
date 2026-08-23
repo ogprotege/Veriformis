@@ -47,8 +47,12 @@ def test_packaged_modes_are_canonical_and_closed() -> None:
     assert catalog.contract_version == INPUT_MODE_CONTRACT_VERSION
     assert catalog.default_mode == DOCUMENT_SOURCE_MODE
     assert tuple(mode.mode_id for mode in catalog.modes) == INPUT_MODE_IDS
-    assert IMPLEMENTED_INPUT_MODES == (DOCUMENT_SOURCE_MODE, DATASET_ROW_MODE)
-    assert PLANNED_INPUT_MODES == (MIXED_MODE,)
+    assert IMPLEMENTED_INPUT_MODES == (
+        DOCUMENT_SOURCE_MODE,
+        DATASET_ROW_MODE,
+        MIXED_MODE,
+    )
+    assert PLANNED_INPUT_MODES == ()
     assert sha256_digest(stored) == sha256_digest(input_mode_catalog_json())
 
 
@@ -72,14 +76,32 @@ def test_document_source_remains_the_default_executable_mode(mode: str | None) -
     assert require_executable_mode(mode) == DOCUMENT_SOURCE_MODE
 
 
-def test_dataset_row_mode_is_executable() -> None:
+def test_dataset_row_and_mixed_modes_are_executable() -> None:
     assert require_executable_mode(DATASET_ROW_MODE) == DATASET_ROW_MODE
+    assert require_executable_mode(MIXED_MODE) == MIXED_MODE
 
 
-def test_mixed_mode_still_refuses_until_item_7_7() -> None:
-    with pytest.raises(InputModeError, match="7.7") as caught:
-        require_executable_mode(MIXED_MODE)
-    assert caught.value.code == "input-mode-unavailable"
+def test_mixed_parse_refuses_fused_document_and_jsonl(tmp_path: Path) -> None:
+    doc = tmp_path / "doc.txt"
+    doc.write_text("A document paragraph.\n", encoding="utf-8")
+    rows = tmp_path / "rows.jsonl"
+    rows.write_text('{"text":"Alpha"}\n', encoding="utf-8")
+    refused = RUNNER.invoke(
+        app,
+        [
+            "parse",
+            str(doc),
+            str(rows),
+            "-o",
+            str(tmp_path / "ws"),
+            "--source-root",
+            str(tmp_path),
+            "--mode",
+            "mixed",
+        ],
+    )
+    assert refused.exit_code != 0
+    assert "distinct" in refused.output
 
 
 def test_unknown_mode_refuses() -> None:
