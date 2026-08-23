@@ -1280,11 +1280,21 @@ class PipelineService:
         """Capture raw files and commit one canonical parse revision."""
         from veriformis.mapping import require_executable_mode
 
-        from veriformis.mapping.modes import DATASET_ROW_MODE
+        from veriformis.mapping.modes import DATASET_ROW_MODE, MIXED_MODE
 
         selected_mode = require_executable_mode(mode)
         if selected_mode == DATASET_ROW_MODE:
             return self._parse_dataset_row(paths, out, source_root=source_root)
+        if selected_mode == MIXED_MODE:
+            suffixes = {path.suffix.lower() for path in paths}
+            if suffixes <= {".jsonl"}:
+                return self._parse_dataset_row(paths, out, source_root=source_root)
+            if ".jsonl" in suffixes:
+                raise ParseError(
+                    "mixed mode keeps construction and imported-row provenance "
+                    "distinct; compile document-source and dataset-row workspaces "
+                    "separately rather than fusing them in one stage graph"
+                )
         source_captures = capture_source_batch(paths, source_root=source_root)
         captured: list[tuple[Path, bytes]] = []
         for source_capture in source_captures:

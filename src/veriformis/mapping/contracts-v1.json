@@ -11,6 +11,8 @@
     "refuse"
   ],
   "membership_policies": [
+    "authoritative",
+    "advisory",
     "replaced"
   ],
   "missing_value_rules": [

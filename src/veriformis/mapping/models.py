@@ -37,7 +37,7 @@ ROW_SCHEMA_PAYLOAD_KEYS: dict[str, tuple[str, ...]] = {
 ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl",)
 RESERVED_CONTAINERS: tuple[str, ...] = ("json", "csv")
 CONTAINER_KINDS: tuple[str, ...] = ADMITTED_CONTAINERS + RESERVED_CONTAINERS
-MEMBERSHIP_POLICIES: tuple[str, ...] = ("replaced",)
+MEMBERSHIP_POLICIES: tuple[str, ...] = ("authoritative", "advisory", "replaced")
 MISSING_VALUE_RULES: tuple[str, ...] = ("refuse",)
 INVALID_ROW_RULES: tuple[str, ...] = ("refuse",)
 COERCION_RULES: tuple[str, ...] = ("refuse",)
@@ -230,7 +230,7 @@ class MappingPlan(_StrictModel):
     representation_id: str
     row_schema: RowSchema
     container_kind: ContainerKind
-    membership_policy: Literal["replaced"]
+    membership_policy: Literal["authoritative", "advisory", "replaced"]
     review_policy: Literal["none", "required"]
     confirmation_digest: str
     field_mappings: tuple[FieldMapping, ...]
@@ -344,6 +344,7 @@ class ImportedRecord(_StrictModel):
     recipe_id: str
     objective_id: str
     fields: tuple[ImportedField, ...]
+    partition_hint: Literal["train", "evaluation"] | None
 
     @field_validator("fields", mode="before")
     @classmethod
@@ -387,6 +388,7 @@ class ImportedRecord(_StrictModel):
         recipe_id: str,
         objective_id: str,
         fields: tuple[ImportedField, ...] | list[ImportedField],
+        partition_hint: str | None = None,
     ) -> ImportedRecord:
         body = {
             "schema_version": "veriformis.imported-record/v1",
@@ -397,6 +399,7 @@ class ImportedRecord(_StrictModel):
             "recipe_id": recipe_id,
             "objective_id": objective_id,
             "fields": [field.model_dump(mode="json") for field in fields],
+            "partition_hint": partition_hint,
         }
         return cls(record_id=derive_id("irc", body), **body)
 
@@ -432,4 +435,6 @@ def _packaged_contracts() -> tuple[str, dict[str, Any]]:
         raise MappingError("mapping contract reserved containers drifted")
     if tuple(payload.get("row_schemas") or ()) != V1_ROW_SCHEMA_KINDS:
         raise MappingError("mapping contract row schemas drifted")
+    if tuple(payload.get("membership_policies") or ()) != MEMBERSHIP_POLICIES:
+        raise MappingError("mapping contract membership policies drifted")
     return canonical, payload

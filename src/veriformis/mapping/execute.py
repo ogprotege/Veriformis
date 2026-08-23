@@ -113,7 +113,8 @@ def _map_one(
     recipe: MappingRecipe,
 ) -> ImportedRecord:
     mapped_keys = {_pointer_head(item.source_path) for item in plan.field_mappings}
-    extra = sorted(set(record.payload) - mapped_keys)
+    ignored = {"partition"} if plan.membership_policy != "replaced" else set()
+    extra = sorted(set(record.payload) - mapped_keys - ignored)
     if extra:
         raise MappingError(
             f"row {record.row_index} has unmapped keys {extra!r}; v1 mapping refuses "
@@ -137,6 +138,7 @@ def _map_one(
         )
     payload = _payload_from_fields(plan.row_schema, fields)
     _payload_contract(plan.row_schema, payload)
+    partition_hint = _partition_hint(plan, record.payload, row_index=record.row_index)
     return ImportedRecord.create(
         source_id=source_id,
         row_index=record.row_index,
@@ -145,7 +147,20 @@ def _map_one(
         recipe_id=recipe.recipe_id,
         objective_id=recipe.objective_id,
         fields=tuple(fields),
+        partition_hint=partition_hint,
     )
+
+
+def _partition_hint(plan: MappingPlan, payload: dict[str, Any], *, row_index: int) -> str | None:
+    if plan.membership_policy == "replaced":
+        return None
+    value = payload.get("partition")
+    if value not in {"train", "evaluation"}:
+        raise MappingError(
+            f"row {row_index} membership policy {plan.membership_policy!r} requires "
+            "partition train or evaluation"
+        )
+    return value
 
 
 def _map_field(

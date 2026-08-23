@@ -45,11 +45,10 @@
     ],
     "implemented_modes": [
       "document-source",
-      "dataset-row"
-    ],
-    "planned_modes": [
+      "dataset-row",
       "mixed"
     ],
+    "planned_modes": [],
     "explicitly_unsupported": [
       {
         "family": "ocr-image",

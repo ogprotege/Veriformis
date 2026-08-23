@@ -83,7 +83,7 @@ local, offline, and free of LLM generation.
       passed.
 - [ ] Independent product Phase 7 is in progress under its
       [active packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md).
-      Items 7.1–7.4 merged as PR #71–#74. Item 7.5 binds mapping provenance.
+      Items 7.1–7.6 merged as PR #71–#76. Item 7.7 admits partition policy and mixed mode.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
