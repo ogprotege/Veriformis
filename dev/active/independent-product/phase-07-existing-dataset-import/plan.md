@@ -209,10 +209,10 @@ Roadmap items 3 and 5 begin here: mapping execution includes field provenance fr
 **Branch:** `phase7/09-rejection-export`  
 **Title:** `Phase 7.9: Export row-level mapping rejections`
 
-- [ ] Versioned rejection report `veriformis.mapping-rejection-report/v1`: every rejected row's index, source path, closed reason code, original-value digest, mapping-plan id. Deterministic order.
-- [ ] CLI/MCP/Python write the report as a project artifact beside the workspace, not as a trainer container and not as a verified export. Mac can reveal the path through the CLI bridge.
-- [ ] Operators can correct the source file and rematch by digest/index without losing the prior audit trail (previous report remains content-addressed).
-- [ ] Prove: accepted rows still seal; rejected rows never appear in `RowSet`; tampering with the report does not change the sealed bundle; a corrected source produces a new plan id.
+- [x] Versioned rejection report `veriformis.mapping-rejection-report/v1`: every rejected row's index, source path, closed reason code, original-value digest, mapping-plan id. Deterministic order.
+- [x] CLI/MCP/Python write the report as a project artifact beside the workspace, not as a trainer container and not as a verified export. Mac can reveal the path through the CLI bridge.
+- [x] Operators can correct the source file and rematch by digest/index without losing the prior audit trail (previous report remains content-addressed).
+- [x] Prove: accepted rows still seal; rejected rows never appear in `RowSet`; tampering with the report does not change the sealed bundle; a corrected source produces a new plan id.
 
 ### 7.10 Ship mapping templates and close Phase 7
 

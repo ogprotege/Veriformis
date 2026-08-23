@@ -44,6 +44,15 @@
       "text"
     ]
   },
+  "rejection_reason_codes": [
+    "empty-required-string",
+    "invalid-mapped-fields",
+    "invalid-messages",
+    "invalid-partition",
+    "missing-source-path",
+    "non-string-value",
+    "unmapped-keys"
+  ],
   "reserved_containers": [],
   "review_policies": [
     "none",
@@ -61,6 +70,7 @@
     "veriformis.imported-record/v1",
     "veriformis.mapped-value-evidence/v1",
     "veriformis.mapping-plan/v1",
+    "veriformis.mapping-rejection-report/v1",
     "veriformis.row-source/v1"
   ]
 }

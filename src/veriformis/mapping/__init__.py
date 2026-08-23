@@ -14,7 +14,13 @@ from veriformis.mapping.detect import (
     mapping_detector_catalog,
     mapping_detector_catalog_json,
 )
-from veriformis.mapping.execute import execute_mapping, replay_mapping
+from veriformis.mapping.execute import execute_mapping, execute_mapping_rows, replay_mapping
+from veriformis.mapping.reject import (
+    MappingRejection,
+    MappingRejectionReport,
+    export_mapping_rejections,
+    write_mapping_rejection_report,
+)
 from veriformis.mapping.finish import (
     FinishedImportPlan,
     ImportedCurationResult,
@@ -31,6 +37,7 @@ from veriformis.mapping.models import (
     COERCION_RULES,
     CONTRACT_DATA_NAME,
     CSV_DIALECT,
+    REJECTION_REASON_CODES,
     FieldMapping,
     ImportedField,
     ImportedRecord,
@@ -74,6 +81,7 @@ __all__ = [
     "COERCION_RULES",
     "CONTRACT_DATA_NAME",
     "CSV_DIALECT",
+    "REJECTION_REASON_CODES",
     "FieldMapping",
     "ImportedField",
     "ImportedRecord",
@@ -108,7 +116,12 @@ __all__ = [
     "mapping_detector_catalog",
     "mapping_detector_catalog_json",
     "execute_mapping",
+    "execute_mapping_rows",
     "replay_mapping",
+    "MappingRejection",
+    "MappingRejectionReport",
+    "export_mapping_rejections",
+    "write_mapping_rejection_report",
     "MAPPING_STAGE_SCHEMA_ID",
     "MappingRecipe",
     "MappingResult",

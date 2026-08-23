@@ -50,3 +50,7 @@ JSON pointer, and mapping-rule ids. It does not claim construction chunks.
 Mapping templates, Parquet/Arrow, and CSV `messages` rows. Constrained CSV
 cannot represent nested `messages`; import refuses that pair and names
 `split-jsonl-directory` or `json`.
+
+Rejected rows are recorded in `veriformis.mapping-rejection-report/v1`. That
+report is a content-addressed project artifact, not a verified export. Accepted
+rows may still seal; rejected rows never appear in the row set.

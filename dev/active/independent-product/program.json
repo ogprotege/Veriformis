@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.7 merged as PR #77. Item 7.8 admits JSON and compatible CSV import and proves production map-seal-export round trips."
+      "next_gate": "Item 7.8 merged as PR #78. Item 7.9 exports row-level mapping rejections as a content-addressed project artifact."
     },
     {
       "number": 8,

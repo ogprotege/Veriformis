@@ -49,6 +49,15 @@ MISSING_VALUE_RULES: tuple[str, ...] = ("refuse",)
 INVALID_ROW_RULES: tuple[str, ...] = ("refuse",)
 COERCION_RULES: tuple[str, ...] = ("refuse",)
 REVIEW_POLICIES: tuple[str, ...] = ("none", "required")
+REJECTION_REASON_CODES: tuple[str, ...] = (
+    "empty-required-string",
+    "invalid-mapped-fields",
+    "invalid-messages",
+    "invalid-partition",
+    "missing-source-path",
+    "non-string-value",
+    "unmapped-keys",
+)
 RowSchema = Literal["text", "prompt_completion", "instruction_output", "messages"]
 ContainerKind = Literal["jsonl", "json", "csv"]
 
@@ -448,6 +457,8 @@ def _packaged_contracts() -> tuple[str, dict[str, Any]]:
         raise MappingError("mapping contract row schemas drifted")
     if tuple(payload.get("membership_policies") or ()) != MEMBERSHIP_POLICIES:
         raise MappingError("mapping contract membership policies drifted")
+    if tuple(payload.get("rejection_reason_codes") or ()) != REJECTION_REASON_CODES:
+        raise MappingError("mapping contract rejection reason codes drifted")
     if payload.get("csv_dialect") != CSV_DIALECT:
         raise MappingError("mapping contract csv dialect drifted")
     return canonical, payload

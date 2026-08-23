@@ -52,3 +52,14 @@ comma CSV with a required header are captured without document recovery.
 **Next action:** Finish 7.8 focused gates, then publish, merge on local
 admission evidence if GitHub Actions remains budget-blocked, and synchronize
 clean main before item 7.9.
+
+## 2026-08-23 — Item 7.8 merged; item 7.9 in progress
+
+Item 7.8 merged as PR #78 at `5a34626d850751811c50d1ad26d13f3297bf98c0`.
+Row-level mapping rejections are a content-addressed project artifact, not a
+verified export. Accepted rows still seal; rejected rows stay out of the row
+set.
+
+**Next action:** Finish 7.9 focused gates, publish, merge on local admission
+evidence if GitHub Actions remains budget-blocked, and synchronize clean main
+before item 7.10.

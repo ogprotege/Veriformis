@@ -216,6 +216,27 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def mapping_rejections(
+        path: str,
+        mapping_plan: str,
+        destination: str,
+        source_root: str | None = None,
+    ) -> str:
+        """Write a content-addressed mapping rejection report. Not a verified export."""
+        root = Path(source_root) if source_root else None
+        return json.dumps(
+            pipeline.export_mapping_rejections(
+                Path(path),
+                json.loads(mapping_plan),
+                Path(destination),
+                source_root=root,
+            ),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def mapping_preview(
         path: str,
         mapping_plan: str,
