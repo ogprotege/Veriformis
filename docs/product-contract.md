@@ -18,17 +18,17 @@ merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
 goal-first recipes and previews complete, closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; Phase 7 existing-dataset import
 and mapping complete; Phase 8 consumer profiles complete with implemented
-TRL and MLX-LM optional adapters; Phase 9 Parquet and Arrow IPC v1
-executable with schemas and fingerprints pinned, Hugging Face Dataset
-still planned; version `0.1.0` development alpha
+TRL and MLX-LM optional adapters; Phase 9 Parquet, Arrow IPC, and local
+Hugging Face DatasetDict v1 executable with schemas and fingerprints
+pinned, taxonomy still planned; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–8 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.5 Arrow)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
 
-**Next review:** Phase 9.5 pull-request merge, item 9.6, beta label cut,
+**Next review:** Phase 9.6 pull-request merge, item 9.7, beta label cut,
 public-ready checklist, or any product-contract change. Do not start Phase
 10 or 13 from this packet.
 
@@ -330,12 +330,14 @@ expectations, and the portable assignment projection. The adapter policy
 currently rejects plain `text` rows. Its repository checks prove descriptor
 self-conformance, not compatibility with a live named Aptus build. Live
 training execution remains outside Veriformis. The independent product ships
-three consumer-neutral generic containers, `split-jsonl-directory`, canonical
-`json`, and `constrained-csv` v1, under separate versioned contracts. None
-selects a trainer or claims trainer compatibility. TRL and MLX-LM are
-implemented optional adapters. Columnar/Hugging Face containers remain
-Phase 9. Axolotl, LLaMA-Factory, Unsloth, and Aptus-as-profile remain
-Phase 10.
+three `portable_exact_bytes` generic containers, `split-jsonl-directory`,
+canonical `json`, and `constrained-csv` v1, plus three
+`semantic_content_only` generics, `parquet`, `arrow`, and
+`hugging-face-dataset` v1. None selects a trainer or claims trainer
+compatibility. Taxonomy still lists the columnar containers as planned.
+TRL and MLX-LM are implemented optional adapters. Extra `columnar` stays
+empty. There is no Hub upload. Axolotl, LLaMA-Factory, Unsloth, and
+Aptus-as-profile remain Phase 10.
 
 ## Fail-closed seal
 

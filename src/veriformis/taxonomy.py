@@ -117,9 +117,7 @@ PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "hugging-face-dataset",
 )
 UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
-    {
-        "hugging-face-dataset": "9.6",
-    }
+    {}
 )
 
 CANONICAL_CONSUMER_PROFILE: Final = "veriformis-canonical-v1"

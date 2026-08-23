@@ -76,3 +76,17 @@ Taxonomy stays planned. Hugging Face Dataset still refuses with item 9.6.
 
 **Next action:** Publish the item 9.5 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.6.
+
+## 2026-08-23 — Item 9.5 merged; item 9.6 in progress
+
+**Status:** Item 9.5 merged as PR #93 at
+`df88c5c576df2aef4289b19cc1dc6e63fbb4b60d` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.6 emits a local Hugging Face DatasetDict v1 with `consumer_id`
+null and `semantic_content_only`. Dry-run plans fingerprints without
+Datasets. Execute fails closed if Datasets is absent. Extra `columnar`
+stays empty. Taxonomy stays planned. There is no Hub upload.
+
+**Next action:** Publish the item 9.6 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 9.7.

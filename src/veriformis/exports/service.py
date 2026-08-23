@@ -88,6 +88,7 @@ from veriformis.exports.constrained_csv import (
 )
 from veriformis.exports.paths import validate_export_relative_path
 from veriformis.exports.arrow import ARROW_IMPLEMENTATION
+from veriformis.exports.hugging_face_dataset import HF_DATASET_IMPLEMENTATION
 from veriformis.exports.parquet import PARQUET_IMPLEMENTATION
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
 from veriformis.profiles.mlx_lm import MLX_LM_IMPLEMENTATION
@@ -135,6 +136,7 @@ class ExportService:
                 CONSTRAINED_CSV_IMPLEMENTATION,
                 PARQUET_IMPLEMENTATION,
                 ARROW_IMPLEMENTATION,
+                HF_DATASET_IMPLEMENTATION,
                 TRL_IMPLEMENTATION,
                 MLX_LM_IMPLEMENTATION,
             )

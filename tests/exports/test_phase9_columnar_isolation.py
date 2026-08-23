@@ -5,9 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from typer.testing import CliRunner
 
-from veriformis.cli import app
 from veriformis.errors import ExportContractError
 from veriformis.exports import (
     EXPORT_SURFACE_REQUEST_SCHEMA,
@@ -31,7 +29,6 @@ FIXTURE = (
     / "phase3"
     / "pre-taxonomy-full-text.vfbundle.json"
 )
-RUNNER = CliRunner()
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -59,9 +56,7 @@ def test_planned_container_item_map_is_closed_over_the_taxonomy() -> None:
     assert set(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) <= set(
         PLANNED_PHYSICAL_CONTAINERS
     )
-    assert "parquet" not in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
-    assert "arrow" not in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
-    assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS["hugging-face-dataset"] == "9.6"
+    assert dict(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) == {}
 
 
 def test_taxonomy_still_lists_columnar_containers_as_planned() -> None:
@@ -91,6 +86,7 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
     assert {profile.container_profile.container_id for profile in generic} == {
         "arrow",
         "constrained-csv",
+        "hugging-face-dataset",
         "json",
         "parquet",
         "split-jsonl-directory",
@@ -115,6 +111,12 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
         None,
         None,
     ) in profiles
+    assert (
+        "hugging-face-dataset",
+        1,
+        None,
+        None,
+    ) in profiles
 
 
 def test_planned_container_refuses_before_source_access(
@@ -129,6 +131,7 @@ def test_planned_container_refuses_before_source_access(
         raise AssertionError("planned containers must fail before source access")
 
     monkeypatch.setattr(service, "verified_source", fail_if_opened)
+    assert dict(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) == {}
     for container_id, item in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS.items():
         with pytest.raises(
             ExportContractError,
@@ -138,14 +141,25 @@ def test_planned_container_refuses_before_source_access(
     assert source_opened is False
 
 
-@pytest.mark.parametrize("container_id", tuple(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS))
-def test_planned_container_refusal_is_visible_on_the_cli(container_id: str) -> None:
-    payload = _planned_request(container_id).canonical_bytes().decode("utf-8")
-    result = RUNNER.invoke(app, ["export", "dry-run", "--request-json", payload])
-    assert result.exit_code != 0
-    later_item = UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS[container_id]
-    assert f"planned for item {later_item}" in result.output
-    assert container_id in result.output
+def test_hugging_face_dataset_dry_run_is_not_a_planned_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = ExportService()
+    source_opened = False
+
+    def mark_opened(*_args: object, **_kwargs: object) -> None:
+        nonlocal source_opened
+        source_opened = True
+        raise AssertionError("source probe")
+
+    monkeypatch.setattr(service, "verified_source", mark_opened)
+    with pytest.raises(AssertionError, match="source probe"):
+        service.dry_run_export(_planned_request("hugging-face-dataset"))
+    assert source_opened is True
+
+
+def test_no_unexecutable_physical_container_remains_on_the_cli() -> None:
+    assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS == {}
 
 
 def test_columnar_extra_is_declared_empty() -> None:

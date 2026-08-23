@@ -109,8 +109,9 @@ Phase 9.2 packages Arrow and Hugging Face feature pins in
 `exports/columnar_schemas-v1.json`. Phase 9.3 packages semantic
 fingerprints in `exports/columnar_fingerprint-v1.json` as
 `semantic_content_only` over ordered product payloads. Extra `columnar`
-stays empty. Parquet and Arrow IPC v1 are export-executable. Taxonomy
-still lists `parquet`, `arrow`, and `hugging-face-dataset` as planned.
+stays empty. Parquet, Arrow IPC, and local Hugging Face DatasetDict v1
+are export-executable. Taxonomy still lists `parquet`, `arrow`, and
+`hugging-face-dataset` as planned. There is no Hub upload.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

@@ -39,5 +39,5 @@ absent, execute fails closed naming extra `columnar`.
 
 ## Non-goals
 
-Hub upload. Portable exact bytes. Parquet (item 9.4). Hugging Face
-Dataset directory (item 9.6). Trainer profiles.
+Hub upload. Portable exact bytes. Trainer profiles. Parquet and
+Hugging Face DatasetDict are separate generic containers.
