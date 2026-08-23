@@ -125,7 +125,7 @@ integrations.
 **Branch:** `phase8/06-profile-sidecars`
 **Title:** `Phase 8.6: Ship config sidecars`
 
-- [ ] Profile-specific config/launch fragments beside the export. No training process.
+- [x] Profile-specific config/launch fragments beside the export. No training process.
 
 ### 8.7 Tell the truth in discovery and close Phase 8
 

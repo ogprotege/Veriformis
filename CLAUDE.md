@@ -46,6 +46,7 @@ merged as PR #82 at `799d56f` after all 14 GitHub checks passed. Item 8.2
 pins official TRL and MLX-LM admission records as packaged data with empty
 extras. Item 8.3 emits the TRL SFT adapter. Item 8.4 emits the MLX-LM LoRA adapter.
 Item 8.5 adds official-schema harnesses and optional profile-integration CI.
+Item 8.6 emits dataset-only launch sidecars; the exporter does not train.
 Taxonomy remains planned. Do not start Phase 9, 10, or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal

@@ -2,15 +2,15 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `fe326c8` on `main` after PR #84
+**Implementation baseline reviewed:** `0797308` on `main` after PR #86
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–7 complete; Phase 8.4 MLX-LM emission)
+Phases 0–2; independent-product Phases 0–7 complete; Phase 8.5 harnesses)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.4 MLX-LM emission)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.6 launch sidecars)
 
-**Next review:** Phase 8.4 pull-request merge, item 8.5, beta label cut, or
+**Next review:** Phase 8.6 pull-request merge, item 8.7, beta label cut, or
 any listed-item status change. Do not start Phase 9, 10, or 13 from this
 packet.
 
@@ -88,8 +88,8 @@ local, offline, and free of LLM generation.
       passed.
 - [ ] Independent product Phase 8 is in progress under its
       [packet](dev/active/independent-product/phase-08-consumer-profiles/README.md).
-      Items 8.1–8.4 merged as PR #82–#85. Item 8.5 adds isolated schema
-      harnesses. Taxonomy remains planned.
+      Items 8.1–8.5 merged as PR #82–#86. Item 8.6 emits dataset-only
+      launch sidecars. Taxonomy remains planned.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

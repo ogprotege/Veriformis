@@ -32,6 +32,7 @@ from veriformis.profiles.trl import (
     TRL_CONSUMER_ID,
     TRL_DATA_CARD_PATH,
     TRL_EVALUATION_PATH,
+    TRL_LAUNCH_PATH,
     TRL_PROFILE_METADATA_PATH,
     TRL_PROFILE_VERSION,
     TRL_PROVENANCE_PATH,
@@ -39,6 +40,7 @@ from veriformis.profiles.trl import (
     TRL_TRAIN_PATH,
     TrlDataCard,
     TrlProfileMetadata,
+    TrlSftLaunchSidecar,
     map_trl_payload,
 )
 from veriformis.profiles import trl as trl_module
@@ -240,6 +242,11 @@ def test_trl_render_maps_every_schema_without_changing_counts(tmp_path: Path) ->
         assert meta.taxonomy_state == "planned"
         assert files[TRL_README_PATH].endswith(b"\n")
         assert b"does not claim that TRL has loaded" in files[TRL_README_PATH]
+        launch = TrlSftLaunchSidecar.from_json_bytes(files[TRL_LAUNCH_PATH])
+        assert launch.launches_training is False
+        assert launch.selects_model is False
+        assert launch.selects_hyperparameters is False
+        assert launch.use_eval_dataset is (row_set.evaluation_row_count > 0)
 
 
 def test_trl_publishes_and_verifies_the_text_fixture(tmp_path: Path) -> None:
@@ -268,6 +275,7 @@ def test_trl_publishes_and_verifies_the_text_fixture(tmp_path: Path) -> None:
         TRL_TRAIN_PATH,
         TRL_EVALUATION_PATH,
         TRL_DATA_CARD_PATH,
+        TRL_LAUNCH_PATH,
         TRL_PROFILE_METADATA_PATH,
         TRL_PROVENANCE_PATH,
         "export-receipt.json",

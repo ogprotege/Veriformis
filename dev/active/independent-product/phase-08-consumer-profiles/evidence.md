@@ -68,3 +68,14 @@ Active-doc continuity merged as PR #81 at
 - [x] Incompatibles refused in Veriformis before the schema loader.
 - [x] Optional `profile_integration` marker; optional CI continue-on-error.
 - [x] Core pytest: 1992 passed, 3 deselected, expected transport warning.
+- [x] Item 8.5 merged as PR #86 at `0797308` after all 16 GitHub checks.
+
+## Required item 8.6 evidence
+
+- [x] TRL and MLX-LM launch JSON sidecars beside the export.
+- [x] `launches_training` is false; command_argv is dataset-only.
+- [x] Renderers import neither subprocess nor multiprocessing.
+- [x] Empty MLX-LM evaluation omits `valid.jsonl` from the sidecar too.
+- [x] Focused tests: 17 passed. Tracking, Ruff, lock, and diff check
+      passed. Core pytest: 1996 passed, 3 deselected, expected transport
+      warning.

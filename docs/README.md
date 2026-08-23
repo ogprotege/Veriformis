@@ -6,9 +6,9 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–7 complete).
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.4 MLX-LM emission)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.6 launch sidecars)
 
-**Next review:** Phase 8.4 pull-request merge, item 8.5, beta label cut,
+**Next review:** Phase 8.6 pull-request merge, item 8.7, beta label cut,
 public-ready checklist, or any contract change
 
 ## Start here

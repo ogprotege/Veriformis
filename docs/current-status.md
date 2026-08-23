@@ -36,13 +36,13 @@ as PR #60 through PR #65 and PR #67 at
 complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 #71 through PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all
 14 GitHub checks passed. Phase 8 consumer profiles are in progress under
-item 8.5: TRL SFT and MLX-LM LoRA adapters are executable; an official-schema
-harness proves column names and filenames without installing trainer
-libraries. Taxonomy remains planned.
+item 8.6: TRL SFT and MLX-LM LoRA adapters are executable with official-schema
+harnesses and dataset-only launch sidecars. The exporter does not launch
+training. Taxonomy remains planned.
 
-**Review date:** 2026-08-23 (independent-product Phase 8.4 MLX-LM emission)
+**Review date:** 2026-08-23 (independent-product Phase 8.6 launch sidecars)
 
-**Next review:** Phase 8.4 pull-request merge, item 8.5, beta label cut,
+**Next review:** Phase 8.6 pull-request merge, item 8.7, beta label cut,
 public-ready checklist, or any contract change. Do not start Phase 9, 10,
 or 13 from this packet.
 

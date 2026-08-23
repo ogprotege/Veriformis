@@ -41,9 +41,18 @@ MLX_LM_TRAIN_PATH = "train.jsonl"
 MLX_LM_EVALUATION_PATH = "valid.jsonl"
 MLX_LM_DATA_CARD_PATH = "metadata/dataset-card.json"
 MLX_LM_PROFILE_METADATA_PATH = "metadata/mlx-lm-profile.json"
+MLX_LM_LAUNCH_SCHEMA = "veriformis.mlx-lm-lora-launch/v1"
+MLX_LM_LAUNCH_PATH = "metadata/mlx-lm-lora-launch.json"
 MLX_LM_PROVENANCE_PATH = "metadata/row-provenance.jsonl"
 MLX_LM_README_PATH = "README.md"
 _SUPPORTED_ROW_SCHEMAS = tuple(sorted(V1_ROW_SCHEMA_KINDS))
+_MLX_LM_COMMAND_ARGV = ("mlx_lm.lora", "--data", ".")
+_MLX_LM_OPERATOR_MUST_SUPPLY = ("iters", "model", "train-flag")
+_MLX_LM_LAUNCH_NOTES = (
+    "Sidecar records the mlx-lm LoRA data directory. Veriformis does "
+    "not launch training, select a model, or set iters."
+)
+_MLX_LM_MASK_PROMPT_FORMATS = frozenset({"chat", "completions"})
 
 
 def _mlx_pin():
@@ -214,6 +223,7 @@ class MlxLmDataCard(_StrictMlxModel):
             MLX_LM_README_PATH,
             self.train_path,
             MLX_LM_DATA_CARD_PATH,
+            MLX_LM_LAUNCH_PATH,
             MLX_LM_PROFILE_METADATA_PATH,
             self.provenance_path,
         ]
@@ -283,6 +293,101 @@ class MlxLmProfileMetadata(_StrictMlxModel):
         return self
 
 
+class MlxLmLoraLaunchSidecar(_StrictMlxModel):
+    schema_version: Literal["veriformis.mlx-lm-lora-launch/v1"] = MLX_LM_LAUNCH_SCHEMA
+    command_argv: tuple[
+        Literal["mlx_lm.lora"],
+        Literal["--data"],
+        Literal["."],
+    ] = _MLX_LM_COMMAND_ARGV
+    data_directory: Literal["."] = "."
+    destination_format: str
+    destination_keys: tuple[str, ...]
+    docs_reviewed_on: str
+    emits_test_jsonl: Literal[False] = False
+    evaluation_row_count: int
+    executable_item: Literal["8.6"] = "8.6"
+    launches_training: Literal[False] = False
+    mapping_kind: str
+    mask_prompt_flag: Literal["--mask-prompt"] = "--mask-prompt"
+    mask_prompt_supported: bool
+    notes: Literal[_MLX_LM_LAUNCH_NOTES] = _MLX_LM_LAUNCH_NOTES
+    operator_must_supply: tuple[
+        Literal["iters"],
+        Literal["model"],
+        Literal["train-flag"],
+    ] = _MLX_LM_OPERATOR_MUST_SUPPLY
+    primary_docs_url: str
+    profile_id: Literal["mlx-lm"] = MLX_LM_CONSUMER_ID
+    profile_version: Literal[1] = MLX_LM_PROFILE_VERSION
+    row_schema: str
+    selects_hyperparameters: Literal[False] = False
+    selects_model: Literal[False] = False
+    test_path: Literal[None] = None
+    train_path: Literal["train.jsonl"] = MLX_LM_TRAIN_PATH
+    train_row_count: int
+    valid_path: Literal["valid.jsonl"] | None
+
+    @field_validator("row_schema")
+    @classmethod
+    def _valid_row_schema(cls, value: str) -> str:
+        if value not in V1_ROW_SCHEMA_KINDS:
+            raise ValueError("launch sidecar names an unsupported row schema")
+        return value
+
+    @field_validator(
+        "command_argv",
+        "destination_keys",
+        "operator_must_supply",
+        mode="before",
+    )
+    @classmethod
+    def _tuple_fields(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("train_row_count", "evaluation_row_count")
+    @classmethod
+    def _valid_count(cls, value: int) -> int:
+        if type(value) is not int or value < 0:
+            raise ValueError("launch sidecar row counts must be non-negative integers")
+        return value
+
+    @model_validator(mode="after")
+    def _closed(self) -> Self:
+        if self.train_row_count < 1:
+            raise ValueError("launch sidecar requires a non-empty train partition")
+        if self.command_argv != _MLX_LM_COMMAND_ARGV:
+            raise ValueError(
+                "MLX-LM launch command_argv is not the dataset-only fragment"
+            )
+        if self.operator_must_supply != _MLX_LM_OPERATOR_MUST_SUPPLY:
+            raise ValueError("MLX-LM launch operator_must_supply is not closed")
+        expected_valid = (
+            MLX_LM_EVALUATION_PATH if self.evaluation_row_count else None
+        )
+        if self.valid_path != expected_valid:
+            raise ValueError("MLX-LM launch valid_path must follow empty-eval omission")
+        expected_mask = self.destination_format in _MLX_LM_MASK_PROMPT_FORMATS
+        if self.mask_prompt_supported is not expected_mask:
+            raise ValueError(
+                "--mask-prompt applies only to chat and completions datasets"
+            )
+        pin = _mlx_pin()
+        if (
+            self.primary_docs_url != pin.primary_docs_url
+            or self.docs_reviewed_on != pin.docs_reviewed_on
+        ):
+            raise ValueError("MLX-LM launch sidecar docs differ from the admission pin")
+        mapping = _mapping_for(self.row_schema)
+        if (
+            self.mapping_kind != mapping.mapping_kind
+            or self.destination_format != mapping.destination_format
+            or self.destination_keys != mapping.destination_keys
+        ):
+            raise ValueError("MLX-LM launch mapping differs from the admission pin")
+        return self
+
+
 def _payload_jsonl(row_schema: str, rows: Sequence[ProductRow]) -> bytes:
     return b"".join(
         lossless_json_bytes(map_mlx_lm_payload(row_schema, row.payload)) + b"\n"
@@ -342,6 +447,27 @@ def _profile_metadata(row_set: RowSet) -> MlxLmProfileMetadata:
     )
 
 
+def _launch_sidecar(row_set: RowSet) -> MlxLmLoraLaunchSidecar:
+    pin = _mlx_pin()
+    mapping = _mapping_for(row_set.row_schema)
+    return MlxLmLoraLaunchSidecar(
+        command_argv=_MLX_LM_COMMAND_ARGV,
+        destination_format=mapping.destination_format,
+        destination_keys=mapping.destination_keys,
+        docs_reviewed_on=pin.docs_reviewed_on,
+        evaluation_row_count=row_set.evaluation_row_count,
+        mapping_kind=mapping.mapping_kind,
+        mask_prompt_supported=mapping.destination_format in _MLX_LM_MASK_PROMPT_FORMATS,
+        operator_must_supply=_MLX_LM_OPERATOR_MUST_SUPPLY,
+        primary_docs_url=pin.primary_docs_url,
+        row_schema=row_set.row_schema,
+        train_row_count=row_set.train_row_count,
+        valid_path=(
+            MLX_LM_EVALUATION_PATH if row_set.evaluation_row_count else None
+        ),
+    )
+
+
 def _readme_bytes(card: MlxLmDataCard) -> bytes:
     mapping = _mapping_for(card.row_schema)
     evaluation = (
@@ -369,9 +495,11 @@ def _readme_bytes(card: MlxLmDataCard) -> bytes:
         f"- Source row set: `{card.row_set_id}`\n\n"
         "Point `mlx_lm.lora --data` at this directory. Default mlx-lm LoRA "
         "loss covers every token; `--mask-prompt` is the documented "
-        "completion-only option for chat and completions datasets. Loader "
-        "conformance is item 8.5; this export does not claim that mlx-lm has "
-        "loaded the files.\n\n"
+        "completion-only option for chat and completions datasets. The "
+        "launch sidecar at `metadata/mlx-lm-lora-launch.json` records that "
+        "data directory. Veriformis does not launch `mlx_lm.lora --train`, "
+        "select a model, or set iters. Loader conformance is item 8.5; this "
+        "export does not claim that mlx-lm has loaded the files.\n\n"
         "Preference, prompt-only, stepwise-supervision, tools, unpaired "
         "preference, and vision types are refused. `round_trip` is false.\n"
     )
@@ -381,10 +509,12 @@ def _readme_bytes(card: MlxLmDataCard) -> bytes:
 def _rendered_files(row_set: RowSet) -> tuple[tuple[str, bytes], ...]:
     card = _data_card(row_set)
     metadata = _profile_metadata(row_set)
+    launch = _launch_sidecar(row_set)
     files = {
         MLX_LM_README_PATH: _readme_bytes(card),
         MLX_LM_TRAIN_PATH: _payload_jsonl(row_set.row_schema, row_set.train_rows),
         MLX_LM_DATA_CARD_PATH: card.canonical_bytes(),
+        MLX_LM_LAUNCH_PATH: launch.canonical_bytes(),
         MLX_LM_PROFILE_METADATA_PATH: metadata.canonical_bytes(),
         MLX_LM_PROVENANCE_PATH: _provenance_jsonl(row_set.provenance),
     }
@@ -414,6 +544,7 @@ def _file_plans(
         MLX_LM_EVALUATION_PATH: "evaluation-partition",
         MLX_LM_TRAIN_PATH: "training-partition",
         MLX_LM_DATA_CARD_PATH: "dataset-card",
+        MLX_LM_LAUNCH_PATH: "config-sidecar",
         MLX_LM_PROFILE_METADATA_PATH: "consumer-profile-metadata",
         MLX_LM_PROVENANCE_PATH: "row-provenance",
     }
@@ -422,6 +553,7 @@ def _file_plans(
         MLX_LM_EVALUATION_PATH: "application/jsonl",
         MLX_LM_TRAIN_PATH: "application/jsonl",
         MLX_LM_DATA_CARD_PATH: "application/json",
+        MLX_LM_LAUNCH_PATH: "application/json",
         MLX_LM_PROFILE_METADATA_PATH: "application/json",
         MLX_LM_PROVENANCE_PATH: "application/jsonl",
     }
@@ -511,6 +643,8 @@ __all__ = [
     "MLX_LM_DESCRIPTOR",
     "MLX_LM_EVALUATION_PATH",
     "MLX_LM_IMPLEMENTATION",
+    "MLX_LM_LAUNCH_PATH",
+    "MLX_LM_LAUNCH_SCHEMA",
     "MLX_LM_PROFILE_METADATA_PATH",
     "MLX_LM_PROFILE_METADATA_SCHEMA",
     "MLX_LM_PROFILE_VERSION",
@@ -518,6 +652,7 @@ __all__ = [
     "MLX_LM_README_PATH",
     "MLX_LM_TRAIN_PATH",
     "MlxLmDataCard",
+    "MlxLmLoraLaunchSidecar",
     "MlxLmProfileMetadata",
     "map_mlx_lm_payload",
 ]

@@ -85,3 +85,20 @@ Core pytest passed 1992 with 3 deselected. Tracking and Ruff passed.
 
 **Next action:** Publish the item 8.5 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 8.6.
+
+## 2026-08-23 — Item 8.5 merged; item 8.6 in progress
+
+**Status:** Item 8.5 merged as PR #86 at
+`0797308ad440e7eec4d0a075099b7e2513ee9754` after all 16 GitHub checks
+passed. Local `main` equals `origin/main`.
+
+Item 8.6 emits dataset-only launch sidecars
+`metadata/trl-sft-launch.json` and `metadata/mlx-lm-lora-launch.json`.
+`launches_training` is false. No model, no hyperparameters, no subprocess.
+
+Focused sidecar and profile tests passed (17). Tracking, Ruff, lock, and
+diff check passed. Core pytest passed 1996 with 3 deselected and the
+intentional transport durability warning.
+
+**Next action:** Publish the item 8.6 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 8.7.

@@ -10,3 +10,4 @@
 | P8-R4 | Open | Medium | High | Incompatible rows reach the consumer | Fail closed in Veriformis; 8.5 harness |
 | P8-R5 | Controlled for 8.2 | Medium | Medium | “Works with Hugging Face” or unpinned version claims | Section-5 pins in 8.2; no generic HF claim |
 | P8-R6 | Controlled for 8.1 | Low | High | Aptus is silently rewritten as a Phase 8 profile | Phase 10 owns that migration; 8.1 leaves the handoff unchanged |
+| P8-R7 | Controlled for 8.6 | Medium | High | Sidecars launch training or pick a model | Dataset-only JSON; `launches_training` false; no subprocess in renderers |
