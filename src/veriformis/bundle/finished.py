@@ -186,13 +186,22 @@ def _require_passing_validation_report(
 ) -> Any:
     """Strict-load and bind the exact passing report retained in the bundle."""
     try:
-        from veriformis.datasets.validation import (
-            dataset_validation_report_from_json_bytes,
-            dataset_validation_report_json_bytes,
-        )
+        preview = json.loads(data.decode("utf-8"))
+        schema = preview.get("schema_version") if isinstance(preview, dict) else None
+        if schema == "veriformis.imported-dataset-validation-report/v1":
+            from veriformis.identity import lossless_json_bytes
+            from veriformis.mapping.finish import imported_validation_from_json_bytes
 
-        report = dataset_validation_report_from_json_bytes(data)
-        canonical = dataset_validation_report_json_bytes(report)
+            report = imported_validation_from_json_bytes(data)
+            canonical = lossless_json_bytes(report.model_dump(mode="json"))
+        else:
+            from veriformis.datasets.validation import (
+                dataset_validation_report_from_json_bytes,
+                dataset_validation_report_json_bytes,
+            )
+
+            report = dataset_validation_report_from_json_bytes(data)
+            canonical = dataset_validation_report_json_bytes(report)
     except (
         ImportError,
         AttributeError,

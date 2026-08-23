@@ -1,5 +1,18 @@
-"""Existing-dataset mapping: compiler-path modes, then later mapping contracts."""
+"""Existing-dataset mapping: compiler-path modes, contracts, and JSONL execution."""
 
+from veriformis.mapping.capture import JsonlCapture, capture_jsonl
+from veriformis.mapping.execute import execute_mapping, replay_mapping
+from veriformis.mapping.finish import (
+    FinishedImportPlan,
+    ImportedCurationResult,
+    ImportedRowSet,
+    ImportedSplitResult,
+    ImportedValidationReport,
+    curate_imported_records,
+    serialize_imported_records,
+    split_imported_records,
+    validate_imported_dataset,
+)
 from veriformis.mapping.models import (
     ADMITTED_CONTAINERS,
     COERCION_RULES,
@@ -30,6 +43,13 @@ from veriformis.mapping.modes import (
     input_mode_catalog_json,
     require_executable_mode,
 )
+from veriformis.mapping.result import (
+    MAPPING_STAGE_SCHEMA_ID,
+    MappingRecipe,
+    MappingResult,
+    ROW_JSONL_PARSER_ID,
+    ROW_JSONL_PARSER_VERSION,
+)
 
 __all__ = [
     "ADMITTED_CONTAINERS",
@@ -58,4 +78,22 @@ __all__ = [
     "input_mode_catalog",
     "input_mode_catalog_json",
     "require_executable_mode",
+    "JsonlCapture",
+    "capture_jsonl",
+    "execute_mapping",
+    "replay_mapping",
+    "MAPPING_STAGE_SCHEMA_ID",
+    "MappingRecipe",
+    "MappingResult",
+    "ROW_JSONL_PARSER_ID",
+    "ROW_JSONL_PARSER_VERSION",
+    "FinishedImportPlan",
+    "ImportedCurationResult",
+    "ImportedRowSet",
+    "ImportedSplitResult",
+    "ImportedValidationReport",
+    "curate_imported_records",
+    "serialize_imported_records",
+    "split_imported_records",
+    "validate_imported_dataset",
 ]

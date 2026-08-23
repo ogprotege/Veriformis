@@ -6,17 +6,21 @@
 
 **Discovery schema:** `veriformis.mapping-contract-discovery/v1`
 
-**Status:** Models and discovery implemented in Phase 7.2. Capture and
-execution remain item 7.3.
+**Status:** Models, discovery, JSONL capture, mapping execution, and the
+dataset-row seal path are implemented in Phase 7.3. Detection, preview,
+JSON/CSV admission, mixed mode, and templates remain later items.
 
 **Last reviewed:** 2026-08-23
 
 ## Purpose
 
 Define the persisted shapes for existing-dataset row sources, field mappings,
-mapping plans, imported records, and `mapped_value` evidence. Discovery is
-read-only. No file is captured and no workspace is mutated by this contract
-item.
+mapping plans, imported records, and `mapped_value` evidence. JSONL capture
+and mapping execution apply a confirmed `mapping-plan/v1` into the four
+Finished Dataset v1 payload shapes. Dataset-row workspaces use revision
+schema 4 with stages `parse → map → curate → split → format → validate →
+seal`. Format emits ordinary `ProductRow` v1. Provenance lists mapping-rule
+ids instead of construction chunk ids.
 
 ## Closed vocabularies
 
@@ -38,5 +42,5 @@ fields fail closed. Field values must match `mapped_value.output_sha256`.
 
 ## Non-goals
 
-Capture, mapping execution, detection, preview, JSON/CSV admission, mixed
-mode, and Parquet/Arrow.
+Detection, preview, JSON/CSV admission, mixed mode, partition honor, mapping
+templates, and Parquet/Arrow.

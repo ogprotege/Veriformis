@@ -53,6 +53,7 @@ from veriformis.construction import (
 from veriformis.contracts import (
     CURATION_STAGE_SCHEMA_ID,
     FORMAT_STAGE_SCHEMA_ID,
+    MAPPING_STAGE_SCHEMA_ID,
     SEAL_STAGE_SCHEMA_ID,
     SPLIT_STAGE_SCHEMA_ID,
     VALIDATION_STAGE_SCHEMA_ID,
@@ -79,6 +80,7 @@ from veriformis.datasets import (
 )
 from veriformis.errors import (
     GoalCatalogError,
+    MappingError,
     MissingStageInputError,
     ConstructionError,
     ParseError,
@@ -160,15 +162,18 @@ from veriformis.taxonomy import (
 )
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
+    IMPORT_REVISION_SCHEMA_VERSION,
     WORKSPACE_REVISION_SCHEMA_VERSION,
     SourceDescriptor,
     Workspace,
     WorkspaceRevision,
+    is_import_revision,
 )
 
 if TYPE_CHECKING:
     from veriformis.goals.preflight import CompilePreflight
     from veriformis.goals.preview import GoalPreview
+    from veriformis.mapping.models import MappingPlan
 
 _CODE_EXTS = CODE_EXTENSIONS
 _STRATEGIES = {
@@ -230,6 +235,15 @@ class ConstructOutcome(StageOutcome):
     diagnostic_count: int = 0
     recipe_id: str | None = None
     result_id: str | None = None
+
+
+@dataclass(frozen=True)
+class MapOutcome(StageOutcome):
+    record_count: int = 0
+    mapping_plan_id: str | None = None
+    recipe_id: str | None = None
+    result_id: str | None = None
+    imported_record_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1062,9 +1076,14 @@ class PipelineService:
     ) -> CompilePreflightOutcome:
         """Evaluate one immutable source capture without opening a workspace."""
         from veriformis.goals import build_compile_preflight
-        from veriformis.mapping import require_executable_mode
+        from veriformis.mapping import DATASET_ROW_MODE, require_executable_mode
 
-        require_executable_mode(mode)
+        selected_mode = require_executable_mode(mode)
+        if selected_mode == DATASET_ROW_MODE:
+            raise MappingError(
+                "dataset-row compile preflight is mapping preview in item 7.6; "
+                "map JSONL with a confirmed mapping plan"
+            )
         preflight = build_compile_preflight(
             paths,
             source_root=source_root,
@@ -1210,7 +1229,11 @@ class PipelineService:
         """Capture raw files and commit one canonical parse revision."""
         from veriformis.mapping import require_executable_mode
 
-        require_executable_mode(mode)
+        from veriformis.mapping.modes import DATASET_ROW_MODE
+
+        selected_mode = require_executable_mode(mode)
+        if selected_mode == DATASET_ROW_MODE:
+            return self._parse_dataset_row(paths, out, source_root=source_root)
         source_captures = capture_source_batch(paths, source_root=source_root)
         captured: list[tuple[Path, bytes]] = []
         for source_capture in source_captures:
@@ -1236,6 +1259,11 @@ class PipelineService:
                 logical_path=result.source.logical_path,
             )
         workspace = Workspace.create(out)
+        if is_import_revision(workspace.head().schema_version):
+            raise ParseError(
+                "document-source parse cannot use a dataset-row workspace; "
+                "create a new workspace or pass --mode dataset-row"
+            )
         with workspace.begin("parse") as transaction:
             descriptors: list[SourceDescriptor] = []
             outputs: dict[str, Any] = {}
@@ -1353,6 +1381,132 @@ class PipelineService:
             ),
         )
 
+    def _parse_dataset_row(
+        self,
+        paths: list[Path],
+        out: Path,
+        *,
+        source_root: Path | None = None,
+    ) -> ParseOutcome:
+        """Capture JSONL row sources into a revision-v4 workspace."""
+        from veriformis.identity import derive_source_id
+        from veriformis.mapping.capture import capture_jsonl
+        from veriformis.mapping.result import (
+            ROW_JSONL_PARSER_ID,
+            ROW_JSONL_PARSER_VERSION,
+        )
+        from veriformis.sources import capture_source_batch
+
+        source_captures = capture_source_batch(paths, source_root=source_root)
+        captured: list[tuple[Path, bytes, Any]] = []
+        for source_capture in source_captures:
+            if source_capture.error is not None:
+                raise source_capture.error
+            assert source_capture.raw_bytes is not None
+            row_capture = capture_jsonl(
+                source_capture.path,
+                logical_path=source_capture.logical_path,
+                raw_bytes=source_capture.raw_bytes,
+            )
+            captured.append(
+                (source_capture.path, source_capture.raw_bytes, row_capture)
+            )
+        workspace = Workspace.create(out, schema_version=IMPORT_REVISION_SCHEMA_VERSION)
+        if not is_import_revision(workspace.head().schema_version):
+            raise ParseError(
+                "dataset-row parse requires a new workspace or an existing "
+                "revision-v4 dataset-row workspace"
+            )
+        with workspace.begin("parse") as transaction:
+            descriptors: list[SourceDescriptor] = []
+            outputs: dict[str, Any] = {}
+            parser_config = {
+                "parser": ROW_JSONL_PARSER_ID,
+                "parser_version": ROW_JSONL_PARSER_VERSION,
+                "canonical_stream_contract_version": 1,
+            }
+            for path, raw_bytes, row_capture in sorted(
+                captured,
+                key=lambda item: item[2].row_source.logical_path,
+            ):
+                source = row_capture.row_source
+                source_id = derive_source_id(source.logical_path, source.sha256)
+                raw_artifact = transaction.put_artifact(
+                    raw_bytes,
+                    kind="raw-source",
+                    media_type="application/octet-stream",
+                    source_ids=(source_id,),
+                    producer_id="veriformis.source-capture",
+                    producer_version="1",
+                    config={"logical_path": source.logical_path},
+                )
+                descriptor = SourceDescriptor.create(
+                    logical_path=source.logical_path,
+                    original_path=str(path.resolve()),
+                    sha256=source.sha256,
+                    size=source.size,
+                    parser_id=ROW_JSONL_PARSER_ID,
+                    parser_version=ROW_JSONL_PARSER_VERSION,
+                    raw_artifact_id=raw_artifact.id,
+                )
+                row_source_artifact = transaction.put_artifact(
+                    lossless_json_bytes(source.model_dump(mode="json")),
+                    kind="row-source",
+                    media_type="application/json",
+                    source_ids=(descriptor.id,),
+                    producer_id=f"veriformis.parser.{ROW_JSONL_PARSER_ID}",
+                    producer_version=ROW_JSONL_PARSER_VERSION,
+                    config=parser_config,
+                )
+                descriptors.append(descriptor)
+                outputs.update(
+                    {
+                        f"source/{descriptor.id}/raw": raw_artifact,
+                        f"source/{descriptor.id}/row-source": row_source_artifact,
+                    }
+                )
+            transaction.set_sources(descriptors)
+            registry_artifact = transaction.put_artifact(
+                lossless_json_bytes(
+                    [
+                        descriptor.model_dump(
+                            mode="json",
+                            exclude={"original_path"},
+                        )
+                        for descriptor in sorted(descriptors, key=lambda item: item.id)
+                    ]
+                ),
+                kind="source-registry",
+                media_type="application/json",
+                source_ids=tuple(descriptor.id for descriptor in descriptors),
+                producer_id="veriformis.parse-stage",
+                producer_version="1",
+                config={"source_count": len(descriptors)},
+            )
+            outputs["registry"] = registry_artifact
+            revision = transaction.commit(
+                outputs=outputs,
+                config={
+                    "sources": [
+                        descriptor.logical_path
+                        for descriptor in sorted(
+                            descriptors, key=lambda item: item.id
+                        )
+                    ]
+                },
+            )
+        return ParseOutcome(
+            source_count=len(captured),
+            revision_id=revision.revision_id,
+            durability_warning=workspace.last_commit_durability_warning,
+            messages=(
+                ServiceMessage(
+                    f"captured {len(captured)} JSONL row-source(s) into revision "
+                    f"{revision.revision_id}"
+                ),
+            ),
+        )
+
     def clean(
         self,
         workspace: Path,
@@ -1364,6 +1518,10 @@ class PipelineService:
         selected, config = _select_rules(rules, custom)
         store = Workspace.open(workspace)
         current = store.head()
+        if "clean" not in current.stages:
+            raise UnsupportedWorkspaceVersionError(
+                "clean is not defined for dataset-row workspaces"
+            )
         messages: list[ServiceMessage] = []
         if (
             current.stages["clean"].status == "complete"
@@ -1642,9 +1800,13 @@ class PipelineService:
         effective settings.
         """
         from veriformis.goals.presets import resolve_recipe_settings
-        from veriformis.mapping import require_executable_mode
+        from veriformis.mapping import DATASET_ROW_MODE, require_executable_mode
 
-        require_executable_mode(mode)
+        selected_mode = require_executable_mode(mode)
+        if selected_mode == DATASET_ROW_MODE:
+            raise ConstructionError(
+                "dataset-row mode does not run constructors; use veriformis map"
+            )
         from veriformis.recipes.library import build_named_recipe
 
         try:
@@ -1672,6 +1834,10 @@ class PipelineService:
         store = Workspace.open(workspace)
         current = store.head()
         if "construct" not in current.stages:
+            if is_import_revision(current.schema_version):
+                raise UnsupportedWorkspaceVersionError(
+                    "construct is not defined for dataset-row workspaces; use map"
+                )
             raise UnsupportedWorkspaceVersionError(
                 "construct requires workspace revision schema 2 or later; run "
                 "`veriformis upgrade-workspace WORKSPACE` first"
@@ -1775,6 +1941,688 @@ class PipelineService:
             ),
         )
 
+    def map_rows(
+        self,
+        workspace: Path,
+        *,
+        goal: str,
+        representation: str,
+        mapping_plan: MappingPlan | dict[str, Any] | None = None,
+    ) -> MapOutcome:
+        """Map captured JSONL row sources into imported records."""
+        from veriformis.mapping.capture import capture_jsonl
+        from veriformis.mapping.execute import execute_mapping
+        from veriformis.mapping.models import MappingPlan as MappingPlanModel
+        from veriformis.mapping.result import MappingRecipe, MappingResult
+
+        if mapping_plan is None:
+            raise MappingError("map requires a confirmed mapping-plan/v1")
+        plan = (
+            mapping_plan
+            if isinstance(mapping_plan, MappingPlanModel)
+            else MappingPlanModel.model_validate(mapping_plan)
+        )
+        if plan.goal_id != goal:
+            raise MappingError(
+                f"mapping plan goal {plan.goal_id!r} does not match requested {goal!r}"
+            )
+        if plan.representation_id != representation:
+            raise MappingError(
+                f"mapping plan representation {plan.representation_id!r} does not match "
+                f"requested {representation!r}"
+            )
+        store = Workspace.open(workspace)
+        current = store.head()
+        if not is_import_revision(current.schema_version):
+            raise UnsupportedWorkspaceVersionError(
+                "map requires a dataset-row workspace created with --mode dataset-row"
+            )
+        source_ids = tuple(sorted(current.sources))
+        if not source_ids:
+            raise MappingError("map requires at least one captured row source")
+        recipe = MappingRecipe.create(plan=plan, source_ids=source_ids)
+        mapped_records = []
+        row_source_ids = []
+        for source_id in source_ids:
+            descriptor = current.sources[source_id]
+            if descriptor.raw_artifact_id is None:
+                raise MappingError(f"source {source_id} lacks captured raw bytes")
+            raw_bytes = store.read_artifact(descriptor.raw_artifact_id, revision=current)
+            capture = capture_jsonl(
+                Path(descriptor.logical_path),
+                logical_path=descriptor.logical_path,
+                raw_bytes=raw_bytes,
+            )
+            row_source_ids.append(capture.row_source.row_source_id)
+            mapped_records.extend(
+                execute_mapping(
+                    plan,
+                    capture,
+                    source_id=source_id,
+                    recipe=recipe,
+                )
+            )
+        result = MappingResult.create(
+            plan=plan,
+            recipe=recipe,
+            row_source_ids=tuple(row_source_ids),
+            records=tuple(mapped_records),
+        )
+        config = {
+            "schema_version": MAPPING_STAGE_SCHEMA_ID,
+            "mapping_plan_id": plan.mapping_plan_id,
+            "selected_source_ids": list(source_ids),
+        }
+        with store.begin(
+            "map",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            plan_artifact = transaction.put_artifact(
+                lossless_json_bytes(plan.model_dump(mode="json")),
+                kind="mapping-plan",
+                media_type="application/json",
+                source_ids=source_ids,
+                producer_id="veriformis.mapping.plan",
+                producer_version="1",
+                config=config,
+            )
+            recipe_artifact = transaction.put_artifact(
+                lossless_json_bytes(recipe.model_dump(mode="json")),
+                kind="mapping-recipe",
+                media_type="application/json",
+                source_ids=source_ids,
+                producer_id="veriformis.mapping.recipe",
+                producer_version="1",
+                config=config,
+            )
+            result_artifact = transaction.put_artifact(
+                lossless_json_bytes(result.model_dump(mode="json")),
+                kind="mapping-result",
+                media_type="application/json",
+                source_ids=source_ids,
+                producer_id="veriformis.mapping.result",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={
+                    "plan": plan_artifact,
+                    "recipe": recipe_artifact,
+                    "result": result_artifact,
+                },
+                config=config,
+            )
+        record_ids = tuple(record.record_id for record in result.records)
+        return MapOutcome(
+            record_count=len(result.records),
+            mapping_plan_id=plan.mapping_plan_id,
+            recipe_id=recipe.recipe_id,
+            result_id=result.result_id,
+            imported_record_ids=record_ids,
+            revision_id=revision.revision_id,
+            durability_warning=store.last_commit_durability_warning,
+            messages=(
+                ServiceMessage(
+                    f"mapped {len(result.records)} imported record(s); "
+                    f"plan {plan.mapping_plan_id}; revision {revision.revision_id}"
+                ),
+            ),
+        )
+
+    def _load_import_context(
+        self,
+        store: Workspace,
+        revision: WorkspaceRevision,
+    ) -> tuple[Any, Any, Any]:
+        from veriformis.mapping.models import MappingPlan
+        from veriformis.mapping.result import MappingRecipe, MappingResult
+
+        plan = MappingPlan.model_validate_json(
+            _output_bytes(store, revision, "map", "plan")
+        )
+        recipe = MappingRecipe.model_validate_json(
+            _output_bytes(store, revision, "map", "recipe")
+        )
+        result = MappingResult.model_validate_json(
+            _output_bytes(store, revision, "map", "result")
+        )
+        return plan, recipe, result
+
+    def _curate_imported(
+        self,
+        store: Workspace,
+        current: WorkspaceRevision,
+        *,
+        goal: str | None,
+        preset: str | None,
+        minimum_target_characters: int | None,
+        balance_mode: str | None,
+        maximum_records_per_primary_source: int | None,
+        evaluation_ratio_ppm: int | None,
+        evaluation_required: bool | None,
+        split_seed: str | None,
+        instruction: str | None,
+    ) -> CurateOutcome:
+        from veriformis.datasets.models import CurationPolicy
+        from veriformis.datasets.serialization import SerializationPlan
+        from veriformis.datasets.splitting import SplitPolicy
+        from veriformis.goals.catalog import resolve_operator_instruction
+        from veriformis.goals.presets import resolve_recipe_settings
+        from veriformis.mapping.finish import (
+            FinishedImportPlan,
+            curate_imported_records,
+        )
+
+        mapping_plan, recipe, mapping_result = self._load_import_context(store, current)
+        try:
+            instruction = resolve_operator_instruction(
+                objective=recipe.objective_kind,
+                row_schema=recipe.row_schema,
+                instruction=instruction,
+            )
+        except GoalCatalogError as exc:
+            raise MappingError(exc.message) from exc
+        try:
+            settings = resolve_recipe_settings(
+                goal=goal or recipe.goal_id,
+                preset=preset,
+                representation=recipe.representation_id,
+                minimum_target_characters=minimum_target_characters,
+                balance_mode=balance_mode,
+                maximum_records_per_primary_source=maximum_records_per_primary_source,
+                evaluation_ratio_ppm=evaluation_ratio_ppm,
+                evaluation_required=evaluation_required,
+                split_seed=split_seed,
+            )
+        except GoalCatalogError as exc:
+            raise MappingError(exc.message) from exc
+        if settings.goal_id != recipe.goal_id:
+            raise MappingError(
+                f"curate goal {settings.goal_id!r} does not match mapped goal "
+                f"{recipe.goal_id!r}"
+            )
+        curation = settings.curation
+        plan = FinishedImportPlan.create(
+            recipe_id=recipe.recipe_id,
+            mapping_result_id=mapping_result.result_id,
+            curation_policy=CurationPolicy.create(
+                minimum_target_characters=curation.minimum_target_characters,
+                balance_mode=curation.balance_mode,  # type: ignore[arg-type]
+                maximum_records_per_primary_source=(
+                    curation.maximum_records_per_primary_source
+                ),
+            ),
+            split_policy=SplitPolicy.create(
+                evaluation_ratio_ppm=curation.evaluation_ratio_ppm,
+                evaluation_required=curation.evaluation_required,
+                seed=curation.split_seed,
+            ),
+            serialization_plan=SerializationPlan.create(
+                row_schema=recipe.row_schema,  # type: ignore[arg-type]
+                instruction_text=instruction,
+            ),
+        )
+        curated = curate_imported_records(plan, recipe, mapping_result)
+        config = _finished_stage_config(CURATION_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "curate",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            plan_artifact = transaction.put_artifact(
+                lossless_json_bytes(plan.model_dump(mode="json")),
+                kind="finished-dataset-plan",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.curation.plan",
+                producer_version="1",
+                config=config,
+            )
+            result_artifact = transaction.put_artifact(
+                lossless_json_bytes(curated.model_dump(mode="json")),
+                kind="curation-result",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.curation.result",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={"plan": plan_artifact, "result": result_artifact},
+                config=config,
+            )
+        excluded = sum(decision.status == "excluded" for decision in curated.decisions)
+        quarantined = sum(
+            decision.status == "quarantined" for decision in curated.decisions
+        )
+        blockers = tuple(
+            sorted(
+                {
+                    code
+                    for entry in curated.coverage_ledger.entries
+                    for code in entry.blocker_codes
+                }
+            )
+        )
+        messages: list[ServiceMessage] = [
+            ServiceMessage(
+                f"curated {len(curated.included_record_ids)} included, {excluded} excluded, "
+                f"and {quarantined} quarantined imported record(s); plan {plan.plan_id}; "
+                f"revision {revision.revision_id}"
+            )
+        ]
+        if blockers:
+            messages.append(
+                ServiceMessage(
+                    f"coverage blockers: {', '.join(blockers)}",
+                    stream="stderr",
+                    kind="warning",
+                )
+            )
+        return CurateOutcome(
+            included_count=len(curated.included_record_ids),
+            excluded_count=excluded,
+            quarantined_count=quarantined,
+            plan_id=plan.plan_id,
+            coverage_blockers=blockers,
+            revision_id=revision.revision_id,
+            durability_warning=store.last_commit_durability_warning,
+            messages=tuple(messages),
+        )
+
+    def _split_imported(
+        self,
+        store: Workspace,
+        current: WorkspaceRevision,
+    ) -> SplitOutcome:
+        from veriformis.mapping.finish import (
+            finished_import_plan_from_json_bytes,
+            imported_curation_from_json_bytes,
+            split_imported_records,
+        )
+
+        mapping_plan, recipe, mapping_result = self._load_import_context(store, current)
+        del mapping_plan
+        plan = finished_import_plan_from_json_bytes(
+            _output_bytes(store, current, "curate", "plan")
+        )
+        curated = imported_curation_from_json_bytes(
+            _output_bytes(store, current, "curate", "result")
+        )
+        raw_digests = {
+            source_id: current.sources[source_id].sha256
+            for source_id in recipe.source_ids
+        }
+        result = split_imported_records(plan, mapping_result, curated, raw_digests)
+        config = _finished_stage_config(SPLIT_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "split",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            artifact = transaction.put_artifact(
+                lossless_json_bytes(result.model_dump(mode="json")),
+                kind="split-result",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.splitting.result",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(outputs={"result": artifact}, config=config)
+        return SplitOutcome(
+            train_record_count=result.realized_train_record_count,
+            evaluation_record_count=result.realized_evaluation_record_count,
+            group_count=len(result.groups),
+            assignment_digest=result.assignment_digest,
+            revision_id=revision.revision_id,
+            durability_warning=store.last_commit_durability_warning,
+            messages=(
+                ServiceMessage(
+                    f"split {result.realized_train_record_count} train and "
+                    f"{result.realized_evaluation_record_count} evaluation imported "
+                    f"record(s) across {len(result.groups)} leakage group(s); revision "
+                    f"{revision.revision_id}"
+                ),
+            ),
+        )
+
+    def _format_imported(
+        self,
+        store: Workspace,
+        current: WorkspaceRevision,
+    ) -> FormatOutcome:
+        from veriformis.mapping.finish import (
+            finished_import_plan_from_json_bytes,
+            imported_curation_from_json_bytes,
+            imported_split_from_json_bytes,
+            serialize_imported_records,
+        )
+
+        mapping_plan, recipe, mapping_result = self._load_import_context(store, current)
+        plan = finished_import_plan_from_json_bytes(
+            _output_bytes(store, current, "curate", "plan")
+        )
+        curated = imported_curation_from_json_bytes(
+            _output_bytes(store, current, "curate", "result")
+        )
+        split_result = imported_split_from_json_bytes(
+            _output_bytes(store, current, "split", "result")
+        )
+        row_set, train_jsonl, evaluation_jsonl, provenance_jsonl = (
+            serialize_imported_records(
+                plan,
+                mapping_plan,
+                mapping_result,
+                curated,
+                split_result,
+            )
+        )
+        config = _finished_stage_config(FORMAT_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "format",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            row_set_artifact = transaction.put_artifact(
+                lossless_json_bytes(row_set.model_dump(mode="json")),
+                kind="formatted-row-set",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.row-set",
+                producer_version="1",
+                config=config,
+            )
+            train_artifact = transaction.put_artifact(
+                train_jsonl,
+                kind="training-partition",
+                media_type="application/jsonl",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.train",
+                producer_version="1",
+                config=config,
+            )
+            evaluation_artifact = transaction.put_artifact(
+                evaluation_jsonl,
+                kind="evaluation-partition",
+                media_type="application/jsonl",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.evaluation",
+                producer_version="1",
+                config=config,
+            )
+            provenance_artifact = transaction.put_artifact(
+                provenance_jsonl,
+                kind="row-provenance",
+                media_type="application/jsonl",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-serializer.provenance",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={
+                    "row-set": row_set_artifact,
+                    "train": train_artifact,
+                    "evaluation": evaluation_artifact,
+                    "provenance": provenance_artifact,
+                },
+                config=config,
+            )
+        return FormatOutcome(
+            train_row_count=len(row_set.train_rows),
+            evaluation_row_count=len(row_set.evaluation_rows),
+            row_schema=row_set.row_schema,
+            revision_id=revision.revision_id,
+            durability_warning=store.last_commit_durability_warning,
+            messages=(
+                ServiceMessage(
+                    f"wrote {len(row_set.train_rows)} train and "
+                    f"{len(row_set.evaluation_rows)} evaluation imported row(s) as "
+                    f"{row_set.row_schema}; revision {revision.revision_id}"
+                ),
+            ),
+        )
+
+    def _validate_imported(
+        self,
+        store: Workspace,
+        current: WorkspaceRevision,
+    ) -> ValidateOutcome:
+        from veriformis.mapping.finish import (
+            finished_import_plan_from_json_bytes,
+            imported_curation_from_json_bytes,
+            imported_row_set_from_json_bytes,
+            imported_split_from_json_bytes,
+            validate_imported_dataset,
+        )
+
+        mapping_plan, recipe, mapping_result = self._load_import_context(store, current)
+        plan = finished_import_plan_from_json_bytes(
+            _output_bytes(store, current, "curate", "plan")
+        )
+        curated = imported_curation_from_json_bytes(
+            _output_bytes(store, current, "curate", "result")
+        )
+        split_result = imported_split_from_json_bytes(
+            _output_bytes(store, current, "split", "result")
+        )
+        row_set = imported_row_set_from_json_bytes(
+            _output_bytes(store, current, "format", "row-set")
+        )
+        train_jsonl = _output_bytes(store, current, "format", "train")
+        evaluation_jsonl = _output_bytes(store, current, "format", "evaluation")
+        provenance_jsonl = _output_bytes(store, current, "format", "provenance")
+        report = validate_imported_dataset(
+            plan,
+            recipe,
+            mapping_plan,
+            mapping_result,
+            curated,
+            split_result,
+            row_set,
+            train_jsonl=train_jsonl,
+            evaluation_jsonl=evaluation_jsonl,
+            provenance_jsonl=provenance_jsonl,
+        )
+        config = _finished_stage_config(VALIDATION_STAGE_SCHEMA_ID, plan.plan_id)
+        with store.begin(
+            "validate",
+            expected_revision_id=current.revision_id,
+        ) as transaction:
+            snapshot_artifact = transaction.put_artifact(
+                lossless_json_bytes(report.snapshot.model_dump(mode="json")),
+                kind="dataset-snapshot",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-validation.snapshot",
+                producer_version="1",
+                config=config,
+            )
+            report_artifact = transaction.put_artifact(
+                lossless_json_bytes(report.model_dump(mode="json")),
+                kind="dataset-validation-report",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.dataset-validation.report",
+                producer_version="1",
+                config=config,
+            )
+            revision = transaction.commit(
+                outputs={"snapshot": snapshot_artifact, "report": report_artifact},
+                config=config,
+                status="complete" if report.status == "passed" else "failed",
+            )
+        messages: list[ServiceMessage] = []
+        for result in report.gate_results:
+            messages.append(ServiceMessage(f"{result.gate_id}: {result.status.upper()}"))
+            for finding in result.finding_codes:
+                messages.append(ServiceMessage(f"  {finding}"))
+        messages.append(ServiceMessage(f"snapshot {report.snapshot_id}"))
+        messages.append(ServiceMessage(f"validation revision {revision.revision_id}"))
+        return ValidateOutcome(
+            report=report,  # type: ignore[arg-type]
+            snapshot_id=report.snapshot_id,
+            revision_id=revision.revision_id,
+            exit_status=0 if report.status == "passed" else 1,
+            durability_warning=store.last_commit_durability_warning,
+            messages=tuple(messages),
+        )
+
+    def _seal_imported(
+        self,
+        store: Workspace,
+        current: WorkspaceRevision,
+        out: Path,
+    ) -> SealOutcome:
+        from veriformis.mapping.finish import (
+            finished_import_plan_from_json_bytes,
+            imported_curation_from_json_bytes,
+            imported_row_set_from_json_bytes,
+            imported_split_from_json_bytes,
+            imported_validation_from_json_bytes,
+            validate_imported_dataset,
+        )
+
+        publication = None
+        expected_revision_id = current.revision_id
+        with store.begin(
+            "seal",
+            expected_revision_id=expected_revision_id,
+        ) as transaction:
+            base = transaction.base
+            mapping_plan, recipe, mapping_result = self._load_import_context(
+                store, base
+            )
+            plan = finished_import_plan_from_json_bytes(
+                _output_bytes(store, base, "curate", "plan")
+            )
+            curated = imported_curation_from_json_bytes(
+                _output_bytes(store, base, "curate", "result")
+            )
+            split_result = imported_split_from_json_bytes(
+                _output_bytes(store, base, "split", "result")
+            )
+            row_set = imported_row_set_from_json_bytes(
+                _output_bytes(store, base, "format", "row-set")
+            )
+            train_jsonl = _output_bytes(store, base, "format", "train")
+            evaluation_jsonl = _output_bytes(store, base, "format", "evaluation")
+            provenance_jsonl = _output_bytes(store, base, "format", "provenance")
+            expected_report = validate_imported_dataset(
+                plan,
+                recipe,
+                mapping_plan,
+                mapping_result,
+                curated,
+                split_result,
+                row_set,
+                train_jsonl=train_jsonl,
+                evaluation_jsonl=evaluation_jsonl,
+                provenance_jsonl=provenance_jsonl,
+            )
+            report_bytes = _output_bytes(store, base, "validate", "report")
+            saved_report = imported_validation_from_json_bytes(report_bytes)
+            if saved_report != expected_report or saved_report.status != "passed":
+                raise ValueError(
+                    "seal requires the exact current passing imported validation report"
+                )
+            files = {
+                "data/train.jsonl": train_jsonl,
+                "data/evaluation.jsonl": evaluation_jsonl,
+                "metadata/row-provenance.jsonl": provenance_jsonl,
+                "validation.json": report_bytes,
+            }
+            roles = {
+                "data/train.jsonl": "training-partition",
+                "data/evaluation.jsonl": "evaluation-partition",
+                "metadata/row-provenance.jsonl": "row-provenance",
+                "validation.json": "dataset-validation-report",
+            }
+            media_types = {
+                "data/train.jsonl": "application/jsonl",
+                "data/evaluation.jsonl": "application/jsonl",
+                "metadata/row-provenance.jsonl": "application/jsonl",
+                "validation.json": "application/json",
+            }
+            record_counts = {
+                "data/train.jsonl": row_set.train_row_count,
+                "data/evaluation.jsonl": row_set.evaluation_row_count,
+                "metadata/row-provenance.jsonl": row_set.total_row_count,
+            }
+            manifest, attestation = build_finished_bundle(
+                files,
+                roles=roles,
+                media_types=media_types,
+                record_counts=record_counts,
+                dataset_snapshot_id=saved_report.snapshot_id,
+                validation_report_id=saved_report.report_id,
+            )
+            manifest_bytes = manifest.canonical_bytes()
+            attestation_bytes = attestation.canonical_bytes()
+            config = _finished_stage_config(SEAL_STAGE_SCHEMA_ID, plan.plan_id)
+            manifest_artifact = transaction.put_artifact(
+                manifest_bytes,
+                kind="finished-bundle-manifest",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.bundle.manifest",
+                producer_version="1",
+                config=config,
+            )
+            attestation_artifact = transaction.put_artifact(
+                attestation_bytes,
+                kind="finished-bundle-attestation",
+                media_type="application/json",
+                source_ids=recipe.source_ids,
+                producer_id="veriformis.bundle.attestation",
+                producer_version="1",
+                config=config,
+            )
+
+            def publish_or_recover() -> None:
+                nonlocal publication
+                target = Path(os.path.abspath(os.fspath(out)))
+                if os.path.lexists(target):
+                    publication = _recover_exact_finished_bundle(
+                        target,
+                        files=files,
+                        manifest=manifest,
+                        attestation=attestation,
+                        manifest_bytes=manifest_bytes,
+                        attestation_bytes=attestation_bytes,
+                        expected_report=saved_report,
+                    )
+                    return
+                publication = write_finished_bundle(
+                    target,
+                    files,
+                    roles=roles,
+                    media_types=media_types,
+                    record_counts=record_counts,
+                    dataset_snapshot_id=saved_report.snapshot_id,
+                    validation_report_id=saved_report.report_id,
+                )
+
+            transaction._set_seal_publication_action(publish_or_recover)
+            revision = transaction.commit(
+                outputs={
+                    "manifest": manifest_artifact,
+                    "attestation": attestation_artifact,
+                },
+                config=config,
+            )
+        assert publication is not None
+        messages = [
+            ServiceMessage(f"sealed bundle: {publication.bundle_path}"),
+            ServiceMessage(f"manifest SHA-256: {publication.manifest_sha256}"),
+            ServiceMessage(f"verification grade: {publication.trust_grade}"),
+            ServiceMessage(f"seal revision {revision.revision_id}"),
+        ]
+        return SealOutcome(
+            publication=publication,
+            revision_id=revision.revision_id,
+            durability_warning=store.last_commit_durability_warning,
+            messages=tuple(messages),
+        )
+
     def curate(
         self,
         workspace: Path,
@@ -1801,6 +2649,20 @@ class PipelineService:
 
         store = Workspace.open(workspace)
         current = store.head()
+        if is_import_revision(current.schema_version):
+            return self._curate_imported(
+                store,
+                current,
+                goal=goal,
+                preset=preset,
+                minimum_target_characters=minimum_target_characters,
+                balance_mode=balance_mode,
+                maximum_records_per_primary_source=maximum_records_per_primary_source,
+                evaluation_ratio_ppm=evaluation_ratio_ppm,
+                evaluation_required=evaluation_required,
+                split_seed=split_seed,
+                instruction=instruction,
+            )
         _require_group3_revision(current)
         recipe, result, inputs = _load_constructed_dataset(store, current)
         try:
@@ -1910,6 +2772,8 @@ class PipelineService:
         """Assign complete transitive leakage groups to fixed partitions."""
         store = Workspace.open(workspace)
         current = store.head()
+        if is_import_revision(current.schema_version):
+            return self._split_imported(store, current)
         recipe, construction, _ = _load_constructed_dataset(store, current)
         plan = _load_finished_plan(store, current)
         curated = _load_curation_result(store, current)
@@ -1958,6 +2822,8 @@ class PipelineService:
         """Lower curated records into the row schema fixed by their dataset plan."""
         store = Workspace.open(workspace)
         current = store.head()
+        if is_import_revision(current.schema_version):
+            return self._format_imported(store, current)
         recipe, construction, _ = _load_constructed_dataset(store, current)
         plan = _load_finished_plan(store, current)
         curated = _load_curation_result(store, current)
@@ -2038,6 +2904,8 @@ class PipelineService:
         """Replay and validate one exact finished-dataset byte snapshot."""
         store = Workspace.open(workspace)
         current = store.head()
+        if is_import_revision(current.schema_version):
+            return self._validate_imported(store, current)
         recipe, construction, inputs = _load_constructed_dataset(store, current)
         plan = _load_finished_plan(store, current)
         curated = _load_curation_result(store, current)
@@ -2108,6 +2976,8 @@ class PipelineService:
         store = Workspace.open(workspace)
         try:
             current = store.head()
+            if is_import_revision(current.schema_version):
+                return self._seal_imported(store, current, out)
             expected_revision_id = current.revision_id
             with store.begin(
                 "seal",

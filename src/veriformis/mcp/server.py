@@ -478,6 +478,23 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def map_rows(
+        workspace: str,
+        goal: str,
+        representation: str,
+        mapping_plan: str,
+    ) -> str:
+        """Map captured JSONL row sources into imported semantic records."""
+        return _outcome_json(
+            pipeline.map_rows(
+                Path(workspace),
+                goal=goal,
+                representation=representation,
+                mapping_plan=json.loads(mapping_plan),
+            )
+        )
+
+    @server.tool()
     def curate(
         workspace: str,
         minimum_target_characters: int | None = None,

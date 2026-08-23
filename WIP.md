@@ -5,13 +5,13 @@
 **Implementation baseline reviewed:** `6c4694c2e1c523156cd7c8f34c12f258a3ce0b01`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–6 complete; Phase 7.1 opening)
+independent-product Phases 0–6 complete; Phase 7.3 JSONL mapping)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7.3 JSONL mapping)
 
-**Next review:** Phase 7.1 pull-request merge, item 7.2, beta
+**Next review:** Phase 7.3 pull-request merge, item 7.4, beta
 label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -83,7 +83,8 @@ local, offline, and free of LLM generation.
       passed.
 - [ ] Independent product Phase 7 is in progress under its
       [active packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md).
-      Item 7.1 names compiler-path modes under ADR-0010.
+      Items 7.1–7.2 merged as PR #71 and PR #72. Item 7.3 maps JSONL rows
+      on workspace revision v4.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

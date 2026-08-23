@@ -123,6 +123,7 @@ CONSTRUCTION_SCHEMA_IDS: Final = (
 )
 
 CONSTRUCTION_STAGE_SCHEMA_ID: Final = "veriformis.construction-stage/v1"
+MAPPING_STAGE_SCHEMA_ID: Final = "veriformis.mapping-stage/v1"
 CURATION_STAGE_SCHEMA_ID: Final = "veriformis.curation-stage/v1"
 SPLIT_STAGE_SCHEMA_ID: Final = "veriformis.split-stage/v1"
 FORMAT_STAGE_SCHEMA_ID: Final = "veriformis.finished-format-stage/v1"
@@ -353,6 +354,7 @@ __all__ = [
     "CONSTRUCTION_OUTPUT_CONTRACTS",
     "CONSTRUCTION_SCHEMA_IDS",
     "CONSTRUCTION_STAGE_SCHEMA_ID",
+    "MAPPING_STAGE_SCHEMA_ID",
     "CURATION_STAGE_SCHEMA_ID",
     "DATASET_CONSTRUCTION_CONTRACT_ID",
     "DATASET_CONSTRUCTION_CONTRACT_VERSION",

@@ -33,11 +33,11 @@ as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
 independent-product Phase 6 complete, with items 6.1–6.7 merged sequentially
 as PR #60 through PR #65 and PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is in
-progress at item 7.1 (compiler-path modes)
+progress at item 7.3 (JSONL row mapping on workspace revision v4)
 
-**Review date:** 2026-08-23 (independent-product Phase 7.1 opening)
+**Review date:** 2026-08-23 (independent-product Phase 7.3 JSONL mapping)
 
-**Next review:** Phase 7.1 pull-request merge, item 7.2, beta label
+**Next review:** Phase 7.3 pull-request merge, item 7.4, beta label
 cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
@@ -353,6 +353,8 @@ The installed console entry point is `veriformis`.
 | `chunk WORKSPACE` | Runs one of five evidence-bearing chunk strategies | `chunks` |
 | `upgrade-workspace WORKSPACE` | Migrates a verified revision-v1 or revision-v2 workspace through every supported migration | One new migration revision per required schema step, or no change when current |
 | `construct WORKSPACE (--goal GOAL \| --preset PRESET \| --objective OBJECTIVE)` | Resolves the selection and explicit overrides through the versioned preset data, builds the recipe through the named recipe library, and constructs candidates, decisions, diagnostics, and immutable accepted records for one exact source set | `recipe`, `result` |
+| `parse PATH... -o WORKSPACE --mode dataset-row` | Captures UTF-8 JSONL row sources into workspace revision v4; does not recover document IR | `registry`, per-source `raw` and `row-source` |
+| `map WORKSPACE --goal GOAL --representation REPRESENTATION --plan PLAN.json` | Applies a confirmed mapping-plan/v1 to captured JSONL objects and commits imported records with `mapped_value` evidence | `plan`, `recipe`, `result` |
 | `curate WORKSPACE` | Fixes the complete finished plan and applies ordered deterministic curation | `plan`, `result` |
 | `split WORKSPACE` | Assigns complete transitive leakage groups to train and evaluation | `result` |
 | `format WORKSPACE` | Lowers included records into the row schema bound by the plan | `row-set`, `train`, `evaluation`, `provenance` |
@@ -366,7 +368,7 @@ The installed console entry point is `veriformis`.
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
-| `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source` executable, `dataset-row` and `mixed` named and refused | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
+| `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source` and `dataset-row` executable, `mixed` named and refused until item 7.7 | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |

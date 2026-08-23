@@ -28,6 +28,7 @@ from veriformis.contracts import (
     CONSTRUCTION_STAGE_SCHEMA_ID,
     CURATION_STAGE_SCHEMA_ID,
     FORMAT_STAGE_SCHEMA_ID,
+    MAPPING_STAGE_SCHEMA_ID,
     SEAL_STAGE_SCHEMA_ID,
     SPLIT_STAGE_SCHEMA_ID,
     VALIDATION_STAGE_SCHEMA_ID,
@@ -61,7 +62,9 @@ WORKSPACE_LAYOUT_SCHEMA_VERSION = 1
 LEGACY_REVISION_SCHEMA_VERSION = 1
 GROUP2_REVISION_SCHEMA_VERSION = 2
 WORKSPACE_REVISION_SCHEMA_VERSION = 3
+IMPORT_REVISION_SCHEMA_VERSION = 4
 CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION = CONSTRUCTION_STAGE_SCHEMA_ID
+MAPPING_STAGE_CONFIG_SCHEMA_VERSION = MAPPING_STAGE_SCHEMA_ID
 
 # Compatibility alias for callers that used the original name for the
 # workspace.json layout contract. Revision manifests now carry their own,
@@ -73,6 +76,7 @@ StageName = Literal[
     "clean",
     "chunk",
     "construct",
+    "map",
     "curate",
     "split",
     "format",
@@ -87,6 +91,7 @@ CommitStage = Literal[
     "clean",
     "chunk",
     "construct",
+    "map",
     "curate",
     "split",
     "format",
@@ -116,6 +121,15 @@ STAGES: tuple[StageName, ...] = (
     "clean",
     "chunk",
     "construct",
+    "curate",
+    "split",
+    "format",
+    "validate",
+    "seal",
+)
+IMPORT_STAGES: tuple[StageName, ...] = (
+    "parse",
+    "map",
     "curate",
     "split",
     "format",
@@ -163,6 +177,23 @@ STAGE_DEPENDENCIES: dict[StageName, tuple[StageName, ...]] = {
         "validate",
     ),
 }
+IMPORT_STAGE_DEPENDENCIES: dict[StageName, tuple[StageName, ...]] = {
+    "parse": (),
+    "map": ("parse",),
+    "curate": ("parse", "map"),
+    "split": ("parse", "map", "curate"),
+    "format": ("parse", "map", "curate", "split"),
+    "validate": ("parse", "map", "curate", "split", "format"),
+    "seal": ("parse", "map", "curate", "split", "format", "validate"),
+}
+
+
+def is_import_revision(schema_version: int) -> bool:
+    return schema_version == IMPORT_REVISION_SCHEMA_VERSION
+
+
+def is_finished_document_revision(schema_version: int) -> bool:
+    return schema_version == WORKSPACE_REVISION_SCHEMA_VERSION
 
 
 def _stages_for_revision(schema_version: int) -> tuple[StageName, ...]:
@@ -172,6 +203,8 @@ def _stages_for_revision(schema_version: int) -> tuple[StageName, ...]:
         return GROUP2_STAGES
     if schema_version == WORKSPACE_REVISION_SCHEMA_VERSION:
         return STAGES
+    if schema_version == IMPORT_REVISION_SCHEMA_VERSION:
+        return IMPORT_STAGES
     raise UnsupportedWorkspaceVersionError(
         f"workspace revision schema {schema_version} is not supported"
     )
@@ -185,6 +218,8 @@ def _dependencies_for_revision(
         return LEGACY_STAGE_DEPENDENCIES
     if schema_version == GROUP2_REVISION_SCHEMA_VERSION:
         return GROUP2_STAGE_DEPENDENCIES
+    if schema_version == IMPORT_REVISION_SCHEMA_VERSION:
+        return IMPORT_STAGE_DEPENDENCIES
     return STAGE_DEPENDENCIES
 
 
@@ -205,9 +240,34 @@ def _descendants(
     return tuple(item for item in stages if item in found)
 
 
-STAGE_DESCENDANTS: dict[StageName, tuple[StageName, ...]] = {
-    stage: _descendants(stage) for stage in STAGES
-}
+def _union_stage_descendants() -> dict[StageName, tuple[StageName, ...]]:
+    names: tuple[StageName, ...] = tuple(
+        dict.fromkeys(LEGACY_STAGES + GROUP2_STAGES + STAGES + IMPORT_STAGES)
+    )
+    result: dict[StageName, tuple[StageName, ...]] = {}
+    for stage in names:
+        found: set[StageName] = set()
+        for schema_version in (
+            LEGACY_REVISION_SCHEMA_VERSION,
+            GROUP2_REVISION_SCHEMA_VERSION,
+            WORKSPACE_REVISION_SCHEMA_VERSION,
+            IMPORT_REVISION_SCHEMA_VERSION,
+        ):
+            stages = _stages_for_revision(schema_version)
+            if stage not in stages and stage != "map":
+                continue
+            found.update(
+                _descendants(
+                    stage,
+                    stages=stages,
+                    dependencies=_dependencies_for_revision(schema_version),
+                )
+            )
+        result[stage] = tuple(item for item in names if item in found)
+    return result
+
+
+STAGE_DESCENDANTS: dict[StageName, tuple[StageName, ...]] = _union_stage_descendants()
 
 
 def _descendants_for_revision(
@@ -600,6 +660,18 @@ _CORE_STAGE_OUTPUT_KINDS: dict[tuple[StageName, str], str] = {
     ("construct", "recipe"): "dataset-recipe",
     ("construct", "result"): "construction-result",
 }
+_IMPORT_STAGE_OUTPUT_KINDS: dict[tuple[StageName, str], str] = {
+    ("parse", "registry"): "source-registry",
+    ("map", "plan"): "mapping-plan",
+    ("map", "recipe"): "mapping-recipe",
+    ("map", "result"): "mapping-result",
+}
+_IMPORT_SOURCE_STAGE_OUTPUT_KINDS: dict[StageName, dict[str, str]] = {
+    "parse": {
+        "raw": "raw-source",
+        "row-source": "row-source",
+    },
+}
 
 _GROUP2_DOWNSTREAM_OUTPUT_KINDS: dict[tuple[StageName, str], str] = {
     ("format", "records"): "formatted-records",
@@ -646,6 +718,10 @@ def _fixed_stage_output_kinds(
     schema_version: int,
 ) -> dict[tuple[StageName, str], str]:
     _stages_for_revision(schema_version)
+    if schema_version == IMPORT_REVISION_SCHEMA_VERSION:
+        fixed = dict(_IMPORT_STAGE_OUTPUT_KINDS)
+        fixed.update(_FINISHED_DATASET_OUTPUT_KINDS)
+        return fixed
     fixed = dict(_CORE_STAGE_OUTPUT_KINDS)
     if schema_version < WORKSPACE_REVISION_SCHEMA_VERSION:
         fixed.update(_GROUP2_DOWNSTREAM_OUTPUT_KINDS)
@@ -668,11 +744,20 @@ def _required_stage_output_kinds(
         for (schema_stage, name), kind in fixed.items()
         if schema_stage == stage
     }
-    role_kinds = _SOURCE_STAGE_OUTPUT_KINDS.get(stage, {})
+    role_kinds = _source_stage_output_kinds(schema_version, stage)
     for source_id in source_ids:
         for role, kind in role_kinds.items():
             expected[f"source/{source_id}/{role}"] = kind
     return expected
+
+
+def _source_stage_output_kinds(
+    schema_version: int,
+    stage: StageName,
+) -> dict[str, str]:
+    if schema_version == IMPORT_REVISION_SCHEMA_VERSION:
+        return _IMPORT_SOURCE_STAGE_OUTPUT_KINDS.get(stage, {})
+    return _SOURCE_STAGE_OUTPUT_KINDS.get(stage, {})
 
 
 def _construct_source_scope(
@@ -712,6 +797,47 @@ def _construct_source_scope(
     if missing:
         raise WorkspaceCorruptError(
             f"construct config selects unknown sources: {sorted(missing)}"
+        )
+    return selected
+
+
+def _map_source_scope(
+    state: StageState,
+    sources: Mapping[str, SourceDescriptor],
+) -> tuple[str, ...]:
+    """Return the exact source set selected by a mapping recipe."""
+    expected_keys = {"schema_version", "mapping_plan_id", "selected_source_ids"}
+    if set(state.config) != expected_keys:
+        raise WorkspaceCorruptError(
+            "map config keys do not match the v1 stage schema"
+        )
+    if state.config["schema_version"] != MAPPING_STAGE_CONFIG_SCHEMA_VERSION:
+        raise WorkspaceCorruptError("map config uses an unsupported stage schema")
+    try:
+        validate_id(state.config["mapping_plan_id"], kind="mpl")
+    except (TypeError, ValueError) as exc:
+        raise WorkspaceCorruptError(
+            "map config requires a valid mapping_plan_id"
+        ) from exc
+    raw = state.config.get("selected_source_ids")
+    if not isinstance(raw, list) or not raw:
+        raise WorkspaceCorruptError(
+            "map config requires a non-empty selected_source_ids list"
+        )
+    try:
+        selected = tuple(validate_id(item, kind="src") for item in raw)
+    except (TypeError, ValueError) as exc:
+        raise WorkspaceCorruptError(
+            "map config contains an invalid selected source identity"
+        ) from exc
+    if selected != tuple(sorted(selected)) or len(selected) != len(set(selected)):
+        raise WorkspaceCorruptError(
+            "map selected_source_ids must be sorted and unique"
+        )
+    missing = set(selected) - set(sources)
+    if missing:
+        raise WorkspaceCorruptError(
+            f"map config selects unknown sources: {sorted(missing)}"
         )
     return selected
 
@@ -779,14 +905,23 @@ def _validate_stage_output_bindings(
     all_source_ids = tuple(sorted(sources))
     finished_source_ids: tuple[str, ...] | None = None
     construct_state = stages.get("construct")
+    map_state = stages.get("map")
     if (
-        schema_version >= WORKSPACE_REVISION_SCHEMA_VERSION
+        is_finished_document_revision(schema_version)
         and construct_state is not None
         and construct_state.status == "complete"
     ):
         finished_source_ids = _construct_source_scope(construct_state, sources)
+    if (
+        is_import_revision(schema_version)
+        and map_state is not None
+        and map_state.status == "complete"
+    ):
+        finished_source_ids = _map_source_scope(map_state, sources)
 
-    if schema_version >= WORKSPACE_REVISION_SCHEMA_VERSION:
+    if is_finished_document_revision(schema_version) or is_import_revision(
+        schema_version
+    ):
         finished_stage_schemas = {
             "curate": CURATION_STAGE_SCHEMA_ID,
             "split": SPLIT_STAGE_SCHEMA_ID,
@@ -794,6 +929,7 @@ def _validate_stage_output_bindings(
             "validate": VALIDATION_STAGE_SCHEMA_ID,
             "seal": SEAL_STAGE_SCHEMA_ID,
         }
+        plan_kind = "fip" if is_import_revision(schema_version) else "fdp"
         active_plan_ids: set[str] = set()
         for stage_name, stage_schema in finished_stage_schemas.items():
             state = stages[stage_name]
@@ -808,7 +944,9 @@ def _validate_stage_output_bindings(
                     f"{stage_name} config uses an unsupported stage schema"
                 )
             try:
-                active_plan_ids.add(validate_id(state.config["plan_id"], kind="fdp"))
+                active_plan_ids.add(
+                    validate_id(state.config["plan_id"], kind=plan_kind)
+                )
             except (TypeError, ValueError) as exc:
                 raise WorkspaceCorruptError(
                     f"{stage_name} config requires a valid plan_id"
@@ -872,6 +1010,11 @@ def _validate_stage_output_bindings(
             if state.stage == "construct" and state.status == "complete"
             else None
         )
+        map_source_ids = (
+            _map_source_scope(state, sources)
+            if state.stage == "map" and state.status == "complete"
+            else None
+        )
         for output_name, artifact_id in state.outputs.items():
             artifact = artifacts[artifact_id]
             expected_kind = _fixed_stage_output_kinds(schema_version).get(
@@ -885,13 +1028,20 @@ def _validate_stage_output_bindings(
                     )
                 if state.stage == "construct":
                     expected_source_ids = construct_source_ids
+                elif state.stage == "map":
+                    expected_source_ids = map_source_ids
                 elif (
-                    schema_version >= WORKSPACE_REVISION_SCHEMA_VERSION
+                    (
+                        is_finished_document_revision(schema_version)
+                        or is_import_revision(schema_version)
+                    )
                     and state.stage in {"curate", "split", "format", "validate", "seal"}
                 ):
                     if finished_source_ids is None:
                         raise WorkspaceCorruptError(
-                            f"active stage {state.stage} lacks a completed construct scope"
+                            f"active stage {state.stage} lacks a completed "
+                            f"{'map' if is_import_revision(schema_version) else 'construct'} "
+                            "scope"
                         )
                     expected_source_ids = finished_source_ids
                 else:
@@ -923,6 +1073,10 @@ def _validate_stage_output_bindings(
                     producer_id = f"veriformis.construction.{output_name}"
                     producer_version = "1"
                     expected_config_digest = state.config_digest
+                elif state.stage == "map":
+                    producer_id = f"veriformis.mapping.{output_name}"
+                    producer_version = "1"
+                    expected_config_digest = state.config_digest
                 elif state.stage == "curate":
                     producer_id = f"veriformis.curation.{output_name}"
                     producer_version = "1"
@@ -932,7 +1086,10 @@ def _validate_stage_output_bindings(
                     producer_version = "1"
                     expected_config_digest = state.config_digest
                 elif state.stage == "format":
-                    if schema_version >= WORKSPACE_REVISION_SCHEMA_VERSION:
+                    if (
+                        is_finished_document_revision(schema_version)
+                        or is_import_revision(schema_version)
+                    ):
                         producer_id = f"veriformis.dataset-serializer.{output_name}"
                     else:
                         record_format = state.config.get("format")
@@ -946,7 +1103,10 @@ def _validate_stage_output_bindings(
                 elif state.stage == "validate":
                     producer_id = (
                         f"veriformis.dataset-validation.{output_name}"
-                        if schema_version >= WORKSPACE_REVISION_SCHEMA_VERSION
+                        if (
+                            is_finished_document_revision(schema_version)
+                            or is_import_revision(schema_version)
+                        )
                         else "veriformis.validation"
                     )
                     producer_version = "1"
@@ -969,7 +1129,7 @@ def _validate_stage_output_bindings(
                 continue
 
             parts = output_name.split("/")
-            role_kinds = _SOURCE_STAGE_OUTPUT_KINDS.get(state.stage, {})
+            role_kinds = _source_stage_output_kinds(schema_version, state.stage)
             if len(parts) != 3 or parts[0] != "source" or parts[2] not in role_kinds:
                 continue
             source_id, role = parts[1], parts[2]
@@ -1553,6 +1713,7 @@ class Workspace:
         cls,
         path: str | Path,
         *,
+        schema_version: int = WORKSPACE_REVISION_SCHEMA_VERSION,
         lock_timeout: float = 10.0,
         failure_injector: Callable[[str], None] | None = None,
     ) -> Workspace:
@@ -1586,9 +1747,13 @@ class Workspace:
             created_at=now,
         )
         _atomic_write(root / "workspace.json", lossless_json_bytes(metadata))
-        stages = {stage: StageState.absent(stage) for stage in STAGES}
+        _stages_for_revision(schema_version)
+        stages = {
+            stage: StageState.absent(stage)
+            for stage in _stages_for_revision(schema_version)
+        }
         initial = _new_revision(
-            schema_version=WORKSPACE_REVISION_SCHEMA_VERSION,
+            schema_version=schema_version,
             parent_revision_id=None,
             committed_stage="init",
             committed_at="1970-01-01T00:00:00+00:00",
@@ -1739,7 +1904,8 @@ class Workspace:
         stage: StageName,
         expected_revision_id: str | None = None,
     ) -> WorkspaceTransaction:
-        if stage not in STAGES:
+        known = set(LEGACY_STAGES + GROUP2_STAGES + STAGES + IMPORT_STAGES)
+        if stage not in known:
             raise ValueError(f"unknown workspace stage: {stage!r}")
         # A transaction is also the read boundary for commands such as seal,
         # which may intentionally produce an external artifact without a new
@@ -1787,6 +1953,8 @@ class Workspace:
             if actual.revision_id != expected:
                 raise WorkspaceRevisionConflict(expected, actual.revision_id)
             durability_confirmed = True
+            if actual.schema_version == IMPORT_REVISION_SCHEMA_VERSION:
+                return actual
             while actual.schema_version != WORKSPACE_REVISION_SCHEMA_VERSION:
                 if actual.schema_version == LEGACY_REVISION_SCHEMA_VERSION:
                     stages = dict(actual.stages)
@@ -2304,6 +2472,309 @@ class WorkspaceTransaction:
             )
         return data
 
+    def _validate_import_stage_semantics(
+        self,
+        revision: WorkspaceRevision,
+        load_json,
+    ) -> None:
+        """Replay dataset-row parse, map, and finished-import stages."""
+        from veriformis.identity import derive_source_id
+        from veriformis.mapping.capture import capture_jsonl
+        from veriformis.mapping.execute import execute_mapping
+        from veriformis.mapping.finish import (
+            curate_imported_records,
+            finished_import_plan_from_json_bytes,
+            imported_curation_from_json_bytes,
+            imported_row_set_from_json_bytes,
+            imported_split_from_json_bytes,
+            imported_validation_from_json_bytes,
+            serialize_imported_records,
+            split_imported_records,
+            validate_imported_dataset,
+        )
+        from veriformis.mapping.models import MappingPlan, RowSource
+        from veriformis.mapping.result import (
+            ROW_JSONL_PARSER_ID,
+            MappingRecipe,
+            MappingResult,
+            mapping_plan_from_dict,
+            mapping_recipe_from_dict,
+            mapping_result_from_dict,
+        )
+
+        parse_state = revision.stages["parse"]
+        if self.stage == "parse":
+            registry = load_json(parse_state.outputs["registry"])
+            expected_registry = [
+                source.model_dump(mode="json", exclude={"original_path"})
+                for source in sorted(
+                    revision.sources.values(), key=lambda item: item.id
+                )
+            ]
+            if registry != expected_registry:
+                raise WorkspaceCorruptError(
+                    "parse registry does not match the candidate source descriptors"
+                )
+            for source_id, source in sorted(revision.sources.items()):
+                if source.parser_id != ROW_JSONL_PARSER_ID:
+                    raise WorkspaceCorruptError(
+                        f"dataset-row source {source_id} must use the row-jsonl parser"
+                    )
+                if source.raw_artifact_id is None:
+                    raise WorkspaceCorruptError(
+                        f"source {source_id} lacks captured raw input"
+                    )
+                raw_bytes = self._candidate_artifact_bytes(
+                    revision,
+                    source.raw_artifact_id,
+                )
+                capture = capture_jsonl(
+                    Path(source.logical_path),
+                    logical_path=source.logical_path,
+                    raw_bytes=raw_bytes,
+                )
+                if derive_source_id(source.logical_path, source.sha256) != source.id:
+                    raise WorkspaceCorruptError(
+                        f"source descriptor identity mismatch for {source_id}"
+                    )
+                stored = RowSource.model_validate(
+                    load_json(parse_state.outputs[f"source/{source_id}/row-source"])
+                )
+                if stored != capture.row_source:
+                    raise WorkspaceCorruptError(
+                        f"row-source artifact does not match JSONL capture {source_id}"
+                    )
+            return
+
+        if self.stage == "map":
+            map_state = revision.stages["map"]
+            selected = _map_source_scope(map_state, revision.sources)
+            plan = MappingPlan.model_validate(
+                load_json(map_state.outputs["plan"])
+            )
+            recipe = MappingRecipe.model_validate(
+                load_json(map_state.outputs["recipe"])
+            )
+            result = MappingResult.model_validate(
+                load_json(map_state.outputs["result"])
+            )
+            if (
+                plan.mapping_plan_id != map_state.config["mapping_plan_id"]
+                or recipe.mapping_plan_id != plan.mapping_plan_id
+                or result.mapping_plan_id != plan.mapping_plan_id
+                or recipe.source_ids != selected
+                or result.source_ids != selected
+            ):
+                raise WorkspaceCorruptError(
+                    "map config, plan, recipe, and result identities disagree"
+                )
+            mapped: list[Any] = []
+            row_source_ids: list[str] = []
+            for source_id in selected:
+                source = revision.sources[source_id]
+                raw_bytes = self._candidate_artifact_bytes(
+                    revision,
+                    source.raw_artifact_id,  # type: ignore[arg-type]
+                )
+                capture = capture_jsonl(
+                    Path(source.logical_path),
+                    logical_path=source.logical_path,
+                    raw_bytes=raw_bytes,
+                )
+                row_source_ids.append(capture.row_source.row_source_id)
+                mapped.extend(
+                    execute_mapping(
+                        plan,
+                        capture,
+                        source_id=source_id,
+                        recipe=recipe,
+                    )
+                )
+            replayed = MappingResult.create(
+                plan=plan,
+                recipe=recipe,
+                row_source_ids=tuple(row_source_ids),
+                records=tuple(mapped),
+            )
+            if replayed != result:
+                raise WorkspaceCorruptError(
+                    "mapping result does not match deterministic replay"
+                )
+            return
+
+        if self.stage in {"curate", "split", "format", "validate", "seal"}:
+            map_state = revision.stages["map"]
+            plan = mapping_plan_from_dict(load_json(map_state.outputs["plan"]))
+            recipe = mapping_recipe_from_dict(load_json(map_state.outputs["recipe"]))
+            mapping_result = mapping_result_from_dict(
+                load_json(map_state.outputs["result"])
+            )
+            import_plan = finished_import_plan_from_json_bytes(
+                self._candidate_artifact_bytes(
+                    revision,
+                    revision.stages["curate"].outputs["plan"],
+                )
+            )
+            if import_plan.plan_id != revision.stages[self.stage].config["plan_id"]:
+                raise WorkspaceCorruptError(
+                    f"{self.stage} config and finished import plan disagree"
+                )
+            curation = imported_curation_from_json_bytes(
+                self._candidate_artifact_bytes(
+                    revision,
+                    revision.stages["curate"].outputs["result"],
+                )
+            )
+            replayed_curation = curate_imported_records(
+                import_plan,
+                recipe,
+                mapping_result,
+            )
+            if curation != replayed_curation:
+                raise WorkspaceCorruptError(
+                    "imported curation result does not match deterministic replay"
+                )
+            if self.stage == "curate":
+                return
+            raw_digests = {
+                source_id: revision.sources[source_id].sha256
+                for source_id in recipe.source_ids
+            }
+            split_result = imported_split_from_json_bytes(
+                self._candidate_artifact_bytes(
+                    revision,
+                    revision.stages["split"].outputs["result"],
+                )
+            )
+            replayed_split = split_imported_records(
+                import_plan,
+                mapping_result,
+                curation,
+                raw_digests,
+            )
+            if split_result != replayed_split:
+                raise WorkspaceCorruptError(
+                    "imported split result does not match deterministic replay"
+                )
+            if self.stage == "split":
+                return
+            row_set, train_jsonl, evaluation_jsonl, provenance_jsonl = (
+                serialize_imported_records(
+                    import_plan,
+                    plan,
+                    mapping_result,
+                    curation,
+                    split_result,
+                )
+            )
+            format_state = revision.stages["format"]
+            stored_row_set = imported_row_set_from_json_bytes(
+                self._candidate_artifact_bytes(
+                    revision,
+                    format_state.outputs["row-set"],
+                )
+            )
+            if stored_row_set != row_set or any(
+                self._candidate_artifact_bytes(revision, format_state.outputs[name])
+                != expected
+                for name, expected in (
+                    ("train", train_jsonl),
+                    ("evaluation", evaluation_jsonl),
+                    ("provenance", provenance_jsonl),
+                )
+            ):
+                raise WorkspaceCorruptError(
+                    "imported format artifacts do not match exact record lowering"
+                )
+            if self.stage == "format":
+                return
+            report = validate_imported_dataset(
+                import_plan,
+                recipe,
+                plan,
+                mapping_result,
+                curation,
+                split_result,
+                row_set,
+                train_jsonl=train_jsonl,
+                evaluation_jsonl=evaluation_jsonl,
+                provenance_jsonl=provenance_jsonl,
+            )
+            if self.stage == "validate":
+                validate_state = revision.stages["validate"]
+                stored = imported_validation_from_json_bytes(
+                    self._candidate_artifact_bytes(
+                        revision,
+                        validate_state.outputs["report"],
+                    )
+                )
+                expected_status = (
+                    "complete" if report.status == "passed" else "failed"
+                )
+                if stored != report or validate_state.status != expected_status:
+                    raise WorkspaceCorruptError(
+                        "imported validation artifacts do not match snapshot replay"
+                    )
+                return
+            from veriformis.bundle import build_finished_bundle
+
+            seal_state = revision.stages["seal"]
+            report_bytes = self._candidate_artifact_bytes(
+                revision,
+                revision.stages["validate"].outputs["report"],
+            )
+            saved_report = imported_validation_from_json_bytes(report_bytes)
+            if saved_report != report or saved_report.status != "passed":
+                raise WorkspaceCorruptError(
+                    "seal requires the exact current passing imported validation report"
+                )
+            files = {
+                "data/train.jsonl": train_jsonl,
+                "data/evaluation.jsonl": evaluation_jsonl,
+                "metadata/row-provenance.jsonl": provenance_jsonl,
+                "validation.json": report_bytes,
+            }
+            roles = {
+                "data/train.jsonl": "training-partition",
+                "data/evaluation.jsonl": "evaluation-partition",
+                "metadata/row-provenance.jsonl": "row-provenance",
+                "validation.json": "dataset-validation-report",
+            }
+            media_types = {
+                "data/train.jsonl": "application/jsonl",
+                "data/evaluation.jsonl": "application/jsonl",
+                "metadata/row-provenance.jsonl": "application/jsonl",
+                "validation.json": "application/json",
+            }
+            record_counts = {
+                "data/train.jsonl": row_set.train_row_count,
+                "data/evaluation.jsonl": row_set.evaluation_row_count,
+                "metadata/row-provenance.jsonl": row_set.total_row_count,
+            }
+            manifest, attestation = build_finished_bundle(
+                files,
+                roles=roles,
+                media_types=media_types,
+                record_counts=record_counts,
+                dataset_snapshot_id=saved_report.snapshot_id,
+                validation_report_id=saved_report.report_id,
+            )
+            stored_manifest = self._candidate_artifact_bytes(
+                revision,
+                seal_state.outputs["manifest"],
+            )
+            stored_attestation = self._candidate_artifact_bytes(
+                revision,
+                seal_state.outputs["attestation"],
+            )
+            if (
+                stored_manifest != manifest.canonical_bytes()
+                or stored_attestation != attestation.canonical_bytes()
+            ):
+                raise WorkspaceCorruptError(
+                    "imported seal artifacts do not match the published bundle"
+                )
+
     def _validate_stage_semantics(self, revision: WorkspaceRevision) -> None:
         """Validate cross-artifact meaning before the atomic commit point."""
         if self.stage not in {
@@ -2311,6 +2782,7 @@ class WorkspaceTransaction:
             "clean",
             "chunk",
             "construct",
+            "map",
             "curate",
             "split",
             "format",
@@ -2331,6 +2803,23 @@ class WorkspaceTransaction:
                 raise WorkspaceCorruptError(
                     "candidate stage artifact is not valid UTF-8 JSON"
                 ) from exc
+
+        if is_import_revision(revision.schema_version):
+            try:
+                self._validate_import_stage_semantics(revision, load_json)
+            except WorkspaceCorruptError:
+                raise
+            except (
+                VeriformisError,
+                KeyError,
+                UnicodeError,
+                ValueError,
+                TypeError,
+            ) as exc:
+                raise WorkspaceCorruptError(
+                    f"{self.stage} artifacts do not match their declared inputs"
+                ) from exc
+            return
 
         def load_construction_context() -> tuple[Any, Any, Any, tuple[str, ...]]:
             from veriformis.chunkers.base import chunk_from_dict
