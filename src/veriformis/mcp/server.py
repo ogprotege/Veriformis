@@ -216,6 +216,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def mapping_templates() -> str:
+        """Return packaged mapping templates from PipelineService."""
+        return json.dumps(
+            pipeline.discover_mapping_templates(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def mapping_rejections(
         path: str,
         mapping_plan: str,

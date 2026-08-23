@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 closeout)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -90,12 +90,12 @@ Phase 6.7 stores one static instruction template and unique task phrase per
 goal in the catalog; omitted `instruction-and-output` instructions resolve to
 that template, and a supplied instruction is admitted only after the
 deterministic truthfulness check.
-Phase 7.1 adds `mapping/modes.py` and packaged
-`veriformis.input-mode-discovery/v1`: compiler paths `document-source`,
-`dataset-row`, and `mixed`. Mode is not a taxonomy axis. Item 7.3 makes
-`dataset-row` executable for JSONL: capture, confirmed mapping into the four
-semantic rows, workspace revision v4 with stage `map`, and seal through
-ordinary `ProductRow` v1. `mixed` remains refused until item 7.7.
+Phase 7 adds `mapping/` as the dataset-row compiler path: modes
+`document-source`, `dataset-row`, and `mixed`; confirmed mapping into the four
+semantic rows; workspace revision v4 with stage `map`; JSON/CSV capture;
+rejection reports; and packaged mapping templates. Mode is not a taxonomy
+axis. Imported fields carry `mapped_value` evidence and seal through ordinary
+`ProductRow` v1.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

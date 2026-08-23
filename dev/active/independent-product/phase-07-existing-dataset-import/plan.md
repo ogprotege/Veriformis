@@ -1,6 +1,6 @@
 # Phase 7 Execution Plan
 
-**Status:** In progress; item 7.1 opening
+**Status:** Complete
 
 **Last updated:** 2026-08-23
 
@@ -219,11 +219,11 @@ Roadmap items 3 and 5 begin here: mapping execution includes field provenance fr
 **Branch:** `phase7/10-templates-closeout`  
 **Title:** `Phase 7.10: Add mapping templates and close Phase 7`
 
-- [ ] Packaged versioned mapping templates (`veriformis.mapping-template/v1`) as shareable project artifacts: named, digest-bound, covering the detectors' unique shapes. Surfaces load them through discovery, not constants.
-- [ ] Operator guide: when to use document-source vs dataset-row vs mixed; how confirmation works; partition policy; CSV vs JSONL; what import does not claim (trainers, Parquet, multi-turn, construction).
-- [ ] Judge U1–U7 with current-tree evidence (full mapping suite, round-trip matrix, Mac runtime tests for detect/confirm/preview).
-- [ ] Promote support registry: `existing-dataset-row-mapping` and `mixed-document-and-dataset-project` become implemented only if their gates passed; close `gap-existing-dataset-row-mapping` or leave it open with an explicit remaining bound.
-- [ ] Reconcile contracts, ADRs, evidence index, status, WIP, CLI docs, architecture, CLAUDE.md, packet `closeout.md`. Mark Phase 7 `completed`. Do not start Phase 8, 9, or 13.
+- [x] Packaged versioned mapping templates (`veriformis.mapping-template/v1`) as shareable project artifacts: named, digest-bound, covering the detectors' unique shapes. Surfaces load them through discovery, not constants.
+- [x] Operator guide: when to use document-source vs dataset-row vs mixed; how confirmation works; partition policy; CSV vs JSONL; what import does not claim (trainers, Parquet, multi-turn, construction).
+- [x] Judge U1–U7 with current-tree evidence (full mapping suite, round-trip matrix, Mac runtime tests for detect/confirm/preview).
+- [x] Promote support registry: `existing-dataset-row-mapping` and `mixed-document-and-dataset-project` become implemented only if their gates passed; close `gap-existing-dataset-row-mapping` or leave it open with an explicit remaining bound.
+- [x] Reconcile contracts, ADRs, evidence index, status, WIP, CLI docs, architecture, CLAUDE.md, packet `closeout.md`. Mark Phase 7 `completed`. Do not start Phase 8, 9, or 13.
 
 ## Predeclared usability criteria
 
@@ -243,7 +243,7 @@ Declare these in the packet at 7.1, before mapper UI exists.
 
 Representative `text`, prompt/completion, instruction/input/output, and two-turn message datasets can be imported under explicit confirmed mappings, validated, sealed, generically exported, and semantically round-tripped. Ambiguous or lossy mappings do not auto-publish. Document-source compilation remains unchanged.
 
-**Result:** Not started. This plan is not evidence.
+**Result:** Complete on local admission evidence. See [closeout.md](closeout.md).
 
 ## Non-goals
 

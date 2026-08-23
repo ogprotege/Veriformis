@@ -1,7 +1,7 @@
 {
   "schema_version": "veriformis.support-registry/v1",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-22",
+  "last_reviewed": "2026-08-23",
   "claim_policy": "docs/governance/project-tracking.md",
   "product": {
     "name": "Veriformis",
@@ -333,11 +333,6 @@
     }
   ],
   "known_current_gaps": [
-    {
-      "id": "gap-existing-dataset-row-mapping",
-      "state": "verified-open",
-      "evidence": "docs/analysis/2026-08-11-independent-product-analysis.md"
-    },
     {
       "id": "gap-retained-scale-benchmarks",
       "state": "verified-open",

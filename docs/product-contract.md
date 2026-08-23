@@ -16,17 +16,18 @@ merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
 5.7's operator guidance and closeout merged as PR #59 at
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, completing Phases 0–5; Phase 6
 goal-first recipes and previews complete, closeout merged as PR #67 at
-`6995d17bef0d09f235b1c464e947c38c63dd313d`; version `0.1.0` development
-alpha
+`6995d17bef0d09f235b1c464e947c38c63dd313d`; Phase 7 existing-dataset import
+and mapping complete; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–5 complete; maturity alpha; public Mac claim still owner-gated
+Phases 0–7 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Phase 7 packet opening, beta
-label cut, public-ready checklist, or any product-contract change
+**Next review:** Beta label cut, public-ready checklist, or any
+product-contract change. Do not start Phase 8, 9, or 13 from the Phase 7
+closeout.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 

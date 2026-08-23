@@ -84,7 +84,8 @@ label cut, public-ready checklist, or any contract change
 | [Phase 4 packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export contracts, service, surfaces, adversarial evidence, and closeout | Completed implementation record |
 | [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and closeout | Completed implementation record; item 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and item 5.7 guidance/closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
 | [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal catalog, contracts, previews, presets, preflight, matrix, truthfulness, and closeout | Completed implementation record; item 6.7 merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d` |
-| [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping contracts, and closeout | In progress; item 7.1 opening |
+| [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping contracts, and closeout | Completed implementation record |
+| [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |

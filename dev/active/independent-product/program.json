@@ -87,12 +87,12 @@
     {
       "number": 7,
       "title": "Add first-class existing-dataset import and mapping",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [5, 6],
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
-      "completed_on": null,
-      "next_gate": "Item 7.8 merged as PR #78. Item 7.9 exports row-level mapping rejections as a content-addressed project artifact."
+      "completed_on": "2026-08-23",
+      "next_gate": "Completed; item 7.10 closeout. Do not start Phase 8, 9, or 13 from this packet."
     },
     {
       "number": 8,

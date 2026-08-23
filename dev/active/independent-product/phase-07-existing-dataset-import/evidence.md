@@ -58,3 +58,15 @@ The completion stamp merged as PR #69 at
 - [x] Tampering the report does not change the sealed bundle digest.
 - [x] A corrected source produces a new mapping-plan id.
 - [x] Python, CLI, and MCP write the same report identity.
+
+## Required item 7.10 evidence
+
+- [x] Packaged mapping templates cover the unique detector shapes and are
+      digest-bound.
+- [x] Operator guide `docs/mapping.md` states modes, confirmation, partitions,
+      JSON/CSV, and non-claims.
+- [x] U1–U7 judged against current-tree mapping tests.
+- [x] `gap-existing-dataset-row-mapping` closed. Remaining bounds are later
+      phases, not an open Phase 7 gap.
+- [x] Phase 7 marked completed. Do not start Phase 8, 9, or 13.
+- [x] Core pytest: 1956 passed, 1 deselected, expected transport warning.
