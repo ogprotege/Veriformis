@@ -42,6 +42,7 @@ from veriformis.errors import (
 from veriformis.taxonomy import (
     CANDIDATE_CONSUMER_PROFILES,
     UNEXECUTABLE_CONSUMER_PROFILE_ITEMS,
+    UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS,
 )
 from veriformis.exports.models import (
     ExportConsumerProfile,
@@ -312,6 +313,7 @@ class ExportService:
         self,
         request: _SelectedExportRequest,
     ) -> _ExportImplementation:
+        _refuse_unexecutable_container_id(request.container_id)
         _refuse_unexecutable_consumer_id(request.consumer_id)
         selector = (
             request.container_id,
@@ -1145,6 +1147,16 @@ def _plan_from_source_evidence(
         file_plans=file_plans,
     )
     return plan, row_set
+
+
+def _refuse_unexecutable_container_id(container_id: str) -> None:
+    """Fail closed on planned columnar containers before catalog lookup."""
+    later_item = UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS.get(container_id)
+    if later_item is not None:
+        raise ExportContractError(
+            f"physical container {container_id!r} is planned for item {later_item}; "
+            "generic JSONL, JSON, and constrained CSV remain the executable containers"
+        )
 
 
 def _refuse_unexecutable_consumer_id(consumer_id: str | None) -> None:

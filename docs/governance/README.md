@@ -25,7 +25,8 @@ claims from drifting away from code and evidence.
 | [Completed Phase 5 packet](../../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Generic local export checklist, decisions, risks, evidence, operator guidance, and closeout |
 | [Completed Phase 6 packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal-first checklist, decisions, risks, usability evidence, and closeout |
 | [Completed Phase 7 packet](../../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping, templates, and closeout |
-| [Active Phase 8 packet](../../dev/active/independent-product/phase-08-consumer-profiles/README.md) | First consumer profiles as optional adapters |
+| [Completed Phase 8 packet](../../dev/active/independent-product/phase-08-consumer-profiles/README.md) | First consumer profiles as optional adapters |
+| [Active Phase 9 packet](../../dev/active/independent-product/phase-09-columnar-containers/README.md) | Columnar and Hugging Face dataset containers |
 
 Run the governance drift check with:
 
@@ -45,7 +46,7 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–8 are complete on `main`.
-`trl` and `mlx-lm` are implemented optional adapters; generic export
-discovery still has a null consumer profile. Historical Phase 4–8 merge
-SHAs remain in those packets and in `docs/current-status.md`.
+At this review, independent-product Phases 0–8 are complete on `main` and
+Phase 9 is in progress under item 9.1. `parquet`, `arrow`, and
+`hugging-face-dataset` remain planned. Historical Phase 4–8 merge SHAs
+remain in those packets and in `docs/current-status.md`.

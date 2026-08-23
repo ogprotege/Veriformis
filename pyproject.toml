@@ -33,10 +33,12 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8.0", "ruff==0.16.0"]
-# Isolation extras declared in Phase 8.2. Version ranges live in
-# admission-v1.json. Packages are installed by item 8.5 harnesses, not core.
+# Isolation extras declared in Phase 8.2 and Phase 9.1. Version ranges live
+# in admission or schema pins. Packages are installed by later harnesses,
+# not core.
 trl = []
 mlx-lm = []
+columnar = []
 
 [project.scripts]
 veriformis = "veriformis.cli:main"

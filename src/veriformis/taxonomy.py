@@ -116,6 +116,13 @@ PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "arrow",
     "hugging-face-dataset",
 )
+UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
+    {
+        "parquet": "9.4",
+        "arrow": "9.5",
+        "hugging-face-dataset": "9.6",
+    }
+)
 
 CANONICAL_CONSUMER_PROFILE: Final = "veriformis-canonical-v1"
 IMPLEMENTED_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
@@ -454,6 +461,7 @@ __all__ = [
     "PLANNED_CONSUMER_PROFILE_ITEMS",
     "PLANNED_CONSUMER_PROFILES",
     "UNEXECUTABLE_CONSUMER_PROFILE_ITEMS",
+    "UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS",
     "PLANNED_PHYSICAL_CONTAINERS",
     "PLANNED_TRAINING_FAMILIES",
     "PROFILE_FORBIDDEN_ROW_SCHEMAS",
