@@ -41,9 +41,18 @@ TRL_TRAIN_PATH = "data/train.jsonl"
 TRL_EVALUATION_PATH = "data/evaluation.jsonl"
 TRL_DATA_CARD_PATH = "metadata/dataset-card.json"
 TRL_PROFILE_METADATA_PATH = "metadata/trl-profile.json"
+TRL_LAUNCH_SCHEMA = "veriformis.trl-sft-launch/v1"
+TRL_LAUNCH_PATH = "metadata/trl-sft-launch.json"
 TRL_PROVENANCE_PATH = "metadata/row-provenance.jsonl"
 TRL_README_PATH = "README.md"
 _SUPPORTED_ROW_SCHEMAS = tuple(sorted(V1_ROW_SCHEMA_KINDS))
+_TRL_COMMAND_ARGV = ("trl", "sft", "--dataset_name", "json")
+_TRL_OPERATOR_MUST_SUPPLY = ("model", "sft-training-arguments")
+_TRL_LAUNCH_NOTES = (
+    "Sidecar records DatasetDict data_files for TRL SFTTrainer. "
+    "Veriformis does not launch training, select a model, or set "
+    "hyperparameters."
+)
 
 
 def _trl_pin():
@@ -219,6 +228,7 @@ class TrlDataCard(_StrictTrlModel):
                         self.evaluation_path,
                         self.train_path,
                         TRL_DATA_CARD_PATH,
+                        TRL_LAUNCH_PATH,
                         TRL_PROFILE_METADATA_PATH,
                         self.provenance_path,
                     )
@@ -285,6 +295,94 @@ class TrlProfileMetadata(_StrictTrlModel):
         return self
 
 
+class TrlLaunchDataFiles(_StrictTrlModel):
+    evaluation: Literal["data/evaluation.jsonl"] = TRL_EVALUATION_PATH
+    train: Literal["data/train.jsonl"] = TRL_TRAIN_PATH
+
+
+class TrlSftLaunchSidecar(_StrictTrlModel):
+    schema_version: Literal["veriformis.trl-sft-launch/v1"] = TRL_LAUNCH_SCHEMA
+    command_argv: tuple[
+        Literal["trl"],
+        Literal["sft"],
+        Literal["--dataset_name"],
+        Literal["json"],
+    ] = _TRL_COMMAND_ARGV
+    data_files: TrlLaunchDataFiles
+    destination_format: str
+    destination_keys: tuple[str, ...]
+    docs_reviewed_on: str
+    evaluation_row_count: int
+    executable_item: Literal["8.6"] = "8.6"
+    huggingface_builder: Literal["json"] = "json"
+    launches_training: Literal[False] = False
+    mapping_kind: str
+    notes: Literal[_TRL_LAUNCH_NOTES] = _TRL_LAUNCH_NOTES
+    operator_must_supply: tuple[
+        Literal["model"],
+        Literal["sft-training-arguments"],
+    ] = _TRL_OPERATOR_MUST_SUPPLY
+    primary_docs_url: str
+    profile_id: Literal["trl"] = TRL_CONSUMER_ID
+    profile_version: Literal[1] = TRL_PROFILE_VERSION
+    row_schema: str
+    selects_hyperparameters: Literal[False] = False
+    selects_model: Literal[False] = False
+    train_row_count: int
+    use_eval_dataset: bool
+
+    @field_validator("row_schema")
+    @classmethod
+    def _valid_row_schema(cls, value: str) -> str:
+        if value not in V1_ROW_SCHEMA_KINDS:
+            raise ValueError("launch sidecar names an unsupported row schema")
+        return value
+
+    @field_validator(
+        "command_argv",
+        "destination_keys",
+        "operator_must_supply",
+        mode="before",
+    )
+    @classmethod
+    def _tuple_fields(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("train_row_count", "evaluation_row_count")
+    @classmethod
+    def _valid_count(cls, value: int) -> int:
+        if type(value) is not int or value < 0:
+            raise ValueError("launch sidecar row counts must be non-negative integers")
+        return value
+
+    @model_validator(mode="after")
+    def _closed(self) -> Self:
+        if self.train_row_count < 1:
+            raise ValueError("launch sidecar requires a non-empty train partition")
+        if self.use_eval_dataset is not (self.evaluation_row_count > 0):
+            raise ValueError(
+                "use_eval_dataset must match a nonempty evaluation partition"
+            )
+        if self.command_argv != _TRL_COMMAND_ARGV:
+            raise ValueError("TRL launch command_argv is not the dataset-only fragment")
+        if self.operator_must_supply != _TRL_OPERATOR_MUST_SUPPLY:
+            raise ValueError("TRL launch operator_must_supply is not closed")
+        pin = _trl_pin()
+        if (
+            self.primary_docs_url != pin.primary_docs_url
+            or self.docs_reviewed_on != pin.docs_reviewed_on
+        ):
+            raise ValueError("TRL launch sidecar docs differ from the admission pin")
+        mapping = _mapping_for(self.row_schema)
+        if (
+            self.mapping_kind != mapping.mapping_kind
+            or self.destination_format != mapping.destination_format
+            or self.destination_keys != mapping.destination_keys
+        ):
+            raise ValueError("TRL launch mapping differs from the admission pin")
+        return self
+
+
 def _payload_jsonl(row_schema: str, rows: Sequence[ProductRow]) -> bytes:
     return b"".join(
         lossless_json_bytes(map_trl_payload(row_schema, row.payload)) + b"\n"
@@ -341,6 +439,25 @@ def _profile_metadata(row_set: RowSet) -> TrlProfileMetadata:
     )
 
 
+def _launch_sidecar(row_set: RowSet) -> TrlSftLaunchSidecar:
+    pin = _trl_pin()
+    mapping = _mapping_for(row_set.row_schema)
+    return TrlSftLaunchSidecar(
+        command_argv=_TRL_COMMAND_ARGV,
+        data_files=TrlLaunchDataFiles(),
+        destination_format=mapping.destination_format,
+        destination_keys=mapping.destination_keys,
+        docs_reviewed_on=pin.docs_reviewed_on,
+        evaluation_row_count=row_set.evaluation_row_count,
+        mapping_kind=mapping.mapping_kind,
+        operator_must_supply=_TRL_OPERATOR_MUST_SUPPLY,
+        primary_docs_url=pin.primary_docs_url,
+        row_schema=row_set.row_schema,
+        train_row_count=row_set.train_row_count,
+        use_eval_dataset=row_set.evaluation_row_count > 0,
+    )
+
+
 def _readme_bytes(card: TrlDataCard) -> bytes:
     mapping = _mapping_for(card.row_schema)
     text = (
@@ -362,8 +479,10 @@ def _readme_bytes(card: TrlDataCard) -> bytes:
         f"- Source row set: `{card.row_set_id}`\n\n"
         "Load the partitions as a Hugging Face `DatasetDict` with explicit "
         "`data_files` for `train` and `evaluation`. Do not glob `metadata/` "
-        "into the loader. Loader conformance is item 8.5; this export does "
-        "not claim that TRL has loaded the files.\n\n"
+        "into the loader. The launch sidecar at `metadata/trl-sft-launch.json` "
+        "repeats those dataset paths. Veriformis does not launch `trl sft`, "
+        "select a model, or set hyperparameters. Loader conformance is item "
+        "8.5; this export does not claim that TRL has loaded the files.\n\n"
         "Preference, prompt-only, stepwise-supervision, tools, unpaired "
         "preference, and vision types are refused. `round_trip` is false.\n"
     )
@@ -373,6 +492,7 @@ def _readme_bytes(card: TrlDataCard) -> bytes:
 def _rendered_files(row_set: RowSet) -> tuple[tuple[str, bytes], ...]:
     card = _data_card(row_set)
     metadata = _profile_metadata(row_set)
+    launch = _launch_sidecar(row_set)
     files = {
         TRL_README_PATH: _readme_bytes(card),
         TRL_EVALUATION_PATH: _payload_jsonl(
@@ -380,6 +500,7 @@ def _rendered_files(row_set: RowSet) -> tuple[tuple[str, bytes], ...]:
         ),
         TRL_TRAIN_PATH: _payload_jsonl(row_set.row_schema, row_set.train_rows),
         TRL_DATA_CARD_PATH: card.canonical_bytes(),
+        TRL_LAUNCH_PATH: launch.canonical_bytes(),
         TRL_PROFILE_METADATA_PATH: metadata.canonical_bytes(),
         TRL_PROVENANCE_PATH: _provenance_jsonl(row_set.provenance),
     }
@@ -405,6 +526,7 @@ def _file_plans(
         TRL_EVALUATION_PATH: "evaluation-partition",
         TRL_TRAIN_PATH: "training-partition",
         TRL_DATA_CARD_PATH: "dataset-card",
+        TRL_LAUNCH_PATH: "config-sidecar",
         TRL_PROFILE_METADATA_PATH: "consumer-profile-metadata",
         TRL_PROVENANCE_PATH: "row-provenance",
     }
@@ -413,6 +535,7 @@ def _file_plans(
         TRL_EVALUATION_PATH: "application/jsonl",
         TRL_TRAIN_PATH: "application/jsonl",
         TRL_DATA_CARD_PATH: "application/json",
+        TRL_LAUNCH_PATH: "application/json",
         TRL_PROFILE_METADATA_PATH: "application/json",
         TRL_PROVENANCE_PATH: "application/jsonl",
     }
@@ -495,6 +618,8 @@ __all__ = [
     "TRL_DESCRIPTOR",
     "TRL_EVALUATION_PATH",
     "TRL_IMPLEMENTATION",
+    "TRL_LAUNCH_PATH",
+    "TRL_LAUNCH_SCHEMA",
     "TRL_PROFILE_METADATA_PATH",
     "TRL_PROFILE_METADATA_SCHEMA",
     "TRL_PROFILE_VERSION",
@@ -502,6 +627,8 @@ __all__ = [
     "TRL_README_PATH",
     "TRL_TRAIN_PATH",
     "TrlDataCard",
+    "TrlLaunchDataFiles",
     "TrlProfileMetadata",
+    "TrlSftLaunchSidecar",
     "map_trl_payload",
 ]

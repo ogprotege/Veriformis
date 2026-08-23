@@ -5,19 +5,21 @@ append-only history.
 
 **Updated:** 2026-08-23
 
-**Local branch:** about to create `phase8/05-conformance-harness` from `main`
+**Local branch:** `phase8/06-profile-sidecars` from `main`
 
-**Predecessor:** Item 8.4 merged as PR #85 at
-`056a0754f162242b1eddc0fda447bdac51cf9f0c`. Local `main` equals `origin/main`.
+**Predecessor:** Item 8.5 merged as PR #86 at
+`0797308ad440e7eec4d0a075099b7e2513ee9754` after all 16 GitHub checks
+passed. Local `main` equals `origin/main`.
 
-**Completed:** 8.1 PR #82, 8.2 PR #83, 8.3 PR #84, 8.4 PR #85
+**Completed:** 8.1 PR #82, 8.2 PR #83, 8.3 PR #84, 8.4 PR #85, 8.5 PR #86
 
-**Current item:** 8.5 Isolated conformance harnesses
+**Current item:** 8.6 Ship config sidecars
 
-**Not started:** 8.6 sidecars, 8.7 closeout. Do not start Phase 9, 10, or 13.
+**Not started:** 8.7 discovery truthfulness and Phase 8 closeout. Do not
+start Phase 9, 10, or 13.
 
-**8.5 design:** Core tests exercise the official TRL/MLX-LM *schema path*
-(column names, filenames, Dataset.from_list-compatible dicts) without
-installing torch/mlx. Optional `profile_integration` tests skip unless the
-extra is installed. Optional CI job is `continue-on-error` like Aptus.
-Extras stay empty lists so `uv lock` does not pull trainer wheels into core.
+**8.6 design:** Emit profile-specific launch JSON beside each export
+(`metadata/trl-sft-launch.json`, `metadata/mlx-lm-lora-launch.json`).
+Dataset paths and documented flags only. `launches_training` is false.
+No model selection, no hyperparameters, no subprocess. Taxonomy remains
+planned.

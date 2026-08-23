@@ -32,12 +32,14 @@ from veriformis.profiles.mlx_lm import (
     MLX_LM_CONSUMER_ID,
     MLX_LM_DATA_CARD_PATH,
     MLX_LM_EVALUATION_PATH,
+    MLX_LM_LAUNCH_PATH,
     MLX_LM_PROFILE_METADATA_PATH,
     MLX_LM_PROFILE_VERSION,
     MLX_LM_PROVENANCE_PATH,
     MLX_LM_README_PATH,
     MLX_LM_TRAIN_PATH,
     MlxLmDataCard,
+    MlxLmLoraLaunchSidecar,
     MlxLmProfileMetadata,
     map_mlx_lm_payload,
 )
@@ -242,6 +244,13 @@ def test_mlx_lm_render_maps_every_schema_without_changing_counts(tmp_path: Path)
         assert b"does not claim that mlx-lm has loaded" in files[MLX_LM_README_PATH]
         assert b"test.jsonl" in files[MLX_LM_README_PATH]
         assert meta.emits_test_jsonl is False
+        launch = MlxLmLoraLaunchSidecar.from_json_bytes(files[MLX_LM_LAUNCH_PATH])
+        assert launch.launches_training is False
+        assert launch.selects_model is False
+        assert launch.selects_hyperparameters is False
+        assert launch.valid_path == MLX_LM_EVALUATION_PATH
+        assert launch.test_path is None
+        assert launch.mask_prompt_supported is (row_schema != "text")
 
 
 def test_mlx_lm_publishes_and_verifies_the_text_fixture(tmp_path: Path) -> None:
@@ -270,6 +279,7 @@ def test_mlx_lm_publishes_and_verifies_the_text_fixture(tmp_path: Path) -> None:
         MLX_LM_TRAIN_PATH,
         MLX_LM_EVALUATION_PATH,
         MLX_LM_DATA_CARD_PATH,
+        MLX_LM_LAUNCH_PATH,
         MLX_LM_PROFILE_METADATA_PATH,
         MLX_LM_PROVENANCE_PATH,
         "export-receipt.json",
@@ -331,9 +341,13 @@ def test_empty_evaluation_omits_valid_jsonl(tmp_path: Path) -> None:
     files = dict(mlx_module._rendered_files(empty))
     assert MLX_LM_TRAIN_PATH in files
     assert MLX_LM_EVALUATION_PATH not in files
+    assert MLX_LM_LAUNCH_PATH in files
     card = MlxLmDataCard.from_json_bytes(files[MLX_LM_DATA_CARD_PATH])
     assert card.evaluation_path is None
     assert card.evaluation_row_count == 0
+    launch = MlxLmLoraLaunchSidecar.from_json_bytes(files[MLX_LM_LAUNCH_PATH])
+    assert launch.valid_path is None
+    assert launch.launches_training is False
     plans = mlx_module._file_plans(mlx_module.MLX_LM_DESCRIPTOR, empty)
     assert {item.path for item in plans} == set(files)
     assert {item.membership_scope for item in plans if item.membership_scope != "none"} == {

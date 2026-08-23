@@ -115,8 +115,8 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | Recipes / YAML | `tests/recipes/` |
 | MCP parity | `tests/mcp/` |
 | Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
-| Planned consumer-profile admission pins | `tests/profiles/` |
-| Optional TRL/MLX-LM loader checks | `profile_integration` marker (none until item 8.5) |
+| Consumer-profile adapters, harnesses, and sidecars | `tests/profiles/` |
+| Optional TRL/MLX-LM loader checks | `profile_integration` marker; optional CI job |
 | Finished seal / verifier | `tests/bundle/` |
 | Verified export models, membership, publication, API, and adapter parity | `tests/exports/`, `tests/contracts/test_verified_export_contract.py`, `tests/regressions/fixtures/phase4/export-surfaces.json` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |

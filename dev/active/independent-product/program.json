@@ -102,7 +102,7 @@
       "packet": "dev/active/independent-product/phase-08-consumer-profiles",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 8.5: isolated schema harnesses and optional profile-integration CI."
+      "next_gate": "Item 8.6: profile-specific config/launch sidecars without launching training."
     },
     {
       "number": 9,

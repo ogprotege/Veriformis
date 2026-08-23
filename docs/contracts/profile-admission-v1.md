@@ -46,9 +46,9 @@ those packages into isolated harnesses.
 
 ## Non-goals
 
-Trainer file emission (8.3, 8.4), loader conformance (8.5), config sidecars
-(8.6), promoting records to `implemented` (8.7), Parquet/Arrow, and Aptus as
-a common profile.
+Promoting records to `implemented` (8.7), Parquet/Arrow, and Aptus as a
+common profile. Emission (8.3, 8.4), loader conformance (8.5), and config
+sidecars (8.6) are later items relative to this pin contract.
 
 ## Discovery
 

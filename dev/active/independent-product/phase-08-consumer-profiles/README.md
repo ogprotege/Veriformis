@@ -31,8 +31,9 @@ launcher.
 
 Item 8.1 opened the packet and published ADR-0012. Item 8.2 pins official
 TRL and MLX-LM admission records as packaged data with empty extras. Item
-8.3 emits the TRL SFT adapter. Taxonomy `trl` remains planned. MLX-LM is
-not executable.
+8.3 emits the TRL SFT adapter. Item 8.4 emits the MLX-LM LoRA adapter.
+Item 8.5 adds official-schema harnesses. Item 8.6 emits launch sidecars.
+Taxonomy remains planned.
 
 ## Packet contents
 
@@ -48,6 +49,6 @@ not executable.
 
 ## Current state
 
-Item 8.3 merged as PR #84. Item 8.4 emits the MLX-LM LoRA adapter. Taxonomy
-remains planned. Generic export selectors stay `consumer_id` null. Empty
-extras do not install trainer packages.
+Item 8.5 merged as PR #86. Item 8.6 emits TRL and MLX-LM launch sidecars
+beside the export. Sidecars do not launch training. Taxonomy remains
+planned. Generic export selectors stay `consumer_id` null.

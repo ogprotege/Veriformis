@@ -599,8 +599,9 @@ canonical `json`, and `constrained-csv`, all version 1, `portable_exact_bytes`,
 and with no consumer profile, plus the optional TRL SFT adapter
 (`split-jsonl-directory` v1 with `consumer_id=trl` v1). Split JSONL, canonical
 JSON, and the TRL and MLX-LM adapters support all four current row schemas;
-constrained CSV supports the three flat schemas only. The adapters do not
-claim loader conformance (item 8.5).
+constrained CSV supports the three flat schemas only. The adapters emit
+dataset-only launch sidecars and do not launch training. Taxonomy remains
+planned until item 8.7.
 Tests may also inject the bounded conformance implementation used for the
 historical cross-surface evidence; that remains private test code.
 
