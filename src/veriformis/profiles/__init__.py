@@ -1,4 +1,4 @@
-"""Consumer-profile admission pins. Emission belongs to later Phase 8 items."""
+"""Consumer-profile admission pins and TRL/MLX-LM export adapters."""
 
 from veriformis.profiles.admission import (
     ADMISSION_DATA_NAME,

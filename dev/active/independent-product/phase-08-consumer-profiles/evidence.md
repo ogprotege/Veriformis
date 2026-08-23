@@ -1,6 +1,6 @@
 # Phase 8 Evidence
 
-**Status:** Open — item 8.2 admission pins
+**Status:** Open — item 8.7 closeout
 
 **Opened:** 2026-08-23
 
@@ -79,3 +79,15 @@ Active-doc continuity merged as PR #81 at
 - [x] Focused tests: 17 passed. Tracking, Ruff, lock, and diff check
       passed. Core pytest: 1996 passed, 3 deselected, expected transport
       warning.
+- [x] Item 8.6 merged as PR #87 at `2381802` after all 16 GitHub checks.
+
+## Required item 8.7 evidence
+
+- [x] Taxonomy and support-registry list `trl` and `mlx-lm` as implemented.
+- [x] Admission discovery names accepted, transformed, and rejected goals/rows.
+- [x] System roles, extra assistant turns, nested content, and refused types
+      fail in Veriformis.
+- [x] One bundle exports to both profiles with identical membership.
+- [x] U1–U7 judged in closeout.md.
+- [x] Tracking, Ruff, and diff check passed. Core pytest: 2001 passed,
+      3 deselected, expected transport warning.

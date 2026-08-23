@@ -300,4 +300,6 @@ def test_phase5_generic_containers_are_the_only_promoted_exports() -> None:
     assert IMPLEMENTED_CONSUMER_PROFILES == (
         "veriformis-canonical-v1",
         "aptus-handoff-v1",
+        "trl",
+        "mlx-lm",
     )

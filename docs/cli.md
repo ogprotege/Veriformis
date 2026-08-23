@@ -600,8 +600,8 @@ and with no consumer profile, plus the optional TRL SFT adapter
 (`split-jsonl-directory` v1 with `consumer_id=trl` v1). Split JSONL, canonical
 JSON, and the TRL and MLX-LM adapters support all four current row schemas;
 constrained CSV supports the three flat schemas only. The adapters emit
-dataset-only launch sidecars and do not launch training. Taxonomy remains
-planned until item 8.7.
+dataset-only launch sidecars and do not launch training. Taxonomy lists
+`trl` and `mlx-lm` as implemented optional adapters.
 Tests may also inject the bounded conformance implementation used for the
 historical cross-surface evidence; that remains private test code.
 
@@ -791,7 +791,7 @@ MCP, YAML, Python, and the workbench. See the
 
 ### `profile-admissions`
 
-Print planned TRL and MLX-LM admission pins as read-only JSON.
+Print implemented TRL and MLX-LM admission pins as read-only JSON.
 
 ```text
 veriformis profile-admissions
@@ -800,9 +800,10 @@ veriformis profile-admissions
 The output is the exact packaged `veriformis.profile-admission-discovery/v1`
 data that `PipelineService` and MCP `profile_admissions` also emit. Each
 record pins official docs, a review date, license, empty extra name, version
-range, admitted row schemas, refused dataset types, partition mapping, and
-row mappings. Both records remain `planned`. The command does not emit
-trainer files and does not import TRL or MLX-LM. See
+range, admitted and transformed row schemas, accepted and rejected goals,
+refused dataset types, partition mapping, and row mappings. Both records
+are `implemented`. The command does not launch training and does not import
+TRL or MLX-LM. See
 [Consumer Profile Admission v1](contracts/profile-admission-v1.md).
 
 ### `preflight`

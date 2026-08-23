@@ -35,14 +35,13 @@ as PR #60 through PR #65 and PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is
 complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 #71 through PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all
-14 GitHub checks passed. Phase 8 consumer profiles are in progress under
-item 8.6: TRL SFT and MLX-LM LoRA adapters are executable with official-schema
-harnesses and dataset-only launch sidecars. The exporter does not launch
-training. Taxonomy remains planned.
+14 GitHub checks passed. Phase 8 consumer profiles are complete: TRL SFT and
+MLX-LM LoRA are implemented optional adapters with official-schema harnesses
+and dataset-only launch sidecars. The exporter does not launch training.
 
-**Review date:** 2026-08-23 (independent-product Phase 8.6 launch sidecars)
+**Review date:** 2026-08-23 (independent-product Phase 8.7 closeout)
 
-**Next review:** Phase 8.6 pull-request merge, item 8.7, beta label cut,
+**Next review:** Phase 8.7 pull-request merge, beta label cut,
 public-ready checklist, or any contract change. Do not start Phase 9, 10,
 or 13 from this packet.
 
@@ -383,7 +382,7 @@ The installed console entry point is `veriformis`.
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
-| `profile-admissions` | Prints planned TRL and MLX-LM admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not emit trainer files |
+| `profile-admissions` | Prints implemented TRL and MLX-LM admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not launch training |
 | `mapping-templates` | Prints packaged mapping templates (`veriformis.mapping-template-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_templates` |
 | `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL, JSON, or compatible CSV file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
 | `mapping-preview PATH --plan PLAN.json` | Walks the full captured file and reports per-row accept/reject samples without writing a workspace | Runtime-only `veriformis.mapping-preview/v1` JSON; 64 KiB sample / 256 KiB response bounds |
@@ -407,10 +406,10 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy, goal-catalog, and planned profile-admission discovery, raw-source compile preflight, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
-| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy, goal-catalog, and planned profile-admission JSON, compile preflight, and canonical verified-export responses |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy, goal-catalog, and implemented profile-admission discovery, raw-source compile preflight, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy, goal-catalog, and implemented profile-admission JSON, compile preflight, and canonical verified-export responses |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
-| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, planned profile-admission, compile-preflight, and verified-export service operations |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, implemented profile-admission, compile-preflight, and verified-export service operations |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
 | macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, strict goal-catalog, pre-workspace compile-preflight, and post-compile goal-preview screens, and a strict canonical verified-export bridge |
 
@@ -726,8 +725,9 @@ See [docs/release.md](release.md).
 | Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
 | Completed independent Phase 6 | Goal catalog, contracts, preview, presets, preflight, acceptance matrix, instruction truthfulness; closeout PR #67 at `6995d17bef` |
 | Completed independent Phase 7 | Existing-dataset import/mapping: modes, contracts, JSONL/JSON/CSV capture, confirmation, provenance, preview, partitions, rejections, templates; closeout PR #80 at `b7bb7f0c2046` after all 14 GitHub checks passed |
+| Completed independent Phase 8 | TRL SFT and MLX-LM LoRA optional adapters, admission pins, official-schema harnesses, dataset-only launch sidecars, discovery truthfulness; items 8.1–8.6 merged as PR #82–#87 |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–7 complete and Phase 8 in progress under its [Phase 8 packet](../dev/active/independent-product/phase-08-consumer-profiles/README.md) |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–8 complete under the [Phase 8 packet](../dev/active/independent-product/phase-08-consumer-profiles/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

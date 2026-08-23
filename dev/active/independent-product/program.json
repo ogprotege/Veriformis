@@ -97,12 +97,12 @@
     {
       "number": 8,
       "title": "Implement the first consumer profiles",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [3, 4, 5, 6],
       "packet": "dev/active/independent-product/phase-08-consumer-profiles",
       "started_on": "2026-08-23",
-      "completed_on": null,
-      "next_gate": "Item 8.6: profile-specific config/launch sidecars without launching training."
+      "completed_on": "2026-08-23",
+      "next_gate": "Completed; closeout is item 8.7. Phase 9 may begin under its own standard packet when the operator asks."
     },
     {
       "number": 9,

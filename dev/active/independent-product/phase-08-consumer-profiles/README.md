@@ -1,10 +1,10 @@
 # Phase 8 — First Consumer Profiles
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-23
 
-**Completed:**
+**Completed:** 2026-08-23
 
 **Roadmap phase:** [Phase 8](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-8--implement-the-first-consumer-profiles)
 
@@ -33,7 +33,7 @@ Item 8.1 opened the packet and published ADR-0012. Item 8.2 pins official
 TRL and MLX-LM admission records as packaged data with empty extras. Item
 8.3 emits the TRL SFT adapter. Item 8.4 emits the MLX-LM LoRA adapter.
 Item 8.5 adds official-schema harnesses. Item 8.6 emits launch sidecars.
-Taxonomy remains planned.
+Item 8.7 promotes taxonomy to implemented.
 
 ## Packet contents
 
@@ -49,6 +49,7 @@ Taxonomy remains planned.
 
 ## Current state
 
-Item 8.5 merged as PR #86. Item 8.6 emits TRL and MLX-LM launch sidecars
-beside the export. Sidecars do not launch training. Taxonomy remains
-planned. Generic export selectors stay `consumer_id` null.
+Item 8.7 promotes `trl` and `mlx-lm` to implemented, names accepted,
+transformed, and rejected goals and rows, and closes Phase 8. Generic
+export selectors stay `consumer_id` null. Do not start Phase 9, 10, or 13
+from this packet.

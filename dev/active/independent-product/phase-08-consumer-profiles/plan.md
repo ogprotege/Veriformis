@@ -1,6 +1,6 @@
 # Phase 8 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-23
 
@@ -132,9 +132,9 @@ integrations.
 **Branch:** `phase8/07-discovery-closeout`
 **Title:** `Phase 8.7: Tell the truth in discovery and close Phase 8`
 
-- [ ] Discovery states exactly which goals/rows are accepted, transformed, or rejected.
-- [ ] Partition, empty-eval, Unicode, nested messages, system roles, multi-assistant, and schema-refusal tests.
-- [ ] Promote `trl` and `mlx-lm` to implemented. Closeout. Do not start Phase 9, 10, or 13.
+- [x] Discovery states exactly which goals/rows are accepted, transformed, or rejected.
+- [x] Partition, empty-eval, Unicode, nested messages, system roles, multi-assistant, and schema-refusal tests.
+- [x] Promote `trl` and `mlx-lm` to implemented. Closeout. Do not start Phase 9, 10, or 13.
 
 ## Usability criteria
 
@@ -154,4 +154,4 @@ Each profile's golden dataset loads in its pinned consumer; incompatibles fail
 in Veriformis first; one bundle exports to both without changing membership or
 targets. Core tests still pass without trainer extras.
 
-**Result:** Pending. See [closeout.md](closeout.md).
+**Result:** Passed. See [closeout.md](closeout.md).

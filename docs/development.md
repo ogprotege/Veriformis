@@ -92,7 +92,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | `src/veriformis/recipes/` | Named recipes, statistics, YAML pipeline runner |
 | `src/veriformis/handoff/` | Aptus handoff v1 build and consumer verification |
 | `src/veriformis/mcp/` | Constrained local MCP adapter, including canonical verified-export tools over `PipelineService` |
-| `src/veriformis/profiles/` | Planned TRL and MLX-LM admission pins; empty extras; not executable |
+| `src/veriformis/profiles/` | Implemented TRL and MLX-LM admission pins and adapters; empty extras |
 | `macos/` | SwiftUI workbench and strict verified-export bridge (CLI shell) |
 | `src/veriformis/serializers/` | Legacy M1 serializers and chat templates |
 | `src/veriformis/validate/` | Legacy and shared gate helpers |

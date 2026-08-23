@@ -5,21 +5,18 @@ append-only history.
 
 **Updated:** 2026-08-23
 
-**Local branch:** `phase8/06-profile-sidecars` from `main`
+**Local branch:** `phase8/07-discovery-closeout` from `main`
 
-**Predecessor:** Item 8.5 merged as PR #86 at
-`0797308ad440e7eec4d0a075099b7e2513ee9754` after all 16 GitHub checks
-passed. Local `main` equals `origin/main`.
+**Predecessor:** Item 8.6 merged as PR #87 at
+`2381802ff62ca9019bc1c1d1cedbb7134a7df2d2`. Local `main` equals
+`origin/main`.
 
-**Completed:** 8.1 PR #82, 8.2 PR #83, 8.3 PR #84, 8.4 PR #85, 8.5 PR #86
+**Completed:** 8.1–8.6 as PR #82–#87
 
-**Current item:** 8.6 Ship config sidecars
+**Current item:** 8.7 Discovery truthfulness and Phase 8 closeout
+(uncommitted closeout on this branch)
 
-**Not started:** 8.7 discovery truthfulness and Phase 8 closeout. Do not
-start Phase 9, 10, or 13.
+**Do not start:** Phase 9, 10, or 13.
 
-**8.6 design:** Emit profile-specific launch JSON beside each export
-(`metadata/trl-sft-launch.json`, `metadata/mlx-lm-lora-launch.json`).
-Dataset paths and documented flags only. `launches_training` is false.
-No model selection, no hyperparameters, no subprocess. Taxonomy remains
-planned.
+**Local gates:** Core pytest 2001 passed, 3 deselected. Tracking and Ruff
+passed.

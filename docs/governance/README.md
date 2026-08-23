@@ -45,9 +45,7 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–7 are complete on `main` and
-Phase 8 is in progress under item 8.2. Item 8.1 merged as PR #82 at
-`799d56f` after all 14 GitHub checks passed. `trl` and `mlx-lm` remain
-planned with packaged admission pins; generic export discovery still has a
-null consumer profile. Historical Phase 4–7 merge SHAs remain in those
-packets and in `docs/current-status.md`.
+At this review, independent-product Phases 0–8 are complete on `main`.
+`trl` and `mlx-lm` are implemented optional adapters; generic export
+discovery still has a null consumer profile. Historical Phase 4–8 merge
+SHAs remain in those packets and in `docs/current-status.md`.

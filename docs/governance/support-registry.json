@@ -308,13 +308,27 @@
     },
     {
       "profile": "trl",
-      "state": "planned",
-      "roadmap_phase": 8
+      "state": "implemented",
+      "product_role": "optional-export-adapter",
+      "evidence": [
+        "src/veriformis/profiles/trl.py",
+        "docs/contracts/trl-export-v1.md",
+        "tests/profiles/test_trl.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ]
     },
     {
       "profile": "mlx-lm",
-      "state": "planned",
-      "roadmap_phase": 8
+      "state": "implemented",
+      "product_role": "optional-export-adapter",
+      "evidence": [
+        "src/veriformis/profiles/mlx_lm.py",
+        "docs/contracts/mlx-lm-export-v1.md",
+        "tests/profiles/test_mlx_lm.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ]
     },
     {
       "profile": "axolotl",

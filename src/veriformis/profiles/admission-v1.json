@@ -3,6 +3,13 @@
   "contract_version": 1,
   "records": [
     {
+      "accepted_goals": [
+        "before_after_transformation",
+        "continuation",
+        "full_text",
+        "section_reconstruction",
+        "structured_field"
+      ],
       "admitted_row_schemas": [
         "instruction_output",
         "messages",
@@ -31,6 +38,7 @@
         "unpaired-preference",
         "vision"
       ],
+      "rejected_goals": [],
       "round_trip": false,
       "row_mappings": [
         {
@@ -72,11 +80,21 @@
           "source_row_schema": "text"
         }
       ],
-      "state": "planned",
+      "state": "implemented",
+      "transformed_row_schemas": [
+        "instruction_output"
+      ],
       "version_range": ">=0.15.0,<1.0.0",
       "workflow": "Export a verified Veriformis bundle as TRL SFT Dataset or DatasetDict-compatible local JSON without preference, stepwise, tools, or vision types."
     },
     {
+      "accepted_goals": [
+        "before_after_transformation",
+        "continuation",
+        "full_text",
+        "section_reconstruction",
+        "structured_field"
+      ],
       "admitted_row_schemas": [
         "instruction_output",
         "messages",
@@ -105,6 +123,7 @@
         "unpaired-preference",
         "vision"
       ],
+      "rejected_goals": [],
       "round_trip": false,
       "row_mappings": [
         {
@@ -146,7 +165,10 @@
           "source_row_schema": "text"
         }
       ],
-      "state": "planned",
+      "state": "implemented",
+      "transformed_row_schemas": [
+        "instruction_output"
+      ],
       "version_range": ">=0.22.0,<1.0.0",
       "workflow": "Export a verified Veriformis bundle as an mlx-lm LoRA data directory with required train.jsonl and optional valid.jsonl. mlx-lm test.jsonl is the --test file and is not mapped from Veriformis evaluation."
     }

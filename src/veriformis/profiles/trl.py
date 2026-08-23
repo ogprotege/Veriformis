@@ -30,7 +30,10 @@ from veriformis.exports.split_jsonl import (
     SPLIT_JSONL_CONTAINER_VERSION,
 )
 from veriformis.identity import lossless_json_bytes, sha256_digest, validate_id
-from veriformis.profiles.admission import profile_admission_catalog
+from veriformis.profiles.admission import (
+    profile_admission_catalog,
+    require_profile_messages_payload,
+)
 from veriformis.taxonomy import LOSS_POLICY_IDS, loss_policy_for_row
 
 TRL_CONSUMER_ID = "trl"
@@ -77,6 +80,8 @@ def map_trl_payload(row_schema: str, payload: Mapping[str, Any]) -> dict[str, An
     """Map one verified payload onto TRL SFT columns. Does not change membership."""
     mapping = _mapping_for(row_schema)
     if mapping.mapping_kind == "identity":
+        if row_schema == "messages":
+            require_profile_messages_payload(payload)
         mapped = dict(payload)
     elif mapping.mapping_kind == "assemble-prompt":
         instruction = payload["instruction"]
@@ -261,7 +266,7 @@ class TrlProfileMetadata(_StrictTrlModel):
     loader: str
     loss_notes: str
     executable_item: Literal["8.3"] = "8.3"
-    taxonomy_state: Literal["planned"] = "planned"
+    taxonomy_state: Literal["implemented"] = "implemented"
     trainer_compatibility_claimed: Literal[False] = False
 
     @field_validator("destination_keys", "refused_dataset_types", mode="before")

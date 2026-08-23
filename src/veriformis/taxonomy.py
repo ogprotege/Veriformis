@@ -121,17 +121,21 @@ CANONICAL_CONSUMER_PROFILE: Final = "veriformis-canonical-v1"
 IMPLEMENTED_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     CANONICAL_CONSUMER_PROFILE,
     "aptus-handoff-v1",
-)
-PLANNED_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "trl",
     "mlx-lm",
 )
-PLANNED_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
+IMPLEMENTED_EXPORT_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
+    "trl",
+    "mlx-lm",
+)
+EXPORT_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
     {
         "trl": "8.3",
         "mlx-lm": "8.4",
     }
 )
+PLANNED_CONSUMER_PROFILES: Final[tuple[str, ...]] = ()
+PLANNED_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
 UNEXECUTABLE_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
 CANDIDATE_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "axolotl",
@@ -218,6 +222,8 @@ PROFILE_FORBIDDEN_ROW_SCHEMAS: Final[Mapping[str, tuple[str, ...]]] = MappingPro
     {
         CANONICAL_CONSUMER_PROFILE: (),
         "aptus-handoff-v1": ("text",),
+        "mlx-lm": (),
+        "trl": (),
     }
 )
 
@@ -434,6 +440,8 @@ __all__ = [
     "EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES",
     "EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES",
     "IMPLEMENTED_CONSUMER_PROFILES",
+    "IMPLEMENTED_EXPORT_CONSUMER_PROFILES",
+    "EXPORT_CONSUMER_PROFILE_ITEMS",
     "IMPLEMENTED_INPUT_FAMILIES",
     "INPUT_FAMILY_PARSERS",
     "INPUT_FAMILY_SUFFIXES",

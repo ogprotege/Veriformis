@@ -298,7 +298,7 @@ def create_mcp_server(
 
     @server.tool()
     def profile_admissions() -> str:
-        """Return planned consumer-profile admission pins from PipelineService."""
+        """Return implemented TRL and MLX-LM admission pins from PipelineService."""
         return json.dumps(
             pipeline.discover_profile_admissions(),
             ensure_ascii=False,
