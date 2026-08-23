@@ -69,3 +69,19 @@ intentional transport durability warning.
 
 **Next action:** Publish the item 8.4 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 8.5.
+
+## 2026-08-23 — Item 8.4 merged; item 8.5 in progress
+
+**Status:** Item 8.4 merged as PR #85 at
+`056a0754f162242b1eddc0fda447bdac51cf9f0c` after all 14 GitHub checks
+passed.
+
+Item 8.5 adds an official-schema harness (Dataset.from_list-compatible
+dicts, mlx-lm filenames) without installing trainer wheels. Optional
+`profile_integration` tests skip unless extras are present. Optional CI
+job is continue-on-error.
+
+Core pytest passed 1992 with 3 deselected. Tracking and Ruff passed.
+
+**Next action:** Publish the item 8.5 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 8.6.

@@ -102,7 +102,7 @@
       "packet": "dev/active/independent-product/phase-08-consumer-profiles",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 8.4: emit the MLX-LM LoRA profile; keep taxonomy planned; do not import mlx-lm."
+      "next_gate": "Item 8.5: isolated schema harnesses and optional profile-integration CI."
     },
     {
       "number": 9,

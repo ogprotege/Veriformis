@@ -60,3 +60,11 @@ Active-doc continuity merged as PR #81 at
 - [x] No `test.jsonl`. Request v2 refused. Core does not import mlx-lm.
 - [x] Focused tests passed. Tracking, Ruff, JSON, and diff check passed.
       Core pytest: 1982 passed, 1 deselected, expected transport warning.
+- [x] Item 8.4 merged as PR #85 at `056a075` after all 14 GitHub checks.
+
+## Required item 8.5 evidence
+
+- [x] Official-schema harness for TRL DatasetDict-compatible dicts and mlx-lm filenames.
+- [x] Incompatibles refused in Veriformis before the schema loader.
+- [x] Optional `profile_integration` marker; optional CI continue-on-error.
+- [x] Core pytest: 1992 passed, 3 deselected, expected transport warning.

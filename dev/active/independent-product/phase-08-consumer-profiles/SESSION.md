@@ -5,18 +5,19 @@ append-only history.
 
 **Updated:** 2026-08-23
 
-**Local branch:** `phase8/04-mlx-lm-profile`
+**Local branch:** about to create `phase8/05-conformance-harness` from `main`
 
-**Predecessor:** Item 8.3 merged as PR #84 at
-`fe326c8e1aac18ce2e795f6d4618566a56ff22b5`. Local `main` equals `origin/main`
-there.
+**Predecessor:** Item 8.4 merged as PR #85 at
+`056a0754f162242b1eddc0fda447bdac51cf9f0c`. Local `main` equals `origin/main`.
 
-**Completed:** 8.1 (PR #82), 8.2 (PR #83), 8.3 (PR #84)
+**Completed:** 8.1 PR #82, 8.2 PR #83, 8.3 PR #84, 8.4 PR #85
 
-**Current item:** 8.4 Emit the MLX-LM profile
+**Current item:** 8.5 Isolated conformance harnesses
 
-**Not started:** 8.5 harness, 8.6 sidecars, 8.7 closeout.
-Do not start Phase 9, 10, or 13.
+**Not started:** 8.6 sidecars, 8.7 closeout. Do not start Phase 9, 10, or 13.
 
-**Standing rules:** Core never imports trainer libraries. Generic exports stay
-`consumer_profile: null`. The exporter does not train.
+**8.5 design:** Core tests exercise the official TRL/MLX-LM *schema path*
+(column names, filenames, Dataset.from_list-compatible dicts) without
+installing torch/mlx. Optional `profile_integration` tests skip unless the
+extra is installed. Optional CI job is `continue-on-error` like Aptus.
+Extras stay empty lists so `uv lock` does not pull trainer wheels into core.
