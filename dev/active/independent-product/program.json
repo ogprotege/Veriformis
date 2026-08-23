@@ -112,7 +112,7 @@
       "packet": "dev/active/independent-product/phase-09-columnar-containers",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 9.1: packet, ADR-0013, planned-container refusal, empty columnar extra."
+      "next_gate": "Item 9.2 packaged Arrow and Hugging Face feature schema pins with empty extra columnar. Item 9.3 defines semantic fingerprints. Do not emit Parquet, Arrow, or Hugging Face Dataset files."
     },
     {
       "number": 10,

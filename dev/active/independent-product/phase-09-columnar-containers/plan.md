@@ -91,7 +91,7 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/02-arrow-schema-pins`
 **Title:** `Phase 9.2: Pin Arrow schemas for every row`
 
-- [ ] Packaged exact Arrow/feature schemas for all four row schemas, including nested messages. Official-doc review dates. Version ranges in data, not core lock.
+- [x] Packaged exact Arrow/feature schemas for all four row schemas, including nested messages. Official-doc review dates. Version ranges in data, not core lock.
 
 ### 9.3 Define semantic fingerprints
 

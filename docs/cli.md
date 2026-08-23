@@ -10,16 +10,16 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `columnar-schemas`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-35 commands; `export` contains four subcommands.
+36 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -45,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV v1, and the TRL and MLX-LM adapters |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `columnar-schemas` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
@@ -806,6 +806,22 @@ are `implemented`. The command does not launch training and does not import
 TRL or MLX-LM. See
 [Consumer Profile Admission v1](contracts/profile-admission-v1.md).
 
+### `columnar-schemas`
+
+Print packaged Arrow and Hugging Face feature schema pins as read-only JSON.
+
+```text
+veriformis columnar-schemas
+```
+
+The output is the exact packaged `veriformis.columnar-schema-discovery/v1`
+data that `PipelineService` and MCP `columnar_schemas` also emit. It pins
+official docs, a review date, license, empty extra name, version ranges,
+and exact Arrow/feature types for every v1 row schema, including nested
+`messages`. The three columnar containers remain `planned`. The command
+does not emit files and does not import PyArrow or Hugging Face Datasets.
+See [Columnar Schema Pins v1](contracts/columnar-schema-v1.md).
+
 ### `preflight`
 
 Evaluate raw-source compile readiness without creating a workspace.
@@ -1093,6 +1109,7 @@ stage-command redesign is planned solely for packaging.
 - [Canonical JSON Export Contract v1](contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](contracts/constrained-csv-export-v1.md)
 - [Consumer Profile Admission v1](contracts/profile-admission-v1.md)
+- [Columnar Schema Pins v1](contracts/columnar-schema-v1.md)
 - [TRL SFT Export v1](contracts/trl-export-v1.md)
 - [MLX-LM LoRA Export v1](contracts/mlx-lm-export-v1.md)
 - [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)

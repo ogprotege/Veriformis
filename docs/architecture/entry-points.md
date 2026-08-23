@@ -28,7 +28,7 @@ transition regardless of the adapter that initiated it.
 
 ## CLI command surface
 
-The CLI exposes 35 root names (34 `@app.command` entries plus the `export`
+The CLI exposes 36 root names (35 `@app.command` entries plus the `export`
 Typer group). Ten names are workspace stages: `parse`, `clean`, `chunk`,
 `construct`, `map`, `curate`, `split`, `format`, `validate`, and `seal`.
 Document-source uses nine of them (no `map`). Dataset-row uses `parse`,
@@ -36,14 +36,14 @@ Document-source uses nine of them (no `map`). Dataset-row uses `parse`,
 `upgrade-workspace`, `verify`, `preview`, `package`, `package-verify`,
 `taxonomy`, `goals`, `presets`, `modes`, `mapping-contracts`,
 `mapping-templates`, `mapping-detect`, `mapping-preview`,
-`mapping-rejections`, `profile-admissions`, `preflight`, `goal-preview`,
+`mapping-rejections`, `profile-admissions`, `columnar-schemas`, `preflight`, `goal-preview`,
 the `export` group with four subcommands, `export-verify`, `run`,
 `list-recipes`, `mcp`, `handoff`, `handoff-verify`, and `version`. Ordering
 is enforced by the workspace dependency table, not by Typer.
 
 ```mermaid
 flowchart TD
-    script["console script: veriformis"] --> cli["cli.py: 35-name Typer adapter"]
+    script["console script: veriformis"] --> cli["cli.py: 36-name Typer adapter"]
     mcp["mcp/server.py: local stdio adapter"] --> service["PipelineService composition root"]
     cli --> service
     mac["SwiftUI workbench"] --> cli

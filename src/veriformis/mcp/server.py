@@ -307,6 +307,16 @@ def create_mcp_server(
         ) + "\n"
 
     @server.tool()
+    def columnar_schemas() -> str:
+        """Return packaged Arrow and Hugging Face feature schema pins."""
+        return json.dumps(
+            pipeline.discover_columnar_schemas(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def preflight(
         paths: list[str],
         source_root: str | None = None,

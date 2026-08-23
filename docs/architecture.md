@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.4 MLX-LM emission)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -105,6 +105,9 @@ Phase 8 records that a consumer profile is an optional adapter over that
 bundle (ADR-0012). `profiles/` holds implemented TRL and MLX-LM admission
 pins and adapters with empty extras. Generic export selectors stay
 `consumer_id` null. Taxonomy lists `trl` and `mlx-lm` as implemented.
+Phase 9.2 packages Arrow and Hugging Face feature pins in
+`exports/columnar_schemas-v1.json`. Extra `columnar` stays empty.
+`parquet`, `arrow`, and `hugging-face-dataset` remain planned.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.
