@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `ef9fded` on `main` after PR #79
+**Implementation baseline reviewed:** `b7bb7f0` on `main` after PR #80
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
 Phases 0–2; independent-product Phases 0–7 mapping)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7.10 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Phase 7.10 pull-request merge, beta
-label cut, public Mac evidence, or any listed-item status change. Do not start
-Phase 8, 9, or 13 from this closeout.
+**Next review:** Phase 8 packet opening, beta label cut, public Mac
+evidence, or any listed-item status change. Do not start Phase 8, 9, or 13
+until the operator asks.
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -83,7 +83,9 @@ local, offline, and free of LLM generation.
       passed.
 - [x] Independent product Phase 7 is complete under its
       [completed packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md).
-      Items 7.1–7.9 merged as PR #71–#79. Item 7.10 adds mapping templates and closeout.
+      Items 7.1–7.10 merged as PR #71–#80. Closeout merged as PR #80 at
+      `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks
+      passed.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

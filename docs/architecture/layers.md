@@ -4,14 +4,15 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 **Next review:** Any layering or architecture change
 
 Veriformis is organized as a strict, acyclically ordered stack of logical
 layers, above which sit axial modules: `workspace.py` (persistence kernel),
 `pipeline/` (typed composition root), `exports/` (verified derivative-source
-service), `recipes/`, `handoff/`, `mcp/`, and `cli.py` (Typer adapter). The
+service), `recipes/`, `goals/`, `mapping/`, `handoff/`, `mcp/`, and `cli.py`
+(Typer adapter). The
 SwiftUI workbench under `macos/` is outside the
 Python package and shells the CLI. From the bottom up,
 the stack comprises a foundation kernel (`errors.py`, `contracts.py`,
@@ -24,7 +25,7 @@ inspection confirms that every intra-project dependency points downward: no
 lower layer imports a higher one, and the only cycle anywhere in
 `src/veriformis/` is a single load-order-safe intra-package edge between
 `ir/__init__.py` and `ir/serde.py`. This ordering is the project's strongest
-structural property, because it makes the nine-stage pipeline's data flow and
+structural property, because it makes the compiler-path data flow and
 the module dependency graph two expressions of the same acyclic order.
 
 ```mermaid

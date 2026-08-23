@@ -25,9 +25,9 @@ Phases 0–7 complete; maturity alpha; public Mac claim still owner-gated
 
 **Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Beta label cut, public-ready checklist, or any
-product-contract change. Do not start Phase 8, 9, or 13 from the Phase 7
-closeout.
+**Next review:** Phase 8 packet opening, beta label cut, public-ready
+checklist, or any product-contract change. Do not start Phase 8, 9, or 13
+until the operator asks.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 

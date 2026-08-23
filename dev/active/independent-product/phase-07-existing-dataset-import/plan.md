@@ -243,7 +243,9 @@ Declare these in the packet at 7.1, before mapper UI exists.
 
 Representative `text`, prompt/completion, instruction/input/output, and two-turn message datasets can be imported under explicit confirmed mappings, validated, sealed, generically exported, and semantically round-tripped. Ambiguous or lossy mappings do not auto-publish. Document-source compilation remains unchanged.
 
-**Result:** Complete on local admission evidence. See [closeout.md](closeout.md).
+**Result:** Complete. Closeout merged as PR #80 at
+`b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks
+passed. See [closeout.md](closeout.md).
 
 ## Non-goals
 

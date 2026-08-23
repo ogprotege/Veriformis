@@ -35,19 +35,14 @@ Phase 6 closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
 passed, then stamped complete as PR #69 at
 `6c4694c2e1c523156cd7c8f34c12f258a3ce0b01`. Phase 7 (existing-dataset import
-and mapping) is in progress under its standard packet. Item 7.1 named input
-modes `document-source`, `dataset-row`, and `mixed` (PR #71). Item 7.2 froze
-row-source and mapping contracts (PR #72). Item 7.3 makes `dataset-row`
-executable for JSONL: capture, mapping execution with `mapped_value`
-evidence, workspace revision v4 with stage `map`, and seal through ordinary
-`ProductRow` v1. Item 7.4 requires confirmation of detector proposals (PR #74).
-Item 7.5 binds mapping provenance and replay (PR #75). Item 7.6 adds full-file
-mapping preview (PR #76). Item 7.7 honors imported partitions and admits mixed
-mode with distinct provenances (PR #77). Item 7.8 admits JSON and compatible
-CSV capture and proves production map → seal → generic-export round trips
-(PR #78). Item 7.9 exports row-level mapping rejections as a content-addressed
-project artifact (PR #79). Item 7.10 ships mapping templates and closes Phase
-7. Do not start Phase 8, 9, or 13 from this closeout.
+and mapping) is complete under its standard packet. Items 7.1–7.10 merged as
+PR #71 through PR #80. Closeout merged as PR #80 at
+`b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks
+passed. Dataset-row compilation is opt-in: `parse --mode dataset-row` then
+`map` on revision v4, with confirmed mapping plans, `mapped_value` evidence,
+JSON/CSV/JSONL capture, rejection reports, and packaged templates. Do not
+start Phase 8, 9, or 13 until the operator asks. Phase 8 is planned as
+versioned TRL and MLX-LM consumer profiles over verified bundles.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

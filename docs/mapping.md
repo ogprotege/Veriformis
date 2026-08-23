@@ -3,7 +3,7 @@
 This page is the operator guide for dataset-row mapping. It is not a trainer
 manual and it does not change `ProductRow` v1.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7.10)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 ## When to use which compiler path
 

@@ -33,14 +33,16 @@ as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
 independent-product Phase 6 complete, with items 6.1–6.7 merged sequentially
 as PR #60 through PR #65 and PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is
-complete (existing-dataset import and mapping). Items 7.1–7.9 merged as PR
-#71 through PR #79. Item 7.10 adds mapping templates and closeout.
+complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
+#71 through PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all
+14 GitHub checks passed. Phase 8 consumer profiles are planned and not
+started.
 
-**Review date:** 2026-08-23 (independent-product Phase 7.10 closeout)
+**Review date:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Phase 7.10 pull-request merge, beta label
-cut, public-ready checklist, or any contract change. Do not start Phase 8, 9,
-or 13 from this closeout.
+**Next review:** Phase 8 packet opening, beta label cut, public-ready
+checklist, or any contract change. Do not start Phase 8, 9, or 13 until the
+operator asks.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -51,7 +53,12 @@ Veriformis is a local-first, offline dataset compiler from supported raw
 sources to a closed, independently verifiable training-dataset bundle:
 
 ```text
+document-source (default):
 parse -> clean -> chunk -> construct -> curate -> split
+      -> format -> validate -> seal -> verify -> package -> package-verify
+
+dataset-row (opt-in):
+parse --mode dataset-row -> map -> curate -> split
       -> format -> validate -> seal -> verify -> package -> package-verify
 ```
 
@@ -340,9 +347,11 @@ operator instruction only after a deterministic truthfulness check, proves
 `messages` user turns are exact context, judges usability criteria U1–U6,
 and writes the Phase 6 closeout; it merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
-passed. Independent-product Phase 6 is complete. None of these items adds
-an objective, row schema, persisted schema, trainer claim, or consumer
-profile.
+passed. Independent-product Phase 6 is complete. Independent-product Phase 7 is
+complete: existing JSONL, JSON, and compatible CSV rows import under
+confirmed mapping plans, seal through ordinary `ProductRow` v1, and use the
+same generic exports. None of these items adds an objective, row schema,
+persisted schema, trainer claim, or consumer profile.
 
 ## Implemented interfaces
 
@@ -355,8 +364,8 @@ The installed console entry point is `veriformis`.
 | `chunk WORKSPACE` | Runs one of five evidence-bearing chunk strategies | `chunks` |
 | `upgrade-workspace WORKSPACE` | Migrates a verified revision-v1 or revision-v2 workspace through every supported migration | One new migration revision per required schema step, or no change when current |
 | `construct WORKSPACE (--goal GOAL \| --preset PRESET \| --objective OBJECTIVE)` | Resolves the selection and explicit overrides through the versioned preset data, builds the recipe through the named recipe library, and constructs candidates, decisions, diagnostics, and immutable accepted records for one exact source set | `recipe`, `result` |
-| `parse PATH... -o WORKSPACE --mode dataset-row` | Captures UTF-8 JSONL row sources into workspace revision v4; does not recover document IR | `registry`, per-source `raw` and `row-source` |
-| `map WORKSPACE --goal GOAL --representation REPRESENTATION --plan PLAN.json` | Applies a confirmed mapping-plan/v1 to captured JSONL objects and commits imported records with `mapped_value` evidence | `plan`, `recipe`, `result` |
+| `parse PATH... -o WORKSPACE --mode dataset-row` | Captures UTF-8 JSONL, JSON, or compatible CSV row sources into workspace revision v4; does not recover document IR | `registry`, per-source `raw` and `row-source` |
+| `map WORKSPACE --goal GOAL --representation REPRESENTATION --plan PLAN.json` | Applies a confirmed mapping-plan/v1 to captured objects and commits imported records with `mapped_value` evidence | `plan`, `recipe`, `result` |
 | `curate WORKSPACE` | Fixes the complete finished plan and applies ordered deterministic curation | `plan`, `result` |
 | `split WORKSPACE` | Assigns complete transitive leakage groups to train and evaluation | `result` |
 | `format WORKSPACE` | Lowers included records into the row schema bound by the plan | `row-set`, `train`, `evaluation`, `provenance` |
@@ -373,8 +382,8 @@ The installed console entry point is `veriformis`.
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
 | `mapping-templates` | Prints packaged mapping templates (`veriformis.mapping-template-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_templates` |
-| `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
-| `mapping-preview PATH --plan PLAN.json` | Walks the full JSONL file and reports per-row accept/reject samples without writing a workspace | Runtime-only `veriformis.mapping-preview/v1` JSON; 64 KiB sample / 256 KiB response bounds |
+| `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL, JSON, or compatible CSV file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
+| `mapping-preview PATH --plan PLAN.json` | Walks the full captured file and reports per-row accept/reject samples without writing a workspace | Runtime-only `veriformis.mapping-preview/v1` JSON; 64 KiB sample / 256 KiB response bounds |
 | `mapping-rejections PATH --plan PLAN.json --output DIR` | Writes a content-addressed mapping rejection report beside a directory; `map` also writes one beside the workspace | `veriformis.mapping-rejection-report/v1` JSON; not a verified export |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
@@ -712,6 +721,8 @@ See [docs/release.md](release.md).
 | Implemented and merged independent Phase 5.5 | Test-only consolidated ordinary-file semantic round-trip fixture covering all 11 compatible container/schema pairs, canonical semantic tamper for each container, and actionable pre-publication constrained-CSV/`messages` refusal; PR #57 at `c72b8e9ec7bc`; no importer, replayer, API, taxonomy, support, or trainer promotion |
 | Implemented and merged independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; PR #58 at `cd017941090c` |
 | Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
+| Completed independent Phase 6 | Goal catalog, contracts, preview, presets, preflight, acceptance matrix, instruction truthfulness; closeout PR #67 at `6995d17bef` |
+| Completed independent Phase 7 | Existing-dataset import/mapping: modes, contracts, JSONL/JSON/CSV capture, confirmation, provenance, preview, partitions, rejections, templates; closeout PR #80 at `b7bb7f0c2046` after all 14 GitHub checks passed |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–7 complete under its [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |

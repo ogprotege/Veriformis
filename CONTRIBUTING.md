@@ -16,6 +16,10 @@ Before changing code, read:
 - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
 - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
 - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
+- [Goal Catalog v1](docs/contracts/goal-catalog-v1.md)
+- [Recipe Preset v1](docs/contracts/recipe-preset-v1.md)
+- [Row Mapping v1](docs/contracts/row-mapping-v1.md)
+- [Existing-dataset import](docs/mapping.md)
 - [ADR-0006: Receipt-Anchored Export-Pack Transport](docs/adr/0006-receipt-anchored-export-pack-transport.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
@@ -32,8 +36,10 @@ Before changing code, read:
 - [Independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
-beta-prep, and private beta workbench Phases 0–2 are implemented. Independent
-product Phases 0–4 are complete; consult the
+beta-prep, and private beta workbench Phases 0–2 are implemented.
+Independent-product Phases 0–7 are complete on `main` (Phase 7 closeout
+PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`). Phase 8 consumer
+profiles are planned and not started. Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed
 service,

@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
-**Next review:** Independent-product Phase 7.1 pull-request merge, item 7.2,
-any later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 8 packet opening, any later phase
+closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -44,37 +44,9 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, Phase 4 is complete and its closeout merged as PR #52 at
-`a76e0fe3185b0e317cd453b9c28a1d2054e617dd`. Phase 5 opened from that clean
-baseline under its own standard packet. Item 5.1 merged as PR #53 at
-`4f12a55063c2721993b65cfbe30e68eaad55f87f`. Item 5.2 merged as PR #54 at
-`f6a5d45f01e0b3117c259271bc59f3599a89dbb6`. Item 5.3's
-`constrained-csv` v1 merged as PR #55 at `c6d7fc13a09a` for the three flat row
-schemas with fixed exact bytes, mandatory provenance, nested-`messages`
-refusal, and no consumer or trainer claim.
-
-Item 5.4's `deterministic-export-pack-zip-v1` merged as PR #56 at
-`499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`. The optional `.vfexport.zip`
-transport wraps one unchanged, already-published export directory under a
-separately retained canonical receipt digest. It is not a fourth renderer,
-source-bound export verification, consumer/trainer profile, MCP operation, or
-Mac UI action.
-Item 5.5 merged as PR #57 at
-`c72b8e9ec7bc2746d74404226aa086d497e15db1`. Its test-only frozen ordinary-file
-fixture closes all eleven compatible current container/schema pairs, proves one
-canonical semantic tamper fails per container, and retains constrained CSV's
-actionable pre-publication `messages` refusal. It adds no importer, replayer,
-API, taxonomy, support state, or trainer claim. Item 5.6's runtime preview
-returns the unchanged plan and exact bounded ordinal-zero samples/tree in
-response v2 without renderer or destination access. It passed all 14 GitHub
-checks and merged as PR #58 at
-`cd017941090c7352cb1d10f9a383042b954d4f2e`. Item 5.7 publishes the
-[generic export operator guide](../generic-exports.md) and reconciles Phase 5
-closeout without a taxonomy or support promotion. It passed all 14 GitHub
-checks and merged as PR #59 at
-`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
-Consumer compatibility still requires a separately admitted named profile.
-Phase 6 (goal-first recipes and previews) is complete under its
-[packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md);
-closeout merged as PR #67 at
-`6995d17bef0d09f235b1c464e947c38c63dd313d`.
+At this review, independent-product Phases 0–7 are complete on `main`.
+Phase 7 closeout merged as PR #80 at
+`b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks
+passed. Consumer compatibility still requires a separately admitted named
+profile; Phase 8 is planned and not started. Historical Phase 4–6 merge SHAs
+remain in those packets and in `docs/current-status.md`.

@@ -69,3 +69,11 @@ before item 7.10.
 Item 7.9 merged as PR #79 at `ef9fded646e55bd8eafabe327ca5cc767fae7d4a`.
 Mapping templates, operator guide, U1–U7 judgment, support-registry gap close,
 and packet closeout are this item. Do not start Phase 8, 9, or 13.
+
+## 2026-08-23 — Item 7.10 merged; GitHub CI observed after budget restore
+
+Item 7.10 merged as PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f`.
+After the spending limit was increased, `main` `ci` rerun 32617948069
+succeeded and PR #80 passed all 14 GitHub checks. Intermediate PRs #71–#79
+remain historically budget-failed on GitHub; the current tree is the
+closeout SHA.

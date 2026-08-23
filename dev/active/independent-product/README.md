@@ -76,9 +76,12 @@ operator guide, keeps container choice separate from objective, schema, and
 consumer compatibility, and reconciles the completed Phase 5 packet without
 changing runtime or support state. It passed all 14 GitHub checks and merged
 as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`; clean local `main`
-was synchronized before Phase 6 opened. Phase 6 opened on 2026-08-22 under
-its [packet](phase-06-goal-first-recipes/README.md); item 6.1 (goal catalog)
-is in progress.
+was synchronized before Phase 6 opened. Phase 6 completed under its
+[packet](phase-06-goal-first-recipes/README.md); closeout merged as PR #67 at
+`6995d17bef0d09f235b1c464e947c38c63dd313d`. Phase 7 completed under its
+[packet](phase-07-existing-dataset-import/README.md); closeout merged as
+PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
+checks passed. Phase 8 consumer profiles remain planned.
 
 ## State change procedure
 

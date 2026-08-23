@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-22
+**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -30,8 +30,9 @@ not substitutes for implementation or tests.
 | [0006](0006-receipt-anchored-export-pack-transport.md) | Receipt-anchored deterministic export-pack transport | Accepted | Export receipt, archive profile, packaging, or trust-envelope change |
 | [0007](0007-goal-first-catalog-as-versioned-data.md) | Goal-first catalog and presets as versioned data over existing objectives | Accepted | Objective, row-schema, loss-policy, or representation change; Phase 6.4 preset freeze; Phase 17 or 18 |
 | [0008](0008-input-family-taxonomy-axis.md) | Input family as the seventh taxonomy axis | Accepted | New parser kind or suffix; Phase 11 input qualification; Phase 12 OCR |
-| [0010](0010-input-mode-as-compiler-path.md) | Input mode as a compiler path | Accepted | Item 7.3 dataset-row execution; item 7.7 mixed projects; any new compiler path |
-| [0011](0011-imported-records-and-mapping-evidence.md) | Imported records and mapped-value evidence | Accepted | Item 7.3 execution; item 7.7 membership; item 7.8 JSON/CSV |
+| 0009 | Not issued | — | Number skipped; 0010 follows 0008 |
+| [0010](0010-input-mode-as-compiler-path.md) | Input mode as a compiler path | Accepted | Any new compiler path beyond document-source, dataset-row, and mixed |
+| [0011](0011-imported-records-and-mapping-evidence.md) | Imported records and mapped-value evidence | Accepted | Any new field-evidence kind, membership policy, or admitted row container |
 
 ## ADR template
 
