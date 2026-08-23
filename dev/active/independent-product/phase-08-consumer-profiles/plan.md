@@ -118,7 +118,7 @@ integrations.
 **Branch:** `phase8/05-conformance-harness`
 **Title:** `Phase 8.5: Load artifacts through the real consumers`
 
-- [ ] Isolated harnesses using the pinned loader or its authoritative schema. Golden load succeeds; incompatibles never reach the loader. Optional CI jobs.
+- [x] Isolated harnesses using the pinned loader or its authoritative schema. Golden load succeeds; incompatibles never reach the loader. Optional CI jobs.
 
 ### 8.6 Ship config sidecars
 

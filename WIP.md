@@ -88,8 +88,8 @@ local, offline, and free of LLM generation.
       passed.
 - [ ] Independent product Phase 8 is in progress under its
       [packet](dev/active/independent-product/phase-08-consumer-profiles/README.md).
-      Items 8.1–8.3 merged as PR #82–#84. Item 8.4 emits the MLX-LM LoRA
-      adapter. Taxonomy remains planned.
+      Items 8.1–8.4 merged as PR #82–#85. Item 8.5 adds isolated schema
+      harnesses. Taxonomy remains planned.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
