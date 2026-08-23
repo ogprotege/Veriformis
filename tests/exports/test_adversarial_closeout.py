@@ -386,6 +386,7 @@ def test_closeout_conformance_injection_never_changes_production_discovery() -> 
 
     assert len(injected.discover_exports().profiles) == 1
     expected = [
+        ("arrow", 1, None, None),
         ("constrained-csv", 1, None, None),
         ("json", 1, None, None),
         ("parquet", 1, None, None),

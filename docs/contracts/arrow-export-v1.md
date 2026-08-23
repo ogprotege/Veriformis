@@ -1,19 +1,19 @@
-# Parquet Export v1
+# Arrow Export v1
 
-**Container ID:** `parquet`
+**Container ID:** `arrow`
 
 **Container version:** `1`
 
 **Determinism claim:** `semantic_content_only`
 
-**Status:** Executable generic export. Taxonomy still lists `parquet` as
+**Status:** Executable generic export. Taxonomy still lists `arrow` as
 planned until Phase 9 closeout. Extra `columnar` remains empty.
 
 **Last reviewed:** 2026-08-23
 
 ## Purpose
 
-Emit train and evaluation Parquet files from a verified bundle without
+Emit train and evaluation Arrow IPC files from a verified bundle without
 changing membership. Nested `messages` is in scope. `consumer_id` is
 null.
 
@@ -25,8 +25,8 @@ This is not portable exact bytes across PyArrow versions.
 
 | Path | Role |
 | --- | --- |
-| `data/train.parquet` | Train payloads |
-| `data/evaluation.parquet` | Evaluation payloads, including empty |
+| `data/train.arrow` | Train payloads (Arrow IPC file) |
+| `data/evaluation.arrow` | Evaluation payloads, including empty |
 | `metadata/dataset-card.json` | Machine-readable layout |
 | `metadata/row-provenance.jsonl` | Aligned provenance |
 | `README.md` | Human-readable description |
@@ -39,5 +39,5 @@ absent, execute fails closed naming extra `columnar`.
 
 ## Non-goals
 
-Hub upload. Portable exact bytes. Hugging Face Dataset directory
-(item 9.6). Trainer profiles. Arrow IPC is a separate generic container.
+Hub upload. Portable exact bytes. Parquet (item 9.4). Hugging Face
+Dataset directory (item 9.6). Trainer profiles.

@@ -247,7 +247,11 @@ class PlannedContainerPin(_StrictModel):
 
     @model_validator(mode="after")
     def _closed(self) -> PlannedContainerPin:
-        expected = UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS[self.container_id]
+        expected = UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS.get(self.container_id)
+        if expected is None:
+            raise ExportContractError(
+                f"{self.container_id} is not an unexecutable planned container"
+            )
         if self.executable_item != expected:
             raise ExportContractError(
                 f"{self.container_id} must name item {expected}"

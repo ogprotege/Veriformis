@@ -45,6 +45,6 @@ planned, and refuses those `container_id` values with the named later item.
 
 ## Current state
 
-Items 9.1–9.3 merged as PR #89–#91. Item 9.4 emits Parquet v1.
+Items 9.1–9.4 merged as PR #89–#92. Item 9.5 emits Arrow IPC v1.
 Taxonomy `parquet`, `arrow`, and `hugging-face-dataset` remain planned.
-Arrow and Hugging Face Dataset still refuse. Extra `columnar` stays empty.
+Hugging Face Dataset still refuses. Extra `columnar` stays empty.

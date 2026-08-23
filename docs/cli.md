@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.5 Arrow)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -44,7 +44,7 @@ examples below use the installed name.
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
-| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet v1, and the TRL and MLX-LM adapters |
+| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC v1, and the TRL and MLX-LM adapters |
 | Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `columnar-schemas` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
@@ -594,14 +594,16 @@ veriformis export-verify --request-json JSON
 
 `discover` accepts no request and lists only executable implementations from the
 private service catalog. Phase 4 closed with that catalog empty. Phase 5.1–5.3
-now advertise three production generic selectors: `split-jsonl-directory`,
-canonical `json`, and `constrained-csv`, all version 1, `portable_exact_bytes`,
-and with no consumer profile, plus the optional TRL SFT adapter
-(`split-jsonl-directory` v1 with `consumer_id=trl` v1). Split JSONL, canonical
-JSON, and the TRL and MLX-LM adapters support all four current row schemas;
-constrained CSV supports the three flat schemas only. The adapters emit
-dataset-only launch sidecars and do not launch training. Taxonomy lists
-`trl` and `mlx-lm` as implemented optional adapters.
+advertise three `portable_exact_bytes` generic selectors:
+`split-jsonl-directory`, canonical `json`, and `constrained-csv`, all version 1
+with no consumer profile. Phase 9.4–9.5 add `parquet` and `arrow` v1 as
+`semantic_content_only` generics; extra `columnar` stays empty and taxonomy
+still lists them planned. Optional TRL and MLX-LM adapters sit on
+`split-jsonl-directory` v1. Split JSONL, canonical JSON, Parquet, Arrow, and
+the TRL and MLX-LM adapters support all four current row schemas; constrained
+CSV supports the three flat schemas only. The adapters emit dataset-only
+launch sidecars and do not launch training. Taxonomy lists `trl` and `mlx-lm`
+as implemented optional adapters.
 Tests may also inject the bounded conformance implementation used for the
 historical cross-surface evidence; that remains private test code.
 

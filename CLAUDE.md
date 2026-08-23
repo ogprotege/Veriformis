@@ -46,10 +46,10 @@ merged as PR #82 through PR #87. Item 8.7 promotes `trl` and `mlx-lm` to
 implemented optional adapters, names accepted/transformed/rejected goals and
 rows, and closes the phase. The exporter does not train. Phase 9 (columnar
 and Hugging Face dataset containers) is in progress under its standard
-packet. Items 9.1–9.3 merged as PR #89–#91. Item 9.4 emits generic Parquet
-v1 with `semantic_content_only`. Extra `columnar` stays empty. Taxonomy
+packet. Items 9.1–9.4 merged as PR #89–#92. Item 9.5 emits generic Arrow
+IPC v1 with `semantic_content_only`. Extra `columnar` stays empty. Taxonomy
 still lists `parquet`, `arrow`, and `hugging-face-dataset` as planned;
-Arrow and Hugging Face Dataset still refuse. Do not start Phase 10 or 13
+Hugging Face Dataset still refuses. Do not start Phase 10 or 13
 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal

@@ -1,6 +1,6 @@
 # Phase 9 Evidence
 
-**Status:** Open — item 9.3 semantic fingerprints
+**Status:** Open — item 9.5 Arrow IPC
 
 **Opened:** 2026-08-23
 
@@ -76,3 +76,17 @@ passed.
 - [x] Nested `messages` is in the supported schema list. Taxonomy stays
       planned. Extra `columnar` stays empty.
 - [x] Core pytest: 2030 passed, 3 deselected, expected transport warning.
+- [x] Item 9.4 merged as PR #92 at
+      `7af0a28fe2b4bf015c7bacffaf438cbc94ff047a` after all 16 GitHub checks
+      passed.
+
+## Required item 9.5 evidence
+
+- [x] Selector `arrow` v1, `consumer_id` null, `semantic_content_only`.
+- [x] Dry-run plans train/evaluation Arrow IPC fingerprints without importing
+      PyArrow. Execute fails closed naming extra `columnar` when PyArrow is
+      absent.
+- [x] Nested `messages` is in the supported schema list. Taxonomy stays
+      planned. Extra `columnar` stays empty. Hugging Face Dataset still
+      refuses with item 9.6.
+- [x] Core pytest: 2033 passed, 3 deselected, expected transport warning.

@@ -112,7 +112,7 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/05-arrow-export`
 **Title:** `Phase 9.5: Emit Arrow`
 
-- [ ] Arrow IPC layout from the 9.2 pins. Split preservation, data card, receipt. Taxonomy remains planned.
+- [x] Arrow IPC layout from the 9.2 pins. Split preservation, data card, receipt. Taxonomy remains planned.
 
 ### 9.6 Emit a local Hugging Face dataset
 
