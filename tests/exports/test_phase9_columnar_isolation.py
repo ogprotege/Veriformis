@@ -56,13 +56,11 @@ def test_planned_container_item_map_is_closed_over_the_taxonomy() -> None:
         "arrow",
         "hugging-face-dataset",
     )
-    assert PLANNED_PHYSICAL_CONTAINERS == (
-        "parquet",
-        "arrow",
-        "hugging-face-dataset",
+    assert set(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) <= set(
+        PLANNED_PHYSICAL_CONTAINERS
     )
     assert "parquet" not in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
-    assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS["arrow"] == "9.5"
+    assert "arrow" not in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
     assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS["hugging-face-dataset"] == "9.6"
 
 
@@ -91,6 +89,7 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
         if profile.consumer_profile is None
     ]
     assert {profile.container_profile.container_id for profile in generic} == {
+        "arrow",
         "constrained-csv",
         "json",
         "parquet",
@@ -104,6 +103,12 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
     assert named == {"mlx-lm", "trl"}
     for identifier in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS:
         assert all(profile.selector[0] != identifier for profile in profiles.values())
+    assert (
+        "arrow",
+        1,
+        None,
+        None,
+    ) in profiles
     assert (
         "parquet",
         1,

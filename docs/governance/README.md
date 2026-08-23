@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.4 Parquet)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.5 Arrow)
 
-**Next review:** Independent-product Phase 9.4 pull-request merge, item 9.5,
+**Next review:** Independent-product Phase 9.5 pull-request merge, item 9.6,
 any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -47,7 +47,8 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–8 are complete on `main` and
-Phase 9 is in progress under item 9.4. Parquet v1 is executable.
-`parquet`, `arrow`, and `hugging-face-dataset` remain planned in taxonomy.
+Phase 9 is in progress under item 9.5. Parquet and Arrow IPC v1 are
+executable. `parquet`, `arrow`, and `hugging-face-dataset` remain planned
+in taxonomy.
 Historical Phase 4–8 merge SHAs
 remain in those packets and in `docs/current-status.md`.

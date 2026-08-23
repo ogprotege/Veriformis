@@ -87,6 +87,7 @@ from veriformis.exports.constrained_csv import (
     CONSTRAINED_CSV_IMPLEMENTATION,
 )
 from veriformis.exports.paths import validate_export_relative_path
+from veriformis.exports.arrow import ARROW_IMPLEMENTATION
 from veriformis.exports.parquet import PARQUET_IMPLEMENTATION
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
 from veriformis.profiles.mlx_lm import MLX_LM_IMPLEMENTATION
@@ -133,6 +134,7 @@ class ExportService:
                 CANONICAL_JSON_IMPLEMENTATION,
                 CONSTRAINED_CSV_IMPLEMENTATION,
                 PARQUET_IMPLEMENTATION,
+                ARROW_IMPLEMENTATION,
                 TRL_IMPLEMENTATION,
                 MLX_LM_IMPLEMENTATION,
             )

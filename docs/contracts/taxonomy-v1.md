@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.4: parquet is export-executable; taxonomy still planned; arrow and hugging-face-dataset refuse)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.5: parquet and arrow are export-executable; taxonomy still planned; hugging-face-dataset refuses)
 
 **Next review:** Any taxonomy, input-family, loss-policy, or
 compatibility-matrix change

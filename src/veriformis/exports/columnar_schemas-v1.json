@@ -25,10 +25,6 @@
   ],
   "planned_containers": [
     {
-      "container_id": "arrow",
-      "executable_item": "9.5"
-    },
-    {
       "container_id": "hugging-face-dataset",
       "executable_item": "9.6"
     }

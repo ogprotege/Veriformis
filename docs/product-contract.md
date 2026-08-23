@@ -18,16 +18,17 @@ merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
 goal-first recipes and previews complete, closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; Phase 7 existing-dataset import
 and mapping complete; Phase 8 consumer profiles complete with implemented
-TRL and MLX-LM optional adapters; Phase 9 Parquet v1 executable with
-schemas and fingerprints pinned, Arrow and Hugging Face Dataset still planned; version `0.1.0` development alpha
+TRL and MLX-LM optional adapters; Phase 9 Parquet and Arrow IPC v1
+executable with schemas and fingerprints pinned, Hugging Face Dataset
+still planned; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–8 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.4 Parquet)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.5 Arrow)
 
-**Next review:** Phase 9.4 pull-request merge, item 9.5, beta label cut,
+**Next review:** Phase 9.5 pull-request merge, item 9.6, beta label cut,
 public-ready checklist, or any product-contract change. Do not start Phase
 10 or 13 from this packet.
 

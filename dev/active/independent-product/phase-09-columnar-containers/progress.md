@@ -62,3 +62,17 @@ Taxonomy stays planned.
 
 **Next action:** Publish the item 9.4 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.5.
+
+## 2026-08-23 — Item 9.4 merged; item 9.5 in progress
+
+**Status:** Item 9.4 merged as PR #92 at
+`7af0a28fe2b4bf015c7bacffaf438cbc94ff047a` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.5 emits generic Arrow IPC v1 with `consumer_id` null and
+`semantic_content_only`. Dry-run plans fingerprints without PyArrow.
+Execute fails closed if PyArrow is absent. Extra `columnar` stays empty.
+Taxonomy stays planned. Hugging Face Dataset still refuses with item 9.6.
+
+**Next action:** Publish the item 9.5 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 9.6.
