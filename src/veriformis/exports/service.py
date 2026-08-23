@@ -41,7 +41,7 @@ from veriformis.errors import (
 )
 from veriformis.taxonomy import (
     CANDIDATE_CONSUMER_PROFILES,
-    PLANNED_CONSUMER_PROFILE_ITEMS,
+    UNEXECUTABLE_CONSUMER_PROFILE_ITEMS,
 )
 from veriformis.exports.models import (
     ExportConsumerProfile,
@@ -87,6 +87,7 @@ from veriformis.exports.constrained_csv import (
 )
 from veriformis.exports.paths import validate_export_relative_path
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
+from veriformis.profiles.trl import TRL_IMPLEMENTATION
 from veriformis.identity import lossless_json_bytes, sha256_digest
 
 
@@ -128,6 +129,7 @@ class ExportService:
                 SPLIT_JSONL_IMPLEMENTATION,
                 CANONICAL_JSON_IMPLEMENTATION,
                 CONSTRAINED_CSV_IMPLEMENTATION,
+                TRL_IMPLEMENTATION,
             )
             if _implementations is None
             else tuple(_implementations)
@@ -1147,7 +1149,7 @@ def _refuse_unexecutable_consumer_id(consumer_id: str | None) -> None:
     """Fail closed on planned or candidate trainer profiles before catalog lookup."""
     if consumer_id is None:
         return
-    later_item = PLANNED_CONSUMER_PROFILE_ITEMS.get(consumer_id)
+    later_item = UNEXECUTABLE_CONSUMER_PROFILE_ITEMS.get(consumer_id)
     if later_item is not None:
         raise ExportContractError(
             f"consumer profile {consumer_id!r} is planned for item {later_item}; "

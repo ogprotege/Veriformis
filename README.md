@@ -18,7 +18,8 @@ explicitly selects it as training content.
 > on `main`. Generic exports are `split-jsonl-directory`, canonical `json`,
 > and `constrained-csv` v1. Goal-first recipes (Phase 6) and existing-dataset
 > import/mapping (Phase 7) are implemented. Phase 8 consumer-profile work is
-> open; TRL and MLX-LM admission pins are packaged and remain non-executable. This is **not** a
+> open; the TRL SFT adapter is executable, taxonomy `trl` remains planned,
+> and MLX-LM is not executable. This is **not** a
 > public beta or production label. Limits:
 > [docs/beta-limitations.md](docs/beta-limitations.md). Install:
 > [docs/install.md](docs/install.md). Status:
@@ -284,9 +285,8 @@ Phase 6 (goal-first recipes and previews) is complete under its packet;
 closeout merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d`.
 Phase 7 (existing-dataset import and mapping) is complete; closeout merged as
 PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
-checks passed. Phase 8 is in progress under ADR-0012; item 8.2 pins planned
-TRL and MLX-LM admission records with empty extras. Both remain
-non-executable.
+checks passed. Phase 8 is in progress under ADR-0012; item 8.3 emits the
+TRL SFT adapter. Taxonomy `trl` remains planned; MLX-LM is not executable.
 The following paragraphs retain Phase 4–5 export-boundary facts that still
 bind generic exports.
 The completed Phase 4 verified-export foundation adds a

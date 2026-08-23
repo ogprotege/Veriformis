@@ -5,21 +5,20 @@ append-only history.
 
 **Updated:** 2026-08-23
 
-**Local branch:** `phase8/02-admission-pins`
+**Local branch:** `phase8/03-trl-profile`
 
-**Predecessor:** Item 8.1 merged as PR #82 at
-`799d56f` (`Merge pull request #82 from ogprotege/phase8/01-profile-packet`).
-Clean `main` at that SHA equals `origin/main`.
+**Predecessor:** Item 8.2 merged as PR #83 at
+`7351904e58c67c925a3a878af350335620306260`. Local `main` equals `origin/main`
+there.
 
-**Current item:** 8.2 Pin TRL and MLX-LM admission records
+**Completed:** 8.1 (PR #82), 8.2 (PR #83)
 
-**Not started:** 8.3 TRL emit, 8.4 MLX-LM emit, 8.5 harness, 8.6 sidecars,
-8.7 discovery truthfulness and closeout. Do not start Phase 9, 10, or 13.
+**Current item:** 8.3 Emit the TRL profile (implementation on branch; gates
+next)
 
-**8.2 remaining:** PR titled `Phase 8.2: Pin TRL and MLX-LM admission records`,
-wait for all 14 GitHub checks, merge, `git checkout main && git pull --ff-only`.
-Local gates passed: 1970 pytest, tracking, Ruff, lock, JSON, diff.
+**Not started:** 8.4 MLX-LM emit, 8.5 harness, 8.6 sidecars, 8.7 closeout.
+Do not start Phase 9, 10, or 13.
 
 **Standing rules:** Core never imports trainer libraries. Generic exports stay
-`consumer_profile: null`. `trl` / `mlx-lm` stay planned and non-executable
-until 8.3 / 8.4. Empty extras only; real packages arrive in 8.5.
+`consumer_profile: null`. `mlx-lm` stays planned until 8.4. The exporter does
+not train.

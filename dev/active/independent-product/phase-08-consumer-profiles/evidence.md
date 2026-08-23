@@ -41,3 +41,13 @@ Active-doc continuity merged as PR #81 at
 - [x] Focused tests: 14 passed. Tracking, Ruff, lock, structured JSON, and
       diff check passed. Core pytest: 1970 passed, 1 deselected, expected
       transport warning.
+- [x] Item 8.2 merged as PR #83 at `7351904` after all 14 GitHub checks.
+
+## Required item 8.3 evidence
+
+- [x] TRL selector is executable beside generic split JSONL.
+- [x] All four row schemas map; instruction_output assembles prompt.
+- [x] Membership and loss-policy IDs are unchanged.
+- [x] Request v2 refused; MLX-LM still planned; core does not import TRL.
+- [x] Focused tests passed. Tracking, Ruff, JSON, and diff check passed.
+      Core pytest: 1975 passed, 1 deselected, expected transport warning.

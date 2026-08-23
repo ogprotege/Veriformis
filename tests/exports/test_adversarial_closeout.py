@@ -389,6 +389,7 @@ def test_closeout_conformance_injection_never_changes_production_discovery() -> 
         ("constrained-csv", 1, None, None),
         ("json", 1, None, None),
         ("split-jsonl-directory", 1, None, None),
+        ("split-jsonl-directory", 1, "trl", 1),
     ]
     assert [
         item.selector for item in DEFAULT_EXPORT_SERVICE.discover_exports().profiles

@@ -104,7 +104,7 @@ integrations.
 **Branch:** `phase8/03-trl-profile`
 **Title:** `Phase 8.3: Emit the TRL profile`
 
-- [ ] TRL profile for currently proven row schemas only. Dataset/DatasetDict-compatible local data plus profile metadata. Refuse preference/stepwise.
+- [x] TRL profile for currently proven row schemas only. Dataset/DatasetDict-compatible local data plus profile metadata. Refuse preference/stepwise.
 
 ### 8.4 Emit the MLX-LM profile
 

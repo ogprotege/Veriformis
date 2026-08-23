@@ -480,8 +480,9 @@ def test_fixture_closes_the_discovered_container_schema_matrix(
     observed = {
         profile.selector: profile.supported_row_schemas
         for profile in discovery.profiles
+        if profile.consumer_profile is None
     }
-    assert len(discovery.profiles) == len(expected)
+    assert len(observed) == len(expected)
     assert expected == observed
     assert {selector[0] for selector in expected} == set(CONTAINERS)
     observed_pairs = {
