@@ -2,12 +2,12 @@
 
 **Status:** Independent-product Phases 0–7 complete; Phase 8 in progress
 
-**Review date:** 2026-08-23 (independent-product Phase 8.1 opening)
+**Review date:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
-**Repository baseline:** Working tree based on PR #81 merge
-`64a7799c27d1a489f01d77d8ba399910c95c0712`
+**Repository baseline:** Working tree based on PR #82 merge
+`799d56f`
 
-**Next review:** Independent-product Phase 8.1 pull-request merge, or the next
+**Next review:** Independent-product Phase 8.2 pull-request merge, or the next
 active-document behavior change
 
 ## Scope examined

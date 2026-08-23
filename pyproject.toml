@@ -33,6 +33,10 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8.0", "ruff==0.16.0"]
+# Isolation extras declared in Phase 8.2. Version ranges live in
+# admission-v1.json. Packages are installed by item 8.5 harnesses, not core.
+trl = []
+mlx-lm = []
 
 [project.scripts]
 veriformis = "veriformis.cli:main"
@@ -48,7 +52,7 @@ where = ["src"]
 version = { attr = "veriformis.__version__" }
 
 [tool.setuptools.package-data]
-veriformis = ["serializers/templates/chat/*.jinja", "goals/*.json", "mapping/*.json"]
+veriformis = ["serializers/templates/chat/*.jinja", "goals/*.json", "mapping/*.json", "profiles/*.json"]
 
 [tool.ruff]
 required-version = "==0.16.0"
@@ -66,4 +70,5 @@ show_missing = true
 [tool.pytest.ini_options]
 markers = [
   "aptus_integration: optional Aptus compatibility checks excluded from core release gates",
+  "profile_integration: optional TRL/MLX-LM loader checks excluded from core release gates",
 ]

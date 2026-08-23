@@ -17,3 +17,21 @@ intentional transport durability warning.
 
 **Next action:** Publish the item 8.1 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 8.2.
+
+## 2026-08-23 — Item 8.1 merged; item 8.2 in progress
+
+**Status:** Item 8.1 merged as PR #82 at `799d56f` after all 14 GitHub
+checks passed. Local `main` equals `origin/main` at that SHA.
+
+Item 8.2 pins official TRL and MLX-LM admission records as packaged
+`admission-v1.json`, declares empty extras `trl` and `mlx-lm`, and exposes
+byte-identical discovery on Python, CLI `profile-admissions`, and MCP
+`profile_admissions`. Both records remain `state: planned`. Export still
+refuses `consumer_id=trl|mlx-lm`. Trainer packages are not installed.
+
+Focused isolation and admission tests passed (14). Tracking, Ruff, lock,
+structured JSON, and diff check passed. Core pytest passed 1970 with 1
+deselected and the intentional transport durability warning.
+
+**Next action:** Publish the item 8.2 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 8.3.

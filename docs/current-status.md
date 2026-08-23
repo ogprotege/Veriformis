@@ -36,12 +36,12 @@ as PR #60 through PR #65 and PR #67 at
 complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 #71 through PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all
 14 GitHub checks passed. Phase 8 consumer profiles are in progress under
-item 8.1: ADR-0012 is published, and `trl` / `mlx-lm` remain planned and
-non-executable.
+item 8.2: ADR-0012 is published; TRL and MLX-LM admission pins are packaged
+as planned discovery; both remain non-executable.
 
-**Review date:** 2026-08-23 (independent-product Phase 8.1 opening)
+**Review date:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
-**Next review:** Phase 8.1 pull-request merge, item 8.2, beta label cut,
+**Next review:** Phase 8.2 pull-request merge, item 8.3, beta label cut,
 public-ready checklist, or any contract change. Do not start Phase 9, 10,
 or 13 from this packet.
 
@@ -382,6 +382,7 @@ The installed console entry point is `veriformis`.
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
+| `profile-admissions` | Prints planned TRL and MLX-LM admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not emit trainer files |
 | `mapping-templates` | Prints packaged mapping templates (`veriformis.mapping-template-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_templates` |
 | `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL, JSON, or compatible CSV file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
 | `mapping-preview PATH --plan PLAN.json` | Walks the full captured file and reports per-row accept/reject samples without writing a workspace | Runtime-only `veriformis.mapping-preview/v1` JSON; 64 KiB sample / 256 KiB response bounds |
@@ -405,10 +406,10 @@ Surfaces over the same composition root:
 
 | Surface | Location | Role |
 | --- | --- | --- |
-| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy and goal-catalog discovery, raw-source compile preflight, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
-| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy and goal-catalog JSON, compile preflight, and canonical verified-export responses |
+| Python API | `veriformis.pipeline.PipelineService` | Typed stage orchestration, read-only taxonomy, goal-catalog, and planned profile-admission discovery, raw-source compile preflight, read-only goal preview, and verified-export discovery/dry-run/inspect/execute/verify operations |
+| CLI | `veriformis` / `veriformis.cli` | Thin Typer adapter, including taxonomy, goal-catalog, and planned profile-admission JSON, compile preflight, and canonical verified-export responses |
 | Recipes / YAML | `veriformis.recipes` | Named recipes, statistics, pipeline runner |
-| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, compile-preflight, and verified-export service operations |
+| MCP | `veriformis.mcp` / `veriformis mcp` | Constrained local automation over the same taxonomy, goal-catalog, planned profile-admission, compile-preflight, and verified-export service operations |
 | Optional Aptus adapter | `veriformis.handoff` | Explicit sibling descriptor + consumer verify; not imported by default seal surfaces |
 | macOS workbench | `macos/` | SwiftUI thin CLI adapter with bounded async execution, accountable cancellation, verified transport output, CLI-backed taxonomy help, strict goal-catalog, pre-workspace compile-preflight, and post-compile goal-preview screens, and a strict canonical verified-export bridge |
 

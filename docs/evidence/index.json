@@ -697,6 +697,28 @@
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "independent-product-phase-08-item-8-2",
+      "date": "2026-08-23",
+      "commit": "working-tree-on-799d56f",
+      "scope": "Independent-product Phase 8.2 TRL and MLX-LM admission pins",
+      "grade": "recorded-local",
+      "summary": "Item 8.2 packages canonical admission-v1.json for planned trl and mlx-lm, declares empty extras, and exposes byte-identical Python/CLI/MCP discovery. Export still refuses those consumer_id values. Trainer packages are not installed.",
+      "details": "dev/active/independent-product/phase-08-consumer-profiles/evidence.md",
+      "related": [
+        "docs/contracts/profile-admission-v1.md",
+        "src/veriformis/profiles/admission-v1.json",
+        "docs/adr/0012-consumer-profile-as-optional-adapter.md"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/profiles tests/exports/test_phase8_profile_isolation.py",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
     }
   ]
 }

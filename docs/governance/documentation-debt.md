@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.1 opening)
+**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
 
-**Next review:** Independent-product Phase 8.1 pull-request merge, or any
+**Next review:** Independent-product Phase 8.2 pull-request merge, or any
 active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |

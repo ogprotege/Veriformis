@@ -71,6 +71,7 @@ integrations.
 - Create: `docs/adr/0012-consumer-profile-as-optional-adapter.md` (8.1)
 - Create later: profile contracts, extras, renderers, harnesses, sidecars, optional CI jobs
 - Modify: `src/veriformis/exports/service.py` planned-profile refusal (8.1)
+- Create in 8.2: `src/veriformis/profiles/`, empty extras, CLI `profile-admissions`, MCP `profile_admissions`
 - Do not modify in 8.1: production generic renderers, taxonomy implemented lists, Aptus handoff defaults
 
 ---
@@ -95,8 +96,8 @@ integrations.
 **Branch:** `phase8/02-admission-pins`
 **Title:** `Phase 8.2: Pin TRL and MLX-LM admission records`
 
-- [ ] Complete section-5 gate records: official docs, review dates, pinned version ranges, loss/refusal model, license/deprecation.
-- [ ] Declare optional extras without emitting trainer files.
+- [x] Complete section-5 gate records: official docs, review dates, pinned version ranges, loss/refusal model, license/deprecation.
+- [x] Declare optional extras without emitting trainer files.
 
 ### 8.3 Emit the TRL profile
 

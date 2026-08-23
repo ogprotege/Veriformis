@@ -1,6 +1,6 @@
 # Phase 8 Evidence
 
-**Status:** Open — item 8.1 packet opening
+**Status:** Open — item 8.2 admission pins
 
 **Opened:** 2026-08-23
 
@@ -30,3 +30,14 @@ Active-doc continuity merged as PR #81 at
 - [x] Generic discovery still has `consumer_profile` null.
 - [x] `pyproject.toml` optional extras remain only `test`.
 - [x] Core pytest: 1964 passed, 1 deselected, expected transport warning.
+- [x] Item 8.1 merged as PR #82 at `799d56f` after all 14 GitHub checks.
+
+## Required item 8.2 evidence
+
+- [x] Packaged canonical `admission-v1.json` closed over `trl` and `mlx-lm`.
+- [x] Optional extras `trl` and `mlx-lm` are empty lists; lock has no trainer packages.
+- [x] Python / CLI / MCP discovery is byte-identical.
+- [x] Export still refuses planned `consumer_id` values.
+- [x] Focused tests: 14 passed. Tracking, Ruff, lock, structured JSON, and
+      diff check passed. Core pytest: 1970 passed, 1 deselected, expected
+      transport warning.

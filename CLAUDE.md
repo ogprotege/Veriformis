@@ -42,9 +42,10 @@ passed. Dataset-row compilation is opt-in: `parse --mode dataset-row` then
 `map` on revision v4, with confirmed mapping plans, `mapped_value` evidence,
 JSON/CSV/JSONL capture, rejection reports, and packaged templates. Phase 8
 (first consumer profiles) is in progress under its standard packet. Item 8.1
-opens the packet and publishes ADR-0012: a profile is an optional adapter
-over a verified bundle. `trl` and `mlx-lm` remain planned and refuse export
-with items 8.3 and 8.4. Do not start Phase 9, 10, or 13 from this packet.
+merged as PR #82 at `799d56f` after all 14 GitHub checks passed. Item 8.2
+pins official TRL and MLX-LM admission records as packaged data with empty
+extras. `trl` and `mlx-lm` remain planned and refuse export with items 8.3
+and 8.4. Do not start Phase 9, 10, or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -112,8 +113,9 @@ Read these current authorities before changing code:
 10. `docs/contracts/canonical-json-export-v1.md`
 11. `docs/contracts/constrained-csv-export-v1.md`,
     `docs/contracts/goal-catalog-v1.md`,
-    `docs/contracts/recipe-preset-v1.md`, and
-    `docs/contracts/row-mapping-v1.md`
+    `docs/contracts/recipe-preset-v1.md`,
+    `docs/contracts/row-mapping-v1.md`, and
+    `docs/contracts/profile-admission-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -191,6 +193,7 @@ Key modules under `src/veriformis/` are:
   preview, and compile preflight, whose strict models resolve plain-language
   goals and presets to existing objectives, row schemas, and executable recipe
   settings, and probe raw sources without workspace mutation;
+- `profiles/` for planned TRL and MLX-LM admission pins (not executable);
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

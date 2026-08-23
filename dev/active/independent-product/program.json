@@ -102,7 +102,7 @@
       "packet": "dev/active/independent-product/phase-08-consumer-profiles",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 8.1: open packet, publish ADR-0012, keep TRL and MLX-LM planned and non-executable."
+      "next_gate": "Item 8.2: pin TRL and MLX-LM admission records and empty extras; keep both planned and non-executable."
     },
     {
       "number": 9,

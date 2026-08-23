@@ -297,6 +297,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def profile_admissions() -> str:
+        """Return planned consumer-profile admission pins from PipelineService."""
+        return json.dumps(
+            pipeline.discover_profile_admissions(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def preflight(
         paths: list[str],
         source_root: str | None = None,
