@@ -1028,6 +1028,12 @@ class PipelineService:
 
         return discover_modes()
 
+    def discover_mapping_contracts(self) -> dict[str, Any]:
+        """Return a fresh, adapter-safe copy of row-mapping contract discovery."""
+        from veriformis.mapping import mapping_contract_discovery
+
+        return mapping_contract_discovery()
+
     def preflight(
         self,
         paths: list[Path],

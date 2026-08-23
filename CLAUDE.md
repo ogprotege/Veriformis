@@ -104,12 +104,14 @@ Read these current authorities before changing code:
 9. `docs/contracts/split-jsonl-export-v1.md`
 10. `docs/contracts/canonical-json-export-v1.md`
 11. `docs/contracts/constrained-csv-export-v1.md`,
-    `docs/contracts/goal-catalog-v1.md`, and
-    `docs/contracts/recipe-preset-v1.md`
+    `docs/contracts/goal-catalog-v1.md`,
+    `docs/contracts/recipe-preset-v1.md`, and
+    `docs/contracts/row-mapping-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
-    `docs/adr/0010-input-mode-as-compiler-path.md`
+    `docs/adr/0010-input-mode-as-compiler-path.md`, and
+    `docs/adr/0011-imported-records-and-mapping-evidence.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

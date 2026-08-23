@@ -216,6 +216,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def mapping_contracts() -> str:
+        """Return row-mapping contract discovery from PipelineService."""
+        return json.dumps(
+            pipeline.discover_mapping_contracts(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def preflight(
         paths: list[str],
         source_root: str | None = None,

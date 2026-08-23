@@ -152,6 +152,18 @@ class InputModeError(VeriformisError):
     code = "input-mode-unavailable"
 
 
+class MappingError(VeriformisError):
+    """A mapping plan, imported record, or mapping contract is invalid."""
+
+    code = "mapping-invalid"
+
+
+class RowSourceError(MappingError):
+    """A captured existing-dataset file is malformed or unsupported."""
+
+    code = "row-source-invalid"
+
+
 class GoalCatalogError(VeriformisError):
     """The versioned goal catalog is malformed, tampered, or not closed over the taxonomy."""
 

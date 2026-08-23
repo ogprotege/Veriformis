@@ -1,5 +1,20 @@
 """Existing-dataset mapping: compiler-path modes, then later mapping contracts."""
 
+from veriformis.mapping.models import (
+    ADMITTED_CONTAINERS,
+    COERCION_RULES,
+    CONTRACT_DATA_NAME,
+    FieldMapping,
+    ImportedField,
+    ImportedRecord,
+    MappedValueEvidence,
+    MappingPlan,
+    RESERVED_CONTAINERS,
+    ROW_SCHEMA_PAYLOAD_KEYS,
+    RowSource,
+    mapping_contract_discovery,
+    mapping_contract_discovery_json,
+)
 from veriformis.mapping.modes import (
     DATASET_ROW_MODE,
     DOCUMENT_SOURCE_MODE,
@@ -17,6 +32,19 @@ from veriformis.mapping.modes import (
 )
 
 __all__ = [
+    "ADMITTED_CONTAINERS",
+    "COERCION_RULES",
+    "CONTRACT_DATA_NAME",
+    "FieldMapping",
+    "ImportedField",
+    "ImportedRecord",
+    "MappedValueEvidence",
+    "MappingPlan",
+    "RESERVED_CONTAINERS",
+    "ROW_SCHEMA_PAYLOAD_KEYS",
+    "RowSource",
+    "mapping_contract_discovery",
+    "mapping_contract_discovery_json",
     "DATASET_ROW_MODE",
     "DOCUMENT_SOURCE_MODE",
     "IMPLEMENTED_INPUT_MODES",

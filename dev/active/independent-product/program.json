@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.1 names document-source, dataset-row, and mixed under ADR-0010; only document-source executes. Dataset-row and mixed refuse until items 7.3 and 7.7."
+      "next_gate": "Item 7.1 merged as PR #71 at caf4b1551d099d3b0d5d4de048ba057ea87050a4. Item 7.2 freezes row-source and mapping contracts without capture or execution."
     },
     {
       "number": 8,

@@ -10,9 +10,9 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-28 commands; `export` contains four subcommands.
+29 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first

@@ -679,6 +679,19 @@ def modes() -> None:
     )
 
 
+@app.command(name="mapping-contracts")
+def mapping_contracts() -> None:
+    """Print row-mapping contract discovery as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_mapping_contracts(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="preflight")
 def preflight(
     paths: list[Path],

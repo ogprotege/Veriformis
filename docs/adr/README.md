@@ -31,6 +31,7 @@ not substitutes for implementation or tests.
 | [0007](0007-goal-first-catalog-as-versioned-data.md) | Goal-first catalog and presets as versioned data over existing objectives | Accepted | Objective, row-schema, loss-policy, or representation change; Phase 6.4 preset freeze; Phase 17 or 18 |
 | [0008](0008-input-family-taxonomy-axis.md) | Input family as the seventh taxonomy axis | Accepted | New parser kind or suffix; Phase 11 input qualification; Phase 12 OCR |
 | [0010](0010-input-mode-as-compiler-path.md) | Input mode as a compiler path | Accepted | Item 7.3 dataset-row execution; item 7.7 mixed projects; any new compiler path |
+| [0011](0011-imported-records-and-mapping-evidence.md) | Imported records and mapped-value evidence | Accepted | Item 7.3 execution; item 7.7 membership; item 7.8 JSON/CSV |
 
 ## ADR template
 
