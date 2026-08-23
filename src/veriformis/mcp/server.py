@@ -216,6 +216,25 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def mapping_preview(
+        path: str,
+        mapping_plan: str,
+        source_root: str | None = None,
+    ) -> str:
+        """Preview mapping across the full JSONL file without writing a workspace."""
+        root = Path(source_root) if source_root else None
+        return json.dumps(
+            pipeline.preview_mapping(
+                Path(path),
+                json.loads(mapping_plan),
+                source_root=root,
+            ),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def mapping_detect(
         path: str,
         source_root: str | None = None,
