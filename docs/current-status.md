@@ -33,11 +33,12 @@ as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
 independent-product Phase 6 complete, with items 6.1–6.7 merged sequentially
 as PR #60 through PR #65 and PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d`; independent-product Phase 7 is in
-progress at item 7.3 (JSONL row mapping on workspace revision v4)
+progress at item 7.8 (JSON and compatible CSV import with production round
+trips). Items 7.1–7.7 merged as PR #71 through PR #77.
 
-**Review date:** 2026-08-23 (independent-product Phase 7.3 JSONL mapping)
+**Review date:** 2026-08-23 (independent-product Phase 7.8 JSON/CSV mapping)
 
-**Next review:** Phase 7.3 pull-request merge, item 7.4, beta label
+**Next review:** Phase 7.8 pull-request merge, item 7.9, beta label
 cut, public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`

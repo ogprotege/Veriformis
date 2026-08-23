@@ -1286,10 +1286,13 @@ class PipelineService:
         if selected_mode == DATASET_ROW_MODE:
             return self._parse_dataset_row(paths, out, source_root=source_root)
         if selected_mode == MIXED_MODE:
+            from veriformis.mapping.capture import ROW_SUFFIXES
+
             suffixes = {path.suffix.lower() for path in paths}
-            if suffixes <= {".jsonl"}:
+            row_suffixes = set(ROW_SUFFIXES)
+            if suffixes <= row_suffixes:
                 return self._parse_dataset_row(paths, out, source_root=source_root)
-            if ".jsonl" in suffixes:
+            if suffixes & row_suffixes:
                 raise ParseError(
                     "mixed mode keeps construction and imported-row provenance "
                     "distinct; compile document-source and dataset-row workspaces "
@@ -1449,13 +1452,10 @@ class PipelineService:
         *,
         source_root: Path | None = None,
     ) -> ParseOutcome:
-        """Capture JSONL row sources into a revision-v4 workspace."""
+        """Capture JSONL, JSON, or CSV row sources into a revision-v4 workspace."""
         from veriformis.identity import derive_source_id
-        from veriformis.mapping.capture import capture_jsonl
-        from veriformis.mapping.result import (
-            ROW_JSONL_PARSER_ID,
-            ROW_JSONL_PARSER_VERSION,
-        )
+        from veriformis.mapping.capture import capture_row_source
+        from veriformis.mapping.result import ROW_PARSER_VERSION, row_parser_id
         from veriformis.sources import capture_source_batch
 
         source_captures = capture_source_batch(paths, source_root=source_root)
@@ -1464,7 +1464,7 @@ class PipelineService:
             if source_capture.error is not None:
                 raise source_capture.error
             assert source_capture.raw_bytes is not None
-            row_capture = capture_jsonl(
+            row_capture = capture_row_source(
                 source_capture.path,
                 logical_path=source_capture.logical_path,
                 raw_bytes=source_capture.raw_bytes,
@@ -1481,16 +1481,17 @@ class PipelineService:
         with workspace.begin("parse") as transaction:
             descriptors: list[SourceDescriptor] = []
             outputs: dict[str, Any] = {}
-            parser_config = {
-                "parser": ROW_JSONL_PARSER_ID,
-                "parser_version": ROW_JSONL_PARSER_VERSION,
-                "canonical_stream_contract_version": 1,
-            }
             for path, raw_bytes, row_capture in sorted(
                 captured,
                 key=lambda item: item[2].row_source.logical_path,
             ):
                 source = row_capture.row_source
+                parser_name = row_parser_id(source.container_kind)
+                parser_config = {
+                    "parser": parser_name,
+                    "parser_version": ROW_PARSER_VERSION,
+                    "canonical_stream_contract_version": 1,
+                }
                 source_id = derive_source_id(source.logical_path, source.sha256)
                 raw_artifact = transaction.put_artifact(
                     raw_bytes,
@@ -1506,8 +1507,8 @@ class PipelineService:
                     original_path=str(path.resolve()),
                     sha256=source.sha256,
                     size=source.size,
-                    parser_id=ROW_JSONL_PARSER_ID,
-                    parser_version=ROW_JSONL_PARSER_VERSION,
+                    parser_id=parser_name,
+                    parser_version=ROW_PARSER_VERSION,
                     raw_artifact_id=raw_artifact.id,
                 )
                 row_source_artifact = transaction.put_artifact(
@@ -1515,8 +1516,8 @@ class PipelineService:
                     kind="row-source",
                     media_type="application/json",
                     source_ids=(descriptor.id,),
-                    producer_id=f"veriformis.parser.{ROW_JSONL_PARSER_ID}",
-                    producer_version=ROW_JSONL_PARSER_VERSION,
+                    producer_id=f"veriformis.parser.{parser_name}",
+                    producer_version=ROW_PARSER_VERSION,
                     config=parser_config,
                 )
                 descriptors.append(descriptor)
@@ -2010,8 +2011,8 @@ class PipelineService:
         representation: str,
         mapping_plan: MappingPlan | dict[str, Any] | None = None,
     ) -> MapOutcome:
-        """Map captured JSONL row sources into imported records."""
-        from veriformis.mapping.capture import capture_jsonl
+        """Map captured row sources into imported records."""
+        from veriformis.mapping.capture import capture_row_source
         from veriformis.mapping.execute import execute_mapping
         from veriformis.mapping.models import MappingPlan as MappingPlanModel
         from veriformis.mapping.result import MappingRecipe, MappingResult
@@ -2058,7 +2059,7 @@ class PipelineService:
             if descriptor.raw_artifact_id is None:
                 raise MappingError(f"source {source_id} lacks captured raw bytes")
             raw_bytes = store.read_artifact(descriptor.raw_artifact_id, revision=current)
-            capture = capture_jsonl(
+            capture = capture_row_source(
                 Path(descriptor.logical_path),
                 logical_path=descriptor.logical_path,
                 raw_bytes=raw_bytes,

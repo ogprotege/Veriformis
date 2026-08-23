@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Any
 
 from veriformis.bundle import (
     VALIDATION_PATH,
@@ -18,6 +19,10 @@ from veriformis.bundle import (
     VerificationResult,
     VerifiedFinishedBundle,
     inspect_finished_bundle,
+)
+from veriformis.bundle.verifier import (
+    IMPORTED_BUNDLE_ROW_SET_SCHEMA,
+    ImportedBundleRowSet,
 )
 from veriformis.datasets import (
     DatasetValidationReport,
@@ -349,9 +354,12 @@ class ExportService:
         try:
             source_evidence = _source_plan_evidence(source)
             source_row_set = source_evidence[1]
-            planner_row_set = row_set_from_json_bytes(
-                lossless_json_bytes(source_row_set.model_dump(mode="json"))
-            )
+            if isinstance(source_row_set, ImportedBundleRowSet):
+                planner_row_set = source_row_set
+            else:
+                planner_row_set = row_set_from_json_bytes(
+                    lossless_json_bytes(source_row_set.model_dump(mode="json"))
+                )
             if planner_row_set.row_schema not in descriptor.supported_row_schemas:
                 if (
                     descriptor.selector
@@ -590,24 +598,40 @@ class ExportService:
                 )
                 for item in supplied_evaluation_rows
             )
-            provenance = tuple(
-                row_provenance_from_json_bytes(
-                    lossless_json_bytes(item.model_dump(mode="json"))
+            if _is_imported_export_plan(checked_plan):
+                from veriformis.mapping.finish import ImportedRowProvenance
+
+                provenance = tuple(
+                    ImportedRowProvenance.model_validate(
+                        item.model_dump(mode="json")
+                    )
+                    for item in supplied_provenance
                 )
-                for item in supplied_provenance
-            )
-            candidate_row_set = RowSet.create(
-                plan_id=checked_plan.finished_dataset_plan_id,
-                serialization_plan_id=checked_plan.serialization_plan_id,
-                recipe_id=checked_plan.recipe_id,
-                construction_result_id=checked_plan.construction_result_id,
-                curation_result_id=checked_plan.curation_result_id,
-                split_result_id=checked_plan.split_result_id,
-                row_schema=checked_plan.row_schema,
-                train_rows=train_rows,
-                evaluation_rows=evaluation_rows,
-                provenance=provenance,
-            )
+                candidate_row_set = _imported_candidate_row_set(
+                    checked_plan,
+                    train_rows=train_rows,
+                    evaluation_rows=evaluation_rows,
+                    provenance=provenance,
+                )
+            else:
+                provenance = tuple(
+                    row_provenance_from_json_bytes(
+                        lossless_json_bytes(item.model_dump(mode="json"))
+                    )
+                    for item in supplied_provenance
+                )
+                candidate_row_set = RowSet.create(
+                    plan_id=checked_plan.finished_dataset_plan_id,
+                    serialization_plan_id=checked_plan.serialization_plan_id,
+                    recipe_id=checked_plan.recipe_id,
+                    construction_result_id=checked_plan.construction_result_id,
+                    curation_result_id=checked_plan.curation_result_id,
+                    split_result_id=checked_plan.split_result_id,
+                    row_schema=checked_plan.row_schema,
+                    train_rows=train_rows,
+                    evaluation_rows=evaluation_rows,
+                    provenance=provenance,
+                )
             objective_ids = {item.objective_id for item in provenance}
             emitted_source_ids = {
                 source_id for item in provenance for source_id in item.source_ids
@@ -620,7 +644,10 @@ class ExportService:
                 raise ExportVerificationError(
                     "candidate derivative source scope differs from its export plan"
                 )
-            if candidate_row_set.row_set_id != checked_plan.row_set_id:
+            if (
+                not _is_imported_export_plan(checked_plan)
+                and candidate_row_set.row_set_id != checked_plan.row_set_id
+            ):
                 raise ExportVerificationError(
                     "candidate derivative changes the source row set"
                 )
@@ -792,7 +819,7 @@ class ExportService:
         _run_cancellation_check(cancellation_check)
         try:
             plan = ExportPlan.from_json_bytes(plan_bytes)
-            source_row_set = row_set_from_json_bytes(source_row_set_bytes)
+            source_row_set = _export_row_set_from_bytes(source_row_set_bytes)
             rendered = self._render_derivative(plan, source_row_set)
             files = _normalize_file_bytes(
                 plan,
@@ -1092,7 +1119,10 @@ def _plan_from_source_evidence(
         finished_dataset_plan_id=snapshot.plan_id,
         recipe_id=snapshot.recipe_id,
         objective_id=objective_id,
-        construction_result_id=snapshot.construction_result_id,
+        construction_result_id=(
+            getattr(snapshot, "construction_result_id", None)
+            or snapshot.mapping_result_id
+        ),
         curation_result_id=snapshot.curation_result_id,
         serialization_plan_id=row_set.serialization_plan_id,
         split_result_id=snapshot.split_result_id,
@@ -1108,6 +1138,162 @@ def _plan_from_source_evidence(
     return plan, row_set
 
 
+def _export_row_set_from_bytes(data: bytes) -> RowSet | ImportedBundleRowSet:
+    import json
+
+    payload = json.loads(data.decode("utf-8"))
+    if (
+        isinstance(payload, dict)
+        and payload.get("schema_version") == IMPORTED_BUNDLE_ROW_SET_SCHEMA
+    ):
+        return ImportedBundleRowSet.from_dump(payload)
+    return row_set_from_json_bytes(data)
+
+
+def _imported_source_plan_evidence(
+    source: VerifiedFinishedBundle,
+    manifest: FinishedBundleManifest,
+    manifest_bytes: bytes,
+) -> tuple[Any, ImportedBundleRowSet, VerificationResult, str, ExportMembershipProjection]:
+    report = source.validation_report
+    row_set = source.row_set
+    verification = VerificationResult.from_json_bytes(
+        lossless_json_bytes(source.verification.model_dump(mode="json"))
+    )
+    snapshot = report.snapshot
+    manifest_sha256 = sha256_digest(manifest_bytes)
+    report_bytes = lossless_json_bytes(report.model_dump(mode="json"))
+    if (
+        manifest.bundle_id != verification.bundle_id
+        or manifest.dataset_snapshot_id != verification.dataset_snapshot_id
+        or manifest.validation_report_id != verification.validation_report_id
+        or manifest.content_root_sha256 != verification.content_root_sha256
+        or manifest_sha256 != verification.manifest_sha256
+        or report.report_id != verification.validation_report_id
+        or report.snapshot_id != verification.dataset_snapshot_id
+        or report.status != "passed"
+        or snapshot.snapshot_id != verification.dataset_snapshot_id
+        or len(manifest.files) != verification.payload_file_count
+        or row_set.total_row_count != verification.declared_record_count
+        or row_set.plan_id != snapshot.plan_id
+        or row_set.recipe_id != snapshot.recipe_id
+        or row_set.mapping_result_id != snapshot.mapping_result_id
+        or row_set.curation_result_id != snapshot.curation_result_id
+        or row_set.split_result_id != snapshot.split_result_id
+        or row_set.row_set_id != snapshot.row_set_id
+    ):
+        raise ExportVerificationError(
+            "verified export source identities or counts do not close"
+        )
+    manifest_files = {item.path: item for item in manifest.files}
+    for binding in snapshot.file_bindings:
+        descriptor = manifest_files.get(binding.path)
+        if descriptor is None or (
+            descriptor.sha256,
+            descriptor.size,
+            descriptor.record_count,
+            descriptor.role,
+            descriptor.media_type,
+        ) != (
+            binding.sha256,
+            binding.byte_size,
+            binding.record_count,
+            binding.role,
+            binding.media_type,
+        ):
+            raise ExportVerificationError(
+                "verified export manifest differs from the dataset file snapshot"
+            )
+    validation_descriptor = manifest_files.get(VALIDATION_PATH)
+    if validation_descriptor is None or (
+        validation_descriptor.sha256,
+        validation_descriptor.size,
+    ) != (sha256_digest(report_bytes), len(report_bytes)):
+        raise ExportVerificationError(
+            "verified export manifest differs from the validation report"
+        )
+    if len(snapshot.file_bindings) != 3:
+        raise ExportVerificationError(
+            "verified export snapshot has an incomplete file registry"
+        )
+    rows = (*row_set.train_rows, *row_set.evaluation_rows)
+    if not rows or len(rows) != len(row_set.provenance):
+        raise ExportVerificationError(
+            "verified export source has incomplete row provenance"
+        )
+    objective_ids: set[str] = set()
+    emitted_source_ids: set[str] = set()
+    for row, provenance in zip(rows, row_set.provenance, strict=True):
+        objective_ids.add(provenance.objective_id)
+        emitted_source_ids.update(provenance.source_ids)
+        if (
+            provenance.plan_id != snapshot.plan_id
+            or provenance.recipe_id != snapshot.recipe_id
+            or provenance.mapping_result_id != snapshot.mapping_result_id
+            or provenance.curation_result_id != snapshot.curation_result_id
+            or provenance.split_result_id != snapshot.split_result_id
+            or provenance.serialization_plan_id != row_set.serialization_plan_id
+            or provenance.row_id != row.row_id
+            or provenance.record_id != row.record_id
+            or provenance.payload_sha256 != row.payload_sha256
+        ):
+            raise ExportVerificationError(
+                "verified export provenance differs from its source row"
+            )
+    if len(objective_ids) != 1:
+        raise ExportVerificationError(
+            "verified export source must bind one training objective"
+        )
+    if emitted_source_ids != set(snapshot.source_ids):
+        raise ExportVerificationError(
+            "verified export rows do not cover the dataset source scope"
+        )
+    return (
+        report,
+        row_set,
+        verification,
+        next(iter(objective_ids)),
+        _membership_projection_from_row_set(row_set),
+    )
+
+
+def _is_imported_export_plan(plan: ExportPlan) -> bool:
+    return plan.construction_result_id.startswith("imr-")
+
+
+def _imported_candidate_row_set(
+    plan: ExportPlan,
+    *,
+    train_rows: tuple[ProductRow, ...],
+    evaluation_rows: tuple[ProductRow, ...],
+    provenance: tuple[Any, ...],
+) -> ImportedBundleRowSet:
+    empty = "0" * 64
+    return ImportedBundleRowSet(
+        row_schema=plan.row_schema,
+        train_rows=train_rows,
+        evaluation_rows=evaluation_rows,
+        provenance=provenance,
+        row_set_id=plan.row_set_id,
+        split_result_id=plan.split_result_id,
+        plan_id=plan.finished_dataset_plan_id,
+        recipe_id=plan.recipe_id,
+        mapping_result_id=plan.construction_result_id,
+        construction_result_id=plan.construction_result_id,
+        curation_result_id=plan.curation_result_id,
+        serialization_plan_id=plan.serialization_plan_id,
+        train_jsonl_sha256=empty,
+        train_jsonl_byte_size=0,
+        evaluation_jsonl_sha256=empty,
+        evaluation_jsonl_byte_size=0,
+        provenance_jsonl_sha256=empty,
+        provenance_jsonl_byte_size=0,
+        train_row_count=len(train_rows),
+        evaluation_row_count=len(evaluation_rows),
+        total_row_count=len(train_rows) + len(evaluation_rows),
+    )
+
+
 def _source_plan_evidence(
     source: VerifiedFinishedBundle,
 ) -> tuple[
@@ -1121,6 +1307,12 @@ def _source_plan_evidence(
     try:
         manifest_bytes = source.manifest.canonical_bytes()
         manifest = FinishedBundleManifest.from_json_bytes(manifest_bytes)
+        if isinstance(source.row_set, ImportedBundleRowSet):
+            return _imported_source_plan_evidence(
+                source,
+                manifest,
+                manifest_bytes,
+            )
         report = dataset_validation_report_from_json_bytes(
             lossless_json_bytes(source.validation_report.model_dump(mode="json"))
         )

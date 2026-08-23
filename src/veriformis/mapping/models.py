@@ -34,9 +34,16 @@ ROW_SCHEMA_PAYLOAD_KEYS: dict[str, tuple[str, ...]] = {
     "instruction_output": ("instruction", "input", "output"),
     "messages": ("messages",),
 }
-ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl",)
-RESERVED_CONTAINERS: tuple[str, ...] = ("json", "csv")
+ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl", "json", "csv")
+RESERVED_CONTAINERS: tuple[str, ...] = ()
 CONTAINER_KINDS: tuple[str, ...] = ADMITTED_CONTAINERS + RESERVED_CONTAINERS
+CSV_DIALECT: dict[str, object] = {
+    "delimiter": ",",
+    "encoding": "utf-8",
+    "header_required": True,
+    "pad": False,
+    "trim": False,
+}
 MEMBERSHIP_POLICIES: tuple[str, ...] = ("authoritative", "advisory", "replaced")
 MISSING_VALUE_RULES: tuple[str, ...] = ("refuse",)
 INVALID_ROW_RULES: tuple[str, ...] = ("refuse",)
@@ -260,11 +267,15 @@ class MappingPlan(_StrictModel):
             )
         if self.container_kind in RESERVED_CONTAINERS:
             raise MappingError(
-                f"container {self.container_kind!r} is reserved until item 7.8"
+                f"container {self.container_kind!r} is reserved"
             )
         if self.container_kind not in ADMITTED_CONTAINERS:
             raise MappingError(
                 f"unsupported mapping container {self.container_kind!r}"
+            )
+        if self.container_kind == "csv" and self.row_schema == "messages":
+            raise MappingError(
+                "CSV cannot represent nested messages; use split-jsonl-directory or json"
             )
         validate_sha256(self.confirmation_digest)
         if not self.field_mappings:
@@ -437,4 +448,6 @@ def _packaged_contracts() -> tuple[str, dict[str, Any]]:
         raise MappingError("mapping contract row schemas drifted")
     if tuple(payload.get("membership_policies") or ()) != MEMBERSHIP_POLICIES:
         raise MappingError("mapping contract membership policies drifted")
+    if payload.get("csv_dialect") != CSV_DIALECT:
+        raise MappingError("mapping contract csv dialect drifted")
     return canonical, payload

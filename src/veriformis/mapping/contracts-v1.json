@@ -1,12 +1,21 @@
 {
   "admitted_containers": [
-    "jsonl"
+    "jsonl",
+    "json",
+    "csv"
   ],
   "coercion_rules": [
     "refuse"
   ],
   "contract_id": "veriformis.row-mapping",
   "contract_version": 1,
+  "csv_dialect": {
+    "delimiter": ",",
+    "encoding": "utf-8",
+    "header_required": true,
+    "pad": false,
+    "trim": false
+  },
   "invalid_row_rules": [
     "refuse"
   ],
@@ -35,10 +44,7 @@
       "text"
     ]
   },
-  "reserved_containers": [
-    "json",
-    "csv"
-  ],
+  "reserved_containers": [],
   "review_policies": [
     "none",
     "required"

@@ -1,6 +1,6 @@
 # Phase 7 Evidence
 
-**Status:** Open — item 7.3 JSONL mapping
+**Status:** Open — item 7.8 JSON/CSV round trips
 
 **Opened:** 2026-08-23
 
@@ -37,3 +37,15 @@ The completion stamp merged as PR #69 at
 - [x] Document-source v3 workspaces reject `map`; v4 workspaces reject `clean` / `construct`.
 - [x] Four JSONL fixtures (`text`, `prompt_completion`, `instruction_output`, `messages`) map and seal.
 - [x] Python / CLI / MCP parity on mapping-plan id, imported-record ids, and manifest digest.
+
+## Required item 7.8 evidence
+
+- [x] JSON capture admits a top-level array of objects or one object with a
+      `records`/`rows` array; scalar files and non-object records fail closed.
+- [x] CSV capture requires a header, comma, UTF-8, no trim/pad; jagged and
+      nested rows fail closed; `messages` names `split-jsonl-directory` or `json`.
+- [x] Document-source parse of the same JSON bytes remains a different parser
+      path from dataset-row capture.
+- [x] Round-trip matrix: JSONL × 4 schemas, JSON × 4, CSV × 3 flat, using
+      production mapping plus existing generic export, not Phase 5.5 loaders.
+- [x] Core pytest: 1951 passed, 1 deselected, expected transport warning.

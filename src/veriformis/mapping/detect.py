@@ -12,7 +12,7 @@ from pydantic import field_validator, model_validator
 
 from veriformis.errors import MappingError
 from veriformis.identity import lossless_json_bytes, sha256_digest
-from veriformis.mapping.capture import CapturedRow, JsonlCapture, capture_jsonl
+from veriformis.mapping.capture import CapturedRow, JsonlCapture, capture_row_source
 from veriformis.mapping.execute import _require_two_turn_messages, resolve_json_pointer
 from veriformis.mapping.models import FieldMapping, MappingPlan, _StrictModel
 
@@ -145,9 +145,18 @@ def detect_mapping_capture(
             and detector.representation_id != representation_id
         ):
             continue
+        if (
+            capture.row_source.container_kind == "csv"
+            and detector.row_schema == "messages"
+        ):
+            continue
         if not _detector_matches(detector, capture.records):
             continue
-        plan = _plan_from_detector(detector, source_digests=source_digests)
+        plan = _plan_from_detector(
+            detector,
+            source_digests=source_digests,
+            container_kind=capture.row_source.container_kind,
+        )
         if plan.mapping_plan_id in seen:
             continue
         seen.add(plan.mapping_plan_id)
@@ -175,7 +184,7 @@ def detect_mapping(
     goal_id: str | None = None,
     representation_id: str | None = None,
 ) -> dict[str, Any]:
-    capture = capture_jsonl(path, logical_path=logical_path or path.name)
+    capture = capture_row_source(path, logical_path=logical_path or path.name)
     return detect_mapping_capture(
         capture,
         goal_id=goal_id,
@@ -208,6 +217,7 @@ def _plan_from_detector(
     detector: MappingDetector,
     *,
     source_digests: tuple[tuple[str, str], ...],
+    container_kind: str,
 ) -> MappingPlan:
     from veriformis.mapping.models import ROW_SCHEMA_PAYLOAD_KEYS
 
@@ -231,7 +241,7 @@ def _plan_from_detector(
         goal_id=detector.goal_id,
         representation_id=detector.representation_id,
         row_schema=detector.row_schema,
-        container_kind="jsonl",
+        container_kind=container_kind,
         confirmation_digest=confirmation,
         field_mappings=mappings,
     )

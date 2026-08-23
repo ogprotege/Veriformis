@@ -487,13 +487,109 @@ def _row_contract(
     return row, row_schema, objective_kind
 
 
+IMPORTED_BUNDLE_ROW_SET_SCHEMA = "veriformis.imported-bundle-row-set/v1"
+
+
+@dataclass(frozen=True, slots=True)
+class ImportedBundleRowSet:
+    """Product rows reconstructed from an imported finished bundle."""
+
+    row_schema: str
+    train_rows: tuple[Any, ...]
+    evaluation_rows: tuple[Any, ...]
+    provenance: tuple[Any, ...]
+    row_set_id: str
+    split_result_id: str
+    plan_id: str
+    recipe_id: str
+    mapping_result_id: str
+    construction_result_id: str
+    curation_result_id: str
+    serialization_plan_id: str
+    train_jsonl_sha256: str
+    train_jsonl_byte_size: int
+    evaluation_jsonl_sha256: str
+    evaluation_jsonl_byte_size: int
+    provenance_jsonl_sha256: str
+    provenance_jsonl_byte_size: int
+    train_row_count: int
+    evaluation_row_count: int
+    total_row_count: int
+
+    def model_dump(self, *, mode: str = "json") -> dict[str, Any]:
+        return {
+            "schema_version": IMPORTED_BUNDLE_ROW_SET_SCHEMA,
+            "row_schema": self.row_schema,
+            "train_rows": [row.model_dump(mode=mode) for row in self.train_rows],
+            "evaluation_rows": [
+                row.model_dump(mode=mode) for row in self.evaluation_rows
+            ],
+            "provenance": [item.model_dump(mode=mode) for item in self.provenance],
+            "row_set_id": self.row_set_id,
+            "split_result_id": self.split_result_id,
+            "plan_id": self.plan_id,
+            "recipe_id": self.recipe_id,
+            "mapping_result_id": self.mapping_result_id,
+            "construction_result_id": self.construction_result_id,
+            "curation_result_id": self.curation_result_id,
+            "serialization_plan_id": self.serialization_plan_id,
+            "train_jsonl_sha256": self.train_jsonl_sha256,
+            "train_jsonl_byte_size": self.train_jsonl_byte_size,
+            "evaluation_jsonl_sha256": self.evaluation_jsonl_sha256,
+            "evaluation_jsonl_byte_size": self.evaluation_jsonl_byte_size,
+            "provenance_jsonl_sha256": self.provenance_jsonl_sha256,
+            "provenance_jsonl_byte_size": self.provenance_jsonl_byte_size,
+            "train_row_count": self.train_row_count,
+            "evaluation_row_count": self.evaluation_row_count,
+            "total_row_count": self.total_row_count,
+        }
+
+    @classmethod
+    def from_dump(cls, payload: dict[str, Any]) -> ImportedBundleRowSet:
+        from veriformis.datasets.serialization import ProductRow
+        from veriformis.mapping.finish import ImportedRowProvenance
+
+        if payload.get("schema_version") != IMPORTED_BUNDLE_ROW_SET_SCHEMA:
+            raise ValueError("imported bundle row set schema mismatch")
+        return cls(
+            row_schema=payload["row_schema"],
+            train_rows=tuple(
+                ProductRow.model_validate(item) for item in payload["train_rows"]
+            ),
+            evaluation_rows=tuple(
+                ProductRow.model_validate(item) for item in payload["evaluation_rows"]
+            ),
+            provenance=tuple(
+                ImportedRowProvenance.model_validate(item)
+                for item in payload["provenance"]
+            ),
+            row_set_id=payload["row_set_id"],
+            split_result_id=payload["split_result_id"],
+            plan_id=payload["plan_id"],
+            recipe_id=payload["recipe_id"],
+            mapping_result_id=payload["mapping_result_id"],
+            construction_result_id=payload["construction_result_id"],
+            curation_result_id=payload["curation_result_id"],
+            serialization_plan_id=payload["serialization_plan_id"],
+            train_jsonl_sha256=payload["train_jsonl_sha256"],
+            train_jsonl_byte_size=payload["train_jsonl_byte_size"],
+            evaluation_jsonl_sha256=payload["evaluation_jsonl_sha256"],
+            evaluation_jsonl_byte_size=payload["evaluation_jsonl_byte_size"],
+            provenance_jsonl_sha256=payload["provenance_jsonl_sha256"],
+            provenance_jsonl_byte_size=payload["provenance_jsonl_byte_size"],
+            train_row_count=payload["train_row_count"],
+            evaluation_row_count=payload["evaluation_row_count"],
+            total_row_count=payload["total_row_count"],
+        )
+
+
 def _verify_imported_row_provenance_alignment(
     root_descriptor: int,
     *,
     file_facts: dict[str, _EntryFacts],
     files_by_path: dict[str, BundleFile],
     snapshot: Any,
-) -> Any:
+) -> ImportedBundleRowSet:
     """Align imported payloads with mapping provenance; never invent chunks."""
     from veriformis.datasets.serialization import ProductRow
     from veriformis.mapping.finish import ImportedRowProvenance
@@ -653,7 +749,31 @@ def _verify_imported_row_provenance_alignment(
                 raise BundleVerificationError(
                     f"bundle file changed during row alignment: {path!r}"
                 )
-        return snapshot
+        first = provenance_values[0]
+        train_binding, evaluation_binding, provenance_binding = snapshot.file_bindings
+        return ImportedBundleRowSet(
+            row_schema=expected_row_schema,
+            train_rows=tuple(train_rows),
+            evaluation_rows=tuple(evaluation_rows),
+            provenance=tuple(provenance_values),
+            row_set_id=snapshot.row_set_id,
+            split_result_id=snapshot.split_result_id,
+            plan_id=snapshot.plan_id,
+            recipe_id=snapshot.recipe_id,
+            mapping_result_id=snapshot.mapping_result_id,
+            construction_result_id=snapshot.mapping_result_id,
+            curation_result_id=snapshot.curation_result_id,
+            serialization_plan_id=first.serialization_plan_id,
+            train_jsonl_sha256=train_binding.sha256,
+            train_jsonl_byte_size=train_binding.byte_size,
+            evaluation_jsonl_sha256=evaluation_binding.sha256,
+            evaluation_jsonl_byte_size=evaluation_binding.byte_size,
+            provenance_jsonl_sha256=provenance_binding.sha256,
+            provenance_jsonl_byte_size=provenance_binding.byte_size,
+            train_row_count=len(train_rows),
+            evaluation_row_count=len(evaluation_rows),
+            total_row_count=len(train_rows) + len(evaluation_rows),
+        )
     finally:
         for handle in handles.values():
             handle.close()

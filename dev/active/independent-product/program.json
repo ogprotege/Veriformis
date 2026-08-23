@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.6 merged as PR #76. Item 7.7 honors imported partitions under an explicit membership policy and admits mixed mode with distinct provenances."
+      "next_gate": "Item 7.7 merged as PR #77. Item 7.8 admits JSON and compatible CSV import and proves production map-seal-export round trips."
     },
     {
       "number": 8,

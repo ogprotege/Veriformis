@@ -42,3 +42,13 @@ v1. Partition policy remains `replaced`. JSON and CSV remain reserved.
 
 Item 7.3 merged as PR #73. Item 7.4 packages mapping detectors and requires
 the confirmation digest of a chosen proposal before `map` mutates a workspace.
+
+## 2026-08-23 — Items 7.4–7.7 merged; item 7.8 in progress
+
+Items 7.4–7.7 merged as PR #74 through PR #77. JSON and CSV remain the item
+7.8 admission. Mapping-grade JSON arrays, `{records}`/`{rows}` objects, and
+comma CSV with a required header are captured without document recovery.
+
+**Next action:** Finish 7.8 focused gates, then publish, merge on local
+admission evidence if GitHub Actions remains budget-blocked, and synchronize
+clean main before item 7.9.

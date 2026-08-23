@@ -2479,7 +2479,7 @@ class WorkspaceTransaction:
     ) -> None:
         """Replay dataset-row parse, map, and finished-import stages."""
         from veriformis.identity import derive_source_id
-        from veriformis.mapping.capture import capture_jsonl
+        from veriformis.mapping.capture import capture_row_source
         from veriformis.mapping.execute import execute_mapping
         from veriformis.mapping.finish import (
             curate_imported_records,
@@ -2494,12 +2494,13 @@ class WorkspaceTransaction:
         )
         from veriformis.mapping.models import MappingPlan, RowSource
         from veriformis.mapping.result import (
-            ROW_JSONL_PARSER_ID,
+            ROW_PARSER_IDS,
             MappingRecipe,
             MappingResult,
             mapping_plan_from_dict,
             mapping_recipe_from_dict,
             mapping_result_from_dict,
+            row_parser_id,
         )
 
         parse_state = revision.stages["parse"]
@@ -2516,9 +2517,9 @@ class WorkspaceTransaction:
                     "parse registry does not match the candidate source descriptors"
                 )
             for source_id, source in sorted(revision.sources.items()):
-                if source.parser_id != ROW_JSONL_PARSER_ID:
+                if source.parser_id not in ROW_PARSER_IDS:
                     raise WorkspaceCorruptError(
-                        f"dataset-row source {source_id} must use the row-jsonl parser"
+                        f"dataset-row source {source_id} must use a row-source parser"
                     )
                 if source.raw_artifact_id is None:
                     raise WorkspaceCorruptError(
@@ -2528,11 +2529,16 @@ class WorkspaceTransaction:
                     revision,
                     source.raw_artifact_id,
                 )
-                capture = capture_jsonl(
+                capture = capture_row_source(
                     Path(source.logical_path),
                     logical_path=source.logical_path,
                     raw_bytes=raw_bytes,
                 )
+                if source.parser_id != row_parser_id(capture.row_source.container_kind):
+                    raise WorkspaceCorruptError(
+                        f"dataset-row source {source_id} parser does not match "
+                        f"captured container {capture.row_source.container_kind!r}"
+                    )
                 if derive_source_id(source.logical_path, source.sha256) != source.id:
                     raise WorkspaceCorruptError(
                         f"source descriptor identity mismatch for {source_id}"
@@ -2542,7 +2548,7 @@ class WorkspaceTransaction:
                 )
                 if stored != capture.row_source:
                     raise WorkspaceCorruptError(
-                        f"row-source artifact does not match JSONL capture {source_id}"
+                        f"row-source artifact does not match capture {source_id}"
                     )
             return
 
@@ -2576,7 +2582,7 @@ class WorkspaceTransaction:
                     revision,
                     source.raw_artifact_id,  # type: ignore[arg-type]
                 )
-                capture = capture_jsonl(
+                capture = capture_row_source(
                     Path(source.logical_path),
                     logical_path=source.logical_path,
                     raw_bytes=raw_bytes,

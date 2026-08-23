@@ -799,9 +799,18 @@ class ExportDryRunPreview:
         """Freeze ordinal-zero payloads from the exact row set used by planning."""
         try:
             checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
-            checked_row_set = row_set_from_json_bytes(
-                lossless_json_bytes(row_set.model_dump(mode="json"))
-            )
+            dumped = lossless_json_bytes(row_set.model_dump(mode="json"))
+            payload = json.loads(dumped.decode("utf-8"))
+            if (
+                isinstance(payload, dict)
+                and payload.get("schema_version")
+                == "veriformis.imported-bundle-row-set/v1"
+            ):
+                from veriformis.bundle.verifier import ImportedBundleRowSet
+
+                checked_row_set = ImportedBundleRowSet.from_dump(payload)
+            else:
+                checked_row_set = row_set_from_json_bytes(dumped)
         except (AttributeError, TypeError, UnicodeError, ValueError, VeriformisError) as exc:
             raise ExportContractError(
                 f"invalid dry-run preview source evidence: {exc}"

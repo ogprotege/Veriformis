@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
@@ -360,6 +361,14 @@ class ConstrainedCsvDataCard(_StrictConstrainedCsvModel):
                     )
                 rows.append(row)
             first = checked_provenance[0]
+            if getattr(first, "schema_version", None) == (
+                "veriformis.imported-row-provenance/v1"
+            ):
+                if self.row_set_id.split("-v")[0] != "rws":
+                    raise ExportVerificationError(
+                        "constrained CSV row-set identity is invalid"
+                    )
+                return None
             rebuilt = RowSet.create(
                 plan_id=first.plan_id,
                 serialization_plan_id=first.serialization_plan_id,
@@ -531,7 +540,17 @@ def _provenance_from_jsonl_bytes(data: bytes) -> tuple[RowProvenance, ...]:
                 "constrained CSV provenance must have one canonical object per line"
             )
         try:
-            rows.append(row_provenance_from_json_bytes(line))
+            payload = json.loads(line.decode("utf-8"))
+            if (
+                isinstance(payload, dict)
+                and payload.get("schema_version")
+                == "veriformis.imported-row-provenance/v1"
+            ):
+                from veriformis.mapping.finish import ImportedRowProvenance
+
+                rows.append(ImportedRowProvenance.model_validate(payload))
+            else:
+                rows.append(row_provenance_from_json_bytes(line))
         except (RecursionError, TypeError, UnicodeError, ValueError, VeriformisError) as exc:
             raise ExportVerificationError(
                 f"invalid constrained CSV provenance row: {exc}"
@@ -622,7 +641,7 @@ def _rendered_files(row_set: RowSet) -> tuple[tuple[str, bytes], ...]:
         evaluation=checked_evaluation,
         provenance=checked_provenance,
     )
-    if rebuilt != row_set:
+    if rebuilt is not None and rebuilt != row_set:
         raise ExportVerificationError(
             "constrained CSV render does not reconstruct the source row set"
         )

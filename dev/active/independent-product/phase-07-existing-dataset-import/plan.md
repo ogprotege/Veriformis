@@ -198,11 +198,11 @@ Roadmap items 3 and 5 begin here: mapping execution includes field provenance fr
 **Branch:** `phase7/08-json-csv-roundtrip`  
 **Title:** `Phase 7.8: Admit JSON and CSV import and prove round trips`
 
-- [ ] JSON: one object with a declared records array, or a top-level array of objects. Nested paths via JSON pointer. Refuse non-object records and the document-mode flattened projection.
-- [ ] CSV: mapping-grade reader, not `parsers/structured.py`. Declared dialect on the mapping plan (header required, comma, UTF-8, no silent trim/pad). Ragged rows are invalid-row events, not padded cells. Compatible with the three flat schemas only. Refuse `messages` with the same actionable alternative as constrained-CSV export (`split-jsonl-directory` or `json`).
-- [ ] Do not treat Veriformis constrained-CSV export dialect as the only admissible CSV; do treat it as a detector proposal.
-- [ ] Round-trip matrix: for every admitted pair (JSONL × 4 schemas, JSON × 4, CSV × 3 flat), map → curate → split (replaced or authoritative as pinned) → seal → generic export of the matching container → semantic equality of payloads and partitions. This uses production mapping + existing export, not Phase 5.5's test loaders.
-- [ ] Negative: CSV+`messages`, nested CSV, JSON scalar file, document-mode compile of the same bytes still produces a different (construction) artifact — modes must not collapse.
+- [x] JSON: one object with a declared records array, or a top-level array of objects. Nested paths via JSON pointer. Refuse non-object records and the document-mode flattened projection.
+- [x] CSV: mapping-grade reader, not `parsers/structured.py`. Declared dialect on the mapping plan (header required, comma, UTF-8, no silent trim/pad). Ragged rows are invalid-row events, not padded cells. Compatible with the three flat schemas only. Refuse `messages` with the same actionable alternative as constrained-CSV export (`split-jsonl-directory` or `json`).
+- [x] Do not treat Veriformis constrained-CSV export dialect as the only admissible CSV; do treat it as a detector proposal.
+- [x] Round-trip matrix: for every admitted pair (JSONL × 4 schemas, JSON × 4, CSV × 3 flat), map → curate → split (replaced or authoritative as pinned) → seal → generic export of the matching container → semantic equality of payloads and partitions. This uses production mapping + existing export, not Phase 5.5's test loaders.
+- [x] Negative: CSV+`messages`, nested CSV, JSON scalar file, document-mode compile of the same bytes still produces a different (construction) artifact — modes must not collapse.
 
 ### 7.9 Export row-level rejections
 
