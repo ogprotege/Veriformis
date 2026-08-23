@@ -51,3 +51,12 @@ Active-doc continuity merged as PR #81 at
 - [x] Request v2 refused; MLX-LM still planned; core does not import TRL.
 - [x] Focused tests passed. Tracking, Ruff, JSON, and diff check passed.
       Core pytest: 1975 passed, 1 deselected, expected transport warning.
+- [x] Item 8.3 merged as PR #84 at `fe326c8` after all 14 GitHub checks.
+
+## Required item 8.4 evidence
+
+- [x] MLX-LM selector is executable.
+- [x] `train.jsonl` required; `valid.jsonl` omitted when evaluation is empty.
+- [x] No `test.jsonl`. Request v2 refused. Core does not import mlx-lm.
+- [x] Focused tests passed. Tracking, Ruff, JSON, and diff check passed.
+      Core pytest: 1982 passed, 1 deselected, expected transport warning.

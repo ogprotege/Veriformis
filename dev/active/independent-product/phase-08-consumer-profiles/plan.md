@@ -111,7 +111,7 @@ integrations.
 **Branch:** `phase8/04-mlx-lm-profile`
 **Title:** `Phase 8.4: Emit the MLX-LM profile`
 
-- [ ] Required `train.jsonl`, optional `valid.jsonl` / `test.jsonl`, supported shapes, explicit masking/completion.
+- [x] Required `train.jsonl`, optional `valid.jsonl`, supported shapes, explicit masking/completion. `test.jsonl` is not mapped from Veriformis evaluation.
 
 ### 8.5 Load artifacts through the real consumers
 

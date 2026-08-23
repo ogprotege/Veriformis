@@ -87,6 +87,7 @@ from veriformis.exports.constrained_csv import (
 )
 from veriformis.exports.paths import validate_export_relative_path
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
+from veriformis.profiles.mlx_lm import MLX_LM_IMPLEMENTATION
 from veriformis.profiles.trl import TRL_IMPLEMENTATION
 from veriformis.identity import lossless_json_bytes, sha256_digest
 
@@ -130,6 +131,7 @@ class ExportService:
                 CANONICAL_JSON_IMPLEMENTATION,
                 CONSTRAINED_CSV_IMPLEMENTATION,
                 TRL_IMPLEMENTATION,
+                MLX_LM_IMPLEMENTATION,
             )
             if _implementations is None
             else tuple(_implementations)

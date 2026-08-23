@@ -16,6 +16,7 @@ exit until items 8.1–8.7 and U1–U7 have current-tree evidence.
 - Item 8.2 packages official-doc admission pins and empty extras without
   emitting trainer files.
 - Item 8.3 emits the TRL SFT adapter. Taxonomy remains planned.
+- Item 8.4 emits the MLX-LM LoRA adapter. Taxonomy remains planned.
 
 ## Exclusions
 
