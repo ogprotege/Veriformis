@@ -1,0 +1,31 @@
+# Phase 9 Evidence
+
+**Status:** Open — item 9.1 packet
+
+**Opened:** 2026-08-23
+
+## Predecessor evidence
+
+Phase 8 completed. Item 8.7 merged as PR #88 at
+`199e16eeabd8c624b571add9d28034830b3b92da` after all 16 GitHub checks
+passed.
+
+## Source-verified starting facts
+
+| Fact | Grade | Source |
+| --- | --- | --- |
+| `parquet`, `arrow`, and `hugging-face-dataset` are planned taxonomy identifiers | `source-verified` | `src/veriformis/taxonomy.py`; `docs/governance/support-registry.json` |
+| Production discovery has no those container selectors | `source-verified` | `ExportService.discover_exports()` |
+| Core optional extras are `test`, `trl`, and `mlx-lm` | `source-verified` | `pyproject.toml` |
+| Generic JSONL, JSON, and constrained CSV are implemented | `source-verified` | Phase 5 closeout |
+
+## Required item 9.1 evidence
+
+- [x] Packet opened; Phase 9 `in_progress`; Phase 8 merge cited.
+- [x] ADR-0013 published and indexed.
+- [x] Planned containers refuse export with items 9.4, 9.5, and 9.6.
+- [x] Existing generic and profile selectors remain executable.
+- [x] Extra `columnar` is an empty list; lock has no PyArrow or datasets packages.
+- [x] Focused isolation tests passed (15 including Phase 8 isolation). Tracking,
+      Ruff, lock, and diff check passed. Core pytest: 2009 passed, 3
+      deselected, expected transport warning.

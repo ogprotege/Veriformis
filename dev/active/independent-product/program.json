@@ -102,17 +102,17 @@
       "packet": "dev/active/independent-product/phase-08-consumer-profiles",
       "started_on": "2026-08-23",
       "completed_on": "2026-08-23",
-      "next_gate": "Completed; closeout is item 8.7. Phase 9 may begin under its own standard packet when the operator asks."
+      "next_gate": "Completed; closeout merged as PR #88 at 199e16eeabd8c624b571add9d28034830b3b92da with all 16 GitHub checks passed and clean main synchronized; Phase 9 began under its own standard packet."
     },
     {
       "number": 9,
       "title": "Add columnar and Hugging Face dataset containers",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [4],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-09-columnar-containers",
+      "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Begin after optional-dependency and export evidence rules pass."
+      "next_gate": "Item 9.1: packet, ADR-0013, planned-container refusal, empty columnar extra."
     },
     {
       "number": 10,

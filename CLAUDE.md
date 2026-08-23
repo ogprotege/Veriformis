@@ -44,8 +44,11 @@ JSON/CSV/JSONL capture, rejection reports, and packaged templates. Phase 8
 (first consumer profiles) is complete under its standard packet. Items 8.1–8.6
 merged as PR #82 through PR #87. Item 8.7 promotes `trl` and `mlx-lm` to
 implemented optional adapters, names accepted/transformed/rejected goals and
-rows, and closes the phase. The exporter does not train. Do not start Phase 9,
-10, or 13 from this packet.
+rows, and closes the phase. The exporter does not train. Phase 9 (columnar
+and Hugging Face dataset containers) is in progress under its standard
+packet. Item 9.1 opens the packet and refuses planned `parquet`, `arrow`,
+and `hugging-face-dataset` selectors. Do not start Phase 10 or 13 from this
+packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -123,7 +126,8 @@ Read these current authorities before changing code:
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
     `docs/adr/0010-input-mode-as-compiler-path.md`,
     `docs/adr/0011-imported-records-and-mapping-evidence.md`, and
-    `docs/adr/0012-consumer-profile-as-optional-adapter.md`
+    `docs/adr/0012-consumer-profile-as-optional-adapter.md`, and
+    `docs/adr/0013-columnar-containers-as-optional-generic-exports.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

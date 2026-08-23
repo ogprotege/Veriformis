@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.1 columnar packet)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -34,6 +34,7 @@ not substitutes for implementation or tests.
 | [0010](0010-input-mode-as-compiler-path.md) | Input mode as a compiler path | Accepted | Any new compiler path beyond document-source, dataset-row, and mixed |
 | [0011](0011-imported-records-and-mapping-evidence.md) | Imported records and mapped-value evidence | Accepted | Any new field-evidence kind, membership policy, or admitted row container |
 | [0012](0012-consumer-profile-as-optional-adapter.md) | Consumer profile as optional adapter over a verified bundle | Accepted | Item 8.3 TRL execution; item 8.4 MLX-LM execution; any required trainer extra |
+| [0013](0013-columnar-containers-as-optional-generic-exports.md) | Columnar containers as optional generic exports | Accepted | Item 9.4 Parquet execution; item 9.5 Arrow execution; item 9.6 Hugging Face Dataset execution; any required PyArrow extra |
 
 ## ADR template
 
