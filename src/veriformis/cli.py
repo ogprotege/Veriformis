@@ -767,6 +767,19 @@ def mapping_detect(
         raise typer.Exit(code=2)
 
 
+@app.command(name="mapping-templates")
+def mapping_templates() -> None:
+    """Print packaged mapping templates as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_mapping_templates(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="mapping-contracts")
 def mapping_contracts() -> None:
     """Print row-mapping contract discovery as deterministic JSON."""

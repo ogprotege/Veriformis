@@ -46,7 +46,8 @@ mapping preview (PR #76). Item 7.7 honors imported partitions and admits mixed
 mode with distinct provenances (PR #77). Item 7.8 admits JSON and compatible
 CSV capture and proves production map → seal → generic-export round trips
 (PR #78). Item 7.9 exports row-level mapping rejections as a content-addressed
-project artifact.
+project artifact (PR #79). Item 7.10 ships mapping templates and closes Phase
+7. Do not start Phase 8, 9, or 13 from this closeout.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

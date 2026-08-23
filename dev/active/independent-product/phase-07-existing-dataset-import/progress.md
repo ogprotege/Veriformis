@@ -63,3 +63,9 @@ set.
 **Next action:** Finish 7.9 focused gates, publish, merge on local admission
 evidence if GitHub Actions remains budget-blocked, and synchronize clean main
 before item 7.10.
+
+## 2026-08-23 — Item 7.9 merged; item 7.10 closeout in progress
+
+Item 7.9 merged as PR #79 at `ef9fded646e55bd8eafabe327ca5cc767fae7d4a`.
+Mapping templates, operator guide, U1–U7 judgment, support-registry gap close,
+and packet closeout are this item. Do not start Phase 8, 9, or 13.

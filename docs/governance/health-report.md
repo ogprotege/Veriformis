@@ -102,8 +102,8 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Open Phase 7 under its own standard packet after existing-dataset
-   import contracts and acceptance fixtures are pinned.
+1. Do not start Phase 8, 9, or 13 from the Phase 7 closeout. Consumer
+   profiles remain Phase 8; Parquet/Arrow remain Phase 9.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a

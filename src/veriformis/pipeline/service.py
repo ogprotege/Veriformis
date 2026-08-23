@@ -1050,6 +1050,12 @@ class PipelineService:
 
         return mapping_contract_discovery()
 
+    def discover_mapping_templates(self) -> dict[str, Any]:
+        """Return packaged mapping templates. Discovery data, not constants."""
+        from veriformis.mapping.templates import mapping_template_catalog
+
+        return mapping_template_catalog().model_dump(mode="json")
+
     def detect_mapping(
         self,
         path: Path,

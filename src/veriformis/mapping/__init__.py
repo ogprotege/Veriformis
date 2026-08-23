@@ -15,6 +15,13 @@ from veriformis.mapping.detect import (
     mapping_detector_catalog_json,
 )
 from veriformis.mapping.execute import execute_mapping, execute_mapping_rows, replay_mapping
+from veriformis.mapping.templates import (
+    MappingTemplate,
+    MappingTemplateCatalog,
+    mapping_plan_from_template,
+    mapping_template_catalog,
+    mapping_template_catalog_json,
+)
 from veriformis.mapping.reject import (
     MappingRejection,
     MappingRejectionReport,
@@ -122,6 +129,11 @@ __all__ = [
     "MappingRejectionReport",
     "export_mapping_rejections",
     "write_mapping_rejection_report",
+    "MappingTemplate",
+    "MappingTemplateCatalog",
+    "mapping_plan_from_template",
+    "mapping_template_catalog",
+    "mapping_template_catalog_json",
     "MAPPING_STAGE_SCHEMA_ID",
     "MappingRecipe",
     "MappingResult",

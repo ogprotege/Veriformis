@@ -1,0 +1,83 @@
+{
+  "contract_id": "veriformis.mapping-template",
+  "contract_version": 1,
+  "schema_id": "veriformis.mapping-template-discovery/v1",
+  "templates": [
+    {
+      "container_kind": "jsonl",
+      "detector_id": "alpaca-instruction-output",
+      "field_mappings": [
+        {
+          "source_path": "instruction",
+          "target_key": "instruction"
+        },
+        {
+          "source_path": "input",
+          "target_key": "input"
+        },
+        {
+          "source_path": "output",
+          "target_key": "output"
+        }
+      ],
+      "goal_id": "continue-a-passage",
+      "membership_policy": "replaced",
+      "plain_language": "Map instruction, input, and output strings into the instruction-output row.",
+      "representation_id": "instruction-and-output",
+      "row_schema": "instruction_output",
+      "template_id": "instruction-output"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "two-turn-messages",
+      "field_mappings": [
+        {
+          "source_path": "messages",
+          "target_key": "messages"
+        }
+      ],
+      "goal_id": "continue-a-passage",
+      "membership_policy": "replaced",
+      "plain_language": "Map a two-turn user then assistant messages array into the conversation row.",
+      "representation_id": "conversation",
+      "row_schema": "messages",
+      "template_id": "two-turn-messages"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "prompt-completion",
+      "field_mappings": [
+        {
+          "source_path": "prompt",
+          "target_key": "prompt"
+        },
+        {
+          "source_path": "completion",
+          "target_key": "completion"
+        }
+      ],
+      "goal_id": "continue-a-passage",
+      "membership_policy": "replaced",
+      "plain_language": "Map prompt and completion strings into the prompt-completion row.",
+      "representation_id": "prompt-and-completion",
+      "row_schema": "prompt_completion",
+      "template_id": "prompt-completion"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "flat-text",
+      "field_mappings": [
+        {
+          "source_path": "text",
+          "target_key": "text"
+        }
+      ],
+      "goal_id": "learn-the-text",
+      "membership_policy": "replaced",
+      "plain_language": "Map a text field into the whole-text row.",
+      "representation_id": "whole-text",
+      "row_schema": "text",
+      "template_id": "flat-text"
+    }
+  ]
+}

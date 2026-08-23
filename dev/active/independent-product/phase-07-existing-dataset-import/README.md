@@ -1,10 +1,10 @@
 # Phase 7 — Existing-Dataset Import and Mapping
 
-**Status:** In progress; item 7.1 opening
+**Status:** Complete
 
 **Started:** 2026-08-23
 
-**Completed:** —
+**Completed:** 2026-08-23
 
 **Roadmap phase:** [Phase 7](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-7--add-first-class-existing-dataset-import-and-mapping)
 
@@ -43,5 +43,6 @@ executable.
 
 ## Current state
 
-Phase 7 opened on 2026-08-23 from clean `main` at
-`6c4694c2e1c523156cd7c8f34c12f258a3ce0b01`. Item 7.1 is in progress.
+Phase 7 completed on 2026-08-23. Items 7.1–7.9 merged as PR #71–#79. Item 7.10
+adds mapping templates, the operator guide, U1–U7 judgment, and closeout.
+GitHub Actions remained budget-blocked; merges used local admission evidence.

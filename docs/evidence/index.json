@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.evidence-index/v1",
-  "last_updated": "2026-08-22",
+  "last_updated": "2026-08-23",
   "evidence_grades": {
     "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
     "test-verified": "Claim is exercised by an automated passing test.",
