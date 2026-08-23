@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 from pathlib import Path
@@ -29,7 +30,7 @@ from veriformis.contracts import (
     V1_CONSTRUCTION_DIAGNOSTIC_CODES,
     V1_ROW_SCHEMA_KINDS,
 )
-from veriformis.errors import GoalCatalogError, TaxonomyError
+from veriformis.errors import GoalCatalogError, GoalInstructionError, TaxonomyError
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.taxonomy import (
     DEFAULT_ROW_SCHEMA,
@@ -107,6 +108,194 @@ LossPolicyKind = Literal[
     "output-only",
     "final-assistant-suffix",
 ]
+InstructionTaskClaimKind = Literal[
+    "continuation",
+    "section-recovery",
+    "recorded-change",
+    "structured-extraction",
+]
+InstructionSource = Literal["not-applicable", "catalog-default", "operator"]
+
+# Matching is validation-only. Phrases are Unicode-casefolded and matched at
+# token boundaries; the exact instruction string is never normalized or
+# rewritten. A truthful override must name its own non-negated task category
+# and must mention no other task or closed absent-transformation category.
+INSTRUCTION_TASK_CLAIM_VOCABULARY: dict[str, tuple[str, ...]] = {
+    "continuation": (
+        "continue the passage",
+        "exact remainder",
+        "source remainder",
+    ),
+    "section-recovery": (
+        "body for this heading",
+        "section body",
+        "source section",
+    ),
+    "recorded-change": (
+        "before-and-after",
+        "cleaning change",
+        "recorded change",
+    ),
+    "structured-extraction": (
+        "recorded attribute",
+        "structural attribute",
+        "structured value",
+    ),
+}
+INSTRUCTION_ABSENT_CLAIM_VOCABULARY: dict[str, tuple[str, ...]] = {
+    "answering": (
+        "answer",
+        "answers",
+        "answered",
+        "answering",
+        "question",
+        "questions",
+        "q&a",
+    ),
+    "explanation": (
+        "explain",
+        "explains",
+        "explained",
+        "explaining",
+        "explanation",
+    ),
+    "general-editing": ("general edit", "general editing", "style transfer"),
+    "inference": (
+        "infer",
+        "infers",
+        "inferred",
+        "inferring",
+        "inference",
+        "guess",
+        "guesses",
+        "guessed",
+        "guessing",
+        "compute",
+        "computes",
+        "computed",
+        "computing",
+    ),
+    "invention": (
+        "invent",
+        "invents",
+        "invented",
+        "inventing",
+        "creative",
+        "creatively",
+        "new content",
+        "new ending",
+    ),
+    "outlining": ("outline", "outlines", "outlined", "outlining"),
+    "paraphrase": (
+        "paraphrase",
+        "paraphrases",
+        "paraphrased",
+        "paraphrasing",
+    ),
+    "reordering": ("reorder", "reorders", "reordered", "reordering"),
+    "rewrite": ("rewrite", "rewrites", "rewritten", "rewriting"),
+    "shortening": (
+        "shorten",
+        "shortens",
+        "shortened",
+        "shortening",
+        "abridge",
+        "abridges",
+        "abridged",
+        "abridging",
+        "condense",
+        "condenses",
+        "condensed",
+        "condensing",
+    ),
+    "summary": (
+        "summarize",
+        "summarizes",
+        "summarized",
+        "summarizing",
+        "summarization",
+        "summarise",
+        "summarises",
+        "summarised",
+        "summarising",
+        "summarisation",
+        "summary",
+    ),
+    "translation": (
+        "translate",
+        "translates",
+        "translated",
+        "translating",
+        "translation",
+    ),
+}
+_EXPECTED_INSTRUCTION_TASK_CLAIM: dict[str, str | None] = {
+    "full_text": None,
+    "continuation": "continuation",
+    "section_reconstruction": "section-recovery",
+    "before_after_transformation": "recorded-change",
+    "structured_field": "structured-extraction",
+}
+
+
+@dataclass(frozen=True)
+class ResolvedGoalInstruction:
+    """One exact instruction value and the authority that supplied it."""
+
+    instruction_text: str | None
+    source: InstructionSource
+
+
+_TASK_NEGATION = re.compile(
+    r"(?:\bdo\s+not|\bdoes\s+not|\bdid\s+not|\bdon't|\bdoesn't|\bdidn't|"
+    r"\bnot|\bnever|\bwithout|\bavoid|\bavoiding)\s+$"
+)
+
+
+def _phrase_matches(text: str, phrase: str) -> tuple[re.Match[str], ...]:
+    pattern = r"(?<!\w)" + re.escape(phrase).replace(r"\ ", r"\s+") + r"(?!\w)"
+    return tuple(re.finditer(pattern, text))
+
+
+def _matching_instruction_claims(text: str) -> dict[str, tuple[str, ...]]:
+    folded = text.casefold()
+    matches: dict[str, tuple[str, ...]] = {}
+    for claim, phrases in {
+        **INSTRUCTION_TASK_CLAIM_VOCABULARY,
+        **INSTRUCTION_ABSENT_CLAIM_VOCABULARY,
+    }.items():
+        observed: list[str] = []
+        for phrase in phrases:
+            occurrences = _phrase_matches(folded, phrase)
+            if claim in INSTRUCTION_TASK_CLAIM_VOCABULARY:
+                occurrences = tuple(
+                    occurrence
+                    for occurrence in occurrences
+                    if _TASK_NEGATION.search(folded[: occurrence.start()]) is None
+                )
+            if occurrences:
+                observed.append(phrase)
+        if observed:
+            matches[claim] = tuple(observed)
+    return matches
+
+
+def _instruction_truth_reasons(
+    instruction: str,
+    *,
+    task_claim: str,
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if instruction == "":
+        return ("instruction-empty",)
+    if instruction.strip() != instruction or not instruction.isprintable():
+        return ("instruction-not-plain",)
+    matches = _matching_instruction_claims(instruction)
+    if task_claim not in matches:
+        reasons.append("goal-task-not-named")
+    if any(claim != task_claim for claim in matches):
+        reasons.append("absent-transformation-claimed")
+    return tuple(reasons)
 
 
 def _require_identifier(field: str, value: str) -> str:
@@ -298,6 +487,8 @@ class Goal(_StrictModel):
     default_representation: str
     compatible_representations: tuple[str, ...]
     eligible_input_families: tuple[str, ...]
+    default_instruction: str | None
+    instruction_task_claim: InstructionTaskClaimKind | None
     required_source_evidence: str
     required_evidence_diagnostics: tuple[str, ...]
     target_construction: str
@@ -348,6 +539,18 @@ class Goal(_StrictModel):
     @classmethod
     def _identifier(cls, value: str) -> str:
         return _require_identifier("goal_id", value)
+
+    @field_validator("default_instruction")
+    @classmethod
+    def _default_instruction(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if not value or value.strip() != value or not value.isprintable():
+            raise ValueError(
+                "default_instruction must be non-empty printable text without "
+                "surrounding whitespace"
+            )
+        return value
 
     @field_validator(*_PLAIN_GOAL_FIELDS)
     @classmethod
@@ -456,6 +659,31 @@ class GoalCatalog(_StrictModel):
     def model_post_init(self, __context: Any) -> None:
         by_rep = {rep.representation_id: rep for rep in self.representations}
         for goal in self.goals:
+            expected_claim = _EXPECTED_INSTRUCTION_TASK_CLAIM[goal.objective]
+            if goal.instruction_task_claim != expected_claim:
+                raise ValueError(
+                    f"goal {goal.goal_id!r} instruction_task_claim must be "
+                    f"{expected_claim!r}"
+                )
+            if expected_claim is None:
+                if goal.default_instruction is not None:
+                    raise ValueError(
+                        f"goal {goal.goal_id!r} cannot define a default instruction"
+                    )
+            else:
+                if goal.default_instruction is None:
+                    raise ValueError(
+                        f"goal {goal.goal_id!r} requires a default instruction"
+                    )
+                reasons = _instruction_truth_reasons(
+                    goal.default_instruction,
+                    task_claim=expected_claim,
+                )
+                if reasons:
+                    raise ValueError(
+                        f"goal {goal.goal_id!r} default instruction violates "
+                        f"its truth policy: {list(reasons)!r}"
+                    )
             for rep_id in goal.compatible_representations:
                 if rep_id not in by_rep:
                     raise ValueError(
@@ -594,6 +822,68 @@ def resolve_goal(
             f"expected one of {list(goal.compatible_representations)!r}"
         )
     return goal.objective, rep.row_schema, goal.recipe_library_id, rep.loss_policy
+
+
+def resolve_goal_instruction(
+    *, objective: str, row_schema: str, instruction: str | None
+) -> ResolvedGoalInstruction:
+    """Resolve one catalog default or truth-checked operator override.
+
+    Serialization still requires a non-empty instruction literal for
+    ``instruction_output``. Omission at a goal-first surface selects the
+    catalog literal; a supplied value is preserved byte-for-byte only after
+    the goal's deterministic claim-vocabulary check passes.
+    """
+    goal = goal_for_objective(objective)
+    try:
+        representation = representation_for_row_schema(row_schema)
+    except GoalCatalogError as exc:
+        raise GoalInstructionError(
+            exc.message,
+            reason_codes=("instruction-not-applicable",),
+        ) from exc
+    if representation.representation_id not in goal.compatible_representations:
+        raise GoalInstructionError(
+            f"goal {goal.goal_id!r} does not admit row schema {row_schema!r}",
+            reason_codes=("instruction-not-applicable",),
+        )
+    if row_schema != "instruction_output":
+        if instruction is not None:
+            raise GoalInstructionError(
+                "instruction is valid only for the instruction-and-output "
+                "representation",
+                reason_codes=("instruction-not-applicable",),
+            )
+        return ResolvedGoalInstruction(
+            instruction_text=None,
+            source="not-applicable",
+        )
+    if goal.default_instruction is None or goal.instruction_task_claim is None:
+        raise GoalInstructionError(
+            f"goal {goal.goal_id!r} does not admit instruction-and-output rows",
+            reason_codes=("instruction-not-applicable",),
+        )
+
+    candidate = goal.default_instruction if instruction is None else instruction
+    if not isinstance(candidate, str):
+        raise GoalInstructionError(
+            "instruction must be a string",
+            reason_codes=("instruction-not-plain",),
+        )
+    source: InstructionSource = "catalog-default" if instruction is None else "operator"
+    reasons = _instruction_truth_reasons(
+        candidate,
+        task_claim=goal.instruction_task_claim,
+    )
+    if reasons:
+        matches = sorted(_matching_instruction_claims(candidate))
+        raise GoalInstructionError(
+            f"instruction for goal {goal.goal_id!r} failed the deterministic "
+            f"truthfulness check ({', '.join(reasons)}); matched claim "
+            f"categories {matches!r}",
+            reason_codes=reasons,
+        )
+    return ResolvedGoalInstruction(instruction_text=candidate, source=source)
 
 
 def require_goal_input_family(

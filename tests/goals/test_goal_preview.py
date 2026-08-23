@@ -12,7 +12,7 @@ from typer.testing import CliRunner
 from veriformis.cli import app
 from veriformis.datasets import SerializationPlan
 from veriformis.datasets.serialization import render_record_payload
-from veriformis.errors import GoalCatalogError, MissingStageInputError
+from veriformis.errors import GoalCatalogError, GoalInstructionError, MissingStageInputError
 from veriformis.goals import (
     GoalPreview,
     goal_catalog,
@@ -20,7 +20,6 @@ from veriformis.goals import (
 )
 from veriformis.goals import preview as preview_module
 from veriformis.goals.preview import (
-    INSTRUCTION_REQUIRED_OMISSION,
     MAX_RECORD_BYTES,
     MAX_RESPONSE_BYTES,
     RECORD_LIMIT_OMISSION,
@@ -107,7 +106,8 @@ def test_preview_shows_exact_row_and_supervised_span_for_every_goal(
 ) -> None:
     workspace = workspaces[objective]
     rep = goal_catalog().representation(rep_id)
-    instruction = "Produce the exact source-derived target." if rep.requires_operator_instruction else None
+    goal = goal_for_objective(objective)
+    instruction = None
     before = _snapshot(workspace)
     outcome = SERVICE.preview_goal(workspace, representation=rep_id, instruction=instruction)
     assert _snapshot(workspace) == before
@@ -125,7 +125,12 @@ def test_preview_shows_exact_row_and_supervised_span_for_every_goal(
     recipe, result, inputs = _load_constructed_dataset(store, store.head())
     sources = {source.id: source for source in inputs.sources}
     by_id = {record.record_id: record for record in result.records}
-    plan = SerializationPlan.create(row_schema=rep.row_schema, instruction_text=instruction)
+    plan = SerializationPlan.create(
+        row_schema=rep.row_schema,
+        instruction_text=(
+            goal.default_instruction if rep.requires_operator_instruction else None
+        ),
+    )
     for entry in preview.records:
         record = by_id[entry.record_id]
         assert entry.omission_reason is None
@@ -144,6 +149,14 @@ def test_preview_shows_exact_row_and_supervised_span_for_every_goal(
                 assert expected_row["messages"][0]["content"]
             else:
                 assert key in expected_row
+        if rep.row_schema == "messages":
+            assert len(entry.context) == 1
+            assert expected_row["messages"][0] == {
+                "role": "user",
+                "content": next(iter(entry.context.values())),
+            }
+        if rep.row_schema == "instruction_output":
+            assert expected_row["instruction"] == goal.default_instruction
         assert entry.recovered_source
         for item in entry.recovered_source:
             assert item.excerpt is not None
@@ -162,20 +175,56 @@ def test_preview_shows_exact_row_and_supervised_span_for_every_goal(
     assert len(preview.transport_text().encode("utf-8")) <= MAX_RESPONSE_BYTES
 
 
-def test_default_representation_follows_the_recipe_and_requires_instruction_when_needed(
+def test_default_representation_follows_recipe_and_catalog_supplies_instruction(
     workspaces,
 ) -> None:
     preview = SERVICE.preview_goal(workspaces["continuation"]).preview
     assert preview.representation_id == "prompt-and-completion"
-    missing = SERVICE.preview_goal(
+    defaulted = SERVICE.preview_goal(
         workspaces["continuation"], representation="instruction-and-output"
     ).preview
-    assert missing.records
-    for entry in missing.records:
-        assert entry.omission_reason == INSTRUCTION_REQUIRED_OMISSION
-        assert entry.rendered_row is None
+    assert defaulted.records
+    for entry in defaulted.records:
+        assert entry.omission_reason is None
+        assert entry.rendered_row == {
+            "instruction": goal_for_objective("continuation").default_instruction,
+            "input": entry.context["prompt"],
+            "output": entry.target["completion"],
+        }
         assert entry.target is not None and entry.supervised.end > 0
-    assert missing.counts["omitted"] == 0
+    assert defaulted.counts["omitted"] == 0
+
+
+def test_curate_uses_catalog_default_instruction_in_the_finished_plan(tmp_path) -> None:
+    workspace = _compile(tmp_path, "continuation", target_row_schema="instruction_output")
+    SERVICE.curate(workspace, evaluation_required=False)
+
+    preview = SERVICE.preview_goal(workspace).preview
+    expected = goal_for_objective("continuation").default_instruction
+    assert expected is not None
+    assert preview.records
+    assert all(entry.rendered_row["instruction"] == expected for entry in preview.records)
+
+
+def test_curate_refuses_untruthful_instruction_without_mutating_workspace(
+    tmp_path,
+) -> None:
+    workspace = _compile(
+        tmp_path,
+        "continuation",
+        target_row_schema="instruction_output",
+    )
+    before = _snapshot(workspace)
+
+    with pytest.raises(GoalInstructionError) as excinfo:
+        SERVICE.curate(
+            workspace,
+            evaluation_required=False,
+            instruction="Invent a new ending.",
+        )
+
+    assert "absent-transformation-claimed" in excinfo.value.reason_codes
+    assert _snapshot(workspace) == before
 
 
 def test_preview_reports_curation_decisions_and_persisted_instruction(tmp_path) -> None:
@@ -197,6 +246,21 @@ def test_preview_reports_curation_decisions_and_persisted_instruction(tmp_path) 
         assert "target-too-short" in entry.curation_reason_codes
         assert entry.rendered_row["instruction"] == "Continue the passage exactly."
     assert preview.omitted_exclusion_count == 0
+
+    conversation = SERVICE.preview_goal(
+        workspace,
+        representation="conversation",
+    ).preview
+    assert conversation.records
+    assert all(
+        entry.rendered_row == {
+            "messages": [
+                {"role": "user", "content": entry.context["prompt"]},
+                {"role": "assistant", "content": entry.target["completion"]},
+            ]
+        }
+        for entry in conversation.records
+    )
 
 
 def test_preview_fails_closed_on_incompatible_or_unknown_selection(workspaces, tmp_path) -> None:

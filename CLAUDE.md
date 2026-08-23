@@ -17,8 +17,8 @@ semantic round-trip matrix merged as PR #57 at
 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e` after
 all 14 GitHub checks passed. Phase 5.7's operator guide and Phase 5 closeout
 merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14
-GitHub checks passed. Phase 6 (goal-first recipes and previews) is in progress
-under its standard packet. Item 6.1's plain-language goal catalog merged as
+GitHub checks passed. Phase 6 (goal-first recipes and previews) is complete
+locally under its standard packet. Item 6.1's plain-language goal catalog merged as
 PR #60 at `7316d94faf2d6c23b7abb6fe200f154da47d398c` after all 14 GitHub
 checks passed; item 6.2's per-goal contracts and seventh taxonomy axis
 `input_family` merged as PR #61 at
@@ -29,8 +29,13 @@ at `abdd630e25e83ebf346316319caec892f4d64886` after all 14 GitHub checks
 passed. Item 6.5's compile preflight over raw sources merged as PR #64 at
 `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d` after all 14 checks passed.
 Item 6.6's frozen goal acceptance matrix across every eligible input family,
-compatible representation, and product surface is locally complete and awaits
-its pull request.
+compatible representation, and product surface merged as PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`. Item 6.7's catalog-default
+instruction truthfulness, visible non-claims, and scripted Mac walkthrough
+passed the current-tree matrix (297), Mac XCTest target (102), and standalone
+Python suite (2,006). Phase 6 closeout is recorded locally. Do not begin
+Phase 7 or claim publication, GitHub checks, merge, or clean main before the
+item 6.7 pull request is green and merged.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -100,8 +105,9 @@ Read these current authorities before changing code:
     `docs/contracts/goal-catalog-v1.md`, and
     `docs/contracts/recipe-preset-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
-    `docs/adr/0007-goal-first-catalog-as-versioned-data.md`, and
-    `docs/adr/0008-input-family-taxonomy-axis.md`
+    `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
+    `docs/adr/0008-input-family-taxonomy-axis.md`, and
+    `docs/adr/0009-catalog-default-instructions-and-truthfulness.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

@@ -14,18 +14,22 @@ Phase 5.5's test-only consolidated semantic round-trip matrix merged as PR #57
 at `c72b8e9ec7bc2746d74404226aa086d497e15db1`, Phase 5.6 exact dry-run preview
 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and Phase
 5.7's operator guidance and closeout merged as PR #59 at
-`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, completing Phases 0–5; Phase 6
-goal-first recipes and previews in progress; version `0.1.0` development
-alpha
+`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, completing Phases 0–5; Phase
+6.1–6.6 merged through PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`, and Phase 6.7 goal-first
+instruction truthfulness passed current-tree gates with Phase 6 closeout
+recorded locally and publication pending;
+version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–5 complete; maturity alpha; public Mac claim still owner-gated
+Phases 0–6 complete locally at item 6.7 closeout, with publication pending;
+maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
-label cut, public-ready checklist, or any product-contract change
+**Next review:** Phase 6.7 pull-request merge, Phase 7 opening, beta label cut,
+public-ready checklist, or any product-contract change
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -298,7 +302,7 @@ The product may describe this as faithful, source-grounded, loss-accounted, or p
 
 ## Deterministic v1 boundary
 
-The v1 dataset pipeline makes no LLM calls and performs no remote model generation. The implemented deterministic builders create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field candidates when the recipe states a truthful task and every constructed field has evidence. Structured-field construction binds each selected strict-IR scalar to its immutable artifact, RFC 6901 pointer, exact value digest, encoding, output digest, and construction context.
+The v1 dataset pipeline makes no LLM calls and performs no remote model generation. The implemented deterministic builders create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field candidates when the recipe states a truthful task and every constructed field has evidence. Structured-field construction binds each selected strict-IR scalar to its immutable artifact, RFC 6901 pointer, exact value digest, encoding, output digest, and construction context. For a source-grounded instruction-and-output representation, goal-first omission resolves one versioned catalog default and an explicit operator override is admitted only by the deterministic per-goal claim-vocabulary check. That check adds no generated text and does not reinterpret the exact instruction already bound into a finished plan or bundle.
 
 The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, row-lowering, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 

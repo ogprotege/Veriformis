@@ -152,6 +152,16 @@ class GoalCatalogError(VeriformisError):
     code = "goal-catalog-invalid"
 
 
+class GoalInstructionError(VeriformisError):
+    """A supplied goal instruction is absent, inapplicable, or untruthful."""
+
+    code = "goal-instruction-invalid"
+
+    def __init__(self, message: str, *, reason_codes: tuple[str, ...]):
+        self.reason_codes = reason_codes
+        super().__init__(message)
+
+
 class CompilePreflightError(VeriformisError):
     """Compile preflight cannot produce one complete truthful response."""
 

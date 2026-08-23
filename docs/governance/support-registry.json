@@ -124,11 +124,16 @@
       "src/veriformis/taxonomy.py",
       "src/veriformis/goals/catalog.py",
       "src/veriformis/goals/catalog-v1.json",
+      "src/veriformis/goals/preflight.py",
+      "src/veriformis/goals/preview.py",
       "src/veriformis/goals/presets.py",
       "src/veriformis/goals/presets-v1.json",
       "docs/contracts/dataset-construction-v1.md",
       "docs/contracts/taxonomy-v1.md",
-      "docs/contracts/goal-catalog-v1.md"
+      "docs/contracts/goal-catalog-v1.md",
+      "tests/goals/test_goal_instructions.py",
+      "tests/regressions/test_phase6_goal_acceptance_matrix.py",
+      "macos/Tests/CLIBridgeTests.swift"
     ]
   },
   "artifacts": {

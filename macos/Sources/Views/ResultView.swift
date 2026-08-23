@@ -130,11 +130,10 @@ struct GoalPreviewView: View {
         Text("\(preview.supervisedRegion) (\(preview.lossPolicy))")
             .font(.caption)
             .foregroundStyle(.secondary)
-        ForEach(preview.notThis, id: \.self) { claim in
-            Text("Not this: \(claim)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
+        GoalDisclosuresView(
+            notThis: preview.notThis,
+            nonClaims: preview.nonClaims
+        )
         if let counts = countsLine(preview.counts) {
             Text(counts)
                 .font(.caption.monospaced())

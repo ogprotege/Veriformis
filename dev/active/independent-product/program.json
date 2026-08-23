@@ -77,12 +77,12 @@
     {
       "number": 6,
       "title": "Deliver goal-first recipes and previews",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [4],
       "packet": "dev/active/independent-product/phase-06-goal-first-recipes",
       "started_on": "2026-08-22",
-      "completed_on": null,
-      "next_gate": "Items 6.1 through 6.5 merged sequentially through PR #64 at b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d; item 6.6 goal acceptance matrix passed all local admission gates and awaits its green pull-request merge and clean-main synchronization before item 6.7."
+      "completed_on": "2026-08-22",
+      "next_gate": "Completed locally: items 6.1 through 6.6 merged sequentially through PR #65 at 7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5; item 6.7 instruction truthfulness, usability judgment, and Phase 6 closeout recorded on the current tree. Pull request pending GitHub checks, merge, and clean-main synchronization. Phase 7 remains planned."
     },
     {
       "number": 7,
@@ -92,7 +92,7 @@
       "packet": null,
       "started_on": null,
       "completed_on": null,
-      "next_gate": "Begin after generic export and goal semantics pass."
+      "next_gate": "Begin after the Phase 6.7 closeout pull request is green, merged, and clean local main equals origin/main."
     },
     {
       "number": 8,

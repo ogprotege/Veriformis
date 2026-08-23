@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -83,7 +83,15 @@ chunking, named construction, global curation, and split functions in memory.
 The service, CLI, MCP, and Mac workbench share its exact response, while real
 construction shares the same goal/input-family gate so preflight and compile
 cannot disagree about source eligibility. It creates no workspace and accesses
-no renderer or destination.
+no renderer or destination. Phase 6.6 closes the catalog to 74 raw-source,
+input-family, and representation cells through seal and external-digest verify.
+Phase 6.7 adds `resolve_goal_instruction` at the goal layer: an omitted
+instruction-and-output value resolves from `catalog-v1.json`, while an explicit
+operator override passes a closed deterministic task/absent-transformation
+vocabulary check. The resolved exact literal enters the existing finished plan;
+serialization and verification do not consult the catalog or change meaning.
+The Mac picker and preview render both goal-specific and closed non-claims, and
+the view model delegates export through the existing typed CLI bridge.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

@@ -437,3 +437,72 @@ Observed gates on the reconciled working tree:
 **Next action:** Publish the item 6.6 pull request, require every GitHub check
 to pass, merge, and synchronize clean local `main` with `origin/main` before
 item 6.7 begins.
+
+## 2026-08-22 — Item 6.6 merged; item 6.7 implementation complete, gates pending
+
+**Status:** Item 6.6 merged as PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`; item 6.7 implementation is
+present, but its required current-tree evidence is incomplete.
+
+The goal catalog now owns one exact default instruction for each of the four
+supervised goals. Goal-first omission resolves that default before a finished
+plan is created; an operator override is preserved exactly only after a
+documented boundary-aware, Unicode-casefolded, closed-vocabulary check confirms
+the selected source-derived task and rejects other task or absent-
+transformation claims. Preflight binds the exact catalog digest plus supplied
+and effective instruction digests. The persisted plan continues to require one
+exact non-empty instruction literal; serialization and verification perform no
+catalog lookup or semantic reinterpretation. `messages` remains exact
+source-derived context and target.
+
+The Mac picker and preview share one presentation of both `not_this` and the
+closed `non_claims`; thin workbench delegates forward the existing typed export
+requests; and the predeclared pick → preflight → compile → preview → export
+walkthrough exists as XCTest. ADR-0009, the three affected contracts, current
+product/CLI/architecture/status docs, support and evidence records, governance,
+and the Phase 6 packet were reconciled without starting Phase 7.
+
+Observed current-tree evidence:
+
+- 208 focused Python cases passed in 5.91 seconds; focused Ruff, exact catalog
+  fixture comparison, and all 74 Python-cell fixture regenerations passed.
+- The complete cross-surface matrix was interrupted after 155 passing cases in
+  163.83 seconds with no observed failure. Because it did not finish, it is not
+  a pass and U3 is not finally judged on this tree.
+- The macOS target passed `build-for-testing`. Runtime execution could not
+  start because the sandbox could not reach `testmanagerd`; zero of the 102
+  XCTest methods executed. U4 and U6 are therefore not finally judged.
+- The last vocabulary expansion for common past, nominal, and British
+  inflections occurred after the focused run and is unexecuted.
+
+**Next action:** Run the complete current-tree matrix and Mac XCTest target,
+then the full required repository gates. If all pass, judge U3/U4/U6, complete
+the Phase 6 closeout, publish item 6.7, require green GitHub checks, merge, and
+synchronize clean local `main` with `origin/main`. Do not begin Phase 7 first.
+
+## 2026-08-22 — Item 6.7 required gates passed; Phase 6 closed locally
+
+**Status:** Item 6.7 current-tree gates, U1–U6, and Phase 6 closeout recorded.
+Publication, GitHub checks, merge, and clean-main synchronization remain
+pending. Phase 7 has not started.
+
+Observed current-tree evidence on `7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`:
+
+- Focused 6.7 Python files: 231 passed in 6.77 seconds.
+- `tests/goals`: 481 passed in 14.23 seconds.
+- Complete Python/CLI/MCP/YAML matrix: 297 passed in 284.56 seconds.
+- Standalone release suite: 2,006 passed, 1 deselected, 1 intentional
+  durability warning in 340.84 seconds.
+- macOS XCTest: 102 passed, 0 failures in 272.147 seconds; `TEST SUCCEEDED`.
+  All five item 6.7 methods passed, including the non-developer walkthrough
+  in 4.655 seconds.
+- Tracking, lock, Ruff, structured JSON, catalog fixture `cmp`, diff check,
+  CLI/workbench parity, and `scripts/release/check_local.sh` passed.
+
+U3, U4, and U6 are judged on that evidence. The packet closeout, program
+ledger, WIP, status, and governance records are reconciled without starting
+Phase 7.
+
+**Next action:** Publish the item 6.7 pull request, require every GitHub check
+to pass, merge, and synchronize clean local `main` with `origin/main`. Do not
+begin Phase 7 first.

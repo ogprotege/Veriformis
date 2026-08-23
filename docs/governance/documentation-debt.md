@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
-item closeout, or any active-document behavior change
+**Next review:** Independent-product Phase 6.7 pull-request merge, Phase 7
+opening, or any active-document behavior change
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
 | --- | --- | --- | --- | --- | --- |
@@ -34,7 +34,15 @@ preview passed all 14 GitHub checks and merged as PR #58 at
 JSONL/JSON/CSV chooser and axis-separation obligation through the
 [generic export operator guide](../generic-exports.md), with no persisted-
 schema, runtime, taxonomy, support, consumer, trainer, or new documentation-
-debt promotion. DOC-002, DOC-003, DOC-006, and DOC-007 remain open.
+debt promotion. Phase 6's goal catalog, goal contracts, input-family taxonomy
+axis, preview, presets, compile preflight, acceptance matrix, instruction
+truthfulness policy, and usability criteria/implementation reconciliation are
+recorded in the Phase 6 packet; U1–U6 and closeout are judged on the current
+tree, with publication pending. The Phase 6.7 implementation introduces no new documentation debt and
+deliberately leaves
+the persisted instruction literal, serializer, verifier, row schemas, consumer
+profiles, and trainer claims unchanged. DOC-002, DOC-003, DOC-006, and DOC-007
+remain open.
 
 Debt is not silently deleted. Closing an item requires a dated phase progress
 entry and evidence or an accepted ADR explaining why the item no longer

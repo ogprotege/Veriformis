@@ -38,7 +38,7 @@ from veriformis.taxonomy import (
 )
 
 DATA_PATH = Path(__file__).parents[2] / "src" / "veriformis" / "goals" / "catalog-v1.json"
-DATA_SHA256 = "c0cc0cef6959abf98f5c0b345817d0db14d683b782cb457cb4034023963e7481"
+DATA_SHA256 = "b23ce9872889497339f99b776aa4e1313f9031bb83b713b4990d86b9c47c281b"
 FROZEN_FIXTURE = (
     Path(__file__).parents[1] / "regressions" / "fixtures" / "phase6" / "goal-catalog.json"
 )
@@ -338,6 +338,91 @@ def _mutated(edit) -> dict:
                 "requires_operator_instruction", False
             ),
             "instruction",
+        ),
+        (
+            "missing default instruction field",
+            lambda p: p["goals"][1].pop("default_instruction"),
+            "default_instruction",
+        ),
+        (
+            "missing instruction task claim field",
+            lambda p: p["goals"][1].pop("instruction_task_claim"),
+            "instruction_task_claim",
+        ),
+        (
+            "whole-text goal defines an instruction",
+            lambda p: p["goals"][0].__setitem__(
+                "default_instruction",
+                "Continue the passage with its exact source remainder.",
+            ),
+            "cannot define a default instruction",
+        ),
+        (
+            "whole-text goal defines an instruction task claim",
+            lambda p: p["goals"][0].__setitem__(
+                "instruction_task_claim", "continuation"
+            ),
+            "instruction_task_claim",
+        ),
+        (
+            "supervised goal omits its default instruction",
+            lambda p: p["goals"][1].__setitem__("default_instruction", None),
+            "requires a default instruction",
+        ),
+        (
+            "supervised goal names the wrong instruction task",
+            lambda p: p["goals"][1].__setitem__(
+                "instruction_task_claim", "section-recovery"
+            ),
+            "instruction_task_claim",
+        ),
+        (
+            "default instruction does not name its task",
+            lambda p: p["goals"][1].__setitem__(
+                "default_instruction", "Produce the exact source-derived target."
+            ),
+            "truth policy",
+        ),
+        (
+            "default instruction claims an absent transformation",
+            lambda p: p["goals"][1].__setitem__(
+                "default_instruction",
+                "Continue the passage and summarize the source.",
+            ),
+            "truth policy",
+        ),
+        (
+            "default instruction uses a task substring",
+            lambda p: p["goals"][1].__setitem__(
+                "default_instruction", "Discontinue the passage."
+            ),
+            "truth policy",
+        ),
+        (
+            "default instruction negates its task",
+            lambda p: p["goals"][1].__setitem__(
+                "default_instruction", "Do not continue the passage."
+            ),
+            "truth policy",
+        ),
+        (
+            "default instruction claims catalog non-work",
+            lambda p: p["goals"][1].__setitem__(
+                "default_instruction", "Continue the passage but shorten it."
+            ),
+            "truth policy",
+        ),
+        (
+            "default instruction has surrounding whitespace",
+            lambda p: p["goals"][1].__setitem__(
+                "default_instruction", " Continue the passage."
+            ),
+            "default_instruction",
+        ),
+        (
+            "default instruction is not text",
+            lambda p: p["goals"][1].__setitem__("default_instruction", 7),
+            "default_instruction",
         ),
     ],
 )

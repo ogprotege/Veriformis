@@ -1,15 +1,15 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phase 5 complete; Phase 6 in progress with item
-6.1 (goal catalog) in progress
+**Status:** Independent-product Phases 0–6 complete locally; Phase 6.7
+publication pending
 
-**Review date:** 2026-08-22 (independent-product Phase 6 opening)
+**Review date:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Repository baseline:** Working tree based on Phase 5.7 PR #59 merge
-`65cbd471e96d83f8dd65e2cda60e90f64a916e2b`
+**Repository baseline:** Working tree based on Phase 6.6 PR #65 merge
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`
 
-**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
-item closeout, or the next active-document behavior change
+**Next review:** Independent-product Phase 6.7 pull-request merge, Phase 7
+opening, or the next active-document behavior change
 
 ## Scope examined
 
@@ -30,10 +30,10 @@ item closeout, or the next active-document behavior change
   generic-export operator, release, and beta-limitations documents.
 - Independent product analysis and roadmap.
 - Project governance, support registry, evidence index, ADRs, documentation
-  debt, WIP, and the completed Phase 0–5 packets.
+  debt, WIP, and the completed Phase 0–6 packets.
 - Versioned integrity, construction, finished-dataset, verified-export, split-
-  JSONL, canonical-JSON, constrained-CSV, and optional Aptus handoff contracts, plus the
-  implemented taxonomy contract.
+  JSONL, canonical-JSON, constrained-CSV, optional Aptus handoff, goal-catalog,
+  and recipe-preset contracts, plus the implemented taxonomy contract.
 
 These documents govern current behavior, future work, or active execution and
 must be updated when their scope changes.
@@ -87,14 +87,15 @@ deprecated document must link its replacement and removal/review trigger.
 | PR #57 merged while active records still described Phase 5.5 publication as pending, and item 5.6 lacked a frozen bounded runtime contract | PR #57 at `c72b8e9ec7bc`; Verified Export Contract v1 and Phase 5 packet | Recorded the Phase 5.5 merge and froze response-v2 dry-run preview semantics: exact ordinal-zero samples, a 65,536-byte inclusion ceiling with whole-row omission above it or under response-budget pressure, ASCII-safe exact decoded values, and a normalized plan-derived tree plus receipt; retained all persisted models, requests, discovery, selectors, taxonomy, and support state while leaving 5.6 admission/publication open |
 | Item 5.6 implementation was present while active evidence still recorded only a 49-test partial observation | Exact preview implementation; 60 focused, 480 integrated, 1,238 full Python, 1,226 standalone, and 66 Mac test results; independent reviews | Recorded local admission after closing the all-11-pair execution matrix, digest/size binding, exact ceiling, both response-budget fallbacks, metadata-only refusal, forged-omission rejection, strict Mac v2 bounds, and no-renderer/no-destination evidence; retained unchanged persisted models, requests, discovery, selectors, taxonomy, support, and trainer/consumer claims |
 | PR #58 merged while active records still described Phase 5.6 publication as pending, and operators lacked one authoritative JSONL/JSON/CSV chooser | PR #58 at `cd017941090c`; shipped container contracts; `docs/generic-exports.md`; completed Phase 5 packet | Recorded the green merge, separated objective, row schema, physical container, and consumer profile, documented the exact compatibility matrix and safe export flow, and reconciled Phase 5 completion without changing runtime, persisted schemas, taxonomy, support state, or trainer/consumer claims |
+| Phase 6.6 merged while active governance still described Phase 6.1 as in progress, and item 6.7 needed one compatible instruction authority | PR #65 at `7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`; Goal Catalog, Recipe Preset, and Finished Dataset contracts; ADR-0009; Phase 6 packet | Reconciled items 6.1–6.6 as merged and Phase 6.7 current-tree gates as passed. Goal-first omission resolves the catalog default, while every persisted instruction remains one exact non-empty plan literal and serialization/verification never consult or reinterpret the catalog. No objective, row schema, consumer profile, trainer claim, or Phase 7 capability is added. |
 
 ## Current health assessment
 
 | Area | Assessment | Basis |
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
-| Current capability accuracy | Good within audited active scope; Phase 5 is complete with its closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`, and Phase 6.1 is in progress | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, exact preview evidence, operator guidance, and unchanged production discovery/support |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–5 packets, and the active Phase 6 packet |
+| Current capability accuracy | Good within audited active scope; Phase 6.1–6.6 are merged through PR #65, and Phase 6.7 current-tree gates and closeout are recorded locally | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, goal/preset discovery, preview, preflight, acceptance-matrix, instruction-truthfulness, and unchanged persisted/support boundaries |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, and completed Phase 0–6 packets; item 6.7 publication remains explicit |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -103,8 +104,9 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Complete item 6.1 (goal catalog) under the Phase 6 packet as a green pull
-   request; merge and synchronize clean local `main` before item 6.2.
+1. Publish the item 6.7 pull request, require green GitHub checks, merge it,
+   and synchronize clean local `main` with `origin/main`; do not begin Phase 7
+   before that merge.
 2. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
 3. Decide whether completed `dev/active/group-*` packets should move to a
@@ -141,6 +143,20 @@ trainer capability. It passed all 14 GitHub checks and merged as PR #59 at
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 Generic output does not establish trainer compatibility, and any future
 shipped semantic profile must enforce explicit resource limits.
+
+Phase 6.1–6.6 merged sequentially as PR #60 through PR #65. Their current
+product boundary is five plain-language goals over the unchanged five
+objectives; eight implemented input families plus explicit OCR refusal; one
+safe versioned preset per goal; bounded read-only preview and compile preflight;
+and a discovery-closed 74-cell raw-source-to-externally-verified acceptance
+matrix across Python, CLI, MCP, YAML, and the real Mac CLI bridge. Phase 6.7
+adds four catalog-owned default instructions, deterministic validation of
+operator overrides, visible non-claims, and the predeclared workbench
+walkthrough. On the current tree the matrix passed 297 cases, the Mac XCTest
+target passed 102 methods, and the standalone Python suite passed 2,006 tests;
+U1–U6 and Phase 6 closeout are recorded locally. Publication remains pending.
+The finished plan, serializer, verifier, rows, bundles,
+consumer profiles, and trainer claims retain their existing meanings.
 
 The detailed open list is maintained in
 [Documentation Debt](documentation-debt.md). This report summarizes health; it

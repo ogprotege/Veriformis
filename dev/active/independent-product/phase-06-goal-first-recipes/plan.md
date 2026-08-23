@@ -1,6 +1,6 @@
 # Phase 6 Execution Plan
 
-**Status:** In progress
+**Status:** Completed locally; Phase 6.7 pull request pending
 
 **Last updated:** 2026-08-22
 
@@ -178,16 +178,17 @@ the repository requires. The widening is recorded in `decisions.md`.
 
 ### 6.7 Validate truthfulness and close Phase 6
 
-- [ ] Add per-goal static instruction templates to the catalog as the only
+- [x] Add per-goal static instruction templates to the catalog as the only
       default instruction literals, each stating exactly the source-derived
       task; admit an operator instruction only when it passes a deterministic,
       documented truthfulness check (names the goal's task; contains no claim
       vocabulary for transformations the goal does not perform).
-- [ ] Prove `messages` user turns are exact context and `instruction_output`
+- [x] Prove `messages` user turns are exact context and `instruction_output`
       instructions never describe a summary, translation, answer, or other
       absent transformation, for every goal and representation.
-- [ ] Judge the predeclared usability criteria with recorded evidence.
-- [ ] Reconcile contracts, evidence, status, WIP, support registry, program
+- [x] Judge the predeclared usability criteria with recorded evidence after
+      the complete current-tree cross-surface matrix and Mac runtime suite pass.
+- [x] Reconcile contracts, evidence, status, WIP, support registry, program
       ledger, ADRs, and documentation debt; write the closeout.
 
 ## Predeclared usability criteria
@@ -211,7 +212,9 @@ A non-developer can select each supported goal from plain language and
 inspect exactly what receives training loss; all surfaces resolve to the same
 recipe identifiers and outputs.
 
-**Result:** Pending.
+**Result:** Passed locally. U1–U6 are recorded in `evidence.md`; Phase 6.7
+publication, GitHub checks, merge, and clean-main synchronization remain
+unclaimed.
 
 ## Non-goals
 

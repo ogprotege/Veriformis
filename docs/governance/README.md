@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Next review:** Independent-product Phase 6.1 pull-request merge, any Phase 6
-item closeout, any later phase closeout, or governance-schema change
+**Next review:** Independent-product Phase 6.7 pull-request merge, Phase 7
+opening, any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -23,6 +23,7 @@ claims from drifting away from code and evidence.
 | [Program ledger](../../dev/active/independent-product/program.json) | Machine-readable phase status and dependencies |
 | [Completed Phase 4 packet](../../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export foundation checklist, decisions, risks, evidence, and closeout |
 | [Completed Phase 5 packet](../../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Generic local export checklist, decisions, risks, evidence, operator guidance, and closeout |
+| [Completed Phase 6 packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal-first checklist, decisions, risks, usability evidence, and closeout; item 6.7 publication pending |
 
 Run the governance drift check with:
 
@@ -72,6 +73,12 @@ closeout without a taxonomy or support promotion. It passed all 14 GitHub
 checks and merged as PR #59 at
 `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
 Consumer compatibility still requires a separately admitted named profile.
-Phase 6 (goal-first recipes and previews) is in progress under its
-[packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md);
-item 6.1 (goal catalog) is in progress.
+Phase 6 items 6.1–6.6 merged sequentially through PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`. Item 6.7 adds catalog-default
+instructions, deterministic operator-instruction truthfulness, visible
+non-claims, and the predeclared view-model walkthrough. Current-tree matrix,
+Mac XCTest, and standalone Python gates passed; U1–U6 and Phase 6 closeout
+are recorded under its
+[packet](../../dev/active/independent-product/phase-06-goal-first-recipes/README.md).
+Pull request, GitHub checks, merge, and clean-main synchronization are not
+yet claimed. Phase 7 has not started.

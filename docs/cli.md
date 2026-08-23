@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.5)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -301,7 +301,7 @@ veriformis curate WORKSPACE [--goal GOAL | --preset PRESET] \
 | `--evaluation-ratio-ppm` | preset value | Requested evaluation partition ratio, 1–999999 |
 | `--require-evaluation` / `--allow-empty-evaluation` | preset value (required) | Permits a sole leakage group to remain entirely in train |
 | `--split-seed` | preset value | Seed entering the deterministic group order |
-| `--instruction` | none | Required when the recipe selected `instruction_output`; rejected for all other row schemas |
+| `--instruction` | selected goal's catalog default for `instruction_output`; otherwise null | Optional exact operator override for `instruction_output`, admitted only when it names the selected task and claims no absent transformation; rejected for every other row schema |
 
 Curation runs minimum-target filtering, source-scoped conflict quarantine,
 exact deduplication, optional primary-source cap, and coverage closure, in
@@ -319,10 +319,11 @@ The command prints included, excluded, and quarantined counts plus the plan
 and revision IDs, and prints coverage blockers to stderr. A result with
 blockers is still committed and auditable, but later validation cannot pass.
 
-Failure modes (exit 2): invalid policy combinations (balance mode, source
-cap, ratio range, `--instruction` misuse) raise untyped validation errors and
-surface as `error[invalid-data]`; `curation-invalid` on replay or identity
-mismatch; `unsupported-workspace-version` on a pre-schema-3 workspace.
+Failure modes (exit 2): invalid policy combinations (balance mode, source cap,
+ratio range) surface as `error[invalid-data]`; an inapplicable or untruthful
+`--instruction` surfaces as `error[goal-instruction-invalid]` before a
+transaction opens; `curation-invalid` on replay or identity mismatch;
+`unsupported-workspace-version` on a pre-schema-3 workspace.
 
 ### `split`
 
@@ -763,7 +764,9 @@ The output is the exact packaged `veriformis.goal-catalog/v1` data that
 states in plain words what the model learns, what you provide, and what the
 goal is not, and binds to exactly one existing objective and named recipe.
 Each representation binds to exactly one row schema and its loss policy. The
-catalog adds no objective or row schema; see the
+four supervised goals also carry the only default instruction literals and
+their closed task-claim categories; whole-text carries neither. The catalog
+adds no objective or row schema; see the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md). The command accepts
 no workspace and writes no state.
 
@@ -799,7 +802,11 @@ source's parser and goal-family eligibility, exact refusals, missing goal
 evidence, expected exclusions, coverage and split blockers, and explicit
 limitations. All `chunk`, `construct`, and `curate` setting flags are accepted
 as explicit overrides; omitted values come only from the selected versioned
-preset. The report is printed before exit: admission exits `0`, while a
+preset. For instruction-and-output, omitted text comes from the selected goal's
+catalog default; an untruthful explicit override is reported at the selection
+boundary before any source capture. The request digest binds the exact catalog,
+supplied instruction when present, and resolved effective instruction. The
+report is printed before exit: admission exits `0`, while a
 complete negative verdict exits `2`. Source entries are bounded at 64 KiB and
 the whole response at 256 KiB without truncating values. The command creates
 no workspace, calls no renderer, and accesses no destination. See the
@@ -821,9 +828,11 @@ context and target fields, the row exactly as `format` would lower it, and the
 exact supervised span with its loss policy. When `curate` has run, each record
 carries its curation decision and every excluded record is listed with its
 reason codes. `--representation` must be compatible with the goal;
-`--instruction` supplies the instruction-and-output instruction when none is
-persisted. Records above 64 KiB or beyond the 256 KiB response budget are
-omitted whole with an exact reason. The command writes no state. See the
+`--instruction` is an optional truth-checked operator override for
+instruction-and-output. Without it, the exact persisted plan instruction is
+used after curation and the catalog default is used before curation. Records
+above 64 KiB or beyond the 256 KiB response budget are omitted whole with an
+exact reason. The command writes no state. See the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md#goal-preview-v1).
 
 ### `verify`

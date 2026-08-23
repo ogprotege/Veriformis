@@ -30,14 +30,16 @@ dry-run preview merged as PR #58 at
 generic-export operator guide and completes Phase 5 reconciliation without a
 runtime, taxonomy, support, consumer-profile, or trainer claim change, merged
 as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`;
-independent-product Phase 6.1–6.5 merged sequentially as PR #60 through PR #64,
-and item 6.6's goal acceptance matrix is locally complete pending its pull
-request
+independent-product Phase 6.1–6.6 merged sequentially as PR #60 through PR #65
+at `7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`; item 6.7's catalog-default
+instruction truthfulness, visible Mac non-claims, and scripted walkthrough
+passed current-tree gates and Phase 6 closeout is recorded locally, with
+publication pending
 
-**Review date:** 2026-08-22 (independent-product Phase 6.6 locally complete)
+**Review date:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Next review:** Phase 6.6 pull-request merge, Phase 6.7 closeout, beta label
-cut, public-ready checklist, or any contract change
+**Next review:** Phase 6.7 pull-request merge, Phase 7 opening, beta label cut,
+public-ready checklist, or any contract change
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -326,13 +328,24 @@ selected cleaning, segmentation, named construction, global curation, and
 leakage-group split entirely in memory. Python, CLI, MCP, and the Mac panel
 share the exact report, and real construction shares its goal/input-family
 gate. No workspace, renderer, or destination is created or accessed; it merged
-as PR #64 at `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`. Phase 6.6 is
-locally complete with a frozen 74-cell raw-source-to-verified-bundle matrix:
+as PR #64 at `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`. Phase 6.6's
+frozen 74-cell raw-source-to-verified-bundle matrix proves that
 Python, CLI, MCP, YAML, and the real Mac CLI bridge agree on recipe, row-set,
 manifest, supervision, and exact exclusion identities through seal and
-external-digest verify; its pull request is pending. None of these items adds
-an objective, row schema, persisted schema, trainer claim, or consumer
-profile.
+external-digest verify; it merged as PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`. Phase 6.7 makes the catalog the
+only default-instruction authority for the four supervised goals, validates
+operator overrides through one closed deterministic vocabulary, and proves
+messages remain exact source context/target. It also makes both non-claim sets
+visible in the Mac picker and preview and executes the predeclared
+pick/preflight/compile/preview/export walkthrough through the view model. The
+finished plan still binds one exact non-empty instruction literal;
+serialization and verification do not infer or reinterpret it. On the current
+tree the complete matrix passed 297 cases, the Mac XCTest target passed 102
+methods, and the standalone Python suite passed 2,006 tests; U1–U6 and the
+Phase 6 closeout are recorded locally. Publication remains pending. None of
+these items adds an objective, row schema, persisted schema, trainer claim, or
+consumer profile.
 
 ## Implemented interfaces
 
@@ -694,7 +707,7 @@ See [docs/release.md](release.md).
 | Implemented and merged independent Phase 5.6 | Runtime response-v2 dry-run preview: exact first row per non-empty partition, complete payloads through the 65,536-byte inclusion ceiling and whole-row omission above it or under response-budget pressure, ASCII-safe exact-value transport, and normalized plan-derived tree plus receipt; no renderer/destination access or persisted/support promotion; PR #58 at `cd017941090c` |
 | Completed independent Phase 5.7 | [Generic export operator guidance](generic-exports.md) separates JSONL/JSON/CSV container choice from objective, row schema, and consumer compatibility; reconciled Phase 5 closeout with no runtime or support-state change |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–5 complete and Phase 6 in progress under its [standard packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–6 complete locally under the [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md); item 6.7 publication pending; Phase 7 has not started |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

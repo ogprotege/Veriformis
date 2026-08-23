@@ -22,6 +22,7 @@ from veriformis.goals import (
 from veriformis.identity import derive_source_id
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
+from veriformis.goals import preflight as preflight_module
 from veriformis.sources import derive_logical_paths
 from veriformis.workspace import Workspace
 
@@ -255,16 +256,17 @@ def test_preflight_executes_the_selected_cleaning_rules_for_transform_evidence(
     )
 
 
-def test_instruction_and_review_configuration_fail_before_source_access(
+def test_untruthful_instruction_and_review_configuration_fail_before_source_access(
     tmp_path: Path,
 ) -> None:
     missing = tmp_path / "not-read.txt"
 
-    instruction_required = SERVICE.preflight(
+    instruction_untruthful = SERVICE.preflight(
         [missing],
         source_root=tmp_path,
         goal="continue-a-passage",
         representation="instruction-and-output",
+        instruction="Summarize the source passage.",
     ).preflight
     instruction_not_applicable = SERVICE.preflight(
         [missing],
@@ -279,9 +281,9 @@ def test_instruction_and_review_configuration_fail_before_source_access(
         require_review=True,
     ).preflight
 
-    assert instruction_required is not None
-    assert [item.code for item in instruction_required.incompatibilities] == [
-        "instruction-required"
+    assert instruction_untruthful is not None
+    assert [item.code for item in instruction_untruthful.incompatibilities] == [
+        "instruction-untruthful"
     ]
     assert instruction_not_applicable is not None
     assert [item.code for item in instruction_not_applicable.incompatibilities] == [
@@ -291,8 +293,36 @@ def test_instruction_and_review_configuration_fail_before_source_access(
     assert [item.code for item in review_unavailable.incompatibilities] == [
         "review-evidence-unavailable"
     ]
-    assert instruction_required.sources == instruction_not_applicable.sources == ()
+    assert instruction_untruthful.sources == instruction_not_applicable.sources == ()
     assert review_unavailable.sources == ()
+
+
+def test_catalog_default_instruction_is_admitted_without_pending_limitation(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "sources"
+    source_root.mkdir()
+    paths = []
+    for index in range(2):
+        path = source_root / f"source-{index}.txt"
+        path.write_text(
+            f"Exact source passage {index} with enough distinct text for continuation.",
+            encoding="utf-8",
+        )
+        paths.append(path)
+
+    report = SERVICE.preflight(
+        paths,
+        source_root=source_root,
+        goal="continue-a-passage",
+        representation="instruction-and-output",
+    ).preflight
+
+    assert report is not None and report.admitted
+    assert report.incompatibilities == ()
+    assert "instruction-truthfulness-not-yet-validated" not in {
+        item.code for item in report.known_limitations
+    }
 
 
 def test_incompatible_representation_has_the_representation_code(
@@ -838,3 +868,23 @@ def test_real_construct_uses_the_same_family_gate_as_preflight(tmp_path: Path) -
         )
 
     assert Workspace.open(workspace).head().revision_id == before
+
+
+def test_request_digest_binds_the_catalog_that_supplies_default_instructions(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    missing = tmp_path / "not-read.txt"
+    first = SERVICE.preflight([missing], source_root=tmp_path).preflight
+    assert first is not None
+
+    monkeypatch.setattr(
+        preflight_module,
+        "goal_catalog_json",
+        lambda: '{"different":"catalog"}\n',
+        raising=False,
+    )
+    second = SERVICE.preflight([missing], source_root=tmp_path).preflight
+    assert second is not None
+
+    assert first.request_digest != second.request_digest

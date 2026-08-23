@@ -2390,6 +2390,44 @@ private struct GoalCatalogKey: CodingKey {
     init(_ value: String) { stringValue = value }
 }
 
+/// Closed v1 task claim carried by a catalog-owned supervised instruction.
+enum GoalInstructionTaskClaim: String, Equatable, Sendable {
+    case continuation
+    case sectionRecovery = "section-recovery"
+    case recordedChange = "recorded-change"
+    case structuredExtraction = "structured-extraction"
+}
+
+/// One exact disclosure line shared by the goal picker and post-compile preview.
+struct GoalDisclosureLine: Equatable, Identifiable, Sendable {
+    enum Kind: String, Equatable, Sendable {
+        case notThis = "not-this"
+        case nonClaim = "non-claim"
+    }
+
+    let kind: Kind
+    let value: String
+
+    var id: String { "\(kind.rawValue):\(value)" }
+
+    var renderedText: String {
+        switch kind {
+        case .notThis:
+            return "Not this: \(value)"
+        case .nonClaim:
+            return "Does not claim: \(value)"
+        }
+    }
+
+    static func disclosures(
+        notThis: [String],
+        nonClaims: [String]
+    ) -> [GoalDisclosureLine] {
+        notThis.map { GoalDisclosureLine(kind: .notThis, value: $0) }
+            + nonClaims.map { GoalDisclosureLine(kind: .nonClaim, value: $0) }
+    }
+}
+
 /// One plain-language goal bound to exactly one persisted objective.
 struct GoalCatalogGoal: Equatable, Sendable {
     static let expectedKeys: Set<String> = [
@@ -2397,6 +2435,7 @@ struct GoalCatalogGoal: Equatable, Sendable {
         "what_you_provide", "not_this", "objective", "training_family",
         "recipe_library_id", "default_representation",
         "compatible_representations", "eligible_input_families",
+        "default_instruction", "instruction_task_claim",
         "required_source_evidence", "required_evidence_diagnostics",
         "target_construction", "supervision_boundary", "curation_defaults",
         "review_policy_default", "review_policy_options", "non_claims", "state",
@@ -2414,6 +2453,8 @@ struct GoalCatalogGoal: Equatable, Sendable {
     let defaultRepresentation: String
     let compatibleRepresentations: [String]
     let eligibleInputFamilies: [String]
+    let defaultInstruction: String?
+    let instructionTaskClaim: GoalInstructionTaskClaim?
     let requiredSourceEvidence: String
     let requiredEvidenceDiagnostics: [String]
     let targetConstruction: String
@@ -2470,6 +2511,13 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
     ]
     /// Taxonomy v1 row schemas in taxonomy order; Python discovery is authoritative.
     static let rowSchemaOrder = ["text", "prompt_completion", "instruction_output", "messages"]
+    /// Closed v1 non-claims in contract order; every goal must state all four.
+    static let nonClaimOrder = [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment",
+    ]
 
     let schemaID: String
     let contractID: String
@@ -2557,8 +2605,43 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 throw GoalCatalogError.invalidGoals("unknown objective \(objectiveValue)")
             }
             let notThis = try item.decode([String].self, forKey: GoalCatalogKey("not_this"))
-            guard !notThis.isEmpty, notThis.allSatisfy(Self.isPlain) else {
+            guard !notThis.isEmpty,
+                  notThis.count == Set(notThis).count,
+                  notThis.allSatisfy(Self.isPlain)
+            else {
                 throw GoalCatalogError.invalidGoals("not_this must be non-empty plain text")
+            }
+            let defaultInstruction = try item.decodeIfPresent(
+                String.self,
+                forKey: GoalCatalogKey("default_instruction")
+            )
+            if let defaultInstruction, !Self.isPlain(defaultInstruction) {
+                throw GoalCatalogError.invalidMetadata("default_instruction")
+            }
+            let taskClaimValue = try item.decodeIfPresent(
+                String.self,
+                forKey: GoalCatalogKey("instruction_task_claim")
+            )
+            let instructionTaskClaim = taskClaimValue.flatMap {
+                GoalInstructionTaskClaim(rawValue: $0)
+            }
+            if taskClaimValue != nil, instructionTaskClaim == nil {
+                throw GoalCatalogError.invalidGoals("unknown instruction_task_claim")
+            }
+            let expectedInstructionTaskClaim = Self.expectedInstructionTaskClaim(
+                for: objective
+            )
+            guard instructionTaskClaim == expectedInstructionTaskClaim else {
+                throw GoalCatalogError.invalidGoals(
+                    "instruction_task_claim drift for \(objective.rawValue)"
+                )
+            }
+            guard (expectedInstructionTaskClaim == nil && defaultInstruction == nil)
+                    || (expectedInstructionTaskClaim != nil && defaultInstruction != nil)
+            else {
+                throw GoalCatalogError.invalidGoals(
+                    "default_instruction drift for \(objective.rawValue)"
+                )
             }
             let compatible = try item.decode(
                 [String].self,
@@ -2600,6 +2683,10 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
             else {
                 throw GoalCatalogError.invalidGoals("review policy options drift")
             }
+            let nonClaims = try Self.identifiers(item, "non_claims")
+            guard nonClaims == Self.nonClaimOrder else {
+                throw GoalCatalogError.invalidGoals("non_claims drift")
+            }
             let goal = GoalCatalogGoal(
                 goalID: try Self.text(item, "goal_id"),
                 title: try Self.text(item, "title"),
@@ -2613,6 +2700,8 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 defaultRepresentation: try Self.text(item, "default_representation"),
                 compatibleRepresentations: compatible,
                 eligibleInputFamilies: try Self.identifiers(item, "eligible_input_families"),
+                defaultInstruction: defaultInstruction,
+                instructionTaskClaim: instructionTaskClaim,
                 requiredSourceEvidence: try Self.text(item, "required_source_evidence"),
                 requiredEvidenceDiagnostics: try Self.identifiers(
                     item, "required_evidence_diagnostics"
@@ -2622,7 +2711,7 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
                 curationDefaults: curationDefaults,
                 reviewPolicyDefault: reviewDefault,
                 reviewPolicyOptions: reviewOptions,
-                nonClaims: try Self.identifiers(item, "non_claims"),
+                nonClaims: nonClaims,
                 state: try Self.text(item, "state")
             )
             guard goal.state == "implemented" else {
@@ -2702,6 +2791,23 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
         !value.isEmpty
             && value == value.trimmingCharacters(in: .whitespacesAndNewlines)
             && value.unicodeScalars.allSatisfy { !CharacterSet.controlCharacters.contains($0) }
+    }
+
+    private static func expectedInstructionTaskClaim(
+        for objective: TrainingObjective
+    ) -> GoalInstructionTaskClaim? {
+        switch objective {
+        case .fullText:
+            return nil
+        case .continuation:
+            return .continuation
+        case .sectionReconstruction:
+            return .sectionRecovery
+        case .beforeAfterTransformation:
+            return .recordedChange
+        case .structuredField:
+            return .structuredExtraction
+        }
     }
 
     /// Catalog identifiers match `^[a-z0-9]+(-[a-z0-9]+)*$` exactly.

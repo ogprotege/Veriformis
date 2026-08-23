@@ -14,6 +14,7 @@
         "minimum_target_characters": 1,
         "split_seed": "veriformis-v1"
       },
+      "default_instruction": null,
       "default_representation": "whole-text",
       "eligible_input_families": [
         "plain-text",
@@ -26,6 +27,7 @@
         "json-records"
       ],
       "goal_id": "learn-the-text",
+      "instruction_task_claim": null,
       "non_claims": [
         "no-trainer-compatibility",
         "no-generated-text",
@@ -70,6 +72,7 @@
         "minimum_target_characters": 1,
         "split_seed": "veriformis-v1"
       },
+      "default_instruction": "Continue the passage with its exact source remainder.",
       "default_representation": "prompt-and-completion",
       "eligible_input_families": [
         "plain-text",
@@ -82,6 +85,7 @@
         "json-records"
       ],
       "goal_id": "continue-a-passage",
+      "instruction_task_claim": "continuation",
       "non_claims": [
         "no-trainer-compatibility",
         "no-generated-text",
@@ -127,6 +131,7 @@
         "minimum_target_characters": 1,
         "split_seed": "veriformis-v1"
       },
+      "default_instruction": "Produce the exact source section body for this heading.",
       "default_representation": "prompt-and-completion",
       "eligible_input_families": [
         "markdown",
@@ -134,6 +139,7 @@
         "html"
       ],
       "goal_id": "recover-a-section-from-its-heading",
+      "instruction_task_claim": "section-recovery",
       "non_claims": [
         "no-trainer-compatibility",
         "no-generated-text",
@@ -179,6 +185,7 @@
         "minimum_target_characters": 1,
         "split_seed": "veriformis-v1"
       },
+      "default_instruction": "Apply the recorded cleaning change to this exact source text.",
       "default_representation": "prompt-and-completion",
       "eligible_input_families": [
         "plain-text",
@@ -190,6 +197,7 @@
         "json-records"
       ],
       "goal_id": "reproduce-a-recorded-change",
+      "instruction_task_claim": "recorded-change",
       "non_claims": [
         "no-trainer-compatibility",
         "no-generated-text",
@@ -236,6 +244,7 @@
         "minimum_target_characters": 1,
         "split_seed": "veriformis-v1"
       },
+      "default_instruction": "Produce the exact structural attribute recorded by this source.",
       "default_representation": "prompt-and-completion",
       "eligible_input_families": [
         "source-code",
@@ -244,6 +253,7 @@
         "html"
       ],
       "goal_id": "extract-a-structured-value",
+      "instruction_task_claim": "structured-extraction",
       "non_claims": [
         "no-trainer-compatibility",
         "no-generated-text",

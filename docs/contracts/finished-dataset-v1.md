@@ -15,7 +15,7 @@
 **Implementation status:** Implemented. The Group 3 exit gate in this document
 passed on 2026-07-29.
 
-**Last reviewed:** 2026-08-11 (active implementation reconciliation)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
 **Next review:** Any finished-dataset schema or Group 4 service-boundary change
 
@@ -428,8 +428,17 @@ source-derived context and the assistant content is the exact target:
 The serialization plan MUST set `instruction_text` to null for `text` and
 `prompt_completion` and `messages`. It MUST supply a non-empty value only for
 `instruction_output`. That instruction is an explicit, content-addressed plan
-literal. The CLI requires it when the recipe selects `instruction_output`. It
-is not source evidence and is never represented as source-derived target text.
+literal. Goal-first compile surfaces resolve an omitted value from the selected
+goal's versioned catalog default and validate an explicit operator override
+before creating the plan; by the time this contract applies, the plan always
+contains the exact resolved literal. It is not source evidence and is never
+represented as source-derived target text.
+
+This is a goal-layer convenience under
+[ADR-0009](../adr/0009-catalog-default-instructions-and-truthfulness.md), not a
+serializer or verifier behavior change. Serialization never consults the goal
+catalog or infers text, and independent verification never reinterprets the
+exact instruction literal already bound into a finished plan or sealed bundle.
 
 Rendered tokenizer or model-family chat text is not an authoritative product
 row. It MAY be produced as an unsealed preview or conformance display.

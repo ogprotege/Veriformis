@@ -166,6 +166,14 @@ _SURFACE_FILES = (
     "src/veriformis/recipes/runner.py",
     "src/veriformis/recipes/library.py",
 )
+_GOAL_INSTRUCTION_LITERAL_FREE_SOURCES = (
+    *_SURFACE_FILES,
+    "src/veriformis/goals/preflight.py",
+    "src/veriformis/goals/preview.py",
+    "macos/Sources/ViewModels/WorkbenchViewModel.swift",
+    "macos/Sources/Views/CompileView.swift",
+    "macos/Sources/Services/VeriformisCLI.swift",
+)
 
 
 @pytest.mark.parametrize("relative", _SURFACE_FILES)
@@ -173,6 +181,18 @@ def test_no_surface_holds_a_recipe_default_literal(relative: str) -> None:
     """Roadmap 6.4: defaults are versioned data, not duplicated CLI/Swift constants."""
     text = (ROOT / relative).read_text(encoding="utf-8")
     hits = [pattern.pattern for pattern in _LITERAL_PATTERNS if pattern.search(text)]
+    assert hits == [], (relative, hits)
+
+
+@pytest.mark.parametrize("relative", _GOAL_INSTRUCTION_LITERAL_FREE_SOURCES)
+def test_no_surface_holds_a_goal_instruction_default_literal(relative: str) -> None:
+    """Phase 6.7: the catalog is the only production default authority."""
+    text = (ROOT / relative).read_text(encoding="utf-8")
+    hits = [
+        goal.goal_id
+        for goal in goal_catalog().goals
+        if goal.default_instruction is not None and goal.default_instruction in text
+    ]
     assert hits == [], (relative, hits)
 
 

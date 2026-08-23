@@ -410,6 +410,27 @@ final class WorkbenchViewModel: ObservableObject {
         }
     }
 
+    /// Run the shipped typed export dry-run through the same resolved CLI.
+    /// Request construction and export policy remain owned by the shared
+    /// export contracts; the workbench does not infer a container or profile.
+    func dryRunExport(
+        _ request: ExportDryRunRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportDryRunResult> {
+        guard let cli else { throw WorkbenchError.missingCLI }
+        return try await cli.dryRunExport(request, controller: controller)
+    }
+
+    /// Execute an operator-confirmed typed export plan without changing the
+    /// request, selected container, destination, or expected plan identity.
+    func executeExport(
+        _ request: ExportExecuteRequest,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ExportSurfaceResponse<ExportExecutionResult> {
+        guard let cli else { throw WorkbenchError.missingCLI }
+        return try await cli.executeExport(request, controller: controller)
+    }
+
     /// Cancel a raw-source preflight and discard its report. A report is valid
     /// only for the exact immutable form snapshot that produced it.
     func cancelCompilePreflight() {

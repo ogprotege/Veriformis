@@ -9,10 +9,11 @@
 **Execution profile:** `offline-deterministic-v1`
 
 **Implementation status:** Implemented in independent-product Phase 6.4,
-reused without duplicated defaults by Phase 6.5 compile preflight, and
-acceptance-matrix bound by Phase 6.6.
+reused without duplicated defaults by Phase 6.5 compile preflight,
+acceptance-matrix bound by Phase 6.6, and unchanged by Phase 6.7's separate
+goal-catalog instruction policy.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.6)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
 **Next review:** Any default, preset, goal, representation, chunk-strategy,
 curation-policy, or consumer-profile change
@@ -25,6 +26,9 @@ workbench. This contract makes one packaged, versioned data file the single
 source of every recipe default and of each goal's safe named preset. Every
 surface resolves its effective settings through the same function, so the
 same selection yields the same `recipe_id` and finished plan everywhere.
+Instruction text is intentionally outside this contract: the
+[Goal Catalog Contract v1](goal-catalog-v1.md) owns each source-grounded
+default and operator truthfulness policy.
 
 ## Normative language
 
@@ -89,12 +93,16 @@ every segmentation, construction, curation, and review field, and returns
    not an operator value).
 4. Unknown goals, presets, representations, or incompatible combinations fail
    closed before any workspace is opened.
+5. `resolve_recipe_settings` does not own instruction text. After settings
+   resolve the goal/objective and row schema, the goal catalog resolves an
+   omitted instruction or validates an explicit override before curation fixes
+   the finished plan.
 
 ## Surfaces
 
 | Surface | Behavior |
 | --- | --- |
-| `PipelineService.chunk` / `construct` / `curate` | Every setting parameter defaults to `None`; omitted settings resolve from the selected preset or the goal's safe preset. `construct` builds the recipe through the named recipe library. `construct --preset` fails closed when the workspace chunks were not produced with the preset's segmentation. |
+| `PipelineService.chunk` / `construct` / `curate` | Every recipe-setting parameter defaults to `None`; omitted settings resolve from the selected preset or the goal's safe preset. `construct` builds the recipe through the named recipe library. `construct --preset` fails closed when the workspace chunks were not produced with the preset's segmentation. For `instruction_output`, curate separately resolves omission from the goal catalog or validates an operator override. |
 | CLI `chunk`, `construct`, `curate` | `--goal`, `--preset`, `--representation` select; every other option is an explicit override with no literal default. `--objective` remains as the persisted-kind selection. |
 | MCP `chunk`, `construct`, `curate` | The same parameters, appended after the existing ones. |
 | YAML `veriformis.pipeline/v1` | Stage keys `goal`, `preset`, and (construct) `representation`; omitted values resolve from the data. `recipe_library_id` remains supported. |
@@ -118,3 +126,5 @@ workspace or bundle; only the resolved recipe and finished plan are.
 - Deciding whether fine-tuning is appropriate.
 - Adding an objective, row schema, construction behavior, or trainer claim.
 - The acceptance matrix (Phase 6.6).
+- Owning default instruction text or its truthfulness vocabulary (Goal Catalog
+  v1 and ADR-0009).

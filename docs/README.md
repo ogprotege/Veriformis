@@ -5,10 +5,10 @@ capture through a verified finished-dataset bundle, plus local automation and
 the private beta Mac workbench (Groups 1–7 product path, Group 9 automated
 gates, workbench Phases 0–2).
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 opening)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Next review:** Phase 6.1 pull-request merge, any Phase 6 item closeout, beta
-label cut, public-ready checklist, or any contract change
+**Next review:** Phase 6.7 pull-request merge, Phase 7 opening, beta label cut,
+public-ready checklist, or any contract change
 
 ## Start here
 
@@ -41,7 +41,8 @@ label cut, public-ready checklist, or any contract change
   [macOS workbench](../macos/README.md) →
   [private beta plan](plans/2026-08-06-private-beta-workbench.md).
 - **Contract reviewer:** [product contract](product-contract.md), then Integrity,
-  Dataset Construction, Finished Dataset, Dataset Taxonomy, Verified Export,
+  Dataset Construction, Finished Dataset, Goal Catalog, Recipe Preset, Dataset
+  Taxonomy, Verified Export,
   Split JSONL Export, Canonical JSON Export, Constrained CSV Export, Bundle Transport,
   and Aptus Handoff contracts plus the [ADR index](adr/README.md), with
   [current status](current-status.md) for evidence.
@@ -64,7 +65,9 @@ label cut, public-ready checklist, or any contract change
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
 | [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
 | [Generic export operator guide](generic-exports.md) | When to use split JSONL, canonical JSON, or constrained CSV without conflating container, objective, row schema, or consumer compatibility | Implemented Phase 5.7 operator guidance; merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
-| [ADR index](adr/README.md) | Accepted product-boundary and transport decisions (0001–0006) | Decision records |
+| [Goal Catalog Contract v1](contracts/goal-catalog-v1.md) | Plain-language goals, source-evidence eligibility, preview/preflight, and catalog-default instruction truthfulness | Implemented Phase 6 contract |
+| [Recipe Preset Contract v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and one safe preset per goal | Implemented Phase 6 contract |
+| [ADR index](adr/README.md) | Accepted product-boundary, transport, goal-first, taxonomy, and instruction-truthfulness decisions (0001–0009) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
@@ -83,6 +86,7 @@ label cut, public-ready checklist, or any contract change
 | [Phase 3 packet](../dev/active/independent-product/phase-03-taxonomy/README.md) | Taxonomy contract, registry, discovery, and compatibility closeout | Completed implementation record |
 | [Phase 4 packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md) | Verified export contracts, service, surfaces, adversarial evidence, and closeout | Completed implementation record |
 | [Phase 5 packet](../dev/active/independent-product/phase-05-generic-local-exports/README.md) | Lossless generic local export plan, progress, decisions, risks, evidence, and closeout | Completed implementation record; item 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`, and item 5.7 guidance/closeout merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
+| [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal catalog, input-family contracts, previews, presets, preflight, acceptance matrix, truthfulness, usability evidence, and closeout | Completed locally; items 6.1–6.6 merged through PR #65 at `7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`; item 6.7 publication pending |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
 | [Phase 1 workbench design](../dev/active/private-beta-workbench/phase-1-design.md) | Sidebar, run sheet, history, settings | Phase 1 design (implemented on `main`) |

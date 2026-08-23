@@ -938,6 +938,7 @@ final class CLIBridgeTests: XCTestCase {
     func testGoalAcceptanceMatrixEveryCellSealsAndVerifiesWithRealRepoCLI() async throws {
         continueAfterFailure = false
         let fixture = try goalAcceptanceMatrixFixture()
+        let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
         let sourcesByID = Dictionary(
             fixture.sourceFixtures.map { ($0.sourceFixtureID, $0) },
             uniquingKeysWith: { first, _ in first }
@@ -1031,9 +1032,12 @@ final class CLIBridgeTests: XCTestCase {
             XCTAssertEqual(identity.rowSetSHA256, cell.rowSetSHA256, cell.cellID)
 
             let preview = try await cli.previewGoal(workspace: workspace)
+            let catalogGoal = try XCTUnwrap(goals.goal(withID: cell.goalID))
             XCTAssertEqual(preview.recipeID, cell.recipeID, cell.cellID)
             XCTAssertEqual(preview.lossPolicy, cell.lossPolicy, cell.cellID)
             XCTAssertEqual(preview.lossBoundary, cell.lossBoundary, cell.cellID)
+            XCTAssertEqual(preview.notThis, catalogGoal.notThis, cell.cellID)
+            XCTAssertEqual(preview.nonClaims, catalogGoal.nonClaims, cell.cellID)
             XCTAssertEqual(preview.records.count, 2, cell.cellID)
             let contextRowKeys = preview.records.first?.contextRowKeys ?? []
             let supervisedRowKey = preview.records.first?.supervised.rowKey ?? ""
@@ -1112,6 +1116,159 @@ final class CLIBridgeTests: XCTestCase {
             try FileManager.default.removeItem(at: cellRoot)
         }
         XCTAssertTrue(runtimeHasExclusions)
+    }
+
+    @MainActor
+    func testNonDeveloperGoalWalkthroughPickPreflightCompilePreviewExportWithRealRepoCLI() async throws {
+        continueAfterFailure = false
+        let fixture = try goalAcceptanceMatrixFixture()
+        let cell = try XCTUnwrap(
+            fixture.cells.first {
+                $0.cellID == "continue-a-passage__plain-text__prompt-and-completion"
+            }
+        )
+        let sourcesByID = Dictionary(
+            fixture.sourceFixtures.map { ($0.sourceFixtureID, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let repositoryRoot = testRepositoryRoot()
+        let repoCLI = repositoryRoot.appendingPathComponent(".venv/bin/veriformis")
+        XCTAssertTrue(FileManager.default.isExecutableFile(atPath: repoCLI.path))
+        let cli = try VeriformisCLI.resolve(
+            repositoryRoot: repositoryRoot,
+            environment: ["VERIFORMIS_CLI": repoCLI.path]
+        )
+
+        let root = temporaryTestDirectory("phase6-nondeveloper-walkthrough")
+        let sourceRoot = root.appendingPathComponent("sources", isDirectory: true)
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        let exportDestination = root.appendingPathComponent("split-jsonl", isDirectory: true)
+        try FileManager.default.createDirectory(at: sourceRoot, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        var sources: [URL] = []
+        for sourceFixtureID in cell.sourceFixtureIDs {
+            let sourceFixture = try XCTUnwrap(sourcesByID[sourceFixtureID])
+            let raw = try XCTUnwrap(Data(base64Encoded: sourceFixture.rawBase64))
+            XCTAssertEqual(raw.count, sourceFixture.size)
+            XCTAssertEqual(sha256Hex(raw), sourceFixture.sha256)
+            let source = sourceRoot.appendingPathComponent(sourceFixture.logicalPath)
+            try FileManager.default.createDirectory(
+                at: source.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
+            try raw.write(to: source)
+            sources.append(source)
+        }
+
+        let isolated = try isolatedDefaults(output: output)
+        defer { isolated.defaults.removePersistentDomain(forName: isolated.name) }
+        let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
+        let presets = try JSONDecoder().decode(
+            RecipePresetCatalog.self,
+            from: recipePresetsData()
+        )
+        let workbench = WorkbenchViewModel(
+            cli: cli,
+            defaults: isolated.defaults,
+            supportDirectory: support
+        )
+        workbench.applyCatalogs(goals: goals, presets: presets)
+        workbench.sourceURLs = sources
+        workbench.sourceRootURL = sourceRoot
+        workbench.outputDirectoryURL = output
+
+        // Pick a goal in plain language; the catalog supplies its safe preset.
+        workbench.selectGoal("continue-a-passage")
+        XCTAssertEqual(workbench.selectedGoal?.title, "Continue a passage")
+        XCTAssertEqual(workbench.selectedPresetID, "continue-a-passage.safe")
+
+        // Preflight must admit the exact source snapshot before any workspace exists.
+        workbench.refreshCompilePreflight()
+        guard case .ready(let preflight) = try await waitForTerminalPreflightState(
+            workbench,
+            attempts: 12_000
+        ) else {
+            return XCTFail("real CLI preflight did not return a report")
+        }
+        XCTAssertTrue(preflight.admitted)
+        XCTAssertEqual(preflight.selection.resolved?.goalID, "continue-a-passage")
+        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath: output.path).isEmpty)
+
+        // Compile through the real CLI and await the automatically loaded goal preview.
+        workbench.compile()
+        try await waitForCompileToFinish(workbench, attempts: 12_000)
+        XCTAssertNil(workbench.lastError)
+        XCTAssertEqual(workbench.runHistory.first?.status, .succeeded)
+        let compileResult = try XCTUnwrap(workbench.lastResult)
+        let manifestSHA256 = try XCTUnwrap(compileResult.manifestSHA256)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: compileResult.bundleURL.path))
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: compileResult.transportArchiveURL.path)
+        )
+
+        guard case .ready(let preview) = try await waitForTerminalGoalPreviewState(
+            workbench,
+            attempts: 12_000
+        ) else {
+            return XCTFail("real CLI goal preview did not become ready")
+        }
+        let selectedGoal = try XCTUnwrap(workbench.selectedGoal)
+        XCTAssertEqual(preview.goalID, selectedGoal.goalID)
+        XCTAssertEqual(preview.notThis, selectedGoal.notThis)
+        XCTAssertEqual(preview.nonClaims, selectedGoal.nonClaims)
+        XCTAssertFalse(preview.records.isEmpty)
+        XCTAssertTrue(
+            preview.records.allSatisfy { $0.supervised.rowKey == "completion" }
+        )
+
+        // Export is a separate, typed derivative of the verified bundle. The
+        // dry-run plan identity is carried unchanged into no-replace execute.
+        let representation = try XCTUnwrap(
+            goals.representation(withID: cell.representationID)
+        )
+        let containerID = "split-jsonl-directory"
+        XCTAssertTrue(representation.compatibleGenericExports.contains(containerID))
+        let dryRunRequest = try ExportDryRunRequest(
+            bundle: compileResult.bundleURL.path,
+            containerID: containerID,
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: manifestSHA256
+        )
+        let dryRunResponse = try await workbench.dryRunExport(dryRunRequest)
+        XCTAssertEqual(dryRunResponse.status, .ok)
+        let dryRun = try XCTUnwrap(dryRunResponse.result)
+        XCTAssertEqual(dryRun.plan.rowSchema, "prompt_completion")
+        XCTAssertGreaterThan(dryRun.plan.trainRecordCount, 0)
+        XCTAssertGreaterThan(dryRun.plan.evaluationRecordCount, 0)
+
+        let executeRequest = try ExportExecuteRequest(
+            bundle: compileResult.bundleURL.path,
+            containerID: containerID,
+            containerVersion: 1,
+            sourceTrustPolicy: .requireExternalDigest,
+            expectedManifestSHA256: manifestSHA256,
+            destinationRoot: exportDestination.path,
+            expectedExportPlanID: dryRun.plan.exportPlanID
+        )
+        let executeResponse = try await workbench.executeExport(executeRequest)
+        XCTAssertEqual(executeResponse.status, .ok)
+        let execution = try XCTUnwrap(executeResponse.result)
+        XCTAssertEqual(execution.plan.exportPlanID, dryRun.plan.exportPlanID)
+        XCTAssertEqual(execution.verification.sourceTrustGrade, .externalDigest)
+        XCTAssertEqual(execution.verification.rowSchema, "prompt_completion")
+        for relativePath in [
+            "data/train.jsonl",
+            "data/evaluation.jsonl",
+            "export-receipt.json",
+        ] {
+            let file = exportDestination.appendingPathComponent(relativePath)
+            XCTAssertTrue(FileManager.default.fileExists(atPath: file.path), relativePath)
+            XCTAssertFalse(try Data(contentsOf: file).isEmpty, relativePath)
+        }
     }
 
     // MARK: - Recipe presets (Phase 6.4)
@@ -1348,8 +1505,38 @@ final class CLIBridgeTests: XCTestCase {
         for goal in catalog.goals {
             XCTAssertTrue(goal.compatibleRepresentations.contains(goal.defaultRepresentation))
             XCTAssertFalse(goal.notThis.isEmpty)
+            XCTAssertEqual(goal.nonClaims, GoalCatalog.nonClaimOrder)
             XCTAssertEqual(goal.state, "implemented")
             XCTAssertNotNil(catalog.representation(withID: goal.defaultRepresentation))
+            switch goal.objective {
+            case .fullText:
+                XCTAssertNil(goal.defaultInstruction)
+                XCTAssertNil(goal.instructionTaskClaim)
+            case .continuation:
+                XCTAssertEqual(
+                    goal.defaultInstruction,
+                    "Continue the passage with its exact source remainder."
+                )
+                XCTAssertEqual(goal.instructionTaskClaim, .continuation)
+            case .sectionReconstruction:
+                XCTAssertEqual(
+                    goal.defaultInstruction,
+                    "Produce the exact source section body for this heading."
+                )
+                XCTAssertEqual(goal.instructionTaskClaim, .sectionRecovery)
+            case .beforeAfterTransformation:
+                XCTAssertEqual(
+                    goal.defaultInstruction,
+                    "Apply the recorded cleaning change to this exact source text."
+                )
+                XCTAssertEqual(goal.instructionTaskClaim, .recordedChange)
+            case .structuredField:
+                XCTAssertEqual(
+                    goal.defaultInstruction,
+                    "Produce the exact structural attribute recorded by this source."
+                )
+                XCTAssertEqual(goal.instructionTaskClaim, .structuredExtraction)
+            }
         }
         let instruction = try XCTUnwrap(catalog.representation(withID: "instruction-and-output"))
         XCTAssertTrue(instruction.requiresOperatorInstruction)
@@ -1379,6 +1566,105 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertFalse(structural.requiredEvidenceDiagnostics.isEmpty)
         XCTAssertEqual(catalog.goal(withID: "learn-the-text")?.compatibleRepresentations, ["whole-text"])
         XCTAssertNil(catalog.goal(withID: "summarize-the-document"))
+    }
+
+    func testGoalDisclosurePresentationIncludesNotThisAndClosedNonClaims() throws {
+        let catalog = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
+
+        for goal in catalog.goals {
+            let lines = GoalDisclosureLine.disclosures(
+                notThis: goal.notThis,
+                nonClaims: goal.nonClaims
+            )
+            XCTAssertEqual(
+                lines.map(\.kind),
+                Array(repeating: .notThis, count: goal.notThis.count)
+                    + Array(repeating: .nonClaim, count: goal.nonClaims.count)
+            )
+            XCTAssertEqual(
+                lines.map(\.value),
+                goal.notThis + GoalCatalog.nonClaimOrder
+            )
+            XCTAssertEqual(
+                lines.map(\.renderedText),
+                goal.notThis.map { "Not this: \($0)" }
+                    + GoalCatalog.nonClaimOrder.map { "Does not claim: \($0)" }
+            )
+        }
+    }
+
+    func testGoalCatalogRejectsInstructionDefaultAndTaskClaimDrift() throws {
+        for field in ["default_instruction", "instruction_task_claim"] {
+            XCTAssertThrowsError(
+                try JSONDecoder().decode(
+                    GoalCatalog.self,
+                    from: goalCatalogData { payload in
+                        var goals = payload["goals"] as! [[String: Any]]
+                        goals[1].removeValue(forKey: field)
+                        payload["goals"] = goals
+                    }
+                )
+            ) { error in
+                XCTAssertEqual(
+                    error as? GoalCatalogError,
+                    .invalidKeySet(
+                        scope: "goal",
+                        missing: [field],
+                        unexpected: []
+                    )
+                )
+            }
+        }
+
+        for taskClaim in ["section-recovery", "summarization"] {
+            XCTAssertThrowsError(
+                try JSONDecoder().decode(
+                    GoalCatalog.self,
+                    from: goalCatalogData { payload in
+                        var goals = payload["goals"] as! [[String: Any]]
+                        goals[1]["instruction_task_claim"] = taskClaim
+                        payload["goals"] = goals
+                    }
+                ),
+                "task claim \(taskClaim) must fail closed"
+            )
+        }
+
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[0]["default_instruction"] = "Use the whole passage."
+                    payload["goals"] = goals
+                }
+            )
+        )
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[1]["default_instruction"] = NSNull()
+                    payload["goals"] = goals
+                }
+            )
+        )
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                GoalCatalog.self,
+                from: goalCatalogData { payload in
+                    var goals = payload["goals"] as! [[String: Any]]
+                    goals[1]["default_instruction"] = " Continue the passage."
+                    payload["goals"] = goals
+                }
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? GoalCatalogError,
+                .invalidMetadata("default_instruction")
+            )
+        }
     }
 
     func testGoalCatalogRejectsMissingExtraAndWrongMetadata() throws {
@@ -2169,6 +2455,89 @@ final class CLIBridgeTests: XCTestCase {
                 try configuredVerify.canonicalJSON(),
             ].contains { $0.contains("force") }
         )
+    }
+
+    @MainActor
+    func testWorkbenchExportDelegatesForwardTypedRequestsUnchanged() async throws {
+        let root = temporaryTestDirectory("workbench-export-delegates")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let executable = root.appendingPathComponent("fake-veriformis")
+        let arguments = root.appendingPathComponent("arguments.txt")
+        try writeExecutable(
+            executable,
+            script: """
+            #!/bin/sh
+            printf '%s\\n' "$@" > "\(arguments.path)"
+            if [ "$2" = "dry-run" ]; then
+              operation=dry_run
+              response_schema=veriformis.export-surface-response/v2
+            else
+              operation="$2"
+              response_schema=veriformis.export-surface-response/v1
+            fi
+            printf '{"error":{"code":"invalid-data","message":"delegated"},"operation":"%s","result":null,"schema_version":"%s","status":"error"}\\n' "$operation" "$response_schema"
+            exit 1
+            """
+        )
+        let isolated = try isolatedDefaults(output: output)
+        defer { isolated.defaults.removePersistentDomain(forName: isolated.name) }
+        let workbench = WorkbenchViewModel(
+            cli: VeriformisCLI(executableURL: executable, prefixArguments: []),
+            defaults: isolated.defaults,
+            supportDirectory: root.appendingPathComponent("support", isDirectory: true)
+        )
+
+        let dryRun = try exportDryRunRequest()
+        let dryRunResponse = try await workbench.dryRunExport(
+            dryRun,
+            controller: CLIProcessController()
+        )
+        XCTAssertEqual(dryRunResponse.status, .error)
+        XCTAssertEqual(
+            try recordedArguments(arguments),
+            ["export", "dry-run", "--request-json", try dryRun.canonicalJSON()]
+        )
+
+        let execute = try exportExecuteRequest()
+        let executeResponse = try await workbench.executeExport(
+            execute,
+            controller: CLIProcessController()
+        )
+        XCTAssertEqual(executeResponse.status, .error)
+        XCTAssertEqual(
+            try recordedArguments(arguments),
+            ["export", "execute", "--request-json", try execute.canonicalJSON()]
+        )
+    }
+
+    @MainActor
+    func testWorkbenchExportDelegatesFailClosedWhenCLIIsMissing() async throws {
+        let root = temporaryTestDirectory("workbench-export-missing-cli")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let isolated = try isolatedDefaults(output: output)
+        defer { isolated.defaults.removePersistentDomain(forName: isolated.name) }
+        let workbench = WorkbenchViewModel(
+            cli: nil,
+            defaults: isolated.defaults,
+            supportDirectory: root.appendingPathComponent("support", isDirectory: true)
+        )
+
+        do {
+            _ = try await workbench.dryRunExport(try exportDryRunRequest())
+            XCTFail("dry-run must require the resolved CLI")
+        } catch {
+            XCTAssertEqual(error as? WorkbenchError, .missingCLI)
+        }
+        do {
+            _ = try await workbench.executeExport(try exportExecuteRequest())
+            XCTFail("execute must require the resolved CLI")
+        } catch {
+            XCTAssertEqual(error as? WorkbenchError, .missingCLI)
+        }
     }
 
     func testExportResponseRejectsUnexpectedKeysAtEveryDecodedBoundary() throws {
@@ -3894,9 +4263,10 @@ final class CLIBridgeTests: XCTestCase {
 
     @MainActor
     private func waitForTerminalPreflightState(
-        _ workbench: WorkbenchViewModel
+        _ workbench: WorkbenchViewModel,
+        attempts: Int = 300
     ) async throws -> CompilePreflightState {
-        for _ in 0 ..< 300 {
+        for _ in 0 ..< attempts {
             switch workbench.compilePreflightState {
             case .ready, .unavailable:
                 return workbench.compilePreflightState
@@ -3910,12 +4280,30 @@ final class CLIBridgeTests: XCTestCase {
 
     @MainActor
     private func waitForCompileToFinish(
-        _ workbench: WorkbenchViewModel
+        _ workbench: WorkbenchViewModel,
+        attempts: Int = 300
     ) async throws {
-        for _ in 0 ..< 300 where workbench.isRunning {
+        for _ in 0 ..< attempts where workbench.isRunning {
             try await Task.sleep(nanoseconds: 10_000_000)
         }
         XCTAssertFalse(workbench.isRunning, "compile did not finish")
+    }
+
+    @MainActor
+    private func waitForTerminalGoalPreviewState(
+        _ workbench: WorkbenchViewModel,
+        attempts: Int = 300
+    ) async throws -> GoalPreviewState {
+        for _ in 0 ..< attempts {
+            switch workbench.goalPreviewState {
+            case .ready, .unavailable:
+                return workbench.goalPreviewState
+            case .idle, .loading:
+                try await Task.sleep(nanoseconds: 10_000_000)
+            }
+        }
+        XCTFail("goal preview did not reach a terminal state")
+        return workbench.goalPreviewState
     }
 
     private func waitForFile(_ url: URL) async throws {

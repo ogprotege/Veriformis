@@ -1,7 +1,8 @@
 # Phase 6 Evidence
 
-**Status:** Open — items 6.1–6.5 merged as PR #60 through PR #64; item 6.6
-passed its local admission gates and awaits its pull request
+**Status:** Closed locally — items 6.1–6.6 merged as PR #60 through PR #65;
+item 6.7 required current-tree gates, U1–U6, and Phase 6 closeout are
+recorded; publication remains pending
 
 **Opened:** 2026-08-22
 
@@ -46,14 +47,14 @@ goal-first capability.
 
 ## Required phase exit evidence
 
-- [ ] Every goal is selectable from plain language on every surface (U1).
-- [ ] The preview shows the exact supervised region for every goal and
+- [x] Every goal is selectable from plain language on every surface (U1).
+- [x] The preview shows the exact supervised region for every goal and
       representation, proved equal to the serialized target (U2).
 - [x] Identical recipe identifiers and outputs across surfaces for every
       acceptance cell (U3).
-- [ ] Non-claims visible everywhere a goal is shown (U4).
-- [ ] Preflight refuses incompatible selections before cost (U5).
-- [ ] Scripted non-developer walkthrough executed and recorded (U6).
+- [x] Non-claims visible everywhere a goal is shown (U4).
+- [x] Preflight refuses incompatible selections before cost (U5).
+- [x] Scripted non-developer walkthrough executed and recorded (U6).
 
 ## Observed results
 
@@ -236,3 +237,41 @@ messages are all sealed end to end.
 
 These are local observations. They do not claim publication, GitHub checks,
 merge, or clean-main synchronization for the item 6.6 pull request.
+
+Item 6.6 subsequently passed its required GitHub checks and merged as PR #65 at
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`; clean local `main` was
+synchronized with `origin/main` before item 6.7 began.
+
+### Item 6.7 (2026-08-22, working tree on
+`7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`)
+
+| Gate | Observed |
+| --- | --- |
+| Focused 6.7 instruction/catalog/preflight/preview/surface files | 231 passed in 6.77 seconds |
+| Focused goal tests (`tests/goals`) | 481 passed in 14.23 seconds |
+| Complete Python/CLI/MCP/YAML matrix | 297 passed in 284.56 seconds |
+| Standalone release (`--ignore=tests/handoff -m "not aptus_integration"`) | 2,006 passed, 1 deselected, 1 intentional durability warning in 340.84 seconds |
+| Goal catalog fixture | Exact byte comparison passed |
+| `macos/scripts/parity_check.sh` | PASS with identical bundle and file-binding identities |
+| macOS XCTest target | 102 passed, 0 failures in 272.147 seconds; `TEST SUCCEEDED` |
+| Item 6.7 Mac tests | `testGoalDisclosurePresentationIncludesNotThisAndClosedNonClaims`, `testGoalCatalogRejectsInstructionDefaultAndTaskClaimDrift`, `testWorkbenchExportDelegatesForwardTypedRequestsUnchanged`, `testWorkbenchExportDelegatesFailClosedWhenCLIIsMissing`, and `testNonDeveloperGoalWalkthroughPickPreflightCompilePreviewExportWithRealRepoCLI` all passed |
+| `scripts/check_project_tracking.py` and its regression | PASS |
+| `uv lock --check`, Ruff, structured JSON, fixture `cmp`, and `git diff --check` | PASS |
+| `scripts/release/check_local.sh` | PASS (clean wheel, both golden compiles, external digest, transport) |
+
+The implementation adds four catalog-owned defaults, exact operator-string
+preservation after the closed deterministic truth check, default resolution
+before plan creation, preflight identity binding to catalog/supplied/effective
+instruction digests, visible Mac non-claims, typed export delegates, and the
+scripted walkthrough test. It retains the exact persisted plan literal and
+does not change serializer or verifier semantics. Catalog-default omission is
+what the 74-cell fixture now exercises.
+
+U1, U2, and U5 retain their previously admitted evidence and remain true on
+this tree. U3 is judged from the complete 297-case matrix. U4 is judged from
+shared Mac presentation plus discovery tests. U6 is judged from the walkthrough
+XCTest on the real repo CLI.
+
+These local observations complete item 6.7's required gates and the Phase 6
+exit judgment. They claim no pull request, GitHub result, merge, or clean-main
+synchronization.

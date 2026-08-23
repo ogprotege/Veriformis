@@ -33,6 +33,7 @@ from veriformis.datasets import row_set_from_json_bytes
 from veriformis.goals import (
     goal_catalog,
     goal_catalog_json,
+    goal_for_objective,
     preset_catalog_json,
 )
 from veriformis.identity import canonical_digest, sha256_digest
@@ -126,20 +127,6 @@ _BEFORE_AFTER_CUSTOM = {
     "delimited-table": "alpha",
     "json-records": "first",
 }
-_INSTRUCTIONS = {
-    "continue-a-passage": "Continue the passage with its exact source remainder.",
-    "recover-a-section-from-its-heading": (
-        "Produce the exact source section body for this heading."
-    ),
-    "reproduce-a-recorded-change": (
-        "Apply the recorded cleaning change to this exact source text."
-    ),
-    "extract-a-structured-value": (
-        "Produce the exact structural attribute recorded by this source."
-    ),
-}
-
-
 def _canonical_docx_bytes(*, heading: str, level: int, body: str) -> bytes:
     raw = io.BytesIO()
     document = DocxBuilder()
@@ -315,11 +302,9 @@ def _cell_selections() -> list[dict[str, object]]:
                         "goal_id": goal.goal_id,
                         "preset_id": f"{goal.goal_id}.safe",
                         "representation_id": representation_id,
-                        "instruction": (
-                            _INSTRUCTIONS[goal.goal_id]
-                            if representation_id == "instruction-and-output"
-                            else None
-                        ),
+                        # Omission is intentional: instruction-and-output cells
+                        # must exercise the packaged per-goal catalog default.
+                        "instruction": None,
                         "cleaning_rules": "",
                         "cleaning_custom": (
                             _BEFORE_AFTER_CUSTOM[family]
@@ -405,6 +390,16 @@ def _observe(
         assert surface_preview == preview.model_dump(mode="json")
     assert len(preview.records) == 2
     assert preview.omitted_exclusion_count == 0
+    if preview.row_schema == "instruction_output":
+        expected_instruction = goal_for_objective(
+            preview.objective
+        ).default_instruction
+        assert expected_instruction is not None
+        assert all(
+            record.rendered_row is not None
+            and record.rendered_row["instruction"] == expected_instruction
+            for record in preview.records
+        )
     assert all(
         exclusion.status == "excluded"
         and exclusion.reason_codes == ("exact-duplicate",)
@@ -514,7 +509,6 @@ def _finish_python(
     SERVICE.curate(
         workspace,
         preset=str(cell["preset_id"]),
-        instruction=cell["instruction"],
     )
     SERVICE.split(workspace)
     SERVICE.format(workspace)
@@ -665,7 +659,6 @@ def _finish_mcp(
     _mcp_json(
         tools["curate"],
         str(workspace),
-        instruction=cell["instruction"],
         preset=str(cell["preset_id"]),
     )
     for tool_name in ("split", "format_rows"):
@@ -791,6 +784,7 @@ def test_frozen_matrix_is_canonical_discovery_closed_and_path_independent() -> N
         assert source_a["logical_path"] != source_b["logical_path"]
 
     expected_selections = _cell_selections()
+    assert all(selection["instruction"] is None for selection in expected_selections)
     # These small before/after windows are explicit evidence-shape controls.
     # They prove the goal's contract without claiming that the safe preset's
     # default segmentation happens to isolate every cleaning edit.

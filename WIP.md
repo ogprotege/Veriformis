@@ -2,18 +2,19 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`
+**Implementation baseline reviewed:** `7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–5 complete and Phase 6.1–6.5 merged), plus the
-locally complete Phase 6.6 goal-acceptance-matrix work awaiting its pull request
+independent-product Phases 0–5 complete and Phase 6.1–6.6 merged), plus the
+Phase 6.7 instruction-truthfulness closeout on the current tree awaiting
+publication, merge, and clean-main synchronization
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.6 locally complete)
+**Last reviewed:** 2026-08-22 (independent-product Phase 6.7 required-gate completion)
 
-**Next review:** Phase 6.6 pull-request merge, any Phase 6 item closeout, beta
-label cut, public Mac evidence, or any listed-item status change
+**Next review:** Phase 6.7 pull-request merge, Phase 7 opening, beta label cut,
+public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -66,8 +67,8 @@ local, offline, and free of LLM generation.
       `cd017941090c7352cb1d10f9a383042b954d4f2e`; item 5.7's operator guide
       and phase closeout merged as PR #59 at
       `65cbd471e96d83f8dd65e2cda60e90f64a916e2b`.
-- [ ] Independent product Phase 6 is in progress under its
-      [active packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md).
+- [x] Independent product Phase 6 is complete locally under its
+      [completed packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md).
       Item 6.1's plain-language goal catalog merged as PR #60 at
       `7316d94faf2d6c23b7abb6fe200f154da47d398c` and item 6.2's goal
       contracts and `input_family` axis merged as PR #61 at
@@ -77,8 +78,12 @@ local, offline, and free of LLM generation.
       presets and goal-first compile surfaces merged as PR #63 at
       `abdd630e25e83ebf346316319caec892f4d64886`; item 6.5 compile preflight
       merged as PR #64 at `b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d`;
-      item 6.6's goal acceptance matrix passed every local admission gate and
-      awaits its pull request.
+      item 6.6's goal acceptance matrix merged as PR #65 at
+      `7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5`. Item 6.7's catalog-default
+      instruction truthfulness, visible non-claims, and scripted Mac walkthrough
+      passed the current-tree matrix (297), Mac XCTest target (102), and
+      standalone Python suite (2,006). Closeout is recorded; publication,
+      GitHub checks, merge, and clean-main synchronization remain pending.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -97,7 +102,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 3 | Formalize the goal, schema, container, and profile taxonomy | Completed | [Completed packet](dev/active/independent-product/phase-03-taxonomy/README.md) |
 | 4 | Build the verified export foundation | Completed | [Completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
 | 5 | Ship lossless generic local exports | Completed | [Completed packet](dev/active/independent-product/phase-05-generic-local-exports/README.md) |
-| 6 | Deliver goal-first recipes and previews | In progress | [Active packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
+| 6 | Deliver goal-first recipes and previews | Completed | [Completed packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
 | 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 9 | Add columnar and Hugging Face dataset containers | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

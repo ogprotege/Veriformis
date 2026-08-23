@@ -381,12 +381,10 @@ struct CompileView: View {
                     Text(goal.whatTheModelLearns)
                         .font(.caption)
                         .fixedSize(horizontal: false, vertical: true)
-                    ForEach(goal.notThis, id: \.self) { claim in
-                        Text("Not this: \(claim)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    GoalDisclosuresView(
+                        notThis: goal.notThis,
+                        nonClaims: goal.nonClaims
+                    )
                     let options = presets.presets(forGoal: goal.goalID)
                     Picker(
                         "Preset",
@@ -464,6 +462,28 @@ struct CompileView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .textSelection(.enabled)
+        }
+    }
+}
+
+/// One pure presentation of goal exclusions and contract non-claims, reused
+/// wherever the workbench shows a goal so picker and preview cannot drift.
+struct GoalDisclosuresView: View {
+    let lines: [GoalDisclosureLine]
+
+    init(notThis: [String], nonClaims: [String]) {
+        lines = GoalDisclosureLine.disclosures(
+            notThis: notThis,
+            nonClaims: nonClaims
+        )
+    }
+
+    var body: some View {
+        ForEach(lines) { line in
+            Text(line.renderedText)
+                .font(line.kind == .nonClaim ? .caption.monospaced() : .caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

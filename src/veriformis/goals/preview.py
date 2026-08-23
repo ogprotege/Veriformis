@@ -28,6 +28,7 @@ from veriformis.goals.catalog import (
     goal_catalog,
     goal_for_objective,
     representation_for_row_schema,
+    resolve_goal_instruction,
 )
 from veriformis.identity import lossless_json_bytes
 from veriformis.taxonomy import loss_boundary
@@ -290,14 +291,14 @@ def build_goal_preview(
 
     decisions = {} if curation is None else {d.record_id: d for d in curation.decisions}
     context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
-    instruction_missing = rep.requires_operator_instruction and instruction is None
-    plan = (
-        None
-        if instruction_missing
-        else SerializationPlan.create(
-            row_schema=rep.row_schema,
-            instruction_text=instruction if rep.requires_operator_instruction else None,
-        )
+    resolved_instruction = resolve_goal_instruction(
+        objective=recipe.objective.kind,
+        row_schema=rep.row_schema,
+        instruction=instruction,
+    )
+    plan = SerializationPlan.create(
+        row_schema=rep.row_schema,
+        instruction_text=resolved_instruction.instruction_text,
     )
     passes = {construction_pass.pass_id: construction_pass for construction_pass in recipe.passes}
 
@@ -306,7 +307,7 @@ def build_goal_preview(
         construction_pass = passes[record.pass_id]
         fields = {field.name: field.value for field in record.fields}
         target_value = fields[target_names[0]]
-        rendered = None if plan is None else render_record_payload(plan, recipe, record)
+        rendered = render_record_payload(plan, recipe, record)
         decision = decisions.get(record.record_id)
         entry = GoalPreviewRecord(
             record_id=record.record_id,
@@ -330,7 +331,7 @@ def build_goal_preview(
             recovered_source=_recovered_source(record, sources),
             curation_status=None if decision is None else decision.status,
             curation_reason_codes=() if decision is None else tuple(decision.reason_codes),
-            omission_reason=INSTRUCTION_REQUIRED_OMISSION if instruction_missing else None,
+            omission_reason=None,
             exact_size_bytes=0,
         )
         full_records.append(

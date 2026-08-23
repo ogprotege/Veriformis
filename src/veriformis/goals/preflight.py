@@ -25,6 +25,7 @@ from veriformis.diagnostics import validate_parse_report_locations
 from veriformis.errors import (
     CompilePreflightError,
     GoalCatalogError,
+    GoalInstructionError,
     InvalidSourceLocatorError,
     ParseError,
     SplitError,
@@ -56,7 +57,13 @@ from veriformis.taxonomy import (
     input_family_for_suffix,
 )
 
-from .catalog import CurationDefaults, goal_catalog, require_goal_input_family
+from .catalog import (
+    CurationDefaults,
+    goal_catalog,
+    goal_catalog_json,
+    require_goal_input_family,
+    resolve_goal_instruction,
+)
 from .presets import (
     ConstructionSettings,
     ResolvedRecipeSettings,
@@ -96,6 +103,7 @@ IncompatibilityCode = Literal[
     "override-invalid",
     "instruction-required",
     "instruction-not-applicable",
+    "instruction-untruthful",
     "review-evidence-unavailable",
 ]
 
@@ -280,6 +288,7 @@ def _request_digest(logical_paths: tuple[str, ...], values: dict[str, Any]) -> s
     return canonical_digest(
         {
             "schema_id": COMPILE_PREFLIGHT_SCHEMA_ID,
+            "goal_catalog_sha256": sha256_digest(goal_catalog_json()),
             "logical_paths": list(logical_paths),
             "selection": values,
         }
@@ -292,9 +301,7 @@ def _parser_id_for_suffix(*, logical_path: str, input_family: str) -> str:
     return suffix_parser if suffix_parser in parsers else parsers[0]
 
 
-def _limitations(
-    *, instruction_truth_pending: bool = False
-) -> tuple[PreflightLimitation, ...]:
+def _limitations() -> tuple[PreflightLimitation, ...]:
     items = [
         PreflightLimitation(
             code="point-in-time-source-capture",
@@ -341,17 +348,6 @@ def _limitations(
             source_ids=(),
         ),
     ]
-    if instruction_truth_pending:
-        items.append(
-            PreflightLimitation(
-                code="instruction-truthfulness-not-yet-validated",
-                message=(
-                    "This item checks only instruction presence; Phase 6.7 owns "
-                    "deterministic instruction truthfulness validation."
-                ),
-                source_ids=(),
-            )
-        )
     return tuple(items)
 
 
@@ -601,6 +597,7 @@ def build_compile_preflight(
         "instruction_sha256": None
         if instruction is None
         else sha256_digest(instruction),
+        "effective_instruction_sha256": None,
         "rules": rules,
         "custom": custom,
         "strategy": strategy,
@@ -626,6 +623,7 @@ def build_compile_preflight(
         resolved=None,
     )
     incompatibilities: list[PreflightIncompatibility] = []
+    resolved_instruction: str | None = None
     clean_config: dict[str, Any] | None = None
     settings: ResolvedRecipeSettings | None = None
     selection_problem = _selection_precheck(
@@ -700,27 +698,29 @@ def build_compile_preflight(
                 )
             }
         )
-        if settings.row_schema == "instruction_output":
-            if instruction is None or instruction == "":
-                incompatibilities.append(
-                    PreflightIncompatibility(
-                        code="instruction-required",
-                        fields=("instruction",),
-                        message=(
-                            "instruction is required for the instruction-and-output "
-                            "representation"
-                        ),
-                    )
-                )
-        elif instruction is not None:
+        try:
+            resolved_instruction = resolve_goal_instruction(
+                objective=settings.objective,
+                row_schema=settings.row_schema,
+                instruction=instruction,
+            ).instruction_text
+            request_values["effective_instruction_sha256"] = (
+                None
+                if resolved_instruction is None
+                else sha256_digest(resolved_instruction)
+            )
+            request_digest = _request_digest(requested_logical_paths, request_values)
+        except GoalInstructionError as exc:
+            incompatibility_code: IncompatibilityCode = (
+                "instruction-not-applicable"
+                if exc.reason_codes == ("instruction-not-applicable",)
+                else "instruction-untruthful"
+            )
             incompatibilities.append(
                 PreflightIncompatibility(
-                    code="instruction-not-applicable",
+                    code=incompatibility_code,
                     fields=("instruction", "representation"),
-                    message=(
-                        "instruction is valid only for the instruction-and-output "
-                        "representation"
-                    ),
+                    message=exc.message,
                 )
             )
         if settings.construction.require_review:
@@ -735,11 +735,7 @@ def build_compile_preflight(
                 )
             )
 
-    limitations = _limitations(
-        instruction_truth_pending=(
-            settings is not None and settings.row_schema == "instruction_output"
-        )
-    )
+    limitations = _limitations()
     if incompatibilities:
         return _assemble_bounded(
             CompilePreflight(
@@ -1234,7 +1230,7 @@ def build_compile_preflight(
         evaluation_ratio_ppm=settings.curation.evaluation_ratio_ppm,
         evaluation_required=settings.curation.evaluation_required,
         split_seed=settings.curation.split_seed,
-        instruction=instruction,
+        instruction=resolved_instruction,
     )
     curated = curate_dataset(plan, recipe, inputs, result)
     records = {record.record_id: record for record in result.records}

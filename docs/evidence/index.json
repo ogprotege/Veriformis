@@ -609,6 +609,77 @@
         "python3 -m json.tool docs/evidence/index.json",
         "git diff --check"
       ]
+    },
+    {
+      "id": "phase-6-compile-preflight-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-abdd630e25e83ebf346316319caec892f4d64886",
+      "scope": "Independent-product Phase 6.5 bounded compile preflight over raw sources",
+      "grade": "recorded-local",
+      "summary": "The runtime-only veriformis.compile-preflight/v1 response passed 245 focused compile-preflight, matrix, pipeline, and recipe-surface tests, 1,593 full Python tests, 1,581 standalone release tests with 1 deselected, and 93 Mac tests. Full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation, both golden compile/external-digest/transport flows, CLI/workbench parity, tracking, lock, Ruff, structured JSON, and diff checks passed. One root-pinned capture feeds the production parser, selected cleaning replay, preset segmentation, named construction, global curation, and leakage-group split entirely in memory. Evidence covers all 40 goal-by-input-family cells, every closed selection/source refusal, eligible-source compile parity, the shared real-construction family gate, source retarget and alias refusal before body read, exact request/source identity, bounded private transport, Swift path parity, and refusal before any workspace, renderer, or destination. The item adds no objective, row schema, persisted schema, consumer profile, trainer claim, or generated text. Item 6.5 subsequently passed all 14 GitHub checks and merged as PR #64 at b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/goals/test_compile_preflight.py tests/goals/test_compile_preflight_matrix.py tests/pipeline/test_pipeline_service.py tests/goals/test_recipe_surfaces.py",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase6-05-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check .",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-6-goal-acceptance-matrix-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-b2e28b3dcfe48cd28ec74d8d8eaed12049f72d2d",
+      "scope": "Independent-product Phase 6.6 discovery-closed goal acceptance matrix",
+      "grade": "recorded-local",
+      "summary": "The frozen 74-cell veriformis.goal-acceptance-matrix/v1 fixture passed 297 Python/CLI/MCP/YAML matrix tests, 353 focused goal tests, 1,890 full Python tests, 1,878 standalone release tests with 1 deselected, and 97 Mac tests with zero failures. Full and standalone Python emitted only the intentional transport durability-warning regression warning. Clean-wheel installation, both golden compiles, external-digest verification, deterministic transport, CLI/workbench parity, tracking and its regression, lock, Ruff, structured JSON, byte-identical fixture regeneration, and diff checks passed. Every discovery-admitted goal/input-family/representation cell starts from two distinct raw sources, preserves required evaluation, produces non-empty train and evaluation partitions, seals, and passes external-digest verification while pinning recipe, semantic row-set, manifest, loss, supervised-sample, and exact ordered exclusion identities. Python, CLI, MCP, YAML, and the real Mac CLI bridge agree across all cells; the matrix closes DOCX, section reconstruction, recorded changes, structured extraction, instruction/output, messages, Unicode scalar, and real exact-duplicate-exclusion gaps. Item 6.6 subsequently passed its required GitHub checks and merged as PR #65 at 7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/regressions/test_phase6_goal_acceptance_matrix.py",
+        "uv run pytest -q tests/goals",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase6-06-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q tests/regressions/test_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check .",
+        "python3 -m json.tool tests/regressions/fixtures/phase6/goal-acceptance-matrix.json",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "phase-6-instruction-truthfulness-closeout-local-2026-08-22",
+      "date": "2026-08-22",
+      "commit": "working-tree-on-7b93a32a5a9b18e5bc9c032750f467c4d9c43ea5",
+      "scope": "Independent-product Phase 6.7 instruction truthfulness and Phase 6 closeout",
+      "grade": "recorded-local",
+      "summary": "Item 6.7 current-tree gates passed: 231 focused 6.7 Python cases, 481 tests/goals, 297 Python/CLI/MCP/YAML matrix cases, 2,006 standalone Python tests with 1 deselected and the intentional durability warning, 102 Mac XCTests with TEST SUCCEEDED including the five item 6.7 methods, catalog fixture cmp, tracking, lock, Ruff, structured JSON, parity, check_local (clean wheel, both golden compiles, external digest, transport), and git diff --check. Catalog-owned default instructions, closed deterministic operator truthfulness, visible non-claims, typed export delegates, and the scripted walkthrough are recorded. U1-U6 and Phase 6 closeout are judged locally. This record does not claim publication, GitHub checks, merge, or clean-main synchronization.",
+      "details": "dev/active/independent-product/phase-06-goal-first-recipes/evidence.md",
+      "rerun": [
+        "uv run pytest -q tests/goals/test_goal_catalog.py tests/goals/test_goal_instructions.py tests/goals/test_recipe_surfaces.py tests/goals/test_compile_preflight.py tests/goals/test_goal_preview.py tests/regressions/test_phase6_goal_acceptance_matrix.py",
+        "uv run pytest -q tests/regressions/test_phase6_goal_acceptance_matrix.py",
+        "uv run pytest -q",
+        "uv run pytest -q --ignore=tests/handoff -m \"not aptus_integration\"",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "xcodebuild test -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug -destination platform=macOS -derivedDataPath /private/tmp/veriformis-phase6-07-xcode CODE_SIGNING_ALLOWED=NO",
+        "uv run python scripts/check_project_tracking.py",
+        "uv run pytest -q tests/regressions/test_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check .",
+        "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
     }
   ]
 }

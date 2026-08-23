@@ -1108,7 +1108,7 @@ class PipelineService:
         recipe = dataset_recipe_from_json_bytes(
             _output_bytes(store, revision, "construct", "recipe")
         )
-        resolve_preview_representation(recipe, representation)
+        preview_representation = resolve_preview_representation(recipe, representation)
         recipe, result, inputs = _load_constructed_dataset(store, revision)
         curation = None
         persisted_instruction = None
@@ -1123,7 +1123,15 @@ class PipelineService:
             inputs=inputs,
             curation=curation,
             representation_id=representation,
-            instruction=instruction if instruction is not None else persisted_instruction,
+            instruction=(
+                instruction
+                if instruction is not None
+                else (
+                    persisted_instruction
+                    if preview_representation.row_schema == "instruction_output"
+                    else None
+                )
+            ),
             record_ids=tuple(record_ids),
         )
         return GoalPreviewOutcome(preview=preview)
@@ -1779,13 +1787,13 @@ class PipelineService:
         current = store.head()
         _require_group3_revision(current)
         recipe, result, inputs = _load_constructed_dataset(store, current)
-        if recipe.target_row_schema == "instruction_output":
-            if instruction is None or not instruction:
-                raise ValueError(
-                    "--instruction is required for instruction_output rows"
-                )
-        elif instruction is not None:
-            raise ValueError("--instruction is valid only for instruction_output rows")
+        from veriformis.goals.catalog import resolve_goal_instruction
+
+        instruction = resolve_goal_instruction(
+            objective=recipe.objective.kind,
+            row_schema=recipe.target_row_schema,
+            instruction=instruction,
+        ).instruction_text
         try:
             settings = resolve_recipe_settings(
                 goal=goal,
