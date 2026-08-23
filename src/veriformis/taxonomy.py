@@ -132,11 +132,7 @@ PLANNED_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
         "mlx-lm": "8.4",
     }
 )
-UNEXECUTABLE_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
-    {
-        "mlx-lm": "8.4",
-    }
-)
+UNEXECUTABLE_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
 CANDIDATE_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "axolotl",
     "llama-factory",

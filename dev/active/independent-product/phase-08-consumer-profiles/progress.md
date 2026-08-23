@@ -52,3 +52,20 @@ intentional transport durability warning.
 
 **Next action:** Publish the item 8.3 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 8.4.
+
+## 2026-08-23 — Item 8.3 merged; item 8.4 in progress
+
+**Status:** Item 8.3 merged as PR #84 at
+`fe326c8e1aac18ce2e795f6d4618566a56ff22b5` after all 14 GitHub checks
+passed. Local `main` equals `origin/main`.
+
+Item 8.4 emits the MLX-LM LoRA adapter: required `train.jsonl`, optional
+`valid.jsonl` when evaluation is nonempty, no `test.jsonl`. Taxonomy remains
+planned. Core does not import mlx-lm.
+
+Focused MLX-LM and discovery tests passed. Tracking, Ruff, JSON, and diff
+check passed. Core pytest passed 1982 with 1 deselected and the
+intentional transport durability warning.
+
+**Next action:** Publish the item 8.4 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 8.5.

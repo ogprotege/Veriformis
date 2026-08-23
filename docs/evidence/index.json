@@ -739,6 +739,26 @@
         "uv run ruff check src tests",
         "git diff --check"
       ]
+    },
+    {
+      "id": "independent-product-phase-08-item-8-4",
+      "date": "2026-08-23",
+      "commit": "working-tree-on-fe326c8",
+      "scope": "Independent-product Phase 8.4 MLX-LM LoRA emission",
+      "grade": "recorded-local",
+      "summary": "Item 8.4 emits the MLX-LM LoRA adapter with required train.jsonl and optional valid.jsonl. test.jsonl is not mapped from Veriformis evaluation. Taxonomy remains planned. Core does not import mlx-lm.",
+      "details": "dev/active/independent-product/phase-08-consumer-profiles/evidence.md",
+      "related": [
+        "docs/contracts/mlx-lm-export-v1.md",
+        "src/veriformis/profiles/mlx_lm.py"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/profiles tests/exports/test_phase8_profile_isolation.py",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
+        "git diff --check"
+      ]
     }
   ]
 }

@@ -58,7 +58,7 @@ def test_planned_profile_item_map_is_closed_over_the_taxonomy() -> None:
     assert tuple(PLANNED_CONSUMER_PROFILE_ITEMS) == PLANNED_CONSUMER_PROFILES
     assert PLANNED_CONSUMER_PROFILE_ITEMS["trl"] == "8.3"
     assert PLANNED_CONSUMER_PROFILE_ITEMS["mlx-lm"] == "8.4"
-    assert UNEXECUTABLE_CONSUMER_PROFILE_ITEMS == {"mlx-lm": "8.4"}
+    assert UNEXECUTABLE_CONSUMER_PROFILE_ITEMS == {}
 
 
 def test_taxonomy_still_lists_trl_and_mlx_lm_as_planned() -> None:
@@ -82,12 +82,18 @@ def test_generic_export_discovery_keeps_a_null_consumer_profile() -> None:
     ]
     assert generic
     assert all(profile.consumer_profile is None for profile in generic)
-    assert {(profile.consumer_profile.consumer_id if profile.consumer_profile else None) for profile in named} == {"trl"}
+    assert {
+        profile.consumer_profile.consumer_id
+        for profile in named
+        if profile.consumer_profile is not None
+    } == {"mlx-lm", "trl"}
 
 
-def test_planned_consumer_id_refuses_before_catalog_lookup() -> None:
-    with pytest.raises(ExportContractError, match="planned for item 8.4"):
-        ExportService().dry_run_export(_planned_request("mlx-lm"))
+def test_emitted_profiles_are_not_refused_as_planned() -> None:
+    selectors = {
+        profile.selector[2] for profile in ExportService().discover_exports().profiles
+    }
+    assert {"mlx-lm", "trl"} <= selectors
 
 
 def test_candidate_consumer_id_refuses_as_phase_10() -> None:
@@ -95,11 +101,11 @@ def test_candidate_consumer_id_refuses_as_phase_10() -> None:
         ExportService().dry_run_export(_planned_request("axolotl"))
 
 
-def test_planned_consumer_id_refusal_is_visible_on_the_cli() -> None:
-    payload = _planned_request("mlx-lm").canonical_bytes().decode("utf-8")
+def test_candidate_consumer_id_refusal_is_visible_on_the_cli() -> None:
+    payload = _planned_request("axolotl").canonical_bytes().decode("utf-8")
     result = RUNNER.invoke(app, ["export", "dry-run", "--request-json", payload])
     assert result.exit_code != 0
-    assert "planned for item 8.4" in result.output
+    assert "Phase 10 candidate" in result.output
 
 
 def test_optional_profile_extras_are_declared_empty() -> None:

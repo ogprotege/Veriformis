@@ -48,6 +48,6 @@ not executable.
 
 ## Current state
 
-Item 8.2 merged as PR #83. Item 8.3 emits the TRL SFT adapter. Taxonomy
-`trl` remains planned. Generic export selectors stay `consumer_id` null.
-MLX-LM remains non-executable. Empty extras do not install trainer packages.
+Item 8.3 merged as PR #84. Item 8.4 emits the MLX-LM LoRA adapter. Taxonomy
+remains planned. Generic export selectors stay `consumer_id` null. Empty
+extras do not install trainer packages.
