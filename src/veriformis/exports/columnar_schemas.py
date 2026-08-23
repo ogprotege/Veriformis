@@ -18,10 +18,7 @@ from veriformis.contracts import (
 )
 from veriformis.errors import ExportContractError
 from veriformis.identity import sha256_digest
-from veriformis.taxonomy import (
-    PLANNED_PHYSICAL_CONTAINERS,
-    UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS,
-)
+from veriformis.taxonomy import UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
 
 COLUMNAR_SCHEMA_DATA_NAME = "columnar_schemas-v1.json"
 RowSchema = Literal["instruction_output", "messages", "prompt_completion", "text"]
@@ -41,7 +38,7 @@ MESSAGE_STRUCT_FIELDS: tuple[str, ...] = ("role", "content")
 MESSAGE_ROLES: tuple[str, ...] = ("user", "assistant")
 SORTED_ROW_SCHEMAS: tuple[str, ...] = tuple(sorted(V1_ROW_SCHEMA_KINDS))
 SORTED_PACKAGES: tuple[str, ...] = ("datasets", "pyarrow")
-SORTED_CONTAINERS: tuple[str, ...] = tuple(sorted(PLANNED_PHYSICAL_CONTAINERS))
+SORTED_CONTAINERS: tuple[str, ...] = tuple(sorted(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS))
 
 
 class _StrictModel(BaseModel):

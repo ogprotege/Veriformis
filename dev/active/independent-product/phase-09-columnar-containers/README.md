@@ -45,7 +45,6 @@ planned, and refuses those `container_id` values with the named later item.
 
 ## Current state
 
-Items 9.1–9.2 merged as PR #89 and PR #90. Item 9.3 packages semantic
-fingerprints. Taxonomy `parquet`, `arrow`, and `hugging-face-dataset`
-remain planned. Generic export selectors stay the three Phase 5 containers
-plus the Phase 8 TRL/MLX-LM adapters. Extra `columnar` stays empty.
+Items 9.1–9.3 merged as PR #89–#91. Item 9.4 emits Parquet v1.
+Taxonomy `parquet`, `arrow`, and `hugging-face-dataset` remain planned.
+Arrow and Hugging Face Dataset still refuse. Extra `columnar` stays empty.

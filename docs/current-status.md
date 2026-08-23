@@ -38,14 +38,13 @@ complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 14 GitHub checks passed. Phase 8 consumer profiles are complete: TRL SFT and
 MLX-LM LoRA are implemented optional adapters with official-schema harnesses
 and dataset-only launch sidecars. The exporter does not launch training.
-Phase 9 columnar containers are in progress under item 9.3: Arrow and
-Hugging Face feature schemas and semantic fingerprints are pinned.
-Parquet, Arrow, and Hugging Face Dataset remain planned and refuse with
-the later item.
+Phase 9 columnar containers are in progress under item 9.4: Parquet v1
+is an executable generic export with semantic fingerprints. Taxonomy still
+lists it planned. Arrow and Hugging Face Dataset refuse with later items.
 
-**Review date:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
+**Review date:** 2026-08-23 (independent-product Phase 9.4 Parquet)
 
-**Next review:** Phase 9.3 pull-request merge, item 9.4, beta label cut,
+**Next review:** Phase 9.4 pull-request merge, item 9.5, beta label cut,
 public-ready checklist, or any contract change. Do not start Phase 10 or
 13 from this packet.
 
@@ -394,7 +393,7 @@ The installed console entry point is `veriformis`.
 | `mapping-rejections PATH --plan PLAN.json --output DIR` | Writes a content-addressed mapping rejection report beside a directory; `map` also writes one beside the workspace | `veriformis.mapping-rejection-report/v1` JSON; not a verified export |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
-| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, `split-jsonl-directory` v1, and TRL / MLX-LM adapters |
+| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `constrained-csv`, `json`, `parquet`, `split-jsonl-directory` v1, and TRL / MLX-LM adapters |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
 | `export execute --request-json JSON` | Re-derives and atomically publishes the operator-confirmed no-replace plan | Canonical receipt and verification response, or explicit cancellation/visible-partial status |

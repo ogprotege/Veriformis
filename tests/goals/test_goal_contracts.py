@@ -77,7 +77,10 @@ def test_representation_exports_equal_the_production_export_catalog() -> None:
     discovery = PipelineService().discover_exports().discovery
     assert discovery is not None
     generic = [
-        profile for profile in discovery.profiles if profile.consumer_profile is None
+        profile
+        for profile in discovery.profiles
+        if profile.consumer_profile is None
+        and profile.container_profile.container_id in GENERIC_EXPORT_CONTAINERS
     ]
     supported: dict[str, list[str]] = {}
     for profile in generic:

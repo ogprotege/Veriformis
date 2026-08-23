@@ -87,6 +87,7 @@ from veriformis.exports.constrained_csv import (
     CONSTRAINED_CSV_IMPLEMENTATION,
 )
 from veriformis.exports.paths import validate_export_relative_path
+from veriformis.exports.parquet import PARQUET_IMPLEMENTATION
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
 from veriformis.profiles.mlx_lm import MLX_LM_IMPLEMENTATION
 from veriformis.profiles.trl import TRL_IMPLEMENTATION
@@ -131,6 +132,7 @@ class ExportService:
                 SPLIT_JSONL_IMPLEMENTATION,
                 CANONICAL_JSON_IMPLEMENTATION,
                 CONSTRAINED_CSV_IMPLEMENTATION,
+                PARQUET_IMPLEMENTATION,
                 TRL_IMPLEMENTATION,
                 MLX_LM_IMPLEMENTATION,
             )
@@ -1154,8 +1156,7 @@ def _refuse_unexecutable_container_id(container_id: str) -> None:
     later_item = UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS.get(container_id)
     if later_item is not None:
         raise ExportContractError(
-            f"physical container {container_id!r} is planned for item {later_item}; "
-            "generic JSONL, JSON, and constrained CSV remain the executable containers"
+            f"physical container {container_id!r} is planned for item {later_item}"
         )
 
 

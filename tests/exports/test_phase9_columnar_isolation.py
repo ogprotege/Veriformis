@@ -56,8 +56,12 @@ def test_planned_container_item_map_is_closed_over_the_taxonomy() -> None:
         "arrow",
         "hugging-face-dataset",
     )
-    assert tuple(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) == PLANNED_PHYSICAL_CONTAINERS
-    assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS["parquet"] == "9.4"
+    assert PLANNED_PHYSICAL_CONTAINERS == (
+        "parquet",
+        "arrow",
+        "hugging-face-dataset",
+    )
+    assert "parquet" not in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
     assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS["arrow"] == "9.5"
     assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS["hugging-face-dataset"] == "9.6"
 
@@ -89,6 +93,7 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
     assert {profile.container_profile.container_id for profile in generic} == {
         "constrained-csv",
         "json",
+        "parquet",
         "split-jsonl-directory",
     }
     named = {
@@ -97,8 +102,14 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
         if profile.consumer_profile is not None
     }
     assert named == {"mlx-lm", "trl"}
-    for identifier in PLANNED_PHYSICAL_CONTAINERS:
+    for identifier in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS:
         assert all(profile.selector[0] != identifier for profile in profiles.values())
+    assert (
+        "parquet",
+        1,
+        None,
+        None,
+    ) in profiles
 
 
 def test_planned_container_refuses_before_source_access(
@@ -122,7 +133,7 @@ def test_planned_container_refuses_before_source_access(
     assert source_opened is False
 
 
-@pytest.mark.parametrize("container_id", PLANNED_PHYSICAL_CONTAINERS)
+@pytest.mark.parametrize("container_id", tuple(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS))
 def test_planned_container_refusal_is_visible_on_the_cli(container_id: str) -> None:
     payload = _planned_request(container_id).canonical_bytes().decode("utf-8")
     result = RUNNER.invoke(app, ["export", "dry-run", "--request-json", payload])

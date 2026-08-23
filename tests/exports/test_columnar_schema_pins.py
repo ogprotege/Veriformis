@@ -28,10 +28,7 @@ from veriformis.exports.columnar_schemas import (
 )
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
-from veriformis.taxonomy import (
-    PLANNED_PHYSICAL_CONTAINERS,
-    UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS,
-)
+from veriformis.taxonomy import UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS
 
 DATA_PATH = (
     Path(__file__).resolve().parents[2]
@@ -95,7 +92,7 @@ def test_catalog_closes_over_every_row_schema_and_planned_container() -> None:
     )
     assert tuple(item.package for item in catalog.packages) == ("datasets", "pyarrow")
     assert tuple(item.container_id for item in catalog.planned_containers) == tuple(
-        sorted(PLANNED_PHYSICAL_CONTAINERS)
+        sorted(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS)
     )
     for pin in catalog.planned_containers:
         assert pin.executable_item == UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS[pin.container_id]

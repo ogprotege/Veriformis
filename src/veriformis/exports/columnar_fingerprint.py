@@ -24,7 +24,7 @@ from veriformis.exports.columnar_schemas import (
     PAYLOAD_FIELDS,
     columnar_schema_digest,
 )
-from veriformis.identity import canonical_digest, lossless_json_bytes, validate_sha256
+from veriformis.identity import canonical_digest, lossless_json_bytes, sha256_digest, validate_sha256
 
 COLUMNAR_FINGERPRINT_DATA_NAME = "columnar_fingerprint-v1.json"
 RowSchema = Literal["instruction_output", "messages", "prompt_completion", "text"]
@@ -232,6 +232,21 @@ def columnar_partition_preimage(
     )
 
 
+def columnar_partition_preimage_bytes(
+    *,
+    row_schema: RowSchema,
+    partition: Partition,
+    payloads: Sequence[MappingABC[str, Any]],
+) -> bytes:
+    """Lossless canonical bytes of one partition preimage."""
+    preimage = columnar_partition_preimage(
+        row_schema=row_schema,
+        partition=partition,
+        payloads=payloads,
+    )
+    return lossless_json_bytes(preimage.model_dump(mode="json"))
+
+
 def columnar_partition_fingerprint(
     *,
     row_schema: RowSchema,
@@ -239,12 +254,13 @@ def columnar_partition_fingerprint(
     payloads: Sequence[MappingABC[str, Any]],
 ) -> str:
     """SHA-256 of the lossless canonical preimage. Independent of library bytes."""
-    preimage = columnar_partition_preimage(
-        row_schema=row_schema,
-        partition=partition,
-        payloads=payloads,
+    return sha256_digest(
+        columnar_partition_preimage_bytes(
+            row_schema=row_schema,
+            partition=partition,
+            payloads=payloads,
+        )
     )
-    return canonical_digest(preimage.model_dump(mode="json"))
 
 
 def columnar_dataset_fingerprint(

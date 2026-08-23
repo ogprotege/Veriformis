@@ -6,9 +6,9 @@
 
 **Discovery schema:** `veriformis.columnar-schema-discovery/v1`
 
-**Status:** Packaged Arrow and Hugging Face feature pins for planned
-`parquet`, `arrow`, and `hugging-face-dataset` containers. Those
-selectors remain non-executable.
+**Status:** Packaged Arrow and Hugging Face feature pins. Parquet v1 is
+export-executable. `arrow` and `hugging-face-dataset` remain
+non-executable. Taxonomy still lists all three as planned.
 
 **Last reviewed:** 2026-08-23
 
@@ -19,10 +19,10 @@ row schema, including nested `messages`. A pin records official-doc URLs,
 review dates, licenses, the empty extra name, and version ranges. Version
 ranges live in this catalog. They are not core lock pins.
 
-The three containers stay `planned`. Selecting them as `container_id`
-still fails closed naming items 9.4, 9.5, and 9.6. Generic JSONL, JSON,
-and constrained CSV remain the executable containers. TRL and MLX-LM
-remain split-JSONL adapters.
+Taxonomy still lists all three as `planned` until Phase 9 closeout.
+Selecting `arrow` or `hugging-face-dataset` as `container_id` fails closed
+naming items 9.5 and 9.6. Selecting `parquet` plans and can emit Parquet
+v1. TRL and MLX-LM remain split-JSONL adapters.
 
 ## Closed vocabularies
 
@@ -61,8 +61,9 @@ must not import PyArrow, Hugging Face Datasets, or pandas.
 
 ## Non-goals
 
-Parquet, Arrow IPC, and Hugging Face Dataset emission. Hub upload.
-Portable exact bytes across library versions. Phase 10 trainer profiles.
+Arrow IPC (item 9.5) and Hugging Face Dataset emission (item 9.6). Hub
+upload. Portable exact bytes across library versions. Phase 10 trainer
+profiles.
 
 ## Discovery
 

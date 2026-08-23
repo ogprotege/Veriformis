@@ -2,15 +2,15 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `2f31526` on `main` after PR #90
+**Implementation baseline reviewed:** `f4c35e1` on `main` after PR #91
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
 Phases 0–2; independent-product Phases 0–8 complete; Phase 9.3 fingerprints)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.4 Parquet)
 
-**Next review:** Phase 9.3 pull-request merge, item 9.4, beta label cut, or
+**Next review:** Phase 9.4 pull-request merge, item 9.5, beta label cut, or
 any listed-item status change. Do not start Phase 10 or 13 from this
 packet.
 
@@ -91,8 +91,8 @@ local, offline, and free of LLM generation.
       Items 8.1–8.7 merged as PR #82–#88.
 - [ ] Independent product Phase 9 is in progress under its
       [packet](dev/active/independent-product/phase-09-columnar-containers/README.md).
-      Items 9.1–9.2 merged as PR #89–#90. Item 9.3 pins semantic
-      fingerprints. Columnar containers remain planned.
+      Items 9.1–9.3 merged as PR #89–#91. Item 9.4 emits Parquet v1.
+      Taxonomy still lists the three columnar containers as planned.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

@@ -261,6 +261,7 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
     expected_production = [
         ("constrained-csv", 1, None, None),
         ("json", 1, None, None),
+        ("parquet", 1, None, None),
         ("split-jsonl-directory", 1, None, None),
         ("split-jsonl-directory", 1, "mlx-lm", 1),
         ("split-jsonl-directory", 1, "trl", 1),
@@ -273,6 +274,12 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
             "text",
         ),
         "json": (
+            "instruction_output",
+            "messages",
+            "prompt_completion",
+            "text",
+        ),
+        "parquet": (
             "instruction_output",
             "messages",
             "prompt_completion",

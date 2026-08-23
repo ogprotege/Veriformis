@@ -105,7 +105,7 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/04-parquet-export`
 **Title:** `Phase 9.4: Emit Parquet`
 
-- [ ] Selector `parquet` v1, `consumer_id` null. Splits preserved. Nested `messages` admitted. Taxonomy remains planned.
+- [x] Selector `parquet` v1, `consumer_id` null. Splits preserved. Nested `messages` admitted. Taxonomy remains planned.
 
 ### 9.5 Emit Arrow
 
