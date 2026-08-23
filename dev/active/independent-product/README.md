@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–6 complete
+**Status:** Active program — Phases 0–6 complete; Phase 7.1 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -22,6 +22,7 @@ with roadmap headings.
 - [Phase 4 — Verified export foundation](phase-04-verified-export-foundation/README.md) — completed
 - [Phase 5 — Lossless generic local exports](phase-05-generic-local-exports/README.md) — completed
 - [Phase 6 — Goal-first recipes and previews](phase-06-goal-first-recipes/README.md) — completed
+- [Phase 7 — Existing-dataset import and mapping](phase-07-existing-dataset-import/README.md) — in progress; item 7.1 opening
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active

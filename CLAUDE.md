@@ -33,7 +33,11 @@ Item 6.6's frozen goal acceptance matrix merged as PR #65 at
 Item 6.7's instruction templates, truthfulness check, U1–U6 judgment, and
 Phase 6 closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
-passed.
+passed, then stamped complete as PR #69 at
+`6c4694c2e1c523156cd7c8f34c12f258a3ce0b01`. Phase 7 (existing-dataset import
+and mapping) is in progress under its standard packet at item 7.1: input modes
+`document-source`, `dataset-row`, and `mixed`, with only document-source
+executable.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -103,8 +107,9 @@ Read these current authorities before changing code:
     `docs/contracts/goal-catalog-v1.md`, and
     `docs/contracts/recipe-preset-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
-    `docs/adr/0007-goal-first-catalog-as-versioned-data.md`, and
-    `docs/adr/0008-input-family-taxonomy-axis.md`
+    `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
+    `docs/adr/0008-input-family-taxonomy-axis.md`, and
+    `docs/adr/0010-input-mode-as-compiler-path.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

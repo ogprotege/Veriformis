@@ -1022,6 +1022,12 @@ class PipelineService:
 
         return discover_presets()
 
+    def discover_modes(self) -> dict[str, Any]:
+        """Return a fresh, adapter-safe copy of compiler-path input modes."""
+        from veriformis.mapping import discover_modes
+
+        return discover_modes()
+
     def preflight(
         self,
         paths: list[Path],
@@ -1046,10 +1052,13 @@ class PipelineService:
         evaluation_required: bool | None = None,
         split_seed: str | None = None,
         review_policy: str | None = None,
+        mode: str | None = None,
     ) -> CompilePreflightOutcome:
         """Evaluate one immutable source capture without opening a workspace."""
         from veriformis.goals import build_compile_preflight
+        from veriformis.mapping import require_executable_mode
 
+        require_executable_mode(mode)
         preflight = build_compile_preflight(
             paths,
             source_root=source_root,
@@ -1190,8 +1199,12 @@ class PipelineService:
         out: Path,
         *,
         source_root: Path | None = None,
+        mode: str | None = None,
     ) -> ParseOutcome:
         """Capture raw files and commit one canonical parse revision."""
+        from veriformis.mapping import require_executable_mode
+
+        require_executable_mode(mode)
         source_captures = capture_source_batch(paths, source_root=source_root)
         captured: list[tuple[Path, bytes]] = []
         for source_capture in source_captures:
@@ -1612,6 +1625,7 @@ class PipelineService:
         split_ratio_ppm: int | None = None,
         require_review: bool | None = None,
         consumer_profile: str | None = None,
+        mode: str | None = None,
     ) -> ConstructOutcome:
         """Construct evidence-bearing candidates and immutable accepted records.
 
@@ -1622,6 +1636,9 @@ class PipelineService:
         effective settings.
         """
         from veriformis.goals.presets import resolve_recipe_settings
+        from veriformis.mapping import require_executable_mode
+
+        require_executable_mode(mode)
         from veriformis.recipes.library import build_named_recipe
 
         try:

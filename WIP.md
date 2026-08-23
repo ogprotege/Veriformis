@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `6995d17bef0d09f235b1c464e947c38c63dd313d`
+**Implementation baseline reviewed:** `6c4694c2e1c523156cd7c8f34c12f258a3ce0b01`
 on `main` (Groups 1–7;
 Group 9 automated gates; beta-prep; private beta workbench Phases 0–2;
-independent-product Phases 0–6 complete)
+independent-product Phases 0–6 complete; Phase 7.1 opening)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6 complete)
+**Last reviewed:** 2026-08-23 (independent-product Phase 7.1 opening)
 
-**Next review:** Phase 7 packet opening, beta
+**Next review:** Phase 7.1 pull-request merge, item 7.2, beta
 label cut, public Mac evidence, or any listed-item status change
 
 > **Authority:** This file is a convenience tracker. It does not define product
@@ -81,6 +81,9 @@ local, offline, and free of LLM generation.
       truthfulness and Phase 6 closeout merged as PR #67 at
       `6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
       passed.
+- [ ] Independent product Phase 7 is in progress under its
+      [active packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md).
+      Item 7.1 names compiler-path modes under ADR-0010.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -100,7 +103,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 4 | Build the verified export foundation | Completed | [Completed packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md) |
 | 5 | Ship lossless generic local exports | Completed | [Completed packet](dev/active/independent-product/phase-05-generic-local-exports/README.md) |
 | 6 | Deliver goal-first recipes and previews | Completed | [Completed packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
-| 7 | Add first-class existing-dataset import and mapping | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 7 | Add first-class existing-dataset import and mapping | In progress | [Active packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md) |
 | 8 | Implement the first consumer profiles | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 9 | Add columnar and Hugging Face dataset containers | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 10 | Expand consumer profiles under evidence gates | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-22",
+  "last_updated": "2026-08-23",
   "status_values": [
     "planned",
     "in_progress",
@@ -87,12 +87,12 @@
     {
       "number": 7,
       "title": "Add first-class existing-dataset import and mapping",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [5, 6],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
+      "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Begin after generic export and goal semantics pass."
+      "next_gate": "Item 7.1 names document-source, dataset-row, and mixed under ADR-0010; only document-source executes. Dataset-row and mixed refuse until items 7.3 and 7.7."
     },
     {
       "number": 8,
