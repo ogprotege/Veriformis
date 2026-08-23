@@ -448,6 +448,11 @@ evidence, curation, leakage group, assignment, split, and plan identities. A
 mismatch in count, ordinal, row ID, payload digest, record binding, or partition
 fails validation.
 
+Imported dataset-row seals keep the same payload JSONL and `ProductRow` v1
+shapes. Their provenance lines use `veriformis.imported-row-provenance/v1`
+and name file, 1-based row index, JSON pointer, and mapping-rule ids. They
+do not invent construction chunk ids.
+
 Rows within each partition are ordered lexicographically by `record_id`. The
 combined row-set and provenance order is all `train` rows followed by all
 `evaluation` rows. The row-set identity binds both ordered payload sequences

@@ -39,6 +39,10 @@ Payload keys are exactly the Finished Dataset v1 keys: `text`; `prompt` and
 
 Every persisted object recomputes its identity on load. Extra or missing
 fields fail closed. Field values must match `mapped_value.output_sha256`.
+The mapping recipe identity includes the mapping-plan id, every mapping-rule
+id, the goal catalog SHA-256, and the selected sources, so a silent mapping
+edit cannot reuse a prior seal. Imported row provenance names file, index,
+JSON pointer, and mapping-rule ids. It does not claim construction chunks.
 
 ## Non-goals
 

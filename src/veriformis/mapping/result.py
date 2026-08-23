@@ -9,7 +9,8 @@ from pydantic import field_validator, model_validator
 
 from veriformis.errors import MappingError
 from veriformis.goals import goal_catalog
-from veriformis.identity import derive_id, validate_id
+from veriformis.goals.catalog import goal_catalog_json
+from veriformis.identity import derive_id, sha256_digest, validate_id, validate_sha256
 from veriformis.mapping.models import (
     ADMITTED_CONTAINERS,
     ROW_SCHEMA_PAYLOAD_KEYS,
@@ -37,9 +38,11 @@ class MappingRecipe(_StrictModel):
     objective_id: str
     objective_kind: str
     mapping_plan_id: str
+    mapping_rule_ids: tuple[str, ...]
+    goal_catalog_sha256: str
     source_ids: tuple[str, ...]
 
-    @field_validator("source_ids", mode="before")
+    @field_validator("source_ids", "mapping_rule_ids", mode="before")
     @classmethod
     def _tuple_sources(cls, value: Any) -> Any:
         return tuple(value) if isinstance(value, list) else value
@@ -69,6 +72,18 @@ class MappingRecipe(_StrictModel):
             )
         validate_id(self.mapping_plan_id, kind="mpl")
         validate_id(self.objective_id, kind="obj")
+        validate_sha256(self.goal_catalog_sha256)
+        expected_catalog = sha256_digest(goal_catalog_json())
+        if self.goal_catalog_sha256 != expected_catalog:
+            raise MappingError("mapping recipe goal catalog digest mismatch")
+        if not self.mapping_rule_ids:
+            raise MappingError("mapping recipe requires mapping-rule ids")
+        if len(self.mapping_rule_ids) != len(set(self.mapping_rule_ids)):
+            raise MappingError("mapping recipe mapping_rule_ids must be unique")
+        for rule_id in self.mapping_rule_ids:
+            validate_id(rule_id, kind="mrl")
+        if self.mapping_rule_ids != tuple(sorted(self.mapping_rule_ids)):
+            raise MappingError("mapping recipe mapping_rule_ids must be sorted")
         if not self.source_ids:
             raise MappingError("mapping recipe requires at least one source")
         if self.source_ids != tuple(sorted(set(self.source_ids))):
@@ -109,6 +124,10 @@ class MappingRecipe(_StrictModel):
             "objective_id": derive_id("obj", objective_body),
             "objective_kind": goal.objective,
             "mapping_plan_id": plan.mapping_plan_id,
+            "mapping_rule_ids": sorted(
+                item.mapping_rule_id for item in plan.field_mappings
+            ),
+            "goal_catalog_sha256": sha256_digest(goal_catalog_json()),
             "source_ids": list(sources),
         }
         return cls(recipe_id=derive_id("rcp", body), **body)
