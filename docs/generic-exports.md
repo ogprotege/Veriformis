@@ -8,14 +8,15 @@ train/evaluation split.
 
 **Status:** Implemented in development alpha `0.1.0`
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
 
 Imported dataset-row bundles use these same three containers. Mapping does
 not add a fourth renderer or a trainer profile. Named TRL and MLX-LM
 adapters are optional split-JSONL profiles; generic selectors stay
 `consumer_id` null. Parquet, Arrow, and Hugging Face Dataset remain planned
-(Phase 9); their Arrow and Hugging Face feature schemas are pinned.
-Selecting those `container_id` values fails closed until the matching item.
+(Phase 9); their Arrow and Hugging Face feature schemas and semantic
+fingerprints are pinned. Selecting those `container_id` values fails closed
+until the matching item. Columnar v1 will not claim portable exact bytes.
 
 **Next review:** Any generic-export selector, row-schema compatibility,
 consumer-profile, request, receipt, or transport change

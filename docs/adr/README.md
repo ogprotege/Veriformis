@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
 
 **Next review:** Every material architecture or product-boundary decision
 

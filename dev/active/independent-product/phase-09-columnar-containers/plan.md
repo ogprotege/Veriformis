@@ -98,7 +98,7 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/03-semantic-fingerprints`
 **Title:** `Phase 9.3: Define semantic fingerprints`
 
-- [ ] Versioned fingerprint independent of library metadata. Receipts still bind exact emitted bytes.
+- [x] Versioned fingerprint independent of library metadata. Receipts still bind exact emitted bytes.
 
 ### 9.4 Emit Parquet
 

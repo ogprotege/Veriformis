@@ -33,3 +33,18 @@ planned. Do not emit Parquet, Arrow, or Hugging Face Dataset files.
 
 **Next action:** Publish the item 9.2 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.3.
+
+## 2026-08-23 — Item 9.2 merged; item 9.3 in progress
+
+**Status:** Item 9.2 merged as PR #90 at
+`2f31526e15f1fe3d2df394d959a92a124b909258` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.3 packages the semantic fingerprint preimage: ordered product
+payloads, partition, row schema, and the 9.2 schema-pin digest.
+`determinism_claim` is `semantic_content_only`. Container identity and
+library metadata are excluded. Receipts still bind exact emitted bytes.
+Extra `columnar` stays empty. Taxonomy stays planned.
+
+**Next action:** Publish the item 9.3 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 9.4.

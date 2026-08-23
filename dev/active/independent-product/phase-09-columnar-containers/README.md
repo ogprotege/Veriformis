@@ -45,7 +45,7 @@ planned, and refuses those `container_id` values with the named later item.
 
 ## Current state
 
-Item 9.1 merged as PR #89. Item 9.2 packages Arrow and Hugging Face
-feature pins. Taxonomy `parquet`, `arrow`, and `hugging-face-dataset`
+Items 9.1–9.2 merged as PR #89 and PR #90. Item 9.3 packages semantic
+fingerprints. Taxonomy `parquet`, `arrow`, and `hugging-face-dataset`
 remain planned. Generic export selectors stay the three Phase 5 containers
 plus the Phase 8 TRL/MLX-LM adapters. Extra `columnar` stays empty.

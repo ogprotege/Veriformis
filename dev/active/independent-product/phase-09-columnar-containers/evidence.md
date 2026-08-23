@@ -1,6 +1,6 @@
 # Phase 9 Evidence
 
-**Status:** Open — item 9.2 schema pins
+**Status:** Open — item 9.3 semantic fingerprints
 
 **Opened:** 2026-08-23
 
@@ -46,3 +46,20 @@ passed.
 - [x] Focused pin and isolation tests passed (15). Tracking, Ruff, lock, and
       diff check passed. Core pytest: 2016 passed, 3 deselected, expected
       transport warning.
+- [x] Item 9.2 merged as PR #90 at
+      `2f31526e15f1fe3d2df394d959a92a124b909258` after all 16 GitHub checks
+      passed.
+
+## Required item 9.3 evidence
+
+- [x] Packaged fingerprint contract names `semantic_content_only` and
+      `receipt_binds=exact_emitted_bytes`.
+- [x] Preimage is ordered payloads plus partition, row schema, and schema-pin
+      digest. Container id and library metadata are excluded.
+- [x] Unicode is lossless, not NFC-folded. Null, extra keys, and malformed
+      messages fail closed. Empty evaluation has a defined fingerprint.
+- [x] Same rows fingerprint identically regardless of later container choice.
+- [x] Importing the pin does not import PyArrow, datasets, or pandas.
+- [x] Focused fingerprint, schema, and isolation tests passed (26). Tracking,
+      Ruff, lock, and diff check passed. Core pytest: 2027 passed, 3
+      deselected, expected transport warning.

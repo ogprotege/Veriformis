@@ -1,0 +1,26 @@
+{
+  "contract_id": "veriformis.columnar-semantic-fingerprint",
+  "contract_version": 1,
+  "determinism_claim": "semantic_content_only",
+  "excluded_library_metadata": [
+    "arrow_endianness",
+    "compression",
+    "created_by",
+    "dictionary_encoding",
+    "large_utf8_vs_utf8",
+    "parquet_key_value_metadata",
+    "row_group_layout",
+    "statistics"
+  ],
+  "preimage_fields": [
+    "partition",
+    "payloads",
+    "record_count",
+    "row_schema",
+    "schema_id",
+    "schema_pin_digest"
+  ],
+  "receipt_binds": "exact_emitted_bytes",
+  "schema_id": "veriformis.columnar-semantic-fingerprint/v1",
+  "state": "planned"
+}

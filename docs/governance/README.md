@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.3 fingerprints)
 
-**Next review:** Independent-product Phase 9.2 pull-request merge, item 9.3,
+**Next review:** Independent-product Phase 9.3 pull-request merge, item 9.4,
 any later phase closeout, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -47,7 +47,7 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–8 are complete on `main` and
-Phase 9 is in progress under item 9.2. Arrow and Hugging Face feature
-schemas are pinned. `parquet`, `arrow`, and `hugging-face-dataset` remain
-planned. Historical Phase 4–8 merge SHAs
+Phase 9 is in progress under item 9.3. Arrow and Hugging Face feature
+schemas and semantic fingerprints are pinned. `parquet`, `arrow`, and
+`hugging-face-dataset` remain planned. Historical Phase 4–8 merge SHAs
 remain in those packets and in `docs/current-status.md`.
