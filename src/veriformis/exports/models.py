@@ -70,6 +70,13 @@ def _validate_label(value: str, *, label: str) -> str:
     return value
 
 
+def _validate_id_kinds(value: str, kinds: tuple[str, ...]) -> str:
+    prefix = value.split("-v", 1)[0]
+    if prefix not in kinds:
+        raise ValueError(f"identity must use one of {kinds!r}")
+    return validate_id(value, kind=prefix)
+
+
 def _validate_exact_text(value: str, *, label: str) -> str:
     if not value or value != value.strip() or "\x00" in value:
         raise ValueError(f"{label} must be a non-empty exact string")
@@ -544,7 +551,7 @@ class ExportMembershipEntry(_IdentifiedExportModel):
     @field_validator("record_id")
     @classmethod
     def _valid_record_id(cls, value: str) -> str:
-        return validate_id(value, kind="rec")
+        return _validate_id_kinds(value, ("rec", "irc"))
 
     @field_validator("row_id")
     @classmethod
@@ -782,7 +789,7 @@ class ExportPlan(_IdentifiedExportModel):
     @field_validator("finished_dataset_plan_id")
     @classmethod
     def _valid_finished_plan_id(cls, value: str) -> str:
-        return validate_id(value, kind="fdp")
+        return _validate_id_kinds(value, ("fdp", "fip"))
 
     @field_validator("recipe_id")
     @classmethod
@@ -797,7 +804,7 @@ class ExportPlan(_IdentifiedExportModel):
     @field_validator("construction_result_id")
     @classmethod
     def _valid_construction_id(cls, value: str) -> str:
-        return validate_id(value, kind="run")
+        return _validate_id_kinds(value, ("run", "imr"))
 
     @field_validator("curation_result_id")
     @classmethod

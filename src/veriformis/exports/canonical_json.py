@@ -14,7 +14,7 @@ from pydantic import (
 )
 
 from veriformis.contracts import V1_ROW_SCHEMA_KINDS
-from veriformis.datasets import ProductRow, RowProvenance, RowSet
+from veriformis.datasets import ProductRow, RowSet
 from veriformis.errors import (
     ExportContractError,
     ExportVerificationError,
@@ -153,7 +153,29 @@ class CanonicalJsonProvenance(_StrictCanonicalJsonModel):
     train_row_count: int
     evaluation_row_count: int
     alignment: Literal["train_then_evaluation"] = "train_then_evaluation"
-    rows: tuple[RowProvenance, ...]
+    rows: tuple[Any, ...]
+
+    @field_validator("rows", mode="before")
+    @classmethod
+    def _provenance_rows(cls, value: Any) -> Any:
+        if not isinstance(value, (list, tuple)):
+            return value
+        from veriformis.datasets.serialization import row_provenance_from_json_bytes
+        from veriformis.identity import lossless_json_bytes
+
+        loaded: list[Any] = []
+        for item in value:
+            if not isinstance(item, dict):
+                loaded.append(item)
+                continue
+            schema = item.get("schema_version")
+            if schema == "veriformis.imported-row-provenance/v1":
+                from veriformis.mapping.finish import ImportedRowProvenance
+
+                loaded.append(ImportedRowProvenance.model_validate(item))
+            else:
+                loaded.append(row_provenance_from_json_bytes(lossless_json_bytes(item)))
+        return tuple(loaded)
 
     @field_validator("row_schema")
     @classmethod
@@ -354,6 +376,14 @@ class CanonicalJsonDataset(_StrictCanonicalJsonModel):
             rows.append(row)
 
         first = provenance.rows[0]
+        if getattr(first, "schema_version", None) == (
+            "veriformis.imported-row-provenance/v1"
+        ):
+            if provenance.row_set_id != self.row_set_id:
+                raise ExportVerificationError(
+                    "canonical JSON row-set identity does not close over its rows"
+                )
+            return
         try:
             rebuilt = RowSet.create(
                 plan_id=first.plan_id,

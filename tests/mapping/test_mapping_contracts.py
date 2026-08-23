@@ -129,16 +129,30 @@ def test_identity_mismatch_fails_closed() -> None:
 
 
 @pytest.mark.parametrize("container", ["json", "csv"])
-def test_reserved_containers_fail_closed(container: str) -> None:
-    with pytest.raises(MappingError, match="reserved until item 7.8"):
+def test_json_and_csv_containers_are_admitted(container: str) -> None:
+    plan = MappingPlan.create(
+        goal_id="learn-the-text",
+        representation_id="whole-text",
+        row_schema="text",
+        container_kind=container,
+        confirmation_digest=CONFIRM,
+        field_mappings=[
+            FieldMapping.create(source_path="text", target_key="text"),
+        ],
+    )
+    assert plan.container_kind == container
+
+
+def test_csv_messages_plan_is_refused() -> None:
+    with pytest.raises(MappingError, match="split-jsonl-directory or json"):
         MappingPlan.create(
-            goal_id="learn-the-text",
-            representation_id="whole-text",
-            row_schema="text",
-            container_kind=container,
+            goal_id="continue-a-passage",
+            representation_id="conversation",
+            row_schema="messages",
+            container_kind="csv",
             confirmation_digest=CONFIRM,
             field_mappings=[
-                FieldMapping.create(source_path="text", target_key="text"),
+                FieldMapping.create(source_path="messages", target_key="messages"),
             ],
         )
 

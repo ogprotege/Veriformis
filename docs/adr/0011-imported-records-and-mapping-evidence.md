@@ -21,8 +21,9 @@ round-trip evidence.
    row index, field path, original-value digest, mapping-rule id, and output
    SHA-256. The field value must match that output digest.
 3. A mapping plan names an existing catalog goal and compatible
-   representation. Constructors do not run. Membership policy in v1 is only
-   `replaced`. JSON and CSV containers are reserved until item 7.8.
+   representation. Constructors do not run. Membership policy is
+   `authoritative`, `advisory`, or `replaced`. JSONL, JSON, and compatible CSV
+   are admitted containers. CSV cannot represent nested `messages`.
 4. Coercion, missing-value, and invalid-row rules are closed vocabularies.
    v1 admits only `refuse`.
 5. Identities are recomputed on load. Extra or missing fields fail closed.
@@ -40,5 +41,4 @@ round-trip evidence.
 
 ## Review triggers
 
-Item 7.3 execution; item 7.7 membership policies; item 7.8 JSON/CSV; any new
-field-evidence kind.
+Item 7.9 rejection export; item 7.10 templates; any new field-evidence kind.

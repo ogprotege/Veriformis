@@ -40,8 +40,11 @@ modes `document-source`, `dataset-row`, and `mixed` (PR #71). Item 7.2 froze
 row-source and mapping contracts (PR #72). Item 7.3 makes `dataset-row`
 executable for JSONL: capture, mapping execution with `mapped_value`
 evidence, workspace revision v4 with stage `map`, and seal through ordinary
-`ProductRow` v1. `mixed` remains refused until item 7.7. JSON and CSV remain
-reserved until item 7.8.
+`ProductRow` v1. Item 7.4 requires confirmation of detector proposals (PR #74).
+Item 7.5 binds mapping provenance and replay (PR #75). Item 7.6 adds full-file
+mapping preview (PR #76). Item 7.7 honors imported partitions and admits mixed
+mode with distinct provenances (PR #77). Item 7.8 admits JSON and compatible
+CSV capture and proves production map → seal → generic-export round trips.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

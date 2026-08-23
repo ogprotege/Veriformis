@@ -1,6 +1,12 @@
-"""Existing-dataset mapping: compiler-path modes, contracts, and JSONL execution."""
+"""Existing-dataset mapping: compiler-path modes, contracts, and row execution."""
 
-from veriformis.mapping.capture import JsonlCapture, capture_jsonl
+from veriformis.mapping.capture import (
+    JsonlCapture,
+    capture_csv,
+    capture_json,
+    capture_jsonl,
+    capture_row_source,
+)
 from veriformis.mapping.detect import (
     confirm_mapping_plan,
     detect_mapping,
@@ -24,6 +30,7 @@ from veriformis.mapping.models import (
     ADMITTED_CONTAINERS,
     COERCION_RULES,
     CONTRACT_DATA_NAME,
+    CSV_DIALECT,
     FieldMapping,
     ImportedField,
     ImportedRecord,
@@ -54,14 +61,19 @@ from veriformis.mapping.result import (
     MAPPING_STAGE_SCHEMA_ID,
     MappingRecipe,
     MappingResult,
+    ROW_CSV_PARSER_ID,
+    ROW_JSON_PARSER_ID,
     ROW_JSONL_PARSER_ID,
     ROW_JSONL_PARSER_VERSION,
+    ROW_PARSER_IDS,
+    row_parser_id,
 )
 
 __all__ = [
     "ADMITTED_CONTAINERS",
     "COERCION_RULES",
     "CONTRACT_DATA_NAME",
+    "CSV_DIALECT",
     "FieldMapping",
     "ImportedField",
     "ImportedRecord",
@@ -86,7 +98,10 @@ __all__ = [
     "input_mode_catalog_json",
     "require_executable_mode",
     "JsonlCapture",
+    "capture_csv",
+    "capture_json",
     "capture_jsonl",
+    "capture_row_source",
     "confirm_mapping_plan",
     "detect_mapping",
     "mapping_confirmation_digest",
@@ -97,8 +112,12 @@ __all__ = [
     "MAPPING_STAGE_SCHEMA_ID",
     "MappingRecipe",
     "MappingResult",
+    "ROW_CSV_PARSER_ID",
+    "ROW_JSON_PARSER_ID",
     "ROW_JSONL_PARSER_ID",
     "ROW_JSONL_PARSER_VERSION",
+    "ROW_PARSER_IDS",
+    "row_parser_id",
     "FinishedImportPlan",
     "ImportedCurationResult",
     "ImportedRowSet",

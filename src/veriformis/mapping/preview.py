@@ -8,7 +8,7 @@ from typing import Any
 
 from veriformis.errors import MappingError
 from veriformis.identity import lossless_json_bytes
-from veriformis.mapping.capture import JsonlCapture, capture_jsonl
+from veriformis.mapping.capture import JsonlCapture, capture_row_source
 from veriformis.mapping.detect import mapping_confirmation_digest
 from veriformis.mapping.execute import execute_mapping
 from veriformis.mapping.models import MappingPlan
@@ -25,11 +25,11 @@ def preview_mapping(
     *,
     logical_path: str | None = None,
 ) -> dict[str, Any]:
-    """Walk every JSONL object and report accept/reject with samples."""
+    """Walk every captured object and report accept/reject with samples."""
     from veriformis.identity import derive_source_id
     from veriformis.mapping.finish import imported_payload
 
-    capture = capture_jsonl(path, logical_path=logical_path or path.name)
+    capture = capture_row_source(path, logical_path=logical_path or path.name)
     source_id = derive_source_id(
         capture.row_source.logical_path, capture.row_source.sha256
     )

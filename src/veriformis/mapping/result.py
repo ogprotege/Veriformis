@@ -14,6 +14,7 @@ from veriformis.identity import derive_id, sha256_digest, validate_id, validate_
 from veriformis.mapping.models import (
     ADMITTED_CONTAINERS,
     ROW_SCHEMA_PAYLOAD_KEYS,
+    ContainerKind,
     ImportedRecord,
     MappingPlan,
     RowSchema,
@@ -21,7 +22,29 @@ from veriformis.mapping.models import (
 )
 
 ROW_JSONL_PARSER_ID = "row-jsonl"
+ROW_JSON_PARSER_ID = "row-json"
+ROW_CSV_PARSER_ID = "row-csv"
 ROW_JSONL_PARSER_VERSION = "1"
+ROW_PARSER_VERSION = ROW_JSONL_PARSER_VERSION
+_ROW_PARSER_IDS: dict[str, str] = {
+    "jsonl": ROW_JSONL_PARSER_ID,
+    "json": ROW_JSON_PARSER_ID,
+    "csv": ROW_CSV_PARSER_ID,
+}
+ROW_PARSER_IDS: tuple[str, ...] = (
+    ROW_JSONL_PARSER_ID,
+    ROW_JSON_PARSER_ID,
+    ROW_CSV_PARSER_ID,
+)
+
+
+def row_parser_id(container_kind: str) -> str:
+    try:
+        return _ROW_PARSER_IDS[container_kind]
+    except KeyError as exc:
+        raise MappingError(
+            f"unsupported mapping container {container_kind!r}"
+        ) from exc
 MAPPING_STAGE_SCHEMA_ID = "veriformis.mapping-stage/v1"
 MAPPING_RECIPE_SCHEMA = "veriformis.mapping-recipe/v1"
 MAPPING_RESULT_SCHEMA = "veriformis.mapping-result/v1"
@@ -142,7 +165,7 @@ class MappingResult(_StrictModel):
     recipe_id: str
     objective_id: str
     row_schema: RowSchema
-    container_kind: Literal["jsonl"]
+    container_kind: ContainerKind
     membership_policy: Literal["authoritative", "advisory", "replaced"]
     source_ids: tuple[str, ...]
     row_source_ids: tuple[str, ...]
