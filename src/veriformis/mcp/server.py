@@ -216,6 +216,27 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def mapping_detect(
+        path: str,
+        source_root: str | None = None,
+        goal: str | None = None,
+        representation: str | None = None,
+    ) -> str:
+        """Propose mapping plans for one JSONL file without writing a workspace."""
+        root = Path(source_root) if source_root else None
+        return json.dumps(
+            pipeline.detect_mapping(
+                Path(path),
+                source_root=root,
+                goal=goal,
+                representation=representation,
+            ),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def mapping_contracts() -> str:
         """Return row-mapping contract discovery from PipelineService."""
         return json.dumps(

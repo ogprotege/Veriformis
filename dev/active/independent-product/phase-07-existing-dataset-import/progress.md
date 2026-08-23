@@ -37,3 +37,8 @@ Item 7.3 captures UTF-8 JSONL, executes confirmed mapping plans into the
 four semantic rows with `mapped_value` evidence, opens workspace revision
 v4 with stage `map`, and seals imported records as ordinary `ProductRow`
 v1. Partition policy remains `replaced`. JSON and CSV remain reserved.
+
+## 2026-08-23 — Item 7.3 merged; item 7.4 in progress
+
+Item 7.3 merged as PR #73. Item 7.4 packages mapping detectors and requires
+the confirmation digest of a chosen proposal before `map` mutates a workspace.

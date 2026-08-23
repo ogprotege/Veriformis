@@ -1,0 +1,60 @@
+{
+  "contract_id": "veriformis.mapping-detector",
+  "contract_version": 1,
+  "detectors": [
+    {
+      "detector_id": "flat-text",
+      "goal_id": "learn-the-text",
+      "plain_language": "Each object has a text field to learn as whole text.",
+      "representation_id": "whole-text",
+      "required_paths": [
+        "text"
+      ],
+      "row_schema": "text"
+    },
+    {
+      "detector_id": "prompt-completion",
+      "goal_id": "continue-a-passage",
+      "plain_language": "Each object has prompt and completion strings.",
+      "representation_id": "prompt-and-completion",
+      "required_paths": [
+        "prompt",
+        "completion"
+      ],
+      "row_schema": "prompt_completion"
+    },
+    {
+      "detector_id": "alpaca-instruction-output",
+      "goal_id": "continue-a-passage",
+      "plain_language": "Each object has instruction, input, and output strings.",
+      "representation_id": "instruction-and-output",
+      "required_paths": [
+        "instruction",
+        "input",
+        "output"
+      ],
+      "row_schema": "instruction_output"
+    },
+    {
+      "detector_id": "two-turn-messages",
+      "goal_id": "continue-a-passage",
+      "plain_language": "Each object has a two-turn user then assistant messages array.",
+      "representation_id": "conversation",
+      "required_paths": [
+        "messages"
+      ],
+      "row_schema": "messages"
+    },
+    {
+      "detector_id": "veriformis-split-jsonl-payload",
+      "goal_id": "learn-the-text",
+      "plain_language": "Objects match a Veriformis split-JSONL product-row payload. This proposes a mapping; it is not the Phase 5.5 test loader.",
+      "representation_id": "whole-text",
+      "required_paths": [
+        "text"
+      ],
+      "row_schema": "text"
+    }
+  ],
+  "schema_id": "veriformis.mapping-detector-discovery/v1"
+}

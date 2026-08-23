@@ -491,6 +491,37 @@ struct VeriformisCLI: Sendable {
         }
     }
 
+    /// Propose mapping plans for one JSONL file without writing a workspace.
+    func detectMapping(
+        path: String,
+        sourceRoot: String? = nil,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> MappingDetectResponse {
+        var arguments = ["mapping-detect", path]
+        if let sourceRoot {
+            arguments += ["--source-root", sourceRoot]
+        }
+        let result = try await run(arguments: arguments, controller: controller)
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard !result.standardOutputTruncated else {
+            throw MappingDetectError.outputTruncated
+        }
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode(
+                MappingDetectResponse.self,
+                from: result.standardOutputData
+            )
+        } catch let error as MappingDetectError {
+            throw error
+        } catch {
+            throw MappingDetectError.invalidPayload(error.localizedDescription)
+        }
+    }
+
     /// Inspect raw sources and the complete resolved recipe before a workspace exists.
     /// Exit 0 is admitted and exit 2 is a complete, ordinary refusal response.
     func preflight(

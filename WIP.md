@@ -83,8 +83,8 @@ local, offline, and free of LLM generation.
       passed.
 - [ ] Independent product Phase 7 is in progress under its
       [active packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md).
-      Items 7.1–7.2 merged as PR #71 and PR #72. Item 7.3 maps JSONL rows
-      on workspace revision v4.
+      Items 7.1–7.3 merged as PR #71–#73. Item 7.4 proposes mappings and
+      requires confirmation before map.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
