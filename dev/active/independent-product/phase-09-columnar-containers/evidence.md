@@ -1,6 +1,6 @@
 # Phase 9 Evidence
 
-**Status:** Open — item 9.1 packet
+**Status:** Open — item 9.2 schema pins
 
 **Opened:** 2026-08-23
 
@@ -29,3 +29,20 @@ passed.
 - [x] Focused isolation tests passed (15 including Phase 8 isolation). Tracking,
       Ruff, lock, and diff check passed. Core pytest: 2009 passed, 3
       deselected, expected transport warning.
+- [x] Item 9.1 merged as PR #89 at
+      `719c961da3346c3102f26ebd03ddf7af01fded54` after all 16 GitHub checks
+      passed.
+
+## Required item 9.2 evidence
+
+- [x] Packaged Arrow and Hugging Face feature pins cover all four row schemas,
+      including nested `messages` with role then content.
+- [x] Official-doc URLs and 2026-08-23 review dates on `pyarrow` and `datasets`.
+- [x] Version ranges live in data. Extra `columnar` remains empty. Lock has no
+      PyArrow, datasets, or pandas.
+- [x] Python, CLI `columnar-schemas`, and MCP `columnar_schemas` emit the same
+      canonical JSON. Importing pins does not import columnar libraries.
+- [x] Planned containers still refuse. Taxonomy stays planned.
+- [x] Focused pin and isolation tests passed (15). Tracking, Ruff, lock, and
+      diff check passed. Core pytest: 2016 passed, 3 deselected, expected
+      transport warning.

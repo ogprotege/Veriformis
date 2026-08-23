@@ -19,7 +19,8 @@ explicitly selects it as training content.
 > and `constrained-csv` v1. Goal-first recipes (Phase 6) and existing-dataset
 > import/mapping (Phase 7) are implemented. Phase 8 consumer profiles are
 > complete; TRL SFT and MLX-LM LoRA are implemented optional adapters. Phase 9
-> columnar containers are in progress and remain planned. This is **not** a
+> columnar containers are in progress: schemas are pinned and the three
+> containers remain planned. This is **not** a
 > public beta or production label. Limits:
 > [docs/beta-limitations.md](docs/beta-limitations.md). Install:
 > [docs/install.md](docs/install.md). Status:

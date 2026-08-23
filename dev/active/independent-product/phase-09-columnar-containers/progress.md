@@ -18,3 +18,18 @@ deselected and the intentional transport durability warning.
 
 **Next action:** Publish the item 9.1 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.2.
+
+## 2026-08-23 — Item 9.1 merged; item 9.2 in progress
+
+**Status:** Item 9.1 merged as PR #89 at
+`719c961da3346c3102f26ebd03ddf7af01fded54` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.2 packages exact Arrow types and Hugging Face features for
+`text`, `prompt_completion`, `instruction_output`, and nested `messages`.
+Official docs reviewed 2026-08-23. Version ranges live in
+`columnar_schemas-v1.json`. Extra `columnar` stays empty. Taxonomy stays
+planned. Do not emit Parquet, Arrow, or Hugging Face Dataset files.
+
+**Next action:** Publish the item 9.2 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 9.3.

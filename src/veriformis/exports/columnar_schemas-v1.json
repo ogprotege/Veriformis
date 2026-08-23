@@ -1,0 +1,192 @@
+{
+  "contract_id": "veriformis.columnar-schema-pin",
+  "contract_version": 1,
+  "extra": "columnar",
+  "null_policy": "unrepresentable",
+  "packages": [
+    {
+      "docs_reviewed_on": "2026-08-23",
+      "extra": "columnar",
+      "license": "Apache-2.0",
+      "package": "datasets",
+      "primary_docs_url": "https://huggingface.co/docs/datasets/en/about_dataset_features",
+      "role": "hugging-face-dataset",
+      "version_range": ">=3.0.0,<6.0.0"
+    },
+    {
+      "docs_reviewed_on": "2026-08-23",
+      "extra": "columnar",
+      "license": "Apache-2.0",
+      "package": "pyarrow",
+      "primary_docs_url": "https://arrow.apache.org/docs/python/api/datatypes.html",
+      "role": "parquet-and-arrow-ipc",
+      "version_range": ">=19.0.0,<26.0.0"
+    }
+  ],
+  "planned_containers": [
+    {
+      "container_id": "arrow",
+      "executable_item": "9.5"
+    },
+    {
+      "container_id": "hugging-face-dataset",
+      "executable_item": "9.6"
+    },
+    {
+      "container_id": "parquet",
+      "executable_item": "9.4"
+    }
+  ],
+  "round_trip": false,
+  "row_schemas": [
+    {
+      "fields": [
+        {
+          "arrow_type": {
+            "kind": "utf8"
+          },
+          "hf_feature": {
+            "dtype": "string",
+            "kind": "value"
+          },
+          "name": "instruction",
+          "nullable": false
+        },
+        {
+          "arrow_type": {
+            "kind": "utf8"
+          },
+          "hf_feature": {
+            "dtype": "string",
+            "kind": "value"
+          },
+          "name": "input",
+          "nullable": false
+        },
+        {
+          "arrow_type": {
+            "kind": "utf8"
+          },
+          "hf_feature": {
+            "dtype": "string",
+            "kind": "value"
+          },
+          "name": "output",
+          "nullable": false
+        }
+      ],
+      "notes": "Product instruction_output payload is instruction, input, and output as non-null UTF-8 columns. Null is unrepresentable.",
+      "source_row_schema": "instruction_output"
+    },
+    {
+      "fields": [
+        {
+          "arrow_type": {
+            "item": {
+              "fields": [
+                {
+                  "arrow_type": {
+                    "kind": "utf8"
+                  },
+                  "name": "role",
+                  "nullable": false
+                },
+                {
+                  "arrow_type": {
+                    "kind": "utf8"
+                  },
+                  "name": "content",
+                  "nullable": false
+                }
+              ],
+              "kind": "struct"
+            },
+            "item_nullable": false,
+            "kind": "list"
+          },
+          "hf_feature": {
+            "item": {
+              "fields": [
+                {
+                  "hf_feature": {
+                    "dtype": "string",
+                    "kind": "value"
+                  },
+                  "name": "role",
+                  "nullable": false
+                },
+                {
+                  "hf_feature": {
+                    "dtype": "string",
+                    "kind": "value"
+                  },
+                  "name": "content",
+                  "nullable": false
+                }
+              ],
+              "kind": "struct"
+            },
+            "item_nullable": false,
+            "kind": "list"
+          },
+          "name": "messages",
+          "nullable": false
+        }
+      ],
+      "message_roles": [
+        "user",
+        "assistant"
+      ],
+      "message_turn_count": 2,
+      "notes": "Product messages payload is a list of exactly two structs, user then assistant. Each struct has role then content. Tool calls, system roles, extra turns, extra keys, and null are unrepresentable.",
+      "source_row_schema": "messages"
+    },
+    {
+      "fields": [
+        {
+          "arrow_type": {
+            "kind": "utf8"
+          },
+          "hf_feature": {
+            "dtype": "string",
+            "kind": "value"
+          },
+          "name": "prompt",
+          "nullable": false
+        },
+        {
+          "arrow_type": {
+            "kind": "utf8"
+          },
+          "hf_feature": {
+            "dtype": "string",
+            "kind": "value"
+          },
+          "name": "completion",
+          "nullable": false
+        }
+      ],
+      "notes": "Product prompt_completion payload is prompt then completion as non-null UTF-8 columns. Null is unrepresentable.",
+      "source_row_schema": "prompt_completion"
+    },
+    {
+      "fields": [
+        {
+          "arrow_type": {
+            "kind": "utf8"
+          },
+          "hf_feature": {
+            "dtype": "string",
+            "kind": "value"
+          },
+          "name": "text",
+          "nullable": false
+        }
+      ],
+      "notes": "Product text payload is the single UTF-8 column text. Null is unrepresentable.",
+      "source_row_schema": "text"
+    }
+  ],
+  "schema_id": "veriformis.columnar-schema-discovery/v1",
+  "state": "planned"
+}

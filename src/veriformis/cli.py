@@ -806,6 +806,19 @@ def profile_admissions() -> None:
     )
 
 
+@app.command(name="columnar-schemas")
+def columnar_schemas() -> None:
+    """Print packaged Arrow and Hugging Face feature schema pins as JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_columnar_schemas(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="preflight")
 def preflight(
     paths: list[Path],

@@ -6,9 +6,9 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–8 complete; Phase 9 in progress).
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.1 packet)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.2 schema pins)
 
-**Next review:** Phase 9.1 pull-request merge, item 9.2, beta label cut,
+**Next review:** Phase 9.2 pull-request merge, item 9.3, beta label cut,
 public-ready checklist, or any contract change
 
 ## Start here
@@ -65,7 +65,8 @@ public-ready checklist, or any contract change
 | [Goal Catalog v1](contracts/goal-catalog-v1.md) | Plain-language goals bound to existing objectives and row schemas | Implemented contract |
 | [Recipe Preset v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and per-goal presets | Implemented contract |
 | [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
-| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Planned TRL and MLX-LM official-doc pins, empty extras, and non-executable discovery | Packaged pins; TRL emission is item 8.3 |
+| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL and MLX-LM official-doc pins and discovery | Packaged pins; extras remain empty |
+| [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for planned Parquet, Arrow, and Hugging Face Dataset containers | Packaged pins; extra `columnar` remains empty |
 | [TRL SFT Export v1](contracts/trl-export-v1.md) | Optional TRL SFT adapter over split JSONL | Implemented optional adapter |
 | [MLX-LM LoRA Export v1](contracts/mlx-lm-export-v1.md) | Optional mlx-lm LoRA adapter with train.jsonl and optional valid.jsonl | Implemented optional adapter |
 | [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, verification evidence, optional export-pack transport, and bounded exact dry-run previews | Phase 4 foundation plus Phase 5.1–5.3 generic containers, merged Phase 5.4 transport and Phase 5.5 semantic evidence, with Phase 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`; no trainer profile |

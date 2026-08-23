@@ -1062,6 +1062,12 @@ class PipelineService:
 
         return discover_profile_admissions()
 
+    def discover_columnar_schemas(self) -> dict[str, Any]:
+        """Return packaged Arrow and Hugging Face feature schema pins."""
+        from veriformis.exports.columnar_schemas import discover_columnar_schemas
+
+        return discover_columnar_schemas()
+
     def detect_mapping(
         self,
         path: Path,
