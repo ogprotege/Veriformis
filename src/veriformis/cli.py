@@ -301,6 +301,31 @@ def construct(
     )
 
 
+@app.command(name="map")
+def map_cmd(
+    workspace: Path,
+    goal: str = typer.Option(..., "--goal", help="Plain-language goal id."),
+    representation: str = typer.Option(
+        ..., "--representation", help="Catalog representation id."
+    ),
+    plan: Path = typer.Option(
+        ...,
+        "--plan",
+        help="Confirmed mapping-plan/v1 JSON file.",
+    ),
+) -> None:
+    """Map captured JSONL row sources into imported semantic records."""
+    payload = json.loads(plan.read_text(encoding="utf-8"))
+    _run(
+        lambda: _SERVICE.map_rows(
+            workspace,
+            goal=goal,
+            representation=representation,
+            mapping_plan=payload,
+        )
+    )
+
+
 @app.command()
 def curate(
     workspace: Path,

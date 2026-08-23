@@ -35,9 +35,13 @@ Phase 6 closeout merged as PR #67 at
 `6995d17bef0d09f235b1c464e947c38c63dd313d` after all 14 GitHub checks
 passed, then stamped complete as PR #69 at
 `6c4694c2e1c523156cd7c8f34c12f258a3ce0b01`. Phase 7 (existing-dataset import
-and mapping) is in progress under its standard packet at item 7.1: input modes
-`document-source`, `dataset-row`, and `mixed`, with only document-source
-executable.
+and mapping) is in progress under its standard packet. Item 7.1 named input
+modes `document-source`, `dataset-row`, and `mixed` (PR #71). Item 7.2 froze
+row-source and mapping contracts (PR #72). Item 7.3 makes `dataset-row`
+executable for JSONL: capture, mapping execution with `mapped_value`
+evidence, workspace revision v4 with stage `map`, and seal through ordinary
+`ProductRow` v1. `mixed` remains refused until item 7.7. JSON and CSV remain
+reserved until item 7.8.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

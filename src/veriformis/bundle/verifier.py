@@ -487,6 +487,180 @@ def _row_contract(
     return row, row_schema, objective_kind
 
 
+def _verify_imported_row_provenance_alignment(
+    root_descriptor: int,
+    *,
+    file_facts: dict[str, _EntryFacts],
+    files_by_path: dict[str, BundleFile],
+    snapshot: Any,
+) -> Any:
+    """Align imported payloads with mapping provenance; never invent chunks."""
+    from veriformis.datasets.serialization import ProductRow
+    from veriformis.mapping.finish import ImportedRowProvenance
+
+    descriptors: dict[str, int] = {}
+    handles: dict[str, BinaryIO] = {}
+    try:
+        for path in (TRAIN_PATH, EVALUATION_PATH, PROVENANCE_PATH):
+            descriptors[path] = _open_regular_file(
+                root_descriptor,
+                path,
+                expected_facts=file_facts[path],
+            )
+        handles = {
+            path: os.fdopen(descriptor, "rb", closefd=False)
+            for path, descriptor in descriptors.items()
+        }
+        train_rows: list[ProductRow] = []
+        evaluation_rows: list[ProductRow] = []
+        provenance_values: list[ImportedRowProvenance] = []
+        seen_record_ids: set[str] = set()
+        expected_row_schema: str | None = None
+        provenance_ordinal = 0
+        for partition, payload_path in (
+            ("train", TRAIN_PATH),
+            ("evaluation", EVALUATION_PATH),
+        ):
+            declared_count = files_by_path[payload_path].record_count
+            if declared_count is None:
+                raise BundleVerificationError(
+                    f"missing record count for {payload_path!r}"
+                )
+            previous_record_id: str | None = None
+            for ordinal in range(declared_count):
+                payload = _read_jsonl_object(
+                    handles[payload_path],
+                    path=payload_path,
+                    ordinal=ordinal,
+                )
+                raw_provenance = _read_jsonl_object(
+                    handles[PROVENANCE_PATH],
+                    path=PROVENANCE_PATH,
+                    ordinal=provenance_ordinal,
+                )
+                if payload is None or raw_provenance is None:
+                    raise BundleVerificationError(
+                        "dataset payload and provenance counts do not align"
+                    )
+                try:
+                    provenance = ImportedRowProvenance.model_validate(raw_provenance)
+                    keys = set(payload)
+                    if keys == {"text"}:
+                        row_schema = "text"
+                    elif keys == {"prompt", "completion"}:
+                        row_schema = "prompt_completion"
+                    elif keys == {"instruction", "input", "output"}:
+                        row_schema = "instruction_output"
+                    elif keys == {"messages"}:
+                        row_schema = "messages"
+                    else:
+                        raise BundleVerificationError(
+                            "imported payload does not match a v1 row schema"
+                        )
+                    row = ProductRow.create(
+                        record_id=provenance.record_id,
+                        row_schema=row_schema,  # type: ignore[arg-type]
+                        payload=payload,
+                    )
+                except (
+                    RecursionError,
+                    TypeError,
+                    UnicodeError,
+                    ValueError,
+                    VeriformisError,
+                ) as exc:
+                    raise BundleVerificationError(
+                        f"invalid imported row provenance contract: {exc}"
+                    ) from exc
+                if expected_row_schema is None:
+                    expected_row_schema = row.row_schema
+                elif row.row_schema != expected_row_schema:
+                    raise BundleVerificationError(
+                        "finished dataset mixes multiple row schemas"
+                    )
+                if (
+                    provenance.plan_id != snapshot.plan_id
+                    or provenance.recipe_id != snapshot.recipe_id
+                    or provenance.mapping_result_id != snapshot.mapping_result_id
+                    or provenance.curation_result_id != snapshot.curation_result_id
+                    or provenance.split_result_id != snapshot.split_result_id
+                    or provenance.row_id != row.row_id
+                    or provenance.payload_sha256 != row.payload_sha256
+                    or provenance.partition != partition
+                    or provenance.ordinal != ordinal
+                ):
+                    raise BundleVerificationError(
+                        "imported row provenance is not aligned with its payload"
+                    )
+                if not set(provenance.source_ids) <= set(snapshot.source_ids):
+                    raise BundleVerificationError(
+                        "imported provenance names a source outside the snapshot"
+                    )
+                if provenance.record_id in seen_record_ids:
+                    raise BundleVerificationError(
+                        "finished dataset contains duplicate imported records"
+                    )
+                seen_record_ids.add(provenance.record_id)
+                if previous_record_id is not None and (
+                    provenance.record_id <= previous_record_id
+                ):
+                    raise BundleVerificationError(
+                        "partition records are not in canonical record-id order"
+                    )
+                previous_record_id = provenance.record_id
+                if partition == "train":
+                    train_rows.append(row)
+                else:
+                    evaluation_rows.append(row)
+                provenance_values.append(provenance)
+                provenance_ordinal += 1
+            if (
+                _read_jsonl_object(
+                    handles[payload_path],
+                    path=payload_path,
+                    ordinal=declared_count,
+                )
+                is not None
+            ):
+                raise BundleVerificationError(
+                    f"dataset payload {payload_path!r} exceeds its declared count"
+                )
+        if (
+            _read_jsonl_object(
+                handles[PROVENANCE_PATH],
+                path=PROVENANCE_PATH,
+                ordinal=provenance_ordinal,
+            )
+            is not None
+        ):
+            raise BundleVerificationError(
+                "row provenance exceeds the combined dataset payload count"
+            )
+        if expected_row_schema is None:
+            raise BundleVerificationError("finished dataset contains no product rows")
+        if (
+            len(train_rows) != snapshot.file_bindings[0].record_count
+            or len(evaluation_rows) != snapshot.file_bindings[1].record_count
+            or len(provenance_values) != snapshot.file_bindings[2].record_count
+        ):
+            raise BundleVerificationError(
+                "imported payload counts differ from the snapshot"
+            )
+        if snapshot.row_set_id.split("-v")[0] != "rws":
+            raise BundleVerificationError("imported snapshot row-set identity is invalid")
+        for path, descriptor in descriptors.items():
+            if _stable_entry_facts(os.fstat(descriptor)) != file_facts[path]:
+                raise BundleVerificationError(
+                    f"bundle file changed during row alignment: {path!r}"
+                )
+        return snapshot
+    finally:
+        for handle in handles.values():
+            handle.close()
+        for descriptor in descriptors.values():
+            os.close(descriptor)
+
+
 def _verify_row_provenance_alignment(
     root_descriptor: int,
     *,
@@ -911,12 +1085,23 @@ def _inspect_finished_bundle(
             },
             error_type=BundleVerificationError,
         )
-        row_set = _verify_row_provenance_alignment(
-            root_descriptor,
-            file_facts=actual_files,
-            files_by_path={file.path: file for file in manifest.files},
-            snapshot=validation_report.snapshot,
-        )
+        snapshot = validation_report.snapshot
+        if getattr(snapshot, "schema_version", None) == (
+            "veriformis.imported-dataset-snapshot/v1"
+        ):
+            row_set = _verify_imported_row_provenance_alignment(
+                root_descriptor,
+                file_facts=actual_files,
+                files_by_path={file.path: file for file in manifest.files},
+                snapshot=snapshot,
+            )
+        else:
+            row_set = _verify_row_provenance_alignment(
+                root_descriptor,
+                file_facts=actual_files,
+                files_by_path={file.path: file for file in manifest.files},
+                snapshot=snapshot,
+            )
 
         final_files, final_directories = _collect_tree(root_descriptor)
         if final_files != actual_files or final_directories != actual_directories:

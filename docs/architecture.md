@@ -92,8 +92,10 @@ that template, and a supplied instruction is admitted only after the
 deterministic truthfulness check.
 Phase 7.1 adds `mapping/modes.py` and packaged
 `veriformis.input-mode-discovery/v1`: compiler paths `document-source`,
-`dataset-row`, and `mixed`. Only document-source executes; the others refuse
-with the later item named in the reason. Mode is not a taxonomy axis.
+`dataset-row`, and `mixed`. Mode is not a taxonomy axis. Item 7.3 makes
+`dataset-row` executable for JSONL: capture, confirmed mapping into the four
+semantic rows, workspace revision v4 with stage `map`, and seal through
+ordinary `ProductRow` v1. `mixed` remains refused until item 7.7.
 The macOS workbench lives
 outside the Python package under `macos/`. Retained legacy packages
 (`serializers/`, `validate/`) have no production callers.

@@ -1,6 +1,6 @@
 # Phase 7 Evidence
 
-**Status:** Open — item 7.1 opening
+**Status:** Open — item 7.3 JSONL mapping
 
 **Opened:** 2026-08-23
 
@@ -28,3 +28,12 @@ The completion stamp merged as PR #69 at
 - [x] `dataset-row` and `mixed` refuse execution with the named later item.
 - [x] Support registry and tracking checker bind implemented/planned modes.
 - [x] ADR-0010 published; packet opened; Phase 6 merge cited.
+
+## Required item 7.3 evidence
+
+- [x] UTF-8 JSONL capture refuses invalid lines, empty files, and non-JSONL suffixes.
+- [x] Mapping execution binds `mapped_value` evidence and refuses unmapped keys and three-turn messages.
+- [x] Workspace revision v4 defines `parse → map → curate → split → format → validate → seal`.
+- [x] Document-source v3 workspaces reject `map`; v4 workspaces reject `clean` / `construct`.
+- [x] Four JSONL fixtures (`text`, `prompt_completion`, `instruction_output`, `messages`) map and seal.
+- [x] Python / CLI / MCP parity on mapping-plan id, imported-record ids, and manifest digest.

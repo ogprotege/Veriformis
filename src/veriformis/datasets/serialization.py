@@ -257,7 +257,10 @@ class ProductRow(_StrictModel):
     @model_validator(mode="after")
     def _validate_row(self) -> ProductRow:
         validate_id(self.row_id, kind="row")
-        validate_id(self.record_id, kind="rec")
+        record_kind = self.record_id.split("-v", 1)[0]
+        if record_kind not in {"rec", "irc"}:
+            raise ValueError("product row record_id must be a rec or irc identity")
+        validate_id(self.record_id, kind=record_kind)
         if self.row_schema not in V1_ROW_SCHEMAS:
             raise ValueError("product row contains an unsupported row schema")
         reject_floats(self.payload)

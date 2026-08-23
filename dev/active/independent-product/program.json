@@ -92,7 +92,7 @@
       "packet": "dev/active/independent-product/phase-07-existing-dataset-import",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 7.1 merged as PR #71 at caf4b1551d099d3b0d5d4de048ba057ea87050a4. Item 7.2 freezes row-source and mapping contracts without capture or execution."
+      "next_gate": "Item 7.2 merged as PR #72. Item 7.3 maps JSONL into the four semantic rows on workspace revision v4 with stage map, then curate/split/format/validate/seal over imported records."
     },
     {
       "number": 8,

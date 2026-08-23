@@ -44,10 +44,10 @@
       "json-records"
     ],
     "implemented_modes": [
-      "document-source"
+      "document-source",
+      "dataset-row"
     ],
     "planned_modes": [
-      "dataset-row",
       "mixed"
     ],
     "explicitly_unsupported": [

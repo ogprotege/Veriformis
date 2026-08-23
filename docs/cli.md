@@ -3,7 +3,7 @@
 Veriformis ships one console entry point, `veriformis`
 (`veriformis.cli:main`) — a thin Typer adapter over
 `veriformis.pipeline.PipelineService`. **Stage commands**
-(`parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`,
+(`parse`, `clean`, `chunk`, `construct`, `map`, `curate`, `split`, `format`,
 `validate`, `seal`) advance one immutable, transactional workspace through
 the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
@@ -12,7 +12,7 @@ and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
 and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-29 commands; `export` contains four subcommands.
+30 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
@@ -39,7 +39,7 @@ examples below use the installed name.
 
 | Role | Commands | Writes state? |
 | --- | --- | --- |
-| Stage | `parse`, `clean`, `chunk`, `construct`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` publishes a canonical six-file bundle and currently offers a separately controllable Aptus sibling descriptor |
+| Stage | `parse`, `clean`, `chunk`, `construct`, `map`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` publishes a canonical six-file bundle and currently offers a separately controllable Aptus sibling descriptor |
 | Maintenance | `upgrade-workspace` | Appends migration revisions when the workspace is behind |
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |

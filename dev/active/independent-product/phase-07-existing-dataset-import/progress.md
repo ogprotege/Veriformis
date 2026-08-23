@@ -29,3 +29,11 @@ failure.
 Item 7.1 merged as PR #71 at `caf4b1551d099d3b0d5d4de048ba057ea87050a4`.
 GitHub Actions remained budget-blocked; merge followed local admission
 evidence. Item 7.2 freezes mapping contracts without capture or execution.
+
+## 2026-08-23 — Item 7.2 merged; item 7.3 in progress
+
+Item 7.2 merged as PR #72 at `c71fbb3e33e5d65e4a9d349f9bcbd724c28336c1`.
+Item 7.3 captures UTF-8 JSONL, executes confirmed mapping plans into the
+four semantic rows with `mapped_value` evidence, opens workspace revision
+v4 with stage `map`, and seals imported records as ordinary `ProductRow`
+v1. Partition policy remains `replaced`. JSON and CSV remain reserved.

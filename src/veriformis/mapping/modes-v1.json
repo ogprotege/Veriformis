@@ -12,12 +12,12 @@
       "state": "implemented"
     },
     {
-      "executable": false,
+      "executable": true,
       "mode_id": "dataset-row",
-      "opens_in": "7.3",
+      "opens_in": null,
       "plain_language": "Map existing training rows into current semantic schemas.",
-      "refusal": "dataset-row mode is named but not executable until item 7.3 maps JSONL rows.",
-      "state": "planned"
+      "refusal": null,
+      "state": "implemented"
     },
     {
       "executable": false,

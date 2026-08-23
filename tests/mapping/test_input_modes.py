@@ -47,8 +47,8 @@ def test_packaged_modes_are_canonical_and_closed() -> None:
     assert catalog.contract_version == INPUT_MODE_CONTRACT_VERSION
     assert catalog.default_mode == DOCUMENT_SOURCE_MODE
     assert tuple(mode.mode_id for mode in catalog.modes) == INPUT_MODE_IDS
-    assert IMPLEMENTED_INPUT_MODES == (DOCUMENT_SOURCE_MODE,)
-    assert PLANNED_INPUT_MODES == (DATASET_ROW_MODE, MIXED_MODE)
+    assert IMPLEMENTED_INPUT_MODES == (DOCUMENT_SOURCE_MODE, DATASET_ROW_MODE)
+    assert PLANNED_INPUT_MODES == (MIXED_MODE,)
     assert sha256_digest(stored) == sha256_digest(input_mode_catalog_json())
 
 
@@ -72,13 +72,13 @@ def test_document_source_remains_the_default_executable_mode(mode: str | None) -
     assert require_executable_mode(mode) == DOCUMENT_SOURCE_MODE
 
 
-@pytest.mark.parametrize(
-    ("mode", "item"),
-    [(DATASET_ROW_MODE, "7.3"), (MIXED_MODE, "7.7")],
-)
-def test_named_future_modes_refuse_execution(mode: str, item: str) -> None:
-    with pytest.raises(InputModeError, match=item) as caught:
-        require_executable_mode(mode)
+def test_dataset_row_mode_is_executable() -> None:
+    assert require_executable_mode(DATASET_ROW_MODE) == DATASET_ROW_MODE
+
+
+def test_mixed_mode_still_refuses_until_item_7_7() -> None:
+    with pytest.raises(InputModeError, match="7.7") as caught:
+        require_executable_mode(MIXED_MODE)
     assert caught.value.code == "input-mode-unavailable"
 
 
@@ -87,7 +87,7 @@ def test_unknown_mode_refuses() -> None:
         require_executable_mode("parquet")
 
 
-def test_parse_flag_does_not_change_document_source_and_refuses_dataset_row(
+def test_parse_flag_keeps_document_source_and_dataset_row_refuses_documents(
     tmp_path: Path,
 ) -> None:
     source = tmp_path / "doc.txt"
@@ -119,6 +119,5 @@ def test_parse_flag_does_not_change_document_source_and_refuses_dataset_row(
         ],
     )
     assert refused.exit_code != 0
-    assert "input-mode-unavailable" in refused.output
-    assert "7.3" in refused.output
+    assert "jsonl" in refused.output.lower() or "row-source-invalid" in refused.output
     assert not (tmp_path / "other").exists()
