@@ -1,6 +1,6 @@
 # Phase 9 Evidence
 
-**Status:** Open — item 9.6 Hugging Face DatasetDict
+**Status:** Open — item 9.7 columnar import
 
 **Opened:** 2026-08-23
 
@@ -104,3 +104,16 @@ passed.
 - [x] Nested `messages` is in the supported schema list. Taxonomy stays
       planned. Extra `columnar` stays empty.
 - [x] Core pytest: 2038 passed, 3 deselected, expected transport warning.
+- [x] Item 9.6 merged as PR #94 at
+      `49b3901e177c15d7356d4ffc998b2c711e9137e2` after all 16 GitHub checks
+      passed.
+
+## Required item 9.7 evidence
+
+- [x] Dataset-row mapping admits `parquet` and `arrow`. Nested `messages`
+      is in scope. Suffix does not switch document-source to dataset-row.
+- [x] Capture fails closed naming extra `columnar` when PyArrow is absent.
+      Extra `columnar` stays empty. Confirmed mapping plans and
+      `mapped_value` evidence remain the Phase 7 path.
+- [x] Core pytest: 2043 passed before mixed-mode nits; focused mapping tests
+      passed after operator-guide and capture review fixes.

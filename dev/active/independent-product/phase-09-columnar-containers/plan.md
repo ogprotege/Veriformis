@@ -126,7 +126,7 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/07-columnar-import`
 **Title:** `Phase 9.7: Map Parquet and Arrow into Phase 7`
 
-- [ ] Dataset-row mapping admits Parquet/Arrow. Suffix does not switch modes. Confirmed mapping and `mapped_value` evidence.
+- [x] Dataset-row mapping admits Parquet/Arrow. Suffix does not switch modes. Confirmed mapping and `mapped_value` evidence.
 
 ### 9.8 Load through the real libraries and close Phase 9
 

@@ -41,9 +41,10 @@ flowchart LR
     verify --> package[deterministic .vfbundle.zip] --> packageVerify[package-verify]
 ```
 
-Existing JSONL, JSON, or compatible CSV training rows use the opt-in
-**dataset-row** path (`parse --mode dataset-row` then `map`). That path does
-not run `clean`, `chunk`, or `construct`. Operator guide:
+Existing JSONL, JSON, compatible CSV, Parquet, or Arrow training rows use
+the opt-in **dataset-row** path (`parse --mode dataset-row` then `map`).
+That path does not run `clean`, `chunk`, or `construct`. Suffix does not
+switch document-source. Operator guide:
 [docs/mapping.md](docs/mapping.md).
 
 ```text
@@ -86,10 +87,10 @@ Version `0.1.0` provides:
   `prompt_completion`, and `instruction_output`, with fixed fully quoted
   train/evaluation CSV, mandatory aligned provenance, and nested-`messages`
   refusal;
-- confirmed mapping of existing JSONL, JSON, and compatible CSV rows into the
-  four current semantic schemas, with `mapped_value` evidence, rejection
-  reports, and packaged templates; imported rows seal through ordinary
-  `ProductRow` v1 and the same generic exports;
+- confirmed mapping of existing JSONL, JSON, compatible CSV, Parquet, and
+  Arrow rows into the four current semantic schemas, with `mapped_value`
+  evidence, rejection reports, and packaged templates; imported rows seal
+  through ordinary `ProductRow` v1 and the same generic exports;
 - a [generic export operator guide](docs/generic-exports.md) that keeps JSONL,
   JSON, or CSV container choice separate from the already-bound training
   objective, row schema, and any independently admitted consumer profile;

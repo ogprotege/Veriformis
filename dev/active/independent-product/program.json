@@ -112,7 +112,7 @@
       "packet": "dev/active/independent-product/phase-09-columnar-containers",
       "started_on": "2026-08-23",
       "completed_on": null,
-      "next_gate": "Item 9.6 emits a local Hugging Face DatasetDict v1 with semantic_content_only. Taxonomy remains planned. Extra columnar remains empty. Item 9.7 maps Parquet and Arrow into Phase 7."
+      "next_gate": "Item 9.7 maps Parquet and Arrow into Phase 7 dataset-row capture. Suffix does not switch modes. Extra columnar remains empty. Item 9.8 is harnesses, benchmarks, and closeout."
     },
     {
       "number": 10,

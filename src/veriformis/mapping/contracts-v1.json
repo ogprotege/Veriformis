@@ -2,7 +2,9 @@
   "admitted_containers": [
     "jsonl",
     "json",
-    "csv"
+    "csv",
+    "parquet",
+    "arrow"
   ],
   "coercion_rules": [
     "refuse"

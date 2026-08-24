@@ -34,7 +34,7 @@ ROW_SCHEMA_PAYLOAD_KEYS: dict[str, tuple[str, ...]] = {
     "instruction_output": ("instruction", "input", "output"),
     "messages": ("messages",),
 }
-ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl", "json", "csv")
+ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl", "json", "csv", "parquet", "arrow")
 RESERVED_CONTAINERS: tuple[str, ...] = ()
 CONTAINER_KINDS: tuple[str, ...] = ADMITTED_CONTAINERS + RESERVED_CONTAINERS
 CSV_DIALECT: dict[str, object] = {
@@ -59,7 +59,7 @@ REJECTION_REASON_CODES: tuple[str, ...] = (
     "unmapped-keys",
 )
 RowSchema = Literal["text", "prompt_completion", "instruction_output", "messages"]
-ContainerKind = Literal["jsonl", "json", "csv"]
+ContainerKind = Literal["jsonl", "json", "csv", "parquet", "arrow"]
 
 
 class _StrictModel(BaseModel):

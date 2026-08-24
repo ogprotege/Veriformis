@@ -1501,7 +1501,7 @@ class PipelineService:
         *,
         source_root: Path | None = None,
     ) -> ParseOutcome:
-        """Capture JSONL, JSON, or CSV row sources into a revision-v4 workspace."""
+        """Capture JSONL, JSON, CSV, Parquet, or Arrow row sources into a revision-v4 workspace."""
         from veriformis.identity import derive_source_id
         from veriformis.mapping.capture import capture_row_source
         from veriformis.mapping.result import ROW_PARSER_VERSION, row_parser_id
@@ -1612,7 +1612,7 @@ class PipelineService:
             durability_warning=workspace.last_commit_durability_warning,
             messages=(
                 ServiceMessage(
-                    f"captured {len(captured)} JSONL row-source(s) into revision "
+                    f"captured {len(captured)} row-source(s) into revision "
                     f"{revision.revision_id}"
                 ),
             ),

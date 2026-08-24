@@ -24,17 +24,23 @@ from veriformis.mapping.models import (
 ROW_JSONL_PARSER_ID = "row-jsonl"
 ROW_JSON_PARSER_ID = "row-json"
 ROW_CSV_PARSER_ID = "row-csv"
+ROW_PARQUET_PARSER_ID = "row-parquet"
+ROW_ARROW_PARSER_ID = "row-arrow"
 ROW_JSONL_PARSER_VERSION = "1"
 ROW_PARSER_VERSION = ROW_JSONL_PARSER_VERSION
 _ROW_PARSER_IDS: dict[str, str] = {
     "jsonl": ROW_JSONL_PARSER_ID,
     "json": ROW_JSON_PARSER_ID,
     "csv": ROW_CSV_PARSER_ID,
+    "parquet": ROW_PARQUET_PARSER_ID,
+    "arrow": ROW_ARROW_PARSER_ID,
 }
 ROW_PARSER_IDS: tuple[str, ...] = (
     ROW_JSONL_PARSER_ID,
     ROW_JSON_PARSER_ID,
     ROW_CSV_PARSER_ID,
+    ROW_PARQUET_PARSER_ID,
+    ROW_ARROW_PARSER_ID,
 )
 
 

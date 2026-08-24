@@ -6,27 +6,31 @@
 
 **Discovery schema:** `veriformis.mapping-contract-discovery/v1`
 
-**Status:** Models, discovery, JSONL/JSON/CSV capture, mapping execution,
-detection, preview, membership policy, mixed mode, and the dataset-row seal
-path are implemented through Phase 7.10, including packaged mapping templates.
+**Status:** Models, discovery, JSONL/JSON/CSV/Parquet/Arrow capture, mapping
+execution, detection, preview, membership policy, mixed mode, and the
+dataset-row seal path are implemented through Phase 7.10 and item 9.7,
+including packaged mapping templates.
 
-**Last reviewed:** 2026-08-23
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.7 columnar import)
 
 ## Purpose
 
 Define the persisted shapes for existing-dataset row sources, field mappings,
 mapping plans, imported records, and `mapped_value` evidence. JSONL, JSON,
-and compatible CSV capture apply a confirmed `mapping-plan/v1` into the four
-Finished Dataset v1 payload shapes. Dataset-row workspaces use revision
-schema 4 with stages `parse → map → curate → split → format → validate →
-seal`. Format emits ordinary `ProductRow` v1. Provenance lists mapping-rule
-ids instead of construction chunk ids.
+compatible CSV, Parquet, and Arrow IPC capture apply a confirmed
+`mapping-plan/v1` into the four Finished Dataset v1 payload shapes. Suffix
+does not switch compiler mode: `.parquet` and `.arrow` remain unsupported
+in document-source parse. Dataset-row workspaces use revision schema 4 with
+stages `parse → map → curate → split → format → validate → seal`. Format
+emits ordinary `ProductRow` v1. Provenance lists mapping-rule ids instead of
+construction chunk ids. Extra `columnar` stays empty; Parquet and Arrow
+capture import PyArrow only when those files are read.
 
 ## Closed vocabularies
 
 | Vocabulary | v1 values |
 | --- | --- |
-| Admitted containers | `jsonl`, `json`, `csv` |
+| Admitted containers | `jsonl`, `json`, `csv`, `parquet`, `arrow` |
 | Reserved containers | none |
 | CSV dialect | header required, comma, UTF-8, no trim, no pad |
 | Membership policy | `authoritative`, `advisory`, `replaced` |
@@ -47,9 +51,10 @@ JSON pointer, and mapping-rule ids. It does not claim construction chunks.
 
 ## Non-goals
 
-Mapping templates, Parquet/Arrow, and CSV `messages` rows. Constrained CSV
-cannot represent nested `messages`; import refuses that pair and names
-`split-jsonl-directory` or `json`.
+Hub upload. Portable exact bytes for Parquet/Arrow. CSV `messages` rows.
+Constrained CSV cannot represent nested `messages`; import refuses that
+pair and names `split-jsonl-directory` or `json`. Parquet and Arrow admit
+nested `messages`. Suffix never selects document-source versus dataset-row.
 
 Rejected rows are recorded in `veriformis.mapping-rejection-report/v1`. That
 report is a content-addressed project artifact, not a verified export. Accepted
