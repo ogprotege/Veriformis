@@ -8,15 +8,15 @@ train/evaluation split.
 
 **Status:** Implemented in development alpha `0.1.0`
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.5 Arrow)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
 
 Imported dataset-row bundles use these same three containers. Mapping does
 not add a fourth renderer or a trainer profile. Named TRL and MLX-LM
 adapters are optional split-JSONL profiles; generic selectors stay
 `consumer_id` null. Parquet, Arrow, and Hugging Face Dataset remain planned
-in taxonomy (Phase 9). Parquet v1 and Arrow IPC v1 are executable as
-generic `semantic_content_only` exports. Hugging Face Dataset still fails
-closed until item 9.6. Columnar v1 does not claim portable exact bytes.
+in taxonomy (Phase 9). Parquet v1, Arrow IPC v1, and local Hugging Face
+DatasetDict v1 are executable as generic `semantic_content_only` exports.
+Columnar v1 does not claim portable exact bytes. There is no Hub upload.
 
 **Next review:** Any generic-export selector, row-schema compatibility,
 consumer-profile, request, receipt, or transport change

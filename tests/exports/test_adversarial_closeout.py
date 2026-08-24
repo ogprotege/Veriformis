@@ -388,6 +388,7 @@ def test_closeout_conformance_injection_never_changes_production_discovery() -> 
     expected = [
         ("arrow", 1, None, None),
         ("constrained-csv", 1, None, None),
+        ("hugging-face-dataset", 1, None, None),
         ("json", 1, None, None),
         ("parquet", 1, None, None),
         ("split-jsonl-directory", 1, None, None),

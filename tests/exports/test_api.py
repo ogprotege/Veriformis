@@ -261,6 +261,7 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
     expected_production = [
         ("arrow", 1, None, None),
         ("constrained-csv", 1, None, None),
+        ("hugging-face-dataset", 1, None, None),
         ("json", 1, None, None),
         ("parquet", 1, None, None),
         ("split-jsonl-directory", 1, None, None),
@@ -277,6 +278,12 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
         ),
         "constrained-csv": (
             "instruction_output",
+            "prompt_completion",
+            "text",
+        ),
+        "hugging-face-dataset": (
+            "instruction_output",
+            "messages",
             "prompt_completion",
             "text",
         ),

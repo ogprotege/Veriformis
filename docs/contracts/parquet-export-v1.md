@@ -39,5 +39,5 @@ absent, execute fails closed naming extra `columnar`.
 
 ## Non-goals
 
-Hub upload. Portable exact bytes. Hugging Face Dataset directory
-(item 9.6). Trainer profiles. Arrow IPC is a separate generic container.
+Hub upload. Portable exact bytes. Trainer profiles. Arrow IPC and
+Hugging Face DatasetDict are separate generic containers.

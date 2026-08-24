@@ -23,12 +23,7 @@
       "version_range": ">=19.0.0,<26.0.0"
     }
   ],
-  "planned_containers": [
-    {
-      "container_id": "hugging-face-dataset",
-      "executable_item": "9.6"
-    }
-  ],
+  "planned_containers": [],
   "round_trip": false,
   "row_schemas": [
     {

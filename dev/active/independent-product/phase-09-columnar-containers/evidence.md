@@ -1,6 +1,6 @@
 # Phase 9 Evidence
 
-**Status:** Open — item 9.5 Arrow IPC
+**Status:** Open — item 9.6 Hugging Face DatasetDict
 
 **Opened:** 2026-08-23
 
@@ -90,3 +90,17 @@ passed.
       planned. Extra `columnar` stays empty. Hugging Face Dataset still
       refuses with item 9.6.
 - [x] Core pytest: 2033 passed, 3 deselected, expected transport warning.
+- [x] Item 9.5 merged as PR #93 at
+      `df88c5c576df2aef4289b19cc1dc6e63fbb4b60d` after all 16 GitHub checks
+      passed.
+
+## Required item 9.6 evidence
+
+- [x] Selector `hugging-face-dataset` v1, `consumer_id` null,
+      `semantic_content_only`. Local DatasetDict layout. No Hub upload.
+- [x] Dry-run plans train/evaluation fingerprints without importing Datasets
+      or PyArrow. Execute fails closed naming extra `columnar` when Datasets
+      is absent.
+- [x] Nested `messages` is in the supported schema list. Taxonomy stays
+      planned. Extra `columnar` stays empty.
+- [x] Core pytest: 2038 passed, 3 deselected, expected transport warning.

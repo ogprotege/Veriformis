@@ -119,7 +119,7 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/06-hf-dataset-export`
 **Title:** `Phase 9.6: Emit a local Hugging Face dataset`
 
-- [ ] Local Dataset/DatasetDict directory with splits, features, and data card. Not Hub publish. Taxonomy remains planned.
+- [x] Local Dataset/DatasetDict directory with splits, features, and data card. Not Hub publish. Taxonomy remains planned.
 
 ### 9.7 Map Parquet and Arrow into Phase 7
 
