@@ -2,11 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.2 pins)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
 
-**Next review:** Independent-product Phase 10.2 pull-request merge,
-operator approval for item 10.3, beta label cut, or governance-schema
-change
+**Next review:** Phase 10 closeout pull-request merge, beta label cut,
+or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -48,8 +47,9 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–9 are complete on `main` and
-Phase 10 is in progress under item 10.1. Axolotl, LLaMA-Factory, and
-Unsloth remain candidates. Extra lists for those names are empty.
+At this review, independent-product Phases 0–10 are complete on `main`
+once the Phase 10 closeout merges. Axolotl, LLaMA-Factory, and Aptus are
+implemented optional adapters. Unsloth remains a non-executable
+candidate. Extra lists for those names stay empty.
 Historical Phase 4–8 merge SHAs
 remain in those packets and in `docs/current-status.md`.

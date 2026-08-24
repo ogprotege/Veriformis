@@ -265,6 +265,9 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
         ("json", 1, None, None),
         ("parquet", 1, None, None),
         ("split-jsonl-directory", 1, None, None),
+        ("split-jsonl-directory", 1, "aptus", 1),
+        ("split-jsonl-directory", 1, "axolotl", 1),
+        ("split-jsonl-directory", 1, "llama-factory", 1),
         ("split-jsonl-directory", 1, "mlx-lm", 1),
         ("split-jsonl-directory", 1, "trl", 1),
     ]
@@ -307,10 +310,22 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
         ),
     }
     for profile in first.profiles:
-        assert (
-            profile.supported_row_schemas
-            == expected_row_schemas[profile.container_profile.container_id]
+        consumer = (
+            None
+            if profile.consumer_profile is None
+            else profile.consumer_profile.consumer_id
         )
+        if consumer == "aptus":
+            assert profile.supported_row_schemas == (
+                "instruction_output",
+                "messages",
+                "prompt_completion",
+            )
+        else:
+            assert (
+                profile.supported_row_schemas
+                == expected_row_schemas[profile.container_profile.container_id]
+            )
         assert profile.overwrite_policies == ("refuse",)
     assert export_discovery_response(first) == {
         "error": None,

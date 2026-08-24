@@ -1,6 +1,6 @@
 # Phase 10 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-24
 
@@ -100,42 +100,42 @@ optional trainer integrations.
 **Branch:** `phase10/03-<first-admitted>`
 **Title:** `Phase 10.3: Emit the first admitted profile`
 
-- [ ] First profile whose 10.2 pin passes. Operator approval required before this item begins.
+- [x] First profile whose 10.2 pin passes. Operator approval required before this item begins. Combined 10.3–10.8 PR emits Axolotl.
 
 ### 10.4 Emit the second admitted profile
 
 **Branch:** `phase10/04-<second-admitted>`
 **Title:** `Phase 10.4: Emit the second admitted profile`
 
-- [ ] Independent of 10.3. Same bundle exports to both with identical membership and targets.
+- [x] Independent of 10.3. Same bundle exports to both with identical membership and targets. Combined PR emits LLaMA-Factory.
 
 ### 10.5 Emit the third admitted profile
 
 **Branch:** `phase10/05-<third-admitted>`
 **Title:** `Phase 10.5: Emit the third admitted profile`
 
-- [ ] Same pattern. Skip with an explicit non-admission record if 10.2 did not admit a third profile.
+- [x] Same pattern. Skip with an explicit non-admission record if 10.2 did not admit a third profile. Unsloth remains experimental.
 
 ### 10.6 Move Aptus under the common profile lifecycle
 
 **Branch:** `phase10/06-aptus-as-profile`
 **Title:** `Phase 10.6: Move Aptus under the common profile lifecycle`
 
-- [ ] Keep external-digest and assignment checks. Remove special product authority. Default seal still does not write the descriptor.
+- [x] Keep external-digest and assignment checks. Remove special product authority. Default seal still does not write the descriptor.
 
 ### 10.7 Load artifacts through the real consumers
 
 **Branch:** `phase10/07-conformance-harness`
 **Title:** `Phase 10.7: Load artifacts through the real consumers`
 
-- [ ] Isolated harnesses and optional CI. Golden load succeeds. Incompatibles never reach the loader.
+- [x] Isolated harnesses and optional CI. Golden load succeeds. Incompatibles never reach the loader.
 
 ### 10.8 Tell the truth, pin deprecation, and close Phase 10
 
 **Branch:** `phase10/08-discovery-deprecation-closeout`
 **Title:** `Phase 10.8: Tell the truth, pin deprecation, and close Phase 10`
 
-- [ ] Sidecars do not launch training. Discovery names accepted, transformed, and rejected goals and rows. Explicit deprecation policy. Promote only admitted harness-green profiles. Closeout. Do not start Phase 11 or 13.
+- [x] Sidecars do not launch training. Discovery names accepted, transformed, and rejected goals and rows. Explicit deprecation policy. Promote only admitted harness-green profiles. Closeout. Do not start Phase 11 or 13.
 
 ## Usability criteria
 
@@ -157,4 +157,4 @@ Core tests still pass without trainer extras. Failure or absence of any one
 profile integration does not break core compile, generic export, or another
 profile.
 
-**Result:** Pending. See [closeout.md](closeout.md).
+**Result:** Passed. See [closeout.md](closeout.md).

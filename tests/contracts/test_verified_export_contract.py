@@ -305,4 +305,7 @@ def test_implemented_physical_containers_close_over_generic_and_columnar() -> No
         "aptus-handoff-v1",
         "trl",
         "mlx-lm",
+        "axolotl",
+        "llama-factory",
+        "aptus",
     )

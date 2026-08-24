@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–9 complete; Phase 10 in progress
+**Status:** Active program — Phases 0–10 complete
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -25,7 +25,7 @@ with roadmap headings.
 - [Phase 7 — Existing-dataset import and mapping](phase-07-existing-dataset-import/README.md) — completed
 - [Phase 8 — First consumer profiles](phase-08-consumer-profiles/README.md) — completed
 - [Phase 9 — Columnar and Hugging Face dataset containers](phase-09-columnar-containers/README.md) — completed
-- [Phase 10 — Expand consumer profiles under evidence gates](phase-10-profile-expansion/README.md) — in progress
+- [Phase 10 — Expand consumer profiles under evidence gates](phase-10-profile-expansion/README.md) — complete
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -87,6 +87,10 @@ PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
 checks passed. Phase 8 opened on 2026-08-23 under its
 [packet](phase-08-consumer-profiles/README.md); items 8.1–8.6 merged as
 PR #82–#87; item 8.7 closes the phase with implemented TRL and MLX-LM.
+Phase 9 completed under its
+[packet](phase-09-columnar-containers/README.md). Phase 10 completed under
+its [packet](phase-10-profile-expansion/README.md) with implemented
+Axolotl, LLaMA-Factory, and Aptus adapters; Unsloth remains experimental.
 
 ## State change procedure
 

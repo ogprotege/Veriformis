@@ -45,7 +45,7 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `workspace.py` (revision kernel); `pipeline/` (`PipelineService`); `recipes/`;
 `exports/` (consumer-neutral verified-derivative composition boundary);
 `handoff/`; `mcp/`; `goals/`; `mapping/` (compiler-path modes, capture,
-confirmed mapping, templates); `profiles/` (implemented TRL and MLX-LM admission
+confirmed mapping, templates); `profiles/` (implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission
 pins and adapters); and `cli.py` (Typer adapter). Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
@@ -102,9 +102,10 @@ rejection reports; and packaged mapping templates. Mode is not a taxonomy
 axis. Imported fields carry `mapped_value` evidence and seal through ordinary
 `ProductRow` v1.
 Phase 8 records that a consumer profile is an optional adapter over that
-bundle (ADR-0012). `profiles/` holds implemented TRL and MLX-LM admission
+bundle (ADR-0012, ADR-0014). `profiles/` holds implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission
 pins and adapters with empty extras. Generic export selectors stay
-`consumer_id` null. Taxonomy lists `trl` and `mlx-lm` as implemented.
+`consumer_id` null. Taxonomy lists `trl`, `mlx-lm`, `axolotl`,
+`llama-factory`, and `aptus` as implemented. `unsloth` remains candidate.
 Phase 9.2 packages Arrow and Hugging Face feature pins in
 `exports/columnar_schemas-v1.json`. Phase 9.3 packages semantic
 fingerprints in `exports/columnar_fingerprint-v1.json` as

@@ -1,4 +1,4 @@
-"""Section-5 admission pins for implemented TRL and MLX-LM export profiles."""
+"""Section-5 admission pins for implemented export consumer profiles."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from veriformis.taxonomy import (
 
 ADMISSION_DATA_NAME = "admission-v1.json"
 RowSchema = Literal["instruction_output", "messages", "prompt_completion", "text"]
-MappingKind = Literal["identity", "assemble-prompt"]
+MappingKind = Literal["identity", "assemble-prompt", "remap"]
 PartitionName = Literal["evaluation", "train"]
 
 
@@ -112,7 +112,10 @@ class ProfileAdmission(_StrictModel):
             raise ExportContractError(
                 f"admission {self.profile_id!r} must name item {expected_item}"
             )
-        if self.extra != self.profile_id:
+        if self.profile_id == "aptus":
+            if self.extra != "":
+                raise ExportContractError("aptus pin extra must be empty")
+        elif self.extra != self.profile_id:
             raise ExportContractError("admission extra must equal profile_id")
         if self.admitted_row_schemas != tuple(sorted(self.admitted_row_schemas)):
             raise ExportContractError("admitted_row_schemas must be sorted")
@@ -124,11 +127,11 @@ class ProfileAdmission(_StrictModel):
         transformed = tuple(
             item.source_row_schema
             for item in self.row_mappings
-            if item.mapping_kind == "assemble-prompt"
+            if item.mapping_kind in {"assemble-prompt", "remap"}
         )
         if self.transformed_row_schemas != transformed:
             raise ExportContractError(
-                "transformed_row_schemas must match assemble-prompt mappings"
+                "transformed_row_schemas must match assemble-prompt and remap mappings"
             )
         expected_goals = tuple(
             sorted(
@@ -139,8 +142,13 @@ class ProfileAdmission(_StrictModel):
         )
         if self.accepted_goals != expected_goals:
             raise ExportContractError("accepted_goals must match admitted row schemas")
-        if self.rejected_goals != ():
-            raise ExportContractError("no implemented goal is rejected by these profiles")
+        expected_rejected = tuple(
+            objective
+            for objective in DETERMINISTIC_V1_OBJECTIVE_KINDS
+            if objective not in self.accepted_goals
+        )
+        if self.rejected_goals != expected_rejected:
+            raise ExportContractError("rejected_goals must be the remaining v1 objectives")
         expected_partitions = ("evaluation", "train")
         if tuple(sorted(self.partition_mapping)) != expected_partitions:
             raise ExportContractError("partition_mapping must name train and evaluation")

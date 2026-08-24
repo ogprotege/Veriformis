@@ -1057,13 +1057,13 @@ class PipelineService:
         return mapping_template_catalog().model_dump(mode="json")
 
     def discover_profile_admissions(self) -> dict[str, Any]:
-        """Return implemented TRL and MLX-LM admission pins."""
+        """Return implemented consumer-profile admission pins."""
         from veriformis.profiles import discover_profile_admissions
 
         return discover_profile_admissions()
 
     def discover_candidate_profile_admissions(self) -> dict[str, Any]:
-        """Return Phase 10 candidate admission pins. None are executable."""
+        """Return remaining candidate admission pins. None are executable."""
         from veriformis.profiles import discover_candidate_profile_admissions
 
         return discover_candidate_profile_admissions()

@@ -10,16 +10,30 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import veriformis.exports.service as _export_service  # noqa: F401 — break profile/export cycle
 from veriformis.datasets import RowSet
+from veriformis.profiles.aptus import APTUS_LAUNCH_PATH, AptusLaunchSidecar
+from veriformis.profiles.axolotl import (
+    AXOLOTL_LAUNCH_PATH,
+    AXOLOTL_YAML_PATH,
+    AxolotlSftLaunchSidecar,
+)
+from veriformis.profiles.llama_factory import (
+    LLAMA_FACTORY_LAUNCH_PATH,
+    LlamaFactorySftLaunchSidecar,
+)
 from veriformis.profiles.mlx_lm import (
     MLX_LM_LAUNCH_PATH,
     MlxLmLoraLaunchSidecar,
 )
 from veriformis.profiles.trl import TRL_EVALUATION_PATH, TRL_LAUNCH_PATH, TrlSftLaunchSidecar
+from veriformis.profiles import aptus as aptus_module
+from veriformis.profiles import axolotl as axolotl_module
+from veriformis.profiles import llama_factory as llama_module
 from veriformis.profiles import mlx_lm as mlx_module
 from veriformis.profiles import trl as trl_module
 
 from test_trl import (  # type: ignore[import-not-found]
     _materialize_bundle,
+    _row_set_for_schema,
     _source_row_set,
 )
 
@@ -70,7 +84,14 @@ def _imported_modules(tree: ast.AST) -> set[str]:
 
 
 def test_profile_renderers_do_not_import_process_launchers() -> None:
-    for filename in ("trl.py", "mlx_lm.py"):
+    for filename in (
+        "trl.py",
+        "mlx_lm.py",
+        "axolotl.py",
+        "llama_factory.py",
+        "aptus.py",
+        "payload.py",
+    ):
         source = (_PROFILES_DIR / filename).read_text(encoding="utf-8")
         tree = ast.parse(source)
         assert _imported_modules(tree).isdisjoint(_FORBIDDEN_MODULES)
@@ -148,3 +169,57 @@ def test_mlx_lm_sidecar_is_dataset_only_and_does_not_launch(tmp_path: Path) -> N
     }
     assert plans[MLX_LM_LAUNCH_PATH].role == "config-sidecar"
     assert plans[MLX_LM_LAUNCH_PATH].membership_scope == "none"
+
+
+def test_axolotl_sidecar_is_dataset_only_and_does_not_launch(tmp_path: Path) -> None:
+    row_set = _source_row_set(_materialize_bundle(tmp_path))
+    files = dict(axolotl_module._rendered_files(row_set))
+    sidecar = AxolotlSftLaunchSidecar.from_json_bytes(files[AXOLOTL_LAUNCH_PATH])
+    assert sidecar.launches_training is False
+    assert sidecar.selects_model is False
+    assert sidecar.selects_hyperparameters is False
+    assert sidecar.command_argv == ("axolotl", "train", AXOLOTL_YAML_PATH)
+    assert "--train" not in sidecar.command_argv
+    assert b"base_model:" not in files[AXOLOTL_YAML_PATH]
+    plans = {
+        item.path: item
+        for item in axolotl_module._file_plans(axolotl_module.AXOLOTL_DESCRIPTOR, row_set)
+    }
+    assert plans[AXOLOTL_YAML_PATH].role == "config-sidecar"
+    assert plans[AXOLOTL_LAUNCH_PATH].role == "launch-sidecar"
+    assert plans[AXOLOTL_LAUNCH_PATH].membership_scope == "none"
+
+
+def test_llama_factory_sidecar_is_dataset_only_and_does_not_launch(
+    tmp_path: Path,
+) -> None:
+    row_set = _source_row_set(_materialize_bundle(tmp_path))
+    files = dict(llama_module._rendered_files(row_set))
+    sidecar = LlamaFactorySftLaunchSidecar.from_json_bytes(
+        files[LLAMA_FACTORY_LAUNCH_PATH]
+    )
+    assert sidecar.launches_training is False
+    assert sidecar.selects_model is False
+    assert sidecar.command_argv == ("llamafactory-cli", "train")
+    assert "--train" not in sidecar.command_argv
+    plans = {
+        item.path: item
+        for item in llama_module._file_plans(
+            llama_module.LLAMA_FACTORY_DESCRIPTOR, row_set
+        )
+    }
+    assert plans[LLAMA_FACTORY_LAUNCH_PATH].role == "launch-sidecar"
+    assert plans[LLAMA_FACTORY_LAUNCH_PATH].membership_scope == "none"
+
+
+def test_aptus_sidecar_is_dataset_only_and_does_not_write_handoff(
+    tmp_path: Path,
+) -> None:
+    source = _source_row_set(_materialize_bundle(tmp_path))
+    row_set = _row_set_for_schema(source, "prompt_completion")
+    files = dict(aptus_module._rendered_files(row_set))
+    sidecar = AptusLaunchSidecar.from_json_bytes(files[APTUS_LAUNCH_PATH])
+    assert sidecar.launches_training is False
+    assert sidecar.writes_sibling_handoff is False
+    assert sidecar.command_argv == ("veriformis", "handoff")
+    assert "--train" not in sidecar.command_argv

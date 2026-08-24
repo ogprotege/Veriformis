@@ -1,4 +1,4 @@
-"""Consumer-profile admission pins and TRL/MLX-LM export adapters."""
+"""Consumer-profile admission pins and optional export adapters."""
 
 from veriformis.profiles.admission import (
     ADMISSION_DATA_NAME,

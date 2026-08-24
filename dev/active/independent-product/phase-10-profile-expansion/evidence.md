@@ -1,6 +1,6 @@
 # Phase 10 Evidence
 
-**Status:** Open — item 10.2 pins
+**Status:** Open — items 10.3–10.8 combined closeout
 
 **Opened:** 2026-08-24
 
@@ -36,3 +36,23 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Extras `axolotl`, `llama-factory`, and `unsloth` are empty lists; lock
       has no those trainer packages.
 - [x] Focused isolation tests, tracking, Ruff, lock, and diff check.
+
+## Required items 10.3–10.8 evidence
+
+- [x] Axolotl JSONL plus dataset-only YAML; extra stays empty.
+- [x] LLaMA-Factory alpaca/sharegpt plus `dataset_info.json`; extra stays empty.
+- [x] Unsloth remains experimental; selecting it refuses as Phase 10.
+- [x] Aptus identity export admits three schemas and refuses `text`.
+- [x] Default seal still does not write the sibling handoff descriptor.
+- [x] Official-schema harnesses do not import trainer libraries.
+- [x] Sidecars do not launch training.
+- [x] Discovery names accepted, transformed, and rejected goals and rows.
+
+## Local gates (2026-08-24)
+
+- `uv lock --check`
+- `uv run ruff check src tests`
+- `uv run python scripts/check_project_tracking.py` PASS
+- focused profile/isolation/taxonomy: 197 passed, 3 skipped
+- core pytest: 2090 passed, 16 deselected, 1 expected durability warning
+- `git diff --check` clean

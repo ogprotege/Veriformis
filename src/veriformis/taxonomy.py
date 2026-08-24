@@ -125,25 +125,30 @@ IMPLEMENTED_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "aptus-handoff-v1",
     "trl",
     "mlx-lm",
+    "axolotl",
+    "llama-factory",
+    "aptus",
 )
 IMPLEMENTED_EXPORT_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
     "trl",
     "mlx-lm",
+    "axolotl",
+    "llama-factory",
+    "aptus",
 )
 EXPORT_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
     {
         "trl": "8.3",
         "mlx-lm": "8.4",
+        "axolotl": "10.3",
+        "llama-factory": "10.4",
+        "aptus": "10.6",
     }
 )
 PLANNED_CONSUMER_PROFILES: Final[tuple[str, ...]] = ()
 PLANNED_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
 UNEXECUTABLE_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
-CANDIDATE_CONSUMER_PROFILES: Final[tuple[str, ...]] = (
-    "axolotl",
-    "llama-factory",
-    "unsloth",
-)
+CANDIDATE_CONSUMER_PROFILES: Final[tuple[str, ...]] = ("unsloth",)
 
 LOSS_POLICY_IDS: Final[tuple[str, ...]] = (
     "full-sequence",
@@ -226,6 +231,9 @@ PROFILE_FORBIDDEN_ROW_SCHEMAS: Final[Mapping[str, tuple[str, ...]]] = MappingPro
         "aptus-handoff-v1": ("text",),
         "mlx-lm": (),
         "trl": (),
+        "axolotl": (),
+        "llama-factory": (),
+        "aptus": ("text",),
     }
 )
 

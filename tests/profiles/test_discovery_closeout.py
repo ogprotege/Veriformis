@@ -17,8 +17,15 @@ from veriformis.profiles.admission import (
     discover_profile_admissions,
     require_profile_messages_payload,
 )
+from veriformis.profiles.axolotl import AXOLOTL_CONSUMER_ID, map_axolotl_payload
+from veriformis.profiles.llama_factory import (
+    LLAMA_FACTORY_CONSUMER_ID,
+    map_llama_factory_payload,
+)
 from veriformis.profiles.mlx_lm import MLX_LM_CONSUMER_ID, map_mlx_lm_payload
 from veriformis.profiles.trl import TRL_CONSUMER_ID, map_trl_payload
+from veriformis.profiles import axolotl as axolotl_module
+from veriformis.profiles import llama_factory as llama_module
 from veriformis.profiles import mlx_lm as mlx_module
 from veriformis.profiles import trl as trl_module
 
@@ -35,26 +42,24 @@ from test_trl import (  # type: ignore[import-not-found]
 
 def test_admission_discovery_names_accepted_transformed_and_rejected() -> None:
     catalog = discover_profile_admissions()
+    by_id = {record["profile_id"]: record for record in catalog["records"]}
+    assert set(by_id) == {"trl", "mlx-lm", "axolotl", "llama-factory", "aptus"}
     for record in catalog["records"]:
         assert record["state"] == "implemented"
-        assert record["admitted_row_schemas"] == [
-            "instruction_output",
-            "messages",
-            "prompt_completion",
-            "text",
-        ]
-        assert record["transformed_row_schemas"] == ["instruction_output"]
-        assert record["accepted_goals"] == [
-            "before_after_transformation",
-            "continuation",
-            "full_text",
-            "section_reconstruction",
-            "structured_field",
-        ]
-        assert record["rejected_goals"] == []
         assert "preference" in record["refused_dataset_types"]
         assert "tools" in record["refused_dataset_types"]
         assert "vision" in record["refused_dataset_types"]
+        assert "accepted_goals" in record
+        assert "transformed_row_schemas" in record
+        assert "rejected_goals" in record
+    assert by_id["trl"]["transformed_row_schemas"] == ["instruction_output"]
+    assert by_id["axolotl"]["transformed_row_schemas"] == ["prompt_completion"]
+    assert by_id["llama-factory"]["transformed_row_schemas"] == [
+        "messages",
+        "prompt_completion",
+    ]
+    assert by_id["aptus"]["rejected_goals"] == ["full_text"]
+    assert "text" not in by_id["aptus"]["admitted_row_schemas"]
 
 
 def test_system_roles_and_extra_assistant_turns_are_refused() -> None:
@@ -109,40 +114,59 @@ def test_system_roles_and_extra_assistant_turns_are_refused() -> None:
         )
 
 
-def test_same_bundle_exports_to_both_profiles_without_changing_membership(
+def test_same_bundle_exports_to_implemented_profiles_without_changing_membership(
     tmp_path: Path,
 ) -> None:
     bundle = _materialize_bundle(tmp_path)
     source = _source_row_set(bundle)
     service = ExportService()
-    trl_plan = service.dry_run_export(
-        ExportDryRunRequest(
-            operation="dry_run",
-            **_selection(bundle, schema_version="veriformis.export-surface-request/v1"),
+    plans = {}
+    for consumer_id in (
+        TRL_CONSUMER_ID,
+        MLX_LM_CONSUMER_ID,
+        AXOLOTL_CONSUMER_ID,
+        LLAMA_FACTORY_CONSUMER_ID,
+    ):
+        request = _selection(
+            bundle, schema_version="veriformis.export-surface-request/v1"
         )
+        request["consumer_id"] = consumer_id
+        plan = service.dry_run_export(
+            ExportDryRunRequest(operation="dry_run", **request)
+        )
+        plans[consumer_id] = plan
+        assert plan.consumer_profile is not None
+        assert plan.consumer_profile.consumer_id == consumer_id
+        assert plan.row_set_id == source.row_set_id
+        assert plan.loss_policy == loss_policy_for_row(source.row_schema)
+    aptus_request = _selection(
+        bundle, schema_version="veriformis.export-surface-request/v1"
     )
-    mlx_request = _selection(bundle, schema_version="veriformis.export-surface-request/v1")
-    mlx_request["consumer_id"] = MLX_LM_CONSUMER_ID
-    mlx_plan = service.dry_run_export(
-        ExportDryRunRequest(operation="dry_run", **mlx_request)
-    )
-    assert trl_plan.consumer_profile is not None
-    assert mlx_plan.consumer_profile is not None
-    assert trl_plan.consumer_profile.consumer_id == TRL_CONSUMER_ID
-    assert mlx_plan.consumer_profile.consumer_id == MLX_LM_CONSUMER_ID
-    assert trl_plan.row_set_id == mlx_plan.row_set_id == source.row_set_id
-    assert trl_plan.loss_policy == mlx_plan.loss_policy == loss_policy_for_row(
-        source.row_schema
-    )
+    aptus_request["consumer_id"] = "aptus"
+    with pytest.raises(ExportContractError, match="does not support source row schema 'text'"):
+        service.dry_run_export(
+            ExportDryRunRequest(operation="dry_run", **aptus_request)
+        )
     trl_files = dict(trl_module._rendered_files(source))
     mlx_files = dict(mlx_module._rendered_files(source))
+    axolotl_files = dict(axolotl_module._rendered_files(source))
+    llama_files = dict(llama_module._rendered_files(source))
     trl_train = [
         json.loads(line) for line in trl_files["data/train.jsonl"].decode().splitlines()
     ]
     mlx_train = [
         json.loads(line) for line in mlx_files["train.jsonl"].decode().splitlines()
     ]
+    axolotl_train = [
+        json.loads(line)
+        for line in axolotl_files["data/train.jsonl"].decode().splitlines()
+    ]
+    llama_train = [
+        json.loads(line)
+        for line in llama_files["data/train.jsonl"].decode().splitlines()
+    ]
     assert len(trl_train) == len(mlx_train) == source.train_row_count
+    assert len(axolotl_train) == len(llama_train) == source.train_row_count
     assert trl_train == mlx_train
 
 
@@ -180,3 +204,8 @@ def test_unicode_payloads_survive_both_profiles(tmp_path: Path) -> None:
     assert "composed=\u00e9" in exact["prompt"]
     assert map_trl_payload("prompt_completion", exact) == exact
     assert map_mlx_lm_payload("prompt_completion", exact) == exact
+    remapped = map_axolotl_payload("prompt_completion", exact)
+    assert remapped["instruction"] == exact["prompt"]
+    assert remapped["output"] == exact["completion"]
+    llama = map_llama_factory_payload("prompt_completion", exact)
+    assert llama["instruction"] == exact["prompt"]

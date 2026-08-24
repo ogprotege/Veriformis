@@ -44,7 +44,7 @@ examples below use the installed name.
 | Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
-| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL and MLX-LM adapters |
+| Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters |
 | Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
@@ -600,7 +600,8 @@ with no consumer profile. Phase 9.4–9.6 add `parquet`, `arrow`, and
 `hugging-face-dataset` v1 as `semantic_content_only` generics; extra
 `columnar` stays empty. Taxonomy lists them as implemented. Optional TRL
 and MLX-LM adapters sit on `split-jsonl-directory` v1. Split JSONL, canonical
-JSON, Parquet, Arrow, Hugging Face DatasetDict, and the TRL and MLX-LM
+JSON, Parquet, Arrow, Hugging Face DatasetDict, and the TRL, MLX-LM,
+Axolotl, LLaMA-Factory, and Aptus
 adapters support all four current row schemas; constrained CSV supports the
 three flat schemas only. The adapters emit dataset-only launch sidecars and
 do not launch training. Taxonomy lists `trl` and `mlx-lm` as implemented
@@ -627,7 +628,7 @@ verify because the exact paths and bytes bind the plan ID.
 
 Canonical `json` v1 has no options. Request v1 selects its fixed tree; request
 v2 is refused for that selector even when `container_options` is empty. The
-TRL and MLX-LM adapters are request v1 only; request v2 is refused.
+Named consumer-profile adapters are request v1 only; request v2 is refused.
 Constrained `constrained-csv` v1 has the same request boundary: request v1
 selects its fixed tree, while request v2 and every options object are refused.
 
@@ -794,7 +795,7 @@ MCP, YAML, Python, and the workbench. See the
 
 ### `profile-admissions`
 
-Print implemented TRL and MLX-LM admission pins as read-only JSON.
+Print implemented consumer-profile admission pins as read-only JSON.
 
 ```text
 veriformis profile-admissions
@@ -804,9 +805,9 @@ The output is the exact packaged `veriformis.profile-admission-discovery/v1`
 data that `PipelineService` and MCP `profile_admissions` also emit. Each
 record pins official docs, a review date, license, empty extra name, version
 range, admitted and transformed row schemas, accepted and rejected goals,
-refused dataset types, partition mapping, and row mappings. Both records
-are `implemented`. The command does not launch training and does not import
-TRL or MLX-LM. See
+refused dataset types, partition mapping, and row mappings. The five
+implemented records are `implemented`. The command does not launch
+training and does not import trainer libraries. See
 [Consumer Profile Admission v1](contracts/profile-admission-v1.md).
 
 ### `candidate-profile-admissions`
@@ -820,10 +821,9 @@ veriformis candidate-profile-admissions
 The output is the exact packaged
 `veriformis.candidate-profile-admission-discovery/v1` data that
 `PipelineService` and MCP `candidate_profile_admissions` also emit.
-`axolotl` and `llama-factory` are admitted for a later emit after
-operator approval. `unsloth` is experimental and not executable. `aptus`
-is deferred to item 10.6. The command does not emit files, does not
-change export discovery, and does not import those trainers. See
+`unsloth` is experimental and not executable. Item 10.5 skipped it.
+The command does not emit files, does not change export discovery, and
+does not import trainer libraries. See
 [Consumer Profile Admission v1](contracts/profile-admission-v1.md).
 
 ### `columnar-schemas`
@@ -1132,6 +1132,9 @@ stage-command redesign is planned solely for packaging.
 - [Columnar Schema Pins v1](contracts/columnar-schema-v1.md)
 - [TRL SFT Export v1](contracts/trl-export-v1.md)
 - [MLX-LM LoRA Export v1](contracts/mlx-lm-export-v1.md)
+- [Axolotl SFT Export v1](contracts/axolotl-export-v1.md)
+- [LLaMA-Factory SFT Export v1](contracts/llama-factory-export-v1.md)
+- [Aptus Export v1](contracts/aptus-export-v1.md)
 - [Aptus Handoff Contract v1](contracts/aptus-handoff-v1.md)
 - [Current implementation status](current-status.md)
 - [Install guide](install.md)

@@ -20,8 +20,9 @@ explicitly selects it as training content.
 > Goal-first recipes (Phase 6) and existing-dataset import/mapping (Phase 7)
 > are implemented. Phase 8 consumer profiles are complete; TRL SFT and
 > MLX-LM LoRA are implemented optional adapters. Phase 9 columnar containers
-> are complete; extra `columnar` stays empty. Phase 10 is in progress;
-> `axolotl`, `llama-factory`, and `unsloth` remain candidates. This is **not** a
+> are complete; extra `columnar` stays empty. Phase 10 is complete;
+> Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters;
+> `unsloth` remains a non-executable candidate. This is **not** a
 > public beta or production label. Limits:
 > [docs/beta-limitations.md](docs/beta-limitations.md). Install:
 > [docs/install.md](docs/install.md). Status:

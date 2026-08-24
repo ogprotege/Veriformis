@@ -132,7 +132,7 @@ jobs:
         run: uv python install 3.12
       - name: Sync test extras
         run: uv sync --python 3.12 --extra test
-      - name: Optional TRL/MLX-LM pytest selection
+      - name: Optional trainer-schema pytest selection
         run: uv run --python 3.12 pytest -q -m "profile_integration"
 
   # Isolated columnar library-reload evidence. Visible but cannot block standalone release.

@@ -63,7 +63,7 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
         for profile in profiles.values()
         if profile.consumer_profile is not None
     }
-    assert named == {"mlx-lm", "trl"}
+    assert named == {"aptus", "axolotl", "llama-factory", "mlx-lm", "trl"}
     for identifier in COLUMNAR_CONTAINERS:
         profile = profiles[(identifier, 1, None, None)]
         assert profile.consumer_profile is None

@@ -795,7 +795,7 @@ def mapping_contracts() -> None:
 
 @app.command(name="profile-admissions")
 def profile_admissions() -> None:
-    """Print implemented TRL and MLX-LM admission pins as deterministic JSON."""
+    """Print implemented consumer-profile admission pins as deterministic JSON."""
     typer.echo(
         json.dumps(
             _SERVICE.discover_profile_admissions(),
@@ -808,7 +808,7 @@ def profile_admissions() -> None:
 
 @app.command(name="candidate-profile-admissions")
 def candidate_profile_admissions() -> None:
-    """Print Phase 10 candidate admission pins as deterministic JSON."""
+    """Print remaining candidate admission pins as deterministic JSON."""
     typer.echo(
         json.dumps(
             _SERVICE.discover_candidate_profile_admissions(),

@@ -20,20 +20,19 @@ goal-first recipes and previews complete, closeout merged as PR #67 at
 and mapping complete; Phase 8 consumer profiles complete with implemented
 TRL and MLX-LM optional adapters; Phase 9 Parquet, Arrow IPC, and local
 Hugging Face DatasetDict v1 implemented as `semantic_content_only`
-generics; Phase 10 in progress under ADR-0014 with Axolotl, LLaMA-Factory,
-and Unsloth remaining candidates; version `0.1.0` development alpha
+generics; Phase 10 complete under ADR-0014 with implemented Axolotl,
+LLaMA-Factory, and Aptus optional adapters and Unsloth remaining a
+non-executable candidate; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–9 complete; Phase 10 in progress under item 10.1; maturity alpha;
-public Mac claim still owner-gated
+Phases 0–10 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
 
-**Next review:** Item 10.2 pull-request merge, operator approval for
-item 10.3, beta label cut, public-ready checklist, or any
-product-contract change. Do not start item 10.3 until the operator
-approves. Do not start Phase 11 or 13 from this packet.
+**Next review:** Phase 10 closeout pull-request merge, beta label cut,
+public-ready checklist, or any product-contract change. Do not start
+Phase 11 or 13 from this packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -338,9 +337,10 @@ canonical `json`, and `constrained-csv` v1, plus three
 `semantic_content_only` generics, `parquet`, `arrow`, and
 `hugging-face-dataset` v1. None selects a trainer or claims trainer
 compatibility. Taxonomy lists the three columnar containers as
-implemented. TRL and MLX-LM are implemented optional adapters. Extra
-`columnar` stays empty. There is no Hub upload. Axolotl, LLaMA-Factory,
-Unsloth, and Aptus-as-profile remain Phase 10.
+implemented. TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus are
+implemented optional adapters. Extra `columnar` and the trainer extras
+stay empty. There is no Hub upload. Unsloth remains a non-executable
+candidate. The exporter does not train.
 
 ## Fail-closed seal
 

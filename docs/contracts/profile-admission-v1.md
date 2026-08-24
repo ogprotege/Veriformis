@@ -6,38 +6,41 @@
 
 **Discovery schema:** `veriformis.profile-admission-discovery/v1`
 
-**Status:** Packaged section-5 pins for implemented `trl` and `mlx-lm`,
-plus Phase 10 candidate pins. Discovery names accepted, transformed, and
-rejected goals and rows. Candidate records are not executable.
+**Status:** Packaged section-5 pins for implemented `trl`, `mlx-lm`,
+`axolotl`, `llama-factory`, and `aptus`, plus the remaining Unsloth
+candidate pin. Discovery names accepted, transformed, and rejected goals
+and rows. Candidate records are not executable.
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.2)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8)
 
 ## Purpose
 
-Pin official-documentation admission records for the two Phase 8 consumer
-profiles. A pin records the reviewed docs URL, review date, license, extra
-name, version range, admitted and transformed row schemas, accepted and
-rejected goals, refused dataset types, partition mapping, row mappings,
-loss notes, and deprecation policy. Both records are `implemented`.
+Pin official-documentation admission records for implemented export
+consumer profiles. A pin records the reviewed docs URL, review date,
+license, extra name, version range, admitted and transformed row schemas,
+accepted and rejected goals, refused dataset types, partition mapping,
+row mappings, loss notes, and deprecation policy. Implemented records are
+`implemented`.
 
-Generic export selectors remain `consumer_id` null. Selecting `trl` or
-`mlx-lm` emits the matching adapter. Candidates remain Phase 10.
+Generic export selectors remain `consumer_id` null. Selecting an
+implemented `consumer_id` emits the matching adapter. `unsloth` remains
+the Phase 10 candidate and is not executable.
 
 ## Closed vocabularies
 
 | Vocabulary | v1 values |
 | --- | --- |
-| Profiles | `trl`, `mlx-lm` in that order |
-| Candidate pins | `axolotl`, `llama-factory`, `unsloth`, `aptus` in that order |
-| State | `implemented` for the two Phase 8 records; `admitted`, `experimental`, or `deferred` for candidate records |
-| Mapping kind | `identity`, `assemble-prompt` |
-| Admitted row schemas | `instruction_output`, `messages`, `prompt_completion`, `text` |
+| Profiles | `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus` in that order |
+| Candidate pins | `unsloth` |
+| State | `implemented` for the five export records; `experimental` for the Unsloth candidate |
+| Mapping kind | `identity`, `assemble-prompt`, `remap` |
+| Admitted row schemas | `instruction_output`, `messages`, `prompt_completion`, `text`; Aptus omits `text` |
 | Round-trip | `false` |
 
-`instruction_output` maps by assembling `prompt` from `instruction` plus a
-newline and `input` when `input` is nonempty; `completion` is `output`. The
-other three schemas map by identity onto the destination keys named in the
-pin.
+TRL and MLX-LM assemble `instruction_output` into `prompt`/`completion`.
+Axolotl remaps `prompt_completion` onto alpaca keys. LLaMA-Factory remaps
+`messages` onto sharegpt `conversations` and `prompt_completion` onto
+alpaca. Aptus maps admitted schemas by identity and refuses `text`.
 
 ## Isolation
 
@@ -48,8 +51,7 @@ pytest must not import those trainers.
 
 ## Non-goals
 
-Emitting Axolotl, LLaMA-Factory, or Unsloth files from item 10.2. Moving
-Aptus onto `ExportService` (item 10.6). A hosted OpenAI profile.
+Emitting Unsloth files. A hosted OpenAI profile. Training launch.
 
 ## Discovery
 
@@ -57,15 +59,12 @@ Python `PipelineService.discover_profile_admissions()`, CLI
 `veriformis profile-admissions`, and MCP `profile_admissions` emit the same
 canonical JSON as `src/veriformis/profiles/admission-v1.json`. Each record
 names `accepted_goals`, `transformed_row_schemas`, `rejected_goals`, and
-`refused_dataset_types`. Both records remain `implemented`.
+`refused_dataset_types`. All five records remain `implemented`.
 
 Python `PipelineService.discover_candidate_profile_admissions()`, CLI
 `veriformis candidate-profile-admissions`, and MCP
 `candidate_profile_admissions` emit the same canonical JSON as
 `src/veriformis/profiles/candidate-admission-v1.json`
-(`veriformis.candidate-profile-admission-discovery/v1`). `axolotl` and
-`llama-factory` are `admitted` and `emit_eligible` for later items
-10.3–10.5 after operator approval. `unsloth` is `experimental` and not
-executable. `aptus` is `deferred` to item 10.6 and is not a
-`consumer_id`. Selecting a candidate `consumer_id` still refuses as
-Phase 10.
+(`veriformis.candidate-profile-admission-discovery/v1`). `unsloth` is
+`experimental` and not executable. Item 10.5 skipped it with this pin.
+Selecting `unsloth` still refuses as Phase 10.

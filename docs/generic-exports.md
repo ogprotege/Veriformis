@@ -12,7 +12,7 @@ train/evaluation split.
 **Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet; candidates remain non-executable)
 
 Imported dataset-row bundles use the same generic containers. Mapping
-does not add a trainer profile. Named TRL and MLX-LM adapters are
+does not add a trainer profile. Named TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters are
 optional split-JSONL profiles; generic selectors stay `consumer_id`
 null. Columnar v1 does not claim portable exact bytes. There is no Hub
 upload.

@@ -4,14 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–9 complete, Phase 10 in progress).
+Phases 0–10 complete).
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.2 pins)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
 
-**Next review:** Item 10.2 pull-request merge, operator approval for
-item 10.3, beta label cut, public-ready checklist, or any contract
-change. Do not start item 10.3 until the operator approves. Do not
-start Phase 11 or 13 from this packet.
+**Next review:** Phase 10 closeout pull-request merge, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 11
+or 13 from this packet.
 
 ## Start here
 
@@ -67,7 +66,7 @@ start Phase 11 or 13 from this packet.
 | [Goal Catalog v1](contracts/goal-catalog-v1.md) | Plain-language goals bound to existing objectives and row schemas | Implemented contract |
 | [Recipe Preset v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and per-goal presets | Implemented contract |
 | [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
-| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL and MLX-LM pins plus Phase 10 candidate pins | Packaged pins; extras remain empty; candidates are not executable |
+| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
 | [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints | Implemented; extra `columnar` remains empty |
@@ -75,6 +74,9 @@ start Phase 11 or 13 from this packet.
 | [Hugging Face Dataset Export v1](contracts/hugging-face-dataset-export-v1.md) | Local Hugging Face DatasetDict container with semantic fingerprints | Implemented; extra `columnar` remains empty; no Hub upload |
 | [TRL SFT Export v1](contracts/trl-export-v1.md) | Optional TRL SFT adapter over split JSONL | Implemented optional adapter |
 | [MLX-LM LoRA Export v1](contracts/mlx-lm-export-v1.md) | Optional mlx-lm LoRA adapter with train.jsonl and optional valid.jsonl | Implemented optional adapter |
+| [Axolotl SFT Export v1](contracts/axolotl-export-v1.md) | Optional Axolotl JSONL plus dataset-only YAML sidecar | Implemented optional adapter; extra stays empty |
+| [LLaMA-Factory SFT Export v1](contracts/llama-factory-export-v1.md) | Optional LLaMA-Factory alpaca/sharegpt plus dataset_info.json | Implemented optional adapter; extra stays empty |
+| [Aptus Export v1](contracts/aptus-export-v1.md) | Optional identity JSONL for Aptus-admitted schemas | Implemented optional adapter; sibling handoff remains |
 | [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, verification evidence, optional export-pack transport, and bounded exact dry-run previews | Phase 4 foundation plus Phase 5.1–5.3 generic containers, merged Phase 5.4 transport and Phase 5.5 semantic evidence, with Phase 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`; no trainer profile |
 | [Split JSONL Export v1](contracts/split-jsonl-export-v1.md) | Canonical split payload JSONL, safe configuration, aligned provenance, data card, and receipt | Implemented Phase 5.1 generic container |
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
