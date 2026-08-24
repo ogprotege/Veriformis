@@ -307,6 +307,16 @@ def create_mcp_server(
         ) + "\n"
 
     @server.tool()
+    def candidate_profile_admissions() -> str:
+        """Return Phase 10 candidate admission pins. None are executable."""
+        return json.dumps(
+            pipeline.discover_candidate_profile_admissions(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @server.tool()
     def columnar_schemas() -> str:
         """Return packaged Arrow and Hugging Face feature schema pins."""
         return json.dumps(

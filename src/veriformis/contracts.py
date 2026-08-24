@@ -43,6 +43,9 @@ MAPPING_DISCOVERY_SCHEMA_ID: Final = "veriformis.mapping-contract-discovery/v1"
 PROFILE_ADMISSION_CONTRACT_ID: Final = "veriformis.consumer-profile-admission"
 PROFILE_ADMISSION_CONTRACT_VERSION: Final = 1
 PROFILE_ADMISSION_SCHEMA_ID: Final = "veriformis.profile-admission-discovery/v1"
+CANDIDATE_PROFILE_ADMISSION_SCHEMA_ID: Final = (
+    "veriformis.candidate-profile-admission-discovery/v1"
+)
 
 COLUMNAR_SCHEMA_CONTRACT_ID: Final = "veriformis.columnar-schema-pin"
 COLUMNAR_SCHEMA_CONTRACT_VERSION: Final = 1
@@ -384,6 +387,7 @@ __all__ = [
     "PROFILE_ADMISSION_CONTRACT_ID",
     "PROFILE_ADMISSION_CONTRACT_VERSION",
     "PROFILE_ADMISSION_SCHEMA_ID",
+    "CANDIDATE_PROFILE_ADMISSION_SCHEMA_ID",
     "COLUMNAR_SCHEMA_CONTRACT_ID",
     "COLUMNAR_SCHEMA_CONTRACT_VERSION",
     "COLUMNAR_SCHEMA_SCHEMA_ID",

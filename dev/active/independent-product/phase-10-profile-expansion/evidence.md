@@ -1,6 +1,6 @@
 # Phase 10 Evidence
 
-**Status:** Open — item 10.1 packet
+**Status:** Open — item 10.2 pins
 
 **Opened:** 2026-08-24
 

@@ -1062,6 +1062,12 @@ class PipelineService:
 
         return discover_profile_admissions()
 
+    def discover_candidate_profile_admissions(self) -> dict[str, Any]:
+        """Return Phase 10 candidate admission pins. None are executable."""
+        from veriformis.profiles import discover_candidate_profile_admissions
+
+        return discover_candidate_profile_admissions()
+
     def discover_columnar_schemas(self) -> dict[str, Any]:
         """Return packaged Arrow and Hugging Face feature schema pins."""
         from veriformis.exports.columnar_schemas import discover_columnar_schemas

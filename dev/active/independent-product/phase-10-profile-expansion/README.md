@@ -44,5 +44,6 @@ sibling handoff until item 10.6.
 
 ## Current state
 
-Item 10.1 is opening the packet. Do not emit Axolotl, LLaMA-Factory, Unsloth,
-or Aptus-as-profile files. Do not start Phase 11 or 13 from this packet.
+Item 10.2 pins section-5 records. Do not emit Axolotl, LLaMA-Factory,
+Unsloth, or Aptus-as-profile files. Operator approval is required before
+item 10.3. Do not start Phase 11 or 13 from this packet.

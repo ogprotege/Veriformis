@@ -10,16 +10,16 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `columnar-schemas`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-36 commands; `export` contains four subcommands.
+37 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.2 candidate pins)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -45,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL and MLX-LM adapters |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `columnar-schemas` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
@@ -807,6 +807,23 @@ range, admitted and transformed row schemas, accepted and rejected goals,
 refused dataset types, partition mapping, and row mappings. Both records
 are `implemented`. The command does not launch training and does not import
 TRL or MLX-LM. See
+[Consumer Profile Admission v1](contracts/profile-admission-v1.md).
+
+### `candidate-profile-admissions`
+
+Print Phase 10 candidate admission pins as read-only JSON.
+
+```text
+veriformis candidate-profile-admissions
+```
+
+The output is the exact packaged
+`veriformis.candidate-profile-admission-discovery/v1` data that
+`PipelineService` and MCP `candidate_profile_admissions` also emit.
+`axolotl` and `llama-factory` are admitted for a later emit after
+operator approval. `unsloth` is experimental and not executable. `aptus`
+is deferred to item 10.6. The command does not emit files, does not
+change export discovery, and does not import those trainers. See
 [Consumer Profile Admission v1](contracts/profile-admission-v1.md).
 
 ### `columnar-schemas`

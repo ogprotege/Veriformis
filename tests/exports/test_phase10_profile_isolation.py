@@ -117,6 +117,19 @@ def test_candidate_refusal_is_visible_on_the_cli(consumer_id: str) -> None:
     assert consumer_id in result.output
 
 
+def test_candidate_pins_do_not_make_export_executable() -> None:
+    from veriformis.profiles import candidate_profile_admission_catalog
+
+    catalog = candidate_profile_admission_catalog()
+    emit_eligible = {
+        record.profile_id for record in catalog.records if record.emit_eligible
+    }
+    assert emit_eligible == {"axolotl", "llama-factory"}
+    for consumer_id in CANDIDATE_CONSUMER_PROFILES:
+        with pytest.raises(ExportContractError, match="Phase 10 candidate"):
+            ExportService().dry_run_export(_candidate_request(consumer_id))
+
+
 def test_phase_10_extras_are_declared_empty() -> None:
     text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert "axolotl = []" in text

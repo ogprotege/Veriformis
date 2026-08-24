@@ -2,17 +2,18 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `abdcce6` on `main` after PR #96
+**Implementation baseline reviewed:** `8df562f` on `main` after PR #97
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–9 complete)
+Phases 0–2; independent-product Phases 0–9 complete; Phase 10.1 opened)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-24 (Phase 9 closeout; operator Pascendi compile)
+**Last reviewed:** 2026-08-24 (Phase 10.2 candidate admission pins)
 
-**Next review:** Item 10.1 pull-request merge, item 10.2, beta label
-cut, or any listed-item status change. Do not start item 10.3 until
-the operator approves. Do not start Phase 11 or 13 from this packet.
+**Next review:** Item 10.2 pull-request merge, operator approval for
+item 10.3, beta label cut, or any listed-item status change. Do not
+start item 10.3 until the operator approves. Do not start Phase 11 or
+13 from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -101,7 +102,8 @@ local, offline, and free of LLM generation.
       Items 9.1–9.8 merged as PR #89–#96. Extra `columnar` stays empty.
 - [ ] Independent product Phase 10 is in progress under its
       [packet](dev/active/independent-product/phase-10-profile-expansion/README.md).
-      Item 10.1 opens the packet. Candidates remain non-executable.
+      Item 10.1 opened the packet as PR #97. Item 10.2 pins admission
+      records. Candidates remain non-executable.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

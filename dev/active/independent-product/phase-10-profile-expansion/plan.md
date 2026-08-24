@@ -91,9 +91,9 @@ optional trainer integrations.
 **Branch:** `phase10/02-admission-pins`
 **Title:** `Phase 10.2: Pin admission records for every candidate`
 
-- [ ] Section-5 gate records for Axolotl, LLaMA-Factory, Unsloth, and Aptus-as-profile: official docs, review dates, pinned version ranges, loss/refusal model, license/deprecation.
-- [ ] If a candidate has no stable machine-checkable contract, the pin says experimental / not executable.
-- [ ] Declare extras remain empty. Do not emit trainer files.
+- [x] Section-5 gate records for Axolotl, LLaMA-Factory, Unsloth, and Aptus-as-profile: official docs, review dates, pinned version ranges, loss/refusal model, license/deprecation.
+- [x] If a candidate has no stable machine-checkable contract, the pin says experimental / not executable.
+- [x] Declare extras remain empty. Do not emit trainer files.
 
 ### 10.3 Emit the first admitted profile
 

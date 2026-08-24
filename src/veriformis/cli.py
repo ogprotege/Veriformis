@@ -806,6 +806,19 @@ def profile_admissions() -> None:
     )
 
 
+@app.command(name="candidate-profile-admissions")
+def candidate_profile_admissions() -> None:
+    """Print Phase 10 candidate admission pins as deterministic JSON."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_candidate_profile_admissions(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="columnar-schemas")
 def columnar_schemas() -> None:
     """Print packaged Arrow and Hugging Face feature schema pins as JSON."""

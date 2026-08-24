@@ -30,10 +30,10 @@ public Mac claim still owner-gated
 
 **Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet)
 
-**Next review:** Item 10.1 pull-request merge, item 10.2, beta label cut,
-public-ready checklist, or any product-contract change. Do not start
-item 10.3 until the operator approves. Do not start Phase 11 or 13 from
-this packet.
+**Next review:** Item 10.2 pull-request merge, operator approval for
+item 10.3, beta label cut, public-ready checklist, or any
+product-contract change. Do not start item 10.3 until the operator
+approves. Do not start Phase 11 or 13 from this packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
