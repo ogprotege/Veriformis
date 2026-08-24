@@ -122,7 +122,7 @@
       "packet": "dev/active/independent-product/phase-10-profile-expansion",
       "started_on": "2026-08-24",
       "completed_on": null,
-      "next_gate": "Item 10.1 opens the packet and publishes ADR-0014. Candidates remain non-executable. Extra lists stay empty. Item 10.2 is admission pins."
+      "next_gate": "Item 10.2 pins section-5 records. Axolotl and LLaMA-Factory are admitted for a later emit after operator approval. Unsloth is experimental. Aptus is deferred to 10.6. Extras stay empty. Do not start 10.3 until the operator approves."
     },
     {
       "number": 11,

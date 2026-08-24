@@ -130,6 +130,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis goals` | Print the versioned goal catalog |
 | `veriformis presets` | Print versioned recipe presets |
 | `veriformis profile-admissions` | Print implemented TRL and MLX-LM admission pins |
+| `veriformis candidate-profile-admissions` | Print Phase 10 candidate admission pins; none are executable |
 | `veriformis columnar-schemas` | Print packaged Arrow and Hugging Face feature schema pins |
 | `veriformis preflight PATH... --goal ID` | Raw-source compile admission without a workspace |
 | `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |

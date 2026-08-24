@@ -2,10 +2,11 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.2 pins)
 
-**Next review:** Independent-product Phase 10.1 pull-request merge, item
-10.2, beta label cut, or governance-schema change
+**Next review:** Independent-product Phase 10.2 pull-request merge,
+operator approval for item 10.3, beta label cut, or governance-schema
+change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

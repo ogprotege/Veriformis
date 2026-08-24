@@ -52,11 +52,11 @@ measures JSONL versus columnar tree sizes, promotes `parquet`, `arrow`,
 and `hugging-face-dataset` to implemented, and closes the phase. Extra
 `columnar` stays empty. Phase 10 (expand consumer profiles under
 evidence gates) is in progress under its standard packet. Item 10.1
-opens the packet and publishes ADR-0014. `axolotl`, `llama-factory`,
-and `unsloth` remain candidates. Empty extras of those names keep the
-lock free of trainer wheels. Do not emit those profiles. Do not start
-item 10.3 until the operator approves. Do not start Phase 11 or 13 from
-this packet.
+opened the packet and published ADR-0014 as PR #97. Item 10.2 pins
+section-5 records: Axolotl and LLaMA-Factory are admitted for a later
+emit; Unsloth is experimental; Aptus is deferred to 10.6. Empty extras
+stay empty. Do not emit those profiles. Do not start item 10.3 until
+the operator approves. Do not start Phase 11 or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

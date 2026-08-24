@@ -28,3 +28,29 @@ core pytest 2053 passed, 15 deselected, 1 expected durability warning;
 
 **Next action:** Open the item 10.1 pull request. Require every GitHub
 check, merge, and synchronize clean main before item 10.2.
+
+## 2026-08-24 — Item 10.1 merged; item 10.2 in progress
+
+**Status:** Item 10.1 merged as PR #97 at
+`8df562fb9e0fd673cf39a53aaee6d82daecaf98c` after GitHub checks passed.
+Clean local `main` equals `origin/main`.
+
+Item 10.2 packages section-5 pins. Axolotl and LLaMA-Factory are
+admitted for a later emit. Unsloth is experimental. Aptus is deferred
+to 10.6. Extras stay empty. No trainer files.
+
+**Next action:** Publish the item 10.2 pull request. Require green
+GitHub checks, merge, and synchronize clean main. Then stop for
+operator approval before item 10.3.
+
+## 2026-08-24 — Item 10.2 local gates green
+
+**Status:** Candidate admission catalog, CLI/MCP discovery, and tests
+are on `phase10/02-admission-pins`.
+
+Local gates: `uv lock --check`; `ruff check src tests`; tracking PASS;
+focused admission/isolation tests passed; core pytest 2061 passed, 15
+deselected, 1 expected durability warning; `git diff --check` clean.
+
+**Next action:** Open the item 10.2 pull request. After merge, stop for
+operator approval before item 10.3.

@@ -5,21 +5,18 @@ append-only history.
 
 **Updated:** 2026-08-24
 
-**Local branch:** `phase10/01-profile-expansion-packet` from `main`
+**Local branch:** `phase10/02-admission-pins` from `main` at
+`8df562fb9e0fd673cf39a53aaee6d82daecaf98c` (PR #97).
 
-**Predecessor:** Phase 9 closed as PR #96 at
-`abdcce6474aadd33fcf38a5360b63a4f8d293a5c`. Local `main` equals
-`origin/main` there.
+**Predecessor:** Item 10.1 merged as PR #97.
 
-**Completed:** none in this packet
+**Completed:** 10.1
 
-**Current item:** 10.1 Open the profile-expansion packet
+**Current item:** 10.2 Pin admission records for every candidate
 
-**Not started:** 10.2–10.8. Operator approval is required before 10.3.
+**Not started:** 10.3–10.8. Operator approval is required before 10.3.
 Do not start Phase 11 or 13.
 
-**10.1 design:** Packet + ADR-0014. Candidates refuse as Phase 10. Empty
-extras `axolotl`, `llama-factory`, and `unsloth`. No emission.
-
-**10.1 local gates:** lock, ruff, tracking, focused isolation (22), core
-pytest 2053 passed / 15 deselected. Ready to open the pull request.
+**10.2 design:** Section-5 pins. Axolotl and LLaMA-Factory admitted for
+later emit. Unsloth experimental. Aptus deferred to 10.6. Extras stay
+empty. No emission.
