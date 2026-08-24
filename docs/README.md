@@ -54,7 +54,7 @@ or 13 from this packet.
 
 | Document | Purpose | Authority |
 | --- | --- | --- |
-| [README](../README.md) | Product introduction, setup, quickstart | Current `0.1.0` entry point |
+| [README](../README.md) | Product introduction, setup, and first compile | Current `0.1.0` entry point |
 | [Current implementation status](current-status.md) | Exact capabilities, limitations, evidence, phase boundary | **Current source of truth** for capability claims |
 | [Product contract](product-contract.md) | End-to-end ownership, integrity guarantees, non-claims | Product authority |
 | [Integrity Contract v1](contracts/integrity-v1.md) | Workspace, identity, evidence, cleaning | Implemented contract |
