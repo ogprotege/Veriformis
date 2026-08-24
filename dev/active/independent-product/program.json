@@ -117,12 +117,12 @@
     {
       "number": 10,
       "title": "Expand consumer profiles under evidence gates",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [8, 9],
       "packet": "dev/active/independent-product/phase-10-profile-expansion",
       "started_on": "2026-08-24",
-      "completed_on": null,
-      "next_gate": "Item 10.2 pins section-5 records. Axolotl and LLaMA-Factory are admitted for a later emit after operator approval. Unsloth is experimental. Aptus is deferred to 10.6. Extras stay empty. Do not start 10.3 until the operator approves."
+      "completed_on": "2026-08-24",
+      "next_gate": "Completed; closeout on branch phase10/03-08-emit-harness-closeout. Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters. Unsloth remains experimental. Extras stay empty. Do not start Phase 11 or 13 from this packet."
     },
     {
       "number": 11,

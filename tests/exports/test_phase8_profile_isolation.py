@@ -57,7 +57,13 @@ def _planned_request(consumer_id: str) -> ExportDryRunRequest:
 def test_planned_profile_item_map_is_empty_after_promotion() -> None:
     assert PLANNED_CONSUMER_PROFILES == ()
     assert dict(PLANNED_CONSUMER_PROFILE_ITEMS) == {}
-    assert IMPLEMENTED_EXPORT_CONSUMER_PROFILES == ("trl", "mlx-lm")
+    assert IMPLEMENTED_EXPORT_CONSUMER_PROFILES == (
+        "trl",
+        "mlx-lm",
+        "axolotl",
+        "llama-factory",
+        "aptus",
+    )
     assert UNEXECUTABLE_CONSUMER_PROFILE_ITEMS == {}
 
 
@@ -67,6 +73,9 @@ def test_taxonomy_lists_trl_and_mlx_lm_as_implemented() -> None:
     }
     assert entries[("consumer_profile", "trl")] == "implemented"
     assert entries[("consumer_profile", "mlx-lm")] == "implemented"
+    assert entries[("consumer_profile", "axolotl")] == "implemented"
+    assert entries[("consumer_profile", "llama-factory")] == "implemented"
+    assert entries[("consumer_profile", "aptus")] == "implemented"
     for identifier in CANDIDATE_CONSUMER_PROFILES:
         assert entries[("consumer_profile", identifier)] == "candidate"
 
@@ -86,23 +95,23 @@ def test_generic_export_discovery_keeps_a_null_consumer_profile() -> None:
         profile.consumer_profile.consumer_id
         for profile in named
         if profile.consumer_profile is not None
-    } == {"mlx-lm", "trl"}
+    } == {"aptus", "axolotl", "llama-factory", "mlx-lm", "trl"}
 
 
 def test_emitted_profiles_are_not_refused_as_planned() -> None:
     selectors = {
         profile.selector[2] for profile in ExportService().discover_exports().profiles
     }
-    assert {"mlx-lm", "trl"} <= selectors
+    assert {"aptus", "axolotl", "llama-factory", "mlx-lm", "trl"} <= selectors
 
 
 def test_candidate_consumer_id_refuses_as_phase_10() -> None:
     with pytest.raises(ExportContractError, match="Phase 10 candidate"):
-        ExportService().dry_run_export(_planned_request("axolotl"))
+        ExportService().dry_run_export(_planned_request("unsloth"))
 
 
 def test_candidate_consumer_id_refusal_is_visible_on_the_cli() -> None:
-    payload = _planned_request("axolotl").canonical_bytes().decode("utf-8")
+    payload = _planned_request("unsloth").canonical_bytes().decode("utf-8")
     result = RUNNER.invoke(app, ["export", "dry-run", "--request-json", payload])
     assert result.exit_code != 0
     assert "Phase 10 candidate" in result.output

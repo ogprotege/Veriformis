@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet: axolotl, llama-factory, and unsloth remain candidate consumer profiles)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8: axolotl, llama-factory, and aptus are implemented export profiles; unsloth remains candidate)
 
 **Next review:** Any taxonomy, input-family, loss-policy, or
 compatibility-matrix change
@@ -155,9 +155,10 @@ change record membership.
 | `aptus-handoff-v1` | implemented | Optional sibling descriptor; default surfaces do not write it |
 | `trl` | implemented | Optional SFT export adapter over split JSONL |
 | `mlx-lm` | implemented | Optional LoRA export adapter over split JSONL |
-| `axolotl` | candidate | Phase 10 |
-| `llama-factory` | candidate | Phase 10 |
-| `unsloth` | candidate | Phase 10 |
+| `axolotl` | implemented | Optional Axolotl SFT adapter over split JSONL |
+| `llama-factory` | implemented | Optional LLaMA-Factory SFT adapter over split JSONL |
+| `aptus` | implemented | Optional identity export adapter over split JSONL; sibling handoff remains |
+| `unsloth` | candidate | Phase 10; experimental, not executable |
 
 The persisted validation gate ID `aptus-row-shape` remains a generic row-shape
 check. It is not a consumer profile and imports no Aptus code.

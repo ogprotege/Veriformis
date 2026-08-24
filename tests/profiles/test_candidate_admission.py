@@ -81,45 +81,28 @@ def test_packaged_candidate_catalog_is_canonical_and_shared() -> None:
     assert first == second and first is not second
 
 
-def test_candidate_catalog_closes_over_phase_10_pins() -> None:
+def test_candidate_catalog_closes_over_unsloth_skip() -> None:
     catalog = candidate_profile_admission_catalog()
     assert isinstance(catalog, CandidateProfileAdmissionCatalog)
-    assert tuple(record.profile_id for record in catalog.records) == (
-        "axolotl",
-        "llama-factory",
-        "unsloth",
-        "aptus",
-    )
-    assert CANDIDATE_CONSUMER_PROFILES == ("axolotl", "llama-factory", "unsloth")
-    by_id = {record.profile_id: record for record in catalog.records}
-    axolotl = by_id["axolotl"]
-    llama = by_id["llama-factory"]
-    unsloth = by_id["unsloth"]
-    aptus = by_id["aptus"]
-    assert axolotl.state == "admitted" and axolotl.emit_eligible is True
-    assert llama.state == "admitted" and llama.emit_eligible is True
+    assert tuple(record.profile_id for record in catalog.records) == ("unsloth",)
+    assert CANDIDATE_CONSUMER_PROFILES == ("unsloth",)
+    unsloth = catalog.records[0]
     assert unsloth.state == "experimental" and unsloth.emit_eligible is False
-    assert aptus.state == "deferred" and aptus.emit_eligible is False
-    assert axolotl.later_item == "10.3-10.5"
-    assert llama.later_item == "10.3-10.5"
     assert unsloth.later_item == "none"
-    assert aptus.later_item == "10.6"
-    assert axolotl.package == "axolotl"
-    assert axolotl.version_range == ">=0.18.0,<1.0.0"
-    assert llama.package == "llamafactory"
-    assert llama.version_range == ">=0.9.5,<1.0.0"
     assert unsloth.package == "unsloth"
     assert unsloth.machine_checkable_contract is False
-    assert aptus.extra == ""
-    assert aptus.package == "aptus-handoff"
+    assert "skipped Unsloth" in unsloth.admission_verdict
     assert all(record.round_trip is False for record in catalog.records)
 
 
-def test_implemented_profile_admissions_stay_trl_and_mlx_lm() -> None:
+def test_implemented_profile_admissions_include_phase_10_emits() -> None:
     implemented = discover_profile_admissions()
     assert [record["profile_id"] for record in implemented["records"]] == [
         "trl",
         "mlx-lm",
+        "axolotl",
+        "llama-factory",
+        "aptus",
     ]
     assert all(record["state"] == "implemented" for record in implemented["records"])
 
@@ -131,7 +114,7 @@ def test_candidate_models_refuse_executable_claims_and_unknown_ids() -> None:
     with pytest.raises(ExportContractError, match="not a Phase 10 pin"):
         CandidateProfileAdmission.model_validate(first)
     first = dict(payload["records"][0])
-    first["emit_eligible"] = False
+    first["emit_eligible"] = True
     with pytest.raises(ExportContractError, match="emit_eligible"):
         CandidateProfileAdmission.model_validate(first)
     first = dict(payload["records"][0])

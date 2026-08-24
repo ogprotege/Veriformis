@@ -51,12 +51,12 @@ containers through PyArrow and Hugging Face Datasets in optional CI,
 measures JSONL versus columnar tree sizes, promotes `parquet`, `arrow`,
 and `hugging-face-dataset` to implemented, and closes the phase. Extra
 `columnar` stays empty. Phase 10 (expand consumer profiles under
-evidence gates) is in progress under its standard packet. Item 10.1
-opened the packet and published ADR-0014 as PR #97. Item 10.2 pins
-section-5 records: Axolotl and LLaMA-Factory are admitted for a later
-emit; Unsloth is experimental; Aptus is deferred to 10.6. Empty extras
-stay empty. Do not emit those profiles. Do not start item 10.3 until
-the operator approves. Do not start Phase 11 or 13 from this packet.
+evidence gates) is complete under its standard packet. Items 10.1–10.2
+opened the packet and pinned admissions as PR #97 and PR #98. Items
+10.3–10.8 emit Axolotl and LLaMA-Factory, skip Unsloth, move Aptus onto
+`ExportService`, add official-schema harnesses, and close the phase.
+Empty extras stay empty. The exporter does not train. Do not start
+Phase 11 or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -130,8 +130,11 @@ Read these current authorities before changing code:
     `docs/contracts/columnar-schema-v1.md`,
     `docs/contracts/columnar-fingerprint-v1.md`,
     `docs/contracts/parquet-export-v1.md`,
-    `docs/contracts/trl-export-v1.md`, and
-    `docs/contracts/mlx-lm-export-v1.md`
+    `docs/contracts/trl-export-v1.md`,
+    `docs/contracts/mlx-lm-export-v1.md`,
+    `docs/contracts/axolotl-export-v1.md`,
+    `docs/contracts/llama-factory-export-v1.md`, and
+    `docs/contracts/aptus-export-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -211,7 +214,7 @@ Key modules under `src/veriformis/` are:
   preview, and compile preflight, whose strict models resolve plain-language
   goals and presets to existing objectives, row schemas, and executable recipe
   settings, and probe raw sources without workspace mutation;
-- `profiles/` for implemented TRL and MLX-LM admission pins and adapters;
+- `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

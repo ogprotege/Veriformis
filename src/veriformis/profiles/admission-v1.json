@@ -171,6 +171,257 @@
       ],
       "version_range": ">=0.22.0,<1.0.0",
       "workflow": "Export a verified Veriformis bundle as an mlx-lm LoRA data directory with required train.jsonl and optional valid.jsonl. mlx-lm test.jsonl is the --test file and is not mapped from Veriformis evaluation."
+    },
+    {
+      "accepted_goals": [
+        "before_after_transformation",
+        "continuation",
+        "full_text",
+        "section_reconstruction",
+        "structured_field"
+      ],
+      "admitted_row_schemas": [
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+        "text"
+      ],
+      "deprecation_policy": "A new admission-record version is required when Axolotl named dataset types, default chat_template keys, or required YAML fields for those SFT types change.",
+      "docs_reviewed_on": "2026-08-24",
+      "executable_item": "10.3",
+      "extra": "axolotl",
+      "license": "Apache-2.0",
+      "loader": "axolotl YAML datasets path to local JSONL; conformance in item 10.7. Extra axolotl stays empty.",
+      "loss_notes": "Default chat_template trains assistant turns. Completion/pretrain trains the full text sequence. The profile must not change Veriformis loss-policy IDs. Masking is YAML, not a row rewrite.",
+      "package": "axolotl",
+      "partition_mapping": {
+        "evaluation": "optional second datasets entry or split named in YAML; omitted when evaluation is empty",
+        "train": "datasets JSONL path in the sidecar YAML"
+      },
+      "primary_docs_url": "https://docs.axolotl.ai/docs/dataset-formats/",
+      "profile_id": "axolotl",
+      "refused_dataset_types": [
+        "pre-tokenized",
+        "preference",
+        "stepwise-supervision",
+        "template-free-segments",
+        "tools",
+        "unpaired-preference",
+        "vision"
+      ],
+      "rejected_goals": [],
+      "round_trip": false,
+      "row_mappings": [
+        {
+          "destination_format": "alpaca",
+          "destination_keys": [
+            "input",
+            "instruction",
+            "output"
+          ],
+          "mapping_kind": "identity",
+          "notes": "Axolotl type: alpaca. Veriformis instruction, input, and output keep those keys.",
+          "source_row_schema": "instruction_output"
+        },
+        {
+          "destination_format": "chat_template-openai",
+          "destination_keys": [
+            "messages"
+          ],
+          "mapping_kind": "identity",
+          "notes": "Axolotl type: chat_template with default OpenAI keys. Veriformis messages remain two turns, user then assistant. System roles and tools are refused.",
+          "source_row_schema": "messages"
+        },
+        {
+          "destination_format": "alpaca",
+          "destination_keys": [
+            "input",
+            "instruction",
+            "output"
+          ],
+          "mapping_kind": "remap",
+          "notes": "Remap prompt to instruction, completion to output, and empty input. Not a named Axolotl prompt-completion type.",
+          "source_row_schema": "prompt_completion"
+        },
+        {
+          "destination_format": "completion",
+          "destination_keys": [
+            "text"
+          ],
+          "mapping_kind": "identity",
+          "notes": "Axolotl type: completion under datasets, or pretrain {text}. Full-sequence loss.",
+          "source_row_schema": "text"
+        }
+      ],
+      "state": "implemented",
+      "transformed_row_schemas": [
+        "prompt_completion"
+      ],
+      "version_range": ">=0.18.0,<1.0.0",
+      "workflow": "Export a verified Veriformis bundle as local JSONL plus a dataset-only YAML sidecar. The exporter does not train. Chat template choice is documented, not applied as a membership change."
+    },
+    {
+      "accepted_goals": [
+        "before_after_transformation",
+        "continuation",
+        "full_text",
+        "section_reconstruction",
+        "structured_field"
+      ],
+      "admitted_row_schemas": [
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+        "text"
+      ],
+      "deprecation_policy": "A new admission-record version is required when LLaMA-Factory alpaca/sharegpt column names, dataset_info.json fields, or ranking/tools/multimodal requirements change.",
+      "docs_reviewed_on": "2026-08-24",
+      "executable_item": "10.4",
+      "extra": "llama-factory",
+      "license": "Apache-2.0",
+      "loader": "llamafactory dataset_info.json plus local files; conformance in item 10.7. Extra llama-factory stays empty.",
+      "loss_notes": "Alpaca SFT concatenates instruction and input as the user prompt and trains on output. ShareGPT trains gpt/assistant turns. The profile must not change Veriformis loss-policy IDs.",
+      "package": "llamafactory",
+      "partition_mapping": {
+        "evaluation": "dataset_info.json split override or a second dataset name; omitted when evaluation is empty",
+        "train": "dataset_info.json file_name with split train"
+      },
+      "primary_docs_url": "https://github.com/hiyouga/LlamaFactory/blob/main/data/README.md",
+      "profile_id": "llama-factory",
+      "refused_dataset_types": [
+        "history",
+        "kto",
+        "preference",
+        "ranking",
+        "tools",
+        "unpaired-preference",
+        "vision"
+      ],
+      "rejected_goals": [],
+      "round_trip": false,
+      "row_mappings": [
+        {
+          "destination_format": "alpaca",
+          "destination_keys": [
+            "input",
+            "instruction",
+            "output"
+          ],
+          "mapping_kind": "identity",
+          "notes": "LLaMA-Factory alpaca SFT. instruction, input, and output keep those keys. system and history columns are not emitted.",
+          "source_row_schema": "instruction_output"
+        },
+        {
+          "destination_format": "sharegpt",
+          "destination_keys": [
+            "conversations"
+          ],
+          "mapping_kind": "remap",
+          "notes": "Remap two-turn user/assistant messages to conversations with from/value tags human and gpt. tools, observation, and function_call roles are refused.",
+          "source_row_schema": "messages"
+        },
+        {
+          "destination_format": "alpaca",
+          "destination_keys": [
+            "input",
+            "instruction",
+            "output"
+          ],
+          "mapping_kind": "remap",
+          "notes": "Remap prompt to instruction, completion to output, and empty input.",
+          "source_row_schema": "prompt_completion"
+        },
+        {
+          "destination_format": "alpaca-pretrain",
+          "destination_keys": [
+            "text"
+          ],
+          "mapping_kind": "identity",
+          "notes": "LLaMA-Factory pre-training uses the text column. dataset_info.json maps columns.prompt to text.",
+          "source_row_schema": "text"
+        }
+      ],
+      "state": "implemented",
+      "transformed_row_schemas": [
+        "messages",
+        "prompt_completion"
+      ],
+      "version_range": ">=0.9.5,<1.0.0",
+      "workflow": "Export a verified Veriformis bundle as local alpaca or sharegpt files plus dataset_info.json. The exporter does not train."
+    },
+    {
+      "accepted_goals": [
+        "before_after_transformation",
+        "continuation",
+        "section_reconstruction",
+        "structured_field"
+      ],
+      "admitted_row_schemas": [
+        "instruction_output",
+        "messages",
+        "prompt_completion"
+      ],
+      "deprecation_policy": "A new admission-record version is required when aptus-handoff-v1 required checks, assignment digest, or backend_capabilities change, or when this export consumer_id mapping changes.",
+      "docs_reviewed_on": "2026-08-24",
+      "executable_item": "10.6",
+      "extra": "",
+      "license": "MIT",
+      "loader": "ExportService identity JSONL for admitted schemas. Sibling name.vfbundle.aptus-handoff.json remains optional. Extra is empty.",
+      "loss_notes": "Identity product rows keep prompt_completion completion-only, instruction_output output-only, and messages final-assistant-suffix. text is refused. The profile must not change Veriformis loss-policy IDs.",
+      "package": "aptus-handoff",
+      "partition_mapping": {
+        "evaluation": "data/evaluation.jsonl in the export tree",
+        "train": "data/train.jsonl in the export tree"
+      },
+      "primary_docs_url": "https://github.com/ogprotege/Veriformis/blob/main/docs/contracts/aptus-handoff-v1.md",
+      "profile_id": "aptus",
+      "refused_dataset_types": [
+        "preference",
+        "text",
+        "tools",
+        "unpaired-preference",
+        "vision"
+      ],
+      "rejected_goals": [
+        "full_text"
+      ],
+      "round_trip": false,
+      "row_mappings": [
+        {
+          "destination_format": "finished-dataset-instruction_output",
+          "destination_keys": [
+            "input",
+            "instruction",
+            "output"
+          ],
+          "mapping_kind": "identity",
+          "notes": "Identity product rows. No remap.",
+          "source_row_schema": "instruction_output"
+        },
+        {
+          "destination_format": "finished-dataset-messages",
+          "destination_keys": [
+            "messages"
+          ],
+          "mapping_kind": "identity",
+          "notes": "Two-turn user then assistant product rows. System roles are refused.",
+          "source_row_schema": "messages"
+        },
+        {
+          "destination_format": "finished-dataset-prompt_completion",
+          "destination_keys": [
+            "completion",
+            "prompt"
+          ],
+          "mapping_kind": "identity",
+          "notes": "Identity prompt_completion product rows.",
+          "source_row_schema": "prompt_completion"
+        }
+      ],
+      "state": "implemented",
+      "transformed_row_schemas": [],
+      "version_range": "veriformis.aptus-handoff/v1",
+      "workflow": "Export a verified Veriformis bundle as identity split-JSONL for Aptus-admitted schemas. The sibling handoff CLI remains. Default seal still does not write the descriptor. The exporter does not train."
     }
   ],
   "schema_id": "veriformis.profile-admission-discovery/v1"

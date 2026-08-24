@@ -392,6 +392,9 @@ def test_closeout_conformance_injection_never_changes_production_discovery() -> 
         ("json", 1, None, None),
         ("parquet", 1, None, None),
         ("split-jsonl-directory", 1, None, None),
+        ("split-jsonl-directory", 1, "aptus", 1),
+        ("split-jsonl-directory", 1, "axolotl", 1),
+        ("split-jsonl-directory", 1, "llama-factory", 1),
         ("split-jsonl-directory", 1, "mlx-lm", 1),
         ("split-jsonl-directory", 1, "trl", 1),
     ]

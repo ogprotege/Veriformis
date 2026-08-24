@@ -25,7 +25,7 @@ from veriformis.taxonomy import (
 )
 
 CANDIDATE_ADMISSION_DATA_NAME = "candidate-admission-v1.json"
-CANDIDATE_PROFILE_IDS: tuple[str, ...] = (*CANDIDATE_CONSUMER_PROFILES, "aptus")
+CANDIDATE_PROFILE_IDS: tuple[str, ...] = CANDIDATE_CONSUMER_PROFILES
 RowSchema = Literal["instruction_output", "messages", "prompt_completion", "text"]
 MappingKind = Literal["identity", "assemble-prompt", "remap"]
 CandidateState = Literal["admitted", "deferred", "experimental"]

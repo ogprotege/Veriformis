@@ -383,13 +383,39 @@
     },
     {
       "profile": "axolotl",
-      "state": "candidate",
-      "roadmap_phase": 10
+      "state": "implemented",
+      "product_role": "optional-export-adapter",
+      "evidence": [
+        "src/veriformis/profiles/axolotl.py",
+        "docs/contracts/axolotl-export-v1.md",
+        "tests/profiles/test_axolotl.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ]
     },
     {
       "profile": "llama-factory",
-      "state": "candidate",
-      "roadmap_phase": 10
+      "state": "implemented",
+      "product_role": "optional-export-adapter",
+      "evidence": [
+        "src/veriformis/profiles/llama_factory.py",
+        "docs/contracts/llama-factory-export-v1.md",
+        "tests/profiles/test_llama_factory.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ]
+    },
+    {
+      "profile": "aptus",
+      "state": "implemented",
+      "product_role": "optional-export-adapter",
+      "evidence": [
+        "src/veriformis/profiles/aptus.py",
+        "docs/contracts/aptus-export-v1.md",
+        "tests/profiles/test_aptus.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ]
     },
     {
       "profile": "unsloth",

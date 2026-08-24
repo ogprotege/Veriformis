@@ -1,10 +1,10 @@
 # Phase 10 — Expand Consumer Profiles under Evidence Gates
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-24
 
-**Completed:**
+**Completed:** 2026-08-24
 
 **Roadmap phase:** [Phase 10](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-10--expand-consumer-profiles-under-evidence-gates)
 
@@ -44,6 +44,7 @@ sibling handoff until item 10.6.
 
 ## Current state
 
-Item 10.2 pins section-5 records. Do not emit Axolotl, LLaMA-Factory,
-Unsloth, or Aptus-as-profile files. Operator approval is required before
-item 10.3. Do not start Phase 11 or 13 from this packet.
+Items 10.3–10.8 emit Axolotl and LLaMA-Factory, skip Unsloth, move Aptus
+onto `ExportService`, add official-schema harnesses, and close the
+phase. Extras stay empty. The exporter does not train. Do not start
+Phase 11 or 13 from this packet.

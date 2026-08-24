@@ -43,18 +43,18 @@ local Hugging Face DatasetDict v1 are implemented `semantic_content_only`
 generic exports with semantic fingerprints, library-reload harnesses, and
 dataset-row mapping for Parquet and Arrow. Suffix does not switch modes.
 Extra `columnar` stays empty. There is no Hub upload.
-Phase 10 consumer-profile expansion is in progress under item 10.2:
-Axolotl and LLaMA-Factory are admitted for a later emit after operator
-approval. Unsloth is experimental and not executable. Aptus remains the
-sibling handoff and is deferred to item 10.6. Selecting those candidate
-`consumer_id` values still refuses as Phase 10. Empty extras stay empty.
+Phase 10 consumer-profile expansion is complete: Axolotl, LLaMA-Factory,
+and Aptus are implemented optional `ExportService` adapters. Unsloth
+remains experimental and is not executable. The sibling Aptus handoff
+CLI remains; default seal still does not write the descriptor. Empty
+extras stay empty. The exporter does not train. Do not start Phase 11
+or 13 from this packet.
 
-**Review date:** 2026-08-24 (independent-product Phase 10.2 pins)
+**Review date:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
 
-**Next review:** Phase 10.2 pull-request merge, operator approval for
-item 10.3, beta label cut, public-ready checklist, or any contract
-change. Do not start item 10.3 until the operator approves. Do not start
-Phase 11 or 13 from this packet.
+**Next review:** Phase 10 closeout pull-request merge, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 11
+or 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -393,8 +393,8 @@ The installed console entry point is `veriformis`.
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
-| `profile-admissions` | Prints implemented TRL and MLX-LM admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not launch training |
-| `candidate-profile-admissions` | Prints Phase 10 candidate pins (`veriformis.candidate-profile-admission-discovery/v1`): Axolotl and LLaMA-Factory admitted for a later emit; Unsloth experimental; Aptus deferred to 10.6 | Read-only terminal output, byte-identical to MCP `candidate_profile_admissions`; does not emit files or launch training |
+| `profile-admissions` | Prints implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not launch training |
+| `candidate-profile-admissions` | Prints remaining Phase 10 candidate pins (`veriformis.candidate-profile-admission-discovery/v1`): Unsloth experimental and not executable | Read-only terminal output, byte-identical to MCP `candidate_profile_admissions`; does not emit files or launch training |
 | `columnar-schemas` | Prints packaged Arrow and Hugging Face feature pins (`veriformis.columnar-schema-discovery/v1`) | Read-only terminal output, byte-identical to MCP `columnar_schemas`; does not emit files or import PyArrow |
 | `mapping-templates` | Prints packaged mapping templates (`veriformis.mapping-template-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_templates` |
 | `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL, JSON, compatible CSV, Parquet, or Arrow file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
@@ -741,8 +741,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 8 | TRL SFT and MLX-LM LoRA optional adapters, admission pins, official-schema harnesses, dataset-only launch sidecars, discovery truthfulness; items 8.1–8.6 merged as PR #82–#87 |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
-| In progress independent Phase 10.2 | Section-5 pins: Axolotl and LLaMA-Factory admitted for later emit; Unsloth experimental; Aptus deferred to 10.6; extras stay empty; no trainer files |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–9 complete and Phase 10 in progress under its [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) |
+| Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–10 complete under the [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

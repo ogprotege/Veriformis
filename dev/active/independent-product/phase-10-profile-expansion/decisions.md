@@ -11,4 +11,8 @@
 | Aptus remains the sibling handoff until item 10.6 | Accepted | ADR-0012 |
 | Hosted OpenAI is out of this packet | Accepted | Roadmap: research separately; offline default |
 | Operator reviews after 10.2 before 10.3 begins | Accepted | Operator instruction 2026-08-24 |
+| Items 10.3–10.8 land as one pull request | Accepted | Operator instruction 2026-08-24 after 10.2 |
+| First admitted emit is Axolotl; second is LLaMA-Factory | Accepted | 10.2 pins; Unsloth experimental |
+| Unsloth is skipped with the experimental candidate pin | Accepted | Item 10.5 skip rule |
+| Aptus becomes `consumer_id=aptus`; sibling handoff remains | Accepted | Item 10.6; default seal still false |
 | The exporter does not train | Accepted | ADR-0012 |

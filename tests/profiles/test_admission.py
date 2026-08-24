@@ -14,7 +14,6 @@ from veriformis.contracts import (
     PROFILE_ADMISSION_CONTRACT_ID,
     PROFILE_ADMISSION_CONTRACT_VERSION,
     PROFILE_ADMISSION_SCHEMA_ID,
-    V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import ExportContractError
 from veriformis.mcp.server import create_mcp_server
@@ -39,17 +38,8 @@ DATA_PATH = (
     / "profiles"
     / ADMISSION_DATA_NAME
 )
-ROOT = Path(__file__).resolve().parents[2]
 RUNNER = CliRunner()
 SERVICE = PipelineService()
-TRL_REFUSED = (
-    "preference",
-    "prompt-only",
-    "stepwise-supervision",
-    "tools",
-    "unpaired-preference",
-    "vision",
-)
 
 
 def test_admission_contract_constants_are_exact() -> None:
@@ -97,24 +87,21 @@ def test_catalog_closes_over_implemented_export_profiles() -> None:
         tuple(record.profile_id for record in catalog.records)
         == IMPLEMENTED_EXPORT_CONSUMER_PROFILES
     )
-    assert IMPLEMENTED_EXPORT_CONSUMER_PROFILES == ("trl", "mlx-lm")
+    assert IMPLEMENTED_EXPORT_CONSUMER_PROFILES == (
+        "trl",
+        "mlx-lm",
+        "axolotl",
+        "llama-factory",
+        "aptus",
+    )
     for record in catalog.records:
         assert record.state == "implemented"
         assert record.round_trip is False
-        assert record.extra == record.profile_id
+        if record.profile_id == "aptus":
+            assert record.extra == ""
+        else:
+            assert record.extra == record.profile_id
         assert record.executable_item == EXPORT_CONSUMER_PROFILE_ITEMS[record.profile_id]
-        assert record.admitted_row_schemas == tuple(sorted(V1_ROW_SCHEMA_KINDS))
-        assert record.transformed_row_schemas == ("instruction_output",)
-        assert record.rejected_goals == ()
-        assert record.accepted_goals == (
-            "before_after_transformation",
-            "continuation",
-            "full_text",
-            "section_reconstruction",
-            "structured_field",
-        )
-        assert record.refused_dataset_types == TRL_REFUSED
-        assert record.docs_reviewed_on == "2026-08-23"
         assert tuple(sorted(record.partition_mapping)) == ("evaluation", "train")
 
 
@@ -144,12 +131,36 @@ def test_trl_and_mlx_lm_pins_match_official_docs() -> None:
     assert "valid.jsonl" in mlx.partition_mapping["evaluation"]
     assert "test.jsonl" in mlx.workflow
     assert "not mapped from Veriformis evaluation" in mlx.workflow
+    axolotl = by_id["axolotl"]
+    assert axolotl.package == "axolotl"
+    assert axolotl.executable_item == "10.3"
+    assert axolotl.transformed_row_schemas == ("prompt_completion",)
+    assert [item.mapping_kind for item in axolotl.row_mappings] == [
+        "identity",
+        "identity",
+        "remap",
+        "identity",
+    ]
+    llama = by_id["llama-factory"]
+    assert llama.package == "llamafactory"
+    assert llama.executable_item == "10.4"
+    assert llama.transformed_row_schemas == ("messages", "prompt_completion")
+    aptus = by_id["aptus"]
+    assert aptus.extra == ""
+    assert aptus.executable_item == "10.6"
+    assert aptus.rejected_goals == ("full_text",)
+    assert aptus.admitted_row_schemas == (
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+    )
+    assert aptus.transformed_row_schemas == ()
 
 
 def test_admission_models_refuse_unknown_profiles_and_round_trip_claims() -> None:
     payload = profile_admission_catalog().model_dump(mode="json")
     first = dict(payload["records"][0])
-    first["profile_id"] = "axolotl"
+    first["profile_id"] = "unsloth"
     with pytest.raises(ExportContractError, match="not an implemented export profile"):
         ProfileAdmission.model_validate(first)
     first = dict(payload["records"][0])
@@ -165,10 +176,14 @@ def test_admission_models_refuse_unknown_profiles_and_round_trip_claims() -> Non
 def test_importing_admission_does_not_import_trainer_libraries() -> None:
     assert "trl" not in sys.modules
     assert "mlx_lm" not in sys.modules
+    assert "axolotl" not in sys.modules
+    assert "llamafactory" not in sys.modules
     assert "torch" not in sys.modules
     assert "mlx" not in sys.modules
     discover_profile_admissions()
     assert "trl" not in sys.modules
     assert "mlx_lm" not in sys.modules
+    assert "axolotl" not in sys.modules
+    assert "llamafactory" not in sys.modules
     assert "torch" not in sys.modules
     assert "mlx" not in sys.modules

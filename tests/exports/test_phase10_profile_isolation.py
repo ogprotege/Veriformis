@@ -47,8 +47,8 @@ def _candidate_request(consumer_id: str) -> ExportDryRunRequest:
     )
 
 
-def test_taxonomy_keeps_phase_10_profiles_as_candidates() -> None:
-    assert CANDIDATE_CONSUMER_PROFILES == ("axolotl", "llama-factory", "unsloth")
+def test_taxonomy_keeps_unsloth_as_the_remaining_candidate() -> None:
+    assert CANDIDATE_CONSUMER_PROFILES == ("unsloth",)
     entries = {
         (entry.axis, entry.identifier): entry.state for entry in catalog()
     }
@@ -56,6 +56,9 @@ def test_taxonomy_keeps_phase_10_profiles_as_candidates() -> None:
         assert entries[("consumer_profile", identifier)] == "candidate"
     assert entries[("consumer_profile", "trl")] == "implemented"
     assert entries[("consumer_profile", "mlx-lm")] == "implemented"
+    assert entries[("consumer_profile", "axolotl")] == "implemented"
+    assert entries[("consumer_profile", "llama-factory")] == "implemented"
+    assert entries[("consumer_profile", "aptus")] == "implemented"
 
 
 def test_implemented_generic_and_profile_selectors_remain_discoverable() -> None:
@@ -81,7 +84,7 @@ def test_implemented_generic_and_profile_selectors_remain_discoverable() -> None
         for profile in profiles.values()
         if profile.consumer_profile is not None
     }
-    assert named == {"mlx-lm", "trl"}
+    assert named == {"aptus", "axolotl", "llama-factory", "mlx-lm", "trl"}
     for identifier in CANDIDATE_CONSUMER_PROFILES:
         assert all(profile.selector[2] != identifier for profile in profiles.values())
 
@@ -124,7 +127,7 @@ def test_candidate_pins_do_not_make_export_executable() -> None:
     emit_eligible = {
         record.profile_id for record in catalog.records if record.emit_eligible
     }
-    assert emit_eligible == {"axolotl", "llama-factory"}
+    assert emit_eligible == set()
     for consumer_id in CANDIDATE_CONSUMER_PROFILES:
         with pytest.raises(ExportContractError, match="Phase 10 candidate"):
             ExportService().dry_run_export(_candidate_request(consumer_id))

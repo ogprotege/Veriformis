@@ -1,4 +1,4 @@
-"""Optional TRL/MLX-LM loader checks. Excluded from core pytest."""
+"""Optional schema-loader checks. Excluded from core pytest."""
 
 from __future__ import annotations
 
@@ -19,3 +19,13 @@ def test_trl_extra_is_not_required_for_core() -> None:
 
 def test_mlx_lm_extra_is_not_required_for_core() -> None:
     pytest.importorskip("mlx_lm")
+
+
+def test_axolotl_and_llama_factory_extras_are_not_required_for_core() -> None:
+    pytest.importorskip("datasets")
+    with pytest.raises(ImportError):
+        __import__("axolotl")
+    with pytest.raises(ImportError):
+        __import__("llamafactory")
+    with pytest.raises(ImportError):
+        __import__("unsloth")

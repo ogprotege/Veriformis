@@ -54,3 +54,33 @@ deselected, 1 expected durability warning; `git diff --check` clean.
 
 **Next action:** Open the item 10.2 pull request. After merge, stop for
 operator approval before item 10.3.
+
+## 2026-08-24 — Item 10.2 merged; items 10.3–10.8 combined
+
+**Status:** Item 10.2 merged as PR #98 at
+`47297f658892d594378b8af24c150a132f3df346` after GitHub checks passed.
+The operator asked to implement 10.3 through 10.8 fully in one pull
+request, not six sequential PRs.
+
+Axolotl is the first admitted emit. LLaMA-Factory is the second.
+Unsloth is skipped with the experimental pin. Aptus becomes
+`consumer_id=aptus` identity export; sibling handoff remains. Official-
+schema harnesses and closeout fold into the same change. Extras stay
+empty.
+
+**Next action:** Finish the combined 10.3–10.8 change, pass local gates,
+and open one pull request.
+
+## 2026-08-24 — Items 10.3–10.8 local gates green
+
+**Status:** Combined emit, Unsloth skip, Aptus-as-profile, harnesses, and
+closeout are on `phase10/03-08-emit-harness-closeout`.
+
+Local gates: `uv lock --check`; `ruff check src tests`; tracking PASS;
+focused profile/isolation/taxonomy tests 197 passed, 3 skipped; core
+pytest 2090 passed, 16 deselected, 1 expected durability warning;
+`git diff --check` clean.
+
+**Next action:** Open one pull request covering 10.3–10.8. Require every
+GitHub check, merge, and synchronize clean main. Do not start Phase 11
+or 13.

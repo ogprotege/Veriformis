@@ -49,7 +49,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "1c240dfa84c275b529b0b0bab46f866650826b796071aab2303c69d1591c2b3b"
+    "f5b7522bab4dc46b3049e4b4d3fb84743911b393f3e6f97ca2f5ea22b1f885d6"
 )
 
 
@@ -214,6 +214,9 @@ def test_canonical_profile_accepts_text_and_aptus_refuses_it() -> None:
         "aptus-handoff-v1",
         "trl",
         "mlx-lm",
+        "axolotl",
+        "llama-factory",
+        "aptus",
     )
     assert_profile_row_compatible(CANONICAL_CONSUMER_PROFILE, "text")
     assert_compile_combination("full_text", "text")
@@ -234,11 +237,28 @@ def test_implemented_export_profiles_can_be_selected_for_compile() -> None:
         profile="trl",
     )
     assert_compile_combination("full_text", "text", profile="mlx-lm")
-    with pytest.raises(TaxonomyError, match="axolotl"):
+    assert_compile_combination(
+        "continuation",
+        "prompt_completion",
+        profile="axolotl",
+    )
+    assert_compile_combination(
+        "continuation",
+        "prompt_completion",
+        profile="llama-factory",
+    )
+    assert_compile_combination(
+        "continuation",
+        "prompt_completion",
+        profile="aptus",
+    )
+    with pytest.raises(TaxonomyError, match="aptus"):
+        assert_compile_combination("full_text", "text", profile="aptus")
+    with pytest.raises(TaxonomyError, match="unsloth"):
         assert_compile_combination(
             "continuation",
             "prompt_completion",
-            profile="axolotl",
+            profile="unsloth",
         )
 
 

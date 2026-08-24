@@ -91,6 +91,9 @@ from veriformis.exports.arrow import ARROW_IMPLEMENTATION
 from veriformis.exports.hugging_face_dataset import HF_DATASET_IMPLEMENTATION
 from veriformis.exports.parquet import PARQUET_IMPLEMENTATION
 from veriformis.exports.split_jsonl import SPLIT_JSONL_IMPLEMENTATION
+from veriformis.profiles.aptus import APTUS_IMPLEMENTATION
+from veriformis.profiles.axolotl import AXOLOTL_IMPLEMENTATION
+from veriformis.profiles.llama_factory import LLAMA_FACTORY_IMPLEMENTATION
 from veriformis.profiles.mlx_lm import MLX_LM_IMPLEMENTATION
 from veriformis.profiles.trl import TRL_IMPLEMENTATION
 from veriformis.identity import lossless_json_bytes, sha256_digest
@@ -139,6 +142,9 @@ class ExportService:
                 HF_DATASET_IMPLEMENTATION,
                 TRL_IMPLEMENTATION,
                 MLX_LM_IMPLEMENTATION,
+                AXOLOTL_IMPLEMENTATION,
+                LLAMA_FACTORY_IMPLEMENTATION,
+                APTUS_IMPLEMENTATION,
             )
             if _implementations is None
             else tuple(_implementations)

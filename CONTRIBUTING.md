@@ -40,10 +40,10 @@ Before changing code, read:
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
-Independent-product Phases 0–9 are complete on `main` (Phase 9 closeout
-PR #96 at `abdcce6474aadd33fcf38a5360b63a4f8d293a5c`). Phase 10 is in
-progress under ADR-0014; item 10.1 keeps `axolotl`, `llama-factory`, and
-`unsloth` as candidates and empty extras.
+Independent-product Phases 0–10 are complete on `main` once the Phase 10
+closeout merges. Phase 10 implements Axolotl, LLaMA-Factory, and Aptus
+as optional adapters under ADR-0014; `unsloth` remains a non-executable
+candidate. Extras stay empty.
 Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed
