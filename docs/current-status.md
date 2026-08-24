@@ -43,11 +43,17 @@ local Hugging Face DatasetDict v1 are implemented `semantic_content_only`
 generic exports with semantic fingerprints, library-reload harnesses, and
 dataset-row mapping for Parquet and Arrow. Suffix does not switch modes.
 Extra `columnar` stays empty. There is no Hub upload.
+Phase 10 consumer-profile expansion is in progress under item 10.1:
+Axolotl, LLaMA-Factory, and Unsloth remain candidates and refuse as
+Phase 10. Aptus remains the sibling handoff. Empty extras `axolotl`,
+`llama-factory`, and `unsloth` do not pull trainer wheels.
 
-**Review date:** 2026-08-24 (independent-product Phase 9 closeout)
+**Review date:** 2026-08-24 (independent-product Phase 10.1 packet)
 
-**Next review:** Beta label cut, public-ready checklist, or any contract
-change. Do not start Phase 10 or 13 from this packet.
+**Next review:** Phase 10.1 pull-request merge, item 10.2, beta label
+cut, public-ready checklist, or any contract change. Do not start item
+10.3 until the operator approves. Do not start Phase 11 or 13 from this
+packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -733,7 +739,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 8 | TRL SFT and MLX-LM LoRA optional adapters, admission pins, official-schema harnesses, dataset-only launch sidecars, discovery truthfulness; items 8.1–8.6 merged as PR #82–#87 |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–9 complete; Phase 10 remains planned |
+| In progress independent Phase 10.1 | Packet opened; ADR-0014; `axolotl`, `llama-factory`, and `unsloth` remain candidates and refuse as Phase 10; extras of those names stay empty |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–9 complete and Phase 10 in progress under its [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

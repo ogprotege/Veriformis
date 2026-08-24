@@ -9,7 +9,7 @@ train/evaluation split.
 
 **Status:** Implemented in development alpha `0.1.0`
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet; candidates remain non-executable)
 
 Imported dataset-row bundles use the same generic containers. Mapping
 does not add a trainer profile. Named TRL and MLX-LM adapters are

@@ -2,16 +2,24 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `d452df3` on `main` after PR #95
+**Implementation baseline reviewed:** `abdcce6` on `main` after PR #96
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–8 complete; Phase 9.7 mapping)
+Phases 0–2; independent-product Phases 0–9 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
+**Last reviewed:** 2026-08-24 (Phase 9 closeout; operator Pascendi compile)
 
-**Next review:** Phase 9.8 pull-request merge, beta label cut, or any
-listed-item status change. Do not start Phase 10 or 13 from this packet.
+**Next review:** Item 10.1 pull-request merge, item 10.2, beta label
+cut, or any listed-item status change. Do not start item 10.3 until
+the operator approves. Do not start Phase 11 or 13 from this packet.
+
+**Operator compile:** `/Users/biscuit/Documents/Veriformis` at
+`2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
+bundle, 31 train / 0 eval, manifest
+`94b63232166aeedc9db797fdc0ec0167b2135d8c01bd3934635250a0a2245ace`.
+Seal `self_consistent`; zip `external_digest`. Empty eval is one leakage
+group. No trainer or columnar export in that run.
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -90,7 +98,10 @@ local, offline, and free of LLM generation.
       Items 8.1–8.7 merged as PR #82–#88.
 - [x] Independent product Phase 9 is complete under its
       [packet](dev/active/independent-product/phase-09-columnar-containers/README.md).
-      Items 9.1–9.8 merge sequentially. Extra `columnar` stays empty.
+      Items 9.1–9.8 merged as PR #89–#96. Extra `columnar` stays empty.
+- [ ] Independent product Phase 10 is in progress under its
+      [packet](dev/active/independent-product/phase-10-profile-expansion/README.md).
+      Item 10.1 opens the packet. Candidates remain non-executable.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -113,7 +124,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 7 | Add first-class existing-dataset import and mapping | Completed | [Completed packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md) |
 | 8 | Implement the first consumer profiles | Completed | [Completed packet](dev/active/independent-product/phase-08-consumer-profiles/README.md) |
 | 9 | Add columnar and Hugging Face dataset containers | Completed | [Completed packet](dev/active/independent-product/phase-09-columnar-containers/README.md) |
-| 10 | Expand consumer profiles under evidence gates | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 10 | Expand consumer profiles under evidence gates | In progress | [Active packet](dev/active/independent-product/phase-10-profile-expansion/README.md) |
 | 11 | Harden collection ingest and qualify additional input types | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 12 | Add optional local OCR with accountable recovery | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 13 | Build dataset quality intelligence | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

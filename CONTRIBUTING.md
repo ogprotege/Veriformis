@@ -23,6 +23,7 @@ Before changing code, read:
 - [ADR-0006: Receipt-Anchored Export-Pack Transport](docs/adr/0006-receipt-anchored-export-pack-transport.md)
 - [ADR-0012: Consumer Profile as Optional Adapter](docs/adr/0012-consumer-profile-as-optional-adapter.md)
 - [ADR-0013: Columnar Containers as Optional Generic Exports](docs/adr/0013-columnar-containers-as-optional-generic-exports.md)
+- [ADR-0014: Independently Admitted Consumer Profiles](docs/adr/0014-independently-admitted-consumer-profiles.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -39,11 +40,10 @@ Before changing code, read:
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
-Independent-product Phases 0–8 are complete on `main` (Phase 8 closeout
-PR #88 at `199e16eeabd8c624b571add9d28034830b3b92da`). Phase 9 is in
-progress under ADR-0013; items 9.2–9.3 pin Arrow/feature schemas and
-semantic fingerprints while Parquet, Arrow, and Hugging Face Dataset remain
-planned.
+Independent-product Phases 0–9 are complete on `main` (Phase 9 closeout
+PR #96 at `abdcce6474aadd33fcf38a5360b63a4f8d293a5c`). Phase 10 is in
+progress under ADR-0014; item 10.1 keeps `axolotl`, `llama-factory`, and
+`unsloth` as candidates and empty extras.
 Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed

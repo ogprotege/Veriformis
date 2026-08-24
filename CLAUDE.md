@@ -50,7 +50,13 @@ packet. Items 9.1–9.8 merge sequentially. Item 9.8 loads the three
 containers through PyArrow and Hugging Face Datasets in optional CI,
 measures JSONL versus columnar tree sizes, promotes `parquet`, `arrow`,
 and `hugging-face-dataset` to implemented, and closes the phase. Extra
-`columnar` stays empty. Do not start Phase 10 or 13 from this packet.
+`columnar` stays empty. Phase 10 (expand consumer profiles under
+evidence gates) is in progress under its standard packet. Item 10.1
+opens the packet and publishes ADR-0014. `axolotl`, `llama-factory`,
+and `unsloth` remain candidates. Empty extras of those names keep the
+lock free of trainer wheels. Do not emit those profiles. Do not start
+item 10.3 until the operator approves. Do not start Phase 11 or 13 from
+this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -131,8 +137,9 @@ Read these current authorities before changing code:
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
     `docs/adr/0010-input-mode-as-compiler-path.md`,
     `docs/adr/0011-imported-records-and-mapping-evidence.md`, and
-    `docs/adr/0012-consumer-profile-as-optional-adapter.md`, and
-    `docs/adr/0013-columnar-containers-as-optional-generic-exports.md`
+    `docs/adr/0012-consumer-profile-as-optional-adapter.md`,
+    `docs/adr/0013-columnar-containers-as-optional-generic-exports.md`, and
+    `docs/adr/0014-independently-admitted-consumer-profiles.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`
