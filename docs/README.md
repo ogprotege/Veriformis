@@ -4,12 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–9 complete).
+Phases 0–9 complete, Phase 10 in progress).
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet)
 
-**Next review:** Beta label cut, public-ready checklist, or any contract
-change
+**Next review:** Item 10.1 pull-request merge, item 10.2, beta label cut,
+public-ready checklist, or any contract change. Do not start item 10.3
+until the operator approves. Do not start Phase 11 or 13 from this packet.
 
 ## Start here
 
