@@ -5,19 +5,23 @@ append-only history.
 
 **Updated:** 2026-08-24
 
-**Local branch:** `phase9/08-harness-benchmarks-closeout` from `main`
+**Local branch:** `main`
 
-**Predecessor:** Phase 9.7 merged as PR #95 at
-`d452df35a52577852a0c1ccc9ad6e46f28983778`. Local `main` equals
-`origin/main` there.
+**HEAD:** `abdcce6474aadd33fcf38a5360b63a4f8d293a5c`
+(`Merge pull request #96 from ogprotege/phase9/08-harness-benchmarks-closeout`)
 
-**Completed:** 9.1–9.7
+**Local `main` equals `origin/main`.** Working tree was clean at shutdown.
 
-**Current item:** 9.8 Harness, benchmarks, and Phase 9 closeout
+**Completed:** Phase 9 entire (items 9.1–9.8, PR #89–#96).
 
-**Not started:** Phase 10. Do not start Phase 10 or 13.
+**Current item:** None. Phase 9 is closed.
 
-**9.8 design:** Optional `columnar_integration` CI installs pin-range
-PyArrow and Datasets with `uv run --with` so the lock stays empty.
-Harnesses reload Parquet, Arrow, and DatasetDict through those
-libraries. Taxonomy promotion lands in this item.
+**Not started:** Phase 10 (consumer-profile expansion) and Phase 13
+(quality intelligence). Do not start either until the operator asks.
+
+**Resume:** Open a new session on `main` at `abdcce6`. Next authorized
+work is Phase 10 under a new standard packet, only when asked.
+**Phase 9.8 merge:** PR #96 after all 18 GitHub checks passed (9 jobs ×
+push+PR, including optional `columnar-integration`). Extra `columnar`
+stays empty. Taxonomy lists `parquet`, `arrow`, and
+`hugging-face-dataset` as implemented generic containers.

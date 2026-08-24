@@ -119,3 +119,14 @@ or 13.
 
 **Next action:** Publish the item 9.8 pull request. Require green GitHub
 checks, merge, and synchronize clean main.
+
+## 2026-08-24 — Phase 9 closed
+
+**Status:** Item 9.8 merged as PR #96 at
+`abdcce6474aadd33fcf38a5360b63a4f8d293a5c` after all 18 GitHub checks
+passed (required matrix plus optional Aptus, profile, and columnar
+jobs). Clean local `main` equals `origin/main`.
+
+Phase 9 is complete. Extra `columnar` stays empty. Do not start Phase
+10 or 13 until the operator asks.
+
