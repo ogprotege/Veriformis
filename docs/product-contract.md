@@ -26,9 +26,9 @@ pinned, taxonomy still planned; version `0.1.0` development alpha
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–8 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.7 columnar import)
 
-**Next review:** Phase 9.6 pull-request merge, item 9.7, beta label cut,
+**Next review:** Phase 9.7 pull-request merge, item 9.8, beta label cut,
 public-ready checklist, or any product-contract change. Do not start Phase
 10 or 13 from this packet.
 

@@ -5,20 +5,20 @@ append-only history.
 
 **Updated:** 2026-08-23
 
-**Local branch:** `phase9/06-hf-dataset-export` from `main`
+**Local branch:** `phase9/07-columnar-import` from `main`
 
-**Predecessor:** Phase 9.5 merged as PR #93 at
-`df88c5c576df2aef4289b19cc1dc6e63fbb4b60d`. Local `main` equals
+**Predecessor:** Phase 9.6 merged as PR #94 at
+`49b3901e177c15d7356d4ffc998b2c711e9137e2`. Local `main` equals
 `origin/main`.
 
-**Completed:** 9.1, 9.2, 9.3, 9.4, 9.5
+**Completed:** 9.1–9.6
 
-**Current item:** 9.6 Emit a local Hugging Face dataset
+**Current item:** 9.7 Map Parquet and Arrow into Phase 7
 
-**Not started:** 9.7–9.8. Do not start Phase 10 or 13.
+**Not started:** 9.8. Do not start Phase 10 or 13.
 
-**9.6 design:** Selector `hugging-face-dataset` v1, `consumer_id` null,
-`semantic_content_only`. Dry-run plans fingerprints without Datasets or
-PyArrow. Execute imports Hugging Face Datasets only at render time and
-fails closed if it is absent. Extra `columnar` stays empty. Taxonomy
-stays planned. No Hub upload.
+**9.7 design:** Dataset-row capture admits `.parquet` and `.arrow`.
+Document-source parse of those suffixes stays unsupported. Extra
+`columnar` stays empty; capture imports PyArrow only when those files
+are read and fails closed if it is absent. Confirmed mapping plans and
+`mapped_value` evidence are unchanged.

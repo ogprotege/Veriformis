@@ -90,3 +90,16 @@ stays empty. Taxonomy stays planned. There is no Hub upload.
 
 **Next action:** Publish the item 9.6 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.7.
+
+## 2026-08-23 — Item 9.6 merged; item 9.7 in progress
+
+**Status:** Item 9.6 merged as PR #94 at
+`49b3901e177c15d7356d4ffc998b2c711e9137e2` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.7 admits Parquet and Arrow into Phase 7 dataset-row capture.
+Suffix does not switch modes. Extra `columnar` stays empty. Capture
+imports PyArrow only when those files are read.
+
+**Next action:** Publish the item 9.7 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 9.8.

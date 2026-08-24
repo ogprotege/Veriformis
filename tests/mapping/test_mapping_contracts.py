@@ -128,8 +128,8 @@ def test_identity_mismatch_fails_closed() -> None:
         MappingPlan.model_validate(payload)
 
 
-@pytest.mark.parametrize("container", ["json", "csv"])
-def test_json_and_csv_containers_are_admitted(container: str) -> None:
+@pytest.mark.parametrize("container", ["json", "csv", "parquet", "arrow"])
+def test_json_csv_parquet_and_arrow_containers_are_admitted(container: str) -> None:
     plan = MappingPlan.create(
         goal_id="learn-the-text",
         representation_id="whole-text",

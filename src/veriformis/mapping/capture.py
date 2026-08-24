@@ -1,4 +1,4 @@
-"""UTF-8 JSONL, JSON, and compatible CSV row-source capture.
+"""UTF-8 JSONL, JSON, compatible CSV, Parquet, and Arrow row-source capture.
 
 This path does not flatten, trim, pad, or call document recovery.
 """
@@ -19,7 +19,15 @@ from veriformis.mapping.models import RowSource
 JSONL_SUFFIX = ".jsonl"
 JSON_SUFFIX = ".json"
 CSV_SUFFIX = ".csv"
-ROW_SUFFIXES = (JSONL_SUFFIX, JSON_SUFFIX, CSV_SUFFIX)
+PARQUET_SUFFIX = ".parquet"
+ARROW_SUFFIX = ".arrow"
+ROW_SUFFIXES = (
+    JSONL_SUFFIX,
+    JSON_SUFFIX,
+    CSV_SUFFIX,
+    PARQUET_SUFFIX,
+    ARROW_SUFFIX,
+)
 JSON_RECORD_KEYS = ("records", "rows")
 
 
@@ -48,7 +56,7 @@ def capture_row_source(
     logical_path: str,
     raw_bytes: bytes | None = None,
 ) -> JsonlCapture:
-    """Capture JSONL, JSON array, or compatible CSV as ordered objects."""
+    """Capture JSONL, JSON, CSV, Parquet, or Arrow as ordered objects."""
     suffix = path.suffix.lower()
     if suffix == JSONL_SUFFIX:
         return capture_jsonl(path, logical_path=logical_path, raw_bytes=raw_bytes)
@@ -56,6 +64,10 @@ def capture_row_source(
         return capture_json(path, logical_path=logical_path, raw_bytes=raw_bytes)
     if suffix == CSV_SUFFIX:
         return capture_csv(path, logical_path=logical_path, raw_bytes=raw_bytes)
+    if suffix == PARQUET_SUFFIX:
+        return capture_parquet(path, logical_path=logical_path, raw_bytes=raw_bytes)
+    if suffix == ARROW_SUFFIX:
+        return capture_arrow(path, logical_path=logical_path, raw_bytes=raw_bytes)
     raise RowSourceError(
         f"{logical_path}: dataset-row capture admits only {ROW_SUFFIXES} files"
     )
@@ -216,6 +228,142 @@ def capture_jsonl(
         size=len(payload),
         record_count=len(records),
         container_kind="jsonl",
+    )
+    return JsonlCapture(row_source=source, records=tuple(records), raw_bytes=payload)
+
+
+def capture_parquet(
+    path: Path,
+    *,
+    logical_path: str,
+    raw_bytes: bytes | None = None,
+) -> JsonlCapture:
+    """Capture one Parquet table as ordered JSON objects."""
+    return _capture_columnar(
+        path,
+        logical_path=logical_path,
+        raw_bytes=raw_bytes,
+        suffix=PARQUET_SUFFIX,
+        container_kind="parquet",
+        label="Parquet",
+    )
+
+
+def capture_arrow(
+    path: Path,
+    *,
+    logical_path: str,
+    raw_bytes: bytes | None = None,
+) -> JsonlCapture:
+    """Capture one Arrow IPC file as ordered JSON objects."""
+    return _capture_columnar(
+        path,
+        logical_path=logical_path,
+        raw_bytes=raw_bytes,
+        suffix=ARROW_SUFFIX,
+        container_kind="arrow",
+        label="Arrow",
+    )
+
+
+def _require_pyarrow() -> tuple[Any, Any, Any]:
+    try:
+        import pyarrow as pa
+        import pyarrow.ipc as ipc
+        import pyarrow.parquet as pq
+    except ImportError as exc:
+        raise RowSourceError(
+            "Parquet and Arrow capture require PyArrow; the optional extra "
+            "'columnar' is empty in this install"
+        ) from exc
+    return pa, pq, ipc
+
+
+def _json_ready(value: Any, *, logical_path: str, row_index: int) -> Any:
+    if value is None:
+        raise RowSourceError(
+            f"{logical_path}: row {row_index} contains null; null is unrepresentable"
+        )
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        return [
+            _json_ready(item, logical_path=logical_path, row_index=row_index)
+            for item in value
+        ]
+    if isinstance(value, dict):
+        ready: dict[str, Any] = {}
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise RowSourceError(
+                    f"{logical_path}: row {row_index} has a non-string field name"
+                )
+            ready[key] = _json_ready(
+                item, logical_path=logical_path, row_index=row_index
+            )
+        return ready
+    raise RowSourceError(
+        f"{logical_path}: row {row_index} has an unsupported columnar value type"
+    )
+
+
+def _capture_columnar(
+    path: Path,
+    *,
+    logical_path: str,
+    raw_bytes: bytes | None,
+    suffix: str,
+    container_kind: str,
+    label: str,
+) -> JsonlCapture:
+    if path.suffix.lower() != suffix:
+        raise RowSourceError(
+            f"{logical_path}: dataset-row capture admits only {ROW_SUFFIXES} files"
+        )
+    payload = path.read_bytes() if raw_bytes is None else raw_bytes
+    pa, pq, ipc = _require_pyarrow()
+    try:
+        buffer = pa.BufferReader(payload)
+        if container_kind == "parquet":
+            table = pq.read_table(buffer)
+        else:
+            table = ipc.open_file(buffer).read_all()
+        rows = table.to_pylist()
+    except (OSError, TypeError, UnicodeError, ValueError) as exc:
+        raise RowSourceError(
+            f"{logical_path}: {label} table is not a valid row source"
+        ) from exc
+    except Exception as exc:
+        if type(exc).__name__.startswith("Arrow"):
+            raise RowSourceError(
+                f"{logical_path}: {label} table is not a valid row source"
+            ) from exc
+        raise
+    if not rows:
+        raise RowSourceError(f"{logical_path}: {label} file contains no rows")
+    records: list[CapturedRow] = []
+    for index, row in enumerate(rows, start=1):
+        if not isinstance(row, dict):
+            raise RowSourceError(
+                f"{logical_path}: {label} row {index} is not an object"
+            )
+        payload_obj = _json_ready(
+            row, logical_path=logical_path, row_index=index
+        )
+        records.append(
+            CapturedRow(
+                row_index=index,
+                line_number=index,
+                payload=payload_obj,
+                raw_line=lossless_json_bytes(payload_obj).decode("utf-8"),
+            )
+        )
+    source = RowSource.create(
+        logical_path=normalize_logical_path(logical_path),
+        sha256=sha256_digest(payload),
+        size=len(payload),
+        record_count=len(records),
+        container_kind=container_kind,
     )
     return JsonlCapture(row_source=source, records=tuple(records), raw_bytes=payload)
 

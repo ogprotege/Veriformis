@@ -38,14 +38,15 @@ complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 14 GitHub checks passed. Phase 8 consumer profiles are complete: TRL SFT and
 MLX-LM LoRA are implemented optional adapters with official-schema harnesses
 and dataset-only launch sidecars. The exporter does not launch training.
-Phase 9 columnar containers are in progress under item 9.6: Parquet v1,
+Phase 9 columnar containers are in progress under item 9.7: Parquet v1,
 Arrow IPC v1, and local Hugging Face DatasetDict v1 are executable
-generic exports with semantic fingerprints. Taxonomy still lists them
-planned.
+generic exports with semantic fingerprints, and dataset-row mapping admits
+Parquet and Arrow files. Suffix does not switch modes. Taxonomy still
+lists the three containers planned.
 
-**Review date:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
+**Review date:** 2026-08-23 (independent-product Phase 9.7 columnar import)
 
-**Next review:** Phase 9.6 pull-request merge, item 9.7, beta label cut,
+**Next review:** Phase 9.7 pull-request merge, item 9.8, beta label cut,
 public-ready checklist, or any contract change. Do not start Phase 10 or
 13 from this packet.
 
@@ -369,7 +370,7 @@ The installed console entry point is `veriformis`.
 | `chunk WORKSPACE` | Runs one of five evidence-bearing chunk strategies | `chunks` |
 | `upgrade-workspace WORKSPACE` | Migrates a verified revision-v1 or revision-v2 workspace through every supported migration | One new migration revision per required schema step, or no change when current |
 | `construct WORKSPACE (--goal GOAL \| --preset PRESET \| --objective OBJECTIVE)` | Resolves the selection and explicit overrides through the versioned preset data, builds the recipe through the named recipe library, and constructs candidates, decisions, diagnostics, and immutable accepted records for one exact source set | `recipe`, `result` |
-| `parse PATH... -o WORKSPACE --mode dataset-row` | Captures UTF-8 JSONL, JSON, or compatible CSV row sources into workspace revision v4; does not recover document IR | `registry`, per-source `raw` and `row-source` |
+| `parse PATH... -o WORKSPACE --mode dataset-row` | Captures UTF-8 JSONL, JSON, compatible CSV, Parquet, or Arrow IPC row sources into workspace revision v4; does not recover document IR; suffix does not switch document-source | `registry`, per-source `raw` and `row-source` |
 | `map WORKSPACE --goal GOAL --representation REPRESENTATION --plan PLAN.json` | Applies a confirmed mapping-plan/v1 to captured objects and commits imported records with `mapped_value` evidence | `plan`, `recipe`, `result` |
 | `curate WORKSPACE` | Fixes the complete finished plan and applies ordered deterministic curation | `plan`, `result` |
 | `split WORKSPACE` | Assigns complete transitive leakage groups to train and evaluation | `result` |
@@ -389,7 +390,7 @@ The installed console entry point is `veriformis`.
 | `profile-admissions` | Prints implemented TRL and MLX-LM admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not launch training |
 | `columnar-schemas` | Prints packaged Arrow and Hugging Face feature pins (`veriformis.columnar-schema-discovery/v1`) | Read-only terminal output, byte-identical to MCP `columnar_schemas`; does not emit files or import PyArrow |
 | `mapping-templates` | Prints packaged mapping templates (`veriformis.mapping-template-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_templates` |
-| `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL, JSON, or compatible CSV file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
+| `mapping-detect PATH` | Proposes mapping-plan/v1 objects for one JSONL, JSON, compatible CSV, Parquet, or Arrow file, including a confirmation digest; never writes a workspace | Runtime-only `veriformis.mapping-detect/v1` JSON; exit `2` when no detector matches |
 | `mapping-preview PATH --plan PLAN.json` | Walks the full captured file and reports per-row accept/reject samples without writing a workspace | Runtime-only `veriformis.mapping-preview/v1` JSON; 64 KiB sample / 256 KiB response bounds |
 | `mapping-rejections PATH --plan PLAN.json --output DIR` | Writes a content-addressed mapping rejection report beside a directory; `map` also writes one beside the workspace | `veriformis.mapping-rejection-report/v1` JSON; not a verified export |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |

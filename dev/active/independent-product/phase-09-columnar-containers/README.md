@@ -45,6 +45,7 @@ planned, and refuses those `container_id` values with the named later item.
 
 ## Current state
 
-Items 9.1–9.5 merged as PR #89–#93. Item 9.6 emits a local Hugging Face
-DatasetDict v1. Taxonomy `parquet`, `arrow`, and `hugging-face-dataset`
-remain planned. Extra `columnar` stays empty. There is no Hub upload.
+Items 9.1–9.6 merged as PR #89–#94. Item 9.7 maps Parquet and Arrow into
+Phase 7 dataset-row capture. Suffix does not switch modes. Taxonomy
+`parquet`, `arrow`, and `hugging-face-dataset` remain planned. Extra
+`columnar` stays empty. There is no Hub upload.

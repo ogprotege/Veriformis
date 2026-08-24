@@ -2,15 +2,15 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `df88c5c` on `main` after PR #93
+**Implementation baseline reviewed:** `49b3901` on `main` after PR #94
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–8 complete; Phase 9.5 Arrow)
+Phases 0–2; independent-product Phases 0–8 complete; Phase 9.6 DatasetDict)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
+**Last reviewed:** 2026-08-23 (independent-product Phase 9.7 columnar import)
 
-**Next review:** Phase 9.6 pull-request merge, item 9.7, beta label cut, or
+**Next review:** Phase 9.7 pull-request merge, item 9.8, beta label cut, or
 any listed-item status change. Do not start Phase 10 or 13 from this
 packet.
 
@@ -91,9 +91,9 @@ local, offline, and free of LLM generation.
       Items 8.1–8.7 merged as PR #82–#88.
 - [ ] Independent product Phase 9 is in progress under its
       [packet](dev/active/independent-product/phase-09-columnar-containers/README.md).
-      Items 9.1–9.5 merged as PR #89–#93. Item 9.6 emits a local Hugging
-      Face DatasetDict v1. Taxonomy still lists the three columnar
-      containers as planned.
+      Items 9.1–9.6 merged as PR #89–#94. Item 9.7 maps Parquet and Arrow
+      into Phase 7. Taxonomy still lists the three columnar containers as
+      planned.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

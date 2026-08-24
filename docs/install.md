@@ -21,7 +21,7 @@ the hood (usually via the repo’s `.venv` or `uv`).
 | **Mac workbench** (optional) | Thin GUI over that CLI |
 | **Sealed `.vfbundle`** | Finished dataset product |
 | **Generic export derivatives** | Verified split JSONL, canonical JSON, or compatible flat CSV; no trainer profile |
-| **Existing-dataset import** | Confirmed mapping of JSONL, JSON, or compatible CSV rows; [mapping.md](mapping.md) |
+| **Existing-dataset import** | Confirmed mapping of JSONL, JSON, compatible CSV, Parquet, or Arrow rows; [mapping.md](mapping.md) |
 
 There is not yet a notarized App Store–style installer. Private beta means:
 install the CLI on your machine, optionally build/open the Debug app.
