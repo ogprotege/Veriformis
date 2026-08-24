@@ -1,182 +1,55 @@
-# Veriformis
+<p align="center">
+  <img src="docs/assets/colophon.png" width="888" alt="Veriformis colophon: sealed, local, exact">
+</p>
 
-**Local-first dataset compiler: raw documents to validated, provenance-sealed fine-tuning bundles.**
+A local compiler for fine-tuning datasets.
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![uv-managed](https://img.shields.io/badge/uv-managed-orange.svg)](https://docs.astral.sh/uv/)
+Give it documents or already-shaped training rows. It recovers them
+faithfully, records every change, binds every field to evidence, splits
+without leakage, and seals a six-file bundle you can verify without
+trusting the machine that built it.
 
-Veriformis is a local-first compiler that turns heterogeneous raw source
-material into a curated, split, validated, and sealed training dataset. It owns
-the difficult path from source capture through the finished bundle. Cleaned
-text is an accountable intermediate state, except when a `full_text` recipe
-explicitly selects it as training content.
+The pipeline never calls a model. It never leaves the machine.
 
-> **Development alpha (`0.1.0`):** M1 core, Groups 1–7, Group 9 automated
-> release gates, beta-prep docs, and a **private beta Mac workbench**
-> (Phases 0–2 over the CLI), plus completed independent-product Phases 0–9
-> on `main`. Generic exports are `split-jsonl-directory`, canonical `json`,
-> `constrained-csv`, `parquet`, `arrow`, and `hugging-face-dataset` v1.
-> Goal-first recipes (Phase 6) and existing-dataset import/mapping (Phase 7)
-> are implemented. Phase 8 consumer profiles are complete; TRL SFT and
-> MLX-LM LoRA are implemented optional adapters. Phase 9 columnar containers
-> are complete; extra `columnar` stays empty. Phase 10 is complete;
-> Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters;
-> `unsloth` remains a non-executable candidate. This is **not** a
-> public beta or production label. Limits:
-> [docs/beta-limitations.md](docs/beta-limitations.md). Install:
-> [docs/install.md](docs/install.md). Status:
-> [docs/current-status.md](docs/current-status.md).
+**Development alpha `0.1.0`.** Not a public beta. Not production.
+Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
+Capability claims: [docs/current-status.md](docs/current-status.md).
 
-## What works today
+<p align="center">
+  <img src="docs/assets/compile-path.png" width="888" alt="Document-source and dataset-row compiler paths, with seal as the filled station">
+</p>
 
-The default **document-source** compiler path runs nine stage-gated stages
-from raw files to a sealed bundle, verified by a separate command:
+Cleaned text is compiler state. It becomes training content only when a
+`full_text` recipe says so, and only after curation, split, lowering,
+validation, and seal.
 
-```mermaid
-flowchart LR
-    raw[Raw files] --> parse[parse] --> clean[clean] --> chunk[chunk]
-    chunk --> construct[construct] --> curate[curate] --> split[split]
-    split --> format[format] --> validate[validate] --> seal[seal]
-    seal --> bundle[Sealed .vfbundle] --> verify[verify]
-    verify --> package[deterministic .vfbundle.zip] --> packageVerify[package-verify]
-```
-
-Existing JSONL, JSON, compatible CSV, Parquet, or Arrow training rows use
-the opt-in **dataset-row** path (`parse --mode dataset-row` then `map`).
-That path does not run `clean`, `chunk`, or `construct`. Suffix does not
-switch document-source. Operator guide:
-[docs/mapping.md](docs/mapping.md).
-
-```text
-parse --mode dataset-row -> map -> curate -> split
-      -> format -> validate -> seal -> verify
-```
-
-Version `0.1.0` provides:
-
-- local parsing for plain text, Markdown, DOCX, HTML, digitally-born PDF, CSV,
-  JSON, JSONL, and selected source-code files;
-- immutable workspace revisions with atomic commits and stale-stage invalidation;
-- source-scoped identities for sources, artifacts, transforms, chunks, and revisions;
-- strict canonical IR, parser diagnostics, source evidence, and replayable cleaning plans;
-- paragraph, fixed, sliding, sentence, and structure-aware chunking;
-- five deterministic training objectives: `full_text`, `continuation`,
-  `section_reconstruction`, `before_after_transformation`, and
-  `structured_field`;
-- a versioned seven-axis dataset taxonomy, shared compile-compatibility policy,
-  and read-only discovery through `PipelineService`, CLI, MCP, and workbench
-  help;
-- field-level evidence, candidate decisions, optional review evidence, and
-  immutable accepted records;
-- deterministic curation with target-length filtering, conflict quarantine,
-  exact deduplication, optional primary-source caps, and coverage accounting;
-- authoritative train and evaluation assignment by complete transitive leakage groups;
-- deterministic, externally anchored `.vfbundle.zip` transport that preserves
-  the strict six-file canonical bundle without becoming a trainer export;
-- a Phase 5.4 optional receipt-anchored
-  `.vfexport.zip` transport around one unchanged, already-published generic
-  export directory; it reuses `package` / `package-verify`, is not a fourth
-  export renderer or source-bound export verification, and merged as PR #56;
-- a verified `split-jsonl-directory` v1 derivative with canonical train and
-  evaluation JSONL, a deterministic README and data card, an export receipt,
-  and aligned provenance by default;
-- a verified canonical `json` v1 derivative with explicit train/evaluation
-  arrays and schema metadata, mandatory aligned provenance, and an export
-  receipt;
-- a verified `constrained-csv` v1 derivative for `text`,
-  `prompt_completion`, and `instruction_output`, with fixed fully quoted
-  train/evaluation CSV, mandatory aligned provenance, and nested-`messages`
-  refusal;
-- confirmed mapping of existing JSONL, JSON, compatible CSV, Parquet, and
-  Arrow rows into the four current semantic schemas, with `mapped_value`
-  evidence, rejection reports, and packaged templates; imported rows seal
-  through ordinary `ProductRow` v1 and the same generic exports;
-- a [generic export operator guide](docs/generic-exports.md) that keeps JSONL,
-  JSON, or CSV container choice separate from the already-bound training
-  objective, row schema, and any independently admitted consumer profile;
-- one-to-one lowering into `text`, `prompt_completion`,
-  `instruction_output`, or structured `messages` rows;
-- payload-only partition JSONL plus an aligned provenance stream;
-- exact-snapshot validation through 17 ordered gates;
-- an atomic six-file `minimal-v1` bundle with closed-set verification; and
-- `self_consistent` verification, or `external_digest` verification when the
-  caller supplies the manifest SHA-256 retained outside the bundle.
-
-The pipeline makes no LLM calls and sends no document to a network service.
-
-## macOS workbench (private beta)
-
-A SwiftUI adapter lives under [`macos/`](macos/README.md). It **compiles**
-sources into a sealed `.vfbundle` and verified Finder-safe `.vfbundle.zip` by
-shelling the same `veriformis` CLI as the terminal. It keeps process work off
-the main actor, bounds displayed/output retention, supports accountable
-cancellation, and records manifest and transport digests in history.
-It does not expose the Phase 5.4 `.vfexport.zip` packaging path as a Mac UI
-action.
-
-```bash
-# From the repo (preferred private-beta launch):
-uv sync
-./script/build_and_run.sh
-```
-
-See [docs/install.md](docs/install.md), [macos/README.md](macos/README.md), and
-the [private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md).
-
-## Supported inputs
-
-| Category | Extensions |
-| --- | --- |
-| Text | `.txt` |
-| Markdown | `.md`, `.markdown` |
-| Word | `.docx` |
-| Web | `.html`, `.htm` |
-| Digitally-born PDF | `.pdf` (image-only/OCR input fails closed) |
-| Structured data | `.csv`, `.json`, `.jsonl` (document recovery by default; `--mode dataset-row` maps existing training rows instead) |
-| Source code | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` |
-
-Other extensions fail with an `unsupported-input` error.
-
-## Install (CLI — standard local path)
-
-Full operator guide: **[docs/install.md](docs/install.md)**.
+## Install
 
 ```bash
 git clone https://github.com/ogprotege/Veriformis.git
 cd Veriformis
-uv sync                         # creates .venv/bin/veriformis
-uv run veriformis version       # expect 0.1.0
-uv run veriformis --help        # full command list
+uv sync
+uv run veriformis version    # 0.1.0
 ```
 
-Optional: put the CLI on PATH for this checkout:
+Operator guide: [docs/install.md](docs/install.md).
 
 ```bash
 export PATH="$PWD/.venv/bin:$PATH"
-veriformis version
+veriformis --help
 ```
 
-Mac workbench (Debug, private beta): `./script/build_and_run.sh`
-(see [docs/install.md](docs/install.md) and [macos/README.md](macos/README.md)).
-
-### Development / contributor setup
+macOS workbench (private beta, same CLI under the hood):
 
 ```bash
-uv sync --extra test
-uv run ruff check src tests
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
+./script/build_and_run.sh
 ```
 
-Optional Aptus adapter self-conformance is invoked separately with
-`uv run pytest -q -m aptus_integration`.
+## Compile
 
-## Raw source to verified bundle
-
-The GUI runs this same document-source sequence. Use at least two independent
-sources when you need a non-empty evaluation partition under default split
-rules. For files that already contain training rows, see
-[docs/mapping.md](docs/mapping.md).
+Use at least two independent sources if you need a non-empty evaluation
+partition under default split rules. One leakage group: pass
+`--allow-empty-evaluation` to `curate` only when that is intentional.
 
 ```bash
 uv run veriformis parse source-a.txt source-b.txt -o build/workspace
@@ -191,8 +64,7 @@ uv run veriformis seal build/workspace -o build/example.vfbundle
 uv run veriformis verify build/example.vfbundle
 ```
 
-`seal` prints the manifest SHA-256. Retain it outside the bundle when an
-independent trust anchor matters, then verify with:
+`seal` prints the manifest SHA-256. Keep it outside the bundle. Then:
 
 ```bash
 uv run veriformis verify build/example.vfbundle \
@@ -204,20 +76,22 @@ uv run veriformis package-verify build/example.vfbundle.zip \
   --manifest-sha256 EXPECTED_MANIFEST_SHA256
 ```
 
-Without the external digest, verification correctly reports
-`self_consistent`. With a matching digest, it reports `external_digest`.
+Without that digest, verification reports `self_consistent`. With a
+match, `external_digest`.
 
-Default `seal` writes only the canonical six-file bundle. Optional consumer
-artifacts require an explicit flag or command; for the Aptus adapter, use
-`seal ... --aptus-handoff` or `handoff` after sealing. CLI/MCP/workbench startup
-and required release gates do not require Aptus.
+Existing JSONL, JSON, compatible CSV, Parquet, or Arrow rows skip
+`clean` / `chunk` / `construct`:
 
-For a corpus with only one leakage group, the default split cannot create both
-partitions. Pass `--allow-empty-evaluation` to `curate` only when an empty
-evaluation partition is intentional.
+```bash
+uv run veriformis parse --mode dataset-row rows.jsonl -o build/workspace
+uv run veriformis map build/workspace
+# then curate → split → format → validate → seal → verify
+```
 
-For a supervised recipe, choose its objective and target row schema during
-construction. For example:
+Guide: [docs/mapping.md](docs/mapping.md). Suffix never switches the
+document-source path.
+
+For a supervised recipe, bind objective and row schema at construct:
 
 ```bash
 uv run veriformis construct build/workspace \
@@ -225,209 +99,86 @@ uv run veriformis construct build/workspace \
   --target-row-schema messages
 ```
 
-The later commands infer the row schema from the bound recipe and plan. They do
-not accept a second row-schema selector that could contradict it. Only
-`instruction_output` requires `curate --instruction TEXT`.
+Later stages read the bound recipe. Only `instruction_output` needs
+`curate --instruction TEXT`.
 
-## Finished bundle
+<p align="center">
+  <img src="docs/assets/bundle-form.png" width="888" alt="Six-file sealed bundle layout">
+</p>
 
-A successful Group 3 seal writes exactly:
+Default `seal` writes that tree and nothing else. Optional consumer
+sidecars take an explicit flag. Aptus: `seal --aptus-handoff`, or
+`handoff` after sealing. Core install, CLI, MCP, and required release
+gates do not need Aptus.
 
-```text
-example.vfbundle/
-├── data/train.jsonl
-├── data/evaluation.jsonl
-├── metadata/row-provenance.jsonl
-├── validation.json
-├── manifest.json
-└── attestation.json
-```
+## Inputs
 
-The payload files contain only the selected training schema. Provenance remains
-in its aligned metadata stream. The co-located attestation proves internal
-agreement, not external authenticity. The optional expected manifest digest
-provides the external binding.
+| Kind | Extensions |
+| --- | --- |
+| Text | `.txt` |
+| Markdown | `.md`, `.markdown` |
+| Word | `.docx` |
+| HTML | `.html`, `.htm` |
+| Digitally-born PDF | `.pdf` (image-only / OCR fails closed) |
+| Tables and records | `.csv`, `.json`, `.jsonl` |
+| Source | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` |
 
-Group 3 includes the legacy-named `aptus-row-shape` validation gate; despite
-its persisted identifier, it validates the implemented generic row shape and
-does not prove compatibility with an Aptus release. Group 6 adds an optional
-versioned sibling Aptus handoff (`*.aptus-handoff.json`) and
-`handoff-verify` consumer checks. Training execution remains outside
-Veriformis. The handoff records that its current policy rejects plain `text`
-rows; it does not define core dataset correctness or release readiness.
+Anything else fails as `unsupported-input`.
 
-## Workspace integrity
+## What it emits
 
-The physical workspace layout remains schema 1. Document-source revisions use
-schema 3 (`parse → clean → chunk → construct → curate → split → format →
-validate → seal`). Dataset-row revisions use schema 4 (`parse → map → curate
-→ split → format → validate → seal`). `HEAD` selects one immutable revision,
-and that revision maps logical outputs to content-addressed objects under
-`objects/sha256/`.
+The sealed bundle is the product. Derivatives are later, optional, and
+do not recurate or resplit.
 
-Use `upgrade-workspace` to migrate a verified revision-v1 or revision-v2
-workspace through every supported migration onto schema 3. The v2 to v3
-migration preserves parse, clean, chunk, and construct history. It retires
-legacy downstream state instead of reinterpreting chunk projections as
-finished-dataset evidence. Schema 4 is opened by `parse --mode dataset-row`;
-it is not a migration of a document-source workspace.
+| Export | Role |
+| --- | --- |
+| `split-jsonl-directory` | Canonical train / evaluation JSONL |
+| `json` | Canonical JSON tree |
+| `constrained-csv` | Flat quoted CSV (`messages` refused) |
+| `parquet`, `arrow`, `hugging-face-dataset` | Columnar / DatasetDict; extra `columnar` stays empty |
+| `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus` | Optional adapters over a verified bundle |
 
-Persisted artifact JSON and durable identity payloads preserve exact Unicode
-strings and object-key sequences. NFC normalization applies only to explicit
-locator fields whose contracts define that equivalence, currently logical
-source paths.
+Trainer extras stay empty. The exporter does not train. `unsloth` is
+named and not executable. Generic containers keep `consumer_id` null.
 
-## Current boundary
+Deterministic zip: `.vfbundle.zip` around the sealed bundle, and
+optional `.vfexport.zip` around one already-published export directory.
 
-On `main` today: **Groups 1–7**, **Group 9 automated gates**, **beta-prep**,
-**private beta workbench Phases 0–2**, and **independent-product Phases 0–7**.
-Phase 5.6's exact dry-run preview merged as PR #58 at
-`cd017941090c7352cb1d10f9a383042b954d4f2e`. Phase 5.7's operator guidance and
-Phase 5 closeout merged as PR #59 at
-`65cbd471e96d83f8dd65e2cda60e90f64a916e2b` after all 14 GitHub checks passed.
-Phase 6 (goal-first recipes and previews) is complete under its packet;
-closeout merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d`.
-Phase 7 (existing-dataset import and mapping) is complete; closeout merged as
-PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub
-checks passed. Phase 8 consumer profiles are complete under ADR-0012; TRL
-and MLX-LM are implemented optional adapters.
-The following paragraphs retain Phase 4–5 export-boundary facts that still
-bind generic exports.
-The completed Phase 4 verified-export foundation adds a
-typed internal `ExportService` boundary and descriptor-anchored inspection of
-an already verified finished bundle. Its second slice defines strict,
-versioned export plan, profile, membership, file-binding, receipt, and
-verification models. Its third slice enforces trusted-by-default export-source
-admission and explicit lower self-consistent trust. Its fourth slice adds
-read-only `create_plan`: source identities and the complete source membership
-baseline are derived from one admitted bundle view, while callers provide only
-strict profile, dependency, and file-plan evidence. Its fifth slice fresh-
-reconstructs normalized candidate semantic rows and provenance and requires
-their row-set and complete membership projection to match that baseline. The
-sixth slice adds internal exact-byte atomic publication and independent closed-
-tree verification. The seventh adds private two-
-render conformance: exact profiles require identical
-normalized byte trees, while semantic-only profiles require equal versioned
-canonical semantic preimages, complete reconstructed membership, service-
-computed digests, and descriptor-reread staged replay. Phase 4.8 adds strict
-discovery, dry-run, inspect, execute, and source-bound verify operations through
-`PipelineService`, CLI, MCP, and a CLI-backed Mac bridge; it merged as PR #50 at
-`fb0a13d7cab1e456b6ff3b3dc6ebab13b9898edb`, with review corrections in PR #51
-at `d91542fe12c5a492de578ad060836a7d65999e42`. Phase 4.9 completes the
-adversarial harness and closeout reconciliation.
-That empty catalog is a completed Phase 4 fact. Phase 5.1–5.3 install three
-production exact-byte renderers: `split-jsonl-directory`, canonical `json`,
-and `constrained-csv` v1, all with no consumer profile or trainer-compatibility
-claim.
-Phase 5.4 does not add a renderer. It adds the optional
-`deterministic-export-pack-zip-v1` transport after directory publication:
-`package` and `package-verify` require a separately retained canonical
-`export-receipt.json` SHA-256 and wrap the receipt plus its exact bound file
-set as `.vfexport.zip`. Archive verification preserves the embedded source
-trust grade and is not source-bound export verification. Export discovery,
-request schemas, persisted export models, and the Mac UI remain unchanged.
-The merged Phase 5.5 fixture then exercises all 11 compatible
-container/current-row-schema pairs by materializing and strictly reloading
-ordinary files, plus the one actionable constrained-CSV/`messages` refusal
-and one semantic tamper per container. This is proof infrastructure only: it
-does not ship a production importer or replayer and changes no public surface,
-taxonomy, support claim, or persisted schema.
-Phase 5.6 keeps the same `export dry-run` operation and requests but moves its
-runtime result to response v2 with exactly the unchanged `plan` plus a
-`preview`. The preview selects ordinal zero from each non-empty partition,
-reports exact payload digest and byte size, includes each payload whole only at
-or below 65,536 bytes and within the response budget, and lists the sorted
-plan-derived destination tree plus `export-receipt.json`. Omitted rows are
-never truncated. The ASCII-safe wire response decodes to the exact original
-values. Preview derivation calls no renderer and accesses no destination.
-Historical request v1 remains unchanged: it selects split JSONL's `train` /
-`evaluation` filenames with aligned provenance and the canonical JSON fixed
-tree, or constrained CSV's fixed quoted-CSV tree. Request v2 applies only to
-split JSONL and requires the complete
-`veriformis.split-jsonl-options/v1` object to change those safe filename stems
-or omit provenance; canonical JSON and constrained CSV refuse configured
-requests. Constrained CSV supports the three flat row schemas and refuses
-`messages` with a split JSONL or canonical JSON alternative. No request
-changes source rows, ordering, partition membership, curation, or split policy.
-The ten persisted verified-export v1 schemas, request v1/v2, discovery v1, and
-existing `ExportService.publish` call signature remain unchanged. Response v1
-remains exact for non-dry-run operations; dry run uses runtime response v2 and
-preview v1 without creating durable export evidence. Every new
-trainer-specific profile remains later work.
-Maturity remains development **alpha** (not a
-public beta label). A future beta cut must follow
-[docs/beta-limitations.md](docs/beta-limitations.md). **Public Mac app** claims
-need owner signing/notarization per [docs/release.md](docs/release.md).
-**Group 8** model-assisted construction is optional and owner-gated.
+## What it will not do
 
-## Documentation
+- Invent a summary or any other transformation that did not occur
+- Call a network or an LLM
+- OCR a scan
+- Upload to a Hub
+- Launch training
+- Claim public beta or a signed Mac app
 
-The [documentation index](docs/README.md) defines document authority and
-reading paths. The map:
+Exact capability inventory: [docs/current-status.md](docs/current-status.md).
 
-- **Product and status**
-  - [Product contract](docs/product-contract.md) — ownership boundary and non-claims
-  - [Current implementation status](docs/current-status.md) — exact alpha boundary
-  - [Work in progress](WIP.md) — non-authoritative tracker
-- **Architecture**
-  - [Architecture hub](docs/architecture.md)
-  - [Architecture tree](docs/architecture/README.md)
-- **Contracts**
-  - [Integrity Contract v1](docs/contracts/integrity-v1.md)
-  - [Dataset Construction Contract v1](docs/contracts/dataset-construction-v1.md)
-  - [Finished Dataset Contract v1](docs/contracts/finished-dataset-v1.md)
-  - [Dataset Taxonomy Contract v1](docs/contracts/taxonomy-v1.md)
-  - [Deterministic Archive Transport v1](docs/contracts/bundle-transport-v1.md)
-  - [Verified Export Contract v1](docs/contracts/verified-export-v1.md)
-  - [Split JSONL Export Contract v1](docs/contracts/split-jsonl-export-v1.md)
-  - [Canonical JSON Export Contract v1](docs/contracts/canonical-json-export-v1.md)
-  - [Constrained CSV Export Contract v1](docs/contracts/constrained-csv-export-v1.md)
-  - [Goal Catalog v1](docs/contracts/goal-catalog-v1.md)
-  - [Recipe Preset v1](docs/contracts/recipe-preset-v1.md)
-  - [Row Mapping v1](docs/contracts/row-mapping-v1.md)
-  - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
-- **Reference and plans**
-  - [Install guide](docs/install.md)
-  - [Existing-dataset import](docs/mapping.md)
-  - [Generic export operator guide](docs/generic-exports.md)
-  - [CLI reference](docs/cli.md)
-  - [Development guide](docs/development.md)
-  - [Release guide](docs/release.md)
-  - [Beta limitations](docs/beta-limitations.md)
-  - [macOS workbench](macos/README.md)
-  - [Independent product analysis](docs/analysis/2026-08-11-independent-product-analysis.md)
-  - [Authoritative independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
-  - [Project tracking and evidence system](docs/governance/README.md)
-  - [Completed Phase 0 packet](dev/active/independent-product/phase-00-foundation/README.md)
-  - [Completed Phase 1 packet](dev/active/independent-product/phase-01-standalone-independence/README.md)
-  - [Completed Phase 2 packet](dev/active/independent-product/phase-02-reliability-artifact-boundary/README.md)
-  - [Completed Phase 3 packet](dev/active/independent-product/phase-03-taxonomy/README.md)
-  - [Completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
-  - [Completed Phase 5 packet](dev/active/independent-product/phase-05-generic-local-exports/README.md)
-  - [Completed Phase 6 packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md)
-  - [Completed Phase 7 packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md)
-  - [Historical private beta workbench plan](docs/plans/2026-08-06-private-beta-workbench.md)
-  - [Historical build roadmap](docs/plans/2026-07-29-veriformis-roadmap.md)
-  - [Contributing](CONTRIBUTING.md)
+## Read next
 
-## Development checks
+| Page | What it is |
+| --- | --- |
+| [Install](docs/install.md) | CLI and workbench |
+| [Current status](docs/current-status.md) | What `0.1.0` actually does |
+| [Product contract](docs/product-contract.md) | Ownership and non-claims |
+| [CLI](docs/cli.md) | Commands |
+| [Mapping](docs/mapping.md) | Existing-dataset import |
+| [Generic exports](docs/generic-exports.md) | JSONL / JSON / CSV choice |
+| [Documentation index](docs/README.md) | Contracts, architecture, governance |
+| [Contributing](CONTRIBUTING.md) | Checks and house rules |
+
+## Checks
 
 ```bash
+uv sync --extra test
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
+uv run pytest -q --ignore=tests/handoff \
+  -m "not aptus_integration and not profile_integration and not columnar_integration"
 git diff --check
 ```
 
-CI on `main` runs a Python 3.11–3.13 matrix (Ubuntu) plus Python 3.12 on
-macOS, `uv lock --check`, Ruff, core pytest, clean-wheel installed-CLI smoke,
-and standalone golden-corpus compile. Aptus adapter checks are separate and
-non-blocking. Local totals grow over time — re-run the commands for current
-counts. Type-check, coverage thresholds, dependency audit, and signed/notarized
-Mac distribution are not automated release claims; see
-[docs/release.md](docs/release.md) and
-[docs/beta-limitations.md](docs/beta-limitations.md).
-
 ## License
 
-Veriformis is provided under the [MIT License](LICENSE).
+[MIT](LICENSE).
