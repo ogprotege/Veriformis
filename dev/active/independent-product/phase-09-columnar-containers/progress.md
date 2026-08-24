@@ -120,13 +120,24 @@ or 13.
 **Next action:** Publish the item 9.8 pull request. Require green GitHub
 checks, merge, and synchronize clean main.
 
-## 2026-08-24 — Phase 9 closed
+## 2026-08-24 — Phase 9 closed; operator compile observed
 
 **Status:** Item 9.8 merged as PR #96 at
 `abdcce6474aadd33fcf38a5360b63a4f8d293a5c` after all 18 GitHub checks
-passed (required matrix plus optional Aptus, profile, and columnar
-jobs). Clean local `main` equals `origin/main`.
+passed. Clean local `main` equals `origin/main`.
 
-Phase 9 is complete. Extra `columnar` stays empty. Do not start Phase
-10 or 13 until the operator asks.
+Operator compile at `/Users/biscuit/Documents/Veriformis` (timestamp
+`2026-08-24T13-54-52Z`): one Markdown source, Pius X *Pascendi Dominici
+Gregis* (`1907-09-08_pascendi-dominici-gregis.md`), parser `markdown`.
+Recipe `full_text` / target row `text`. 31 chunks, 31 accepted, 31
+curated in, 0 excluded. Split: 31 train, 0 evaluation, 1 leakage group
+(expected for a single source). All 17 dataset gates passed. Bundle
+manifest SHA-256
+`94b63232166aeedc9db797fdc0ec0167b2135d8c01bd3934635250a0a2245ace`.
+Seal grade `self_consistent`; transport zip archive SHA-256
+`ab51ba97a960c6f15acb07a9706839060c914da3f41ffab6fa24d1d304ba7928`
+verified `external_digest`. One train row is scrape front matter, not
+encyclical prose. No generic columnar or trainer-profile export in this
+run.
 
+Phase 9 is complete. 

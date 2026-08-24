@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 9.8: parquet, arrow, and hugging-face-dataset are implemented generic containers)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet: axolotl, llama-factory, and unsloth remain candidate consumer profiles)
 
 **Next review:** Any taxonomy, input-family, loss-policy, or
 compatibility-matrix change

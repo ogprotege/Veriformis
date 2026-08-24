@@ -112,17 +112,17 @@
       "packet": "dev/active/independent-product/phase-09-columnar-containers",
       "started_on": "2026-08-23",
       "completed_on": "2026-08-24",
-      "next_gate": "Completed; closeout is item 9.8. Phase 10 remains planned. Do not start Phase 10 or 13 from this packet."
+      "next_gate": "Completed; closeout merged as PR #96 at abdcce6474aadd33fcf38a5360b63a4f8d293a5c with all 18 GitHub checks passed and clean main synchronized; Phase 10 began under its own standard packet."
     },
     {
       "number": 10,
       "title": "Expand consumer profiles under evidence gates",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [8, 9],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-10-profile-expansion",
+      "started_on": "2026-08-24",
       "completed_on": null,
-      "next_gate": "Admit each profile independently."
+      "next_gate": "Item 10.2 pins section-5 records. Axolotl and LLaMA-Factory are admitted for a later emit after operator approval. Unsloth is experimental. Aptus is deferred to 10.6. Extras stay empty. Do not start 10.3 until the operator approves."
     },
     {
       "number": 11,

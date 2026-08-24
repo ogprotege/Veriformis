@@ -4,12 +4,14 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–9 complete).
+Phases 0–9 complete, Phase 10 in progress).
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
+**Last reviewed:** 2026-08-24 (independent-product Phase 10.2 pins)
 
-**Next review:** Beta label cut, public-ready checklist, or any contract
-change
+**Next review:** Item 10.2 pull-request merge, operator approval for
+item 10.3, beta label cut, public-ready checklist, or any contract
+change. Do not start item 10.3 until the operator approves. Do not
+start Phase 11 or 13 from this packet.
 
 ## Start here
 
@@ -65,7 +67,7 @@ change
 | [Goal Catalog v1](contracts/goal-catalog-v1.md) | Plain-language goals bound to existing objectives and row schemas | Implemented contract |
 | [Recipe Preset v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and per-goal presets | Implemented contract |
 | [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
-| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL and MLX-LM official-doc pins and discovery | Packaged pins; extras remain empty |
+| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL and MLX-LM pins plus Phase 10 candidate pins | Packaged pins; extras remain empty; candidates are not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
 | [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints | Implemented; extra `columnar` remains empty |

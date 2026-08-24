@@ -14,14 +14,14 @@ explicitly selects it as training content.
 
 > **Development alpha (`0.1.0`):** M1 core, Groups 1–7, Group 9 automated
 > release gates, beta-prep docs, and a **private beta Mac workbench**
-> (Phases 0–2 over the CLI), plus completed independent-product Phases 0–8
+> (Phases 0–2 over the CLI), plus completed independent-product Phases 0–9
 > on `main`. Generic exports are `split-jsonl-directory`, canonical `json`,
-> and `constrained-csv` v1. Goal-first recipes (Phase 6) and existing-dataset
-> import/mapping (Phase 7) are implemented. Phase 8 consumer profiles are
-> complete; TRL SFT and MLX-LM LoRA are implemented optional adapters. Phase 9
-> columnar containers are complete: Parquet, Arrow IPC, and local Hugging
-> Face DatasetDict v1 are implemented `semantic_content_only` generics.
-> Extra `columnar` stays empty. This is **not** a
+> `constrained-csv`, `parquet`, `arrow`, and `hugging-face-dataset` v1.
+> Goal-first recipes (Phase 6) and existing-dataset import/mapping (Phase 7)
+> are implemented. Phase 8 consumer profiles are complete; TRL SFT and
+> MLX-LM LoRA are implemented optional adapters. Phase 9 columnar containers
+> are complete; extra `columnar` stays empty. Phase 10 is in progress;
+> `axolotl`, `llama-factory`, and `unsloth` remain candidates. This is **not** a
 > public beta or production label. Limits:
 > [docs/beta-limitations.md](docs/beta-limitations.md). Install:
 > [docs/install.md](docs/install.md). Status:
