@@ -174,8 +174,9 @@ Every goal states `curation_defaults` of `minimum_target_characters` 1,
 `balance_mode` `none`, no per-source cap, `evaluation_ratio_ppm` 500000,
 `evaluation_required` true, and `split_seed` `veriformis-v1`;
 `review_policy_default` `none`; and all four non-claim codes. Representations
-admit `split-jsonl-directory` and `json` for every row schema and
-`constrained-csv` for the three flat schemas only.
+admit `split-jsonl-directory`, `json`, `parquet`, `arrow`, and
+`hugging-face-dataset` for every row schema and `constrained-csv` for
+the three flat schemas only.
 
 | Goal | `instruction_task` | `instruction_template` |
 | --- | --- | --- |

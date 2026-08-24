@@ -49,7 +49,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "f4cd2f14b5e132e47454c4ae18c1b0aeb736d3b8b8c8b3bc1a7ff31831582059"
+    "1c240dfa84c275b529b0b0bab46f866650826b796071aab2303c69d1591c2b3b"
 )
 
 
@@ -286,6 +286,9 @@ def test_admitted_physical_containers_are_implemented_only() -> None:
         "split-jsonl-directory",
         "json",
         "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset",
     }
 
 

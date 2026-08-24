@@ -22,5 +22,5 @@
   ],
   "receipt_binds": "exact_emitted_bytes",
   "schema_id": "veriformis.columnar-semantic-fingerprint/v1",
-  "state": "planned"
+  "state": "implemented"
 }

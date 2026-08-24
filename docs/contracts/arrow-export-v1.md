@@ -6,10 +6,9 @@
 
 **Determinism claim:** `semantic_content_only`
 
-**Status:** Executable generic export. Taxonomy still lists `arrow` as
-planned until Phase 9 closeout. Extra `columnar` remains empty.
+**Status:** Implemented generic export. Extra `columnar` remains empty.
 
-**Last reviewed:** 2026-08-23
+**Last reviewed:** 2026-08-24
 
 ## Purpose
 

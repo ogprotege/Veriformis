@@ -13,3 +13,6 @@
 | Columnar v1 fingerprint is `semantic_content_only` over ordered payloads; container id is excluded so the three containers share identity; receipts still bind exact emitted bytes | Accepted | Item 9.3; ADR-0013; usability U7 |
 | Semantic fingerprint is cross-version identity; receipt SHA-256 is this-run exact bytes | Accepted | Roadmap item 5; ADR-0013 |
 | Hub upload is out of scope | Accepted | Roadmap Phase 9 non-goal |
+| Optional CI installs pin-range wheels with `uv run --with`; extra `columnar` stays empty | Accepted | Item 9.8; keep `uv lock` free of PyArrow |
+| Taxonomy promotion of the three containers lands in closeout, not in the first emission item | Accepted | Phase 8.3–8.7 pattern |
+| JSONL versus columnar size notes cite the measured fixture only | Accepted | Roadmap item 8; risk P9-R6 |

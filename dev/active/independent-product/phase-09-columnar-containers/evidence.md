@@ -1,6 +1,6 @@
 # Phase 9 Evidence
 
-**Status:** Open — item 9.7 columnar import
+**Status:** Open — item 9.8 closeout
 
 **Opened:** 2026-08-23
 
@@ -117,3 +117,26 @@ passed.
       `mapped_value` evidence remain the Phase 7 path.
 - [x] Core pytest: 2043 passed before mixed-mode nits; focused mapping tests
       passed after operator-guide and capture review fixes.
+- [x] Item 9.7 merged as PR #95 at
+      `d452df35a52577852a0c1ccc9ad6e46f28983778` after all 16 GitHub checks
+      passed.
+
+## Required item 9.8 evidence
+
+- [x] Isolated `columnar_integration` harnesses reload Parquet, Arrow, and
+      DatasetDict through PyArrow and Hugging Face Datasets. Large values,
+      nested roles, null refusal, Unicode, shard extra files, empty
+      evaluation, and schema evolution fail closed or round-trip as
+      specified. Focused optional tests: 12 passed.
+- [x] Optional CI job `columnar-integration` uses `continue-on-error` and
+      `uv run --with` pin ranges, plus Hub-offline flags. Extra `columnar`
+      stays empty. Lock has no PyArrow, datasets, or pandas.
+- [x] JSONL versus columnar tree sizes on the Phase 3 full-text fixture:
+      split JSONL 24,073 bytes, Parquet 25,162, Arrow 25,386, DatasetDict
+      31,733. Recorded as this-run sizes, not a recommendation.
+- [x] Taxonomy, support registry, and goal catalog list the three containers
+      as implemented. Core pytest: 2043 passed, 15 deselected, expected
+      transport warning.
+- [x] Library reload required two renderer fixes: DatasetDict `num_shards`
+      is a per-split dict; list-of-struct Features uses `[struct]`; empty
+      evaluation uses `Dataset.from_dict` so the pinned shard remains.

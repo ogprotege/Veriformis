@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import sys
 from pathlib import Path
 
@@ -55,6 +56,8 @@ def test_parquet_and_arrow_are_admitted_mapping_containers() -> None:
 
 
 def test_columnar_capture_fails_closed_without_pyarrow(tmp_path: Path) -> None:
+    if importlib.util.find_spec("pyarrow") is not None:
+        pytest.skip("PyArrow is installed")
     assert "pyarrow" not in sys.modules
     parquet = tmp_path / "rows.parquet"
     arrow = tmp_path / "rows.arrow"
@@ -82,15 +85,24 @@ def test_suffix_does_not_switch_document_source_to_dataset_row(
             source_root=tmp_path,
         )
     assert not workspace.exists()
-    with pytest.raises(RowSourceError, match="require PyArrow.*columnar"):
-        SERVICE.parse(
-            [source],
-            workspace,
-            source_root=tmp_path,
-            mode="dataset-row",
-        )
+    if importlib.util.find_spec("pyarrow") is None:
+        with pytest.raises(RowSourceError, match="require PyArrow.*columnar"):
+            SERVICE.parse(
+                [source],
+                workspace,
+                source_root=tmp_path,
+                mode="dataset-row",
+            )
+        assert "pyarrow" not in sys.modules
+    else:
+        with pytest.raises(RowSourceError):
+            SERVICE.parse(
+                [source],
+                workspace,
+                source_root=tmp_path,
+                mode="dataset-row",
+            )
     assert not workspace.exists()
-    assert "pyarrow" not in sys.modules
 
 
 @pytest.mark.parametrize("suffix", [".parquet", ".arrow"])

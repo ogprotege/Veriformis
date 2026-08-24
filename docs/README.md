@@ -4,12 +4,12 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–8 complete; Phase 9 in progress).
+Phases 0–9 complete).
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
+**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
 
-**Next review:** Phase 9.6 pull-request merge, item 9.7, beta label cut,
-public-ready checklist, or any contract change
+**Next review:** Beta label cut, public-ready checklist, or any contract
+change
 
 ## Start here
 
@@ -66,11 +66,11 @@ public-ready checklist, or any contract change
 | [Recipe Preset v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and per-goal presets | Implemented contract |
 | [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL and MLX-LM official-doc pins and discovery | Packaged pins; extras remain empty |
-| [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for planned Parquet, Arrow, and Hugging Face Dataset containers | Packaged pins; extra `columnar` remains empty |
-| [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Packaged algorithm pin; containers remain planned |
-| [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints; taxonomy still planned | Executable; extra `columnar` remains empty |
-| [Arrow Export v1](contracts/arrow-export-v1.md) | Generic Arrow IPC container with semantic fingerprints; taxonomy still planned | Executable; extra `columnar` remains empty |
-| [Hugging Face Dataset Export v1](contracts/hugging-face-dataset-export-v1.md) | Local Hugging Face DatasetDict container with semantic fingerprints; taxonomy still planned | Executable; extra `columnar` remains empty; no Hub upload |
+| [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
+| [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
+| [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints | Implemented; extra `columnar` remains empty |
+| [Arrow Export v1](contracts/arrow-export-v1.md) | Generic Arrow IPC container with semantic fingerprints | Implemented; extra `columnar` remains empty |
+| [Hugging Face Dataset Export v1](contracts/hugging-face-dataset-export-v1.md) | Local Hugging Face DatasetDict container with semantic fingerprints | Implemented; extra `columnar` remains empty; no Hub upload |
 | [TRL SFT Export v1](contracts/trl-export-v1.md) | Optional TRL SFT adapter over split JSONL | Implemented optional adapter |
 | [MLX-LM LoRA Export v1](contracts/mlx-lm-export-v1.md) | Optional mlx-lm LoRA adapter with train.jsonl and optional valid.jsonl | Implemented optional adapter |
 | [Verified Export Contract v1](contracts/verified-export-v1.md) | Consumer-neutral derivative plans, receipts, verification evidence, optional export-pack transport, and bounded exact dry-run previews | Phase 4 foundation plus Phase 5.1–5.3 generic containers, merged Phase 5.4 transport and Phase 5.5 semantic evidence, with Phase 5.6 merged as PR #58 at `cd017941090c7352cb1d10f9a383042b954d4f2e`; no trainer profile |
@@ -100,7 +100,7 @@ public-ready checklist, or any contract change
 | [Phase 6 packet](../dev/active/independent-product/phase-06-goal-first-recipes/README.md) | Goal catalog, contracts, previews, presets, preflight, matrix, truthfulness, and closeout | Completed implementation record; item 6.7 merged as PR #67 at `6995d17bef0d09f235b1c464e947c38c63dd313d` |
 | [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping contracts, and closeout | Completed implementation record |
 | [Phase 8 packet](../dev/active/independent-product/phase-08-consumer-profiles/README.md) | First consumer profiles (TRL, MLX-LM) as optional adapters | Completed implementation record |
-| [Phase 9 packet](../dev/active/independent-product/phase-09-columnar-containers/README.md) | Columnar and Hugging Face dataset containers | Active implementation packet |
+| [Phase 9 packet](../dev/active/independent-product/phase-09-columnar-containers/README.md) | Columnar and Hugging Face dataset containers | Completed implementation packet |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

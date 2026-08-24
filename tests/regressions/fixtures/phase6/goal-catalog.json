@@ -295,7 +295,10 @@
       "compatible_generic_exports": [
         "split-jsonl-directory",
         "json",
-        "constrained-csv"
+        "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset"
       ],
       "loss_policy": "full-sequence",
       "plain_language": "The passage itself is the training example. Every part of it is trained on.",
@@ -309,7 +312,10 @@
       "compatible_generic_exports": [
         "split-jsonl-directory",
         "json",
-        "constrained-csv"
+        "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset"
       ],
       "loss_policy": "completion-only",
       "plain_language": "A starting context taken from the source, followed by the exact source text that should come next. Only the completion is trained on.",
@@ -323,7 +329,10 @@
       "compatible_generic_exports": [
         "split-jsonl-directory",
         "json",
-        "constrained-csv"
+        "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset"
       ],
       "loss_policy": "output-only",
       "plain_language": "A short instruction you supply, the exact source context as input, and the exact source-derived output. Only the output is trained on, and the instruction must describe the real task.",
@@ -336,7 +345,10 @@
     {
       "compatible_generic_exports": [
         "split-jsonl-directory",
-        "json"
+        "json",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset"
       ],
       "loss_policy": "final-assistant-suffix",
       "plain_language": "A two-turn conversation: the user turn is the exact source context and the assistant turn is the exact source-derived target. Only the assistant turn is trained on.",

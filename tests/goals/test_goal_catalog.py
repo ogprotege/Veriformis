@@ -38,7 +38,7 @@ from veriformis.taxonomy import (
 )
 
 DATA_PATH = Path(__file__).parents[2] / "src" / "veriformis" / "goals" / "catalog-v1.json"
-DATA_SHA256 = "59c518d9a1f10c7bda3f518f5baf6950de0d50e75d8b80118969ca135fead80d"
+DATA_SHA256 = "71ea925f2f874199353e2408c3d2067e7220bda87bf0f387af7dd89d15b70f33"
 FROZEN_FIXTURE = (
     Path(__file__).parents[1] / "regressions" / "fixtures" / "phase6" / "goal-catalog.json"
 )

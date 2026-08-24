@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-23",
+  "last_updated": "2026-08-24",
   "status_values": [
     "planned",
     "in_progress",
@@ -107,12 +107,12 @@
     {
       "number": 9,
       "title": "Add columnar and Hugging Face dataset containers",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [4],
       "packet": "dev/active/independent-product/phase-09-columnar-containers",
       "started_on": "2026-08-23",
-      "completed_on": null,
-      "next_gate": "Item 9.7 maps Parquet and Arrow into Phase 7 dataset-row capture. Suffix does not switch modes. Extra columnar remains empty. Item 9.8 is harnesses, benchmarks, and closeout."
+      "completed_on": "2026-08-24",
+      "next_gate": "Completed; closeout is item 9.8. Phase 10 remains planned. Do not start Phase 10 or 13 from this packet."
     },
     {
       "number": 10,

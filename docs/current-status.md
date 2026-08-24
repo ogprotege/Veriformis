@@ -38,17 +38,16 @@ complete (existing-dataset import and mapping). Items 7.1–7.10 merged as PR
 14 GitHub checks passed. Phase 8 consumer profiles are complete: TRL SFT and
 MLX-LM LoRA are implemented optional adapters with official-schema harnesses
 and dataset-only launch sidecars. The exporter does not launch training.
-Phase 9 columnar containers are in progress under item 9.7: Parquet v1,
-Arrow IPC v1, and local Hugging Face DatasetDict v1 are executable
-generic exports with semantic fingerprints, and dataset-row mapping admits
-Parquet and Arrow files. Suffix does not switch modes. Taxonomy still
-lists the three containers planned.
+Phase 9 columnar containers are complete: Parquet v1, Arrow IPC v1, and
+local Hugging Face DatasetDict v1 are implemented `semantic_content_only`
+generic exports with semantic fingerprints, library-reload harnesses, and
+dataset-row mapping for Parquet and Arrow. Suffix does not switch modes.
+Extra `columnar` stays empty. There is no Hub upload.
 
-**Review date:** 2026-08-23 (independent-product Phase 9.7 columnar import)
+**Review date:** 2026-08-24 (independent-product Phase 9 closeout)
 
-**Next review:** Phase 9.7 pull-request merge, item 9.8, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 10 or
-13 from this packet.
+**Next review:** Beta label cut, public-ready checklist, or any contract
+change. Do not start Phase 10 or 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -733,7 +732,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 7 | Existing-dataset import/mapping: modes, contracts, JSONL/JSON/CSV capture, confirmation, provenance, preview, partitions, rejections, templates; closeout PR #80 at `b7bb7f0c2046` after all 14 GitHub checks passed |
 | Completed independent Phase 8 | TRL SFT and MLX-LM LoRA optional adapters, admission pins, official-schema harnesses, dataset-only launch sidecars, discovery truthfulness; items 8.1–8.6 merged as PR #82–#87 |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–8 complete and Phase 9 in progress under its [Phase 9 packet](../dev/active/independent-product/phase-09-columnar-containers/README.md) |
+| Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–9 complete; Phase 10 remains planned |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -750,7 +750,7 @@ Group 9 automated gates (local or CI):
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 git diff --check

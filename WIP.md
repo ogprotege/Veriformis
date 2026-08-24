@@ -2,17 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `49b3901` on `main` after PR #94
+**Implementation baseline reviewed:** `d452df3` on `main` after PR #95
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–8 complete; Phase 9.6 DatasetDict)
+Phases 0–2; independent-product Phases 0–8 complete; Phase 9.7 mapping)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.7 columnar import)
+**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
 
-**Next review:** Phase 9.7 pull-request merge, item 9.8, beta label cut, or
-any listed-item status change. Do not start Phase 10 or 13 from this
-packet.
+**Next review:** Phase 9.8 pull-request merge, beta label cut, or any
+listed-item status change. Do not start Phase 10 or 13 from this packet.
 
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
@@ -89,11 +88,9 @@ local, offline, and free of LLM generation.
 - [x] Independent product Phase 8 is complete under its
       [packet](dev/active/independent-product/phase-08-consumer-profiles/README.md).
       Items 8.1–8.7 merged as PR #82–#88.
-- [ ] Independent product Phase 9 is in progress under its
+- [x] Independent product Phase 9 is complete under its
       [packet](dev/active/independent-product/phase-09-columnar-containers/README.md).
-      Items 9.1–9.6 merged as PR #89–#94. Item 9.7 maps Parquet and Arrow
-      into Phase 7. Taxonomy still lists the three columnar containers as
-      planned.
+      Items 9.1–9.8 merge sequentially. Extra `columnar` stays empty.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -115,7 +112,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 6 | Deliver goal-first recipes and previews | Completed | [Completed packet](dev/active/independent-product/phase-06-goal-first-recipes/README.md) |
 | 7 | Add first-class existing-dataset import and mapping | Completed | [Completed packet](dev/active/independent-product/phase-07-existing-dataset-import/README.md) |
 | 8 | Implement the first consumer profiles | Completed | [Completed packet](dev/active/independent-product/phase-08-consumer-profiles/README.md) |
-| 9 | Add columnar and Hugging Face dataset containers | In progress | [Active packet](dev/active/independent-product/phase-09-columnar-containers/README.md) |
+| 9 | Add columnar and Hugging Face dataset containers | Completed | [Completed packet](dev/active/independent-product/phase-09-columnar-containers/README.md) |
 | 10 | Expand consumer profiles under evidence gates | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 11 | Harden collection ingest and qualify additional input types | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 12 | Add optional local OCR with accountable recovery | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

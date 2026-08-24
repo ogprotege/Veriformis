@@ -11,7 +11,7 @@ execution, detection, preview, membership policy, mixed mode, and the
 dataset-row seal path are implemented through Phase 7.10 and item 9.7,
 including packaged mapping templates.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.7 columnar import)
+**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
 
 ## Purpose
 

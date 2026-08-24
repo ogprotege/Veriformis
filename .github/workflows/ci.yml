@@ -45,7 +45,7 @@ jobs:
         run: uv run --python ${{ matrix.python-version }} ruff check src tests
 
       - name: Core pytest (optional integrations excluded)
-        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration"
+        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
 
   # Independent of the matrix so packaging signal is not lost when one cell fails.
   install-smoke:
@@ -134,3 +134,25 @@ jobs:
         run: uv sync --python 3.12 --extra test
       - name: Optional TRL/MLX-LM pytest selection
         run: uv run --python 3.12 pytest -q -m "profile_integration"
+
+  # Isolated columnar library-reload evidence. Visible but cannot block standalone release.
+  # Extra columnar stays empty in the lock; this job installs pin-range wheels only here.
+  columnar-integration:
+    name: columnar-integration (optional)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python 3.12
+        run: uv python install 3.12
+      - name: Sync test extras
+        run: uv sync --python 3.12 --extra test
+      - name: Optional PyArrow/Datasets pytest selection
+        run: uv run --python 3.12 --with 'pyarrow>=19.0.0,<26.0.0' --with 'datasets>=3.0.0,<6.0.0' pytest -q -m "columnar_integration"
+        env:
+          HF_DATASETS_DISABLE_PROGRESS_BARS: "1"
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"

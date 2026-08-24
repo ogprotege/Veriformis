@@ -14,7 +14,7 @@ canonical profile classify behavior already shipped under the construction and
 finished-dataset contracts; it adds no new learning behavior, export adaptation
 or container, or trainer-specific destination profile.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.6: parquet, arrow, and hugging-face-dataset are export-executable; taxonomy still planned)
+**Last reviewed:** 2026-08-24 (independent-product Phase 9.8: parquet, arrow, and hugging-face-dataset are implemented generic containers)
 
 **Next review:** Any taxonomy, input-family, loss-policy, or
 compatibility-matrix change
@@ -134,9 +134,9 @@ not determine the objective or loss.
 | `split-jsonl-directory` | implemented | Phase 5 consumer-neutral generic export; contract v1 |
 | `json` | implemented | Phase 5 consumer-neutral canonical JSON export; contract v1 |
 | `constrained-csv` | implemented | Phase 5 consumer-neutral constrained CSV export for the three flat row schemas; contract v1 |
-| `parquet` | planned | Phase 9 |
-| `arrow` | planned | Phase 9 |
-| `hugging-face-dataset` | planned | Phase 9 |
+| `parquet` | implemented | Phase 9 consumer-neutral Parquet; `semantic_content_only` |
+| `arrow` | implemented | Phase 9 consumer-neutral Arrow IPC; `semantic_content_only` |
+| `hugging-face-dataset` | implemented | Phase 9 local Hugging Face DatasetDict; `semantic_content_only`; no Hub |
 
 Phase 5.6's `veriformis.export-dry-run-preview/v1` is a runtime view of one
 already-selected physical container and immutable export plan. It is not a

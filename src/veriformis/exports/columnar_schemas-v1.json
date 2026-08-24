@@ -175,5 +175,5 @@
     }
   ],
   "schema_id": "veriformis.columnar-schema-discovery/v1",
-  "state": "planned"
+  "state": "implemented"
 }

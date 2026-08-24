@@ -66,7 +66,7 @@ class ColumnarFingerprintContract(_StrictModel):
     preimage_fields: tuple[str, ...]
     receipt_binds: Literal["exact_emitted_bytes"]
     schema_id: Literal["veriformis.columnar-semantic-fingerprint/v1"]
-    state: Literal["planned"]
+    state: Literal["implemented"]
 
     @field_validator("excluded_library_metadata", "preimage_fields", mode="before")
     @classmethod

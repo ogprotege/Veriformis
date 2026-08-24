@@ -6,11 +6,10 @@
 
 **Discovery schema:** `veriformis.columnar-schema-discovery/v1`
 
-**Status:** Packaged Arrow and Hugging Face feature pins. Parquet v1,
-Arrow IPC v1, and local Hugging Face DatasetDict v1 are
-export-executable. Taxonomy still lists all three as planned.
+**Status:** Implemented Arrow and Hugging Face feature pins for the three
+columnar generic containers. Extra `columnar` remains empty.
 
-**Last reviewed:** 2026-08-23
+**Last reviewed:** 2026-08-24
 
 ## Purpose
 
@@ -19,15 +18,15 @@ row schema, including nested `messages`. A pin records official-doc URLs,
 review dates, licenses, the empty extra name, and version ranges. Version
 ranges live in this catalog. They are not core lock pins.
 
-Taxonomy still lists all three as `planned` until Phase 9 closeout.
-Selecting `parquet`, `arrow`, or `hugging-face-dataset` plans and can
-emit those containers. TRL and MLX-LM remain split-JSONL adapters.
+Taxonomy lists `parquet`, `arrow`, and `hugging-face-dataset` as
+implemented. Selecting those identifiers plans and can emit those
+containers. TRL and MLX-LM remain split-JSONL adapters.
 
 ## Closed vocabularies
 
 | Vocabulary | v1 values |
 | --- | --- |
-| State | `planned` |
+| State | `implemented` |
 | Extra | `columnar` |
 | Null policy | `unrepresentable` |
 | Round-trip | `false` |

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -50,6 +51,14 @@ def _hugging_face_datasets_loaded() -> bool:
     return callable(getattr(sys.modules.get("datasets"), "DatasetDict", None))
 
 
+def _real_datasets_present() -> bool:
+    spec = importlib.util.find_spec("datasets")
+    origin = getattr(spec, "origin", None) if spec is not None else None
+    if not origin:
+        return False
+    return "/tests/" not in origin.replace("\\", "/")
+
+
 def _materialize_bundle(root: Path) -> Path:
     fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
     bundle = root / "source.vfbundle"
@@ -95,7 +104,7 @@ def test_hugging_face_dataset_is_discoverable_as_semantic_generic_export() -> No
     states = {
         (entry.axis, entry.identifier): entry.state for entry in catalog()
     }
-    assert states[("physical_container", "hugging-face-dataset")] == "planned"
+    assert states[("physical_container", "hugging-face-dataset")] == "implemented"
 
 
 def test_hugging_face_dataset_dry_run_plans_fingerprints_without_datasets(
@@ -138,6 +147,8 @@ def test_hugging_face_dataset_dry_run_plans_fingerprints_without_datasets(
 def test_hugging_face_dataset_execute_fails_closed_without_datasets(
     tmp_path: Path,
 ) -> None:
+    if _real_datasets_present():
+        pytest.skip("Hugging Face Datasets is installed")
     bundle = _materialize_bundle(tmp_path)
     service = ExportService()
     plan = service.dry_run_export(
