@@ -469,6 +469,19 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
                 "constrained CSV support evidence differs from its executable contract",
                 errors,
             )
+        for container_id in ("parquet", "arrow", "hugging-face-dataset"):
+            columnar = implemented_entries.get(container_id)
+            if columnar is not None:
+                _require(
+                    columnar.get("container_version") == 1
+                    and columnar.get("determinism_claim")
+                    == "semantic_content_only"
+                    and columnar.get("consumer_profile") is None
+                    and columnar.get("supported_row_schemas")
+                    == sorted(V1_ROW_SCHEMAS),
+                    f"{container_id} support evidence differs from its executable contract",
+                    errors,
+                )
 
     consumer_profiles = support.get("consumer_profiles")
     if not isinstance(consumer_profiles, list):

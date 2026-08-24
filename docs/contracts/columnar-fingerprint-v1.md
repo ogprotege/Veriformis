@@ -6,10 +6,10 @@
 
 **Schema identifier:** `veriformis.columnar-semantic-fingerprint/v1`
 
-**Status:** Packaged algorithm pin. Columnar containers remain planned.
-Receipts of later emission still bind exact emitted bytes.
+**Status:** Implemented algorithm pin. Receipts still bind exact emitted
+bytes of this run.
 
-**Last reviewed:** 2026-08-23
+**Last reviewed:** 2026-08-24
 
 ## Purpose
 

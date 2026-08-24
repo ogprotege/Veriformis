@@ -21,7 +21,7 @@ Operator non-claims and any future **beta** cut criteria:
 | --- | --- | --- |
 | Lockfile integrity | `uv lock --check` | CI `test` job |
 | Lint | `uv run ruff check src tests` | CI `test` job |
-| Core suite | `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration"` | Required CI matrix Python 3.11–3.13 (Ubuntu) + macOS 3.12; adapter-only modules are not collected |
+| Core suite | `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"` | Required CI matrix Python 3.11–3.13 (Ubuntu) + macOS 3.12; adapter-only modules are not collected |
 | Installable package and installed origin | `scripts/release/smoke_install.sh` | CI `install-smoke` job; wheel installed in an isolated environment, no external `aptus` distribution, full golden path through that CLI |
 | Golden standalone product path | `scripts/release/golden_compile.sh` | Required CI `golden-compile` job; both objectives, canonical seal, externally anchored verify, deterministic package + package verification, no handoff |
 | Workspace migration | Ordinary pytest under `tests/regressions/` | Full suite (not a separate silent skip) |

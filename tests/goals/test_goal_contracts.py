@@ -202,7 +202,7 @@ def _mutated(edit) -> dict:
         (
             "export outside production catalog",
             lambda p: p["representations"][0].__setitem__(
-                "compatible_generic_exports", ["parquet"]
+                "compatible_generic_exports", ["minimal-v1"]
             ),
             "compatible_generic_exports",
         ),

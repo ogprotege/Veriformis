@@ -1,7 +1,7 @@
 {
   "schema_version": "veriformis.support-registry/v1",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-23",
+  "last_reviewed": "2026-08-24",
   "claim_policy": "docs/governance/project-tracking.md",
   "product": {
     "name": "Veriformis",
@@ -137,7 +137,10 @@
       "deterministic-export-pack-zip-v1",
       "split-jsonl-directory",
       "json",
-      "constrained-csv"
+      "constrained-csv",
+      "parquet",
+      "arrow",
+      "hugging-face-dataset"
     ],
     "implemented_bundle_profiles": [
       {
@@ -248,18 +251,66 @@
       },
       {
         "container": "parquet",
-        "state": "planned",
-        "roadmap_phase": 9
+        "state": "implemented",
+        "roadmap_phase": 9,
+        "product_role": "consumer-neutral-generic-export",
+        "container_version": 1,
+        "determinism_claim": "semantic_content_only",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ],
+        "consumer_profile": null,
+        "evidence": [
+          "src/veriformis/exports/parquet.py",
+          "docs/contracts/parquet-export-v1.md",
+          "tests/exports/test_parquet.py",
+          "tests/exports/test_columnar_integration.py"
+        ]
       },
       {
         "container": "arrow",
-        "state": "planned",
-        "roadmap_phase": 9
+        "state": "implemented",
+        "roadmap_phase": 9,
+        "product_role": "consumer-neutral-generic-export",
+        "container_version": 1,
+        "determinism_claim": "semantic_content_only",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ],
+        "consumer_profile": null,
+        "evidence": [
+          "src/veriformis/exports/arrow.py",
+          "docs/contracts/arrow-export-v1.md",
+          "tests/exports/test_arrow.py",
+          "tests/exports/test_columnar_integration.py"
+        ]
       },
       {
         "container": "hugging-face-dataset",
-        "state": "planned",
-        "roadmap_phase": 9
+        "state": "implemented",
+        "roadmap_phase": 9,
+        "product_role": "consumer-neutral-generic-export",
+        "container_version": 1,
+        "determinism_claim": "semantic_content_only",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ],
+        "consumer_profile": null,
+        "evidence": [
+          "src/veriformis/exports/hugging_face_dataset.py",
+          "docs/contracts/hugging-face-dataset-export-v1.md",
+          "tests/exports/test_hugging_face_dataset.py",
+          "tests/exports/test_columnar_integration.py"
+        ]
       }
     ]
   },

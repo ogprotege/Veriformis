@@ -245,7 +245,11 @@ def _feature(spec: Any, datasets: Any) -> Any:
     if spec.kind == "value":
         return datasets.Value("string")
     if spec.kind == "list":
-        return datasets.Sequence(_feature(spec.item, datasets))
+        item = _feature(spec.item, datasets)
+        # Sequence(dict) becomes a dict of lists; a one-element list keeps list-of-struct.
+        if spec.item is not None and spec.item.kind == "struct":
+            return [item]
+        return datasets.Sequence(item)
     return {
         field.name: _feature(field.hf_feature, datasets) for field in spec.fields
     }
@@ -264,6 +268,19 @@ def _hf_features(row_schema: str) -> Any:
 
 def _payloads(rows: Sequence[ProductRow]) -> tuple[dict[str, Any], ...]:
     return tuple(dict(row.payload) for row in rows)
+
+
+def _dataset_from_payloads(
+    payloads: Sequence[dict[str, Any]],
+    features: Any,
+    datasets: Any,
+) -> Any:
+    if payloads:
+        return datasets.Dataset.from_list(list(payloads), features=features)
+    return datasets.Dataset.from_dict(
+        {name: [] for name in features},
+        features=features,
+    )
 
 
 def _library_metadata_preimage(*, kind: str, split: str | None) -> bytes:
@@ -299,18 +316,19 @@ def _dataset_dict_files(row_set: RowSet) -> dict[str, bytes]:
     features = _hf_features(row_set.row_schema)
     dataset_dict = datasets.DatasetDict(
         {
-            "train": datasets.Dataset.from_list(
-                list(_payloads(row_set.train_rows)),
-                features=features,
+            "train": _dataset_from_payloads(
+                _payloads(row_set.train_rows), features, datasets
             ),
-            "evaluation": datasets.Dataset.from_list(
-                list(_payloads(row_set.evaluation_rows)),
-                features=features,
+            "evaluation": _dataset_from_payloads(
+                _payloads(row_set.evaluation_rows), features, datasets
             ),
         }
     )
     with tempfile.TemporaryDirectory() as tmp:
-        dataset_dict.save_to_disk(tmp, num_shards=1)
+        dataset_dict.save_to_disk(
+            tmp,
+            num_shards={"train": 1, "evaluation": 1},
+        )
         produced: dict[str, bytes] = {}
         root = Path(tmp)
         for path in sorted(root.rglob("*")):

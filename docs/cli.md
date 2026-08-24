@@ -598,7 +598,7 @@ advertise three `portable_exact_bytes` generic selectors:
 `split-jsonl-directory`, canonical `json`, and `constrained-csv`, all version 1
 with no consumer profile. Phase 9.4–9.6 add `parquet`, `arrow`, and
 `hugging-face-dataset` v1 as `semantic_content_only` generics; extra
-`columnar` stays empty and taxonomy still lists them planned. Optional TRL
+`columnar` stays empty. Taxonomy lists them as implemented. Optional TRL
 and MLX-LM adapters sit on `split-jsonl-directory` v1. Split JSONL, canonical
 JSON, Parquet, Arrow, Hugging Face DatasetDict, and the TRL and MLX-LM
 adapters support all four current row schemas; constrained CSV supports the

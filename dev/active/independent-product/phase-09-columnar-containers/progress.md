@@ -103,3 +103,19 @@ imports PyArrow only when those files are read.
 
 **Next action:** Publish the item 9.7 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 9.8.
+
+## 2026-08-24 — Item 9.7 merged; item 9.8 in progress
+
+**Status:** Item 9.7 merged as PR #95 at
+`d452df35a52577852a0c1ccc9ad6e46f28983778` after all 16 GitHub checks
+passed. Clean local `main` equals `origin/main`.
+
+Item 9.8 adds isolated library-reload harnesses and optional
+`columnar-integration` CI that installs pin-range PyArrow and Datasets
+with `uv run --with`. It measures JSONL versus columnar tree sizes,
+promotes `parquet`, `arrow`, and `hugging-face-dataset` to implemented,
+and closes Phase 9. Extra `columnar` stays empty. Do not start Phase 10
+or 13.
+
+**Next action:** Publish the item 9.8 pull request. Require green GitHub
+checks, merge, and synchronize clean main.

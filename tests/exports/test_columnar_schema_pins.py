@@ -83,7 +83,7 @@ def test_packaged_catalog_is_canonical_and_shared() -> None:
 def test_catalog_closes_over_every_row_schema_and_planned_container() -> None:
     catalog = columnar_schema_catalog()
     assert isinstance(catalog, ColumnarSchemaCatalog)
-    assert catalog.state == "planned"
+    assert catalog.state == "implemented"
     assert catalog.round_trip is False
     assert catalog.extra == "columnar"
     assert catalog.null_policy == "unrepresentable"
@@ -158,7 +158,7 @@ def test_catalog_refuses_round_trip_claims_and_unknown_fields() -> None:
     with pytest.raises(Exception):
         ColumnarSchemaCatalog.model_validate(payload)
     payload = json.loads(columnar_schema_catalog_json())
-    payload["state"] = "implemented"
+    payload["state"] = "planned"
     with pytest.raises(Exception):
         ColumnarSchemaCatalog.model_validate(payload)
     payload = json.loads(columnar_schema_catalog_json())

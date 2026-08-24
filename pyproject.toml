@@ -73,4 +73,5 @@ show_missing = true
 markers = [
   "aptus_integration: optional Aptus compatibility checks excluded from core release gates",
   "profile_integration: optional TRL/MLX-LM loader checks excluded from core release gates",
+  "columnar_integration: optional PyArrow/Datasets loader checks excluded from core release gates",
 ]

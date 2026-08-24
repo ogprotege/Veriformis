@@ -1,22 +1,21 @@
 # Generic Export Operator Guide
 
-Veriformis publishes three trainer-neutral, lossless derivatives of a verified
-finished bundle: split JSONL, canonical JSON, and constrained CSV. Choose among
-them for the file shape a downstream tool can faithfully read. The choice does
-not create or change the training objective, row schema, curation result, or
+Veriformis publishes trainer-neutral derivatives of a verified finished
+bundle: split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC,
+and a local Hugging Face DatasetDict. Choose among them for the file
+shape a downstream tool can faithfully read. The choice does not create
+or change the training objective, row schema, curation result, or
 train/evaluation split.
 
 **Status:** Implemented in development alpha `0.1.0`
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.6 Hugging Face Dataset)
+**Last reviewed:** 2026-08-24 (independent-product Phase 9 closeout)
 
-Imported dataset-row bundles use these same three containers. Mapping does
-not add a fourth renderer or a trainer profile. Named TRL and MLX-LM
-adapters are optional split-JSONL profiles; generic selectors stay
-`consumer_id` null. Parquet, Arrow, and Hugging Face Dataset remain planned
-in taxonomy (Phase 9). Parquet v1, Arrow IPC v1, and local Hugging Face
-DatasetDict v1 are executable as generic `semantic_content_only` exports.
-Columnar v1 does not claim portable exact bytes. There is no Hub upload.
+Imported dataset-row bundles use the same generic containers. Mapping
+does not add a trainer profile. Named TRL and MLX-LM adapters are
+optional split-JSONL profiles; generic selectors stay `consumer_id`
+null. Columnar v1 does not claim portable exact bytes. There is no Hub
+upload.
 
 **Next review:** Any generic-export selector, row-schema compatibility,
 consumer-profile, request, receipt, or transport change
@@ -32,11 +31,11 @@ Four separate decisions are involved:
 | Physical container | How should those already-finished rows and partitions be encoded as ordinary files? | Verified export selection after seal |
 | Consumer profile | Has a named downstream consumer contract accepted this schema and behavior? | Only when an implemented profile explicitly says so |
 
-The three generic exports have no consumer profile. A continuation dataset
+The generic exports have no consumer profile. A continuation dataset
 remains continuation whether its `prompt` and `completion` rows are written as
-JSONL, JSON, or CSV. Export never turns `full_text` into continuation, converts
-messages into prompt/completion, invents instructions, changes loss policy, or
-resplits records.
+JSONL, JSON, CSV, Parquet, Arrow, or a local DatasetDict. Export never turns
+`full_text` into continuation, converts messages into prompt/completion,
+invents instructions, changes loss policy, or resplits records.
 
 ## Choose a container
 
@@ -45,19 +44,32 @@ resplits records.
 | `split-jsonl-directory` v1 | The downstream reader works one JSON object per line, benefits from separate train/evaluation files, or needs nested `messages` rows | `text`, `prompt_completion`, `instruction_output`, `messages` | Payload files contain only row-schema keys. Provenance is a separate aligned sidecar, enabled by default. The only v1 options are `train_partition_name`, `evaluation_partition_name`, and `include_provenance`, supplied together only through surface request v2. |
 | `json` v1 | The downstream reader wants one self-describing dataset object with explicit schema, objective, loss, counts, and train/evaluation arrays | `text`, `prompt_completion`, `instruction_output`, `messages` | The fixed `dataset.json` document is the sole membership-bearing file. It is one complete JSON document; v1 makes no scale, streaming, or memory claim. It has no options. |
 | `constrained-csv` v1 | A strictly checked tabular reader requires flat named columns and can preserve the frozen CSV dialect exactly | `text`, `prompt_completion`, `instruction_output` | Nested `messages` is refused. CSV is fully quoted UTF-8/LF with mandatory provenance. Formula-looking strings are preserved, not sanitized; spreadsheet display or safety is not claimed. It has no options. |
+| `parquet` v1 | A Parquet reader needs columnar train/evaluation files and can tolerate `semantic_content_only` identity | `text`, `prompt_completion`, `instruction_output`, `messages` | Nested `messages` is a list of role/content structs. Null is unrepresentable. Execute requires optional extra `columnar`. Receipt bytes are this-run, not portable across PyArrow versions. |
+| `arrow` v1 | An Arrow IPC reader needs uncompressed train/evaluation files under the same identity as Parquet | `text`, `prompt_completion`, `instruction_output`, `messages` | Same semantic fingerprint as Parquet for the same rows. Execute requires optional extra `columnar`. |
+| `hugging-face-dataset` v1 | A local Hugging Face `DatasetDict` directory is the needed layout | `text`, `prompt_completion`, `instruction_output`, `messages` | Splits are `train` and `evaluation`. There is no Hub upload. Execute requires optional extra `columnar`. |
 
-If the row schema is `messages`, use split JSONL or canonical JSON. Do not
-flatten, stringify, or otherwise encode the nested value into CSV outside the
-contract and call it the same verified export.
+If the row schema is `messages`, use split JSONL, canonical JSON, Parquet,
+Arrow, or a local Hugging Face DatasetDict. Do not flatten, stringify, or
+otherwise encode the nested value into CSV outside the contract and call
+it the same verified export.
 
 If more than one container is compatible, prefer the simplest exact reader the
 downstream system already has:
 
 - choose split JSONL for one-record-per-line consumption;
 - choose canonical JSON for explicit dataset-level metadata and partition
-  structure in one document; or
+  structure in one document;
 - choose constrained CSV only for a flat-schema system that requires columns
-  and has been checked against the exact dialect.
+  and has been checked against the exact dialect; or
+- choose Parquet, Arrow IPC, or a local Hugging Face DatasetDict when that
+  file shape is the actual reader contract, knowing identity is
+  `semantic_content_only` rather than portable exact bytes.
+
+Measured tree sizes on the Phase 3 full-text fixture (one train row, two
+evaluation rows, this pinned extra) were 24,073 bytes for split JSONL,
+25,162 for Parquet, 25,386 for Arrow IPC, and 31,733 for the local
+DatasetDict. Those numbers are this-run sizes for that fixture. They are
+not a storage or speed recommendation across datasets or library versions.
 
 File-extension familiarity is not consumer compatibility. A tool that says it
 accepts “JSONL,” “JSON,” or “CSV” may still expect different field names,
@@ -136,9 +148,9 @@ stems or Boolean provenance choice:
 
 Repeat the identical `container_options` for v2 execute and verify, adding the
 same `destination_root` and dry-run `expected_export_plan_id` fields shown in
-the v1 templates. Request v1 can select any one of the three fixed container
-profiles. Request v2 is only for split JSONL; canonical JSON and constrained
-CSV refuse it. The [CLI reference](cli.md#verified-export-commands) explains each
+the v1 templates. Request v1 selects any current generic except configured
+split JSONL. Request v2 is only for split JSONL; canonical JSON,
+constrained CSV, Parquet, Arrow, and Hugging Face DatasetDict refuse it. The [CLI reference](cli.md#verified-export-commands) explains each
 operation, options boundary, preview result, and output tree.
 
 Dry run reads and verifies the source but does not invoke a renderer or access

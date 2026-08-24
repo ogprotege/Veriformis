@@ -1,70 +1,37 @@
-"""Phase 9.1: planned columnar containers refuse; existing selectors stay."""
+"""Phase 9 isolation: extras stay empty after taxonomy promotion."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-from veriformis.errors import ExportContractError
-from veriformis.exports import (
-    EXPORT_SURFACE_REQUEST_SCHEMA,
-    ExportDryRunRequest,
-    ExportService,
-)
+from veriformis.exports import ExportService
 from veriformis.exports.split_jsonl import (
     SPLIT_JSONL_CONTAINER_ID,
     SPLIT_JSONL_CONTAINER_VERSION,
 )
 from veriformis.taxonomy import (
+    IMPLEMENTED_PHYSICAL_CONTAINERS,
     PLANNED_PHYSICAL_CONTAINERS,
     UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS,
     catalog,
 )
 
-FIXTURE = (
-    Path(__file__).resolve().parents[1]
-    / "regressions"
-    / "fixtures"
-    / "phase3"
-    / "pre-taxonomy-full-text.vfbundle.json"
-)
 ROOT = Path(__file__).resolve().parents[2]
+COLUMNAR_CONTAINERS = ("parquet", "arrow", "hugging-face-dataset")
 
 
-def _planned_request(container_id: str) -> ExportDryRunRequest:
-    return ExportDryRunRequest(
-        operation="dry_run",
-        schema_version=EXPORT_SURFACE_REQUEST_SCHEMA,
-        bundle=str(FIXTURE),
-        container_id=container_id,
-        container_version=1,
-        consumer_id=None,
-        consumer_profile_version=None,
-        source_trust_policy="allow_self_consistent",
-        expected_manifest_sha256=None,
-        overwrite_policy="refuse",
-    )
-
-
-def test_planned_container_item_map_is_closed_over_the_taxonomy() -> None:
-    assert PLANNED_PHYSICAL_CONTAINERS == (
-        "parquet",
-        "arrow",
-        "hugging-face-dataset",
-    )
-    assert set(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) <= set(
-        PLANNED_PHYSICAL_CONTAINERS
-    )
+def test_planned_container_item_map_is_empty_after_promotion() -> None:
+    assert PLANNED_PHYSICAL_CONTAINERS == ()
     assert dict(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) == {}
+    assert IMPLEMENTED_PHYSICAL_CONTAINERS[-3:] == COLUMNAR_CONTAINERS
 
 
-def test_taxonomy_still_lists_columnar_containers_as_planned() -> None:
+def test_taxonomy_lists_columnar_containers_as_implemented() -> None:
     entries = {
         (entry.axis, entry.identifier): entry.state for entry in catalog()
     }
-    for identifier in PLANNED_PHYSICAL_CONTAINERS:
-        assert entries[("physical_container", identifier)] == "planned"
+    for identifier in COLUMNAR_CONTAINERS:
+        assert entries[("physical_container", identifier)] == "implemented"
 
 
 def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
@@ -97,65 +64,10 @@ def test_existing_generic_and_profile_selectors_remain_discoverable() -> None:
         if profile.consumer_profile is not None
     }
     assert named == {"mlx-lm", "trl"}
-    for identifier in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS:
-        assert all(profile.selector[0] != identifier for profile in profiles.values())
-    assert (
-        "arrow",
-        1,
-        None,
-        None,
-    ) in profiles
-    assert (
-        "parquet",
-        1,
-        None,
-        None,
-    ) in profiles
-    assert (
-        "hugging-face-dataset",
-        1,
-        None,
-        None,
-    ) in profiles
-
-
-def test_planned_container_refuses_before_source_access(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    service = ExportService()
-    source_opened = False
-
-    def fail_if_opened(*_args: object, **_kwargs: object) -> None:
-        nonlocal source_opened
-        source_opened = True
-        raise AssertionError("planned containers must fail before source access")
-
-    monkeypatch.setattr(service, "verified_source", fail_if_opened)
-    assert dict(UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS) == {}
-    for container_id, item in UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS.items():
-        with pytest.raises(
-            ExportContractError,
-            match=f"planned for item {item}",
-        ):
-            service.dry_run_export(_planned_request(container_id))
-    assert source_opened is False
-
-
-def test_hugging_face_dataset_dry_run_is_not_a_planned_refusal(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    service = ExportService()
-    source_opened = False
-
-    def mark_opened(*_args: object, **_kwargs: object) -> None:
-        nonlocal source_opened
-        source_opened = True
-        raise AssertionError("source probe")
-
-    monkeypatch.setattr(service, "verified_source", mark_opened)
-    with pytest.raises(AssertionError, match="source probe"):
-        service.dry_run_export(_planned_request("hugging-face-dataset"))
-    assert source_opened is True
+    for identifier in COLUMNAR_CONTAINERS:
+        profile = profiles[(identifier, 1, None, None)]
+        assert profile.consumer_profile is None
+        assert profile.container_profile.determinism_claim == "semantic_content_only"
 
 
 def test_no_unexecutable_physical_container_remains_on_the_cli() -> None:

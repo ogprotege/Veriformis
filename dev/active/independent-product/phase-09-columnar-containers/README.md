@@ -1,10 +1,10 @@
 # Phase 9 — Columnar and Hugging Face Dataset Containers
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-23
 
-**Completed:**
+**Completed:** 2026-08-24
 
 **Roadmap phase:** [Phase 9](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-9--add-columnar-and-hugging-face-dataset-containers)
 
@@ -45,7 +45,7 @@ planned, and refuses those `container_id` values with the named later item.
 
 ## Current state
 
-Items 9.1–9.6 merged as PR #89–#94. Item 9.7 maps Parquet and Arrow into
-Phase 7 dataset-row capture. Suffix does not switch modes. Taxonomy
-`parquet`, `arrow`, and `hugging-face-dataset` remain planned. Extra
-`columnar` stays empty. There is no Hub upload.
+Items 9.1–9.8 close the phase. Taxonomy lists `parquet`, `arrow`, and
+`hugging-face-dataset` as implemented generic containers. Extra
+`columnar` stays empty. There is no Hub upload. Do not start Phase 10
+or 13 from this packet.

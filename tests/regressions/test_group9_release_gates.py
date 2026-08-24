@@ -121,7 +121,11 @@ def test_required_pytest_commands_do_not_collect_adapter_only_module():
         text = path.read_text(encoding="utf-8")
         assert "--ignore=tests/handoff" in text, path
         assert 'not aptus_integration' in text, path
+        assert "not profile_integration" in text, path
+        assert "not columnar_integration" in text, path
 
     ci_text = required[1].read_text(encoding="utf-8")
     assert "continue-on-error: true" in ci_text
     assert 'pytest -q -m "aptus_integration"' in ci_text
+    assert 'pytest -q -m "profile_integration"' in ci_text
+    assert 'pytest -q -m "columnar_integration"' in ci_text

@@ -269,7 +269,7 @@ class ColumnarSchemaCatalog(_StrictModel):
     round_trip: Literal[False]
     row_schemas: tuple[RowSchemaPin, ...]
     schema_id: Literal["veriformis.columnar-schema-discovery/v1"]
-    state: Literal["planned"]
+    state: Literal["implemented"]
 
     @field_validator("packages", "planned_containers", "row_schemas", mode="before")
     @classmethod

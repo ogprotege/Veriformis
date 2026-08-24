@@ -38,7 +38,7 @@ Run these checks before submitting a change:
 uv lock --check
 uv run ruff check src tests
 uv run python scripts/check_project_tracking.py
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
 git diff --check
 ```
 
@@ -117,6 +117,7 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
 | Consumer-profile adapters, harnesses, and sidecars | `tests/profiles/` |
 | Optional TRL/MLX-LM loader checks | `profile_integration` marker; optional CI job |
+| Optional PyArrow/Datasets loader checks | `columnar_integration` marker; optional CI job |
 | Finished seal / verifier | `tests/bundle/` |
 | Verified export models, membership, publication, API, and adapter parity | `tests/exports/`, `tests/contracts/test_verified_export_contract.py`, `tests/regressions/fixtures/phase4/export-surfaces.json` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |

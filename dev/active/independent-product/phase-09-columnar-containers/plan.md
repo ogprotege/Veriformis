@@ -1,6 +1,6 @@
 # Phase 9 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-23
 
@@ -133,9 +133,9 @@ the Phase 7 dataset-row path; suffix never switches modes.
 **Branch:** `phase9/08-harness-benchmarks-closeout`
 **Title:** `Phase 9.8: Load through the real libraries and close Phase 9`
 
-- [ ] Isolated harnesses and optional CI. Large values, nested roles, null refusal, Unicode, shard boundaries, empty eval, schema evolution, library reload.
-- [ ] Measure JSONL versus columnar before any storage or speed claim.
-- [ ] Promote the three containers to implemented. Closeout. Do not start Phase 10 or 13.
+- [x] Isolated harnesses and optional CI. Large values, nested roles, null refusal, Unicode, shard boundaries, empty eval, schema evolution, library reload.
+- [x] Measure JSONL versus columnar before any storage or speed claim.
+- [x] Promote the three containers to implemented. Closeout. Do not start Phase 10 or 13.
 
 ## Usability criteria
 
@@ -155,4 +155,4 @@ All current compatible row schemas round-trip through each new container with
 identical semantic fingerprints and partitions. Core tests still pass without
 the columnar extra. Version-drift tests fail clearly.
 
-**Result:** Pending. See [closeout.md](closeout.md).
+**Result:** Passed. See [closeout.md](closeout.md).

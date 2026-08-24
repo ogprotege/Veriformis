@@ -288,7 +288,7 @@ def test_normative_contract_names_every_schema_identity_and_current_boundary() -
     assert "complete `ExportDestinationFileBinding` JSON object" in contract
 
 
-def test_phase5_generic_containers_are_the_only_promoted_exports() -> None:
+def test_implemented_physical_containers_close_over_generic_and_columnar() -> None:
     assert IMPLEMENTED_PHYSICAL_CONTAINERS == (
         "minimal-v1",
         "deterministic-vfbundle-zip-v1",
@@ -296,6 +296,9 @@ def test_phase5_generic_containers_are_the_only_promoted_exports() -> None:
         "split-jsonl-directory",
         "json",
         "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset",
     )
     assert IMPLEMENTED_CONSUMER_PROFILES == (
         "veriformis-canonical-v1",

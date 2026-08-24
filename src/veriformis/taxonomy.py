@@ -110,12 +110,11 @@ IMPLEMENTED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "split-jsonl-directory",
     "json",
     "constrained-csv",
-)
-PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = (
     "parquet",
     "arrow",
     "hugging-face-dataset",
 )
+PLANNED_PHYSICAL_CONTAINERS: Final[tuple[str, ...]] = ()
 UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS: Final[Mapping[str, str]] = MappingProxyType(
     {}
 )

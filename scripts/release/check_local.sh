@@ -13,7 +13,7 @@ uv python install "$PYTHON"
 uv lock --check
 uv sync --python "$PYTHON" --extra test
 uv run --python "$PYTHON" ruff check src tests
-uv run --python "$PYTHON" pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration"
+uv run --python "$PYTHON" pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
 # The clean-wheel smoke includes the complete standalone golden compile using
 # the installed CLI, so a second source-tree golden run would duplicate work.
 bash "$ROOT/scripts/release/smoke_install.sh"

@@ -19,9 +19,9 @@ explicitly selects it as training content.
 > and `constrained-csv` v1. Goal-first recipes (Phase 6) and existing-dataset
 > import/mapping (Phase 7) are implemented. Phase 8 consumer profiles are
 > complete; TRL SFT and MLX-LM LoRA are implemented optional adapters. Phase 9
-> columnar containers are in progress: Parquet, Arrow IPC, and local Hugging
-> Face DatasetDict v1 are executable semantic generics. Taxonomy still lists
-> them planned. Extra `columnar` stays empty. This is **not** a
+> columnar containers are complete: Parquet, Arrow IPC, and local Hugging
+> Face DatasetDict v1 are implemented `semantic_content_only` generics.
+> Extra `columnar` stays empty. This is **not** a
 > public beta or production label. Limits:
 > [docs/beta-limitations.md](docs/beta-limitations.md). Install:
 > [docs/install.md](docs/install.md). Status:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -81,7 +82,7 @@ def test_arrow_is_discoverable_as_semantic_generic_export() -> None:
     states = {
         (entry.axis, entry.identifier): entry.state for entry in catalog()
     }
-    assert states[("physical_container", "arrow")] == "planned"
+    assert states[("physical_container", "arrow")] == "implemented"
 
 
 def test_arrow_dry_run_plans_semantic_fingerprints_without_pyarrow(
@@ -110,6 +111,8 @@ def test_arrow_dry_run_plans_semantic_fingerprints_without_pyarrow(
 
 
 def test_arrow_execute_fails_closed_without_pyarrow(tmp_path: Path) -> None:
+    if importlib.util.find_spec("pyarrow") is not None:
+        pytest.skip("PyArrow is installed")
     bundle = _materialize_bundle(tmp_path)
     service = ExportService()
     plan = service.dry_run_export(

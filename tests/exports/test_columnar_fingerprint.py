@@ -28,7 +28,7 @@ from veriformis.exports.columnar_fingerprint import (
 )
 from veriformis.exports.columnar_schemas import columnar_schema_digest
 from veriformis.identity import canonical_digest
-from veriformis.taxonomy import PLANNED_PHYSICAL_CONTAINERS
+from veriformis.taxonomy import IMPLEMENTED_PHYSICAL_CONTAINERS, PLANNED_PHYSICAL_CONTAINERS
 
 DATA_PATH = (
     Path(__file__).resolve().parents[2]
@@ -62,7 +62,7 @@ def test_packaged_contract_is_canonical() -> None:
     assert discover_columnar_fingerprint_contract() == json.loads(stored)
     contract = columnar_fingerprint_contract()
     assert isinstance(contract, ColumnarFingerprintContract)
-    assert contract.state == "planned"
+    assert contract.state == "implemented"
     assert contract.determinism_claim == "semantic_content_only"
     assert contract.receipt_binds == "exact_emitted_bytes"
     assert contract.excluded_library_metadata == EXCLUDED_LIBRARY_METADATA
@@ -107,7 +107,8 @@ def test_fingerprint_does_not_include_container_identity() -> None:
         evaluation_payloads=evaluation,
     )
     assert digest == again
-    assert PLANNED_PHYSICAL_CONTAINERS == (
+    assert PLANNED_PHYSICAL_CONTAINERS == ()
+    assert IMPLEMENTED_PHYSICAL_CONTAINERS[-3:] == (
         "parquet",
         "arrow",
         "hugging-face-dataset",
