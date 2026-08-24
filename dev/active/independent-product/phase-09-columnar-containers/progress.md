@@ -140,4 +140,4 @@ verified `external_digest`. One train row is scrape front matter, not
 encyclical prose. No generic columnar or trainer-profile export in this
 run.
 
-Phase 9 is complete. Do not start Phase 10 or 13 until the operator asks.
+Phase 9 is complete. 
