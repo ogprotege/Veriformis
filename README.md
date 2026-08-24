@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="docs/assets/colophon.png" width="888" alt="Veriformis colophon: sealed, local, exact">
-</p>
+# Veriformis
 
 A local compiler for fine-tuning datasets.
 
@@ -15,13 +13,13 @@ The pipeline never calls a model. It never leaves the machine.
 Limits: [docs/beta-limitations.md](docs/beta-limitations.md).
 Capability claims: [docs/current-status.md](docs/current-status.md).
 
-<p align="center">
-  <img src="docs/assets/compile-path.png" width="888" alt="Document-source and dataset-row compiler paths, with seal as the filled station">
-</p>
+## Highlights
 
-Cleaned text is compiler state. It becomes training content only when a
-`full_text` recipe says so, and only after curation, split, lowering,
-validation, and seal.
+- Document-source path: `parse → clean → chunk → construct → curate → split → format → validate → seal → verify`
+- Existing JSONL, JSON, CSV, Parquet, or Arrow rows: `parse --mode dataset-row` then `map`, then the same tail
+- Cleaned text is compiler state until a `full_text` recipe selects it
+- Sealed product is a six-file `.vfbundle`; derivatives do not recurate or resplit
+- Optional adapters: `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`. Extras stay empty. The exporter does not train.
 
 ## Install
 
@@ -102,14 +100,21 @@ uv run veriformis construct build/workspace \
 Later stages read the bound recipe. Only `instruction_output` needs
 `curate --instruction TEXT`.
 
-<p align="center">
-  <img src="docs/assets/bundle-form.png" width="888" alt="Six-file sealed bundle layout">
-</p>
+Default `seal` writes this tree and nothing else:
 
-Default `seal` writes that tree and nothing else. Optional consumer
-sidecars take an explicit flag. Aptus: `seal --aptus-handoff`, or
-`handoff` after sealing. Core install, CLI, MCP, and required release
-gates do not need Aptus.
+```
+example.vfbundle/
+  data/train.jsonl
+  data/evaluation.jsonl
+  metadata/row-provenance.jsonl
+  validation.json
+  manifest.json
+  attestation.json
+```
+
+Optional consumer sidecars take an explicit flag. Aptus:
+`seal --aptus-handoff`, or `handoff` after sealing. Core install, CLI,
+MCP, and required release gates do not need Aptus.
 
 ## Inputs
 
