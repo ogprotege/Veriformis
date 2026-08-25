@@ -40,10 +40,12 @@ Before changing code, read:
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
-Independent-product Phases 0–10 are complete on `main` once the Phase 10
-closeout merges. Phase 10 implements Axolotl, LLaMA-Factory, and Aptus
-as optional adapters under ADR-0014; `unsloth` remains a non-executable
-candidate. Extras stay empty.
+Independent-product Phases 0–11 are complete on `main`. Phase 12 is in
+progress at item 12.1: optional local OCR remains unevaluated,
+`ocr-image` is explicitly unsupported, and there is no `ocr` extra.
+Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
+adapters under ADR-0014; `unsloth` remains a non-executable candidate.
+Extras stay empty.
 Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed

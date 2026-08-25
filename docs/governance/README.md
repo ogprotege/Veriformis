@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.1 packet opening)
 
-**Next review:** Phase 10 closeout pull-request merge, beta label cut,
-or governance-schema change
+**Next review:** Phase 12.1 pull-request merge, item 12.2 evaluation,
+beta label cut, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -27,7 +27,9 @@ claims from drifting away from code and evidence.
 | [Completed Phase 7 packet](../../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping, templates, and closeout |
 | [Completed Phase 8 packet](../../dev/active/independent-product/phase-08-consumer-profiles/README.md) | First consumer profiles as optional adapters |
 | [Completed Phase 9 packet](../../dev/active/independent-product/phase-09-columnar-containers/README.md) | Columnar and Hugging Face dataset containers |
-| [Active Phase 10 packet](../../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles |
+| [Completed Phase 10 packet](../../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles |
+| [Completed Phase 11 packet](../../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening |
+| [Active Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local OCR; evaluation before ADR |
 
 Run the governance drift check with:
 

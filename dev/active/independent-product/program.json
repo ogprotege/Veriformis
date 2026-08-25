@@ -132,17 +132,17 @@
       "packet": "dev/active/independent-product/phase-11-collection-ingest",
       "started_on": "2026-08-25",
       "completed_on": "2026-08-25",
-      "next_gate": "Completed; collection plan v1 is the shared expander. Archives, parser subprocesses, and new input families are skipped with records. Do not start Phase 12 or 13 from this packet."
+      "next_gate": "Completed; collection plan v1 is the shared expander. Archives, parser subprocesses, and new input families are skipped with records."
     },
     {
       "number": 12,
       "title": "Add optional local OCR with accountable recovery",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [11],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-12-optional-ocr",
+      "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Proceed only if the OCR evaluation and ADR pass."
+      "next_gate": "Item 12.1 opens the packet. ocr-image remains explicitly unsupported. There is no ocr extra. Stop after 12.2 for an owner OCR ADR or deferral. Do not start Phase 13 from this packet."
     },
     {
       "number": 13,

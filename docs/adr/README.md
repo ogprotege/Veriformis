@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 11 collection plan)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.1 packet opening)
 
 **Next review:** Every material architecture or product-boundary decision
 
