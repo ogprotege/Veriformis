@@ -141,10 +141,14 @@ def test_phase_10_extras_are_declared_empty() -> None:
     assert "trl = []" in text
     assert "mlx-lm = []" in text
     assert "columnar = []" in text
+    assert "ocr = []" in text
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
     assert 'name = "axolotl"\n' not in lock
     assert 'name = "unsloth"\n' not in lock
     assert 'name = "llamafactory"\n' not in lock
     assert 'name = "llama-factory"\n' not in lock
     assert 'name = "torch"\n' not in lock
-    assert 'provides-extras = ["test", "trl", "mlx-lm", "columnar", "axolotl", "llama-factory", "unsloth"]' in lock
+    assert (
+        'provides-extras = ["test", "trl", "mlx-lm", "columnar", "axolotl", '
+        '"llama-factory", "unsloth", "ocr"]' in lock
+    )

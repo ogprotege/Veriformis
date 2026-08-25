@@ -32,7 +32,7 @@ every emitted character. This contract does not recover text.
 | `admitted_psm` | `6` |
 | `executable` | `false` |
 | `extra` | `ocr` |
-| `extra_declared` | `false` |
+| `extra_declared` | `true` (empty extra `ocr`) |
 
 Tessdata files are identity. A later parse records the SHA-256 of the
 exact `*.traineddata` bytes used, not a floating distro path.

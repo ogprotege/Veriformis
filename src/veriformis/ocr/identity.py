@@ -57,7 +57,7 @@ class OcrEnginePin(_StrictModel):
     engine_id: Literal["tesseract"]
     executable: Literal[False]
     extra: Literal["ocr"]
-    extra_declared: Literal[False]
+    extra_declared: bool
     license: Literal["Apache-2.0"]
     limitations: tuple[str, ...]
     measured_version: str
@@ -93,8 +93,8 @@ class OcrEnginePin(_StrictModel):
             raise OcrIdentityError("OCR limitations must match the v1 set")
         if self.executable:
             raise OcrIdentityError("OCR recovery is not executable in item 12.3")
-        if self.extra_declared:
-            raise OcrIdentityError("ocr extra is not declared until item 12.7")
+        if not self.extra_declared:
+            raise OcrIdentityError("ocr extra must be declared as an empty extra")
         return self
 
 
@@ -206,7 +206,7 @@ def admitted_ocr_engine() -> OcrEnginePin:
         engine_id="tesseract",
         executable=False,
         extra="ocr",
-        extra_declared=False,
+        extra_declared=True,
         license="Apache-2.0",
         limitations=LIMITATIONS,
         measured_version="5.5.3",

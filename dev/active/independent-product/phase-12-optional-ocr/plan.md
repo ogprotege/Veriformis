@@ -144,7 +144,8 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/07-ocr-extra`
 **Title:** `Phase 12.7: Isolate the OCR extra`
 
-- [ ] Extra `ocr`; core install unchanged.
+- [x] Extra `ocr` is an empty list. Tesseract runs as a subprocess when a
+      caller supplies `TesseractProvider`. Core install does not import it.
 
 ### 12.8 Prove no-network recovery and close Phase 12
 
