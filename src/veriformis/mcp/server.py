@@ -518,6 +518,13 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def ocr_preview(path: str) -> str:
+        """Classify PDF recovery pages without capturing a workspace."""
+        outcome = pipeline.ocr_preview([Path(path)])
+        assert outcome.preview is not None
+        return outcome.preview.transport_text()
+
+    @server.tool()
     def parse(
         paths: list[str],
         out: str,

@@ -136,7 +136,8 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/06-preview-review-hooks`
 **Title:** `Phase 12.6: Add page previews and review hooks`
 
-- [ ] Preview and correction hooks; no Phase 14 review platform.
+- [x] Read-only `ocr-preview` on PipelineService, CLI, and MCP. Pending
+      review is a page flag. Sources are not mutated.
 
 ### 12.7 Isolate the OCR extra
 

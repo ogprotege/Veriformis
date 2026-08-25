@@ -76,17 +76,7 @@ def parse_pdf_file(
         )
 
     try:
-        page_texts: list[str] = []
-        for index in range(len(document)):
-            page = document[index]
-            textpage = page.get_textpage()
-            try:
-                text = textpage.get_text_bounded() or ""
-            finally:
-                textpage.close()
-                page.close()
-            normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip()
-            page_texts.append(normalized)
+        page_texts = _pdf_page_texts(document)
     finally:
         document.close()
 
@@ -288,6 +278,38 @@ def parse_pdf_file(
         source=source,
         diagnostics=report,
     )
+
+
+def _pdf_page_texts(document: pdfium.PdfDocument) -> list[str]:
+    page_texts: list[str] = []
+    for index in range(len(document)):
+        page = document[index]
+        textpage = page.get_textpage()
+        try:
+            text = textpage.get_text_bounded() or ""
+        finally:
+            textpage.close()
+            page.close()
+        page_texts.append(text.replace("\r\n", "\n").replace("\r", "\n").strip())
+    return page_texts
+
+
+def pdf_page_texts(
+    path: str | Path,
+    *,
+    raw_bytes: bytes | None = None,
+) -> tuple[str, ...]:
+    """Return per-page digital text layers without running OCR."""
+    captured = raw_bytes if raw_bytes is not None else Path(path).read_bytes()
+    try:
+        document = pdfium.PdfDocument(captured)
+    except Exception:
+        return ()
+    try:
+        texts = _pdf_page_texts(document)
+    finally:
+        document.close()
+    return tuple(texts) if texts else ("",)
 
 
 def _split_paragraphs(text: str) -> list[str]:

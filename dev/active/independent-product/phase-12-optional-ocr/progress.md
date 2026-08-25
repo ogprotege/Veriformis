@@ -97,3 +97,10 @@ expected durability warning.
 stream and retained on `held_text`.
 
 **Next action:** Open the item 12.5 pull request after #108 merges.
+
+## 2026-08-25 — Item 12.6 preview and review hooks
+
+**Status:** `ocr-preview` is on PipelineService, CLI, and MCP.
+Pending review is a page flag. Sources are not mutated.
+
+**Next action:** Open the item 12.6 pull request after #109 (12.5) merges.

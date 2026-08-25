@@ -171,6 +171,7 @@ def test_mcp_server_registers_required_tools():
         "taxonomy",
         "list_recipes",
         "collect",
+        "ocr_preview",
         "parse",
         "clean",
         "chunk",

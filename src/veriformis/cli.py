@@ -257,6 +257,21 @@ def collect(
     _run(run)
 
 
+@app.command("ocr-preview")
+def ocr_preview(path: Path) -> None:
+    """Print OCR page previews and review hooks without writing a workspace."""
+
+    def run():
+        from veriformis.pipeline.service import StageOutcome
+
+        outcome = _SERVICE.ocr_preview([path])
+        assert outcome.preview is not None
+        typer.echo(outcome.preview.transport_text())
+        return StageOutcome(exit_status=outcome.exit_status)
+
+    _run(run)
+
+
 @app.command()
 def clean(
     workspace: Path,
