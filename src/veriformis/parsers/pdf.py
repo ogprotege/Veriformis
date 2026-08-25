@@ -82,10 +82,22 @@ def parse_pdf_file(
 
     if not page_texts:
         page_texts = [""]
+    rasters: tuple[bytes, ...] | None = None
+    if ocr_provider is not None:
+        from veriformis.ocr.raster import render_pdf_page_png
+
+        rendered: list[bytes] = []
+        for index, text in enumerate(page_texts, start=1):
+            if text.strip():
+                rendered.append(b"")
+            else:
+                rendered.append(render_pdf_page_png(captured, index))
+        rasters = tuple(rendered)
     recovery = recover_pages(
         tuple(page_texts),
         source_sha256=sha256_digest(captured),
         provider=ocr_provider,
+        rasters=rasters,
     )
     empty_pages = [
         page.page_index

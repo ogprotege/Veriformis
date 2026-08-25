@@ -42,6 +42,7 @@ columnar = []
 axolotl = []
 llama-factory = []
 unsloth = []
+ocr = []
 
 [project.scripts]
 veriformis = "veriformis.cli:main"

@@ -104,3 +104,10 @@ stream and retained on `held_text`.
 Pending review is a page flag. Sources are not mutated.
 
 **Next action:** Open the item 12.6 pull request after #109 (12.5) merges.
+
+## 2026-08-25 — Item 12.7 OCR extra
+
+**Status:** Extra `ocr = []`. `TesseractProvider` uses a local tesseract
+binary. Core tests skip when tesseract is absent.
+
+**Next action:** Open the item 12.7 pull request after 12.6 merges.

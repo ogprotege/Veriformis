@@ -30,7 +30,7 @@ _OCR_ENGINE_MODULES = (
 )
 _LOCK_EXTRAS = (
     'provides-extras = ["test", "trl", "mlx-lm", "columnar", "axolotl", '
-    '"llama-factory", "unsloth"]'
+    '"llama-factory", "unsloth", "ocr"]'
 )
 
 
@@ -42,8 +42,8 @@ def test_ocr_image_remains_explicitly_unsupported() -> None:
 def test_pyproject_has_no_ocr_extra() -> None:
     text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     extras = tomllib.loads(text)["project"]["optional-dependencies"]
-    assert "ocr" not in extras
-    assert "ocr =" not in text
+    assert extras.get("ocr") == []
+    assert "ocr = []" in text
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
     assert _LOCK_EXTRAS in lock
     assert 'name = "pytesseract"\n' not in lock

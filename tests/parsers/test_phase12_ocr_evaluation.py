@@ -77,7 +77,7 @@ def test_ocr_image_and_extra_remain_absent() -> None:
     extras = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
         "project"
     ]["optional-dependencies"]
-    assert "ocr" not in extras
+    assert extras.get("ocr") == []
 
 
 def test_evaluation_report_and_results_are_retained() -> None:

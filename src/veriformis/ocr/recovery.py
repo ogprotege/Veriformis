@@ -27,6 +27,7 @@ class _StrictModel(BaseModel):
 class OcrPageRequest(_StrictModel):
     digital_text: str
     page_index: int
+    raster_png: bytes
     source_sha256: str
 
     @model_validator(mode="after")
@@ -125,6 +126,7 @@ def recover_pages(
     *,
     source_sha256: str,
     provider: OcrProvider | None = None,
+    rasters: tuple[bytes, ...] | None = None,
 ) -> PdfDocumentRecovery:
     """Bind each page to digital or OCR recovery. Never OCR a digital page."""
     if not page_texts:
@@ -156,9 +158,15 @@ def recover_pages(
                 )
             )
             continue
+        raster = b""
+        if rasters is not None:
+            if len(rasters) != len(page_texts):
+                raise OcrIdentityError("OCR raster count must match page count")
+            raster = rasters[index - 1]
         request = OcrPageRequest(
             digital_text=text,
             page_index=index,
+            raster_png=raster,
             source_sha256=source_sha256,
         )
         result = provider.recover_page(request)

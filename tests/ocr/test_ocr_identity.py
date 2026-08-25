@@ -41,7 +41,7 @@ def test_admitted_engine_is_tesseract_5_and_not_executable() -> None:
     assert pin.admitted_languages == ("eng", "fra", "lat")
     assert pin.admitted_psm == (6,)
     assert pin.executable is False
-    assert pin.extra_declared is False
+    assert pin.extra_declared is True
     assert pin.contract_id == OCR_RECOVERY_IDENTITY_CONTRACT_ID
     assert pin.schema_id == OCR_RECOVERY_IDENTITY_SCHEMA_ID
     assert "handwriting-unsupported" in LIMITATIONS
@@ -138,7 +138,7 @@ def test_taxonomy_and_extra_unchanged() -> None:
     extras = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
         "project"
     ]["optional-dependencies"]
-    assert "ocr" not in extras
+    assert extras.get("ocr") == []
 
 
 def test_empty_text_pdf_still_refuses() -> None:

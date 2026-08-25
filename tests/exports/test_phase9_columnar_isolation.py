@@ -85,6 +85,6 @@ def test_columnar_extra_is_declared_empty() -> None:
     assert 'name = "pandas"\n' not in lock
     assert (
         'provides-extras = ["test", "trl", "mlx-lm", "columnar", "axolotl", '
-        '"llama-factory", "unsloth"]' in lock
+        '"llama-factory", "unsloth", "ocr"]' in lock
     )
     assert "axolotl = []" in text

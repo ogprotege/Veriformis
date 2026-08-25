@@ -69,7 +69,12 @@ def test_recover_pages_never_calls_provider_for_digital_text() -> None:
 
 def test_request_with_digital_text_fails_closed() -> None:
     with pytest.raises(OcrIdentityError, match="must not replace"):
-        OcrPageRequest(digital_text="keep me", page_index=1, source_sha256=_DIGEST)
+        OcrPageRequest(
+            digital_text="keep me",
+            page_index=1,
+            raster_png=b"",
+            source_sha256=_DIGEST,
+        )
 
 
 def test_mixed_pdf_without_provider_keeps_digital_and_omits_empty() -> None:

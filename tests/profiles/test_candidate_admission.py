@@ -142,6 +142,7 @@ def test_importing_candidate_admission_does_not_import_trainer_libraries() -> No
 def test_phase_10_extras_remain_empty() -> None:
     text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert "axolotl = []" in text
+    assert "ocr = []" in text
     assert "llama-factory = []" in text
     assert "unsloth = []" in text
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
