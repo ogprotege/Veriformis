@@ -170,6 +170,7 @@ def test_mcp_server_registers_required_tools():
         "version",
         "taxonomy",
         "list_recipes",
+        "collect",
         "parse",
         "clean",
         "chunk",

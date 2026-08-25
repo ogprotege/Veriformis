@@ -26,13 +26,13 @@ non-executable candidate; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–10 complete; maturity alpha; public Mac claim still owner-gated
+Phases 0–11 complete; maturity alpha; public Mac claim still owner-gated
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
+**Last reviewed:** 2026-08-25 (independent-product Phase 11.1–11.8 closeout)
 
-**Next review:** Phase 10 closeout pull-request merge, beta label cut,
+**Next review:** Phase 11 closeout pull-request merge, beta label cut,
 public-ready checklist, or any product-contract change. Do not start
-Phase 11 or 13 from this packet.
+Phase 12 or 13 from this packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 

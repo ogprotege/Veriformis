@@ -31,6 +31,7 @@ from veriformis.exports.api import (
     export_response_json,
     export_verify_response,
 )
+from veriformis.collection import CollectionSettings
 from veriformis.pipeline.service import (
     DEFAULT_PIPELINE_SERVICE,
     PipelineService,
@@ -200,6 +201,60 @@ def parse(
 ) -> None:
     """Capture raw files and commit one canonical parse revision."""
     _run(lambda: _SERVICE.parse(paths, out, source_root=source_root, mode=mode))
+
+
+@app.command()
+def collect(
+    paths: list[Path],
+    source_root: Path | None = typer.Option(None, "--source-root"),
+    mode: str | None = typer.Option(
+        None,
+        "--mode",
+        help="Compiler path: document-source (default), dataset-row, or mixed.",
+    ),
+    include_hidden: bool = typer.Option(False, "--hidden/--no-hidden"),
+    include_package_contents: bool = typer.Option(
+        False, "--package-contents/--no-package-contents"
+    ),
+    unsupported_policy: str = typer.Option("ignore", "--unsupported"),
+    max_files: int | None = typer.Option(None, "--max-files"),
+    max_bytes: int | None = typer.Option(None, "--max-bytes"),
+    include_glob: list[str] | None = typer.Option(None, "--include"),
+    exclude_glob: list[str] | None = typer.Option(None, "--exclude"),
+) -> None:
+    """Print a deterministic collection plan without capturing sources."""
+    from veriformis.collection import default_collection_settings
+
+    defaults = default_collection_settings()
+    if unsupported_policy not in {"ignore", "refuse"}:
+        raise typer.BadParameter("--unsupported must be ignore or refuse")
+    settings = CollectionSettings(
+        recurse=True,
+        include_hidden=include_hidden,
+        include_package_contents=include_package_contents,
+        follow_symlinks=False,
+        unsupported_policy=unsupported_policy,  # type: ignore[arg-type]
+        max_files=defaults.max_files if max_files is None else max_files,
+        max_bytes=defaults.max_bytes if max_bytes is None else max_bytes,
+        max_visited=defaults.max_visited,
+        include_globs=tuple(include_glob or ()),
+        exclude_globs=tuple(exclude_glob or ()),
+    )
+
+    def run():
+        from veriformis.pipeline.service import StageOutcome
+
+        outcome = _SERVICE.collect(
+            paths,
+            source_root=source_root,
+            mode=mode,
+            settings=settings,
+        )
+        assert outcome.plan is not None
+        typer.echo(outcome.plan.transport_text())
+        return StageOutcome(exit_status=outcome.exit_status)
+
+    _run(run)
 
 
 @app.command()

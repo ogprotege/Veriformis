@@ -194,6 +194,18 @@ class CompilePreflightError(VeriformisError):
     code = "compile-preflight-invalid"
 
 
+class CollectionError(VeriformisError):
+    """A collection plan cannot be built or is unsafe to execute."""
+
+    code = "collection-invalid"
+
+
+class CollectionLimitError(CollectionError):
+    """A collection exceeded a declared file, byte, or walk limit."""
+
+    code = "collection-limit"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

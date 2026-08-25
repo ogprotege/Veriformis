@@ -47,13 +47,18 @@ Phase 10 consumer-profile expansion is complete: Axolotl, LLaMA-Factory,
 and Aptus are implemented optional `ExportService` adapters. Unsloth
 remains experimental and is not executable. The sibling Aptus handoff
 CLI remains; default seal still does not write the descriptor. Empty
-extras stay empty. The exporter does not train. Do not start Phase 11
-or 13 from this packet.
+extras stay empty. The exporter does not train.
+Phase 11 collection ingest is complete: `veriformis.collection-plan/v1`
+expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
+unsupported, duplicate, and symlink members are counted. Limits fail
+closed. Archive ingest, parser subprocesses, and new input families are
+skipped with records. Image-only PDF still refuses as `ocr-image`. Do
+not start Phase 12 or 13 from this packet.
 
-**Review date:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
+**Review date:** 2026-08-25 (independent-product Phase 11.1–11.8 closeout)
 
-**Next review:** Phase 10 closeout pull-request merge, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 11
+**Next review:** Phase 11 closeout pull-request merge, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 12
 or 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`

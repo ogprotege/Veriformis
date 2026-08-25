@@ -10,16 +10,16 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-37 commands; `export` contains four subcommands.
+38 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.2 candidate pins)
+**Last reviewed:** 2026-08-25 (independent-product Phase 11 collection plan)
 
 **Next review:** Any CLI surface or release-gate documentation change
 
@@ -45,13 +45,18 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
 ## Supported inputs
 
-`parse` (and raw-file `preview`) accepts explicit files with these extensions:
+`parse` (and raw-file `preview`) accepts files or directories. Directories
+expand through `veriformis.collection-plan/v1` (`veriformis collect` prints
+the inventory). Hidden names are ignored by default; unsupported suffixes
+are counted and not parsed; symlinks are refused; limits fail closed.
+
+Declared suffixes:
 
 - documents: `.txt`, `.md`, `.markdown`, `.docx`, `.html`, `.htm`, `.pdf`;
 - structured: `.csv`, `.json`, `.jsonl`;
@@ -59,9 +64,8 @@ examples below use the installed name.
   `.rb`, `.sh`.
 
 Source code enters as one language-tagged code block. Digitally-born PDFs with
-no extractable text layer refuse with a named OCR limitation. Directories are
-not expanded by the CLI (the workbench may expand folders before calling
-`parse`). Raw-source capture rejects symlink components and non-regular files,
+no extractable text layer refuse with a named OCR limitation. Raw-source
+capture rejects symlink components and non-regular files,
 and walks from a pinned source-root descriptor so a concurrent retarget cannot
 escape the chosen root. Text and structured inputs must be UTF-8.
 

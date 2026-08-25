@@ -502,6 +502,22 @@ def create_mcp_server(
         return json.dumps(list(list_named_recipes()), ensure_ascii=False, indent=2)
 
     @server.tool()
+    def collect(
+        paths: list[str],
+        source_root: str | None = None,
+        mode: str | None = None,
+    ) -> str:
+        """Build a deterministic collection plan without capturing sources."""
+        root = Path(source_root) if source_root else None
+        return _outcome_json(
+            pipeline.collect(
+                [Path(p) for p in paths],
+                source_root=root,
+                mode=mode,
+            )
+        )
+
+    @server.tool()
     def parse(
         paths: list[str],
         out: str,

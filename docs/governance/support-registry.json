@@ -1,7 +1,7 @@
 {
   "schema_version": "veriformis.support-registry/v1",
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-24",
+  "last_reviewed": "2026-08-25",
   "claim_policy": "docs/governance/project-tracking.md",
   "product": {
     "name": "Veriformis",
