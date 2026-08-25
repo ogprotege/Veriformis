@@ -4,12 +4,12 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–10 complete).
+Phases 0–11 complete).
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.3–10.8 closeout)
+**Last reviewed:** 2026-08-25 (independent-product Phase 11.1–11.8 closeout)
 
-**Next review:** Phase 10 closeout pull-request merge, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 11
+**Next review:** Phase 11 closeout pull-request merge, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 12
 or 13 from this packet.
 
 ## Start here
@@ -66,6 +66,8 @@ or 13 from this packet.
 | [Goal Catalog v1](contracts/goal-catalog-v1.md) | Plain-language goals bound to existing objectives and row schemas | Implemented contract |
 | [Recipe Preset v1](contracts/recipe-preset-v1.md) | Versioned recipe defaults and per-goal presets | Implemented contract |
 | [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
+| [Collection Plan v1](contracts/collection-plan-v1.md) | File and directory membership before parse | Implemented contract |
+| [Parser Identity v1](contracts/parser-identity-v1.md) | Parser kind, version pins, and recovery-quality status | Implemented; parse-report bytes unchanged |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

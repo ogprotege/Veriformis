@@ -104,25 +104,16 @@ struct SourceDropView: View {
     }
 
     private func expand(_ urls: [URL]) -> [URL] {
-        var files: [URL] = []
+        // Collection membership is PipelineService. The workbench passes files
+        // and directories through unchanged so CLI parse/collect expand them.
         let fm = FileManager.default
-        for url in urls {
+        return urls.filter { url in
             var isDir: ObjCBool = false
             if fm.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue {
-                if let enumerator = fm.enumerator(
-                    at: url,
-                    includingPropertiesForKeys: [.isRegularFileKey],
-                    options: [.skipsHiddenFiles]
-                ) {
-                    for case let file as URL in enumerator {
-                        if supported(file) { files.append(file) }
-                    }
-                }
-            } else if supported(url) {
-                files.append(url)
+                return true
             }
+            return supported(url)
         }
-        return files
     }
 
     private func supported(_ url: URL) -> Bool {

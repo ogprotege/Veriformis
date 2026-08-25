@@ -55,8 +55,10 @@ evidence gates) is complete under its standard packet. Items 10.1–10.2
 opened the packet and pinned admissions as PR #97 and PR #98. Items
 10.3–10.8 emit Axolotl and LLaMA-Factory, skip Unsloth, move Aptus onto
 `ExportService`, add official-schema harnesses, and close the phase.
-Empty extras stay empty. The exporter does not train. Do not start
-Phase 11 or 13 from this packet.
+Empty extras stay empty. The exporter does not train.
+Phase 11 collection ingest is complete: shared collection plan v1;
+archives, parser subprocesses, and new input families skipped. Do not
+start Phase 12 or 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

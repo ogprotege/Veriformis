@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet)
+**Last reviewed:** 2026-08-25 (independent-product Phase 11 collection plan)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -36,6 +36,7 @@ not substitutes for implementation or tests.
 | [0012](0012-consumer-profile-as-optional-adapter.md) | Consumer profile as optional adapter over a verified bundle | Accepted | Item 8.3 TRL execution; item 8.4 MLX-LM execution; any required trainer extra |
 | [0013](0013-columnar-containers-as-optional-generic-exports.md) | Columnar containers as optional generic exports | Accepted | Item 9.4 Parquet execution; item 9.5 Arrow execution; item 9.6 Hugging Face Dataset execution; any required PyArrow extra |
 | [0014](0014-independently-admitted-consumer-profiles.md) | Independently admitted Phase 10 consumer profiles | Accepted | Item 10.2 admission pins; any required trainer extra; Aptus profile migration |
+| [0015](0015-collection-plan-as-ingest-contract.md) | Collection plan as ingest contract | Accepted | Any new collection setting; archive ingest; parser isolation; new input family; Phase 12 OCR |
 
 ## ADR template
 

@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-24 (Phase 10.3–10.8 emit, harness, closeout)
+**Last reviewed:** 2026-08-25 (Phase 11.1–11.8 collection ingest closeout)
 
-**Next review:** Phase 10 closeout pull-request merge, beta label cut,
-or any listed-item status change. Do not start Phase 11 or 13 from
+**Next review:** Phase 11 closeout pull-request merge, beta label cut,
+or any listed-item status change. Do not start Phase 12 or 13 from
 this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
@@ -103,6 +103,11 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-10-profile-expansion/README.md).
       Items 10.1–10.2 merged as PR #97–#98. Items 10.3–10.8 emit Axolotl,
       LLaMA-Factory, and Aptus, skip Unsloth, and close the phase.
+- [x] Independent product Phase 11 is complete under its
+      [packet](dev/active/independent-product/phase-11-collection-ingest/README.md).
+      Items 11.1–11.8 land as one pull request: collection plan v1, inventory,
+      parser hardening, parser identity pins; archives, subprocess isolation,
+      and new input families skipped.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -126,7 +131,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 8 | Implement the first consumer profiles | Completed | [Completed packet](dev/active/independent-product/phase-08-consumer-profiles/README.md) |
 | 9 | Add columnar and Hugging Face dataset containers | Completed | [Completed packet](dev/active/independent-product/phase-09-columnar-containers/README.md) |
 | 10 | Expand consumer profiles under evidence gates | Completed | [Completed packet](dev/active/independent-product/phase-10-profile-expansion/README.md) |
-| 11 | Harden collection ingest and qualify additional input types | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 11 | Harden collection ingest and qualify additional input types | Completed | [Completed packet](dev/active/independent-product/phase-11-collection-ingest/README.md) |
 | 12 | Add optional local OCR with accountable recovery | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 13 | Build dataset quality intelligence | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 14 | Deliver human review and correction workflows | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

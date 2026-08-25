@@ -78,6 +78,12 @@ from veriformis.datasets import (
     split_result_to_dict,
     validate_finished_dataset,
 )
+from veriformis.collection import (
+    CollectionPlan,
+    CollectionSettings,
+    accepted_source_paths,
+    build_collection_plan,
+)
 from veriformis.errors import (
     GoalCatalogError,
     MappingError,
@@ -207,6 +213,11 @@ class StageOutcome:
 @dataclass(frozen=True)
 class ParseOutcome(StageOutcome):
     source_count: int = 0
+
+
+@dataclass(frozen=True)
+class CollectionOutcome(StageOutcome):
+    plan: CollectionPlan | None = None
 
 
 @dataclass(frozen=True)
@@ -383,6 +394,15 @@ def _require_accepted_parse(result: ParseResult, *, logical_path: str) -> None:
     )
     detail = ", ".join(codes) if codes else "unspecified-parser-error"
     raise ParseError(f"parser refused {logical_path}: {detail}")
+
+
+def _collection_message(plan: CollectionPlan) -> ServiceMessage:
+    counts = plan.counts
+    return ServiceMessage(
+        f"collection {plan.plan_id}: accepted={counts.accepted} "
+        f"ignored={counts.ignored} refused={counts.refused} "
+        f"duplicate={counts.duplicate} degraded={counts.degraded}"
+    )
 
 
 def _recover_exact_finished_bundle(
@@ -1190,8 +1210,13 @@ class PipelineService:
                 "dataset-row compile preflight is mapping preview in item 7.6; "
                 "map JSONL with a confirmed mapping plan"
             )
-        preflight = build_compile_preflight(
+        _plan, collected = self._collected_paths(
             paths,
+            source_root=source_root,
+            mode=selected_mode,
+        )
+        preflight = build_compile_preflight(
+            collected,
             source_root=source_root,
             goal=goal,
             preset=preset,
@@ -1324,6 +1349,81 @@ class PipelineService:
             )
         )
 
+    def collect(
+        self,
+        paths: list[Path],
+        *,
+        source_root: Path | None = None,
+        mode: str | None = None,
+        settings: CollectionSettings | None = None,
+    ) -> CollectionOutcome:
+        """Build a collection plan without capturing or parsing."""
+        plan = self._collection_plan(
+            paths,
+            source_root=source_root,
+            mode=mode,
+            settings=settings,
+        )
+        counts = plan.counts
+        return CollectionOutcome(
+            plan=plan,
+            messages=(
+                ServiceMessage(
+                    f"collection {plan.plan_id}: accepted={counts.accepted} "
+                    f"ignored={counts.ignored} refused={counts.refused} "
+                    f"duplicate={counts.duplicate} degraded={counts.degraded}"
+                ),
+            ),
+        )
+
+    def _collection_plan(
+        self,
+        paths: list[Path],
+        *,
+        source_root: Path | None,
+        mode: str | None = None,
+        settings: CollectionSettings | None = None,
+    ) -> CollectionPlan:
+        from veriformis.mapping import require_executable_mode
+        from veriformis.mapping.capture import ROW_SUFFIXES
+        from veriformis.mapping.modes import DATASET_ROW_MODE, MIXED_MODE
+        from veriformis.parsers.dispatch import DECLARED_V1_EXTENSIONS
+
+        selected_mode = require_executable_mode(mode)
+        if selected_mode == DATASET_ROW_MODE:
+            suffixes = ROW_SUFFIXES
+        elif selected_mode == MIXED_MODE:
+            suffixes = tuple(sorted(set(DECLARED_V1_EXTENSIONS) | set(ROW_SUFFIXES)))
+        else:
+            suffixes = tuple(sorted(DECLARED_V1_EXTENSIONS))
+        return build_collection_plan(
+            paths,
+            source_root=source_root,
+            settings=settings,
+            accepted_suffixes=suffixes,
+        )
+
+    def _collected_paths(
+        self,
+        paths: list[Path],
+        *,
+        source_root: Path | None,
+        mode: str | None = None,
+        settings: CollectionSettings | None = None,
+    ) -> tuple[CollectionPlan | None, list[Path]]:
+        from veriformis.sources import _source_root
+
+        if not any(path.is_dir() for path in paths):
+            return None, list(paths)
+        plan = self._collection_plan(
+            paths,
+            source_root=source_root,
+            mode=mode,
+            settings=settings,
+        )
+        root, _identity = _source_root(source_root)
+        return plan, accepted_source_paths(plan, source_root=root)
+
     def parse(
         self,
         paths: list[Path],
@@ -1338,22 +1438,37 @@ class PipelineService:
         from veriformis.mapping.modes import DATASET_ROW_MODE, MIXED_MODE
 
         selected_mode = require_executable_mode(mode)
+        collection, collected = self._collected_paths(
+            paths,
+            source_root=source_root,
+            mode=selected_mode,
+        )
         if selected_mode == DATASET_ROW_MODE:
-            return self._parse_dataset_row(paths, out, source_root=source_root)
+            return self._parse_dataset_row(
+                collected,
+                out,
+                source_root=source_root,
+                collection=collection,
+            )
         if selected_mode == MIXED_MODE:
             from veriformis.mapping.capture import ROW_SUFFIXES
 
-            suffixes = {path.suffix.lower() for path in paths}
+            suffixes = {path.suffix.lower() for path in collected}
             row_suffixes = set(ROW_SUFFIXES)
             if suffixes <= row_suffixes:
-                return self._parse_dataset_row(paths, out, source_root=source_root)
+                return self._parse_dataset_row(
+                    collected,
+                    out,
+                    source_root=source_root,
+                    collection=collection,
+                )
             if suffixes & row_suffixes:
                 raise ParseError(
                     "mixed mode keeps construction and imported-row provenance "
                     "distinct; compile document-source and dataset-row workspaces "
                     "separately rather than fusing them in one stage graph"
                 )
-        source_captures = capture_source_batch(paths, source_root=source_root)
+        source_captures = capture_source_batch(collected, source_root=source_root)
         captured: list[tuple[Path, bytes]] = []
         for source_capture in source_captures:
             if source_capture.error is not None:
@@ -1489,15 +1604,19 @@ class PipelineService:
                     ]
                 },
             )
+        parse_messages: list[ServiceMessage] = []
+        if collection is not None:
+            parse_messages.append(_collection_message(collection))
+        parse_messages.append(
+            ServiceMessage(
+                f"parsed {len(results)} source(s) into revision {revision.revision_id}"
+            )
+        )
         return ParseOutcome(
             source_count=len(results),
             revision_id=revision.revision_id,
             durability_warning=workspace.last_commit_durability_warning,
-            messages=(
-                ServiceMessage(
-                    f"parsed {len(results)} source(s) into revision {revision.revision_id}"
-                ),
-            ),
+            messages=tuple(parse_messages),
         )
 
     def _parse_dataset_row(
@@ -1506,6 +1625,7 @@ class PipelineService:
         out: Path,
         *,
         source_root: Path | None = None,
+        collection: CollectionPlan | None = None,
     ) -> ParseOutcome:
         """Capture JSONL, JSON, CSV, Parquet, or Arrow row sources into a revision-v4 workspace."""
         from veriformis.identity import derive_source_id
@@ -1612,16 +1732,20 @@ class PipelineService:
                     ]
                 },
             )
+        parse_messages: list[ServiceMessage] = []
+        if collection is not None:
+            parse_messages.append(_collection_message(collection))
+        parse_messages.append(
+            ServiceMessage(
+                f"captured {len(captured)} row-source(s) into revision "
+                f"{revision.revision_id}"
+            )
+        )
         return ParseOutcome(
             source_count=len(captured),
             revision_id=revision.revision_id,
             durability_warning=workspace.last_commit_durability_warning,
-            messages=(
-                ServiceMessage(
-                    f"captured {len(captured)} row-source(s) into revision "
-                    f"{revision.revision_id}"
-                ),
-            ),
+            messages=tuple(parse_messages),
         )
 
     def clean(
