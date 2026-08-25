@@ -8,11 +8,11 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 11.1–11.8 collection ingest closeout)
+**Last reviewed:** 2026-08-25 (Phase 12.1 OCR packet opening)
 
-**Next review:** Phase 11 closeout pull-request merge, beta label cut,
-or any listed-item status change. Do not start Phase 12 or 13 from
-this packet.
+**Next review:** Phase 12.1 pull-request merge, item 12.2 evaluation,
+beta label cut, or any listed-item status change. Do not start Phase 13
+from this packet. Items 12.3–12.8 wait on an owner OCR ADR or deferral.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -108,6 +108,11 @@ local, offline, and free of LLM generation.
       Items 11.1–11.8 land as one pull request: collection plan v1, inventory,
       parser hardening, parser identity pins; archives, subprocess isolation,
       and new input families skipped.
+- [ ] Independent product Phase 12 is in progress under its
+      [packet](dev/active/independent-product/phase-12-optional-ocr/README.md).
+      Item 12.1 opens the packet. `ocr-image` remains explicitly unsupported.
+      There is no `ocr` extra. Stop after 12.2 for an owner ADR or deferral.
+      Do not start Phase 13 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -132,7 +137,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 9 | Add columnar and Hugging Face dataset containers | Completed | [Completed packet](dev/active/independent-product/phase-09-columnar-containers/README.md) |
 | 10 | Expand consumer profiles under evidence gates | Completed | [Completed packet](dev/active/independent-product/phase-10-profile-expansion/README.md) |
 | 11 | Harden collection ingest and qualify additional input types | Completed | [Completed packet](dev/active/independent-product/phase-11-collection-ingest/README.md) |
-| 12 | Add optional local OCR with accountable recovery | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 12 | Add optional local OCR with accountable recovery | In progress | [Active packet](dev/active/independent-product/phase-12-optional-ocr/README.md) |
 | 13 | Build dataset quality intelligence | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 14 | Deliver human review and correction workflows | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

@@ -52,14 +52,17 @@ Phase 11 collection ingest is complete: `veriformis.collection-plan/v1`
 expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
 unsupported, duplicate, and symlink members are counted. Limits fail
 closed. Archive ingest, parser subprocesses, and new input families are
-skipped with records. Image-only PDF still refuses as `ocr-image`. Do
-not start Phase 12 or 13 from this packet.
+skipped with records. Image-only PDF still refuses as `ocr-image`.
+Phase 12 is in progress at item 12.1: the OCR packet is open,
+`ocr-image` remains explicitly unsupported, and there is no `ocr`
+extra. Items 12.3–12.8 wait on an owner-approved OCR ADR or an explicit
+deferral after item 12.2. Do not start Phase 13 from this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 11.1–11.8 closeout)
+**Review date:** 2026-08-25 (independent-product Phase 12.1 packet opening)
 
-**Next review:** Phase 11 closeout pull-request merge, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 12
-or 13 from this packet.
+**Next review:** Phase 12.1 pull-request merge, item 12.2 evaluation,
+beta label cut, public-ready checklist, or any contract change. Do not
+start Phase 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

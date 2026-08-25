@@ -57,8 +57,11 @@ opened the packet and pinned admissions as PR #97 and PR #98. Items
 `ExportService`, add official-schema harnesses, and close the phase.
 Empty extras stay empty. The exporter does not train.
 Phase 11 collection ingest is complete: shared collection plan v1;
-archives, parser subprocesses, and new input families skipped. Do not
-start Phase 12 or 13 from this packet.
+archives, parser subprocesses, and new input families skipped. Phase 12
+is in progress at item 12.1: the OCR packet is open, `ocr-image` remains
+explicitly unsupported, and there is no `ocr` extra. Items 12.3–12.8
+wait on an owner-approved OCR ADR or deferral after 12.2. Do not start
+Phase 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
