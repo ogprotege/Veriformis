@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.1 packet opening)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.2 OCR evaluation)
 
-**Next review:** Phase 12.1 pull-request merge, item 12.2 evaluation,
-beta label cut, or governance-schema change
+**Next review:** Phase 12.2 operator ADR or deferral, beta label cut,
+or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

@@ -1,6 +1,6 @@
 # Phase 12 Evidence
 
-**Status:** Open — item 12.1
+**Status:** Open — item 12.2 evaluation recorded; ADR pending
 
 **Opened:** 2026-08-25
 
@@ -37,11 +37,26 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Core parse does not import OCR libraries.
 - [x] Focused isolation tests, tracking, Ruff, lock, and diff check.
 
+## Required item 12.2 evidence
+
+- [x] Retained license-safe corpus under `tests/fixtures/phase12/ocr-eval/`.
+- [x] Languages, scan rasters, mixed PDF, rotation, table, degraded noise,
+      handwriting exclusion, and CJK desk-note.
+- [x] Tesseract 5.5.3 measured: CER, runtime, RSS, tessdata sizes, OSD probe.
+- [x] Desk comparison of RapidOCR, PaddleOCR, EasyOCR, docTR, Surya, Apple
+      Vision, OCRmyPDF, and cloud OCR.
+- [x] Image-only corpus PDFs still refuse; mixed PDF keeps digital text.
+- [x] No `ocr` extra; `ocr-image` still explicitly unsupported.
+- [x] Operator decision recorded as accept / defer / more evaluation.
+- [x] Repository fixture inventory in `docs/governance/corpus-demand-matrix.json`
+      updated for the retained corpus.
+
 ## Local gates (2026-08-25)
 
-- `uv lock --check`
-- `uv run ruff check src tests`
-- `uv run python scripts/check_project_tracking.py` PASS
-- focused parser/taxonomy/isolation/tracking: 47 passed
-- core pytest: 2117 passed, 16 deselected, 1 expected durability warning
-- `git diff --check` clean
+Item 12.1: focused isolation 47 passed; core pytest 2117 passed, 16
+deselected, 1 expected durability warning.
+
+Item 12.2: `uv lock --check`; `ruff check src tests scripts`; tracking
+PASS; focused Phase 12 and corpus-matrix tests passed; core pytest 2122
+passed then 1 corpus-matrix miss, fixed by updating the fixture
+inventory; `git diff --check` clean.

@@ -1,0 +1,81 @@
+{
+  "cases": {
+    "clean-en": {
+      "condition": "clean-print",
+      "expected": "Veriformis recovers source text. This page is digitally born.",
+      "height": 612,
+      "language": "eng",
+      "width": 1700
+    },
+    "degraded-en": {
+      "condition": "degraded-noise",
+      "expected": "Veriformis recovers source text. This page is digitally born.",
+      "height": 612,
+      "language": "eng",
+      "width": 1700
+    },
+    "fra-accents": {
+      "condition": "language-french",
+      "expected": "Caf\u00e9 \u00e9l\u00e8ve: la page fran\u00e7aise reste locale.",
+      "height": 612,
+      "language": "fra",
+      "width": 1700
+    },
+    "lat-print": {
+      "condition": "language-latin",
+      "expected": "Non est summaria haec pagina.",
+      "height": 612,
+      "language": "lat",
+      "width": 1700
+    },
+    "mixed-en": {
+      "condition": "mixed-text-and-empty-page",
+      "expected": "Digital text on page one.",
+      "language": "eng"
+    },
+    "rotated-en": {
+      "condition": "rotation-90",
+      "expected": "Veriformis recovers source text. This page is digitally born.",
+      "height": 1700,
+      "language": "eng",
+      "width": 612
+    },
+    "table-en": {
+      "condition": "table",
+      "expected": "Item Count Note alpha 12 keep beta 3 skip",
+      "height": 778,
+      "language": "eng",
+      "width": 1700
+    }
+  },
+  "excluded": {
+    "cjk": "PDF standard-14 Helvetica cannot rasterize CJK; language-pack facts are desk-evaluated.",
+    "cloud-ocr": "Roadmap non-goal.",
+    "handwriting": "Roadmap non-goal; no handwriting sample is retained."
+  },
+  "files": {
+    "clean-en.image.pdf": "ca7d0edc431d2a586405a01ee5b492caed69a201825e792f2a5008d2bff6c9ce",
+    "clean-en.png": "3e5ba9c09f0fda1da84827bb0981ec7ca48a84638aa5f5a7a155a7018e637f66",
+    "clean-en.text.pdf": "91f10dc69fa73c81e1dffaf803aeae06002a4bd063296518e615bb1db133e645",
+    "degraded-en.image.pdf": "33717627b2be358033b7d1a21133ba57ed0a878258e106af8a90a0674d37ec47",
+    "degraded-en.png": "92f1cf03baea7823fa050277e4a3409116236f32fb7dbbffe4beef5b0d54cca5",
+    "degraded-en.text.pdf": "91f10dc69fa73c81e1dffaf803aeae06002a4bd063296518e615bb1db133e645",
+    "fra-accents.image.pdf": "2aea17df8289599ee35f698f980f9e70cdcb048e90e7e67e04eabbc0449a4dcd",
+    "fra-accents.png": "1c88c0e66ce94281f965d0436ba2c1663b8c0b38456d5c8a8e884a734cf3ee9f",
+    "fra-accents.text.pdf": "83af727a6eb02f9fd87572da670b4c334eb4479cae0e1c88fb0caa0b40afee9b",
+    "lat-print.image.pdf": "209451b75202f4d114014820464a8dfba2da367c7798d2a210829974b0277b2c",
+    "lat-print.png": "7a6a5ba179ef0817b9fcf71a121b9d68e38dd968b363c408d199c7cdff63db93",
+    "lat-print.text.pdf": "693ecd637ca4505c79604b6ce6ac433eebde8323c60d50ad9c4ec80fb8e5cbfd",
+    "mixed-en.text.pdf": "05b26c0ceb988947e473dc233909934d9130d546fcdfa23489d613ca05268f13",
+    "rotated-en.image.pdf": "4d680bb94b93d75d0dbbe74965b179c89201966f7e864ae1a433b6420871b741",
+    "rotated-en.png": "72d2ba9f85c6b13e0051923502a10a3bd5ad4887772550b80eaf6fc60e515556",
+    "rotated-en.text.pdf": "91f10dc69fa73c81e1dffaf803aeae06002a4bd063296518e615bb1db133e645",
+    "table-en.image.pdf": "611203e7e7e4c486a1fdec93ed7256875e8db2c6b7234797be2959255a6dc015",
+    "table-en.png": "b1d23f1362554473a1edba5f2495540b0b251af9acc728cfc3b9ba03d5e5b6f5",
+    "table-en.text.pdf": "9ac8f8d7d2b709a0e8656f3ff964e24b4e62f90b9296c02f6ffa21dd58d74dbd"
+  },
+  "license": "Original Veriformis fixtures. No third-party page scans.",
+  "renderer": "pypdfium2",
+  "scale": 2.7777777777777777,
+  "schema": "veriformis.phase12-ocr-eval-corpus/v1"
+}

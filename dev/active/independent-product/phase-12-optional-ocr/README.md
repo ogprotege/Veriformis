@@ -40,10 +40,13 @@ this packet.
 | [decisions.md](decisions.md) | Accepted scope decisions |
 | [risks.md](risks.md) | Risk register and controls |
 | [evidence.md](evidence.md) | Starting facts and observed proof |
+| [evaluation.md](evaluation.md) | Item 12.2 engine evaluation (operator decision) |
+| [evaluation-results.json](evaluation-results.json) | Item 12.2 Tesseract measurements |
 | [closeout.md](closeout.md) | Exit-gate judgment |
 | [SESSION.md](SESSION.md) | Crash-recovery pointer for the current item |
 
 ## Current state
 
-Item 12.1 is opening the packet. OCR is not implemented. Do not start
-Phase 13 from this packet.
+Item 12.2 records the OCR engine evaluation. `ocr-image` remains
+explicitly unsupported. There is no `ocr` extra. Stop for an owner ADR
+or deferral. Do not start items 12.3–12.8 or Phase 13 from this packet.

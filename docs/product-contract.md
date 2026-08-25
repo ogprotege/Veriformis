@@ -23,19 +23,19 @@ Hugging Face DatasetDict v1 implemented as `semantic_content_only`
 generics; Phase 10 complete under ADR-0014 with implemented Axolotl,
 LLaMA-Factory, and Aptus optional adapters and Unsloth remaining a
 non-executable candidate; Phase 11 collection-plan ingest complete;
-Phase 12 in progress at item 12.1 with `ocr-image` still explicitly
+Phase 12 in progress at item 12.2 with `ocr-image` still explicitly
 unsupported; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–11 complete; Phase 12 in progress at item 12.1; maturity alpha;
+Phases 0–11 complete; Phase 12 in progress at item 12.2; maturity alpha;
 public Mac claim still owner-gated. OCR remains explicitly unsupported.
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.1 packet opening)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.2 OCR evaluation)
 
-**Next review:** Phase 12.1 pull-request merge, item 12.2 evaluation,
-beta label cut, public-ready checklist, or any product-contract change.
-Do not start Phase 13 from this packet.
+**Next review:** Phase 12.2 operator ADR or deferral, beta label cut,
+public-ready checklist, or any product-contract change. Do not start
+Phase 13 from this packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
