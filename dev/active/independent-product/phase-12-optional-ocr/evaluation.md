@@ -1,6 +1,6 @@
 # Phase 12.2 OCR Engine Evaluation
 
-**Status:** Recorded 2026-08-25. Awaiting operator ADR or deferral.
+**Status:** Recorded 2026-08-25. Operator accepted Tesseract 5.
 
 **Does not change product behavior.** `ocr-image` remains
 `explicitly_unsupported`. There is no `ocr` extra. Image-only PDFs still
@@ -81,17 +81,8 @@ layout). They were not measured here and must not be implied implemented.
 
 ## Operator decision (12.2 exit)
 
-Choose one. Items 12.3–12.8 do not start until this is recorded.
+Recorded 2026-08-25: the operator chose **1. Accept Tesseract 5**.
 
-1. **Accept Tesseract 5** as the optional local engine and authorize a
-   Phase 12 OCR ADR. Item 12.3 then pins engine/model/language/version
-   identities. Digital text stays first. Rotation is an explicit
-   preprocess. Handwriting stays excluded. The `ocr` extra waits for 12.7.
-2. **Defer Phase 12.** `ocr-image` stays `explicitly_unsupported`. Image-only
-   PDFs keep refusing. The corpus and this report remain evidence.
-3. **Request more evaluation** before either 1 or 2 (camera photos, CJK
-   with an embedded font, a second engine measured on the same rasters).
-   That is still item 12.2.
-
-This report does not set acceptance thresholds. Those belong to item 12.5
-after an ADR, or they are moot if the phase is deferred.
+ADR-0016 and item 12.3 pin identities. Digital text stays first. Rotation
+is an explicit preprocess. Handwriting stays excluded. The `ocr` extra
+waits for 12.7. Thresholds remain item 12.5.

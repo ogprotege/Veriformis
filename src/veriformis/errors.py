@@ -206,6 +206,12 @@ class CollectionLimitError(CollectionError):
     code = "collection-limit"
 
 
+class OcrIdentityError(VeriformisError):
+    """An OCR recovery identity is invalid or not yet executable."""
+
+    code = "ocr-identity-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

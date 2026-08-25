@@ -4,13 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–11 complete; Phase 12 in progress at item 12.1).
+Phases 0–11 complete; Phase 12 in progress at item 12.3).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.2 OCR evaluation)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.3 OCR identities)
 
-**Next review:** Phase 12.2 operator ADR or deferral, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 13
-from this packet. OCR remains explicitly unsupported.
+**Next review:** Phase 12.3 pull-request merge, item 12.4 recovery paths,
+beta label cut, public-ready checklist, or any contract change. Do not
+start Phase 13 from this packet. OCR recovery is not executable.
 
 ## Start here
 
@@ -68,6 +68,7 @@ from this packet. OCR remains explicitly unsupported.
 | [Row Mapping v1](contracts/row-mapping-v1.md) | Existing-dataset capture, confirmed mapping plans, and `mapped_value` evidence | Implemented contract |
 | [Collection Plan v1](contracts/collection-plan-v1.md) | File and directory membership before parse | Implemented contract |
 | [Parser Identity v1](contracts/parser-identity-v1.md) | Parser kind, version pins, and recovery-quality status | Implemented; parse-report bytes unchanged |
+| [OCR Recovery Identity v1](contracts/ocr-recovery-identity-v1.md) | Tesseract 5 engine/page pins | Identity pin; recovery not executable; `ocr-image` still unsupported |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

@@ -41,9 +41,9 @@ Before changing code, read:
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
 Independent-product Phases 0–11 are complete on `main`. Phase 12 is in
-progress at item 12.2: optional local OCR is evaluated and waiting on an
-owner ADR or deferral, `ocr-image` is explicitly unsupported, and there
-is no `ocr` extra.
+progress at item 12.3: the operator accepted Tesseract 5, identities are
+pinned, recovery is not executable, `ocr-image` is explicitly
+unsupported, and there is no `ocr` extra.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

@@ -95,8 +95,9 @@ its [packet](phase-10-profile-expansion/README.md) with implemented
 Axolotl, LLaMA-Factory, and Aptus adapters; Unsloth remains experimental.
 Phase 11 completed under its
 [packet](phase-11-collection-ingest/README.md). Phase 12 opened under its
-[packet](phase-12-optional-ocr/README.md) on 2026-08-25; item 12.1 keeps
-`ocr-image` explicitly unsupported and adds no `ocr` extra.
+[packet](phase-12-optional-ocr/README.md) on 2026-08-25; the operator
+accepted Tesseract 5; item 12.3 pins identities; recovery is not
+executable; `ocr-image` stays explicitly unsupported.
 
 ## State change procedure
 

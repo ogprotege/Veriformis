@@ -8,11 +8,11 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 12.2 OCR engine evaluation)
+**Last reviewed:** 2026-08-25 (Phase 12.3 OCR identities)
 
-**Next review:** Phase 12.2 operator ADR or deferral, beta label cut,
-or any listed-item status change. Do not start items 12.3–12.8 or
-Phase 13 from this packet.
+**Next review:** Phase 12.3 pull-request merge, item 12.4 recovery paths,
+beta label cut, or any listed-item status change. Do not start Phase 13
+from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -111,9 +111,9 @@ local, offline, and free of LLM generation.
 - [ ] Independent product Phase 12 is in progress under its
       [packet](dev/active/independent-product/phase-12-optional-ocr/README.md).
       Item 12.1 opens the packet. Item 12.2 records the engine evaluation.
-      `ocr-image` remains explicitly unsupported. There is no `ocr` extra.
-      Stop for an owner ADR or deferral. Do not start Phase 13 from this
-      packet.
+      The operator accepted Tesseract 5. Item 12.3 records ADR-0016 and
+      recovery identities. `ocr-image` remains explicitly unsupported.
+      There is no `ocr` extra. Do not start Phase 13 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
