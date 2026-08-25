@@ -119,7 +119,9 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/04-recovery-paths`
 **Title:** `Phase 12.4: Distinguish digital, OCR, and merged recovery`
 
-- [ ] Never silently replace recoverable digital text.
+- [x] Classify digital, OCR, and merged pages. Digital text is never
+      sent to an OCR provider. Default parse still refuses image-only
+      PDFs. `ocr-image` stays unsupported.
 
 ### 12.5 Add confidence thresholds
 

@@ -1,4 +1,4 @@
-"""Optional OCR identities. Recovery is not executable until a later item."""
+"""Optional OCR identities and recovery-path classification."""
 
 from veriformis.ocr.identity import (
     ADMITTED_LANGUAGES,
@@ -16,6 +16,15 @@ from veriformis.ocr.identity import (
     ocr_page_identity_id,
     require_ocr_recovery_not_executable,
 )
+from veriformis.ocr.recovery import (
+    OcrPageRequest,
+    OcrPageResult,
+    PdfDocumentRecovery,
+    PdfPageRecovery,
+    document_recovery_path,
+    page_kind,
+    recover_pages,
+)
 
 __all__ = [
     "ADMITTED_LANGUAGES",
@@ -27,9 +36,16 @@ __all__ = [
     "OcrConfidence",
     "OcrEnginePin",
     "OcrPageIdentity",
+    "OcrPageRequest",
+    "OcrPageResult",
     "OcrPreprocess",
+    "PdfDocumentRecovery",
+    "PdfPageRecovery",
     "admitted_ocr_engine",
     "build_ocr_page_identity",
+    "document_recovery_path",
     "ocr_page_identity_id",
+    "page_kind",
+    "recover_pages",
     "require_ocr_recovery_not_executable",
 ]

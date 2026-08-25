@@ -8,9 +8,9 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 12.3 OCR identities)
+**Last reviewed:** 2026-08-25 (Phase 12.4 recovery paths)
 
-**Next review:** Phase 12.3 pull-request merge, item 12.4 recovery paths,
+**Next review:** Phase 12.4 pull-request merge, item 12.5 thresholds,
 beta label cut, or any listed-item status change. Do not start Phase 13
 from this packet.
 
@@ -111,8 +111,9 @@ local, offline, and free of LLM generation.
 - [ ] Independent product Phase 12 is in progress under its
       [packet](dev/active/independent-product/phase-12-optional-ocr/README.md).
       Item 12.1 opens the packet. Item 12.2 records the engine evaluation.
-      The operator accepted Tesseract 5. Item 12.3 records ADR-0016 and
-      recovery identities. `ocr-image` remains explicitly unsupported.
+      The operator accepted Tesseract 5. Item 12.3 records ADR-0016.
+      Item 12.4 classifies digital, OCR, and merged recovery. Digital
+      text is never replaced. `ocr-image` remains explicitly unsupported.
       There is no `ocr` extra. Do not start Phase 13 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).

@@ -1,12 +1,13 @@
 """Digitally-born PDF recovery via pypdfium2 text layer.
 
-Scanned or empty text-layer PDFs are refused with a named OCR limitation.
-No image decoding or OCR path exists in deterministic v1.
+Empty text-layer pages are classified as OCR recovery. Digital text is
+never replaced. Without an OCR provider, image-only PDFs still refuse.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pypdfium2 as pdfium
 
@@ -15,8 +16,13 @@ from veriformis.diagnostics import (
     make_diagnostic,
     make_parse_report,
 )
+from veriformis.identity import sha256_digest
 from veriformis.ir import Document, Heading, Paragraph, Span, Text
+from veriformis.ocr.recovery import recover_pages
 from veriformis.sources import ParseResult, register_source
+
+if TYPE_CHECKING:
+    from veriformis.ocr.recovery import OcrProvider
 
 PARSER_VERSION = "1.0.0"
 _PARSER = "pdf"
@@ -28,6 +34,7 @@ def parse_pdf_file(
     *,
     logical_path: str,
     raw_bytes: bytes | None = None,
+    ocr_provider: OcrProvider | None = None,
 ) -> ParseResult:
     """Extract page text from a digitally-born PDF into canonical IR."""
     p = Path(path)
@@ -70,7 +77,6 @@ def parse_pdf_file(
 
     try:
         page_texts: list[str] = []
-        empty_pages: list[int] = []
         for index in range(len(document)):
             page = document[index]
             textpage = page.get_textpage()
@@ -80,19 +86,37 @@ def parse_pdf_file(
                 textpage.close()
                 page.close()
             normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip()
-            if not normalized:
-                empty_pages.append(index + 1)
             page_texts.append(normalized)
     finally:
         document.close()
 
+    if not page_texts:
+        page_texts = [""]
+    recovery = recover_pages(
+        tuple(page_texts),
+        source_sha256=sha256_digest(captured),
+        provider=ocr_provider,
+    )
+    empty_pages = [
+        page.page_index
+        for page in recovery.pages
+        if page.recovery_path == "ocr" and not page.text.strip()
+    ]
+    recovery_details = {
+        "recovery_path": recovery.recovery_path,
+        "pages": [
+            {"page_index": page.page_index, "recovery_path": page.recovery_path}
+            for page in recovery.pages
+        ],
+    }
+
     blocks: list = []
     parts: list[str] = []
     pos = 0
-    for page_number, page_text in enumerate(page_texts, start=1):
-        if not page_text:
+    for page in recovery.pages:
+        if not page.text.strip():
             continue
-        heading = f"Page {page_number}"
+        heading = f"Page {page.page_index}"
         if parts:
             pos += 2
         heading_start = pos
@@ -107,7 +131,7 @@ def parse_pdf_file(
         )
         parts.append(heading)
         pos = heading_end
-        for paragraph in _split_paragraphs(page_text):
+        for paragraph in _split_paragraphs(page.text):
             pos += 2
             start = pos
             end = start + len(paragraph)
@@ -146,7 +170,7 @@ def parse_pdf_file(
                     "One or more PDF pages exposed no extractable text layer: "
                     + ", ".join(str(item) for item in empty_pages)
                 ),
-                details={"empty_pages": empty_pages},
+                details={"empty_pages": empty_pages, **recovery_details},
             )
         )
 
@@ -168,6 +192,7 @@ def parse_pdf_file(
                 details={
                     "limitation": _OCR_LIMITATION,
                     "page_count": len(page_texts),
+                    **recovery_details,
                 },
             )
         )

@@ -5,15 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-25
 
-**Local branch:** `phase12/03-ocr-adr-identities` from
-`phase12/02-ocr-engine-evaluation`.
+**Local branch:** `phase12/04-recovery-paths` from
+`phase12/03-ocr-adr-identities`.
 
-**Predecessor:** Item 12.2 on `phase12/02-ocr-engine-evaluation` (PR #106).
+**Predecessor:** Item 12.3 (PR #107).
 
-**Completed:** 12.1 packet; 12.2 evaluation; operator accepted Tesseract 5
+**Completed:** 12.1–12.3. Operator accepted Tesseract 5.
 
-**Current item:** 12.3 Record the OCR ADR and recovery identities
+**Current item:** 12.4 Distinguish digital, OCR, and merged recovery
 
-**Not started:** 12.4–12.8. Do not start Phase 13 from this packet.
+**Not started:** 12.5–12.8. Do not start Phase 13 from this packet.
 
-**12.3 design:** ADR-0016. Identity pin. Recovery not executable. No extra.
+**12.4 design:** Classify pages. Never OCR digital text. Provider is
+opt-in; default parse still refuses image-only PDFs.

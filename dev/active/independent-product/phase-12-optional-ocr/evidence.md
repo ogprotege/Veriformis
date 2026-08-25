@@ -61,6 +61,15 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] `ocr-image` still unsupported; no `ocr` extra; empty-text PDF still
       refuses; identity import does not load Tesseract.
 
+## Required item 12.4 evidence
+
+- [x] Pages classify as digital, ocr, or a merged document.
+- [x] OCR provider is never called for a digital page.
+- [x] A request carrying digital text fails closed.
+- [x] Mixed PDF keeps digital text; with a test provider, empty pages recover
+      as OCR without replacing digital text.
+- [x] Image-only PDF without a provider still refuses.
+
 ## Local gates (2026-08-25)
 
 Item 12.1: focused isolation 47 passed; core pytest 2117 passed, 16
