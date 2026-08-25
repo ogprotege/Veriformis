@@ -109,48 +109,48 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/03-ocr-adr-identities`
 **Title:** `Phase 12.3: Record the OCR ADR and recovery identities`
 
-- [ ] Blocked on 12.2. Define engine/model/language/version identities,
-      page/image digests, coordinates, confidence facts, preprocessing
-      transforms, and deterministic limitations.
+- [x] Operator accepted Tesseract 5. ADR-0016 and
+      `veriformis.ocr-recovery-identity/v1` pin engine, tessdata, page
+      digest, coordinates, confidence, preprocess, and limitations.
+      Recovery is not executable. `ocr-image` stays unsupported.
 
 ### 12.4 Distinguish digital, OCR, and merged recovery
 
 **Branch:** `phase12/04-recovery-paths`
 **Title:** `Phase 12.4: Distinguish digital, OCR, and merged recovery`
 
-- [ ] Blocked on 12.2. Never silently replace recoverable digital text.
+- [ ] Never silently replace recoverable digital text.
 
 ### 12.5 Add confidence thresholds
 
 **Branch:** `phase12/05-confidence-thresholds`
 **Title:** `Phase 12.5: Add confidence thresholds`
 
-- [ ] Blocked on 12.2. Warn, require review, or refuse. Do not delete
-      low-confidence content silently.
+- [ ] Warn, require review, or refuse. Do not delete low-confidence
+      content silently.
 
 ### 12.6 Add page previews and review hooks
 
 **Branch:** `phase12/06-preview-review-hooks`
 **Title:** `Phase 12.6: Add page previews and review hooks`
 
-- [ ] Blocked on 12.2. Preview and correction hooks; no Phase 14 review
-      platform.
+- [ ] Preview and correction hooks; no Phase 14 review platform.
 
 ### 12.7 Isolate the OCR extra
 
 **Branch:** `phase12/07-ocr-extra`
 **Title:** `Phase 12.7: Isolate the OCR extra`
 
-- [ ] Blocked on 12.2. Extra `ocr`; core install unchanged.
+- [ ] Extra `ocr`; core install unchanged.
 
 ### 12.8 Prove no-network recovery and close Phase 12
 
 **Branch:** `phase12/08-ocr-harness-closeout`
 **Title:** `Phase 12.8: Prove no-network recovery and close Phase 12`
 
-- [ ] Blocked on 12.2. No-network, missing model, multilingual, corrupt
-      image, resource-limit, and provenance-replay tests. Closeout. Do not
-      start Phase 13.
+- [ ] No-network, missing model, multilingual, corrupt image,
+      resource-limit, and provenance-replay tests. Closeout. Do not start
+      Phase 13.
 
 ## Usability criteria
 

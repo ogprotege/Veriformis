@@ -85,7 +85,7 @@ def test_evaluation_report_and_results_are_retained() -> None:
     text = RESULTS.read_text(encoding="utf-8")
     assert "Tesseract 5" in text
     assert "Surya" in text
-    assert "Awaiting operator ADR or deferral" in text
+    assert "Operator accepted Tesseract 5" in text
     payload = json.loads(RESULTS_JSON.read_text(encoding="utf-8"))
     assert payload["schema"] == "veriformis.phase12-ocr-eval-results/v1"
     assert payload["tesseract"]["available"] is True

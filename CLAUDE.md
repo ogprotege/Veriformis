@@ -58,10 +58,11 @@ opened the packet and pinned admissions as PR #97 and PR #98. Items
 Empty extras stay empty. The exporter does not train.
 Phase 11 collection ingest is complete: shared collection plan v1;
 archives, parser subprocesses, and new input families skipped. Phase 12
-is in progress at item 12.2: the OCR evaluation is recorded, `ocr-image`
-remains explicitly unsupported, and there is no `ocr` extra. Items
-12.3–12.8 wait on an owner-approved OCR ADR or deferral. Do not start
-Phase 13 from this packet.
+is in progress at item 12.3: the operator accepted Tesseract 5. ADR-0016
+and `veriformis.ocr-recovery-identity/v1` pin engine, tessdata, page, and
+preprocess identities. Recovery is not executable. `ocr-image` remains
+explicitly unsupported. There is no `ocr` extra. Do not start Phase 13
+from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -138,8 +139,11 @@ Read these current authorities before changing code:
     `docs/contracts/trl-export-v1.md`,
     `docs/contracts/mlx-lm-export-v1.md`,
     `docs/contracts/axolotl-export-v1.md`,
-    `docs/contracts/llama-factory-export-v1.md`, and
-    `docs/contracts/aptus-export-v1.md`
+    `docs/contracts/llama-factory-export-v1.md`,
+    `docs/contracts/aptus-export-v1.md`,
+    `docs/contracts/collection-plan-v1.md`,
+    `docs/contracts/parser-identity-v1.md`, and
+    `docs/contracts/ocr-recovery-identity-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -147,7 +151,9 @@ Read these current authorities before changing code:
     `docs/adr/0011-imported-records-and-mapping-evidence.md`, and
     `docs/adr/0012-consumer-profile-as-optional-adapter.md`,
     `docs/adr/0013-columnar-containers-as-optional-generic-exports.md`, and
-    `docs/adr/0014-independently-admitted-consumer-profiles.md`
+    `docs/adr/0014-independently-admitted-consumer-profiles.md`,
+    `docs/adr/0015-collection-plan-as-ingest-contract.md`, and
+    `docs/adr/0016-optional-local-tesseract-ocr.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

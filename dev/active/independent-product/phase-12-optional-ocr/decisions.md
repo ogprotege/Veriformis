@@ -16,3 +16,7 @@
 | Item 12.2 measures Tesseract on a retained corpus and desk-evaluates other engines; it does not admit an engine | Accepted | Roadmap items 1–2; operator chooses ADR or deferral |
 | Handwriting and cloud OCR stay excluded from the corpus | Accepted | Roadmap non-goals |
 | CJK is desk-evaluated only in 12.2 (no standard-14 glyphs) | Accepted | Helvetica cannot rasterize CJK |
+| Operator accepted Tesseract 5 | Accepted | Operator instruction 2026-08-25 after 12.2 |
+| ADR-0016 and ocr-recovery-identity v1 land in 12.3; recovery is not executable | Accepted | Identities before parser path (12.4) |
+| Admitted languages are `eng`, `fra`, `lat`; PSM is 6 | Accepted | 12.2 measurements |
+| Rotation is explicit `osd-rotate/v1` | Accepted | Default PSM failed the rotated page |

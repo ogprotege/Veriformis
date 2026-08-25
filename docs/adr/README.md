@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.1 packet opening)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.3 OCR identities)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -37,6 +37,7 @@ not substitutes for implementation or tests.
 | [0013](0013-columnar-containers-as-optional-generic-exports.md) | Columnar containers as optional generic exports | Accepted | Item 9.4 Parquet execution; item 9.5 Arrow execution; item 9.6 Hugging Face Dataset execution; any required PyArrow extra |
 | [0014](0014-independently-admitted-consumer-profiles.md) | Independently admitted Phase 10 consumer profiles | Accepted | Item 10.2 admission pins; any required trainer extra; Aptus profile migration |
 | [0015](0015-collection-plan-as-ingest-contract.md) | Collection plan as ingest contract | Accepted | Any new collection setting; archive ingest; parser isolation; new input family; Phase 12 OCR |
+| [0016](0016-optional-local-tesseract-ocr.md) | Optional local Tesseract 5 OCR | Accepted | Any new OCR engine; tessdata or language admission; promoting `ocr-image`; extra `ocr`; silent digital-text replacement |
 
 ## ADR template
 

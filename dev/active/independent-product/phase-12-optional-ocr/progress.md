@@ -43,3 +43,27 @@ extra. Surya weights fail the license gate. Cloud OCR remains excluded.
 **Next action:** Open the item 12.2 pull request. Stop for the operator
 to accept an OCR ADR, defer the phase, or request more evaluation. Do
 not start items 12.3–12.8.
+
+## 2026-08-25 — Operator accepted Tesseract 5; item 12.3 in progress
+
+**Status:** Operator instruction after 12.2: accept Tesseract 5.
+
+Item 12.3 publishes ADR-0016 and `veriformis.ocr-recovery-identity/v1`.
+The pin names Tesseract 5, measured languages `eng`/`fra`/`lat`, PSM 6,
+explicit `osd-rotate/v1`, and `executable=false`. Image-only PDF still
+refuses. There is no `ocr` extra.
+
+**Next action:** Publish the item 12.3 pull request. Do not start item
+12.4 until it merges.
+
+## 2026-08-25 — Item 12.3 local gates green
+
+**Status:** ADR-0016, identity pin, and tests are on
+`phase12/03-ocr-adr-identities`.
+
+Local gates: `uv lock --check`; `ruff check src tests`; tracking PASS;
+focused OCR/parser/taxonomy/tracking 37 passed; core pytest 2131 passed,
+16 deselected, 1 expected durability warning; `git diff --check` clean.
+
+**Next action:** Open the item 12.3 pull request. Require every GitHub
+check. Do not start item 12.4 until it merges.

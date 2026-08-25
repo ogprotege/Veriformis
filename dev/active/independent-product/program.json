@@ -142,7 +142,7 @@
       "packet": "dev/active/independent-product/phase-12-optional-ocr",
       "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Item 12.2 recorded the OCR evaluation. ocr-image remains explicitly unsupported. There is no ocr extra. Stop for an owner OCR ADR or deferral. Do not start items 12.3-12.8 or Phase 13 from this packet."
+      "next_gate": "Item 12.3 records ADR-0016 and Tesseract 5 identities. ocr-image remains explicitly unsupported. Recovery is not executable. There is no ocr extra. Do not start Phase 13 from this packet."
     },
     {
       "number": 13,

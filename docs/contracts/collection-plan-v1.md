@@ -49,8 +49,8 @@ suffixes, sorted members, and counts. Extra fields fail closed.
 
 ## Non-goals
 
-MIME sniffing. Archive expansion. Following links. Truncation at limits. OCR.
-New suffixes without an admission record.
+MIME sniffing. Archive expansion. Following links. Truncation at limits.
+OCR execution. New suffixes without an admission record.
 
 ## Surfaces
 

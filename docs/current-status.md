@@ -53,16 +53,17 @@ expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
 unsupported, duplicate, and symlink members are counted. Limits fail
 closed. Archive ingest, parser subprocesses, and new input families are
 skipped with records. Image-only PDF still refuses as `ocr-image`.
-Phase 12 is in progress at item 12.2: the OCR evaluation is recorded,
-`ocr-image` remains explicitly unsupported, and there is no `ocr`
-extra. Items 12.3–12.8 wait on an owner-approved OCR ADR or an explicit
-deferral. Do not start Phase 13 from this packet.
+Phase 12 is in progress at item 12.3: the operator accepted Tesseract 5.
+ADR-0016 and `veriformis.ocr-recovery-identity/v1` pin engine, tessdata,
+page, and preprocess identities. Recovery is not executable. `ocr-image`
+remains explicitly unsupported. There is no `ocr` extra. Do not start
+Phase 13 from this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 12.2 OCR evaluation)
+**Review date:** 2026-08-25 (independent-product Phase 12.3 OCR identities)
 
-**Next review:** Phase 12.2 operator ADR or deferral, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 13
-from this packet.
+**Next review:** Phase 12.3 pull-request merge, item 12.4 recovery paths,
+beta label cut, public-ready checklist, or any contract change. Do not
+start Phase 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

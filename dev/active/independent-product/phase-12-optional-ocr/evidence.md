@@ -1,6 +1,6 @@
 # Phase 12 Evidence
 
-**Status:** Open — item 12.2 evaluation recorded; ADR pending
+**Status:** Open — item 12.3 identities; recovery not executable
 
 **Opened:** 2026-08-25
 
@@ -47,9 +47,19 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
       Vision, OCRmyPDF, and cloud OCR.
 - [x] Image-only corpus PDFs still refuse; mixed PDF keeps digital text.
 - [x] No `ocr` extra; `ocr-image` still explicitly unsupported.
-- [x] Operator decision recorded as accept / defer / more evaluation.
+- [x] Operator accepted Tesseract 5.
 - [x] Repository fixture inventory in `docs/governance/corpus-demand-matrix.json`
       updated for the retained corpus.
+
+## Required item 12.3 evidence
+
+- [x] ADR-0016 accepted: optional local Tesseract 5.
+- [x] `veriformis.ocr-recovery-identity/v1` names engine, tessdata, page,
+      raster, preprocess, boxes, confidence, and limitations.
+- [x] Pin `executable=false`; `require_ocr_recovery_not_executable` fails closed.
+- [x] Unknown language, PSM, preprocess, and digest fail closed.
+- [x] `ocr-image` still unsupported; no `ocr` extra; empty-text PDF still
+      refuses; identity import does not load Tesseract.
 
 ## Local gates (2026-08-25)
 
@@ -60,3 +70,7 @@ Item 12.2: `uv lock --check`; `ruff check src tests scripts`; tracking
 PASS; focused Phase 12 and corpus-matrix tests passed; core pytest 2122
 passed then 1 corpus-matrix miss, fixed by updating the fixture
 inventory; `git diff --check` clean.
+
+Item 12.3: `uv lock --check`; `ruff check src tests`; tracking PASS;
+focused OCR/parser/taxonomy/tracking 37 passed; core pytest 2131 passed,
+16 deselected, 1 expected durability warning; `git diff --check` clean.

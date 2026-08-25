@@ -5,17 +5,15 @@ append-only history.
 
 **Updated:** 2026-08-25
 
-**Local branch:** `phase12/02-ocr-engine-evaluation` from
-`phase12/01-ocr-packet`.
+**Local branch:** `phase12/03-ocr-adr-identities` from
+`phase12/02-ocr-engine-evaluation`.
 
-**Predecessor:** Item 12.1 on `phase12/01-ocr-packet` (PR #105).
+**Predecessor:** Item 12.2 on `phase12/02-ocr-engine-evaluation` (PR #106).
 
-**Completed:** 12.1 (packet; OCR still refused)
+**Completed:** 12.1 packet; 12.2 evaluation; operator accepted Tesseract 5
 
-**Current item:** 12.2 Evaluate candidate local OCR engines
+**Current item:** 12.3 Record the OCR ADR and recovery identities
 
-**Not started:** 12.3–12.8 wait on owner ADR or deferral. Do not start
-Phase 13 from this packet.
+**Not started:** 12.4–12.8. Do not start Phase 13 from this packet.
 
-**12.2 design:** Retained license-safe corpus, Tesseract measurement,
-desk comparison of other engines. No extra. No taxonomy change. Stop.
+**12.3 design:** ADR-0016. Identity pin. Recovery not executable. No extra.
