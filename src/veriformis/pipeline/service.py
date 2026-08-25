@@ -221,6 +221,11 @@ class CollectionOutcome(StageOutcome):
 
 
 @dataclass(frozen=True)
+class OcrPreviewOutcome(StageOutcome):
+    preview: Any = None
+
+
+@dataclass(frozen=True)
 class CleanOutcome(StageOutcome):
     document_count: int = 0
     transform_count: int = 0
@@ -1372,6 +1377,32 @@ class PipelineService:
                     f"collection {plan.plan_id}: accepted={counts.accepted} "
                     f"ignored={counts.ignored} refused={counts.refused} "
                     f"duplicate={counts.duplicate} degraded={counts.degraded}"
+                ),
+            ),
+        )
+
+    def ocr_preview(self, paths: list[Path]) -> OcrPreviewOutcome:
+        """Classify PDF recovery pages without capturing a workspace."""
+        from veriformis.identity import sha256_digest
+        from veriformis.ocr.preview import page_previews
+        from veriformis.ocr.recovery import recover_pages
+        from veriformis.parsers.pdf import pdf_page_texts
+
+        if len(paths) != 1:
+            raise ParseError("ocr-preview accepts exactly one PDF")
+        path = paths[0]
+        raw = path.read_bytes()
+        recovery = recover_pages(
+            pdf_page_texts(path, raw_bytes=raw),
+            source_sha256=sha256_digest(raw),
+        )
+        preview = page_previews(recovery)
+        return OcrPreviewOutcome(
+            preview=preview,
+            messages=(
+                ServiceMessage(
+                    f"ocr-preview recovery_path={preview.recovery_path} "
+                    f"pages={len(preview.pages)}"
                 ),
             ),
         )

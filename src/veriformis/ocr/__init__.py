@@ -16,6 +16,7 @@ from veriformis.ocr.identity import (
     ocr_page_identity_id,
     require_ocr_recovery_not_executable,
 )
+from veriformis.ocr.preview import OcrPagePreview, OcrPreview, page_previews
 from veriformis.ocr.recovery import (
     OcrPageRequest,
     OcrPageResult,
@@ -42,7 +43,9 @@ __all__ = [
     "OcrConfidence",
     "OcrEnginePin",
     "OcrPageIdentity",
+    "OcrPagePreview",
     "OcrPageRequest",
+    "OcrPreview",
     "OcrPageResult",
     "OcrPreprocess",
     "PdfDocumentRecovery",
@@ -56,6 +59,7 @@ __all__ = [
     "document_recovery_path",
     "ocr_page_identity_id",
     "page_kind",
+    "page_previews",
     "recover_pages",
     "require_ocr_recovery_not_executable",
 ]
