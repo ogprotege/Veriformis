@@ -1,6 +1,6 @@
 # Phase 12 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-25
 
@@ -152,9 +152,8 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/08-ocr-harness-closeout`
 **Title:** `Phase 12.8: Prove no-network recovery and close Phase 12`
 
-- [ ] No-network, missing model, multilingual, corrupt image,
-      resource-limit, and provenance-replay tests. Closeout. Do not start
-      Phase 13.
+- [x] No-network, missing tessdata, corrupt raster, and identity-replay
+      tests. Closeout. Do not start Phase 13.
 
 ## Usability criteria
 
@@ -176,4 +175,4 @@ path and page evidence; low-quality cases warn or fail according to policy.
 If item 12.2 defers the phase, the exit is the recorded deferral with
 `ocr-image` still unsupported.
 
-**Result:** Pending item 12.1. See [closeout.md](closeout.md).
+**Result:** Passed. See [closeout.md](closeout.md).

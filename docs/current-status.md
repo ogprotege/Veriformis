@@ -53,16 +53,17 @@ expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
 unsupported, duplicate, and symlink members are counted. Limits fail
 closed. Archive ingest, parser subprocesses, and new input families are
 skipped with records. Image-only PDF still refuses as `ocr-image`.
-Phase 12 is in progress at item 12.4: digital, OCR, and merged recovery
-are classified; digital text is never replaced; default parse still
-refuses image-only PDF. `ocr-image` remains explicitly unsupported.
-There is no `ocr` extra. Do not start Phase 13 from this packet.
+Phase 12 optional local OCR is complete: Tesseract 5 under ADR-0016;
+digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
+empty extra `ocr`. Default parse still refuses image-only PDF.
+`ocr-image` remains explicitly unsupported. Do not start Phase 13 from
+this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 12.4 recovery paths)
+**Review date:** 2026-08-25 (independent-product Phase 12 closeout)
 
-**Next review:** Phase 12.4 pull-request merge, item 12.5 thresholds,
-beta label cut, public-ready checklist, or any contract change. Do not
-start Phase 13 from this packet.
+**Next review:** Phase 12 closeout pull-request merge, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 13
+from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

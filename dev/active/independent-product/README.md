@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–11 complete; Phase 12 in progress
+**Status:** Active program — Phases 0–12 complete
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -27,7 +27,7 @@ with roadmap headings.
 - [Phase 9 — Columnar and Hugging Face dataset containers](phase-09-columnar-containers/README.md) — completed
 - [Phase 10 — Expand consumer profiles under evidence gates](phase-10-profile-expansion/README.md) — complete
 - [Phase 11 — Harden collection ingest and qualify additional input types](phase-11-collection-ingest/README.md) — complete
-- [Phase 12 — Add optional local OCR with accountable recovery](phase-12-optional-ocr/README.md) — in progress
+- [Phase 12 — Add optional local OCR with accountable recovery](phase-12-optional-ocr/README.md) — complete
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active

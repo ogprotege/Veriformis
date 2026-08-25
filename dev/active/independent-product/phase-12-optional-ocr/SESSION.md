@@ -5,16 +5,10 @@ append-only history.
 
 **Updated:** 2026-08-25
 
-**Local branch:** `phase12/04-recovery-paths` from
-`phase12/03-ocr-adr-identities`.
+**Local branch:** `phase12/08-ocr-harness-closeout`
 
-**Predecessor:** Item 12.3 (PR #107).
+**Completed:** 12.1–12.8
 
-**Completed:** 12.1–12.3. Operator accepted Tesseract 5.
+**Current item:** Closeout pull request
 
-**Current item:** 12.4 Distinguish digital, OCR, and merged recovery
-
-**Not started:** 12.5–12.8. Do not start Phase 13 from this packet.
-
-**12.4 design:** Classify pages. Never OCR digital text. Provider is
-opt-in; default parse still refuses image-only PDFs.
+**Not started:** Phase 13. Do not start it from this packet.

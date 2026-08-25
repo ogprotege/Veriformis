@@ -4,13 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–11 complete; Phase 12 in progress at item 12.3).
+Phases 0–12 complete).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.3 OCR identities)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout)
 
-**Next review:** Phase 12.3 pull-request merge, item 12.4 recovery paths,
-beta label cut, public-ready checklist, or any contract change. Do not
-start Phase 13 from this packet. OCR recovery is not executable.
+**Next review:** Phase 12 closeout pull-request merge, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 13
+from this packet. Default parse still refuses image-only PDF.
 
 ## Start here
 
