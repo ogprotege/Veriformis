@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.3 OCR identities)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout)
 
-**Next review:** Phase 12.3 pull-request merge, item 12.4 recovery paths,
-beta label cut, or governance-schema change
+**Next review:** Phase 13 packet opening, beta label cut, or
+governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -29,7 +29,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 9 packet](../../dev/active/independent-product/phase-09-columnar-containers/README.md) | Columnar and Hugging Face dataset containers |
 | [Completed Phase 10 packet](../../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles |
 | [Completed Phase 11 packet](../../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening |
-| [Active Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local OCR; evaluation before ADR |
+| [Completed Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR |
 
 Run the governance drift check with:
 

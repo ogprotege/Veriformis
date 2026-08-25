@@ -1,10 +1,10 @@
 # Phase 12 — Add Optional Local OCR with Accountable Recovery
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-25
 
-**Completed:**
+**Completed:** 2026-08-25
 
 **Roadmap phase:** [Phase 12](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-12--add-optional-local-ocr-with-accountable-recovery)
 
@@ -47,6 +47,7 @@ this packet.
 
 ## Current state
 
-Item 12.4 classifies digital, OCR, and merged recovery. Digital text is
-never replaced. Default parse still refuses image-only PDFs. There is
-no `ocr` extra. Do not start Phase 13 from this packet.
+Items 12.1–12.8 are complete. Optional Tesseract 5 recovery is classified,
+thresholded, previewable, and isolated under empty extra `ocr`. Default
+parse still refuses image-only PDF. `ocr-image` stays explicitly
+unsupported. Do not start Phase 13 from this packet.

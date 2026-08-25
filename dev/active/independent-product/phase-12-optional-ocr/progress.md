@@ -111,3 +111,8 @@ Pending review is a page flag. Sources are not mutated.
 binary. Core tests skip when tesseract is absent.
 
 **Next action:** Open the item 12.7 pull request after 12.6 merges.
+
+## 2026-08-25 — Item 12.8 harness and closeout
+
+**Status:** No-network, missing tessdata, corrupt raster, and identity
+replay tests. Packet closeout. Phase 12 completed. Do not start Phase 13.

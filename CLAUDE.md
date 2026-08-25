@@ -57,11 +57,11 @@ opened the packet and pinned admissions as PR #97 and PR #98. Items
 `ExportService`, add official-schema harnesses, and close the phase.
 Empty extras stay empty. The exporter does not train.
 Phase 11 collection ingest is complete: shared collection plan v1;
-archives, parser subprocesses, and new input families skipped. Phase 12
-is in progress at item 12.4: digital, OCR, and merged recovery are
-classified and digital text is never replaced. Default parse still
-refuses image-only PDF. `ocr-image` remains explicitly unsupported.
-There is no `ocr` extra. Do not start Phase 13 from this packet.
+archives, parser subprocesses, and new input families skipped. Phase 12 optional local OCR is complete: Tesseract 5 under ADR-0016;
+digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
+empty extra `ocr`. Default parse still refuses image-only PDF.
+`ocr-image` remains explicitly unsupported. Do not start Phase 13 from
+this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
