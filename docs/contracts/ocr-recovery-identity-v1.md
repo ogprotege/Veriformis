@@ -92,5 +92,18 @@ Unknown transform ids fail closed. Parameter object keys are sorted.
 ## Non-goals
 
 Running Tesseract in production parse. Promoting `ocr-image`. Declaring
-extra `ocr`. Confidence thresholds (item 12.5). Page preview UI (item
-12.6). Handwriting. Cloud OCR. Silent replacement of digital text.
+extra `ocr`. Page preview UI (item 12.6). Handwriting. Cloud OCR. Silent replacement
+of digital text.
+
+## Confidence policy (item 12.5)
+
+Schema `veriformis.ocr-confidence-policy/v1`. Missing confidence accepts.
+
+| Action | When | Stream |
+| --- | --- | --- |
+| `accept` | mean ≥ 80 and minimum ≥ 30 | OCR text emitted |
+| `warn` | 60 ≤ mean < 80 and minimum ≥ 30 | OCR text emitted |
+| `review` | 30 ≤ mean < 60 and minimum ≥ 30 | OCR text emitted, pending review |
+| `refuse` | minimum < 30 | OCR text omitted from the stream and retained on `held_text` |
+
+Low-confidence OCR is not deleted. Digital pages are not scored.

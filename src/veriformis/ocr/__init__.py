@@ -25,6 +25,12 @@ from veriformis.ocr.recovery import (
     page_kind,
     recover_pages,
 )
+from veriformis.ocr.thresholds import (
+    REFUSE_BELOW_MINIMUM,
+    REVIEW_BELOW_MEAN,
+    WARN_BELOW_MEAN,
+    decide_confidence,
+)
 
 __all__ = [
     "ADMITTED_LANGUAGES",
@@ -41,8 +47,12 @@ __all__ = [
     "OcrPreprocess",
     "PdfDocumentRecovery",
     "PdfPageRecovery",
+    "REFUSE_BELOW_MINIMUM",
+    "REVIEW_BELOW_MEAN",
+    "WARN_BELOW_MEAN",
     "admitted_ocr_engine",
     "build_ocr_page_identity",
+    "decide_confidence",
     "document_recovery_path",
     "ocr_page_identity_id",
     "page_kind",

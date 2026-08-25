@@ -89,3 +89,11 @@ then 27 after tracking edits; core pytest 2139 passed, 16 deselected, 1
 expected durability warning.
 
 **Next action:** Merge #107, then open the item 12.4 pull request.
+
+## 2026-08-25 — Item 12.5 confidence thresholds
+
+**Status:** Warn / review / refuse policy is on
+`phase12/05-confidence-thresholds`. Refused OCR text is omitted from the
+stream and retained on `held_text`.
+
+**Next action:** Open the item 12.5 pull request after #108 merges.

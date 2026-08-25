@@ -128,8 +128,8 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/05-confidence-thresholds`
 **Title:** `Phase 12.5: Add confidence thresholds`
 
-- [ ] Warn, require review, or refuse. Do not delete low-confidence
-      content silently.
+- [x] Confidence policy v1: warn / review / refuse. Refused OCR text is
+      omitted from the stream and retained on `held_text`.
 
 ### 12.6 Add page previews and review hooks
 

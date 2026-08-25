@@ -142,7 +142,7 @@
       "packet": "dev/active/independent-product/phase-12-optional-ocr",
       "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Item 12.4 classifies digital, OCR, and merged recovery. Digital text is never replaced. Default parse still refuses image-only PDF. There is no ocr extra. Do not start Phase 13 from this packet."
+      "next_gate": "Item 12.5 applies OCR confidence thresholds. Refused text is retained on held_text, not deleted. Default parse still refuses image-only PDF. There is no ocr extra. Do not start Phase 13 from this packet."
     },
     {
       "number": 13,

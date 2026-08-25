@@ -8,9 +8,9 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 12.4 recovery paths)
+**Last reviewed:** 2026-08-25 (Phase 12.5 OCR confidence thresholds)
 
-**Next review:** Phase 12.4 pull-request merge, item 12.5 thresholds,
+**Next review:** Phase 12.5 pull-request merge, item 12.6 preview hooks,
 beta label cut, or any listed-item status change. Do not start Phase 13
 from this packet.
 

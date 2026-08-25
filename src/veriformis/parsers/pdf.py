@@ -155,6 +155,80 @@ def parse_pdf_file(
         raw_bytes=captured,
     )
     diagnostics = []
+    warn_pages = [
+        page.page_index
+        for page in recovery.pages
+        if page.confidence_action == "warn"
+    ]
+    review_pages = [
+        page.page_index
+        for page in recovery.pages
+        if page.confidence_action == "review"
+    ]
+    refused_pages = [
+        page.page_index
+        for page in recovery.pages
+        if page.confidence_action == "refuse"
+    ]
+    if warn_pages:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code="pdf.ocr-confidence-warn",
+                severity="warning",
+                disposition="preserved",
+                loss_kind="none",
+                location=DiagnosticLocation(kind="source"),
+                message=(
+                    "OCR confidence is below the warn threshold on pages: "
+                    + ", ".join(str(item) for item in warn_pages)
+                ),
+                details={"pages": warn_pages, **recovery_details},
+            )
+        )
+    if review_pages:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code="pdf.ocr-confidence-review",
+                severity="warning",
+                disposition="preserved",
+                loss_kind="none",
+                location=DiagnosticLocation(kind="source"),
+                message=(
+                    "OCR confidence requires review on pages: "
+                    + ", ".join(str(item) for item in review_pages)
+                ),
+                details={
+                    "pages": review_pages,
+                    "pending_review": True,
+                    **recovery_details,
+                },
+            )
+        )
+    if refused_pages:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code="pdf.ocr-confidence-refuse",
+                severity="warning",
+                disposition="omitted",
+                loss_kind="text",
+                location=DiagnosticLocation(kind="source"),
+                message=(
+                    "OCR confidence is below the refuse threshold; recovered "
+                    "text is retained on held_text and omitted from the stream "
+                    "on pages: " + ", ".join(str(item) for item in refused_pages)
+                ),
+                details={"pages": refused_pages, **recovery_details},
+            )
+        )
     if empty_pages:
         diagnostics.append(
             make_diagnostic(

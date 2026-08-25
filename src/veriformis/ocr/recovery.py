@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 from veriformis.errors import OcrIdentityError
 from veriformis.ocr.identity import OcrPageIdentity
+from veriformis.ocr.thresholds import ConfidenceAction, decide_confidence
 
 
 PageKind = Literal["digital", "ocr"]
@@ -51,6 +52,8 @@ class OcrPageResult(_StrictModel):
 
 
 class PdfPageRecovery(_StrictModel):
+    confidence_action: ConfidenceAction | None
+    held_text: str
     ocr_identity: OcrPageIdentity | None
     page_index: int
     recovery_path: PageKind
@@ -65,9 +68,15 @@ class PdfPageRecovery(_StrictModel):
                 raise OcrIdentityError("digital recovery requires extracted text")
             if self.ocr_identity is not None:
                 raise OcrIdentityError("digital recovery cannot carry an OCR identity")
+            if self.confidence_action is not None:
+                raise OcrIdentityError("digital recovery has no OCR confidence action")
         if self.recovery_path == "ocr" and self.ocr_identity is not None:
             if self.ocr_identity.page_index != self.page_index:
                 raise OcrIdentityError("OCR identity page_index does not match the page")
+        if self.confidence_action == "refuse" and self.text.strip():
+            raise OcrIdentityError("refused OCR text cannot enter the recovered stream")
+        if self.confidence_action == "refuse" and not self.held_text.strip():
+            raise OcrIdentityError("refused OCR text must be retained on held_text")
         return self
 
 
@@ -126,6 +135,8 @@ def recover_pages(
         if kind == "digital":
             pages.append(
                 PdfPageRecovery(
+                    confidence_action=None,
+                    held_text="",
                     ocr_identity=None,
                     page_index=index,
                     recovery_path="digital",
@@ -136,6 +147,8 @@ def recover_pages(
         if provider is None:
             pages.append(
                 PdfPageRecovery(
+                    confidence_action=None,
+                    held_text="",
                     ocr_identity=None,
                     page_index=index,
                     recovery_path="ocr",
@@ -151,12 +164,16 @@ def recover_pages(
         result = provider.recover_page(request)
         if result.identity.page_index != index:
             raise OcrIdentityError("OCR provider returned a different page_index")
+        action = decide_confidence(result.identity.confidence)
+        accepted = "" if action == "refuse" else result.text
         pages.append(
             PdfPageRecovery(
+                confidence_action=action,
+                held_text=result.text,
                 ocr_identity=result.identity,
                 page_index=index,
                 recovery_path="ocr",
-                text=result.text,
+                text=accepted,
             )
         )
     kinds = tuple(page.recovery_path for page in pages)
