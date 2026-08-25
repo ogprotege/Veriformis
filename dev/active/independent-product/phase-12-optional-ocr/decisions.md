@@ -20,3 +20,5 @@
 | ADR-0016 and ocr-recovery-identity v1 land in 12.3; recovery is not executable | Accepted | Identities before parser path (12.4) |
 | Admitted languages are `eng`, `fra`, `lat`; PSM is 6 | Accepted | 12.2 measurements |
 | Rotation is explicit `osd-rotate/v1` | Accepted | Default PSM failed the rotated page |
+| Digital pages are never passed to an OCR provider | Accepted | ADR-0016; item 12.4 |
+| Default parse has no OCR provider; image-only still refuses | Accepted | Extra and executable recovery wait for 12.7 |

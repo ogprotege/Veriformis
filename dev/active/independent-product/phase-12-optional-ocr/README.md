@@ -47,6 +47,6 @@ this packet.
 
 ## Current state
 
-Item 12.3 records ADR-0016 and Tesseract 5 identities. Recovery is not
-executable. `ocr-image` remains explicitly unsupported. There is no
-`ocr` extra. Do not start Phase 13 from this packet.
+Item 12.4 classifies digital, OCR, and merged recovery. Digital text is
+never replaced. Default parse still refuses image-only PDFs. There is
+no `ocr` extra. Do not start Phase 13 from this packet.

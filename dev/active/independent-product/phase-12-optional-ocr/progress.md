@@ -67,3 +67,25 @@ focused OCR/parser/taxonomy/tracking 37 passed; core pytest 2131 passed,
 
 **Next action:** Open the item 12.3 pull request. Require every GitHub
 check. Do not start item 12.4 until it merges.
+
+## 2026-08-25 — Item 12.4 recovery paths
+
+**Status:** Digital, OCR, and merged classification is on
+`phase12/04-recovery-paths`.
+
+Pages with a text layer stay digital and are never sent to an OCR
+provider. Empty pages are `ocr`. Mixed documents are `merged`. Default
+parse still refuses image-only PDFs. A test provider can recover empty
+pages without replacing digital text.
+
+**Next action:** Open the item 12.4 pull request after #107 merges.
+
+## 2026-08-25 — Item 12.4 local gates green
+
+**Status:** Recovery-path classification is on `phase12/04-recovery-paths`.
+
+Local gates: tracking PASS; ruff pass; focused OCR/PDF 73 passed earlier,
+then 27 after tracking edits; core pytest 2139 passed, 16 deselected, 1
+expected durability warning.
+
+**Next action:** Merge #107, then open the item 12.4 pull request.

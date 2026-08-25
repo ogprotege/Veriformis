@@ -53,10 +53,22 @@ One OCR page record contains:
 | `preprocess` | Ordered named transforms |
 | `boxes` | Page-space rectangles with an explicit unit |
 | `confidence` | Optional mean, minimum, word count on 0..100 |
-| `recovery_path` | `ocr` in this item; `digital` and `merged` are named for item 12.4 |
+| `recovery_path` | `ocr` for Tesseract-recovered pages |
 
 Page identity id is `derive_id("ocr-page", …)`. Recovered text is not in
 the identity preimage.
+
+## Recovery paths (item 12.4)
+
+| Path | Meaning |
+| --- | --- |
+| `digital` | Page exposed an extractable text layer. That text is the recovery. |
+| `ocr` | Page exposed no text layer. OCR may recover it; without a provider it stays empty. |
+| `merged` | Document has both digital and OCR pages. |
+
+OCR is never invoked for a digital page. A provider request that carries
+digital text fails closed. Default parse still has no provider: image-only
+PDFs refuse; mixed PDFs keep digital text and omit empty pages.
 
 ## Preprocess identifiers
 
@@ -79,6 +91,6 @@ Unknown transform ids fail closed. Parameter object keys are sorted.
 
 ## Non-goals
 
-Running Tesseract. Promoting `ocr-image`. Declaring extra `ocr`.
-Confidence thresholds (item 12.5). Page preview UI (item 12.6).
-Handwriting. Cloud OCR. Silent replacement of digital text.
+Running Tesseract in production parse. Promoting `ocr-image`. Declaring
+extra `ocr`. Confidence thresholds (item 12.5). Page preview UI (item
+12.6). Handwriting. Cloud OCR. Silent replacement of digital text.
