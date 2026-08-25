@@ -13,3 +13,6 @@
 | No cloud OCR | Accepted | Roadmap non-goal; offline deterministic v1 |
 | No handwriting guarantee | Accepted | Roadmap non-goal |
 | Do not start Phase 13 from this packet | Accepted | Roadmap dependency and standing constraint |
+| Item 12.2 measures Tesseract on a retained corpus and desk-evaluates other engines; it does not admit an engine | Accepted | Roadmap items 1–2; operator chooses ADR or deferral |
+| Handwriting and cloud OCR stay excluded from the corpus | Accepted | Roadmap non-goals |
+| CJK is desk-evaluated only in 12.2 (no standard-14 glyphs) | Accepted | Helvetica cannot rasterize CJK |

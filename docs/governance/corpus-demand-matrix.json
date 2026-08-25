@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.corpus-demand-matrix/v1",
-  "last_reviewed": "2026-08-22",
+  "last_reviewed": "2026-08-25",
   "collection_policy": {
     "scanner": "scripts/scan_corpus_metadata.py",
     "allowed_metadata": [
@@ -22,63 +22,59 @@
   },
   "inventory_observations": [
     {
-      "schema_version": "veriformis.corpus-metadata-aggregate/v1",
-      "source_id": "repository-test-fixtures",
-      "evidence_grade": "test-verified",
-      "portability": "repository-tracked",
-      "observation_scope": "filesystem-metadata-only",
       "aggregate": {
-        "file_count": 16,
-        "directory_count": 14,
-        "total_bytes": 13812,
-        "symlink_count": 0,
-        "other_entry_count": 0,
-        "inaccessible_entry_count": 0,
-        "hidden_entry_count": 0,
-        "bundle_directory_count": 0,
         "bundle_context_file_count": 0,
+        "bundle_directory_count": 0,
+        "directory_count": 16,
         "extensions": [
           {
+            "declared_v1_input_suffix": true,
             "extension": ".json",
             "family": "structured-data",
-            "file_count": 4,
-            "total_bytes": 11631,
-            "declared_v1_input_suffix": true
+            "file_count": 5,
+            "total_bytes": 15212
           },
           {
+            "declared_v1_input_suffix": true,
             "extension": ".md",
             "family": "markup",
-            "file_count": 4,
-            "total_bytes": 682,
-            "declared_v1_input_suffix": true
+            "file_count": 5,
+            "total_bytes": 1184
           },
           {
+            "declared_v1_input_suffix": true,
             "extension": ".pdf",
             "family": "portable-document",
-            "file_count": 2,
-            "total_bytes": 986,
-            "declared_v1_input_suffix": true
+            "file_count": 15,
+            "total_bytes": 215581
           },
           {
+            "declared_v1_input_suffix": true,
             "extension": ".py",
             "family": "source-code",
             "file_count": 3,
-            "total_bytes": 377,
-            "declared_v1_input_suffix": true
+            "total_bytes": 377
           },
           {
+            "declared_v1_input_suffix": true,
             "extension": ".txt",
             "family": "plain-text",
             "file_count": 3,
-            "total_bytes": 136,
-            "declared_v1_input_suffix": true
+            "total_bytes": 136
+          },
+          {
+            "declared_v1_input_suffix": false,
+            "extension": "[undeclared-other]",
+            "family": "undeclared-other",
+            "file_count": 6,
+            "total_bytes": 217201
           }
         ],
         "families": [
           {
             "family": "markup",
-            "file_count": 4,
-            "total_bytes": 682
+            "file_count": 5,
+            "total_bytes": 1184
           },
           {
             "family": "plain-text",
@@ -87,8 +83,8 @@
           },
           {
             "family": "portable-document",
-            "file_count": 2,
-            "total_bytes": 986
+            "file_count": 15,
+            "total_bytes": 215581
           },
           {
             "family": "source-code",
@@ -97,10 +93,19 @@
           },
           {
             "family": "structured-data",
-            "file_count": 4,
-            "total_bytes": 11631
+            "file_count": 5,
+            "total_bytes": 15212
+          },
+          {
+            "family": "undeclared-other",
+            "file_count": 6,
+            "total_bytes": 217201
           }
         ],
+        "file_count": 37,
+        "hidden_entry_count": 0,
+        "inaccessible_entry_count": 0,
+        "other_entry_count": 0,
         "size_buckets": [
           {
             "bucket": "zero",
@@ -109,13 +114,13 @@
           },
           {
             "bucket": "1b_to_1kib",
-            "file_count": 12,
-            "total_bytes": 2181
+            "file_count": 20,
+            "total_bytes": 7578
           },
           {
             "bucket": "over_1kib_to_1mib",
-            "file_count": 4,
-            "total_bytes": 11631
+            "file_count": 17,
+            "total_bytes": 442113
           },
           {
             "bucket": "over_1mib_to_100mib",
@@ -127,22 +132,29 @@
             "file_count": 0,
             "total_bytes": 0
           }
-        ]
+        ],
+        "symlink_count": 0,
+        "total_bytes": 449691
       },
-      "privacy": {
-        "file_content_read": false,
-        "file_names_emitted": false,
-        "source_paths_emitted": false,
-        "content_hashes_emitted": false,
-        "timestamps_emitted": false,
-        "undeclared_extensions_emitted": false
-      },
+      "evidence_grade": "test-verified",
       "limitations": [
         "Suffix classification does not prove that a file is a user source or that parsing succeeds.",
         "Counts establish the observed root's composition, not customer-corpus prevalence or product demand.",
         "Undeclared suffixes are combined to avoid disclosing uncommon extension names.",
         "Symlink targets and file content are never followed or read."
-      ]
+      ],
+      "observation_scope": "filesystem-metadata-only",
+      "portability": "repository-tracked",
+      "privacy": {
+        "content_hashes_emitted": false,
+        "file_content_read": false,
+        "file_names_emitted": false,
+        "source_paths_emitted": false,
+        "timestamps_emitted": false,
+        "undeclared_extensions_emitted": false
+      },
+      "schema_version": "veriformis.corpus-metadata-aggregate/v1",
+      "source_id": "repository-test-fixtures"
     },
     {
       "schema_version": "veriformis.corpus-metadata-aggregate/v1",

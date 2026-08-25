@@ -5,17 +5,17 @@ append-only history.
 
 **Updated:** 2026-08-25
 
-**Local branch:** `phase12/01-ocr-packet` from `main` at
-`e856af96043c9876affa275b5246e83541254d9d` (PR #104).
+**Local branch:** `phase12/02-ocr-engine-evaluation` from
+`phase12/01-ocr-packet`.
 
-**Predecessor:** Phase 11 closeout merged as PR #104.
+**Predecessor:** Item 12.1 on `phase12/01-ocr-packet` (PR #105).
 
-**Completed:** none
+**Completed:** 12.1 (packet; OCR still refused)
 
-**Current item:** 12.1 Open the OCR packet
+**Current item:** 12.2 Evaluate candidate local OCR engines
 
-**Not started:** 12.2 evaluation; 12.3–12.8 wait on ADR or deferral. Do not
-start Phase 13 from this packet.
+**Not started:** 12.3–12.8 wait on owner ADR or deferral. Do not start
+Phase 13 from this packet.
 
-**12.1 design:** Packet and tracking only. Prove OCR is still refused. Do
-not add an extra or change taxonomy state.
+**12.2 design:** Retained license-safe corpus, Tesseract measurement,
+desk comparison of other engines. No extra. No taxonomy change. Stop.

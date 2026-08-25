@@ -94,14 +94,14 @@ from Phase 11 does not change suffix dispatch.
 **Branch:** `phase12/02-ocr-engine-evaluation`
 **Title:** `Phase 12.2: Evaluate candidate local OCR engines`
 
-- [ ] Compare candidate local OCR engines on a retained, license-safe corpus
+- [x] Compare candidate local OCR engines on a retained, license-safe corpus
       covering languages, scans, mixed text/images, rotation, tables,
       handwriting exclusions, and degraded pages.
-- [ ] Record accuracy proxies, runtime, memory, platform support, model size,
+- [x] Record accuracy proxies, runtime, memory, platform support, model size,
       licensing, and offline behavior.
-- [ ] Do not add an `ocr` extra, do not change taxonomy state, and do not
+- [x] Do not add an `ocr` extra, do not change taxonomy state, and do not
       emit OCR text as source recovery.
-- [ ] Stop for the operator to accept an OCR ADR or defer the phase. Do not
+- [x] Stop for the operator to accept an OCR ADR or defer the phase. Do not
       start items 12.3–12.8 from this item.
 
 ### 12.3 Record the OCR ADR and recovery identities

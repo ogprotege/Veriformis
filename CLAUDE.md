@@ -58,9 +58,9 @@ opened the packet and pinned admissions as PR #97 and PR #98. Items
 Empty extras stay empty. The exporter does not train.
 Phase 11 collection ingest is complete: shared collection plan v1;
 archives, parser subprocesses, and new input families skipped. Phase 12
-is in progress at item 12.1: the OCR packet is open, `ocr-image` remains
-explicitly unsupported, and there is no `ocr` extra. Items 12.3–12.8
-wait on an owner-approved OCR ADR or deferral after 12.2. Do not start
+is in progress at item 12.2: the OCR evaluation is recorded, `ocr-image`
+remains explicitly unsupported, and there is no `ocr` extra. Items
+12.3–12.8 wait on an owner-approved OCR ADR or deferral. Do not start
 Phase 13 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal

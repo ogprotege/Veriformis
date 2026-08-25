@@ -6,11 +6,11 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–11 complete; Phase 12 in progress at item 12.1).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.1 packet opening)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12.2 OCR evaluation)
 
-**Next review:** Phase 12.1 pull-request merge, item 12.2 evaluation,
-beta label cut, public-ready checklist, or any contract change. Do not
-start Phase 13 from this packet. OCR remains explicitly unsupported.
+**Next review:** Phase 12.2 operator ADR or deferral, beta label cut,
+public-ready checklist, or any contract change. Do not start Phase 13
+from this packet. OCR remains explicitly unsupported.
 
 ## Start here
 

@@ -1,0 +1,118 @@
+{
+  "corpus_manifest_digest": "d88f570ad4eba995d031c68e377ddaf4292758487be1fec75155581c9c7a5e9a",
+  "host": {
+    "cwd_repo": "/Users/biscuit/Veriformis",
+    "mac_ver": "26.6.2",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "release": "25.6.0",
+    "system": "Darwin"
+  },
+  "network": {
+    "cloud_ocr": "excluded",
+    "evaluation_script_opens_sockets": false
+  },
+  "note": "This measurement is evidence for the operator ADR. It does not admit ocr-image or add an ocr extra.",
+  "recorded_on": "2026-08-25",
+  "schema": "veriformis.phase12-ocr-eval-results/v1",
+  "tesseract": {
+    "available": true,
+    "binary": "/opt/homebrew/bin/tesseract",
+    "measurements": [
+      {
+        "character_error_rate": 0.0,
+        "condition": "clean-print",
+        "expected": "Veriformis recovers source text. This page is digitally born.",
+        "hypothesis": "Veriformis recovers source text. This page is digitally born.",
+        "id": "clean-en",
+        "language_requested": "eng",
+        "language_used": "eng",
+        "max_rss_bytes": 52756480,
+        "raw_hypothesis": "Veriformis recovers source text. This page is digitally born.",
+        "returncode": 0,
+        "seconds": 0.0686,
+        "stderr_tail": "                   0  signals received\n                   0  voluntary context switches\n                  12  involuntary context switches\n          1221847858  instructions retired\n           284061330  cycles elapsed\n            44548480  peak memory footprint"
+      },
+      {
+        "character_error_rate": 0.0,
+        "condition": "language-french",
+        "expected": "Caf\u00e9 \u00e9l\u00e8ve: la page fran\u00e7aise reste locale.",
+        "hypothesis": "Cafe eleve: la page francaise reste locale.",
+        "id": "fra-accents",
+        "language_requested": "fra",
+        "language_used": "fra",
+        "max_rss_bytes": 40615936,
+        "raw_hypothesis": "Caf\u00e9 \u00e9l\u00e8ve: la page fran\u00e7aise reste locale.",
+        "returncode": 0,
+        "seconds": 0.0607,
+        "stderr_tail": "                   0  signals received\n                   0  voluntary context switches\n                   9  involuntary context switches\n          1082029124  instructions retired\n           252652159  cycles elapsed\n            32407936  peak memory footprint"
+      },
+      {
+        "character_error_rate": 0.0,
+        "condition": "language-latin",
+        "expected": "Non est summaria haec pagina.",
+        "hypothesis": "Non est summaria haec pagina.",
+        "id": "lat-print",
+        "language_requested": "lat",
+        "language_used": "lat",
+        "max_rss_bytes": 49119232,
+        "raw_hypothesis": "Non est summaria haec pagina.",
+        "returncode": 0,
+        "seconds": 0.0661,
+        "stderr_tail": "                   0  signals received\n                   0  voluntary context switches\n                  11  involuntary context switches\n          1138259378  instructions retired\n           274167702  cycles elapsed\n            40927640  peak memory footprint"
+      },
+      {
+        "character_error_rate": 1.7049,
+        "condition": "rotation-90",
+        "expected": "Veriformis recovers source text. This page is digitally born.",
+        "hypothesis": "< i) 3 = \u2014 = n on] f9)) QO [e) < i) op] n n fe) Cc onl i?) fa) [mel ) x > + =. n xe) fed) Ko} fa) a 2. 2. [al 2 < oy [e) 5 >",
+        "id": "rotated-en",
+        "language_requested": "eng",
+        "language_used": "eng",
+        "max_rss_bytes": 51347456,
+        "raw_hypothesis": "<\ni)\n3\n=\n\u2014\n=\nn\non]\nf9))\nQO\n[e)\n<\ni)\nop]\nn\nn\nfe)\nCc\nonl\ni?)\nfa)\n[mel\n)\nx\n>\n+\n=.\nn\nxe)\nfed)\nKo}\nfa)\na\n2.\n2.\n[al\n2\n<\noy\n[e)\n5\n>",
+        "returncode": 0,
+        "seconds": 0.0992,
+        "stderr_tail": "                   0  signals received\n                   0  voluntary context switches\n                   9  involuntary context switches\n          1778660782  instructions retired\n           410666268  cycles elapsed\n            43139480  peak memory footprint"
+      },
+      {
+        "character_error_rate": 0.1148,
+        "condition": "degraded-noise",
+        "expected": "Veriformis recovers source text. This page is digitally born.",
+        "hypothesis": "___ Veriformis recovers source text. This page is digitally born. oe",
+        "id": "degraded-en",
+        "language_requested": "eng",
+        "language_used": "eng",
+        "max_rss_bytes": 52183040,
+        "raw_hypothesis": "___ Veriformis recovers source text. This page is digitally born. oe",
+        "returncode": 0,
+        "seconds": 0.0736,
+        "stderr_tail": "                   0  signals received\n                   0  voluntary context switches\n                   9  involuntary context switches\n          1245622562  instructions retired\n           298576116  cycles elapsed\n            43991448  peak memory footprint"
+      },
+      {
+        "character_error_rate": 0.0,
+        "condition": "table",
+        "expected": "Item Count Note alpha 12 keep beta 3 skip",
+        "hypothesis": "Item Count Note alpha 12 keep beta 3 skip",
+        "id": "table-en",
+        "language_requested": "eng",
+        "language_used": "eng",
+        "max_rss_bytes": 55001088,
+        "raw_hypothesis": "Item Count Note\nalpha 12 keep\nbeta 3 skip",
+        "returncode": 0,
+        "seconds": 0.0705,
+        "stderr_tail": "                   0  signals received\n                   0  voluntary context switches\n                   9  involuntary context switches\n          1219808639  instructions retired\n           287838483  cycles elapsed\n            46825904  peak memory footprint"
+      }
+    ],
+    "osd_probe_rotated_en": {
+      "returncode": 0,
+      "stderr_tail": "Estimating resolution as 303\nWarning. Invalid resolution 0 dpi. Using 70 instead.",
+      "stdout": "Page number: 0\nOrientation in degrees: 90\nRotate: 270\nOrientation confidence: 3.35\nScript: Latin\nScript confidence: 6.67"
+    },
+    "tessdata_eng_bytes": 4113088,
+    "tessdata_fra_bytes": 1130365,
+    "tessdata_lat_bytes": 3187463,
+    "version": "tesseract 5.5.3"
+  }
+}
