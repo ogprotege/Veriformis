@@ -45,7 +45,7 @@ from this packet.
 
 ## Current state
 
-Item 14.2 is in progress. `veriformis.review-bundle/v1` binds an empty
-bundle to a finished-dataset plan. `blocks_seal` is false. Waivers cannot
-change bytes. Corrections are transforms or mapping revisions. There is
-no submit command. Do not start Phase 15 from this packet.
+Item 14.3 is in progress. Core queue kinds are listed. Required-review
+construction fills `construction-pending` items. Opt-in quality queues
+stay off unless requested. The bundle does not block seal. Do not start
+Phase 15 from this packet.

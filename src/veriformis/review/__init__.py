@@ -8,12 +8,14 @@ from veriformis.review.models import (
     SAMPLING_QUEUE_KIND,
     ReviewBundle,
     ReviewCorrection,
+    ReviewItem,
     ReviewerRef,
     ReviewSupersession,
     ReviewWaiver,
     assemble_review_bundle,
     empty_review_bundle,
 )
+from veriformis.review.queues import report_core_queues
 
 __all__ = [
     "CORE_QUEUE_KINDS",
@@ -23,9 +25,11 @@ __all__ = [
     "SAMPLING_QUEUE_KIND",
     "ReviewBundle",
     "ReviewCorrection",
+    "ReviewItem",
     "ReviewerRef",
     "ReviewSupersession",
     "ReviewWaiver",
     "assemble_review_bundle",
     "empty_review_bundle",
+    "report_core_queues",
 ]
