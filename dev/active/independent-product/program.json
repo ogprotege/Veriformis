@@ -157,12 +157,12 @@
     {
       "number": 14,
       "title": "Deliver human review and correction workflows",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [13],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-14-review-workflows",
+      "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Begin after quality facts and review contracts stabilize."
+      "next_gate": "Item 14.1 opens the review-workflow packet. Sequential PRs 14.1–14.8. Do not start Phase 15 from this packet."
     },
     {
       "number": 15,

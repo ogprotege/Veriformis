@@ -61,13 +61,17 @@ image-only PDF. `ocr-image` remains explicitly unsupported.
 Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
-There is no quality-report command. Do not start Phase 14 from this
+There is no quality-report command.
+Phase 14 review workflows are in progress at item 14.1: construction
+`review_policy` defaults to `none`; there is no review queue or CLI
+submit path. Mac Review belongs to Phase 18. Do not start Phase 15 from
+this packet.
+
+**Review date:** 2026-08-26 (independent-product Phase 14.1 review packet)
+
+**Next review:** Phase 14.1 pull-request merge, item 14.2 review
+contracts, or any contract change. Do not start Phase 15 from this
 packet.
-
-**Review date:** 2026-08-26 (independent-product Phase 13 closeout)
-
-**Next review:** Phase 14 when the operator asks, or any contract change.
-Do not start Phase 14 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -758,7 +762,7 @@ See [docs/release.md](release.md).
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
 | Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–13 complete under the [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md); do not start Phase 14 from that packet |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–13 complete and Phase 14 in progress under the [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md); do not start Phase 15 from that packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
