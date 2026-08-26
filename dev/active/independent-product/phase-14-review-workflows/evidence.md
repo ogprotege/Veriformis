@@ -1,6 +1,6 @@
 # Phase 14 Evidence
 
-**Status:** Open — item 14.4 corrections as transforms or mapping revisions
+**Status:** Open — item 14.5 named-seed sampling
 
 **Opened:** 2026-08-26
 
@@ -60,3 +60,12 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Unchanged mapping or identical-byte transform fails closed.
 - [x] In-place mutation of accepted records fails closed.
 - [x] Waiver `changes_bytes` stays false.
+
+## Required item 14.5 evidence
+
+- [x] Named seed replays the same selection from a complete population.
+- [x] Different seeds change the selection.
+- [x] Unicode population members are exact.
+- [x] Invalid seed, duplicates, and oversized draws fail closed.
+- [x] Sample-acceptance items are not required reviews.
+- [x] `statistical_meaning` is false.

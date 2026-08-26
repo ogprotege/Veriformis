@@ -117,7 +117,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/05-sampling`
 **Title:** `Phase 14.5: Add deterministic sampling`
 
-- [ ] Named seed, complete population and selection evidence, replay. No
+- [x] Named seed, complete population and selection evidence, replay. No
       statistical meaning claimed.
 
 ### 14.6 Add review exchange on CLI, MCP, and Python
