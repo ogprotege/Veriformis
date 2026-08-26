@@ -6,9 +6,10 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.2. The report does
-not enforce heuristics. Seal still uses the seventeen finished-dataset gates.
-There is no quality-report CLI command.
+**Status:** Schema pin through independent-product Phase 13.3. Item 13.3
+fills plan-bound distribution facts. The report does not enforce
+heuristics. Seal still uses the seventeen finished-dataset gates. There
+is no quality-report CLI command.
 
 **Last reviewed:** 2026-08-25
 
@@ -32,16 +33,52 @@ downstream model quality.
 A name cannot appear in both `facts` and `policy_decisions`. A recommendation
 may only name facts that are present in the same report.
 
+## Distribution facts (item 13.3)
+
+`report_dataset_distributions` fills one closed, sorted fact set from a
+bound recipe, construction result, curation result, and split result.
+Integer facts are counts. Text facts are lossless canonical JSON.
+
+| Fact | Value |
+| --- | --- |
+| `included-record-count` | Included records |
+| `excluded-record-count` | Excluded records |
+| `quarantined-record-count` | Quarantined records |
+| `train-record-count` | Split train assignments |
+| `evaluation-record-count` | Split evaluation assignments |
+| `distinct-source-count` | Unique source identities on included records |
+| `distinct-objective-count` | Unique objective identities on included records |
+| `coverage-blocker-count` | Coverage blocker codes across selected sources |
+| `language-evidence-qualified-count` | Language tokens from a `language` field or an IR pointer ending `/language` |
+| `language-evidence-unqualified-count` | Included records with no language evidence |
+| `source-distribution` | Source identity to included-record contribution count |
+| `objective-distribution` | Objective identity to included-record count |
+| `row-schema-distribution` | Recipe target row schema to included-record count |
+| `role-distribution` | `user` / `assistant` counts for `messages`; otherwise empty |
+| `label-distribution` | Constructed field-name counts on included records |
+| `target-length-distribution` | Sorted `[character-length, count]` pairs for objective target fields |
+| `context-length-distribution` | Sorted `[character-length, count]` pairs for objective context fields |
+| `language-distribution` | Evidence-qualified language tokens, or `evidence-unqualified` |
+| `exclusion-distribution` | Curation reason codes for non-included records |
+| `split-distribution` | `train` and `evaluation` assignment counts |
+| `coverage-distribution` | Per-source ledger counts and blocker codes |
+
+Language is reported only where constructed evidence names it. The compiler
+does not infer a document language. Lengths are Unicode character counts, not
+tokens. Distributions do not delete rows.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.2 cannot fail seal. Later items may add
+`enforcing` is `false`. Item 13.3 cannot fail seal. Later items may add
 previewable gates; a heuristic may block seal only after item 13.9 records
 calibrated labeled fixtures for that heuristic.
 
 ## Binding
 
 Every report names a finished-dataset `plan_id`. Identity is
-`derive_id("qrp", …)` over the payload excluding `report_id`.
+`derive_id("qrp", …)` over the payload excluding `report_id`. Distribution
+inputs must share that plan, recipe, construction result, and curation
+result. Split input identities must equal the included records.
 
 ## Limitations
 
@@ -58,6 +95,6 @@ The v1 limitation set is:
 
 ## Non-goals
 
-Distributions, near-duplicates, leakage corpora, tokenizer simulations,
-PII/secret detectors, and split-comparability findings. Those are later
-Phase 13 items. Phase 14 review queues are out of scope.
+Near-duplicates, leakage corpora, tokenizer simulations, PII/secret
+detectors, and split-comparability findings. Those are later Phase 13
+items. Phase 14 review queues are out of scope.

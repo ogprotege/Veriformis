@@ -1,7 +1,7 @@
 """Versioned quality report: facts, policy, and recommendations stay separate.
 
-Item 13.2 records the schema. The report does not enforce heuristics and does
-not block seal. Distributions and detectors arrive in later items.
+Item 13.2 records the schema. Item 13.3 fills plan-bound distribution facts.
+The report does not enforce heuristics and does not block seal.
 """
 
 from __future__ import annotations
