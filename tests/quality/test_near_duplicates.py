@@ -215,10 +215,14 @@ def test_similar_targets_form_an_inspectable_cluster(tmp_path: Path) -> None:
     assert "semantic" not in NEAR_DUPLICATE_ALGORITHM_ID
     assert _fact(first, "near-duplicate-cluster-count").integer_value == 1
     assert _fact(first, "near-duplicate-member-count").integer_value == 2
+    assert _fact(first, "near-duplicate-shingle-size").integer_value == 5
+    assert _fact(first, "near-duplicate-cluster-threshold-ppm").integer_value == 800000
     clusters = _json(first, "near-duplicate-clusters")
     assert len(clusters) == 1
     assert len(clusters[0]["record-ids"]) == 2
-    assert clusters[0]["pair-similarities-ppm"][0][2] >= 800000
+    ppm = clusters[0]["pair-similarities-ppm"][0][2]
+    assert type(ppm) is int
+    assert ppm >= 800000
     preview = _json(first, "near-duplicate-threshold-preview")
     assert preview["800000"]["cluster-count"] == 1
     assert preview["990000"]["cluster-count"] == 0
@@ -226,10 +230,30 @@ def test_similar_targets_form_an_inspectable_cluster(tmp_path: Path) -> None:
     assert len(policy) == 1
     assert policy[0].action == "record-only"
     assert policy[0].name == "near-duplicate-disabled"
-    assert case.curation.coverage_ledger.entries[0].included_count >= 0
+    assert policy[0].threshold_id is None
+    assert first.recommendations == ()
+    assert first.plan_id == case.curation.plan_id
     assert CurationPolicy.create(minimum_target_characters=1).near_duplicate_policy == (
         "disabled"
     )
+
+
+def test_casefold_and_whitespace_normalize_cluster(tmp_path: Path) -> None:
+    case = _finished(
+        tmp_path,
+        (
+            ("cafe-a.txt", "Café au lait for the first source."),
+            ("cafe-b.txt", "CAFÉ  au   lait for the first source."),
+            ("other.txt", "Omega zeta unrelated material for the third source."),
+        ),
+    )
+    report = _report(case)
+    assert _fact(report, "included-record-count").integer_value == 3
+    assert _fact(report, "near-duplicate-cluster-count").integer_value == 1
+    assert _fact(report, "near-duplicate-member-count").integer_value == 2
+    ppm = _json(report, "near-duplicate-clusters")[0]["pair-similarities-ppm"][0][2]
+    assert type(ppm) is int
+    assert ppm == 1_000_000
 
 
 def test_distinct_targets_do_not_cluster(tmp_path: Path) -> None:

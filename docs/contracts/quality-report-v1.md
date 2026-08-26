@@ -85,8 +85,8 @@ identity. It does not delete rows.
 | `near-duplicate-cluster-threshold-ppm` | Inspectable cluster threshold (`800000`) |
 | `near-duplicate-cluster-count` | Clusters of size ≥ 2 at that threshold |
 | `near-duplicate-member-count` | Included records in those clusters |
-| `near-duplicate-clusters` | `cluster-id`, sorted `record-ids`, pair Jaccard ppm |
-| `near-duplicate-threshold-preview` | Cluster and member counts at 500000, 800000, 900000, and 990000 ppm |
+| `near-duplicate-clusters` | Sorted list of `{cluster-id, record-ids, pair-similarities-ppm}`. `cluster-id` is `canonical_digest({algorithm, record-ids})`. `record-ids` are sorted. Each pair is `[left, right, ppm]` with `left < right` and integer ppm |
+| `near-duplicate-threshold-preview` | Object keyed by decimal ppm strings `"500000"`, `"800000"`, `"900000"`, `"990000"` to `{cluster-count, member-count}` integers |
 
 Normalization is strip, whitespace collapse, and Unicode casefold of the
 objective target fields. Similarity is integer Jaccard over overlapping

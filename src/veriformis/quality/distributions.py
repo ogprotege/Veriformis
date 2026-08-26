@@ -135,6 +135,7 @@ def included_dataset_records(
     curation: CurationResult,
     split: SplitResult,
 ) -> tuple[DatasetRecord, ...]:
+    """Return included records after fail-closed plan/recipe/result binding."""
     _require_bound_inputs(
         recipe=recipe,
         construction=construction,

@@ -87,9 +87,9 @@ records inspectable clusters and ppm threshold previews. It is not
 semantic identity and does not delete rows. Curation
 `near_duplicate_policy` stays `disabled`. The report is not enforcing.
 
-Local gates: tracking PASS; ruff pass; focused quality/isolation 22
+Local gates: tracking PASS; ruff pass; focused quality/isolation 23
 passed; core pytest 2178 passed, 16 deselected, 1 expected durability
-warning.
+warning. Follow-up pins Unicode casefold/whitespace clustering.
 
 **Next action:** Publish the item 13.4 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.5.

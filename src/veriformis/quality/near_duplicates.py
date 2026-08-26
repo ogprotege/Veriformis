@@ -87,8 +87,6 @@ def _jaccard_ppm(left: frozenset[str], right: frozenset[str]) -> int:
     if not left and not right:
         return 1_000_000
     union = left | right
-    if not union:
-        return 0
     return (len(left & right) * 1_000_000) // len(union)
 
 
