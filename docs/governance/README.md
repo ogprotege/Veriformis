@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14.2 review contracts)
+**Last reviewed:** 2026-08-26 (independent-product Phase 14.4 corrections)
 
-**Next review:** Phase 14.2 pull-request merge, item 14.3 first queues,
+**Next review:** Phase 14.4 pull-request merge, item 14.5 sampling,
 or governance-schema change. Do not start Phase 15 from the Phase 14
 packet.
 
@@ -53,7 +53,7 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–13 are complete on `main` and
-Phase 14 is in progress at item 14.2. Phase 13 closeout merged as PR #122
+Phase 14 is in progress at item 14.4. Phase 13 closeout merged as PR #122
 at `ef31559c9184b553209a3c45eca5d943fbb9a680`. The quality report is
 preview-only. Construction `review_policy` defaults to `none`. There is
 no review-queue command. Mac Review belongs to Phase 18. Optional

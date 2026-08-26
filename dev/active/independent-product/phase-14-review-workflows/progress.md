@@ -70,3 +70,24 @@ pytest 2215 passed, 16 deselected, 1 expected durability warning.
 
 **Next action:** Publish the item 14.3 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 14.4.
+
+## 2026-08-26 — Item 14.3 merged
+
+**Status:** Phase 14.3 merged as PR #126 at
+`ac708087d850800335c659d734d428fb1ae080c2`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 14.4 pull request.
+
+## 2026-08-26 — Item 14.4 corrections
+
+**Status:** A correction binds a new transform (`trn`) or mapping-plan
+(`mpl`) identity. Identical-byte transforms and unchanged mappings fail
+closed. `overwrite_accepted_record` refuses in-place mutation. Waivers
+do not change bytes. The bundle still does not block seal.
+
+Local gates: tracking PASS; ruff pass; focused review 27 passed; core
+pytest 2223 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.4 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 14.5.

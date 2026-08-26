@@ -45,7 +45,7 @@ from this packet.
 
 ## Current state
 
-Item 14.3 is in progress. Core queue kinds are listed. Required-review
-construction fills `construction-pending` items. Opt-in quality queues
-stay off unless requested. The bundle does not block seal. Do not start
+Item 14.4 is in progress. Corrections bind a new transform or mapping
+revision. Waivers do not change bytes. In-place mutation of accepted
+records fails closed. The bundle does not block seal. Do not start
 Phase 15 from this packet.

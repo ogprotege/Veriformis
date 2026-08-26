@@ -6,10 +6,10 @@
 
 **Schema:** `veriformis.review-bundle/v1`
 
-**Status:** Schema pin through independent-product Phase 14.3. Item 14.3
-fills core queue kinds from construction `pending_review` and curation
-conflicts. The bundle does not block seal. There is no review-submit
-CLI command. Mac Review belongs to Phase 18.
+**Status:** Schema pin through independent-product Phase 14.4. Item 14.4
+binds corrections to a new transform or mapping-plan identity. Waivers
+do not change bytes. The bundle does not block seal. There is no
+review-submit CLI command. Mac Review belongs to Phase 18.
 
 **Last reviewed:** 2026-08-26
 
@@ -44,8 +44,11 @@ items fill them.
 
 ## Waiver and correction
 
-A waiver has `changes_bytes=false`. A correction `kind` is `transform` or
-`mapping-revision`. In-place mutation of accepted records is out of scope.
+A waiver has `changes_bytes=false` and does not produce a transform. A
+correction `kind` is `transform` or `mapping-revision` and names a new
+`result_id` (`trn` or `mpl`). A transform must change bytes. A mapping
+revision must create a new mapping-plan identity. In-place mutation of
+accepted records fails closed.
 
 ## Limitations
 
@@ -59,4 +62,5 @@ A waiver has `changes_bytes=false`. A correction `kind` is `transform` or
 ## Non-goals
 
 Mac Review screens. CLI submit. Seal blocking. Phase 15 scale work.
-Privacy or safety certification from detector findings.
+Privacy or safety certification from detector findings. In-place edits
+of content-addressed records.

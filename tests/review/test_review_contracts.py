@@ -69,8 +69,14 @@ def test_waiver_cannot_change_bytes() -> None:
 
 def test_correction_must_be_transform_or_mapping_revision() -> None:
     item_id = derive_id("rit", {"phase14": "correction-item"})
-    correction = ReviewCorrection.create(item_id=item_id, kind="transform")
+    result_id = derive_id("trn", {"phase14": "new-transform"})
+    correction = ReviewCorrection.create(
+        item_id=item_id,
+        kind="transform",
+        result_id=result_id,
+    )
     assert correction.kind == "transform"
+    assert correction.result_id == result_id
     payload = correction.model_dump(mode="json")
     payload["kind"] = "in-place"
     with pytest.raises(ValidationError):

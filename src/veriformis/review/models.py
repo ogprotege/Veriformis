@@ -1,12 +1,13 @@
-"""Versioned review contracts. Item 14.2 records the schema only.
+"""Versioned review contracts.
 
-Queues, submit paths, and seal blocking land in later items. Waivers cannot
-change bytes. Corrections are transforms or mapping revisions. Default
-review policy stays none. The bundle does not block seal in 14.2.
+Queues list existing facts. Corrections bind a new transform or mapping
+revision. Waivers cannot change bytes. Default review policy stays none.
+The bundle does not block seal until item 14.7.
 """
 
 from __future__ import annotations
 
+import re
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
@@ -17,7 +18,7 @@ from veriformis.contracts import (
     REVIEW_CONTRACT_VERSION,
 )
 from veriformis.errors import ReviewError
-from veriformis.identity import derive_id, validate_id
+from veriformis.identity import derive_id, validate_id, validate_sha256
 
 
 CORE_QUEUE_KINDS: tuple[str, ...] = (
@@ -70,6 +71,9 @@ class _StrictModel(BaseModel):
 
 def _tuple_str(value: Any) -> Any:
     return tuple(value) if isinstance(value, list) else value
+
+
+_TOKEN = re.compile(r"^[a-z][a-z0-9-]*$")
 
 
 def _require_token(value: str, label: str) -> str:
@@ -169,10 +173,63 @@ class ReviewWaiver(_StrictModel):
         return cls(waiver_id=derive_id("rwv", payload), **payload)
 
 
+class ReviewTransform(_StrictModel):
+    input_sha256: str
+    operation: str
+    output_sha256: str
+    schema_version: Literal["veriformis.review-transform/v1"] = (
+        "veriformis.review-transform/v1"
+    )
+    source_id: str
+    transform_id: str
+
+    @model_validator(mode="after")
+    def _closed(self) -> ReviewTransform:
+        if _TOKEN.fullmatch(self.operation) is None:
+            raise ReviewError("transform operation must be a lowercase token")
+        try:
+            validate_id(self.source_id, kind="src")
+            validate_sha256(self.input_sha256)
+            validate_sha256(self.output_sha256)
+        except ValueError as exc:
+            raise ReviewError("review transform source or digest is invalid") from exc
+        if self.input_sha256 == self.output_sha256:
+            raise ReviewError(
+                "transform correction must change bytes; record a waiver instead"
+            )
+        validate_id(self.transform_id, kind="trn")
+        expected = derive_id(
+            "trn",
+            self.model_dump(mode="json", exclude={"transform_id"}),
+        )
+        if self.transform_id != expected:
+            raise ReviewError("review transform identity mismatch")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        source_id: str,
+        input_sha256: str,
+        output_sha256: str,
+        operation: str,
+    ) -> ReviewTransform:
+        payload = {
+            "input_sha256": input_sha256,
+            "operation": operation,
+            "output_sha256": output_sha256,
+            "schema_version": "veriformis.review-transform/v1",
+            "source_id": source_id,
+        }
+        return cls(transform_id=derive_id("trn", payload), **payload)
+
+
 class ReviewCorrection(_StrictModel):
     correction_id: str
     item_id: str
     kind: CorrectionKind
+    result_id: str
     schema_version: Literal["veriformis.review-correction/v1"] = (
         "veriformis.review-correction/v1"
     )
@@ -182,6 +239,15 @@ class ReviewCorrection(_StrictModel):
         if self.kind not in {"mapping-revision", "transform"}:
             raise ReviewError("correction must be a transform or mapping revision")
         validate_id(self.item_id, kind="rit")
+        expected_kind = "trn" if self.kind == "transform" else "mpl"
+        try:
+            validate_id(self.result_id, kind=expected_kind)
+        except ValueError as exc:
+            raise ReviewError(
+                "correction result_id must be a new transform or mapping-plan identity"
+            ) from exc
+        if self.result_id == self.item_id:
+            raise ReviewError("correction cannot reuse the review-item identity")
         validate_id(self.correction_id, kind="rcr")
         expected = derive_id(
             "rcr",
@@ -192,10 +258,17 @@ class ReviewCorrection(_StrictModel):
         return self
 
     @classmethod
-    def create(cls, *, item_id: str, kind: CorrectionKind) -> ReviewCorrection:
+    def create(
+        cls,
+        *,
+        item_id: str,
+        kind: CorrectionKind,
+        result_id: str,
+    ) -> ReviewCorrection:
         payload = {
             "item_id": item_id,
             "kind": kind,
+            "result_id": result_id,
             "schema_version": "veriformis.review-correction/v1",
         }
         return cls(correction_id=derive_id("rcr", payload), **payload)

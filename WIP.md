@@ -8,9 +8,9 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-26 (Phase 14.3 first queues)
+**Last reviewed:** 2026-08-26 (Phase 14.4 corrections)
 
-**Next review:** Phase 14.3 pull-request merge, item 14.4 corrections,
+**Next review:** Phase 14.4 pull-request merge, item 14.5 sampling,
 or any listed-item status change. Do not start Phase 15 from this
 packet.
 
@@ -123,8 +123,9 @@ local, offline, and free of LLM generation.
 - [ ] Independent product Phase 14 is in progress under its
       [packet](dev/active/independent-product/phase-14-review-workflows/README.md).
       Item 14.1 opened tracking. Item 14.2 records the review-bundle
-      schema. Item 14.3 lists core queues over existing facts. There is
-      no submit path. Default `review_policy` stays
+      schema. Item 14.3 lists core queues over existing facts. Item 14.4
+      records corrections as new transforms or mapping revisions. There
+      is no submit path. Default `review_policy` stays
       `none`. Mac Review belongs to Phase 18. Do not start Phase 15 from
       this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).

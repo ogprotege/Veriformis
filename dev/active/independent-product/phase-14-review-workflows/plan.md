@@ -109,7 +109,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/04-corrections`
 **Title:** `Phase 14.4: Implement corrections as transforms or mapping revisions`
 
-- [ ] Corrections create a new transform or mapping revision. Fail closed on
+- [x] Corrections create a new transform or mapping revision. Fail closed on
       in-place mutation of accepted records. Waivers do not change bytes.
 
 ### 14.5 Add deterministic sampling

@@ -62,14 +62,14 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.3: core queues over
-existing construction and curation facts. Opt-in near-duplicate and
-detector queues stay off by default. Mac Review belongs to Phase 18. Do
-not start Phase 15 from this packet.
+Phase 14 review workflows are in progress at item 14.4: corrections bind
+a new transform or mapping revision; waivers do not change bytes.
+In-place mutation of accepted records fails closed. Mac Review belongs
+to Phase 18. Do not start Phase 15 from this packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 14.3 first queues)
+**Review date:** 2026-08-26 (independent-product Phase 14.4 corrections)
 
-**Next review:** Phase 14.3 pull-request merge, item 14.4 corrections,
+**Next review:** Phase 14.4 pull-request merge, item 14.5 sampling,
 or any contract change. Do not start Phase 15 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
