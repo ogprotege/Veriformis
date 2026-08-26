@@ -6,9 +6,9 @@
 
 **Schema:** `veriformis.review-bundle/v1`
 
-**Status:** Schema pin through independent-product Phase 14.2. Item 14.2
-records identity, queue kinds, waiver, correction, and supersession
-types. The empty bundle does not block seal. There is no review-submit
+**Status:** Schema pin through independent-product Phase 14.3. Item 14.3
+fills core queue kinds from construction `pending_review` and curation
+conflicts. The bundle does not block seal. There is no review-submit
 CLI command. Mac Review belongs to Phase 18.
 
 **Last reviewed:** 2026-08-26

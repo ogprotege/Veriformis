@@ -50,3 +50,23 @@ pytest 2213 passed, 16 deselected, 1 expected durability warning.
 
 **Next action:** Publish the item 14.2 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 14.3.
+
+## 2026-08-26 — Item 14.2 merged
+
+**Status:** Phase 14.2 merged as PR #125 at
+`abd8645662722bd8a45b3f2fae070812aa9d980d`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 14.3 pull request.
+
+## 2026-08-26 — Item 14.3 first queues
+
+**Status:** `report_core_queues` lists the five core kinds. Required-review
+construction fills `construction-pending` items. Opt-in kinds stay off
+unless requested. The bundle does not block seal.
+
+Local gates: tracking PASS; ruff pass; focused review 19 passed; core
+pytest 2215 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.3 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 14.4.

@@ -45,3 +45,10 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Closed queue-kind set. Core, opt-in, and sampling kinds are named.
 - [x] Waiver cannot change bytes. Correction kind is transform or mapping-revision.
 - [x] `blocks_seal` is false. CLI still has no submit command.
+
+## Required item 14.3 evidence
+
+- [x] Core queue kinds are listed on every report.
+- [x] Required-review construction fills `construction-pending` items.
+- [x] Default `none` construction has no pending items.
+- [x] Opt-in near-duplicate and detector kinds stay off unless requested.

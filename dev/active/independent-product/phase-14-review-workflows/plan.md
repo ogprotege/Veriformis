@@ -100,7 +100,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/03-first-queues`
 **Title:** `Phase 14.3: Add first queues over existing facts`
 
-- [ ] Construction pending, conflicts, OCR `review`, mapping, and parser
+- [x] Construction pending, conflicts, OCR `review`, mapping, and parser
       degradation as real queues. Near-duplicate and detector queues remain
       opt-in. Findings still do not delete rows.
 

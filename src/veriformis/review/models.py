@@ -87,6 +87,44 @@ class ReviewerRef(_StrictModel):
         return self
 
 
+class ReviewItem(_StrictModel):
+    item_id: str
+    queue_kind: QueueKind
+    required: bool
+    schema_version: Literal["veriformis.review-item/v1"] = "veriformis.review-item/v1"
+    subject_id: str
+
+    @model_validator(mode="after")
+    def _closed(self) -> ReviewItem:
+        if self.queue_kind not in QUEUE_KINDS:
+            raise ReviewError("review item queue_kind is not in the v1 set")
+        _require_token(self.subject_id, "subject_id")
+        validate_id(self.item_id, kind="rit")
+        expected = derive_id(
+            "rit",
+            self.model_dump(mode="json", exclude={"item_id"}),
+        )
+        if self.item_id != expected:
+            raise ReviewError("review item identity mismatch")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        queue_kind: QueueKind,
+        subject_id: str,
+        required: bool,
+    ) -> ReviewItem:
+        payload = {
+            "queue_kind": queue_kind,
+            "required": required,
+            "schema_version": "veriformis.review-item/v1",
+            "subject_id": subject_id,
+        }
+        return cls(item_id=derive_id("rit", payload), **payload)
+
+
 class ReviewWaiver(_StrictModel):
     changes_bytes: Literal[False]
     item_id: str
