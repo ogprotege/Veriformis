@@ -117,7 +117,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/05-leakage-checks`
 **Title:** `Phase 13.5: Add leakage checks against bound corpora`
 
-- [ ] Leakage checks across imported partitions and optional external
+- [x] Leakage checks across imported partitions and optional external
       evaluation/reference corpora bound by digest.
 
 ### 13.6 Add tokenizer-bound length simulations

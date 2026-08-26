@@ -41,8 +41,8 @@ start Phase 14 from this packet.
 
 ## Current state
 
-Item 13.4 is in progress. `veriformis.quality-report/v1` records facts,
-policy, and recommendations as separate layers, fills plan-bound
-distributions, and adds inspectable near-duplicate clusters. The report
-is not enforcing and does not delete rows. There is no quality-report
+Item 13.5 is in progress. `veriformis.quality-report/v1` records facts,
+policy, and recommendations as separate layers, fills distributions,
+near-duplicate clusters, and leakage facts. The report is not enforcing
+and does not certify contamination absence. There is no quality-report
 command. Do not start Phase 14 from this packet.

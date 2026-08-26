@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.4 near-duplicates)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.5 leakage)
 
-**Next review:** Phase 13.4 pull-request merge, item 13.5 leakage checks,
-or governance-schema change
+**Next review:** Phase 13.5 pull-request merge, item 13.6 tokenizer
+simulations, or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -51,7 +51,7 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–12 are complete on `main` and
-Phase 13 is in progress at item 13.4. Phase 12 closeout merged as PR #112
+Phase 13 is in progress at item 13.5. Phase 12 closeout merged as PR #112
 at `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
 recovery is isolated under empty extra `ocr`. Default parse still refuses
 image-only PDF. `ocr-image` stays explicitly unsupported. The quality

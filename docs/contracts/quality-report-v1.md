@@ -6,9 +6,11 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.4. Item 13.3
+**Status:** Schema pin through independent-product Phase 13.5. Item 13.3
 fills plan-bound distribution facts. Item 13.4 adds inspectable
-near-duplicate clusters. The report does not enforce heuristics. Seal
+near-duplicate clusters. Item 13.5 records leakage facts against
+imported partition hints and digest-bound reference corpora. The report
+does not enforce heuristics or certify absence of contamination. Seal
 still uses the seventeen finished-dataset gates. There is no
 quality-report CLI command. `near_duplicate_policy` stays `disabled`.
 
@@ -94,9 +96,27 @@ objective target fields. Similarity is integer Jaccard over overlapping
 `near-duplicate-disabled` as `record-only`. Curation
 `near_duplicate_policy` remains `disabled`.
 
+## Leakage (item 13.5)
+
+`report_leakage_checks` adds facts. It does not certify contamination
+absence.
+
+| Fact | Value |
+| --- | --- |
+| `leakage-cross-partition-exact-target-count` | Distinct target SHA-256 values present in both train and evaluation |
+| `leakage-imported-partition-mismatch-count` | Included records whose imported hint differs from the split assignment |
+| `leakage-imported-partition-mismatches` | `{record-id, hinted, assigned}` rows, sorted by record id |
+| `leakage-reference-corpus-digest` | Canonical digest of a bound corpus, or `unbound` |
+| `leakage-reference-corpus-hit-count` | Included records whose target SHA-256 is in the bound corpus |
+| `leakage-reference-corpus-hits` | Sorted included record ids that hit the corpus |
+
+A bound corpus is the sorted unique SHA-256 set of exact target strings.
+Unknown imported record ids fail closed. Policy records
+`leakage-record-only` as `record-only`.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.4 cannot fail seal. Later items may add
+`enforcing` is `false`. Item 13.5 cannot fail seal. Later items may add
 previewable gates; a heuristic may block seal only after item 13.9 records
 calibrated labeled fixtures for that heuristic.
 
@@ -122,7 +142,7 @@ The v1 limitation set is:
 
 ## Non-goals
 
-Leakage corpora, tokenizer simulations, PII/secret detectors, and
-split-comparability findings. Those are later Phase 13 items. Phase 14
-review queues are out of scope. Semantic identity and silent row
-deletion are out of scope.
+Tokenizer simulations, PII/secret detectors, and split-comparability
+findings. Those are later Phase 13 items. Phase 14 review queues are out
+of scope. Semantic identity, silent row deletion, and contamination
+certification are out of scope.
