@@ -66,9 +66,11 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.7: required
-unresolved reviews block seal; default recipes stay none. Do not start
-Phase 15 from this packet.
+Phase 14 review workflows are complete: queues, corrections as new
+identities, named-seed sampling, CLI/MCP/Python packet exchange,
+required-review seal blocking, and auditable supersession. Default
+recipes stay `none`. Mac Review belongs to Phase 18. Do not start
+Phase 15 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

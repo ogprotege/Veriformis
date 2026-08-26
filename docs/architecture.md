@@ -49,7 +49,10 @@ confirmed mapping, templates); `profiles/` (implemented TRL, MLX-LM, Axolotl, LL
 pins and adapters); `ocr/` (Tesseract 5 identity pin, optional subprocess provider, empty
 extra `ocr`; default parse still refuses image-only PDF);
 `quality/` (versioned quality report; facts stay separate from policy
-and recommendations; 13.3–13.6 including tokenizer pins; not enforcing); and `cli.py` (Typer adapter).
+and recommendations; not enforcing);
+`review/` (queues, corrections as new identities, named-seed sampling,
+packet exchange, required-review seal blocking, auditable supersession);
+and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only

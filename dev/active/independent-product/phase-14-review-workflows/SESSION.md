@@ -5,10 +5,10 @@ append-only history.
 
 **Updated:** 2026-08-26
 
-**Local branch:** `phase14/07-required-review-seal`
+**Local branch:** `phase14/08-supersession-closeout`
 
-**Completed:** 14.1 through 14.6
+**Completed:** 14.1 through 14.8. Phase 14 closeout.
 
-**Current item:** 14.7 Block seal on required unresolved reviews
+**Current item:** Closeout. Do not start Phase 15 from this packet.
 
-**Not started:** 14.8. Phase 15. Do not start Phase 15 from this packet.
+**Not started:** Phase 15.

@@ -1,6 +1,6 @@
 # Phase 14 Evidence
 
-**Status:** Open — item 14.7 required reviews block seal
+**Status:** Complete — Phase 14 closeout
 
 **Opened:** 2026-08-26
 
@@ -83,3 +83,10 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Default `none` construction does not block seal.
 - [x] Named default recipes stay `review_policy=none`.
 - [x] No quality heuristic is admitted to block seal.
+
+## Required item 14.8 evidence
+
+- [x] Supersession keeps prior and successor review identities.
+- [x] Same-review and cross-candidate supersession fail closed.
+- [x] Prior review cannot be dropped from the bundle.
+- [x] Closeout. Do not start Phase 15.

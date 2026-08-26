@@ -62,16 +62,16 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.7: required
-unresolved reviews block seal. Default recipes stay `none`. No Phase 13
-heuristic is a default required-review trigger. Mac Review belongs to
-Phase 18. Do not start Phase 15 from this packet.
+Phase 14 review workflows are complete: core queues, corrections as new
+identities, named-seed sampling, CLI/MCP/Python packet exchange,
+required-review seal blocking, and auditable supersession. Default
+recipes stay `none`. Mac Review belongs to Phase 18. Do not start
+Phase 15 from that packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 14.7 required-review seal)
+**Review date:** 2026-08-26 (independent-product Phase 14 closeout)
 
-**Next review:** Phase 14.7 pull-request merge, item 14.8 supersession
-closeout, or any contract change. Do not start Phase 15 from this
-packet.
+**Next review:** Phase 15 packet, if authorized, or any contract change.
+Do not start Phase 15 from the Phase 14 packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -762,7 +762,8 @@ See [docs/release.md](release.md).
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
 | Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–13 complete and Phase 14 in progress under the [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md); do not start Phase 15 from that packet |
+| Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–14 complete under the [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md); do not start Phase 15 from that packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

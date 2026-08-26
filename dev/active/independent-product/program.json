@@ -157,12 +157,12 @@
     {
       "number": 14,
       "title": "Deliver human review and correction workflows",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [13],
       "packet": "dev/active/independent-product/phase-14-review-workflows",
       "started_on": "2026-08-26",
-      "completed_on": null,
-      "next_gate": "Item 14.7 blocks seal on unresolved required reviews. Sequential PRs 14.7–14.8. Do not start Phase 15 from this packet."
+      "completed_on": "2026-08-26",
+      "next_gate": "Completed. Required-review fixtures cannot seal until resolved; corrections create new identities; supersession keeps prior reviews auditable. Mac Review belongs to Phase 18. Do not start Phase 15 from this packet."
     },
     {
       "number": 15,

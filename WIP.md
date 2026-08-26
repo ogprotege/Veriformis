@@ -8,11 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-26 (Phase 14.7 required-review seal)
+**Last reviewed:** 2026-08-26 (Phase 14 closeout)
 
-**Next review:** Phase 14.7 pull-request merge, item 14.8 supersession
-closeout, or any listed-item status change. Do not start Phase 15 from
-this packet.
+**Next review:** Phase 15 packet, if authorized, or any listed-item
+status change. Do not start Phase 15 from the Phase 14 packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -120,16 +119,12 @@ local, offline, and free of LLM generation.
       `ef31559c9184b553209a3c45eca5d943fbb9a680`. The versioned quality
       report previews configurable gates and records labeled fixtures.
       No heuristic blocks seal. There is no quality-report command.
-- [ ] Independent product Phase 14 is in progress under its
+- [x] Independent product Phase 14 is complete under its
       [packet](dev/active/independent-product/phase-14-review-workflows/README.md).
-      Item 14.1 opened tracking. Item 14.2 records the review-bundle
-      schema. Item 14.3 lists core queues over existing facts. Item 14.4
-      records corrections as new transforms or mapping revisions. Item
-      14.5 adds named-seed sampling with no statistical meaning. Item
-      14.6 adds review packet export, import, and submit on CLI, MCP,
-      and Python. Item 14.7 blocks seal on unresolved required reviews.
+      Required-review fixtures cannot seal until resolved. Corrections
+      create new identities. Supersession keeps prior reviews auditable.
       Default `review_policy` stays `none`. Mac Review belongs to Phase
-      18. Do not start Phase 15 from this packet.
+      18. Do not start Phase 15 from that packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -156,7 +151,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 11 | Harden collection ingest and qualify additional input types | Completed | [Completed packet](dev/active/independent-product/phase-11-collection-ingest/README.md) |
 | 12 | Add optional local OCR with accountable recovery | Completed | [Completed packet](dev/active/independent-product/phase-12-optional-ocr/README.md) |
 | 13 | Build dataset quality intelligence | Completed | [Completed packet](dev/active/independent-product/phase-13-quality-intelligence/README.md) |
-| 14 | Deliver human review and correction workflows | In progress | [Active packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
+| 14 | Deliver human review and correction workflows | Completed | [Completed packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 16 | Establish a safe extension architecture | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 17 | Add governed advanced dataset families | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -590,7 +585,7 @@ Remaining documentation debt:
   JSON, JSONL, and listed source-code formats — not arbitrary binary.
 - The checked-in optional Aptus adapter policy rejects plain `text` rows; live
   named-version compatibility has not been established in this repository.
-- Inter-reviewer supersession is not yet implemented (item 14.8).
+- Mac Review screens belong to Phase 18.
 - The minimal bundle omits raw sources and complete replay artifacts.
 - External trust requires a manifest digest retained outside the bundle.
 - Model-assisted construction remains optional and unapproved (Group 8).

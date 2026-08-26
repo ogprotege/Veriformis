@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–13 complete; Phase 14 in progress
+**Status:** Active program — Phases 0–14 complete; Phase 15 not started
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -29,7 +29,7 @@ with roadmap headings.
 - [Phase 11 — Harden collection ingest and qualify additional input types](phase-11-collection-ingest/README.md) — complete
 - [Phase 12 — Add optional local OCR with accountable recovery](phase-12-optional-ocr/README.md) — complete
 - [Phase 13 — Build dataset quality intelligence](phase-13-quality-intelligence/README.md) — complete
-- [Phase 14 — Deliver human review and correction workflows](phase-14-review-workflows/README.md) — in progress
+- [Phase 14 — Deliver human review and correction workflows](phase-14-review-workflows/README.md) — complete
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active

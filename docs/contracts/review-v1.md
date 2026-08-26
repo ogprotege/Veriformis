@@ -6,10 +6,10 @@
 
 **Schema:** `veriformis.review-bundle/v1`
 
-**Status:** Schema pin through independent-product Phase 14.7. Item 14.7
-blocks seal when required reviews are unresolved. Default recipes stay
-`none`. No Phase 13 heuristic is a default required-review trigger. Mac
-Review belongs to Phase 18.
+**Status:** Implemented through independent-product Phase 14 closeout.
+Required unresolved reviews block seal. Corrections create new
+identities. Supersession keeps prior reviews auditable. Mac Review
+belongs to Phase 18.
 
 **Last reviewed:** 2026-08-26
 
