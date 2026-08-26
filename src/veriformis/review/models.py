@@ -523,6 +523,20 @@ class ReviewSupersession(_StrictModel):
             raise ReviewError("supersession identity mismatch")
         return self
 
+    @classmethod
+    def create(
+        cls,
+        *,
+        prior_review_id: str,
+        successor_review_id: str,
+    ) -> ReviewSupersession:
+        payload = {
+            "prior_review_id": prior_review_id,
+            "schema_version": "veriformis.review-supersession/v1",
+            "successor_review_id": successor_review_id,
+        }
+        return cls(supersession_id=derive_id("rsp", payload), **payload)
+
 
 class ReviewBundle(_StrictModel):
     assignments: tuple[str, ...]

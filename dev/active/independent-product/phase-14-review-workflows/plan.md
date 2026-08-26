@@ -1,6 +1,6 @@
 # Phase 14 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-26
 
@@ -141,7 +141,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/08-supersession-closeout`
 **Title:** `Phase 14.8: Add supersession and close Phase 14`
 
-- [ ] Inter-reviewer supersession with auditable history. Closeout. Do not
+- [x] Inter-reviewer supersession with auditable history. Closeout. Do not
       start Phase 15 from this packet.
 
 ## Usability criteria
@@ -164,4 +164,4 @@ Required-review fixtures cannot seal until resolved; every correction
 replays from immutable inputs; old decisions remain auditable after
 supersession.
 
-**Result:** Pending item 14.1. See [closeout.md](closeout.md).
+**Result:** Passed. See [closeout.md](closeout.md). Do not start Phase 15.

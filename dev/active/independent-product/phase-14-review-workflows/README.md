@@ -1,10 +1,10 @@
 # Phase 14 — Deliver Human Review and Correction Workflows
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-26
 
-**Completed:**
+**Completed:** 2026-08-26
 
 **Roadmap phase:** [Phase 14](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-14--deliver-human-review-and-correction-workflows)
 
@@ -45,6 +45,7 @@ from this packet.
 
 ## Current state
 
-Item 14.7 is in progress. Required unresolved reviews block seal.
-Default recipes stay `none`. No Phase 13 heuristic is a default
-required-review trigger. Do not start Phase 15 from this packet.
+Phase 14 is complete. Required-review fixtures cannot seal until
+resolved. Corrections create new identities. Supersession keeps prior
+reviews auditable. Mac Review belongs to Phase 18. Do not start Phase
+15 from this packet.

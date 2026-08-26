@@ -4,13 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–13 complete; Phase 14 in progress).
+Phases 0–14 complete).
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14.2 review contracts)
+**Last reviewed:** 2026-08-26 (independent-product Phase 14 closeout)
 
-**Next review:** Phase 14.2 pull-request merge, item 14.3 first queues,
-or any contract change. Do not start Phase 15 from this packet. Default
-parse still refuses image-only PDF.
+**Next review:** Phase 15 packet, if authorized, or any contract change.
+Do not start Phase 15 from the Phase 14 packet. Default parse still
+refuses image-only PDF.
 
 ## Start here
 
@@ -70,7 +70,7 @@ parse still refuses image-only PDF.
 | [Parser Identity v1](contracts/parser-identity-v1.md) | Parser kind, version pins, and recovery-quality status | Implemented; parse-report bytes unchanged |
 | [OCR Recovery Identity v1](contracts/ocr-recovery-identity-v1.md) | Tesseract 5 engine/page pins | Optional Tesseract 5; default parse still refuses image-only PDF |
 | [Quality Report v1](contracts/quality-report-v1.md) | Facts, policy, recommendations; previewable gates; labeled fixtures | Schema pin; not enforcing; no heuristic admitted to block seal; no CLI command |
-| [Review v1](contracts/review-v1.md) | Reviewer, queue kinds, waiver, correction, packet exchange, bound bundle | Schema pin; Python/CLI/MCP submit; required unresolved reviews block seal; Mac Review is Phase 18 |
+| [Review v1](contracts/review-v1.md) | Reviewer, queues, packet exchange, corrections, sampling, seal block, supersession | Implemented through Phase 14; Mac Review is Phase 18 |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

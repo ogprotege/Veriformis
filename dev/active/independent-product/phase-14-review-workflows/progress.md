@@ -152,3 +152,23 @@ pytest 2236 passed, 16 deselected, 1 expected durability warning.
 
 **Next action:** Publish the item 14.7 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 14.8.
+
+## 2026-08-26 — Item 14.7 merged
+
+**Status:** Phase 14.7 merged as PR #130 at
+`01085498457e877ca7ecbc3fffbcae71e2cb617f`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 14.8 pull request.
+
+## 2026-08-26 — Item 14.8 supersession and closeout
+
+**Status:** Supersession keeps prior and successor review identities
+auditable. Same-review and cross-candidate links fail closed. Phase 14
+closeout. Do not start Phase 15 from this packet.
+
+Local gates: tracking PASS; ruff pass; focused review 43 passed; core
+pytest 2239 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.8 pull request. Require green GitHub
+checks, merge, and synchronize clean main. Do not start Phase 15.

@@ -2,11 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14.7 required-review seal)
+**Last reviewed:** 2026-08-26 (independent-product Phase 14 closeout)
 
-**Next review:** Phase 14.7 pull-request merge, item 14.8 supersession
-closeout, or governance-schema change. Do not start Phase 15 from the
-Phase 14 packet.
+**Next review:** Phase 15 packet, if authorized, or governance-schema
+change. Do not start Phase 15 from the Phase 14 packet.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -32,7 +31,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 11 packet](../../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening |
 | [Completed Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR |
 | [Completed Phase 13 packet](../../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence |
-| [Active Phase 14 packet](../../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows |
+| [Completed Phase 14 packet](../../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows |
 
 Run the governance drift check with:
 
@@ -52,11 +51,12 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–13 are complete on `main` and
-Phase 14 is in progress at item 14.7. Phase 13 closeout merged as PR #122
+At this review, independent-product Phases 0–14 are complete on `main`.
+Phase 13 closeout merged as PR #122
 at `ef31559c9184b553209a3c45eca5d943fbb9a680`. The quality report is
-preview-only. Construction `review_policy` defaults to `none`. There is
-review-export, review-import, and review-submit exist. Mac Review belongs to Phase 18. Optional
+preview-only. Construction `review_policy` defaults to `none`.
+`review-export`, `review-import`, and `review-submit` exist. Mac Review
+belongs to Phase 18. Optional
 Tesseract 5 recovery is isolated under empty extra `ocr`. Default parse
 still refuses image-only PDF. `ocr-image` stays explicitly unsupported.
 Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters.

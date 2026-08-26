@@ -39,6 +39,7 @@ from veriformis.review.seal import (
     assert_required_reviews_resolved,
     required_reviews_block_seal,
 )
+from veriformis.review.supersession import record_supersession, supersede_review
 
 __all__ = [
     "CORE_QUEUE_KINDS",
@@ -67,10 +68,12 @@ __all__ = [
     "record_mapping_revision",
     "record_transform_correction",
     "record_waiver",
+    "record_supersession",
     "report_core_queues",
     "report_sample_queue",
     "required_reviews_block_seal",
     "revise_mapping_plan",
     "sample_subjects",
     "submit_review_packet",
+    "supersede_review",
 ]
