@@ -36,3 +36,11 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Preflight still names `no-quality-intelligence`.
 - [x] CLI and MCP have no quality-report command.
 - [x] Focused isolation tests, tracking, Ruff, lock, and diff check.
+
+## Required item 13.2 evidence
+
+- [x] `veriformis.quality-report/v1` binds to a finished-dataset plan.
+- [x] Facts, policy decisions, and recommendations are separate types.
+- [x] `enforcing` is false. Seal gates are unchanged.
+- [x] A fact cannot be named as a recommendation. Layers cannot share names.
+- [x] CLI still has no quality-report command.

@@ -92,7 +92,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/02-quality-report`
 **Title:** `Phase 13.2: Define the versioned quality report`
 
-- [ ] Versioned report schema with facts separated from policy decisions and
+- [x] Versioned report schema with facts separated from policy decisions and
       recommendations. No heuristic enforcement.
 
 ### 13.3 Report dataset distributions

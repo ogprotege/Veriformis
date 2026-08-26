@@ -28,3 +28,24 @@ core pytest 2164 passed, 16 deselected, 1 expected durability warning;
 
 **Next action:** Open the item 13.1 pull request. Require every GitHub
 check, merge, and synchronize clean main before item 13.2.
+
+## 2026-08-25 — Item 13.1 merged
+
+**Status:** Phase 13.1 merged as PR #114 at
+`cdbab4e6eadb74a8f0710b4b1fd6ecc46c0fe0f5`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.2 pull request.
+
+## 2026-08-25 — Item 13.2 quality report schema
+
+**Status:** `veriformis.quality-report/v1` binds an empty report to a
+finished-dataset plan. Facts, policy, and recommendations are separate
+types. `enforcing` is false. There is no CLI command.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 14
+passed; core pytest 2170 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.2 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.3.

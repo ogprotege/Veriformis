@@ -5,10 +5,10 @@ append-only history.
 
 **Updated:** 2026-08-25
 
-**Local branch:** `phase13/01-quality-packet`
+**Local branch:** `phase13/02-quality-report`
 
-**Completed:** none
+**Completed:** 13.1
 
-**Current item:** 13.1 Open the quality-intelligence packet
+**Current item:** 13.2 Define the versioned quality report
 
-**Not started:** 13.2–13.9. Phase 14. Do not start Phase 14 from this packet.
+**Not started:** 13.3–13.9. Phase 14. Do not start Phase 14 from this packet.

@@ -212,6 +212,12 @@ class OcrIdentityError(VeriformisError):
     code = "ocr-identity-invalid"
 
 
+class QualityReportError(VeriformisError):
+    """A quality report mixes layers or claims enforcement it does not have."""
+
+    code = "quality-report-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 
