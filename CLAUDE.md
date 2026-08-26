@@ -63,8 +63,10 @@ empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
 image-only PDF. `ocr-image` remains explicitly unsupported.
 Phase 13 quality intelligence is complete: versioned quality report,
-previewable gates, labeled fixtures. No heuristic blocks seal. There is
-no quality-report command. Do not start Phase 14 from this packet.
+previewable gates, labeled fixtures. Closeout merged as PR #122 at
+`ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
+There is no quality-report command. Do not start Phase 14 from this
+packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

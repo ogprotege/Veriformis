@@ -112,7 +112,7 @@ image-only PDF.
 | [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles | Completed implementation record |
 | [Phase 11 packet](../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening | Completed implementation record |
 | [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
-| [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Completed implementation record; preview-only gates |
+| [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Completed; closeout PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680` |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

@@ -4,7 +4,7 @@
 
 **Last reviewed:** 2026-08-26
 
-**Closeout merge:** this pull request (Phase 13.9)
+**Closeout merge:** PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`
 
 ## Exit-gate judgment
 

@@ -202,3 +202,10 @@ warning.
 
 **Next action:** Publish the item 13.9 pull request. Require green GitHub
 checks, merge, and synchronize clean main. Do not start Phase 14.
+
+## 2026-08-26 — Item 13.9 merged; Phase 13 complete
+
+**Status:** Phase 13.9 closeout merged as PR #122 at
+`ef31559c9184b553209a3c45eca5d943fbb9a680`. Clean local `main` equals
+`origin/main` there. Phase 13 is complete. Do not start Phase 14 from
+this packet.

@@ -115,9 +115,11 @@ local, offline, and free of LLM generation.
       empty extra `ocr`. Default parse still refuses image-only PDF.
 - [x] Independent product Phase 13 is complete under its
       [packet](dev/active/independent-product/phase-13-quality-intelligence/README.md).
-      The versioned quality report previews configurable gates and
-      records labeled fixtures. No heuristic blocks seal. There is no
-      quality-report command. Do not start Phase 14 from this packet.
+      Closeout merged as PR #122 at
+      `ef31559c9184b553209a3c45eca5d943fbb9a680`. The versioned quality
+      report previews configurable gates and records labeled fixtures.
+      No heuristic blocks seal. There is no quality-report command. Do
+      not start Phase 14 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

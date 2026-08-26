@@ -26,7 +26,7 @@ non-executable candidate; Phase 11 collection-plan ingest complete;
 Phase 12 optional Tesseract 5 OCR complete with `ocr-image` still
 explicitly unsupported for default parse; closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`; Phase 13 quality intelligence
-complete, preview-only, no heuristic blocks seal; version `0.1.0` development alpha
+complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only, no heuristic blocks seal; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
