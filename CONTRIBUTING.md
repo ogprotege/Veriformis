@@ -25,6 +25,7 @@ Before changing code, read:
 - [ADR-0013: Columnar Containers as Optional Generic Exports](docs/adr/0013-columnar-containers-as-optional-generic-exports.md)
 - [ADR-0014: Independently Admitted Consumer Profiles](docs/adr/0014-independently-admitted-consumer-profiles.md)
 - [ADR-0016: Optional Local Tesseract 5 OCR](docs/adr/0016-optional-local-tesseract-ocr.md)
+- [Quality Report v1](docs/contracts/quality-report-v1.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
