@@ -6,10 +6,10 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.8. Item 13.8
-adds split-comparability and rare-shape findings. The report does not
-enforce heuristics. Seal still uses the seventeen finished-dataset
-gates. There is no quality-report CLI command.
+**Status:** Schema pin through independent-product Phase 13.9. Item 13.9
+previews configurable quality gates and records labeled fixtures. No
+heuristic is admitted to block seal. Seal still uses the seventeen
+finished-dataset gates. There is no quality-report CLI command.
 
 **Last reviewed:** 2026-08-25
 
@@ -167,11 +167,36 @@ malformed messages roles, so those counts stay zero on valid artifacts.
 
 Policy records `split-findings-record-only`.
 
+## Quality gates (item 13.9)
+
+`preview_quality_gates` compares integer facts to a versioned policy
+`veriformis.quality-gate-policy/v1`. Gates are configurable and
+previewable. They bind to the finished-dataset `plan_id`. They do not
+add fields to `FinishedDatasetPlan` or the seventeen-gate validation
+snapshot. `admitted-to-block` is false for every v1 gate. A caller that
+sets `admitted_to_block=True` fails closed.
+
+| Fact | Value |
+| --- | --- |
+| `quality-gate-policy-id` | `veriformis.quality-gate-policy/v1` |
+| `quality-gate-plan-id` | Finished-dataset plan identity |
+| `quality-gate-preview` | Sorted `{gate-id, fact, threshold, observed, would-block, admitted-to-block}` rows |
+| `quality-gate-would-block-count` | Gates whose observed integer meets the threshold |
+| `quality-admitted-blocking-count` | Always `0` in v1 |
+| `quality-labeled-fixture-set-id` | `veriformis.quality-labeled-fixtures/v1` |
+| `quality-labeled-fixture-count` | Closed labeled-fixture catalog size |
+
+Policy records `quality-gates-preview-only` and
+`quality-no-heuristic-admitted-to-block`. Labeled fixtures calibrate
+detector, near-duplicate, leakage, and split-empty/role heuristics.
+None of those heuristics is admitted to fail seal.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.8 cannot fail seal. Later items may add
-previewable gates; a heuristic may block seal only after item 13.9 records
-calibrated labeled fixtures for that heuristic.
+`enforcing` is `false`. Item 13.9 cannot fail seal. A heuristic may block
+seal only after a later admission records labeled-fixture performance
+for that heuristic. The seventeen finished-dataset gates remain the
+seal path.
 
 ## Binding
 

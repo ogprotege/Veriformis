@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.8 split findings; report is not enforcing
+**Status:** Closed — item 13.9 previewable gates; no heuristic blocks seal
 
 **Opened:** 2026-08-25
 
@@ -86,3 +86,14 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Source comparability, imbalance ppm, rare shapes, empty and
       malformed-role counts.
 - [x] Valid full_text artifacts have zero empty/malformed/rare-shape counts.
+
+## Required item 13.9 evidence
+
+- [x] Quality gates are versioned, configurable, and previewable.
+- [x] Gates bind to the finished-dataset plan identity. Plan and snapshot
+      schemas are unchanged.
+- [x] Labeled fixtures exist for detector, near-duplicate, leakage, and
+      split-empty/role heuristics.
+- [x] No heuristic is admitted to block seal. `admitted_to_block=True`
+      fails closed.
+- [x] CLI and MCP still have no quality-report command.

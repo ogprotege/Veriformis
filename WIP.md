@@ -8,11 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 13.8 split findings)
+**Last reviewed:** 2026-08-26 (Phase 13 closeout)
 
-**Next review:** Phase 13.8 pull-request merge, item 13.9 gates and
-closeout, or any listed-item status change. Do not start Phase 14
-from this packet.
+**Next review:** Phase 14 when the operator asks, or any listed-item
+status change. Do not start Phase 14 from the Phase 13 packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -114,15 +113,11 @@ local, offline, and free of LLM generation.
       `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
       recovery is classified, thresholded, previewable, and isolated under
       empty extra `ocr`. Default parse still refuses image-only PDF.
-- [ ] Independent product Phase 13 is in progress under its
+- [x] Independent product Phase 13 is complete under its
       [packet](dev/active/independent-product/phase-13-quality-intelligence/README.md).
-      Item 13.1 opened tracking. Item 13.2 records the quality-report
-      schema. Item 13.3 fills plan-bound distribution facts. Item 13.4
-      adds inspectable near-duplicate clusters. Item 13.5 records
-      leakage facts. Item 13.6 simulates token lengths only under an
-      exact pin. Item 13.7 records detector findings, not certification.
-      Item 13.8 records split-comparability findings. The report is not
-      enforcing. Do not start Phase 14 from this packet.
+      The versioned quality report previews configurable gates and
+      records labeled fixtures. No heuristic blocks seal. There is no
+      quality-report command. Do not start Phase 14 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -148,7 +143,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 10 | Expand consumer profiles under evidence gates | Completed | [Completed packet](dev/active/independent-product/phase-10-profile-expansion/README.md) |
 | 11 | Harden collection ingest and qualify additional input types | Completed | [Completed packet](dev/active/independent-product/phase-11-collection-ingest/README.md) |
 | 12 | Add optional local OCR with accountable recovery | Completed | [Completed packet](dev/active/independent-product/phase-12-optional-ocr/README.md) |
-| 13 | Build dataset quality intelligence | In progress | [Active packet](dev/active/independent-product/phase-13-quality-intelligence/README.md) |
+| 13 | Build dataset quality intelligence | Completed | [Completed packet](dev/active/independent-product/phase-13-quality-intelligence/README.md) |
 | 14 | Deliver human review and correction workflows | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 16 | Establish a safe extension architecture | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

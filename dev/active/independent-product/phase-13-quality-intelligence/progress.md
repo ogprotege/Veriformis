@@ -180,3 +180,25 @@ warning.
 
 **Next action:** Publish the item 13.8 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.9.
+
+## 2026-08-26 — Item 13.8 merged
+
+**Status:** Phase 13.8 merged as PR #121 at
+`328b46bc5fd1e5b155b36ec3c7328846420e34f2`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.9 pull request.
+
+## 2026-08-26 — Item 13.9 previewable gates and closeout
+
+**Status:** `preview_quality_gates` records versioned thresholds against
+integer facts. Labeled fixtures exist. No heuristic is admitted to
+block seal. `enforcing` stays false. There is no CLI command. Phase 13
+closeout is in this item.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 40
+passed; core pytest 2196 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.9 pull request. Require green GitHub
+checks, merge, and synchronize clean main. Do not start Phase 14.

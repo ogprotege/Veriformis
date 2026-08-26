@@ -1,4 +1,4 @@
-"""Dataset quality intelligence. Item 13.8 adds split-comparability findings."""
+"""Dataset quality intelligence. Item 13.9 previews gates; none block seal."""
 
 from veriformis.quality.detectors import (
     DETECTOR_FACT_NAMES,
@@ -9,6 +9,16 @@ from veriformis.quality.distributions import (
     DISTRIBUTION_FACT_NAMES,
     LANGUAGE_UNQUALIFIED,
     report_dataset_distributions,
+)
+from veriformis.quality.gates import (
+    GATE_FACT_NAMES,
+    LABELED_FIXTURE_SET_ID,
+    LABELED_FIXTURES,
+    QUALITY_GATE_POLICY_ID,
+    V1_QUALITY_GATES,
+    LabeledFixture,
+    QualityGateSpec,
+    preview_quality_gates,
 )
 from veriformis.quality.leakage import (
     LEAKAGE_FACT_NAMES,
@@ -51,6 +61,12 @@ __all__ = [
     "DETECTOR_FACT_NAMES",
     "DETECTOR_SET_ID",
     "DISTRIBUTION_FACT_NAMES",
+    "GATE_FACT_NAMES",
+    "LABELED_FIXTURE_SET_ID",
+    "LABELED_FIXTURES",
+    "LabeledFixture",
+    "QUALITY_GATE_POLICY_ID",
+    "QualityGateSpec",
     "LANGUAGE_UNQUALIFIED",
     "LEAKAGE_FACT_NAMES",
     "UNBOUND_REFERENCE_CORPUS",
@@ -65,12 +81,14 @@ __all__ = [
     "QualityPolicyDecision",
     "QualityRecommendation",
     "QualityReport",
+    "V1_QUALITY_GATES",
     "assemble_quality_report",
     "bound_reference_corpus",
     "bound_tokenizer_pin",
     "empty_quality_report",
     "report_dataset_distributions",
     "report_leakage_checks",
+    "preview_quality_gates",
     "report_near_duplicates",
     "report_policy_detectors",
     "report_split_findings",
