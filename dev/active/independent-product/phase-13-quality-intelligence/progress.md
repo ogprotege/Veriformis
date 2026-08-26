@@ -71,3 +71,25 @@ warning.
 
 **Next action:** Publish the item 13.3 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.4.
+
+## 2026-08-25 — Item 13.3 merged
+
+**Status:** Phase 13.3 merged as PR #116 at
+`b2acf7cbd4fa497fb8b7adf5dda5f32b991aa25a`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.4 pull request.
+
+## 2026-08-25 — Item 13.4 near-duplicate clusters
+
+**Status:** Algorithm `veriformis.near-duplicate-ws-shingle-jaccard/v1`
+records inspectable clusters and ppm threshold previews. It is not
+semantic identity and does not delete rows. Curation
+`near_duplicate_policy` stays `disabled`. The report is not enforcing.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 22
+passed; core pytest 2178 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.4 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.5.

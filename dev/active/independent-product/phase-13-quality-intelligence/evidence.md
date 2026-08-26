@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.3 distributions; report is not enforcing
+**Status:** Open — item 13.4 near-duplicates; report is not enforcing
 
 **Opened:** 2026-08-25
 
@@ -53,3 +53,11 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Reports reproduce from bound inputs. Mixed identities fail closed.
 - [x] `enforcing` is false. Policy and recommendations stay vacant.
 - [x] CLI still has no quality-report command.
+
+## Required item 13.4 evidence
+
+- [x] Named algorithm `veriformis.near-duplicate-ws-shingle-jaccard/v1`.
+- [x] Inspectable clusters and threshold previews in ppm integers.
+- [x] Near-duplicates are not called semantic identity.
+- [x] Included records are not deleted. `near_duplicate_policy` stays disabled.
+- [x] `enforcing` is false. Policy is `record-only`.

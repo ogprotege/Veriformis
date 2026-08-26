@@ -16,21 +16,12 @@ from veriformis.construction import (
     IRFieldEvidence,
     RecordField,
 )
-from veriformis.contracts import (
-    QUALITY_REPORT_CONTRACT_ID,
-    QUALITY_REPORT_CONTRACT_VERSION,
-    QUALITY_REPORT_SCHEMA_ID,
-)
 from veriformis.datasets.curation import OBJECTIVE_FIELD_ROLES
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
-from veriformis.identity import derive_id, lossless_json_bytes
-from veriformis.quality.report import (
-    REPORT_LIMITATIONS,
-    QualityFact,
-    QualityReport,
-)
+from veriformis.identity import lossless_json_bytes
+from veriformis.quality.report import QualityFact, QualityReport, assemble_quality_report
 
 
 LANGUAGE_UNQUALIFIED = "evidence-unqualified"
@@ -137,14 +128,13 @@ def _require_bound_inputs(
         raise QualityReportError("split input does not match included records")
 
 
-def report_dataset_distributions(
+def included_dataset_records(
     *,
     recipe: DatasetRecipe,
     construction: ConstructionResult,
     curation: CurationResult,
     split: SplitResult,
-) -> QualityReport:
-    """Build a non-enforcing report of plan-bound dataset distributions."""
+) -> tuple[DatasetRecord, ...]:
     _require_bound_inputs(
         recipe=recipe,
         construction=construction,
@@ -161,8 +151,24 @@ def report_dataset_distributions(
     ]
     if missing:
         raise QualityReportError("included record is missing from construction")
-    included = tuple(
+    return tuple(
         records_by_id[record_id] for record_id in curation.included_record_ids
+    )
+
+
+def report_dataset_distributions(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+) -> QualityReport:
+    """Build a non-enforcing report of plan-bound dataset distributions."""
+    included = included_dataset_records(
+        recipe=recipe,
+        construction=construction,
+        curation=curation,
+        split=split,
     )
     context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
     included_count = len(included)
@@ -258,15 +264,4 @@ def report_dataset_distributions(
     names = tuple(item.name for item in facts)
     if names != DISTRIBUTION_FACT_NAMES:
         raise QualityReportError("distribution facts must match the v1 name set")
-    payload = {
-        "contract_id": QUALITY_REPORT_CONTRACT_ID,
-        "contract_version": QUALITY_REPORT_CONTRACT_VERSION,
-        "enforcing": False,
-        "facts": facts,
-        "limitations": REPORT_LIMITATIONS,
-        "plan_id": curation.plan_id,
-        "policy_decisions": (),
-        "recommendations": (),
-        "schema_id": QUALITY_REPORT_SCHEMA_ID,
-    }
-    return QualityReport(report_id=derive_id("qrp", payload), **payload)
+    return assemble_quality_report(plan_id=curation.plan_id, facts=facts)

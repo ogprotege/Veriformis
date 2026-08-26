@@ -6,10 +6,11 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.3. Item 13.3
-fills plan-bound distribution facts. The report does not enforce
-heuristics. Seal still uses the seventeen finished-dataset gates. There
-is no quality-report CLI command.
+**Status:** Schema pin through independent-product Phase 13.4. Item 13.3
+fills plan-bound distribution facts. Item 13.4 adds inspectable
+near-duplicate clusters. The report does not enforce heuristics. Seal
+still uses the seventeen finished-dataset gates. There is no
+quality-report CLI command. `near_duplicate_policy` stays `disabled`.
 
 **Last reviewed:** 2026-08-25
 
@@ -71,9 +72,31 @@ with no such evidence. Lengths are Unicode character counts, not tokens.
 v1 `messages` role counts are schema-implied from the two-turn lowering,
 not a replay of serialized payloads. Distributions do not delete rows.
 
+## Near-duplicates (item 13.4)
+
+`report_near_duplicates` adds facts from algorithm
+`veriformis.near-duplicate-ws-shingle-jaccard/v1`. It is not semantic
+identity. It does not delete rows.
+
+| Fact | Value |
+| --- | --- |
+| `near-duplicate-algorithm` | Algorithm id |
+| `near-duplicate-shingle-size` | Character n-gram size (`5`) |
+| `near-duplicate-cluster-threshold-ppm` | Inspectable cluster threshold (`800000`) |
+| `near-duplicate-cluster-count` | Clusters of size ≥ 2 at that threshold |
+| `near-duplicate-member-count` | Included records in those clusters |
+| `near-duplicate-clusters` | `cluster-id`, sorted `record-ids`, pair Jaccard ppm |
+| `near-duplicate-threshold-preview` | Cluster and member counts at 500000, 800000, 900000, and 990000 ppm |
+
+Normalization is strip, whitespace collapse, and Unicode casefold of the
+objective target fields. Similarity is integer Jaccard over overlapping
+5-grams, stored as parts per million. Policy records
+`near-duplicate-disabled` as `record-only`. Curation
+`near_duplicate_policy` remains `disabled`.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.3 cannot fail seal. Later items may add
+`enforcing` is `false`. Item 13.4 cannot fail seal. Later items may add
 previewable gates; a heuristic may block seal only after item 13.9 records
 calibrated labeled fixtures for that heuristic.
 
@@ -99,6 +122,7 @@ The v1 limitation set is:
 
 ## Non-goals
 
-Near-duplicates, leakage corpora, tokenizer simulations, PII/secret
-detectors, and split-comparability findings. Those are later Phase 13
-items. Phase 14 review queues are out of scope.
+Leakage corpora, tokenizer simulations, PII/secret detectors, and
+split-comparability findings. Those are later Phase 13 items. Phase 14
+review queues are out of scope. Semantic identity and silent row
+deletion are out of scope.
