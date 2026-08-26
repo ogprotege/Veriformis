@@ -109,7 +109,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/04-near-duplicates`
 **Title:** `Phase 13.4: Add near-duplicate detection`
 
-- [ ] Named, versioned algorithm; inspectable clusters; threshold previews.
+- [x] Named, versioned algorithm; inspectable clusters; threshold previews.
       Do not call it semantic identity. Do not silently delete rows.
 
 ### 13.5 Add leakage checks against bound corpora

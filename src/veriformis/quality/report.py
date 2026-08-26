@@ -1,7 +1,8 @@
 """Versioned quality report: facts, policy, and recommendations stay separate.
 
 Item 13.2 records the schema. Item 13.3 fills plan-bound distribution facts.
-The report does not enforce heuristics and does not block seal.
+Item 13.4 adds inspectable near-duplicate clusters. The report does not
+enforce heuristics, does not delete rows, and does not block seal.
 """
 
 from __future__ import annotations
@@ -163,20 +164,31 @@ class QualityReport(_StrictModel):
         return self
 
 
-def empty_quality_report(*, plan_id: str) -> QualityReport:
-    """Bound empty report. Facts, policy, and recommendations stay vacant."""
+def assemble_quality_report(
+    *,
+    plan_id: str,
+    facts: tuple[QualityFact, ...] = (),
+    policy_decisions: tuple[QualityPolicyDecision, ...] = (),
+    recommendations: tuple[QualityRecommendation, ...] = (),
+) -> QualityReport:
+    """Bind a non-enforcing report. Callers must already sort unique names."""
     payload = {
         "contract_id": QUALITY_REPORT_CONTRACT_ID,
         "contract_version": QUALITY_REPORT_CONTRACT_VERSION,
         "enforcing": False,
-        "facts": (),
+        "facts": facts,
         "limitations": REPORT_LIMITATIONS,
         "plan_id": plan_id,
-        "policy_decisions": (),
-        "recommendations": (),
+        "policy_decisions": policy_decisions,
+        "recommendations": recommendations,
         "schema_id": QUALITY_REPORT_SCHEMA_ID,
     }
     return QualityReport(report_id=derive_id("qrp", payload), **payload)
+
+
+def empty_quality_report(*, plan_id: str) -> QualityReport:
+    """Bound empty report. Facts, policy, and recommendations stay vacant."""
+    return assemble_quality_report(plan_id=plan_id)
 
 
 def require_quality_report_not_enforcing(report: QualityReport) -> None:

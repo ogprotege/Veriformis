@@ -1,9 +1,15 @@
-"""Dataset quality intelligence. Item 13.3 fills plan-bound distributions."""
+"""Dataset quality intelligence. Item 13.4 adds inspectable near-duplicates."""
 
 from veriformis.quality.distributions import (
     DISTRIBUTION_FACT_NAMES,
     LANGUAGE_UNQUALIFIED,
     report_dataset_distributions,
+)
+from veriformis.quality.near_duplicates import (
+    NEAR_DUPLICATE_ALGORITHM_ID,
+    NEAR_DUPLICATE_CLUSTER_THRESHOLD_PPM,
+    NEAR_DUPLICATE_FACT_NAMES,
+    report_near_duplicates,
 )
 from veriformis.quality.report import (
     REPORT_LIMITATIONS,
@@ -11,6 +17,7 @@ from veriformis.quality.report import (
     QualityPolicyDecision,
     QualityRecommendation,
     QualityReport,
+    assemble_quality_report,
     empty_quality_report,
     require_quality_report_not_enforcing,
 )
@@ -18,12 +25,17 @@ from veriformis.quality.report import (
 __all__ = [
     "DISTRIBUTION_FACT_NAMES",
     "LANGUAGE_UNQUALIFIED",
+    "NEAR_DUPLICATE_ALGORITHM_ID",
+    "NEAR_DUPLICATE_CLUSTER_THRESHOLD_PPM",
+    "NEAR_DUPLICATE_FACT_NAMES",
     "REPORT_LIMITATIONS",
     "QualityFact",
     "QualityPolicyDecision",
     "QualityRecommendation",
     "QualityReport",
+    "assemble_quality_report",
     "empty_quality_report",
     "report_dataset_distributions",
+    "report_near_duplicates",
     "require_quality_report_not_enforcing",
 ]

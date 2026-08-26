@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.3 distributions)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.4 near-duplicates)
 
-**Next review:** Phase 13.3 pull-request merge, item 13.4 near-duplicates,
+**Next review:** Phase 13.4 pull-request merge, item 13.5 leakage checks,
 or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
@@ -51,11 +51,12 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–12 are complete on `main` and
-Phase 13 is in progress at item 13.3. Phase 12 closeout merged as PR #112
+Phase 13 is in progress at item 13.4. Phase 12 closeout merged as PR #112
 at `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
 recovery is isolated under empty extra `ocr`. Default parse still refuses
 image-only PDF. `ocr-image` stays explicitly unsupported. The quality
-report fills plan-bound distributions and does not enforce heuristics.
+report fills plan-bound distributions and inspectable near-duplicate
+clusters and does not enforce heuristics.
 There is no quality-report command. Axolotl, LLaMA-Factory, and Aptus are
 implemented optional adapters. Unsloth remains a non-executable
 candidate. Extra lists for those names stay empty. Do not start Phase 14
