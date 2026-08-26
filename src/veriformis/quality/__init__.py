@@ -1,4 +1,4 @@
-"""Dataset quality intelligence. Item 13.7 adds optional policy detectors."""
+"""Dataset quality intelligence. Item 13.8 adds split-comparability findings."""
 
 from veriformis.quality.detectors import (
     DETECTOR_FACT_NAMES,
@@ -22,6 +22,10 @@ from veriformis.quality.near_duplicates import (
     NEAR_DUPLICATE_CLUSTER_THRESHOLD_PPM,
     NEAR_DUPLICATE_FACT_NAMES,
     report_near_duplicates,
+)
+from veriformis.quality.split_findings import (
+    SPLIT_FINDING_FACT_NAMES,
+    report_split_findings,
 )
 from veriformis.quality.tokenizer import (
     TOKENIZER_FACT_NAMES,
@@ -54,6 +58,7 @@ __all__ = [
     "NEAR_DUPLICATE_CLUSTER_THRESHOLD_PPM",
     "NEAR_DUPLICATE_FACT_NAMES",
     "REPORT_LIMITATIONS",
+    "SPLIT_FINDING_FACT_NAMES",
     "TOKENIZER_FACT_NAMES",
     "TOKENIZER_UNBOUND",
     "QualityFact",
@@ -68,6 +73,7 @@ __all__ = [
     "report_leakage_checks",
     "report_near_duplicates",
     "report_policy_detectors",
+    "report_split_findings",
     "report_tokenizer_simulations",
     "require_quality_report_not_enforcing",
 ]

@@ -6,10 +6,10 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.7. Item 13.7
-adds optional policy detectors as findings, not certification. The
-report does not enforce heuristics. Seal still uses the seventeen
-finished-dataset gates. There is no quality-report CLI command.
+**Status:** Schema pin through independent-product Phase 13.8. Item 13.8
+adds split-comparability and rare-shape findings. The report does not
+enforce heuristics. Seal still uses the seventeen finished-dataset
+gates. There is no quality-report CLI command.
 
 **Last reviewed:** 2026-08-25
 
@@ -148,9 +148,28 @@ license status.
 
 Policy records `detector-findings-not-certification` as `record-only`.
 
+## Split findings (item 13.8)
+
+`report_split_findings` records comparability of train versus evaluation
+source membership, integer imbalance in ppm, rare field-name shapes, and
+empty or malformed-role counts. v1 construction forbids empty fields and
+malformed messages roles, so those counts stay zero on valid artifacts.
+
+| Fact | Value |
+| --- | --- |
+| `split-source-comparability` | Per-source `{train, evaluation}` included counts |
+| `split-imbalance-ppm` | `abs(train-eval)*1000000/total` integer |
+| `split-rare-shape-count` | Field-name signatures that occur once |
+| `split-rare-shapes` | Sorted rare signature strings |
+| `split-empty-target-count` | Included records missing a target value |
+| `split-empty-context-count` | Included records missing a context value |
+| `split-malformed-role-count` | Included records with non-v1 message roles |
+
+Policy records `split-findings-record-only`.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.7 cannot fail seal. Later items may add
+`enforcing` is `false`. Item 13.8 cannot fail seal. Later items may add
 previewable gates; a heuristic may block seal only after item 13.9 records
 calibrated labeled fixtures for that heuristic.
 
@@ -176,7 +195,6 @@ The v1 limitation set is:
 
 ## Non-goals
 
-Split-comparability findings. Those are a later Phase 13 item. Phase 14
-review queues are out of scope. Semantic identity, silent row deletion,
-contamination/privacy/safety/license certification, and invented
-tokenizers are out of scope.
+Phase 14 review queues are out of scope. Semantic identity, silent row
+deletion, contamination/privacy/safety/license certification, and
+invented tokenizers are out of scope.
