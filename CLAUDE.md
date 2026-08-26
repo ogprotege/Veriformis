@@ -62,11 +62,11 @@ digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
 image-only PDF. `ocr-image` remains explicitly unsupported.
-Phase 13 quality intelligence is in progress at item 13.4: versioned
-quality report with plan-bound distributions and inspectable
-near-duplicate clusters. The report does not enforce heuristics, does
-not call near-duplicates semantic identity, and does not delete rows.
-Do not start Phase 14 from this packet.
+Phase 13 quality intelligence is in progress at item 13.5: versioned
+quality report with distributions, inspectable near-duplicates, and
+leakage facts against imported partition hints and digest-bound
+corpora. The report does not enforce heuristics or certify
+contamination absence. Do not start Phase 14 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -231,7 +231,7 @@ Key modules under `src/veriformis/` are:
   goals and presets to existing objectives, row schemas, and executable recipe
   settings, and probe raw sources without workspace mutation;
 - `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
-- `quality/` for the versioned quality report (facts, policy, recommendations; 13.3 distributions; 13.4 near-duplicates; not enforcing);
+- `quality/` for the versioned quality report (facts, policy, recommendations; 13.3–13.5 distributions, near-duplicates, leakage; not enforcing);
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

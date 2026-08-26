@@ -8,10 +8,11 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 13.4 near-duplicates)
+**Last reviewed:** 2026-08-25 (Phase 13.5 leakage checks)
 
-**Next review:** Phase 13.4 pull-request merge, item 13.5 leakage checks,
-or any listed-item status change. Do not start Phase 14 from this packet.
+**Next review:** Phase 13.5 pull-request merge, item 13.6 tokenizer
+simulations, or any listed-item status change. Do not start Phase 14
+from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -117,8 +118,9 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-13-quality-intelligence/README.md).
       Item 13.1 opened tracking. Item 13.2 records the quality-report
       schema. Item 13.3 fills plan-bound distribution facts. Item 13.4
-      adds inspectable near-duplicate clusters. The report is not
-      enforcing. Do not start Phase 14 from this packet.
+      adds inspectable near-duplicate clusters. Item 13.5 records
+      leakage facts. The report is not enforcing. Do not start Phase 14
+      from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

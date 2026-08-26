@@ -152,7 +152,7 @@
       "packet": "dev/active/independent-product/phase-13-quality-intelligence",
       "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Item 13.4 adds inspectable near-duplicate clusters. Not semantic identity. No silent deletes. The report is not enforcing. Sequential PRs 13.4–13.9. Do not start Phase 14 from this packet."
+      "next_gate": "Item 13.5 records leakage facts against imported partition hints and digest-bound corpora. The report is not enforcing and does not certify contamination absence. Sequential PRs 13.5–13.9. Do not start Phase 14 from this packet."
     },
     {
       "number": 14,

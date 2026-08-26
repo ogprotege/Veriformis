@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.4 near-duplicates; report is not enforcing
+**Status:** Open — item 13.5 leakage; report is not enforcing
 
 **Opened:** 2026-08-25
 
@@ -61,3 +61,10 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Near-duplicates are not called semantic identity.
 - [x] Included records are not deleted. `near_duplicate_policy` stays disabled.
 - [x] `enforcing` is false. Policy is `record-only`.
+
+## Required item 13.5 evidence
+
+- [x] Imported partition-hint mismatches are facts, not deletions.
+- [x] Optional reference corpora are bound by digest.
+- [x] Unbound corpora are recorded as `unbound`.
+- [x] The report does not certify contamination absence.

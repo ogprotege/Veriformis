@@ -93,3 +93,25 @@ warning. Follow-up pins Unicode casefold/whitespace clustering.
 
 **Next action:** Publish the item 13.4 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.5.
+
+## 2026-08-25 — Item 13.4 merged
+
+**Status:** Phase 13.4 merged as PR #117 at
+`8b011502cc6848adc0bbf13b64592f60a94e384c`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.5 pull request.
+
+## 2026-08-25 — Item 13.5 leakage checks
+
+**Status:** `report_leakage_checks` records imported partition-hint
+mismatches and digest-bound reference corpus hits. Unbound corpora are
+`unbound`. The report is not enforcing and does not certify
+contamination absence.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 25
+passed; core pytest 2181 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.5 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.6.
