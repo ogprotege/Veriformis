@@ -4,13 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–14 complete).
+Phases 0–14 complete; Phase 15 in progress).
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14 closeout)
+**Last reviewed:** 2026-08-26 (independent-product Phase 15.1 scale packet)
 
-**Next review:** Phase 15 packet, if authorized, or any contract change.
-Do not start Phase 15 from the Phase 14 packet. Default parse still
-refuses image-only PDF.
+**Next review:** Phase 15.1 pull-request merge, item 15.2 deterministic
+corpora, or any contract change. Do not start Phase 16 from this
+packet. Default parse still refuses image-only PDF.
 
 ## Start here
 
@@ -114,7 +114,8 @@ refuses image-only PDF.
 | [Phase 11 packet](../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening | Completed implementation record |
 | [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
 | [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Completed; closeout PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680` |
-| [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows | Active packet; item 14.2 records the review-bundle schema |
+| [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows | Completed implementation record |
+| [Phase 15 packet](../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding | Active packet; item 15.1 opens tracking |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

@@ -2,10 +2,11 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14 closeout)
+**Last reviewed:** 2026-08-26 (independent-product Phase 15.1 scale packet)
 
-**Next review:** Phase 15 packet, if authorized, or governance-schema
-change. Do not start Phase 15 from the Phase 14 packet.
+**Next review:** Phase 15.1 pull-request merge, item 15.2 deterministic
+corpora, or governance-schema change. Do not start Phase 16 from the
+Phase 15 packet.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -32,6 +33,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR |
 | [Completed Phase 13 packet](../../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence |
 | [Completed Phase 14 packet](../../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows |
+| [Active Phase 15 packet](../../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding |
 
 Run the governance drift check with:
 
@@ -51,14 +53,15 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–14 are complete on `main`.
-Phase 13 closeout merged as PR #122
-at `ef31559c9184b553209a3c45eca5d943fbb9a680`. The quality report is
-preview-only. Construction `review_policy` defaults to `none`.
-`review-export`, `review-import`, and `review-submit` exist. Mac Review
-belongs to Phase 18. Optional
-Tesseract 5 recovery is isolated under empty extra `ocr`. Default parse
-still refuses image-only PDF. `ocr-image` stays explicitly unsupported.
-Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters.
-Unsloth remains a non-executable candidate. Extra lists for those names
-stay empty. Do not start Phase 15 from this review.
+At this review, independent-product Phases 0–14 are complete on `main`
+and Phase 15 is in progress at item 15.1. Phase 14 closeout merged as
+PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`. There is no
+retained scale benchmark, published corpus tier, or public scale
+guarantee. The quality report is preview-only. Construction
+`review_policy` defaults to `none`. Mac Review belongs to Phase 18.
+Optional Tesseract 5 recovery is isolated under empty extra `ocr`.
+Default parse still refuses image-only PDF. `ocr-image` stays
+explicitly unsupported. Axolotl, LLaMA-Factory, and Aptus are
+implemented optional adapters. Unsloth remains a non-executable
+candidate. Extra lists for those names stay empty. Do not start Phase
+16 from this review.

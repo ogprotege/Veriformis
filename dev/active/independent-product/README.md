@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–14 complete; Phase 15 not started
+**Status:** Active program — Phases 0–14 complete; Phase 15 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -30,6 +30,7 @@ with roadmap headings.
 - [Phase 12 — Add optional local OCR with accountable recovery](phase-12-optional-ocr/README.md) — complete
 - [Phase 13 — Build dataset quality intelligence](phase-13-quality-intelligence/README.md) — complete
 - [Phase 14 — Deliver human review and correction workflows](phase-14-review-workflows/README.md) — complete
+- [Phase 15 — Measure and engineer scale, streaming, and sharding](phase-15-scale/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -104,8 +105,11 @@ empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported. Phase 13 completed under its
 [packet](phase-13-quality-intelligence/README.md); closeout merged as PR
 #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`. Phase 14 opened under
-its [packet](phase-14-review-workflows/README.md) on 2026-08-26; item
-14.1 proves current review facts. Do not start Phase 15 from that
+its [packet](phase-14-review-workflows/README.md) on 2026-08-26; closeout
+merged as PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`. Phase
+15 opened under its [packet](phase-15-scale/README.md) on 2026-08-26;
+item 15.1 proves there is no retained benchmark, published corpus
+tier, or public scale guarantee. Do not start Phase 16 from that
 packet.
 
 ## State change procedure

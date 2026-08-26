@@ -167,12 +167,12 @@
     {
       "number": 15,
       "title": "Measure and engineer scale, streaming, and sharding",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [4, 7, 9, 11],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-15-scale",
+      "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Measure baseline behavior before setting targets."
+      "next_gate": "Item 15.1 opens the scale packet. Sequential PRs 15.1–15.9. Stop after 15.3 for operator review of baselines before 15.4. Do not start Phase 16 from this packet."
     },
     {
       "number": 16,
