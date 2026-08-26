@@ -61,8 +61,9 @@ archives, parser subprocesses, and new input families skipped. Phase 12 optional
 digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
-image-only PDF. `ocr-image` remains explicitly unsupported. Do not start
-Phase 13 from this packet.
+image-only PDF. `ocr-image` remains explicitly unsupported.
+Phase 13 quality intelligence is in progress at item 13.1. Do not start
+Phase 14 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

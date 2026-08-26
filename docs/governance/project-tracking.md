@@ -4,10 +4,10 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.1 quality packet)
 
-**Next review:** Phase 13 packet opening, beta label cut, or any
-program-state, evidence-grade, or completion-rule change
+**Next review:** Phase 13.1 pull-request merge, item 13.2 quality report,
+or any program-state, evidence-grade, or completion-rule change
 
 ## Purpose
 
