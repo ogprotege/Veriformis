@@ -67,15 +67,15 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.1: there is no retained
-benchmark, published corpus tier, or public scale guarantee. Sequential
-PRs 15.1–15.9. Stop after 15.3 for operator review of baselines. Do
-not start Phase 16 from this packet.
+Phase 15 scale work is in progress at item 15.2: deterministic
+synthetic corpora exist; there is still no published corpus tier or
+baseline harness. Sequential PRs 15.1–15.9. Stop after 15.3 for
+operator review of baselines. Do not start Phase 16 from this packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 15.1 scale packet)
+**Review date:** 2026-08-26 (independent-product Phase 15.2 corpora)
 
-**Next review:** Phase 15.1 pull-request merge, item 15.2 deterministic
-corpora, or any contract change. Do not start Phase 16 from this
+**Next review:** Phase 15.2 pull-request merge, item 15.3 baseline
+harness, or any contract change. Do not start Phase 16 from this
 packet.
 
 This document is the current source of truth for implemented `0.1.0`

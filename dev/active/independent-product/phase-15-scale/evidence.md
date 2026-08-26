@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.1
+**Status:** Open — item 15.2
 
 **Opened:** 2026-08-26
 
@@ -28,7 +28,7 @@ That run is not a retained scale benchmark.
 | Canonical JSON v1 makes no scale, streaming, or memory claim | `source-verified` | `docs/generic-exports.md`; `docs/contracts/canonical-json-export-v1.md` |
 | Hugging Face Dataset export pins `num_shards` train/eval = 1 | `source-verified` | `src/veriformis/exports/hugging_face_dataset.py` |
 | Phase 9.8 JSONL-versus-columnar sizes are a tiny fixture, not a recommendation | `source-verified` | Phase 9 evidence; split JSONL 24,073 bytes |
-| No `veriformis.scale` module | `source-verified` | package layout |
+| No `veriformis.scale` module at 15.1 open | `source-verified` | package layout; 15.2 adds generators |
 | CLI, MCP, and `PipelineService` have no scale-benchmark, stream-compile, or shard-export operations | `source-verified` | `src/veriformis/cli.py`; MCP server; `PipelineService` |
 | Seventeen finished-dataset gates unchanged | `source-verified` | `src/veriformis/contracts.py` `V1_FINISHED_DATASET_GATES` |
 | Pytest has no `scale_benchmark` marker | `source-verified` | `pyproject.toml` |
@@ -43,3 +43,13 @@ That run is not a retained scale benchmark.
 - [x] CLI, MCP, and `PipelineService` have no scale, stream-compile, or shard-export operations.
 - [x] No `veriformis.scale` module and no `scale_benchmark` pytest marker.
 - [x] Focused isolation tests, tracking, Ruff, lock, and diff check.
+
+## Required item 15.2 evidence
+
+- [x] `veriformis.scale-corpus-spec/v1` and `veriformis.scale-corpus/v1`.
+- [x] Named seed replays the same bytes; a different seed changes bytes.
+- [x] Unicode payloads are exact. Nested JSONL depth is exact.
+- [x] PDF page count matches the spec. Duplicate ppm copies later records.
+- [x] Tiny CI specs cover both compile paths and the roadmap dimensions.
+- [x] Invalid specs and a non-empty destination fail closed.
+- [x] No published tier, harness, CLI scale command, or committed blobs.

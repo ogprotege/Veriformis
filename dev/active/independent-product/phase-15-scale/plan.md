@@ -1,6 +1,6 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.1
+**Status:** In progress — item 15.2
 
 **Last updated:** 2026-08-26
 
@@ -102,7 +102,7 @@ ergonomics stay the default.
 **Branch:** `phase15/02-benchmark-corpora`
 **Title:** `Phase 15.2: Add deterministic benchmark corpora`
 
-- [ ] Versioned generators and tiny CI fixtures covering file count, bytes,
+- [x] Versioned generators and tiny CI fixtures covering file count, bytes,
       records, row length, nesting, PDF pages, duplicate rate, container,
       and both compile paths. Seeds make them bit-stable. No owner library.
       No committed large blobs.

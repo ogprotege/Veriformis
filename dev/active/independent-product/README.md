@@ -108,8 +108,8 @@ empty extra `ocr`. Default parse still refuses image-only PDF.
 its [packet](phase-14-review-workflows/README.md) on 2026-08-26; closeout
 merged as PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`. Phase
 15 opened under its [packet](phase-15-scale/README.md) on 2026-08-26;
-item 15.1 proves there is no retained benchmark, published corpus
-tier, or public scale guarantee. Do not start Phase 16 from that
+item 15.1 proves there is no retained benchmark; item 15.2 adds
+deterministic synthetic corpora. Do not start Phase 16 from that
 packet.
 
 ## State change procedure

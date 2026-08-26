@@ -1,6 +1,6 @@
 # Phase 15 — Measure and Engineer Scale, Streaming, and Sharding
 
-**Status:** In progress — item 15.1
+**Status:** In progress — item 15.2
 
 **Started:** 2026-08-26
 
@@ -42,7 +42,6 @@ Phase 18. Do not start Phase 16 from this packet.
 
 ## Current state
 
-Item 15.1 is open. There is no retained benchmark, published corpus
-tier, or public scale guarantee. Canonical JSON v1 still makes no
-scale, streaming, or memory claim. Hugging Face Dataset export still
-pins one shard per split. Do not start Phase 16 from this packet.
+Item 15.2 is open. Synthetic generators exist. There is still no
+published corpus tier, baseline harness, or public scale guarantee.
+Do not start Phase 16 from this packet.

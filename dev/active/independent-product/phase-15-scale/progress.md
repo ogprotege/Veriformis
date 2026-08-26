@@ -29,3 +29,35 @@ core pytest 2251 passed, 16 deselected, 1 expected durability warning;
 
 **Next action:** Open the item 15.1 pull request. Require every GitHub
 check, merge, and synchronize clean main before item 15.2.
+
+## 2026-08-26 — Item 15.1 merged
+
+**Status:** Phase 15.1 merged as PR #132 at
+`569ff506a46e6e8ff928167a4320d0a7a5a373f1`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 15.2 pull request.
+
+## 2026-08-26 — Item 15.2 deterministic corpora
+
+**Status:** `veriformis.scale-corpus-spec/v1` generates synthetic
+markdown, JSONL, nested JSONL, PDF, and duplicate fixtures from a named
+seed. Tiny CI specs cover the roadmap dimensions. Destination must be
+empty. Owner library bytes are not used.
+
+**Next action:** Record local gates, then publish the item 15.2 pull
+request. Require green GitHub checks, merge, and synchronize clean main
+before item 15.3.
+
+## 2026-08-26 — Item 15.2 local gates green
+
+**Status:** Generators and scale tests are on
+`phase15/02-benchmark-corpora`.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale 23 passed;
+core pytest 2262 passed, 16 deselected, 1 expected durability warning;
+`git diff --check` clean.
+
+**Next action:** Open the item 15.2 pull request. Require every GitHub
+check, merge, and synchronize clean main before item 15.3.
