@@ -45,6 +45,6 @@ from this packet.
 
 ## Current state
 
-Item 14.6 is in progress. Review packets export, import, and submit on
-Python, CLI, and MCP. Required unresolved reviews do not yet block
-seal. Do not start Phase 15 from this packet.
+Item 14.7 is in progress. Required unresolved reviews block seal.
+Default recipes stay `none`. No Phase 13 heuristic is a default
+required-review trigger. Do not start Phase 15 from this packet.

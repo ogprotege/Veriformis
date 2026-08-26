@@ -6,9 +6,10 @@
 
 **Schema:** `veriformis.review-bundle/v1`
 
-**Status:** Schema pin through independent-product Phase 14.6. Item 14.6
-adds review packet export, import, and submit on Python, CLI, and MCP.
-The bundle does not block seal. Mac Review belongs to Phase 18.
+**Status:** Schema pin through independent-product Phase 14.7. Item 14.7
+blocks seal when required reviews are unresolved. Default recipes stay
+`none`. No Phase 13 heuristic is a default required-review trigger. Mac
+Review belongs to Phase 18.
 
 **Last reviewed:** 2026-08-26
 
@@ -24,7 +25,8 @@ revision. Reviewer identity is an opaque local unsigned attestation.
 
 `empty_review_bundle` binds to a finished-dataset `plan_id`. Identity is
 `derive_id("rvb", …)` over the payload excluding `bundle_id`.
-`blocks_seal` is `false` until item 14.7. A `veriformis.review-packet/v1`
+`blocks_seal` is true when required items remain unresolved. Default
+`none` recipes do not block. A `veriformis.review-packet/v1`
 round-trips pending items and completed decisions, waivers, or
 corrections through Python, CLI, and MCP.
 
@@ -62,12 +64,12 @@ accepted records fails closed.
 - `default-review-none`
 - `no-default-heuristic-required-review`
 - `no-mac-review`
-- `no-seal-block`
+- `required-review-blocks-seal`
 - `unsigned-reviewer`
 - `waiver-does-not-change-bytes`
 
 ## Non-goals
 
-Mac Review screens. Seal blocking. Phase 15 scale work. Privacy or
-safety certification from detector findings. In-place edits of
-content-addressed records. Statistical meaning for samples.
+Mac Review screens. Phase 15 scale work. Privacy or safety certification
+from detector findings. In-place edits of content-addressed records.
+Statistical meaning for samples. Default heuristic required-review.

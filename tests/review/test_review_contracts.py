@@ -103,10 +103,15 @@ def test_cli_mcp_and_service_share_review_submit() -> None:
     assert "submit_review" in tools
 
 
-def test_blocks_seal_literal_rejects_true() -> None:
+def test_empty_bundle_does_not_block_seal() -> None:
     plan_id = _plan_id()
     empty = empty_review_bundle(plan_id=plan_id)
+    assert empty.blocks_seal is False
     payload = empty.model_dump(mode="json")
     payload["blocks_seal"] = True
-    with pytest.raises(ValidationError):
-        ReviewBundle.model_validate(payload)
+    payload["bundle_id"] = derive_id(
+        "rvb",
+        {key: value for key, value in payload.items() if key != "bundle_id"},
+    )
+    blocked = ReviewBundle.model_validate(payload)
+    assert blocked.blocks_seal is True

@@ -132,3 +132,23 @@ pytest 2232 passed, 16 deselected, 1 expected durability warning.
 
 **Next action:** Publish the item 14.6 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 14.7.
+
+## 2026-08-26 — Item 14.6 merged
+
+**Status:** Phase 14.6 merged as PR #129 at
+`c121de0f8e31e1dd3bb38d77e5377379681e8e5b`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 14.7 pull request.
+
+## 2026-08-26 — Item 14.7 required-review seal
+
+**Status:** Required `pending_review` construction sets `blocks_seal` and
+refuses validate/seal. Default recipes stay `none`. No Phase 13
+heuristic is admitted to block seal.
+
+Local gates: tracking PASS; ruff pass; focused review 40 passed; core
+pytest 2236 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.7 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 14.8.

@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-26 (Phase 14.6 review exchange)
+**Last reviewed:** 2026-08-26 (Phase 14.7 required-review seal)
 
-**Next review:** Phase 14.6 pull-request merge, item 14.7 required-review
-seal, or any listed-item status change. Do not start Phase 15 from
+**Next review:** Phase 14.7 pull-request merge, item 14.8 supersession
+closeout, or any listed-item status change. Do not start Phase 15 from
 this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
@@ -127,8 +127,9 @@ local, offline, and free of LLM generation.
       records corrections as new transforms or mapping revisions. Item
       14.5 adds named-seed sampling with no statistical meaning. Item
       14.6 adds review packet export, import, and submit on CLI, MCP,
-      and Python. Default `review_policy` stays `none`. Mac Review
-      belongs to Phase 18. Do not start Phase 15 from this packet.
+      and Python. Item 14.7 blocks seal on unresolved required reviews.
+      Default `review_policy` stays `none`. Mac Review belongs to Phase
+      18. Do not start Phase 15 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -589,7 +590,7 @@ Remaining documentation debt:
   JSON, JSONL, and listed source-code formats — not arbitrary binary.
 - The checked-in optional Aptus adapter policy rejects plain `text` rows; live
   named-version compatibility has not been established in this repository.
-- Required unresolved reviews do not yet block seal (item 14.7).
+- Inter-reviewer supersession is not yet implemented (item 14.8).
 - The minimal bundle omits raw sources and complete replay artifacts.
 - External trust requires a manifest digest retained outside the bundle.
 - Model-assisted construction remains optional and unapproved (Group 8).

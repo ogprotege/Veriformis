@@ -146,7 +146,7 @@ def test_required_review_construction_fills_pending_queue(tmp_path: Path) -> Non
     report = report_core_queues(plan_id=plan_id, construction=construction)
     assert report.queues == CORE_QUEUE_KINDS
     assert len(report.items) == len(pending)
-    assert report.blocks_seal is False
+    assert report.blocks_seal is True
     assert not (set(OPT_IN_QUEUE_KINDS) & set(report.queues))
 
 
