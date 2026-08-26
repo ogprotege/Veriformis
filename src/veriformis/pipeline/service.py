@@ -1075,6 +1075,39 @@ class PipelineService:
 
         return mapping_contract_discovery()
 
+    def export_review_packet(
+        self,
+        plan_id: str,
+        items: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+    ) -> dict[str, Any]:
+        """Export a pending review packet. Decisions stay vacant."""
+        from veriformis.review import ReviewItem, export_review_packet
+
+        packet = export_review_packet(
+            plan_id=plan_id,
+            items=tuple(ReviewItem.model_validate(item) for item in items),
+        )
+        return packet.model_dump(mode="json")
+
+    def import_review_packet(
+        self,
+        packet: dict[str, Any] | str | bytes,
+    ) -> dict[str, Any]:
+        """Reload and validate a review packet without submitting it."""
+        from veriformis.review import load_review_packet
+
+        return load_review_packet(packet).model_dump(mode="json")
+
+    def submit_review(
+        self,
+        packet: dict[str, Any] | str | bytes,
+    ) -> dict[str, Any]:
+        """Submit completed review evidence. Required items must be resolved."""
+        from veriformis.review import load_review_packet, submit_review_packet
+
+        loaded = load_review_packet(packet)
+        return submit_review_packet(loaded).model_dump(mode="json")
+
     def discover_mapping_templates(self) -> dict[str, Any]:
         """Return packaged mapping templates. Discovery data, not constants."""
         from veriformis.mapping.templates import mapping_template_catalog

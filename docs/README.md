@@ -70,7 +70,7 @@ parse still refuses image-only PDF.
 | [Parser Identity v1](contracts/parser-identity-v1.md) | Parser kind, version pins, and recovery-quality status | Implemented; parse-report bytes unchanged |
 | [OCR Recovery Identity v1](contracts/ocr-recovery-identity-v1.md) | Tesseract 5 engine/page pins | Optional Tesseract 5; default parse still refuses image-only PDF |
 | [Quality Report v1](contracts/quality-report-v1.md) | Facts, policy, recommendations; previewable gates; labeled fixtures | Schema pin; not enforcing; no heuristic admitted to block seal; no CLI command |
-| [Review v1](contracts/review-v1.md) | Reviewer, queue kinds, waiver, correction, supersession, bound bundle | Schema pin; does not block seal; no submit command; Mac Review is Phase 18 |
+| [Review v1](contracts/review-v1.md) | Reviewer, queue kinds, waiver, correction, packet exchange, bound bundle | Schema pin; Python/CLI/MCP submit; does not block seal; Mac Review is Phase 18 |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

@@ -183,6 +183,36 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def export_review(plan_id: str, items: str) -> str:
+        """Export a pending review packet from PipelineService."""
+        return json.dumps(
+            pipeline.export_review_packet(plan_id, json.loads(items)),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
+    def import_review(packet: str) -> str:
+        """Reload and validate a review packet from PipelineService."""
+        return json.dumps(
+            pipeline.import_review_packet(packet),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
+    def submit_review(packet: str) -> str:
+        """Submit completed human review evidence from PipelineService."""
+        return json.dumps(
+            pipeline.submit_review(packet),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def goals() -> str:
         """Return the plain-language goal catalog from PipelineService."""
         return (

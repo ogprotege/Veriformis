@@ -95,13 +95,12 @@ def test_default_review_policy_stays_none() -> None:
     assert DatasetRecipe.model_fields["review_policy"].default == "none"
 
 
-def test_cli_mcp_and_service_still_cannot_submit_review() -> None:
+def test_cli_mcp_and_service_share_review_submit() -> None:
     names = {command.name for command in app.registered_commands}
-    assert "review" not in names
-    assert "review-submit" not in names
-    assert not hasattr(PipelineService(), "submit_review")
+    assert "review-submit" in names
+    assert hasattr(PipelineService(), "submit_review")
     tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
-    assert "submit_review" not in tools
+    assert "submit_review" in tools
 
 
 def test_blocks_seal_literal_rejects_true() -> None:

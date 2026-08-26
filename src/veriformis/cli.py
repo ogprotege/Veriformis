@@ -795,6 +795,51 @@ def mapping_rejections(
     typer.echo(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
 
 
+@app.command(name="review-export")
+def review_export(
+    plan_id: str = typer.Option(..., "--plan-id"),
+    items: Path = typer.Option(..., "--items"),
+) -> None:
+    """Export a pending review packet as deterministic JSON."""
+    try:
+        payload = json.loads(items.read_text(encoding="utf-8"))
+        packet = _SERVICE.export_review_packet(plan_id, payload)
+    except (OSError, UnicodeError, json.JSONDecodeError, VeriformisError) as exc:
+        _echo_error(
+            exc if isinstance(exc, VeriformisError) else VeriformisError(str(exc))
+        )
+        return
+    typer.echo(json.dumps(packet, ensure_ascii=False, indent=2, sort_keys=True))
+
+
+@app.command(name="review-import")
+def review_import(packet: Path) -> None:
+    """Reload and validate a review packet without submitting it."""
+    try:
+        payload = packet.read_text(encoding="utf-8")
+        loaded = _SERVICE.import_review_packet(payload)
+    except (OSError, UnicodeError, json.JSONDecodeError, VeriformisError) as exc:
+        _echo_error(
+            exc if isinstance(exc, VeriformisError) else VeriformisError(str(exc))
+        )
+        return
+    typer.echo(json.dumps(loaded, ensure_ascii=False, indent=2, sort_keys=True))
+
+
+@app.command(name="review-submit")
+def review_submit(packet: Path) -> None:
+    """Submit completed human review evidence from a packet."""
+    try:
+        payload = packet.read_text(encoding="utf-8")
+        bundle = _SERVICE.submit_review(payload)
+    except (OSError, UnicodeError, json.JSONDecodeError, VeriformisError) as exc:
+        _echo_error(
+            exc if isinstance(exc, VeriformisError) else VeriformisError(str(exc))
+        )
+        return
+    typer.echo(json.dumps(bundle, ensure_ascii=False, indent=2, sort_keys=True))
+
+
 @app.command(name="mapping-preview")
 def mapping_preview(
     path: Path,

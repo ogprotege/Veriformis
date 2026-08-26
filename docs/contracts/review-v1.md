@@ -6,10 +6,9 @@
 
 **Schema:** `veriformis.review-bundle/v1`
 
-**Status:** Schema pin through independent-product Phase 14.5. Item 14.5
-adds named-seed HMAC-SHA256 sampling with complete population evidence.
-It claims no statistical meaning. The bundle does not block seal. There
-is no review-submit CLI command. Mac Review belongs to Phase 18.
+**Status:** Schema pin through independent-product Phase 14.6. Item 14.6
+adds review packet export, import, and submit on Python, CLI, and MCP.
+The bundle does not block seal. Mac Review belongs to Phase 18.
 
 **Last reviewed:** 2026-08-26
 
@@ -25,9 +24,9 @@ revision. Reviewer identity is an opaque local unsigned attestation.
 
 `empty_review_bundle` binds to a finished-dataset `plan_id`. Identity is
 `derive_id("rvb", …)` over the payload excluding `bundle_id`.
-`blocks_seal` is `false` in item 14.2. Queues, items, assignments,
-verdicts, waivers, corrections, and supersessions stay vacant until later
-items fill them.
+`blocks_seal` is `false` until item 14.7. A `veriformis.review-packet/v1`
+round-trips pending items and completed decisions, waivers, or
+corrections through Python, CLI, and MCP.
 
 ## Queue kinds
 
@@ -69,6 +68,6 @@ accepted records fails closed.
 
 ## Non-goals
 
-Mac Review screens. CLI submit. Seal blocking. Phase 15 scale work.
-Privacy or safety certification from detector findings. In-place edits
-of content-addressed records. Statistical meaning for samples.
+Mac Review screens. Seal blocking. Phase 15 scale work. Privacy or
+safety certification from detector findings. In-place edits of
+content-addressed records. Statistical meaning for samples.

@@ -18,6 +18,7 @@ from veriformis.contracts import (
     REVIEW_BUNDLE_SCHEMA_ID,
     REVIEW_CONTRACT_ID,
     REVIEW_CONTRACT_VERSION,
+    REVIEW_PACKET_SCHEMA_ID,
 )
 from veriformis.errors import ReviewError
 from veriformis.identity import derive_id, validate_id, validate_sha256
@@ -373,6 +374,130 @@ class ReviewCorrection(_StrictModel):
             "schema_version": "veriformis.review-correction/v1",
         }
         return cls(correction_id=derive_id("rcr", payload), **payload)
+
+
+class ReviewDecision(_StrictModel):
+    decision_id: str
+    item_id: str
+    rationale: str
+    reviewer_id: str
+    schema_version: Literal["veriformis.review-decision/v1"] = (
+        "veriformis.review-decision/v1"
+    )
+    verdict: ReviewVerdict
+
+    @model_validator(mode="after")
+    def _closed(self) -> ReviewDecision:
+        _require_token(self.reviewer_id, "reviewer_id")
+        _require_token(self.rationale, "review decision rationale")
+        if self.verdict not in {"accepted", "rejected"}:
+            raise ReviewError("review decision verdict is invalid")
+        validate_id(self.item_id, kind="rit")
+        validate_id(self.decision_id, kind="rvd")
+        expected = derive_id(
+            "rvd",
+            self.model_dump(mode="json", exclude={"decision_id"}),
+        )
+        if self.decision_id != expected:
+            raise ReviewError("review decision identity mismatch")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        item_id: str,
+        reviewer_id: str,
+        verdict: ReviewVerdict,
+        rationale: str,
+    ) -> ReviewDecision:
+        payload = {
+            "item_id": item_id,
+            "rationale": rationale,
+            "reviewer_id": reviewer_id,
+            "schema_version": "veriformis.review-decision/v1",
+            "verdict": verdict,
+        }
+        return cls(decision_id=derive_id("rvd", payload), **payload)
+
+
+class ReviewPacket(_StrictModel):
+    corrections: tuple[ReviewCorrection, ...]
+    decisions: tuple[ReviewDecision, ...]
+    items: tuple[ReviewItem, ...]
+    packet_id: str
+    plan_id: str
+    schema_id: str
+    waivers: tuple[ReviewWaiver, ...]
+
+    @field_validator(
+        "corrections",
+        "decisions",
+        "items",
+        "waivers",
+        mode="before",
+    )
+    @classmethod
+    def _tuples(cls, value: Any) -> Any:
+        return _tuple_str(value)
+
+    @model_validator(mode="after")
+    def _closed(self) -> ReviewPacket:
+        if self.schema_id != REVIEW_PACKET_SCHEMA_ID:
+            raise ReviewError("review packet schema_id is invalid")
+        validate_id(self.plan_id, kind="fdp")
+        item_ids = tuple(item.item_id for item in self.items)
+        if item_ids != tuple(sorted(set(item_ids))):
+            raise ReviewError("review packet items must be unique and sorted")
+        decision_items = tuple(item.item_id for item in self.decisions)
+        if decision_items != tuple(sorted(set(decision_items))):
+            raise ReviewError("review packet decisions must be unique by item")
+        if any(item.item_id not in item_ids for item in self.decisions):
+            raise ReviewError("review decision names an unknown item")
+        if any(item.item_id not in item_ids for item in self.waivers):
+            raise ReviewError("review waiver names an unknown item")
+        if any(item.item_id not in item_ids for item in self.corrections):
+            raise ReviewError("review correction names an unknown item")
+        validate_id(self.packet_id, kind="rpk")
+        expected = derive_id(
+            "rpk",
+            self.model_dump(mode="json", exclude={"packet_id"}),
+        )
+        if self.packet_id != expected:
+            raise ReviewError("review packet identity mismatch")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        plan_id: str,
+        items: tuple[ReviewItem, ...] = (),
+        decisions: tuple[ReviewDecision, ...] = (),
+        waivers: tuple[ReviewWaiver, ...] = (),
+        corrections: tuple[ReviewCorrection, ...] = (),
+    ) -> ReviewPacket:
+        ordered_items = tuple(sorted(items, key=lambda item: item.item_id))
+        ordered_decisions = tuple(
+            sorted(decisions, key=lambda item: item.item_id)
+        )
+        ordered_waivers = tuple(sorted(waivers, key=lambda item: item.waiver_id))
+        ordered_corrections = tuple(
+            sorted(corrections, key=lambda item: item.correction_id)
+        )
+        payload = {
+            "corrections": [
+                item.model_dump(mode="json") for item in ordered_corrections
+            ],
+            "decisions": [
+                item.model_dump(mode="json") for item in ordered_decisions
+            ],
+            "items": [item.model_dump(mode="json") for item in ordered_items],
+            "plan_id": plan_id,
+            "schema_id": REVIEW_PACKET_SCHEMA_ID,
+            "waivers": [item.model_dump(mode="json") for item in ordered_waivers],
+        }
+        return cls(packet_id=derive_id("rpk", payload), **payload)
 
 
 class ReviewSupersession(_StrictModel):
