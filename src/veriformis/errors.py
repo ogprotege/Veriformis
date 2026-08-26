@@ -230,6 +230,12 @@ class ScaleError(VeriformisError):
     code = "scale-invalid"
 
 
+class ScaleCancelled(ScaleError):
+    """A scale baseline stopped at a cooperative between-stage checkpoint."""
+
+    code = "scale-cancelled"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

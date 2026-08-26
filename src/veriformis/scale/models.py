@@ -11,6 +11,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from veriformis.contracts import (
+    SCALE_BASELINE_REPORT_SCHEMA_ID,
     SCALE_CORPUS_SCHEMA_ID,
     SCALE_CORPUS_SPEC_SCHEMA_ID,
 )
@@ -308,3 +309,153 @@ def encode_record(
     if spec.pdf_pages > 0:
         return payload
     return payload
+
+
+BASELINE_STAGES: tuple[str, ...] = (
+    "parse",
+    "clean",
+    "chunk",
+    "construct",
+    "curate",
+    "split",
+    "format",
+    "validate",
+    "seal",
+    "verify",
+)
+BASELINE_LIMITATIONS: tuple[str, ...] = (
+    "cancel-is-between-stage",
+    "document-source-only",
+    "no-published-tier",
+    "rss-is-process-peak",
+    "sla-claim-false",
+    "statistical-meaning-false",
+)
+ScaleBaselineOperation = Literal["compile-document"]
+
+
+class ScaleHardware(_StrictModel):
+    implementation: str
+    machine: str
+    platform: str
+    python_version: str
+    veriformis_version: str
+
+    @model_validator(mode="after")
+    def _closed(self) -> ScaleHardware:
+        for label, value in (
+            ("implementation", self.implementation),
+            ("machine", self.machine),
+            ("platform", self.platform),
+            ("python_version", self.python_version),
+            ("veriformis_version", self.veriformis_version),
+        ):
+            if not value or value.strip() != value:
+                raise ScaleError(f"{label} must be a non-empty exact token")
+        return self
+
+
+class ScaleBaselineMetrics(_StrictModel):
+    bundle_bytes: int
+    cancel_observed: bool
+    cpu_system_ns: int
+    cpu_user_ns: int
+    disk_amplification_ppm: int
+    object_count: int
+    peak_rss_bytes: int
+    resume_observed: bool
+    source_bytes: int
+    startup_ns: int
+    wall_ns: int
+    workspace_bytes: int
+
+    @model_validator(mode="after")
+    def _closed(self) -> ScaleBaselineMetrics:
+        for label, value in (
+            ("bundle_bytes", self.bundle_bytes),
+            ("cpu_system_ns", self.cpu_system_ns),
+            ("cpu_user_ns", self.cpu_user_ns),
+            ("disk_amplification_ppm", self.disk_amplification_ppm),
+            ("object_count", self.object_count),
+            ("peak_rss_bytes", self.peak_rss_bytes),
+            ("source_bytes", self.source_bytes),
+            ("startup_ns", self.startup_ns),
+            ("wall_ns", self.wall_ns),
+            ("workspace_bytes", self.workspace_bytes),
+        ):
+            _require_non_negative(value, label)
+        if self.source_bytes < 1:
+            raise ScaleError("source_bytes must be positive")
+        if self.wall_ns < 1:
+            raise ScaleError("wall_ns must be positive")
+        expected = (
+            (self.workspace_bytes + self.bundle_bytes) * PPM_DENOMINATOR
+        ) // self.source_bytes
+        if self.disk_amplification_ppm != expected:
+            raise ScaleError("disk_amplification_ppm must match measured trees")
+        return self
+
+
+class ScaleBaselineReport(_StrictModel):
+    corpus_id: str
+    hardware: ScaleHardware
+    limitations: tuple[str, ...]
+    metrics: ScaleBaselineMetrics
+    operation: ScaleBaselineOperation
+    report_id: str
+    schema_id: Literal["veriformis.scale-baseline-report/v1"] = (
+        SCALE_BASELINE_REPORT_SCHEMA_ID
+    )
+    sla_claim: Literal[False]
+    spec_id: str
+    stages: tuple[str, ...]
+    statistical_meaning: Literal[False]
+
+    @field_validator("limitations", "stages", mode="before")
+    @classmethod
+    def _tuples(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def _closed(self) -> ScaleBaselineReport:
+        validate_id(self.report_id, kind="sbr")
+        validate_id(self.spec_id, kind="scs")
+        validate_id(self.corpus_id, kind="scb")
+        if self.sla_claim is not False:
+            raise ScaleError("scale baseline reports cannot claim an SLA")
+        if self.statistical_meaning is not False:
+            raise ScaleError("scale baseline reports have no statistical meaning")
+        if self.stages != BASELINE_STAGES:
+            raise ScaleError("scale baseline stages must be the document compile path")
+        if self.limitations != BASELINE_LIMITATIONS:
+            raise ScaleError("scale baseline limitations must be the v1 set")
+        expected = derive_id(
+            "sbr",
+            self.model_dump(mode="json", exclude={"report_id"}),
+        )
+        if self.report_id != expected:
+            raise ScaleError("scale baseline report identity mismatch")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        spec_id: str,
+        corpus_id: str,
+        hardware: ScaleHardware,
+        metrics: ScaleBaselineMetrics,
+    ) -> ScaleBaselineReport:
+        payload = {
+            "corpus_id": corpus_id,
+            "hardware": hardware.model_dump(mode="json"),
+            "limitations": list(BASELINE_LIMITATIONS),
+            "metrics": metrics.model_dump(mode="json"),
+            "operation": "compile-document",
+            "schema_id": SCALE_BASELINE_REPORT_SCHEMA_ID,
+            "sla_claim": False,
+            "spec_id": spec_id,
+            "stages": list(BASELINE_STAGES),
+            "statistical_meaning": False,
+        }
+        return cls(report_id=derive_id("sbr", payload), **payload)

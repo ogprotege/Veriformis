@@ -185,6 +185,14 @@ def ci_tiny_specs() -> tuple[ScaleCorpusSpec, ...]:
     )
 
 
+def spec_by_corpus_id(corpus_id: str) -> ScaleCorpusSpec:
+    """Return one packaged tiny spec. Unknown ids fail closed."""
+    for spec in ci_tiny_specs():
+        if spec.corpus_id == corpus_id:
+            return spec
+    raise ScaleError(f"unknown scale corpus id {corpus_id!r}")
+
+
 def materialize_scale_corpus(spec: ScaleCorpusSpec, destination: Path) -> ScaleCorpus:
     """Write the spec into an empty directory and return the measured corpus."""
     dest = destination.expanduser().resolve()

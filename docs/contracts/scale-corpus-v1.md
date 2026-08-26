@@ -6,8 +6,9 @@
 
 **Schemas:** `veriformis.scale-corpus-spec/v1`, `veriformis.scale-corpus/v1`
 
-**Status:** Implemented generators in independent-product Phase 15.2. No
-published support tier, baseline harness, streaming API, or shard plan.
+**Status:** Implemented generators in independent-product Phase 15.2.
+Item 15.3 adds a named-hardware baseline harness. No published support
+tier, streaming API, or shard plan.
 
 **Last reviewed:** 2026-08-26
 

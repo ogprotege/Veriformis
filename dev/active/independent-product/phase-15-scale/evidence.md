@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.2
+**Status:** Open — item 15.3
 
 **Opened:** 2026-08-26
 
@@ -53,3 +53,17 @@ That run is not a retained scale benchmark.
 - [x] Tiny CI specs cover both compile paths and the roadmap dimensions.
 - [x] Invalid specs and a non-empty destination fail closed.
 - [x] No published tier, harness, CLI scale command, or committed blobs.
+
+## Required item 15.3 evidence
+
+- [x] `veriformis.scale-baseline-report/v1` records wall, CPU, peak RSS,
+      disk amplification, object count, startup, cancel, and resume.
+- [x] `sla_claim` and `statistical_meaning` are false.
+- [x] Document-source tiny markdown compiles. Dataset-row specs fail closed.
+- [x] Between-stage cancel stops after parse. Resume continues from that workspace.
+- [x] Python, CLI `scale-baseline`, and MCP `scale_baseline` agree on schema.
+- [x] `scale_benchmark` marker exists and is excluded from core pytest.
+- [x] No published corpus tier.
+- [x] Recorded-local tiny-markdown report at
+      [baselines/2026-08-26-ci-tiny-markdown.json](baselines/2026-08-26-ci-tiny-markdown.json);
+      `sla_claim` is false.

@@ -61,3 +61,37 @@ core pytest 2262 passed, 16 deselected, 1 expected durability warning;
 
 **Next action:** Open the item 15.2 pull request. Require every GitHub
 check, merge, and synchronize clean main before item 15.3.
+
+## 2026-08-26 — Item 15.2 merged
+
+**Status:** Phase 15.2 merged as PR #133 at
+`481fb32ee68ab546ad151e4c520b5761bf6135a4`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 15.3 pull request.
+
+## 2026-08-26 — Item 15.3 named-hardware baselines
+
+**Status:** `veriformis.scale-baseline-report/v1` records wall, CPU,
+peak RSS, disk amplification, object count, startup, between-stage
+cancel, and resume. `sla_claim` is false. Tiny markdown CI smoke is
+unmarked. `scale_benchmark` is excluded from core pytest. No published
+tier.
+
+**Next action:** Record local gates, then publish the item 15.3 pull
+request. Stop after merge for operator review of baselines before 15.4.
+
+## 2026-08-26 — Item 15.3 local gates green
+
+**Status:** Baseline harness and scale tests are on
+`phase15/03-baseline-harness`. Recorded-local tiny-markdown report is
+in the packet; `sla_claim` is false.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale 30 passed;
+core pytest 2268 passed, 17 deselected, 1 expected durability warning;
+`git diff --check` clean.
+
+**Next action:** Open the item 15.3 pull request. Require every GitHub
+check, merge, and synchronize clean main. Stop for operator review of
+baselines before 15.4.

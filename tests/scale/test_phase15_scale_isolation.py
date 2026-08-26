@@ -1,4 +1,4 @@
-"""Phase 15 isolation: no published tier, harness, or scale surface."""
+"""Phase 15 isolation: baseline exists; no published tier or streaming API."""
 
 from __future__ import annotations
 
@@ -15,7 +15,11 @@ from veriformis.contracts import (
 from veriformis.exports import hugging_face_dataset as hugging_face_dataset_mod
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
-from veriformis.scale import ci_tiny_specs, materialize_scale_corpus
+from veriformis.scale import (
+    ci_tiny_specs,
+    materialize_scale_corpus,
+    run_named_tiny_baseline,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -144,18 +148,21 @@ def test_hugging_face_dataset_pins_one_shard_per_split() -> None:
     assert 'num_shards={"train": 1, "evaluation": 1}' in source
 
 
-def test_cli_has_no_scale_operations() -> None:
+def test_cli_exposes_baseline_not_tiers() -> None:
     names = {command.name for command in app.registered_commands}
+    assert "scale-baseline" in names
     assert names.isdisjoint(_FORBIDDEN_CLI)
 
 
-def test_mcp_has_no_scale_tools() -> None:
+def test_mcp_exposes_baseline_not_tiers() -> None:
     tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
+    assert "scale_baseline" in tools
     assert tools.isdisjoint(_FORBIDDEN_MCP)
 
 
-def test_pipeline_service_has_no_scale_operations() -> None:
+def test_pipeline_service_exposes_baseline_not_tiers() -> None:
     service = PipelineService()
+    assert hasattr(service, "run_scale_baseline")
     for name in _FORBIDDEN_SERVICE:
         assert not hasattr(service, name)
 
@@ -165,18 +172,18 @@ def test_finished_dataset_schemas_have_no_scale_contract() -> None:
     assert all("scale-benchmark" not in schema for schema in FINISHED_DATASET_SCHEMA_IDS)
 
 
-def test_scale_package_has_no_harness_or_published_tiers() -> None:
+def test_scale_package_has_harness_and_no_published_tiers() -> None:
     module = importlib.import_module("veriformis.scale")
     assert hasattr(module, "materialize_scale_corpus")
-    assert hasattr(module, "ci_tiny_specs")
+    assert hasattr(module, "run_named_tiny_baseline")
     assert materialize_scale_corpus is module.materialize_scale_corpus
+    assert run_named_tiny_baseline is module.run_named_tiny_baseline
     assert ci_tiny_specs()
     assert not hasattr(module, "publish_scale_tiers")
-    assert not hasattr(module, "run_benchmark")
     assert not hasattr(module, "ScaleTier")
 
 
-def test_pytest_has_no_scale_benchmark_marker() -> None:
+def test_pytest_declares_excluded_scale_benchmark_marker() -> None:
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     markers = config["tool"]["pytest"]["ini_options"]["markers"]
-    assert all("scale_benchmark" not in marker for marker in markers)
+    assert any(marker.startswith("scale_benchmark:") for marker in markers)

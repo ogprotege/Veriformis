@@ -45,7 +45,7 @@ jobs:
         run: uv run --python ${{ matrix.python-version }} ruff check src tests
 
       - name: Core pytest (optional integrations excluded)
-        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
+        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 
   # Independent of the matrix so packaging signal is not lost when one cell fails.
   install-smoke:

@@ -840,6 +840,20 @@ def review_submit(packet: Path) -> None:
     typer.echo(json.dumps(bundle, ensure_ascii=False, indent=2, sort_keys=True))
 
 
+@app.command(name="scale-baseline")
+def scale_baseline(
+    corpus_id: str = typer.Option(..., "--corpus-id"),
+    work_root: Path = typer.Option(..., "--work-root"),
+) -> None:
+    """Record a named-hardware compile baseline. The report is not an SLA."""
+    try:
+        report = _SERVICE.run_scale_baseline(corpus_id, work_root)
+    except VeriformisError as exc:
+        _echo_error(exc)
+        return
+    typer.echo(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+
+
 @app.command(name="mapping-preview")
 def mapping_preview(
     path: Path,

@@ -3755,6 +3755,16 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    def run_scale_baseline(self, corpus_id: str, work_root: Path) -> dict[str, Any]:
+        """Compile one packaged tiny corpus and record named-hardware evidence."""
+        from veriformis.scale import run_named_tiny_baseline
+
+        return run_named_tiny_baseline(
+            corpus_id,
+            work_root,
+            service=self,
+        ).model_dump(mode="json")
+
     def version(self) -> VersionOutcome:
         return VersionOutcome(
             version=veriformis.__version__,

@@ -49,7 +49,7 @@ under empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported. Phase 13 quality intelligence
 is complete with previewable gates and labeled fixtures. No heuristic
 blocks seal. Phase 14 review workflows are complete. Phase 15 scale
-work is in progress at item 15.2. Do not start Phase 16 from that
+work is in progress at item 15.3. Do not start Phase 16 from that
 packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
@@ -114,7 +114,7 @@ non-authoritative reviewed work queue.
 uv sync --extra test
 uv run ruff check src tests
 uv run python scripts/check_project_tracking.py
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 ```
 
 Python 3.11 or newer is required. The test matrix runs Python 3.11, 3.12, and
@@ -194,7 +194,7 @@ For integrity or provenance repairs:
 - [ ] New behavior has regression or acceptance tests.
 - [ ] `uv run ruff check src tests` passes.
 - [ ] `uv run python scripts/check_project_tracking.py` passes.
-- [ ] `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"` passes.
+- [ ] `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"` passes.
 - [ ] Current and planned behavior remain clearly separated.
 - [ ] Relevant CLI, architecture, development, and limitation docs are updated.
 - [ ] No unrelated generated files, secrets, credentials, or local configuration are included.
