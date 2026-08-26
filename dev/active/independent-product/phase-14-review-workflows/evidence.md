@@ -1,6 +1,6 @@
 # Phase 14 Evidence
 
-**Status:** Open — item 14.2 review contracts; empty bundle does not block seal
+**Status:** Open — item 14.4 corrections as transforms or mapping revisions
 
 **Opened:** 2026-08-26
 
@@ -52,3 +52,11 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Required-review construction fills `construction-pending` items.
 - [x] Default `none` construction has no pending items.
 - [x] Opt-in near-duplicate and detector kinds stay off unless requested.
+
+## Required item 14.4 evidence
+
+- [x] Transform correction binds a new `trn` identity and requires a byte change.
+- [x] Mapping revision binds a new `mpl` identity.
+- [x] Unchanged mapping or identical-byte transform fails closed.
+- [x] In-place mutation of accepted records fails closed.
+- [x] Waiver `changes_bytes` stays false.
