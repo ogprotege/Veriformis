@@ -2,7 +2,7 @@
 
 Queues list existing facts. Corrections bind a new transform or mapping
 revision. Waivers cannot change bytes. Default review policy stays none.
-The bundle does not block seal until item 14.7.
+Required unresolved reviews block seal. Default recipes stay none.
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ REVIEW_LIMITATIONS: tuple[str, ...] = (
     "default-review-none",
     "no-default-heuristic-required-review",
     "no-mac-review",
-    "no-seal-block",
+    "required-review-blocks-seal",
     "unsigned-reviewer",
     "waiver-does-not-change-bytes",
 )
@@ -526,7 +526,7 @@ class ReviewSupersession(_StrictModel):
 
 class ReviewBundle(_StrictModel):
     assignments: tuple[str, ...]
-    blocks_seal: Literal[False]
+    blocks_seal: bool
     bundle_id: str
     contract_id: str
     contract_version: int
@@ -563,8 +563,8 @@ class ReviewBundle(_StrictModel):
             raise ReviewError("review contract_version is invalid")
         if self.schema_id != REVIEW_BUNDLE_SCHEMA_ID:
             raise ReviewError("review schema_id is invalid")
-        if self.blocks_seal:
-            raise ReviewError("review bundle cannot block seal in 14.2")
+        if type(self.blocks_seal) is not bool:
+            raise ReviewError("review blocks_seal must be a bool")
         if self.limitations != REVIEW_LIMITATIONS:
             raise ReviewError("review limitations must match the v1 set")
         validate_id(self.plan_id, kind="fdp")
@@ -592,11 +592,12 @@ def assemble_review_bundle(
     waivers: tuple[ReviewWaiver, ...] = (),
     corrections: tuple[ReviewCorrection, ...] = (),
     supersessions: tuple[ReviewSupersession, ...] = (),
+    blocks_seal: bool = False,
 ) -> ReviewBundle:
-    """Bind a non-blocking empty-capable review bundle to a finished-dataset plan."""
+    """Bind a review bundle to a finished-dataset plan."""
     payload = {
         "assignments": assignments,
-        "blocks_seal": False,
+        "blocks_seal": blocks_seal,
         "contract_id": REVIEW_CONTRACT_ID,
         "contract_version": REVIEW_CONTRACT_VERSION,
         "corrections": corrections,

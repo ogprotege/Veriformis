@@ -133,7 +133,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/07-required-review-seal`
 **Title:** `Phase 14.7: Block seal on required unresolved reviews`
 
-- [ ] Required-review fixtures cannot seal until resolved. Default recipes
+- [x] Required-review fixtures cannot seal until resolved. Default recipes
       stay `none`. No default Phase 13 heuristic trigger.
 
 ### 14.8 Add supersession and close Phase 14

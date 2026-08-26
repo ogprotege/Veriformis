@@ -3240,6 +3240,9 @@ class PipelineService:
         if is_import_revision(current.schema_version):
             return self._validate_imported(store, current)
         recipe, construction, inputs = _load_constructed_dataset(store, current)
+        from veriformis.review import assert_required_reviews_resolved
+
+        assert_required_reviews_resolved(construction)
         plan = _load_finished_plan(store, current)
         curated = _load_curation_result(store, current)
         split_result = _load_split_result(store, current)
@@ -3318,6 +3321,9 @@ class PipelineService:
             ) as transaction:
                 base = transaction.base
                 recipe, construction, inputs = _load_constructed_dataset(store, base)
+                from veriformis.review import assert_required_reviews_resolved
+
+                assert_required_reviews_resolved(construction)
                 plan = _load_finished_plan(store, base)
                 curated = _load_curation_result(store, base)
                 split_result = _load_split_result(store, base)

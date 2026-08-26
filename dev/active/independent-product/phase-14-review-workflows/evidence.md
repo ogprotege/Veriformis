@@ -1,6 +1,6 @@
 # Phase 14 Evidence
 
-**Status:** Open — item 14.6 review packet exchange
+**Status:** Open — item 14.7 required reviews block seal
 
 **Opened:** 2026-08-26
 
@@ -76,3 +76,10 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Submit fails closed on unresolved required items.
 - [x] Python, CLI, and MCP agree on packet and bundle identities.
 - [x] `construct` still has no `reviews` argument.
+
+## Required item 14.7 evidence
+
+- [x] Required pending-review construction sets `blocks_seal` and refuses seal.
+- [x] Default `none` construction does not block seal.
+- [x] Named default recipes stay `review_policy=none`.
+- [x] No quality heuristic is admitted to block seal.

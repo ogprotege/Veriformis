@@ -3,7 +3,7 @@
 Item 14.3 lists the five core queue kinds on every bundle. Construction
 `pending_review` decisions and curation `conflicting-target` quarantines
 become items. Opt-in near-duplicate and detector queues stay off unless
-requested. The bundle does not block seal.
+requested. Required pending items set `blocks_seal`.
 """
 
 from __future__ import annotations
@@ -53,4 +53,9 @@ def report_core_queues(
     if include_opt_in:
         queues = tuple(sorted((*CORE_QUEUE_KINDS, *OPT_IN_QUEUE_KINDS)))
     items = tuple(sorted(item.item_id for item in collected))
-    return assemble_review_bundle(plan_id=plan_id, queues=queues, items=items)
+    return assemble_review_bundle(
+        plan_id=plan_id,
+        queues=queues,
+        items=items,
+        blocks_seal=any(item.required for item in collected),
+    )

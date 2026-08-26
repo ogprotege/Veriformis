@@ -62,15 +62,16 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.6: review packets
-export, import, and submit on Python, CLI, and MCP. Required unresolved
-reviews do not yet block seal. Mac Review belongs to Phase 18. Do not
-start Phase 15 from this packet.
+Phase 14 review workflows are in progress at item 14.7: required
+unresolved reviews block seal. Default recipes stay `none`. No Phase 13
+heuristic is a default required-review trigger. Mac Review belongs to
+Phase 18. Do not start Phase 15 from this packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 14.6 review exchange)
+**Review date:** 2026-08-26 (independent-product Phase 14.7 required-review seal)
 
-**Next review:** Phase 14.6 pull-request merge, item 14.7 required-review
-seal, or any contract change. Do not start Phase 15 from this packet.
+**Next review:** Phase 14.7 pull-request merge, item 14.8 supersession
+closeout, or any contract change. Do not start Phase 15 from this
+packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

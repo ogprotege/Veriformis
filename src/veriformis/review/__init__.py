@@ -35,6 +35,10 @@ from veriformis.review.models import (
 )
 from veriformis.review.queues import report_core_queues
 from veriformis.review.sampling import report_sample_queue, sample_subjects
+from veriformis.review.seal import (
+    assert_required_reviews_resolved,
+    required_reviews_block_seal,
+)
 
 __all__ = [
     "CORE_QUEUE_KINDS",
@@ -54,6 +58,7 @@ __all__ = [
     "ReviewSupersession",
     "ReviewWaiver",
     "assemble_review_bundle",
+    "assert_required_reviews_resolved",
     "empty_review_bundle",
     "export_review_packet",
     "load_review_packet",
@@ -64,6 +69,7 @@ __all__ = [
     "record_waiver",
     "report_core_queues",
     "report_sample_queue",
+    "required_reviews_block_seal",
     "revise_mapping_plan",
     "sample_subjects",
     "submit_review_packet",
