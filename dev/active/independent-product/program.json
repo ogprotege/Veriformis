@@ -152,7 +152,7 @@
       "packet": "dev/active/independent-product/phase-13-quality-intelligence",
       "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Item 13.2 records veriformis.quality-report/v1. Facts stay separate from policy and recommendations. The report is not enforcing. Sequential PRs 13.2–13.9. Do not start Phase 14 from this packet."
+      "next_gate": "Item 13.3 fills plan-bound distribution facts on veriformis.quality-report/v1. The report is not enforcing. Sequential PRs 13.3–13.9. Do not start Phase 14 from this packet."
     },
     {
       "number": 14,

@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.1 packet; no quality-report schema
+**Status:** Open — item 13.3 distributions; report is not enforcing
 
 **Opened:** 2026-08-25
 
@@ -43,4 +43,13 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Facts, policy decisions, and recommendations are separate types.
 - [x] `enforcing` is false. Seal gates are unchanged.
 - [x] A fact cannot be named as a recommendation. Layers cannot share names.
+- [x] CLI still has no quality-report command.
+
+## Required item 13.3 evidence
+
+- [x] Source, objective, row, role/label, target-length, context-length,
+      language-where-qualified, exclusion, split, and coverage facts.
+- [x] Language without IR/field evidence is `evidence-unqualified`.
+- [x] Reports reproduce from bound inputs. Mixed identities fail closed.
+- [x] `enforcing` is false. Policy and recommendations stay vacant.
 - [x] CLI still has no quality-report command.

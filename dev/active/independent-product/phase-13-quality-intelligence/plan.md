@@ -100,7 +100,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/03-distributions`
 **Title:** `Phase 13.3: Report dataset distributions`
 
-- [ ] Source, objective, row, role/label, target-length, context-length,
+- [x] Source, objective, row, role/label, target-length, context-length,
       language where evidence-qualified, exclusion, split, and coverage
       distributions.
 

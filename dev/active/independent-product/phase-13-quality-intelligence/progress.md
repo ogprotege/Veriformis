@@ -49,3 +49,25 @@ warning.
 
 **Next action:** Publish the item 13.2 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.3.
+
+## 2026-08-25 — Item 13.2 merged
+
+**Status:** Phase 13.2 merged as PR #115 at
+`89d579629eba3d2cb36444f40f5fe38d3a08ddcc`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.3 pull request.
+
+## 2026-08-25 — Item 13.3 dataset distributions
+
+**Status:** `report_dataset_distributions` fills the closed v1 fact set
+from a bound recipe, construction, curation, and split. Language without
+constructed evidence is `evidence-unqualified`. The report is not
+enforcing. There is no CLI command.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 20
+passed; core pytest 2176 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.3 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.4.

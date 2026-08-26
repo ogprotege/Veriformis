@@ -41,7 +41,7 @@ start Phase 14 from this packet.
 
 ## Current state
 
-Item 13.2 is in progress. `veriformis.quality-report/v1` records facts,
-policy, and recommendations as separate layers. The report is not
-enforcing. There is no quality-report command. Do not start Phase 14
-from this packet.
+Item 13.3 is in progress. `veriformis.quality-report/v1` records facts,
+policy, and recommendations as separate layers and fills plan-bound
+distribution facts. The report is not enforcing. There is no
+quality-report command. Do not start Phase 14 from this packet.

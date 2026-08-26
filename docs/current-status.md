@@ -58,14 +58,15 @@ digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
 image-only PDF. `ocr-image` remains explicitly unsupported.
-Phase 13 quality intelligence is in progress at item 13.2:
+Phase 13 quality intelligence is in progress at item 13.3:
 `veriformis.quality-report/v1` records facts, policy, and recommendations
-as separate layers and does not enforce heuristics. There is no
-quality-report command. Do not start Phase 14 from this packet.
+as separate layers and fills plan-bound distributions. It does not
+enforce heuristics. There is no quality-report command. Do not start
+Phase 14 from this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 13.2 quality report)
+**Review date:** 2026-08-25 (independent-product Phase 13.3 distributions)
 
-**Next review:** Phase 13.2 pull-request merge, item 13.3 distributions,
+**Next review:** Phase 13.3 pull-request merge, item 13.4 near-duplicates,
 or any contract change. Do not start Phase 14 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`

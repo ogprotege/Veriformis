@@ -26,17 +26,17 @@ non-executable candidate; Phase 11 collection-plan ingest complete;
 Phase 12 optional Tesseract 5 OCR complete with `ocr-image` still
 explicitly unsupported for default parse; closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`; Phase 13 quality intelligence
-in progress at item 13.2; version `0.1.0` development alpha
+in progress at item 13.3; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–12 complete; Phase 13 in progress at item 13.2; maturity alpha;
+Phases 0–12 complete; Phase 13 in progress at item 13.3; maturity alpha;
 public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command.
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.2 quality report)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.3 distributions)
 
-**Next review:** Phase 13.2 pull-request merge, item 13.3 distributions,
+**Next review:** Phase 13.3 pull-request merge, item 13.4 near-duplicates,
 or any product-contract change. Do not start Phase 14 from this packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
