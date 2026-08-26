@@ -55,15 +55,15 @@ closed. Archive ingest, parser subprocesses, and new input families are
 skipped with records. Image-only PDF still refuses as `ocr-image`.
 Phase 12 optional local OCR is complete: Tesseract 5 under ADR-0016;
 digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
-empty extra `ocr`. Default parse still refuses image-only PDF.
-`ocr-image` remains explicitly unsupported. Do not start Phase 13 from
-this packet.
+empty extra `ocr`. Closeout merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
+image-only PDF. `ocr-image` remains explicitly unsupported. Do not start
+Phase 13 from this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 12 closeout)
+**Review date:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
 
-**Next review:** Phase 12 closeout pull-request merge, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 13
-from this packet.
+**Next review:** Beta label cut, public-ready checklist, or any contract
+change. Do not start Phase 13 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -499,8 +499,10 @@ and artifact identities carry semantic reproducibility.
 | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` | UTF-8 text captured as one language-tagged code block |
 
 Every parser returns a `ParseReport`, which may be empty. Its status,
-diagnostics, locations, IDs, and digest are persisted. OCR remains unsupported
-and is refused by name on empty-text PDFs.
+diagnostics, locations, IDs, and digest are persisted. Default parse of
+empty-text PDF still refuses as `ocr-unsupported`. Optional Tesseract 5
+recovery runs only when a caller supplies `TesseractProvider`. The
+`ocr-image` family stays `explicitly_unsupported`.
 
 The canonical visible-text projection preserves image alt text, citations, and
 footnote and endnote references. Note bodies share the canonical artifact but
@@ -705,7 +707,8 @@ any named-version compatibility claim requires separate retained evidence.
 
 ### Input and policy breadth remains limited
 
-OCR remains unsupported. Curation supports deterministic minimum target
+Default parse still refuses image-only PDF; optional Tesseract 5 recovery
+is not the default path. Curation supports deterministic minimum target
 filtering, conflict quarantine, exact deduplication, coverage, and an optional
 primary-source cap. Group 5 adds a named recipe library, deterministic
 statistics, and versioned YAML pipelines executed only through
@@ -751,13 +754,13 @@ See [docs/release.md](release.md).
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
 | Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–10 complete under the [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–12 complete under the [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md); closeout PR #112 at `892939f` |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
 | Future opt-in | Governed source-grounded model assistance through a separately approved `GeneratorPass` |
 | Public release | Full checklist in [docs/release.md](release.md) with retained evidence |
-| Outside current product | OCR, model training, cloud accounts, multi-user service, billing, and telemetry |
+| Outside current product | Cloud OCR, handwriting OCR, default-parse `ocr-image`, model training, cloud accounts, multi-user service, billing, and telemetry |
 
 The implemented path remains offline and makes no LLM calls.
 

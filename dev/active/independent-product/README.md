@@ -94,10 +94,13 @@ Phase 9 completed under its
 its [packet](phase-10-profile-expansion/README.md) with implemented
 Axolotl, LLaMA-Factory, and Aptus adapters; Unsloth remains experimental.
 Phase 11 completed under its
-[packet](phase-11-collection-ingest/README.md). Phase 12 opened under its
-[packet](phase-12-optional-ocr/README.md) on 2026-08-25; the operator
-accepted Tesseract 5; item 12.3 pins identities; recovery is not
-executable; `ocr-image` stays explicitly unsupported.
+[packet](phase-11-collection-ingest/README.md). Phase 12 completed under
+its [packet](phase-12-optional-ocr/README.md); closeout merged as PR #112
+at `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
+recovery is classified, thresholded, previewable, and isolated under
+empty extra `ocr`. Default parse still refuses image-only PDF.
+`ocr-image` stays explicitly unsupported. Do not start Phase 13 from
+this packet.
 
 ## State change procedure
 

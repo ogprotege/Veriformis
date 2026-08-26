@@ -6,11 +6,11 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–12 complete).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
 
-**Next review:** Phase 12 closeout pull-request merge, beta label cut,
-public-ready checklist, or any contract change. Do not start Phase 13
-from this packet. Default parse still refuses image-only PDF.
+**Next review:** Beta label cut, public-ready checklist, or any contract
+change. Do not start Phase 13 from this packet. Default parse still
+refuses image-only PDF.
 
 ## Start here
 
@@ -108,6 +108,9 @@ from this packet. Default parse still refuses image-only PDF.
 | [Phase 7 packet](../dev/active/independent-product/phase-07-existing-dataset-import/README.md) | Existing-dataset import modes, mapping contracts, and closeout | Completed implementation record |
 | [Phase 8 packet](../dev/active/independent-product/phase-08-consumer-profiles/README.md) | First consumer profiles (TRL, MLX-LM) as optional adapters | Completed implementation record |
 | [Phase 9 packet](../dev/active/independent-product/phase-09-columnar-containers/README.md) | Columnar and Hugging Face dataset containers | Completed implementation packet |
+| [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles | Completed implementation record |
+| [Phase 11 packet](../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening | Completed implementation record |
+| [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

@@ -24,6 +24,7 @@ Before changing code, read:
 - [ADR-0012: Consumer Profile as Optional Adapter](docs/adr/0012-consumer-profile-as-optional-adapter.md)
 - [ADR-0013: Columnar Containers as Optional Generic Exports](docs/adr/0013-columnar-containers-as-optional-generic-exports.md)
 - [ADR-0014: Independently Admitted Consumer Profiles](docs/adr/0014-independently-admitted-consumer-profiles.md)
+- [ADR-0016: Optional Local Tesseract 5 OCR](docs/adr/0016-optional-local-tesseract-ocr.md)
 - [Aptus Handoff Contract v1](docs/contracts/aptus-handoff-v1.md)
 - [Current implementation status](docs/current-status.md)
 - [Project tracking and evidence policy](docs/governance/project-tracking.md)
@@ -40,7 +41,8 @@ Before changing code, read:
 
 The roadmap is ordered. Historical Groups 1–7, Group 9 automated gates,
 beta-prep, and private beta workbench Phases 0–2 are implemented.
-Independent-product Phases 0–12 are complete on `main`. Phase 12 optional
+Independent-product Phases 0–12 are complete on `main`. Phase 12 closeout
+merged as PR #112 at `892939f527974b69282296ded04eb3b43643554f`. Optional
 Tesseract 5 OCR is classified, thresholded, previewable, and isolated
 under empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported.

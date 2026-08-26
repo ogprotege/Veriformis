@@ -116,3 +116,11 @@ binary. Core tests skip when tesseract is absent.
 
 **Status:** No-network, missing tessdata, corrupt raster, and identity
 replay tests. Packet closeout. Phase 12 completed. Do not start Phase 13.
+
+## 2026-08-25 — Closeout merge stamped
+
+**Status:** Item 12.8 merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`. Clean local `main` equals
+`origin/main` there. Active tracking now cites the merge SHA.
+
+**Next action:** None from this packet. Do not start Phase 13.

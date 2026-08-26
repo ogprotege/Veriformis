@@ -4,9 +4,9 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
 
-**Next review:** Independent-product Phase 8.2 pull-request merge, or any
+**Next review:** Phase 13 packet opening, beta label cut, or any
 program-state, evidence-grade, or completion-rule change
 
 ## Purpose

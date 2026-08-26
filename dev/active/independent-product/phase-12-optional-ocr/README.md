@@ -47,7 +47,8 @@ this packet.
 
 ## Current state
 
-Items 12.1–12.8 are complete. Optional Tesseract 5 recovery is classified,
-thresholded, previewable, and isolated under empty extra `ocr`. Default
-parse still refuses image-only PDF. `ocr-image` stays explicitly
-unsupported. Do not start Phase 13 from this packet.
+Items 12.1–12.8 are complete. Closeout merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5 recovery
+is classified, thresholded, previewable, and isolated under empty extra
+`ocr`. Default parse still refuses image-only PDF. `ocr-image` stays
+explicitly unsupported. Do not start Phase 13 from this packet.
