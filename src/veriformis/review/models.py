@@ -7,6 +7,8 @@ The bundle does not block seal until item 14.7.
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import re
 from typing import Any, Literal
 
@@ -33,6 +35,7 @@ OPT_IN_QUEUE_KINDS: tuple[str, ...] = (
     "near-duplicate",
 )
 SAMPLING_QUEUE_KIND = "sample-acceptance"
+SAMPLE_ALGORITHM_ID = "veriformis.review-sample-hmac-sha256/v1"
 QUEUE_KINDS: tuple[str, ...] = tuple(
     sorted((*CORE_QUEUE_KINDS, *OPT_IN_QUEUE_KINDS, SAMPLING_QUEUE_KIND))
 )
@@ -127,6 +130,104 @@ class ReviewItem(_StrictModel):
             "subject_id": subject_id,
         }
         return cls(item_id=derive_id("rit", payload), **payload)
+
+
+def rank_sample_subjects(
+    *,
+    seed: str,
+    population: tuple[str, ...],
+    size: int,
+) -> tuple[str, ...]:
+    """Rank population by HMAC-SHA256(seed, subject) and take ``size`` members."""
+    ranked = sorted(
+        population,
+        key=lambda subject: (
+            hmac.new(
+                seed.encode("utf-8"),
+                subject.encode("utf-8"),
+                hashlib.sha256,
+            ).hexdigest(),
+            subject,
+        ),
+    )
+    return tuple(sorted(ranked[:size]))
+
+
+class ReviewSample(_StrictModel):
+    algorithm_id: Literal["veriformis.review-sample-hmac-sha256/v1"]
+    population: tuple[str, ...]
+    sample_id: str
+    schema_version: Literal["veriformis.review-sample/v1"] = (
+        "veriformis.review-sample/v1"
+    )
+    seed: str
+    selected: tuple[str, ...]
+    size: int
+    statistical_meaning: Literal[False]
+
+    @field_validator("population", "selected", mode="before")
+    @classmethod
+    def _tuples(cls, value: Any) -> Any:
+        return _tuple_str(value)
+
+    @model_validator(mode="after")
+    def _closed(self) -> ReviewSample:
+        if self.algorithm_id != SAMPLE_ALGORITHM_ID:
+            raise ReviewError("sample algorithm_id is invalid")
+        if _TOKEN.fullmatch(self.seed) is None:
+            raise ReviewError("sample seed must be a lowercase token")
+        if not self.population:
+            raise ReviewError("sample population must be non-empty")
+        if self.population != tuple(sorted(set(self.population))):
+            raise ReviewError("sample population must be unique and sorted")
+        for subject in self.population:
+            _require_token(subject, "sample population member")
+        if type(self.size) is not int or self.size < 1:
+            raise ReviewError("sample size must be a positive int")
+        if self.size > len(self.population):
+            raise ReviewError("sample size cannot exceed the population")
+        expected_selected = rank_sample_subjects(
+            seed=self.seed,
+            population=self.population,
+            size=self.size,
+        )
+        if self.selected != expected_selected:
+            raise ReviewError("sample selection does not match the named seed")
+        if self.statistical_meaning:
+            raise ReviewError("review sampling claims no statistical meaning")
+        validate_id(self.sample_id, kind="rsm")
+        expected = derive_id(
+            "rsm",
+            self.model_dump(mode="json", exclude={"sample_id"}),
+        )
+        if self.sample_id != expected:
+            raise ReviewError("review sample identity mismatch")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        seed: str,
+        population: tuple[str, ...],
+        size: int,
+    ) -> ReviewSample:
+        canonical = tuple(sorted(population))
+        selected = rank_sample_subjects(
+            seed=seed,
+            population=canonical,
+            size=size,
+        )
+        payload = {
+            "algorithm_id": SAMPLE_ALGORITHM_ID,
+            "population": canonical,
+            "schema_version": "veriformis.review-sample/v1",
+            "seed": seed,
+            "selected": selected,
+            "size": size,
+            "statistical_meaning": False,
+        }
+        return cls(sample_id=derive_id("rsm", payload), **payload)
 
 
 class ReviewWaiver(_StrictModel):

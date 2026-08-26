@@ -91,3 +91,23 @@ pytest 2223 passed, 16 deselected, 1 expected durability warning.
 
 **Next action:** Publish the item 14.4 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 14.5.
+
+## 2026-08-26 — Item 14.4 merged
+
+**Status:** Phase 14.4 merged as PR #127 at
+`2ba3d763706c4fbed1b4a19aaafd722c38ef0786`. Clean local `main` equals `origin/main` there.
+
+**Next action:** Open the item 14.5 pull request.
+
+## 2026-08-26 — Item 14.5 sampling
+
+**Status:** Algorithm `veriformis.review-sample-hmac-sha256/v1` ranks a
+complete recorded population by HMAC-SHA256 of a named seed. The draw
+replays. It claims no statistical meaning. Sample-acceptance items are
+not required reviews.
+
+Local gates: tracking PASS; ruff pass; focused review 33 passed; core
+pytest 2229 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.5 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 14.6.

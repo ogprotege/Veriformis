@@ -6,10 +6,10 @@
 
 **Schema:** `veriformis.review-bundle/v1`
 
-**Status:** Schema pin through independent-product Phase 14.4. Item 14.4
-binds corrections to a new transform or mapping-plan identity. Waivers
-do not change bytes. The bundle does not block seal. There is no
-review-submit CLI command. Mac Review belongs to Phase 18.
+**Status:** Schema pin through independent-product Phase 14.5. Item 14.5
+adds named-seed HMAC-SHA256 sampling with complete population evidence.
+It claims no statistical meaning. The bundle does not block seal. There
+is no review-submit CLI command. Mac Review belongs to Phase 18.
 
 **Last reviewed:** 2026-08-26
 
@@ -38,9 +38,17 @@ items fill them.
 | `ocr-review` | Core |
 | `mapping` | Core |
 | `parser-degradation` | Core |
-| `sample-acceptance` | Sampling item |
+| `sample-acceptance` | Named-seed sample; not a required review |
 | `near-duplicate` | Opt-in only |
 | `detector-finding` | Opt-in only |
+
+## Sampling
+
+Algorithm `veriformis.review-sample-hmac-sha256/v1` ranks a complete
+recorded population by HMAC-SHA256 of a named lowercase seed and the
+subject token, then takes `size` members. The draw replays. It is not
+a random sample, confidence interval, or representativeness claim.
+Sample-acceptance items are not required reviews.
 
 ## Waiver and correction
 
@@ -63,4 +71,4 @@ accepted records fails closed.
 
 Mac Review screens. CLI submit. Seal blocking. Phase 15 scale work.
 Privacy or safety certification from detector findings. In-place edits
-of content-addressed records.
+of content-addressed records. Statistical meaning for samples.

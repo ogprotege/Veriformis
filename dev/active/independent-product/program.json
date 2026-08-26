@@ -162,7 +162,7 @@
       "packet": "dev/active/independent-product/phase-14-review-workflows",
       "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Item 14.4 records corrections as transforms or mapping revisions. Sequential PRs 14.4–14.8. Do not start Phase 15 from this packet."
+      "next_gate": "Item 14.5 records named-seed sampling. Sequential PRs 14.5–14.8. Do not start Phase 15 from this packet."
     },
     {
       "number": 15,
