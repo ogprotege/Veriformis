@@ -133,7 +133,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/07-policy-detectors`
 **Title:** `Phase 13.7: Add optional PII and policy detectors`
 
-- [ ] Optional detectors for likely PII, secrets, unsafe content, or license
+- [x] Optional detectors for likely PII, secrets, unsafe content, or license
       policy signals. Findings, not certification.
 
 ### 13.8 Add split-comparability and rare-shape findings

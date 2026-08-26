@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.6 tokenizer simulations; report is not enforcing
+**Status:** Open — item 13.7 detectors; report is not enforcing
 
 **Opened:** 2026-08-25
 
@@ -74,3 +74,9 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Unbound tokenizers invent no token lengths.
 - [x] A bound pin plus encode simulates truncation counts.
 - [x] Encode without a pin, or a pin without encode, fails closed.
+
+## Required item 13.7 evidence
+
+- [x] Named detector set `veriformis.policy-detectors/v1`.
+- [x] Hits are findings. Policy is `detector-findings-not-certification`.
+- [x] Clean text has zero hits. Email and AWS-key fixtures record families.

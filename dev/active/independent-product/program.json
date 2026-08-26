@@ -152,7 +152,7 @@
       "packet": "dev/active/independent-product/phase-13-quality-intelligence",
       "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Item 13.6 simulates token lengths only under an exact tokenizer pin. Unbound otherwise. Sequential PRs 13.6–13.9. Do not start Phase 14 from this packet."
+      "next_gate": "Item 13.7 records optional PII/secret/unsafe/license detectors as findings, not certification. Sequential PRs 13.7–13.9. Do not start Phase 14 from this packet."
     },
     {
       "number": 14,

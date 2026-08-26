@@ -1,5 +1,10 @@
-"""Dataset quality intelligence. Item 13.6 adds tokenizer simulations."""
+"""Dataset quality intelligence. Item 13.7 adds optional policy detectors."""
 
+from veriformis.quality.detectors import (
+    DETECTOR_FACT_NAMES,
+    DETECTOR_SET_ID,
+    report_policy_detectors,
+)
 from veriformis.quality.distributions import (
     DISTRIBUTION_FACT_NAMES,
     LANGUAGE_UNQUALIFIED,
@@ -39,6 +44,8 @@ from veriformis.quality.report import (
 __all__ = [
     "BoundReferenceCorpus",
     "BoundTokenizerPin",
+    "DETECTOR_FACT_NAMES",
+    "DETECTOR_SET_ID",
     "DISTRIBUTION_FACT_NAMES",
     "LANGUAGE_UNQUALIFIED",
     "LEAKAGE_FACT_NAMES",
@@ -60,6 +67,7 @@ __all__ = [
     "report_dataset_distributions",
     "report_leakage_checks",
     "report_near_duplicates",
+    "report_policy_detectors",
     "report_tokenizer_simulations",
     "require_quality_report_not_enforcing",
 ]

@@ -6,10 +6,10 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–12 complete; Phase 13 in progress).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.6 tokenizer)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.7 detectors)
 
-**Next review:** Phase 13.6 pull-request merge, item 13.7 policy
-detectors, or any contract change. Do not start Phase 14 from this packet. Default
+**Next review:** Phase 13.7 pull-request merge, item 13.8 split
+findings, or any contract change. Do not start Phase 14 from this packet. Default
 parse still refuses image-only PDF.
 
 ## Start here

@@ -6,9 +6,9 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.6. Item 13.6
-simulates token lengths only under an exact tokenizer pin. The report
-does not enforce heuristics. Seal still uses the seventeen
+**Status:** Schema pin through independent-product Phase 13.7. Item 13.7
+adds optional policy detectors as findings, not certification. The
+report does not enforce heuristics. Seal still uses the seventeen
 finished-dataset gates. There is no quality-report CLI command.
 
 **Last reviewed:** 2026-08-25
@@ -130,9 +130,27 @@ tokenizer. Without a pin the status is `unbound` and lengths stay empty.
 Encode without a pin, or a pin without encode, fails closed. Policy
 records `tokenizer-record-only`.
 
+## Policy detectors (item 13.7)
+
+`report_policy_detectors` scans included field values with named regular
+expressions in `veriformis.policy-detectors/v1`. Hits are findings with
+false-positive/negative limits. They do not certify privacy, safety, or
+license status.
+
+| Fact | Value |
+| --- | --- |
+| `detector-set-id` | `veriformis.policy-detectors/v1` |
+| `detector-pii-hit-count` | Records matching `pii-email` |
+| `detector-secret-hit-count` | Records matching AWS-key or PEM private-key patterns |
+| `detector-unsafe-hit-count` | Records matching `unsafe-script-tag` |
+| `detector-license-hit-count` | Records matching `license-gpl-3` |
+| `detector-hits` | Sorted `{record-id, family, pattern-id}` rows |
+
+Policy records `detector-findings-not-certification` as `record-only`.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.6 cannot fail seal. Later items may add
+`enforcing` is `false`. Item 13.7 cannot fail seal. Later items may add
 previewable gates; a heuristic may block seal only after item 13.9 records
 calibrated labeled fixtures for that heuristic.
 
@@ -158,7 +176,7 @@ The v1 limitation set is:
 
 ## Non-goals
 
-PII/secret detectors and split-comparability findings. Those are later
-Phase 13 items. Phase 14 review queues are out of scope. Semantic
-identity, silent row deletion, contamination certification, and
-invented tokenizers are out of scope.
+Split-comparability findings. Those are a later Phase 13 item. Phase 14
+review queues are out of scope. Semantic identity, silent row deletion,
+contamination/privacy/safety/license certification, and invented
+tokenizers are out of scope.

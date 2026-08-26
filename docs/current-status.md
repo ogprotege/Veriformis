@@ -58,16 +58,14 @@ digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
 image-only PDF. `ocr-image` remains explicitly unsupported.
-Phase 13 quality intelligence is in progress at item 13.6:
-`veriformis.quality-report/v1` records facts, policy, and recommendations
-as separate layers, including tokenizer simulations only under an exact
-pin. Unbound tokenizers invent no lengths. There is no quality-report
-command. Do not start Phase 14 from this packet.
+Phase 13 quality intelligence is in progress at item 13.7: optional
+policy detectors are findings, not certification. There is no
+quality-report command. Do not start Phase 14 from this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 13.6 tokenizer)
+**Review date:** 2026-08-25 (independent-product Phase 13.7 detectors)
 
-**Next review:** Phase 13.6 pull-request merge, item 13.7 policy
-detectors, or any contract change. Do not start Phase 14 from this packet.
+**Next review:** Phase 13.7 pull-request merge, item 13.8 split
+findings, or any contract change. Do not start Phase 14 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

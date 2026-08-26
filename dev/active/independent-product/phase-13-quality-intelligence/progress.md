@@ -136,3 +136,24 @@ warning.
 
 **Next action:** Publish the item 13.6 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.7.
+
+## 2026-08-25 — Item 13.6 merged
+
+**Status:** Phase 13.6 merged as PR #119 at
+`9397670d998b1966b966a2f5ca26b5c12fea1f4b`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.7 pull request.
+
+## 2026-08-25 — Item 13.7 policy detectors
+
+**Status:** Named detector set `veriformis.policy-detectors/v1` records
+PII, secret, unsafe, and license hits as findings. Policy is
+`detector-findings-not-certification`. The report is not enforcing.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 29
+passed; core pytest 2185 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.7 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.8.
