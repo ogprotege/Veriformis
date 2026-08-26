@@ -1,6 +1,6 @@
 # Phase 14 Evidence
 
-**Status:** Open — item 14.5 named-seed sampling
+**Status:** Open — item 14.6 review packet exchange
 
 **Opened:** 2026-08-26
 
@@ -69,3 +69,10 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Invalid seed, duplicates, and oversized draws fail closed.
 - [x] Sample-acceptance items are not required reviews.
 - [x] `statistical_meaning` is false.
+
+## Required item 14.6 evidence
+
+- [x] `veriformis.review-packet/v1` exports pending items and imports completed packets.
+- [x] Submit fails closed on unresolved required items.
+- [x] Python, CLI, and MCP agree on packet and bundle identities.
+- [x] `construct` still has no `reviews` argument.

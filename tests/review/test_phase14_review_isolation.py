@@ -1,4 +1,4 @@
-"""Phase 14.1 isolation: review workflows are not yet queues or submit paths."""
+"""Phase 14 isolation: default review stays none; Mac Review is not in this packet."""
 
 from __future__ import annotations
 
@@ -58,35 +58,32 @@ def test_review_evidence_is_unsigned_local_attestation() -> None:
     assert "public_key" not in fields
 
 
-def test_cli_cannot_submit_completed_review_evidence() -> None:
+def test_cli_exposes_review_exchange_not_construct_reviews() -> None:
     names = {command.name for command in app.registered_commands}
-    assert "review" not in names
+    assert "review-export" in names
+    assert "review-import" in names
+    assert "review-submit" in names
     assert "review-queue" not in names
-    assert "review-submit" not in names
-    assert "review-export" not in names
-    assert "review-import" not in names
     parameters = inspect.signature(construct).parameters
     assert "require_review" in parameters
     assert "reviews" not in parameters
 
 
-def test_mcp_has_no_review_submit_tool() -> None:
+def test_mcp_exposes_review_exchange_tools() -> None:
     tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
-    assert "review" not in tools
+    assert "export_review" in tools
+    assert "import_review" in tools
+    assert "submit_review" in tools
     assert "review_queue" not in tools
     assert "review-queue" not in tools
-    assert "submit_review" not in tools
-    assert "review_submit" not in tools
-    assert "review_export" not in tools
-    assert "review_import" not in tools
 
 
-def test_pipeline_service_cannot_submit_review_evidence() -> None:
+def test_pipeline_service_submits_review_packets() -> None:
     service = PipelineService()
-    assert not hasattr(service, "submit_review")
+    assert hasattr(service, "export_review_packet")
+    assert hasattr(service, "import_review_packet")
+    assert hasattr(service, "submit_review")
     assert not hasattr(service, "review_queue")
-    assert not hasattr(service, "export_review")
-    assert not hasattr(service, "import_review")
     parameters = inspect.signature(PipelineService.construct).parameters
     assert "reviews" not in parameters
 

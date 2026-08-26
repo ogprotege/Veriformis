@@ -111,3 +111,24 @@ pytest 2229 passed, 16 deselected, 1 expected durability warning.
 
 **Next action:** Publish the item 14.5 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 14.6.
+
+## 2026-08-26 — Item 14.5 merged
+
+**Status:** Phase 14.5 merged as PR #128 at
+`008de763a84ea1a1492d049eda2718ede42e599b`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 14.6 pull request.
+
+## 2026-08-26 — Item 14.6 review exchange
+
+**Status:** `veriformis.review-packet/v1` exports pending items and
+imports completed packets. `review-export`, `review-import`, and
+`review-submit` exist on CLI, MCP, and `PipelineService`. Required
+items must be resolved. The bundle still does not block seal.
+
+Local gates: tracking PASS; ruff pass; focused review 36 passed; core
+pytest 2232 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.6 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 14.7.

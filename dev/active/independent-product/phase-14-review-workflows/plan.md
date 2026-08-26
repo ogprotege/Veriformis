@@ -125,7 +125,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/06-review-exchange`
 **Title:** `Phase 14.6: Add review exchange on CLI, MCP, and Python`
 
-- [ ] Export and import review packets. Close “CLI cannot submit completed
+- [x] Export and import review packets. Close “CLI cannot submit completed
       human review evidence.” No Mac Review screens.
 
 ### 14.7 Block seal on required unresolved reviews

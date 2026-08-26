@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14.5 sampling)
+**Last reviewed:** 2026-08-26 (independent-product Phase 14.6 review exchange)
 
-**Next review:** Phase 14.5 pull-request merge, item 14.6 review
-exchange, or governance-schema change. Do not start Phase 15 from the
+**Next review:** Phase 14.6 pull-request merge, item 14.7 required-review
+seal, or governance-schema change. Do not start Phase 15 from the
 Phase 14 packet.
 
 This directory defines how Veriformis records work and prevents capability
@@ -53,10 +53,10 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–13 are complete on `main` and
-Phase 14 is in progress at item 14.5. Phase 13 closeout merged as PR #122
+Phase 14 is in progress at item 14.6. Phase 13 closeout merged as PR #122
 at `ef31559c9184b553209a3c45eca5d943fbb9a680`. The quality report is
 preview-only. Construction `review_policy` defaults to `none`. There is
-no review-queue command. Mac Review belongs to Phase 18. Optional
+review-export, review-import, and review-submit exist. Mac Review belongs to Phase 18. Optional
 Tesseract 5 recovery is isolated under empty extra `ocr`. Default parse
 still refuses image-only PDF. `ocr-image` stays explicitly unsupported.
 Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters.

@@ -62,16 +62,15 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.5: named-seed
-HMAC-SHA256 sampling records the complete population and selection. It
-claims no statistical meaning. Mac Review belongs to Phase 18. Do not
+Phase 14 review workflows are in progress at item 14.6: review packets
+export, import, and submit on Python, CLI, and MCP. Required unresolved
+reviews do not yet block seal. Mac Review belongs to Phase 18. Do not
 start Phase 15 from this packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 14.5 sampling)
+**Review date:** 2026-08-26 (independent-product Phase 14.6 review exchange)
 
-**Next review:** Phase 14.5 pull-request merge, item 14.6 review
-exchange, or any contract change. Do not start Phase 15 from this
-packet.
+**Next review:** Phase 14.6 pull-request merge, item 14.7 required-review
+seal, or any contract change. Do not start Phase 15 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

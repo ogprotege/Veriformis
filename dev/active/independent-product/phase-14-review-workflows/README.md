@@ -45,7 +45,6 @@ from this packet.
 
 ## Current state
 
-Item 14.5 is in progress. Named-seed HMAC-SHA256 sampling records the
-complete population and selection. It claims no statistical meaning.
-Sample-acceptance items are not required. Do not start Phase 15 from
-this packet.
+Item 14.6 is in progress. Review packets export, import, and submit on
+Python, CLI, and MCP. Required unresolved reviews do not yet block
+seal. Do not start Phase 15 from this packet.
