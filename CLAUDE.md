@@ -71,6 +71,10 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
+Phase 15 scale work is in progress at item 15.1: packet opening proves
+there is no retained benchmark, published corpus tier, or public scale
+guarantee. Sequential PRs 15.1–15.9. Stop after 15.3 for operator
+review of baselines. Do not start Phase 16 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
