@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-25",
+  "last_updated": "2026-08-26",
   "status_values": [
     "planned",
     "in_progress",
@@ -152,7 +152,7 @@
       "packet": "dev/active/independent-product/phase-13-quality-intelligence",
       "started_on": "2026-08-25",
       "completed_on": null,
-      "next_gate": "Item 13.7 records optional PII/secret/unsafe/license detectors as findings, not certification. Sequential PRs 13.7–13.9. Do not start Phase 14 from this packet."
+      "next_gate": "Item 13.8 records split-comparability and rare-shape findings. Sequential PRs 13.8–13.9. Do not start Phase 14 from this packet."
     },
     {
       "number": 14,

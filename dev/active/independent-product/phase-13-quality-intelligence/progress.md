@@ -157,3 +157,26 @@ warning.
 
 **Next action:** Publish the item 13.7 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.8.
+
+## 2026-08-25 — Item 13.7 merged
+
+**Status:** Phase 13.7 merged as PR #120 at
+`ec841c53b9b93211cf33e667c38a52449c9ac09e`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.8 pull request.
+
+## 2026-08-26 — Item 13.8 split findings
+
+**Status:** `report_split_findings` records source comparability, integer
+imbalance ppm, rare field-name shapes, and empty/malformed-role counts.
+Policy is `split-findings-record-only`. Valid full_text artifacts have
+zero empty, malformed-role, and rare-shape counts. The report is not
+enforcing. There is no CLI command.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 32
+passed; core pytest 2188 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.8 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.9.

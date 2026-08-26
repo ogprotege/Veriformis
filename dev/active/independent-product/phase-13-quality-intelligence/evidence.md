@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.7 detectors; report is not enforcing
+**Status:** Open — item 13.8 split findings; report is not enforcing
 
 **Opened:** 2026-08-25
 
@@ -80,3 +80,9 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Named detector set `veriformis.policy-detectors/v1`.
 - [x] Hits are findings. Policy is `detector-findings-not-certification`.
 - [x] Clean text has zero hits. Email and AWS-key fixtures record families.
+
+## Required item 13.8 evidence
+
+- [x] Source comparability, imbalance ppm, rare shapes, empty and
+      malformed-role counts.
+- [x] Valid full_text artifacts have zero empty/malformed/rare-shape counts.

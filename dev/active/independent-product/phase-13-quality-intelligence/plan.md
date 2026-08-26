@@ -141,7 +141,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/08-split-findings`
 **Title:** `Phase 13.8: Add split-comparability and rare-shape findings`
 
-- [ ] Split-comparability, imbalance, rare-shape, malformed-role, and empty
+- [x] Split-comparability, imbalance, rare-shape, malformed-role, and empty
       target/context findings.
 
 ### 13.9 Preview quality gates and close Phase 13
