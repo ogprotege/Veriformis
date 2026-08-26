@@ -147,12 +147,12 @@
     {
       "number": 13,
       "title": "Build dataset quality intelligence",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [3, 7],
       "packet": "dev/active/independent-product/phase-13-quality-intelligence",
       "started_on": "2026-08-25",
-      "completed_on": null,
-      "next_gate": "Item 13.8 records split-comparability and rare-shape findings. Sequential PRs 13.8–13.9. Do not start Phase 14 from this packet."
+      "completed_on": "2026-08-26",
+      "next_gate": "Completed; quality report is preview-only; labeled fixtures exist; no heuristic blocks seal; seventeen finished-dataset gates remain the seal path. Do not start Phase 14 from this packet."
     },
     {
       "number": 14,

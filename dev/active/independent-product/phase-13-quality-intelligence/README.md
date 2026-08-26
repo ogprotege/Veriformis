@@ -1,10 +1,10 @@
 # Phase 13 — Build Dataset Quality Intelligence
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-25
 
-**Completed:**
+**Completed:** 2026-08-26
 
 **Roadmap phase:** [Phase 13](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-13--build-dataset-quality-intelligence)
 
@@ -41,9 +41,8 @@ start Phase 14 from this packet.
 
 ## Current state
 
-Item 13.8 is in progress. `veriformis.quality-report/v1` records facts,
-policy, and recommendations as separate layers, fills distributions,
-near-duplicate clusters, leakage facts, tokenizer pins, detector findings,
-and split-comparability findings. The report is not enforcing and does
-not certify contamination absence. There is no quality-report command.
+Phase 13 is complete. `veriformis.quality-report/v1` records facts,
+policy, and recommendations as separate layers and previews configurable
+gates bound to the finished-dataset plan. Labeled fixtures exist. No
+heuristic is admitted to block seal. There is no quality-report command.
 Do not start Phase 14 from this packet.

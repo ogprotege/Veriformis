@@ -4,13 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–12 complete; Phase 13 in progress).
+Phases 0–13 complete).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.8 split findings)
+**Last reviewed:** 2026-08-26 (independent-product Phase 13 closeout)
 
-**Next review:** Phase 13.8 pull-request merge, item 13.9 gates and
-closeout, or any contract change. Do not start Phase 14 from this packet. Default
-parse still refuses image-only PDF.
+**Next review:** Phase 14 when the operator asks, or any contract change.
+Do not start Phase 14 from this packet. Default parse still refuses
+image-only PDF.
 
 ## Start here
 
@@ -69,7 +69,7 @@ parse still refuses image-only PDF.
 | [Collection Plan v1](contracts/collection-plan-v1.md) | File and directory membership before parse | Implemented contract |
 | [Parser Identity v1](contracts/parser-identity-v1.md) | Parser kind, version pins, and recovery-quality status | Implemented; parse-report bytes unchanged |
 | [OCR Recovery Identity v1](contracts/ocr-recovery-identity-v1.md) | Tesseract 5 engine/page pins | Optional Tesseract 5; default parse still refuses image-only PDF |
-| [Quality Report v1](contracts/quality-report-v1.md) | Facts, policy, recommendations; distributions through split findings | Schema pin; not enforcing; split findings are record-only; no CLI command |
+| [Quality Report v1](contracts/quality-report-v1.md) | Facts, policy, recommendations; previewable gates; labeled fixtures | Schema pin; not enforcing; no heuristic admitted to block seal; no CLI command |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
@@ -112,7 +112,7 @@ parse still refuses image-only PDF.
 | [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles | Completed implementation record |
 | [Phase 11 packet](../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening | Completed implementation record |
 | [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
-| [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Active packet; item 13.1 opens tracking |
+| [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Completed implementation record; preview-only gates |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

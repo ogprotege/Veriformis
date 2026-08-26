@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.8 split findings)
+**Last reviewed:** 2026-08-26 (independent-product Phase 13 closeout)
 
-**Next review:** Phase 13.8 pull-request merge, item 13.9 gates and
-closeout, or governance-schema change
+**Next review:** Phase 14 when the operator asks, or governance-schema
+change. Do not start Phase 14 from the Phase 13 packet.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -30,7 +30,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 10 packet](../../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles |
 | [Completed Phase 11 packet](../../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening |
 | [Completed Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR |
-| [Active Phase 13 packet](../../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence |
+| [Completed Phase 13 packet](../../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence |
 
 Run the governance drift check with:
 
@@ -50,14 +50,13 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–12 are complete on `main` and
-Phase 13 is in progress at item 13.8. Phase 12 closeout merged as PR #112
-at `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
+At this review, independent-product Phases 0–13 are complete on `main`.
+Phase 12 closeout merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
 recovery is isolated under empty extra `ocr`. Default parse still refuses
 image-only PDF. `ocr-image` stays explicitly unsupported. The quality
-report fills plan-bound distributions, inspectable near-duplicate
-clusters, and split-comparability findings and does not enforce
-heuristics.
+report is preview-only: labeled fixtures exist and no heuristic is
+admitted to block seal.
 There is no quality-report command. Axolotl, LLaMA-Factory, and Aptus are
 implemented optional adapters. Unsloth remains a non-executable
 candidate. Extra lists for those names stay empty. Do not start Phase 14

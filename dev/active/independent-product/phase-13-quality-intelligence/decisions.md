@@ -1,6 +1,6 @@
 # Phase 13 Decision Index
 
-**Status:** Active
+**Status:** Closed
 
 | Decision | State | Basis |
 | --- | --- | --- |
@@ -12,3 +12,6 @@
 | Near-duplicates are not semantic identity and must not silently delete rows | Accepted | Roadmap work item 3 |
 | Optional detectors are findings, not certification | Accepted | Roadmap work item 6 and non-goals |
 | Do not start Phase 14 from this packet | Accepted | Roadmap dependency 7: quality facts precede review gates |
+| Quality gates preview only; none admitted to block seal | Accepted | Roadmap items 8–9; U3; detectors and near-duplicates are not certification or identity |
+| Gates bind to `plan_id`; FinishedDatasetPlan and snapshot schemas stay frozen | Accepted | Changing those schemas would rewrite every sealed bundle |
+| No quality-report CLI or MCP command in Phase 13 | Accepted | Report is not a pipeline stage; U8 is agreement that the operator surface is absent |
