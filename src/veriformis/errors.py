@@ -224,6 +224,12 @@ class ReviewError(VeriformisError):
     code = "review-invalid"
 
 
+class ScaleError(VeriformisError):
+    """A scale corpus spec or materialization violates its v1 contract."""
+
+    code = "scale-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

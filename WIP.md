@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-26 (Phase 15.1 scale packet)
+**Last reviewed:** 2026-08-26 (Phase 15.2 benchmark corpora)
 
-**Next review:** Phase 15.1 pull-request merge, item 15.2 deterministic
-corpora, or any listed-item status change. Do not start Phase 16
+**Next review:** Phase 15.2 pull-request merge, item 15.3 baseline
+harness, or any listed-item status change. Do not start Phase 16
 from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
@@ -128,10 +128,10 @@ local, offline, and free of LLM generation.
       18. Do not start Phase 15 from that packet.
 - [ ] Independent product Phase 15 is in progress under its
       [packet](dev/active/independent-product/phase-15-scale/README.md).
-      Item 15.1 opens tracking and proves there is no retained
-      benchmark, published corpus tier, or public scale guarantee.
-      Sequential PRs 15.1–15.9. Stop after 15.3 for operator review of
-      baselines. Do not start Phase 16 from this packet.
+      Item 15.2 adds deterministic synthetic corpora. There is still
+      no published corpus tier or baseline harness. Sequential PRs
+      15.1–15.9. Stop after 15.3 for operator review of baselines.
+      Do not start Phase 16 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

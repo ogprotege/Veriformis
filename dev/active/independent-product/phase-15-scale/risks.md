@@ -5,7 +5,7 @@
 | ID | State | Likelihood | Impact | Risk | Control |
 | --- | --- | --- | --- | --- | --- |
 | P15-R1 | Controlled for 15.1 | High | High | Docs imply published tiers or throughput SLAs before measurement | Isolation tests; 15.1 claims none |
-| P15-R2 | Controlled for 15.1 | High | High | 15.1 adds generators, streaming, or sharding and looks like a rewrite | Honesty packet; no `veriformis.scale` module yet |
+| P15-R2 | Controlled for 15.2 | High | High | Generators become a second compiler or commit owner-library bytes | Synthetic specs only; no compile/export; destination must be empty |
 | P15-R3 | Open until 15.3 | High | High | GitHub CI is treated as the baseline machine | Lock 4; tiny smoke only in a later marker |
 | P15-R4 | Open until 15.4 | High | High | Targets are set before operator review of 15.3 | Lock 1; stop after 15.3 |
 | P15-R5 | Open until 15.5 | High | High | Scale rewrite breaks determinism | Lock 2; sealed-bundle oracle; semantic fingerprints |

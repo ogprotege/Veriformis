@@ -1,4 +1,4 @@
-"""Phase 15.1 isolation: no retained benchmark, published tier, or scale API."""
+"""Phase 15 isolation: no published tier, harness, or scale surface."""
 
 from __future__ import annotations
 
@@ -6,8 +6,6 @@ import importlib
 import json
 import tomllib
 from pathlib import Path
-
-import pytest
 
 from veriformis.cli import app
 from veriformis.contracts import (
@@ -17,6 +15,7 @@ from veriformis.contracts import (
 from veriformis.exports import hugging_face_dataset as hugging_face_dataset_mod
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
+from veriformis.scale import ci_tiny_specs, materialize_scale_corpus
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -49,6 +48,7 @@ _FORBIDDEN_MCP = frozenset(
     }
 )
 _FORBIDDEN_SERVICE = (
+    "materialize_scale_corpus",
     "publish_scale_tiers",
     "run_benchmark",
     "scale_benchmark",
@@ -165,9 +165,15 @@ def test_finished_dataset_schemas_have_no_scale_contract() -> None:
     assert all("scale-benchmark" not in schema for schema in FINISHED_DATASET_SCHEMA_IDS)
 
 
-def test_scale_package_does_not_exist() -> None:
-    with pytest.raises(ModuleNotFoundError):
-        importlib.import_module("veriformis.scale")
+def test_scale_package_has_no_harness_or_published_tiers() -> None:
+    module = importlib.import_module("veriformis.scale")
+    assert hasattr(module, "materialize_scale_corpus")
+    assert hasattr(module, "ci_tiny_specs")
+    assert materialize_scale_corpus is module.materialize_scale_corpus
+    assert ci_tiny_specs()
+    assert not hasattr(module, "publish_scale_tiers")
+    assert not hasattr(module, "run_benchmark")
+    assert not hasattr(module, "ScaleTier")
 
 
 def test_pytest_has_no_scale_benchmark_marker() -> None:

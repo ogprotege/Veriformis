@@ -5,12 +5,11 @@ append-only history.
 
 **Updated:** 2026-08-26
 
-**Local branch:** `phase15/01-scale-packet`
+**Local branch:** `phase15/02-benchmark-corpora`
 
-**Completed:** none
+**Completed:** 15.1 (PR #132 at `569ff506a46e6e8ff928167a4320d0a7a5a373f1`)
 
-**Current item:** 15.1 Open the scale packet. Prove no retained
-benchmark, published tier, or public scale guarantee. Do not claim
-targets.
+**Current item:** 15.2 Add deterministic benchmark corpora. No published
+tiers or baseline harness.
 
-**Not started:** 15.2–15.9. Phase 16.
+**Not started:** 15.3–15.9. Phase 16.
