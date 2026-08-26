@@ -4,13 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–12 complete).
+Phases 0–12 complete; Phase 13 in progress).
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.1 quality packet)
 
-**Next review:** Beta label cut, public-ready checklist, or any contract
-change. Do not start Phase 13 from this packet. Default parse still
-refuses image-only PDF.
+**Next review:** Phase 13.1 pull-request merge, item 13.2 quality report,
+or any contract change. Do not start Phase 14 from this packet. Default
+parse still refuses image-only PDF.
 
 ## Start here
 
@@ -111,6 +111,7 @@ refuses image-only PDF.
 | [Phase 10 packet](../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles | Completed implementation record |
 | [Phase 11 packet](../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening | Completed implementation record |
 | [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
+| [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Active packet; item 13.1 opens tracking |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

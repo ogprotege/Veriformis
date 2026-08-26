@@ -2,10 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
+**Last reviewed:** 2026-08-25 (independent-product Phase 13.1 quality packet)
 
-**Next review:** Phase 13 packet opening, beta label cut, or
-governance-schema change
+**Next review:** Phase 13.1 pull-request merge, item 13.2 quality report,
+or governance-schema change
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -30,6 +30,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 10 packet](../../dev/active/independent-product/phase-10-profile-expansion/README.md) | Independently admitted consumer profiles |
 | [Completed Phase 11 packet](../../dev/active/independent-product/phase-11-collection-ingest/README.md) | Collection-plan ingest and parser hardening |
 | [Completed Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR |
+| [Active Phase 13 packet](../../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence |
 
 Run the governance drift check with:
 
@@ -49,12 +50,11 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–12 are complete on `main`.
-Phase 12 closeout merged as PR #112 at
-`892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5 recovery
-is isolated under empty extra `ocr`. Default parse still refuses
-image-only PDF. `ocr-image` stays explicitly unsupported. Axolotl,
-LLaMA-Factory, and Aptus are implemented optional adapters. Unsloth
-remains a non-executable candidate. Extra lists for those names stay
-empty. Historical Phase 4–11 merge SHAs remain in those packets and in
-`docs/current-status.md`. Do not start Phase 13 from this review.
+At this review, independent-product Phases 0–12 are complete on `main` and
+Phase 13 is in progress at item 13.1. Phase 12 closeout merged as PR #112
+at `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
+recovery is isolated under empty extra `ocr`. Default parse still refuses
+image-only PDF. `ocr-image` stays explicitly unsupported. There is no
+quality-report command. Axolotl, LLaMA-Factory, and Aptus are implemented
+optional adapters. Unsloth remains a non-executable candidate. Extra lists
+for those names stay empty. Do not start Phase 14 from this review.

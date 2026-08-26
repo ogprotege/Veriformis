@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–12 complete
+**Status:** Active program — Phases 0–12 complete; Phase 13 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -28,6 +28,7 @@ with roadmap headings.
 - [Phase 10 — Expand consumer profiles under evidence gates](phase-10-profile-expansion/README.md) — complete
 - [Phase 11 — Harden collection ingest and qualify additional input types](phase-11-collection-ingest/README.md) — complete
 - [Phase 12 — Add optional local OCR with accountable recovery](phase-12-optional-ocr/README.md) — complete
+- [Phase 13 — Build dataset quality intelligence](phase-13-quality-intelligence/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -99,8 +100,10 @@ its [packet](phase-12-optional-ocr/README.md); closeout merged as PR #112
 at `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
 recovery is classified, thresholded, previewable, and isolated under
 empty extra `ocr`. Default parse still refuses image-only PDF.
-`ocr-image` stays explicitly unsupported. Do not start Phase 13 from
-this packet.
+`ocr-image` stays explicitly unsupported. Phase 13 opened under its
+[packet](phase-13-quality-intelligence/README.md) on 2026-08-25; item
+13.1 proves current quality facts. Do not start Phase 14 from that
+packet.
 
 ## State change procedure
 

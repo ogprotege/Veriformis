@@ -57,13 +57,16 @@ Phase 12 optional local OCR is complete: Tesseract 5 under ADR-0016;
 digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
-image-only PDF. `ocr-image` remains explicitly unsupported. Do not start
-Phase 13 from this packet.
+image-only PDF. `ocr-image` remains explicitly unsupported.
+Phase 13 quality intelligence is in progress at item 13.1: packet open;
+the seventeen finished-dataset gates and four quality-finding codes remain
+the implemented quality surface. There is no quality-report command. Do
+not start Phase 14 from this packet.
 
-**Review date:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
+**Review date:** 2026-08-25 (independent-product Phase 13.1 quality packet)
 
-**Next review:** Beta label cut, public-ready checklist, or any contract
-change. Do not start Phase 13 from this packet.
+**Next review:** Phase 13.1 pull-request merge, item 13.2 quality report,
+or any contract change. Do not start Phase 14 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -754,7 +757,7 @@ See [docs/release.md](release.md).
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
 | Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–12 complete under the [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md); closeout PR #112 at `892939f` |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–12 complete and Phase 13 in progress under the [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
