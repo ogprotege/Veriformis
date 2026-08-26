@@ -5,10 +5,10 @@ append-only history.
 
 **Updated:** 2026-08-26
 
-**Local branch:** `phase13/09-gates-closeout`
+**Local branch:** `main` at `ef31559c9184b553209a3c45eca5d943fbb9a680`
 
-**Completed:** 13.1 through 13.9
+**Completed:** 13.1 through 13.9. Closeout PR #122.
 
-**Current item:** 13.9 Preview quality gates and close Phase 13
+**Current item:** none. Phase 13 is complete.
 
 **Not started:** Phase 14. Do not start Phase 14 from this packet.

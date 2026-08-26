@@ -59,8 +59,10 @@ empty extra `ocr`. Closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`. Default parse still refuses
 image-only PDF. `ocr-image` remains explicitly unsupported.
 Phase 13 quality intelligence is complete: versioned quality report,
-previewable gates, and labeled fixtures. No heuristic blocks seal. There
-is no quality-report command. Do not start Phase 14 from this packet.
+previewable gates, and labeled fixtures. Closeout merged as PR #122 at
+`ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
+There is no quality-report command. Do not start Phase 14 from this
+packet.
 
 **Review date:** 2026-08-26 (independent-product Phase 13 closeout)
 

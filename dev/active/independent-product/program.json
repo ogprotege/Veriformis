@@ -152,7 +152,7 @@
       "packet": "dev/active/independent-product/phase-13-quality-intelligence",
       "started_on": "2026-08-25",
       "completed_on": "2026-08-26",
-      "next_gate": "Completed; quality report is preview-only; labeled fixtures exist; no heuristic blocks seal; seventeen finished-dataset gates remain the seal path. Do not start Phase 14 from this packet."
+      "next_gate": "Completed; closeout merged as PR #122 at ef31559c9184b553209a3c45eca5d943fbb9a680. Quality report is preview-only; labeled fixtures exist; no heuristic blocks seal; seventeen finished-dataset gates remain the seal path. Do not start Phase 14 from this packet."
     },
     {
       "number": 14,
