@@ -43,6 +43,7 @@ from veriformis.ir import (
     attach_canonical_provenance,
 )
 from veriformis.ir.serde import document_to_dict
+from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
 from veriformis.quality import (
     DISTRIBUTION_FACT_NAMES,
@@ -285,10 +286,12 @@ def test_full_text_distributions_reproduce_and_stay_non_enforcing(
     assert _json(first, "source-distribution") == {
         source_id: 1 for source_id in sorted(case.recipe.source_ids)
     }
+    assert _json(first, "objective-distribution") == {
+        case.recipe.objective.objective_id: 2
+    }
     target_hist = _json(first, "target-length-distribution")
+    assert target_hist == [[15, 1], [21, 1]]
     assert target_hist == _json(first, "context-length-distribution")
-    assert target_hist
-    assert all(len(pair) == 2 and pair[0] > 0 and pair[1] > 0 for pair in target_hist)
     coverage = _json(first, "coverage-distribution")
     assert set(coverage) == set(case.recipe.source_ids)
     for entry in coverage.values():
@@ -404,3 +407,6 @@ def test_cli_and_service_still_have_no_quality_report_command() -> None:
     names = {command.name for command in app.registered_commands}
     assert "quality-report" not in names
     assert not hasattr(PipelineService(), "quality_report")
+    tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
+    assert "quality_report" not in tools
+    assert "quality-report" not in tools

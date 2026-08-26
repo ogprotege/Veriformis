@@ -96,7 +96,9 @@ def _field_values(record: DatasetRecord, names: tuple[str, ...]) -> tuple[str, .
     by_name = {field.name: field.value for field in record.fields}
     missing = [name for name in names if name not in by_name]
     if missing:
-        raise QualityReportError("included record is missing an objective field")
+        raise QualityReportError(
+            f"included record {record.record_id} is missing objective field {missing[0]!r}"
+        )
     return tuple(by_name[name] for name in names)
 
 
@@ -104,9 +106,10 @@ def _language_token(field: RecordField) -> str | None:
     if field.name == "language":
         return field.value
     evidence = field.evidence
-    if isinstance(evidence, IRFieldEvidence) and evidence.json_pointer.endswith(
-        "/language"
-    ):
+    if not isinstance(evidence, IRFieldEvidence):
+        return None
+    tokens = [part for part in evidence.json_pointer.split("/") if part]
+    if tokens and tokens[-1] == "language":
         return field.value
     return None
 

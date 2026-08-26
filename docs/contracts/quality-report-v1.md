@@ -54,18 +54,22 @@ Integer facts are counts. Text facts are lossless canonical JSON.
 | `source-distribution` | Source identity to included-record contribution count |
 | `objective-distribution` | Objective identity to included-record count |
 | `row-schema-distribution` | Recipe target row schema to included-record count |
-| `role-distribution` | `user` / `assistant` counts for `messages`; otherwise empty |
+| `role-distribution` | Schema-implied `user` / `assistant` counts for v1 `messages` (one of each per included row); otherwise empty |
 | `label-distribution` | Constructed field-name counts on included records |
 | `target-length-distribution` | Sorted `[character-length, count]` pairs for objective target fields |
 | `context-length-distribution` | Sorted `[character-length, count]` pairs for objective context fields |
-| `language-distribution` | Evidence-qualified language tokens, or `evidence-unqualified` |
+| `language-distribution` | Evidence-qualified language tokens, or reserved `evidence-unqualified` |
 | `exclusion-distribution` | Curation reason codes for non-included records |
 | `split-distribution` | `train` and `evaluation` assignment counts |
 | `coverage-distribution` | Per-source ledger counts and blocker codes |
 
-Language is reported only where constructed evidence names it. The compiler
-does not infer a document language. Lengths are Unicode character counts, not
-tokens. Distributions do not delete rows.
+Language is reported only where constructed evidence names it: a field named
+`language`, or an IR pointer whose last token is `language` (v1
+`structured_field` stores that scalar on `fields`). The compiler does not
+infer a document language. `evidence-unqualified` is reserved for records
+with no such evidence. Lengths are Unicode character counts, not tokens.
+v1 `messages` role counts are schema-implied from the two-turn lowering,
+not a replay of serialized payloads. Distributions do not delete rows.
 
 ## Enforcement
 
