@@ -20,9 +20,10 @@ built or run here.
   `export PATH="$HOME/.local/bin:$PATH"` (or `. "$HOME/.local/bin/env"`) first.
 - Standard commands (sync, lint, test, lock check) live in `CLAUDE.md` and
   `README.md`. The core test invocation is
-  `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"`; the
+  `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"`; the
   `tests/handoff` suite and the `aptus_integration` marker are optional Aptus
-  integration checks that are intentionally excluded from the core gates.
+  integration checks that are intentionally excluded from the core gates;
+  `scale_benchmark` is optional named-hardware baseline dumps.
 - `uv run pytest` on the full core suite takes ~90s. One test
   (`tests/bundle/test_defectclose_transport.py`) intentionally emits a
   `RuntimeWarning` about an unremovable staging link; that warning is expected

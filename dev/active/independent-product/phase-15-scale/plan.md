@@ -1,6 +1,6 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.2
+**Status:** In progress — item 15.3
 
 **Last updated:** 2026-08-26
 
@@ -112,7 +112,7 @@ ergonomics stay the default.
 **Branch:** `phase15/03-baseline-harness`
 **Title:** `Phase 15.3: Record named-hardware baselines`
 
-- [ ] Harness records wall, CPU, peak RSS, disk amplification, object
+- [x] Harness records wall, CPU, peak RSS, disk amplification, object
       count, startup, cancel, and resume on named hardware. Reports are
       evidence, not SLAs. CI smoke only under an excluded marker. No
       published tiers.

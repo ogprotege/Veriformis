@@ -213,6 +213,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def scale_baseline(corpus_id: str, work_root: str) -> str:
+        """Record a named-hardware compile baseline. The report is not an SLA."""
+        return json.dumps(
+            pipeline.run_scale_baseline(corpus_id, Path(work_root)),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def goals() -> str:
         """Return the plain-language goal catalog from PipelineService."""
         return (

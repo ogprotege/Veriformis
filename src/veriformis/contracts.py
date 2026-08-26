@@ -72,6 +72,7 @@ SCALE_CORPUS_CONTRACT_ID: Final = "veriformis.scale-corpus"
 SCALE_CORPUS_CONTRACT_VERSION: Final = 1
 SCALE_CORPUS_SPEC_SCHEMA_ID: Final = "veriformis.scale-corpus-spec/v1"
 SCALE_CORPUS_SCHEMA_ID: Final = "veriformis.scale-corpus/v1"
+SCALE_BASELINE_REPORT_SCHEMA_ID: Final = "veriformis.scale-baseline-report/v1"
 
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
@@ -422,6 +423,7 @@ __all__ = [
     "REVIEW_CONTRACT_ID",
     "REVIEW_CONTRACT_VERSION",
     "REVIEW_PACKET_SCHEMA_ID",
+    "SCALE_BASELINE_REPORT_SCHEMA_ID",
     "SCALE_CORPUS_CONTRACT_ID",
     "SCALE_CORPUS_CONTRACT_VERSION",
     "SCALE_CORPUS_SCHEMA_ID",

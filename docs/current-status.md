@@ -67,16 +67,17 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.2: deterministic
-synthetic corpora exist; there is still no published corpus tier or
-baseline harness. Sequential PRs 15.1–15.9. Stop after 15.3 for
-operator review of baselines. Do not start Phase 16 from this packet.
+Phase 15 scale work is in progress at item 15.3: a named-hardware
+baseline harness records wall, CPU, peak RSS, disk amplification,
+object count, startup, cancel, and resume. Reports are not an SLA.
+There is still no published corpus tier. Sequential PRs 15.1–15.9.
+Stop after 15.3 for operator review of baselines. Do not start Phase
+16 from this packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 15.2 corpora)
+**Review date:** 2026-08-26 (independent-product Phase 15.3 baselines)
 
-**Next review:** Phase 15.2 pull-request merge, item 15.3 baseline
-harness, or any contract change. Do not start Phase 16 from this
-packet.
+**Next review:** Operator review of 15.3 baseline reports before item
+15.4, or any contract change. Do not start Phase 16 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -785,7 +786,7 @@ Group 9 automated gates (local or CI):
 ```text
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 git diff --check

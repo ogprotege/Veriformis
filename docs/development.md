@@ -38,7 +38,7 @@ Run these checks before submitting a change:
 uv lock --check
 uv run ruff check src tests
 uv run python scripts/check_project_tracking.py
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 git diff --check
 ```
 

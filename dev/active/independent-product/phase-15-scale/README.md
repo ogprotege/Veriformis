@@ -1,6 +1,6 @@
 # Phase 15 — Measure and Engineer Scale, Streaming, and Sharding
 
-**Status:** In progress — item 15.2
+**Status:** In progress — item 15.3
 
 **Started:** 2026-08-26
 
@@ -42,6 +42,7 @@ Phase 18. Do not start Phase 16 from this packet.
 
 ## Current state
 
-Item 15.2 is open. Synthetic generators exist. There is still no
-published corpus tier, baseline harness, or public scale guarantee.
-Do not start Phase 16 from this packet.
+Item 15.3 is open. Synthetic generators and a named-hardware baseline
+harness exist. Reports are evidence, not SLAs. There is still no
+published corpus tier. Stop after 15.3 for operator review of
+baselines before 15.4. Do not start Phase 16 from this packet.
