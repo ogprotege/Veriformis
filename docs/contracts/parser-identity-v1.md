@@ -36,4 +36,4 @@ part of source identity. Source identity remains logical path plus raw SHA-256.
 
 Changing golden parse-report digests. Process isolation. OCR execution
 (identities are [OCR Recovery Identity v1](ocr-recovery-identity-v1.md);
-recovery is not executable).
+default parse still has no provider).

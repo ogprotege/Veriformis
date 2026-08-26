@@ -6,8 +6,9 @@
 
 **Schema:** `veriformis.ocr-recovery-identity/v1`
 
-**Status:** Identity pin through independent-product Phase 12.3. Recovery is
-not executable. Image-only PDF still refuses.
+**Status:** Identity pin for optional Tesseract 5. Extra `ocr` is declared
+empty. `executable` remains `false`: default parse has no provider.
+Image-only PDF still refuses. `ocr-image` stays explicitly_unsupported.
 
 **Last reviewed:** 2026-08-25
 

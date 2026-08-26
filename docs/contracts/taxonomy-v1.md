@@ -197,7 +197,7 @@ sources.
 | `pdf-text` | implemented | `.pdf` | `pdf` | Paragraphs from the embedded text layer under synthetic per-page labels (`Page N` headings); image-only pages refuse |
 | `delimited-table` | implemented | `.csv` | `csv` | One table without alignment attributes |
 | `json-records` | implemented | `.json`, `.jsonl` | `json`, `jsonl` | Paragraph text per flattened textual field |
-| `ocr-image` | explicitly_unsupported | — | — | ADR-0016 authorizes Tesseract 5; recovery is not executable; image-only PDFs fail closed |
+| `ocr-image` | explicitly_unsupported | — | — | ADR-0016 authorizes optional Tesseract 5; default parse still refuses image-only PDF; family stays explicitly_unsupported |
 
 Goal eligibility per family is bound in the
 [Goal Catalog Contract v1](goal-catalog-v1.md). Adding a family, moving a

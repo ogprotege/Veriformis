@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 12 closeout)
+**Last reviewed:** 2026-08-25 (Phase 12 closeout PR #112)
 
-**Next review:** Phase 12 closeout pull-request merge, beta label cut,
-or any listed-item status change. Do not start Phase 13 from this packet.
+**Next review:** Beta label cut, public-ready checklist, or any listed-item
+status change. Do not start Phase 13 from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -109,9 +109,11 @@ local, offline, and free of LLM generation.
       and new input families skipped.
 - [x] Independent product Phase 12 is complete under its
       [packet](dev/active/independent-product/phase-12-optional-ocr/README.md).
-      Optional Tesseract 5 recovery is classified, thresholded, previewable,
-      and isolated under empty extra `ocr`. Default parse still refuses
-      image-only PDF. Do not start Phase 13 from this packet.
+      Closeout merged as PR #112 at
+      `892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5
+      recovery is classified, thresholded, previewable, and isolated under
+      empty extra `ocr`. Default parse still refuses image-only PDF. Do
+      not start Phase 13 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

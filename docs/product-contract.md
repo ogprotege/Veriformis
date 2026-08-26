@@ -24,18 +24,20 @@ generics; Phase 10 complete under ADR-0014 with implemented Axolotl,
 LLaMA-Factory, and Aptus optional adapters and Unsloth remaining a
 non-executable candidate; Phase 11 collection-plan ingest complete;
 Phase 12 optional Tesseract 5 OCR complete with `ocr-image` still
-explicitly unsupported for default parse; version `0.1.0` development alpha
+explicitly unsupported for default parse; closeout merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`; version `0.1.0` development
+alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–12 complete; maturity alpha;
-public Mac claim still owner-gated. OCR remains explicitly unsupported.
+public Mac claim still owner-gated. `ocr-image` remains explicitly
+unsupported for default parse.
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
 
-**Next review:** Phase 12 closeout pull-request merge, beta label cut,
-public-ready checklist, or any product-contract change. Do not start
-Phase 13 from this packet.
+**Next review:** Beta label cut, public-ready checklist, or any
+product-contract change. Do not start Phase 13 from this packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 

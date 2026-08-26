@@ -46,8 +46,9 @@ stage packages in pipeline order — `parsers/`, `rules/`, `chunkers/`,
 `exports/` (consumer-neutral verified-derivative composition boundary);
 `handoff/`; `mcp/`; `goals/`; `mapping/` (compiler-path modes, capture,
 confirmed mapping, templates); `profiles/` (implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission
-pins and adapters); `ocr/` (Tesseract 5 identity pin; recovery not
-executable); and `cli.py` (Typer adapter). Phase 4 establishes the
+pins and adapters); `ocr/` (Tesseract 5 identity pin, optional subprocess provider, empty
+extra `ocr`; default parse still refuses image-only PDF); and `cli.py`
+(Typer adapter). Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
 persisted export models, fail-closed source-trust admission, and read-only
 source-derived plan population and normalized semantic membership enforcement,

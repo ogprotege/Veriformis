@@ -1,6 +1,7 @@
 # Phase 12 Evidence
 
-**Status:** Open — item 12.3 identities; recovery not executable
+**Status:** Complete — Phase 12 closeout PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`
 
 **Opened:** 2026-08-25
 
@@ -23,7 +24,7 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 | `ocr-image` is explicitly unsupported | `source-verified` | `src/veriformis/taxonomy.py` |
 | Empty-text PDF refuses with `pdf.ocr-required` and `ocr-unsupported` | `source-verified` | `src/veriformis/parsers/pdf.py` |
 | Digitally born PDF extracts the text layer via pypdfium2 | `source-verified` | `src/veriformis/parsers/pdf.py` |
-| There is no `ocr` extra | `source-verified` | `pyproject.toml` |
+| Extra `ocr` is declared empty | `source-verified` | `pyproject.toml` |
 | Collection ingest does not change suffix dispatch | `source-verified` | Phase 11 closeout; ADR-0015 |
 
 ## Required item 12.1 evidence
@@ -70,6 +71,30 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
       as OCR without replacing digital text.
 - [x] Image-only PDF without a provider still refuses.
 
+## Required item 12.5 evidence
+
+- [x] Confidence policy v1: accept / warn / review / refuse.
+- [x] Refused OCR text is omitted from the stream and retained on
+      `held_text`. Digital pages are not scored.
+
+## Required item 12.6 evidence
+
+- [x] Read-only `ocr-preview` on PipelineService, CLI, and MCP.
+- [x] Pending review is a page flag. Sources are not mutated.
+
+## Required item 12.7 evidence
+
+- [x] Extra `ocr = []`. Core install does not import an OCR wheel.
+- [x] `TesseractProvider` recovers empty pages through a local subprocess
+      when a caller supplies it.
+
+## Required item 12.8 evidence
+
+- [x] Missing tessdata, missing binary, corrupt raster, identity replay,
+      and no-network Tesseract recovery.
+- [x] Default parse still refuses image-only PDF. `ocr-image` stays
+      explicitly unsupported. Phase 12 closeout. Do not start Phase 13.
+
 ## Local gates (2026-08-25)
 
 Item 12.1: focused isolation 47 passed; core pytest 2117 passed, 16
@@ -83,3 +108,7 @@ inventory; `git diff --check` clean.
 Item 12.3: `uv lock --check`; `ruff check src tests`; tracking PASS;
 focused OCR/parser/taxonomy/tracking 37 passed; core pytest 2131 passed,
 16 deselected, 1 expected durability warning; `git diff --check` clean.
+
+Item 12.8 closeout: core pytest 2156 passed, 16 deselected, 1 expected
+durability warning. Closeout merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f` after GitHub checks passed.

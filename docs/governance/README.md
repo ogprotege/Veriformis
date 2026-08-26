@@ -2,7 +2,7 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
 
 **Next review:** Phase 13 packet opening, beta label cut, or
 governance-schema change
@@ -49,9 +49,12 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–10 are complete on `main`
-once the Phase 10 closeout merges. Axolotl, LLaMA-Factory, and Aptus are
-implemented optional adapters. Unsloth remains a non-executable
-candidate. Extra lists for those names stay empty.
-Historical Phase 4–8 merge SHAs
-remain in those packets and in `docs/current-status.md`.
+At this review, independent-product Phases 0–12 are complete on `main`.
+Phase 12 closeout merged as PR #112 at
+`892939f527974b69282296ded04eb3b43643554f`. Optional Tesseract 5 recovery
+is isolated under empty extra `ocr`. Default parse still refuses
+image-only PDF. `ocr-image` stays explicitly unsupported. Axolotl,
+LLaMA-Factory, and Aptus are implemented optional adapters. Unsloth
+remains a non-executable candidate. Extra lists for those names stay
+empty. Historical Phase 4–11 merge SHAs remain in those packets and in
+`docs/current-status.md`. Do not start Phase 13 from this review.

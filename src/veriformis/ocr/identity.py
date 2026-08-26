@@ -1,8 +1,8 @@
 """Pinned OCR engine and page-recovery identities.
 
-Item 12.3 records Tesseract 5 after the operator accepted the 12.2 evaluation.
-These models do not import Tesseract and do not recover text. Parse still
-refuses image-only PDFs.
+Tesseract 5 is named after the operator accepted the 12.2 evaluation.
+These models do not import Tesseract. Default parse still refuses
+image-only PDFs. Optional recovery is a separate subprocess provider.
 """
 
 from __future__ import annotations
@@ -92,7 +92,9 @@ class OcrEnginePin(_StrictModel):
         if self.limitations != LIMITATIONS:
             raise OcrIdentityError("OCR limitations must match the v1 set")
         if self.executable:
-            raise OcrIdentityError("OCR recovery is not executable in item 12.3")
+            raise OcrIdentityError(
+                "OCR recovery is not executable as the default parse path"
+            )
         if not self.extra_declared:
             raise OcrIdentityError("ocr extra must be declared as an empty extra")
         return self
@@ -222,8 +224,8 @@ def require_ocr_recovery_not_executable() -> None:
     if pin.executable:
         return
     raise OcrIdentityError(
-        "OCR recovery is not executable. Item 12.3 pins Tesseract 5 identities; "
-        "parse still refuses image-only PDF as ocr-unsupported."
+        "OCR recovery is not executable as the default parse path. "
+        "Parse still refuses image-only PDF as ocr-unsupported."
     )
 
 

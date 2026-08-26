@@ -4,6 +4,8 @@
 
 **Last reviewed:** 2026-08-25
 
+**Closeout merge:** PR #112 at `892939f527974b69282296ded04eb3b43643554f`
+
 ## Exit-gate judgment
 
 Passed. Optional local OCR is Tesseract 5 under ADR-0016. Pages classify as

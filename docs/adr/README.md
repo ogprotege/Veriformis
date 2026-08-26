@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12.3 OCR identities)
+**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
 
 **Next review:** Every material architecture or product-boundary decision
 
