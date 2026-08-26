@@ -62,16 +62,15 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.1: construction
-`review_policy` defaults to `none`; there is no review queue or CLI
-submit path. Mac Review belongs to Phase 18. Do not start Phase 15 from
-this packet.
-
-**Review date:** 2026-08-26 (independent-product Phase 14.1 review packet)
-
-**Next review:** Phase 14.1 pull-request merge, item 14.2 review
-contracts, or any contract change. Do not start Phase 15 from this
+Phase 14 review workflows are in progress at item 14.2: versioned review
+bundle schema. The empty bundle does not block seal. There is no submit
+path. Mac Review belongs to Phase 18. Do not start Phase 15 from this
 packet.
+
+**Review date:** 2026-08-26 (independent-product Phase 14.2 review contracts)
+
+**Next review:** Phase 14.2 pull-request merge, item 14.3 first queues,
+or any contract change. Do not start Phase 15 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

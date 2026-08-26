@@ -162,7 +162,7 @@
       "packet": "dev/active/independent-product/phase-14-review-workflows",
       "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Item 14.1 opens the review-workflow packet. Sequential PRs 14.1–14.8. Do not start Phase 15 from this packet."
+      "next_gate": "Item 14.2 records review contracts. Sequential PRs 14.2–14.8. Do not start Phase 15 from this packet."
     },
     {
       "number": 15,

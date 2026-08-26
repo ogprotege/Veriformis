@@ -2,11 +2,11 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 14.1 review packet)
+**Last reviewed:** 2026-08-26 (independent-product Phase 14.2 review contracts)
 
-**Next review:** Phase 14.1 pull-request merge, item 14.2 review
-contracts, or governance-schema change. Do not start Phase 15 from the
-Phase 14 packet.
+**Next review:** Phase 14.2 pull-request merge, item 14.3 first queues,
+or governance-schema change. Do not start Phase 15 from the Phase 14
+packet.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -53,7 +53,7 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–13 are complete on `main` and
-Phase 14 is in progress at item 14.1. Phase 13 closeout merged as PR #122
+Phase 14 is in progress at item 14.2. Phase 13 closeout merged as PR #122
 at `ef31559c9184b553209a3c45eca5d943fbb9a680`. The quality report is
 preview-only. Construction `review_policy` defaults to `none`. There is
 no review-queue command. Mac Review belongs to Phase 18. Optional

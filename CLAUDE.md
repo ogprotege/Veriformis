@@ -66,10 +66,9 @@ Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
 There is no quality-report command.
-Phase 14 review workflows are in progress at item 14.1: packet opening
-proves construction review defaults to `none`, unsigned local
-`ReviewEvidence`, and no CLI/MCP submit path. Do not start Phase 15
-from this packet.
+Phase 14 review workflows are in progress at item 14.2: versioned review
+bundle schema; empty bundle does not block seal; no submit command. Do
+not start Phase 15 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -151,7 +150,8 @@ Read these current authorities before changing code:
     `docs/contracts/collection-plan-v1.md`,
     `docs/contracts/parser-identity-v1.md`, and
     `docs/contracts/ocr-recovery-identity-v1.md`, and
-    `docs/contracts/quality-report-v1.md`
+    `docs/contracts/quality-report-v1.md`, and
+    `docs/contracts/review-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -235,6 +235,7 @@ Key modules under `src/veriformis/` are:
   settings, and probe raw sources without workspace mutation;
 - `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
 - `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing);
+- `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

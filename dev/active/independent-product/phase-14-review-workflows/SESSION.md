@@ -5,10 +5,10 @@ append-only history.
 
 **Updated:** 2026-08-26
 
-**Local branch:** `phase14/01-review-packet`
+**Local branch:** `phase14/02-review-contracts`
 
-**Completed:** none
+**Completed:** 14.1
 
-**Current item:** 14.1 Open the review-workflow packet
+**Current item:** 14.2 Define review contracts
 
-**Not started:** 14.2–14.8. Phase 15. Do not start Phase 15 from this packet.
+**Not started:** 14.3–14.8. Phase 15. Do not start Phase 15 from this packet.

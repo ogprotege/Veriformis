@@ -29,3 +29,24 @@ core pytest 2205 passed, 16 deselected, 1 expected durability warning;
 
 **Next action:** Open the item 14.1 pull request. Require every GitHub
 check, merge, and synchronize clean main before item 14.2.
+
+## 2026-08-26 — Item 14.1 merged
+
+**Status:** Phase 14.1 merged as PR #124 at
+`2ba797ed093e72bc82a6b58166e0dc2e6c908d18`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 14.2 pull request.
+
+## 2026-08-26 — Item 14.2 review contracts
+
+**Status:** `veriformis.review-bundle/v1` binds an empty bundle to a
+finished-dataset plan. Waivers cannot change bytes. Corrections are
+transforms or mapping revisions. `blocks_seal` is false. There is no
+CLI submit command.
+
+Local gates: tracking PASS; ruff pass; focused review 17 passed; core
+pytest 2213 passed, 16 deselected, 1 expected durability warning.
+
+**Next action:** Publish the item 14.2 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 14.3.
