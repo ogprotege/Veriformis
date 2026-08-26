@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-25 (Phase 13.5 leakage checks)
+**Last reviewed:** 2026-08-25 (Phase 13.6 tokenizer simulations)
 
-**Next review:** Phase 13.5 pull-request merge, item 13.6 tokenizer
-simulations, or any listed-item status change. Do not start Phase 14
+**Next review:** Phase 13.6 pull-request merge, item 13.7 policy
+detectors, or any listed-item status change. Do not start Phase 14
 from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
@@ -119,7 +119,8 @@ local, offline, and free of LLM generation.
       Item 13.1 opened tracking. Item 13.2 records the quality-report
       schema. Item 13.3 fills plan-bound distribution facts. Item 13.4
       adds inspectable near-duplicate clusters. Item 13.5 records
-      leakage facts. The report is not enforcing. Do not start Phase 14
+      leakage facts. Item 13.6 simulates token lengths only under an
+      exact pin. The report is not enforcing. Do not start Phase 14
       from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).

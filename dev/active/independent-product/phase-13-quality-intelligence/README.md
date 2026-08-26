@@ -41,7 +41,7 @@ start Phase 14 from this packet.
 
 ## Current state
 
-Item 13.5 is in progress. `veriformis.quality-report/v1` records facts,
+Item 13.6 is in progress. `veriformis.quality-report/v1` records facts,
 policy, and recommendations as separate layers, fills distributions,
 near-duplicate clusters, and leakage facts. The report is not enforcing
 and does not certify contamination absence. There is no quality-report
