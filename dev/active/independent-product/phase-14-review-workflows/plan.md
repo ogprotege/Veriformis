@@ -92,7 +92,7 @@ unless an opt-in policy names them.
 **Branch:** `phase14/02-review-contracts`
 **Title:** `Phase 14.2: Define review contracts`
 
-- [ ] Versioned identity, queue, assignment, verdict, rationale, waiver, and
+- [x] Versioned identity, queue, assignment, verdict, rationale, waiver, and
       supersession contracts. No Mac. No seal change.
 
 ### 14.3 Add first queues over existing facts

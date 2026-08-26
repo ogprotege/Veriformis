@@ -218,6 +218,12 @@ class QualityReportError(VeriformisError):
     code = "quality-report-invalid"
 
 
+class ReviewError(VeriformisError):
+    """A review bundle, waiver, or correction violates its v1 contract."""
+
+    code = "review-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

@@ -45,8 +45,7 @@ from this packet.
 
 ## Current state
 
-Item 14.1 is in progress. Construction `review_policy` defaults to `none`.
-`ReviewEvidence` is an unsigned local attestation. CLI, MCP, and
-`PipelineService` cannot submit completed review evidence. OCR preview
-and quality findings are not queues. No Phase 13 heuristic is admitted
-to block seal. Do not start Phase 15 from this packet.
+Item 14.2 is in progress. `veriformis.review-bundle/v1` binds an empty
+bundle to a finished-dataset plan. `blocks_seal` is false. Waivers cannot
+change bytes. Corrections are transforms or mapping revisions. There is
+no submit command. Do not start Phase 15 from this packet.

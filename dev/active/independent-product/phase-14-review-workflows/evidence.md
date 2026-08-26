@@ -1,6 +1,6 @@
 # Phase 14 Evidence
 
-**Status:** Open — item 14.1 review packet; no queues claimed
+**Status:** Open — item 14.2 review contracts; empty bundle does not block seal
 
 **Opened:** 2026-08-26
 
@@ -38,3 +38,10 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] OCR preview and quality findings are not review queues.
 - [x] No Phase 13 heuristic is admitted to block seal.
 - [x] Focused isolation tests, tracking, Ruff, lock, and diff check.
+
+## Required item 14.2 evidence
+
+- [x] `veriformis.review-bundle/v1` binds to a finished-dataset plan.
+- [x] Closed queue-kind set. Core, opt-in, and sampling kinds are named.
+- [x] Waiver cannot change bytes. Correction kind is transform or mapping-revision.
+- [x] `blocks_seal` is false. CLI still has no submit command.

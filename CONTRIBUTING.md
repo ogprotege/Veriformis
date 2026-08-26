@@ -48,7 +48,7 @@ Tesseract 5 OCR is classified, thresholded, previewable, and isolated
 under empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported. Phase 13 quality intelligence
 is complete with previewable gates and labeled fixtures. No heuristic
-blocks seal. Phase 14 review workflows are in progress at item 14.1.
+blocks seal. Phase 14 review workflows are in progress at item 14.2.
 Do not start Phase 15 from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.

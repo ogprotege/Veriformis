@@ -8,11 +8,11 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-26 (Phase 14.1 review packet)
+**Last reviewed:** 2026-08-26 (Phase 14.2 review contracts)
 
-**Next review:** Phase 14.1 pull-request merge, item 14.2 review
-contracts, or any listed-item status change. Do not start Phase 15
-from this packet.
+**Next review:** Phase 14.2 pull-request merge, item 14.3 first queues,
+or any listed-item status change. Do not start Phase 15 from this
+packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -122,8 +122,8 @@ local, offline, and free of LLM generation.
       No heuristic blocks seal. There is no quality-report command.
 - [ ] Independent product Phase 14 is in progress under its
       [packet](dev/active/independent-product/phase-14-review-workflows/README.md).
-      Item 14.1 opens tracking and proves current review facts. There is
-      no review queue or CLI submit path. Default `review_policy` stays
+      Item 14.1 opened tracking. Item 14.2 records the review-bundle
+      schema. There is no submit path. Default `review_policy` stays
       `none`. Mac Review belongs to Phase 18. Do not start Phase 15 from
       this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
