@@ -125,7 +125,7 @@ fixtures for that heuristic.
 **Branch:** `phase13/06-tokenizer-simulations`
 **Title:** `Phase 13.6: Add tokenizer-bound length simulations`
 
-- [ ] Token-length and truncation simulations only when a profile supplies
+- [x] Token-length and truncation simulations only when a profile supplies
       an exact tokenizer revision and policy.
 
 ### 13.7 Add optional PII and policy detectors

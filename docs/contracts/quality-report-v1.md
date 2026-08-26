@@ -6,13 +6,10 @@
 
 **Schema:** `veriformis.quality-report/v1`
 
-**Status:** Schema pin through independent-product Phase 13.5. Item 13.3
-fills plan-bound distribution facts. Item 13.4 adds inspectable
-near-duplicate clusters. Item 13.5 records leakage facts against
-imported partition hints and digest-bound reference corpora. The report
-does not enforce heuristics or certify absence of contamination. Seal
-still uses the seventeen finished-dataset gates. There is no
-quality-report CLI command. `near_duplicate_policy` stays `disabled`.
+**Status:** Schema pin through independent-product Phase 13.6. Item 13.6
+simulates token lengths only under an exact tokenizer pin. The report
+does not enforce heuristics. Seal still uses the seventeen
+finished-dataset gates. There is no quality-report CLI command.
 
 **Last reviewed:** 2026-08-25
 
@@ -114,9 +111,28 @@ A bound corpus is the sorted unique SHA-256 set of exact target strings.
 Unknown imported record ids fail closed. Policy records
 `leakage-record-only` as `record-only`.
 
+## Tokenizer simulations (item 13.6)
+
+`report_tokenizer_simulations` records token-length facts only when the
+caller supplies a bound tokenizer id, revision, positive max-token
+policy, and encode function. Whitespace splitting is not a production
+tokenizer. Without a pin the status is `unbound` and lengths stay empty.
+
+| Fact | Value |
+| --- | --- |
+| `tokenizer-status` | `unbound` or `simulated` |
+| `tokenizer-id` | Pin id, or `unbound` |
+| `tokenizer-revision` | Pin revision, or `unbound` |
+| `tokenizer-max-tokens` | Positive policy integer, or `0` when unbound |
+| `tokenizer-target-length-distribution` | Sorted `[token-count, count]` pairs |
+| `tokenizer-truncation-count` | Included records whose token count exceeds max-tokens |
+
+Encode without a pin, or a pin without encode, fails closed. Policy
+records `tokenizer-record-only`.
+
 ## Enforcement
 
-`enforcing` is `false`. Item 13.5 cannot fail seal. Later items may add
+`enforcing` is `false`. Item 13.6 cannot fail seal. Later items may add
 previewable gates; a heuristic may block seal only after item 13.9 records
 calibrated labeled fixtures for that heuristic.
 
@@ -142,7 +158,7 @@ The v1 limitation set is:
 
 ## Non-goals
 
-Tokenizer simulations, PII/secret detectors, and split-comparability
-findings. Those are later Phase 13 items. Phase 14 review queues are out
-of scope. Semantic identity, silent row deletion, and contamination
-certification are out of scope.
+PII/secret detectors and split-comparability findings. Those are later
+Phase 13 items. Phase 14 review queues are out of scope. Semantic
+identity, silent row deletion, contamination certification, and
+invented tokenizers are out of scope.

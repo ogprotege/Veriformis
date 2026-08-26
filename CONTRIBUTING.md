@@ -47,8 +47,8 @@ merged as PR #112 at `892939f527974b69282296ded04eb3b43643554f`. Optional
 Tesseract 5 OCR is classified, thresholded, previewable, and isolated
 under empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported. Phase 13 quality intelligence
-is in progress at item 13.5 with leakage facts. Do not start Phase 14
-from that packet.
+is in progress at item 13.6 with tokenizer simulations under an exact
+pin. Do not start Phase 14 from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

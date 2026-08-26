@@ -1,6 +1,6 @@
 # Phase 13 Evidence
 
-**Status:** Open — item 13.5 leakage; report is not enforcing
+**Status:** Open — item 13.6 tokenizer simulations; report is not enforcing
 
 **Opened:** 2026-08-25
 
@@ -68,3 +68,9 @@ Operator compile of Pius X *Pascendi Dominici Gregis* at
 - [x] Optional reference corpora are bound by digest.
 - [x] Unbound corpora are recorded as `unbound`.
 - [x] The report does not certify contamination absence.
+
+## Required item 13.6 evidence
+
+- [x] Unbound tokenizers invent no token lengths.
+- [x] A bound pin plus encode simulates truncation counts.
+- [x] Encode without a pin, or a pin without encode, fails closed.

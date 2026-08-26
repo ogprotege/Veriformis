@@ -115,3 +115,24 @@ warning.
 
 **Next action:** Publish the item 13.5 pull request. Require green GitHub
 checks, merge, and synchronize clean main before item 13.6.
+
+## 2026-08-25 — Item 13.5 merged
+
+**Status:** Phase 13.5 merged as PR #118 at
+`95e4d28db78ffe5550565c3bb99a890e6e1005be`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Open the item 13.6 pull request.
+
+## 2026-08-25 — Item 13.6 tokenizer simulations
+
+**Status:** Token-length simulation requires a bound tokenizer id,
+revision, max-token policy, and encode function. Unbound tokenizers
+invent no lengths.
+
+Local gates: tracking PASS; ruff pass; focused quality/isolation 27
+passed; core pytest 2183 passed, 16 deselected, 1 expected durability
+warning.
+
+**Next action:** Publish the item 13.6 pull request. Require green GitHub
+checks, merge, and synchronize clean main before item 13.7.
