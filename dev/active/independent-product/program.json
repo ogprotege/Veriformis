@@ -177,12 +177,12 @@
     {
       "number": 16,
       "title": "Establish a safe extension architecture",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [3, 4, 11, 13, 15],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-16-extension-architecture",
+      "started_on": "2026-08-27",
       "completed_on": null,
-      "next_gate": "Stabilize internal protocols before public plugin APIs."
+      "next_gate": "Item 16.1 opens the packet and proves the pre-extension architecture. No protocol, registry, loader, extra, or public plugin API in this item."
     },
     {
       "number": 17,
