@@ -8,9 +8,9 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 15.4 scale support declaration)
+**Last reviewed:** 2026-08-27 (Phase 15.5 skipped: no named bottleneck)
 
-**Next review:** Sequential Phase 15 items 15.5–15.9, skipped with a
+**Next review:** Sequential Phase 15 items 15.6–15.9, skipped with a
 record unless a named bottleneck exists. No modest fig-leaf tier.
 Do not start Phase 16 from this packet.
 
@@ -128,9 +128,8 @@ local, offline, and free of LLM generation.
       18. Do not start Phase 15 from that packet.
 - [ ] Independent product Phase 15 is in progress under its
       [packet](dev/active/independent-product/phase-15-scale/README.md).
-      Item 15.4 records operator-reviewed scale support with empty
-      `published_tiers`. Reports are evidence, not SLAs. A modest
-      fig-leaf tier is forbidden. Sequential PRs 15.1–15.9. Do not
+      Item 15.5 is skipped with a record: 15.4 named no bottleneck.
+      Reports are evidence, not SLAs. Sequential PRs 15.1–15.9. Do not
       start Phase 16 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).

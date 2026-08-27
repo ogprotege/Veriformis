@@ -71,11 +71,10 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.4: the operator reviewed
-the measurement ladder. `scale-support` discovery publishes an empty
-tier list. Observed reports are not an SLA. A modest fig-leaf tier is
-forbidden. Unmet sizes stay unmeasured. Sequential PRs 15.1–15.9. Do
-not start Phase 16 from this packet.
+Phase 15 scale work is in progress at item 15.5, skipped with a
+record: 15.4 named no bottleneck rewrite. `scale-support` discovery
+publishes an empty tier list. Sequential PRs 15.1–15.9. Do not start
+Phase 16 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

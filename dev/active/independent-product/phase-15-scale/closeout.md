@@ -18,6 +18,7 @@ stays closed. Do not start Phase 16 from this packet.
   `scale-baseline` dataset-row refusal. Neither is a support tier.
 - Item 15.4 records operator-reviewed scale support with empty
   `published_tiers`.
+- Item 15.5 is skipped: 15.4 named no bottleneck rewrite.
 
 ## Exclusions
 

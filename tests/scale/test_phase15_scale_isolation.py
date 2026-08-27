@@ -55,6 +55,8 @@ _FORBIDDEN_MCP = frozenset(
 )
 _FORBIDDEN_SERVICE = (
     "materialize_scale_corpus",
+    "optimize_measured_bottlenecks",
+    "profile_hot_paths",
     "publish_scale_tiers",
     "run_benchmark",
     "scale_benchmark",
