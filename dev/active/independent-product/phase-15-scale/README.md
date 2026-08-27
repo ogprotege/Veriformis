@@ -1,6 +1,6 @@
 # Phase 15 — Measure and Engineer Scale, Streaming, and Sharding
 
-**Status:** In progress — item 15.3c
+**Status:** In progress — item 15.4
 
 **Started:** 2026-08-26
 
@@ -42,7 +42,7 @@ Phase 18. Do not start Phase 16 from this packet.
 
 ## Current state
 
-Item 15.3c records the operator dataset-row CLI compile and the
-`scale-baseline` dataset-row refusal. Reports are evidence, not SLAs.
-A modest fig-leaf tier is forbidden. Item 15.4 stays closed. Do not
-start Phase 16 from this packet.
+Item 15.4 records the operator review of the measurement ladder.
+`published_tiers` is empty. Observed measurements are not an SLA. A
+modest fig-leaf tier is forbidden. Do not start Phase 16 from this
+packet.

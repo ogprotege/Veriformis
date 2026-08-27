@@ -10,7 +10,7 @@
 are named-hardware evidence. They are not a product SLA and do not
 publish a support tier.
 
-**Last reviewed:** 2026-08-27
+**Last reviewed:** 2026-08-27 (Phase 15.4 scale support discovery)
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 15.
 

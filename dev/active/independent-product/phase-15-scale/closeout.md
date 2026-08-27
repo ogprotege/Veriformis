@@ -16,6 +16,8 @@ stays closed. Do not start Phase 16 from this packet.
   benchmark, published corpus tier, or public scale guarantee.
 - Item 15.3c records an operator dataset-row CLI compile and a
   `scale-baseline` dataset-row refusal. Neither is a support tier.
+- Item 15.4 records operator-reviewed scale support with empty
+  `published_tiers`.
 
 ## Exclusions
 

@@ -840,6 +840,19 @@ def review_submit(packet: Path) -> None:
     typer.echo(json.dumps(bundle, ensure_ascii=False, indent=2, sort_keys=True))
 
 
+@app.command(name="scale-support")
+def scale_support() -> None:
+    """Print operator-reviewed scale support discovery. Tiers stay empty."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_scale_support(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="scale-baseline")
 def scale_baseline(
     corpus_id: str = typer.Option(..., "--corpus-id"),

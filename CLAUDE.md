@@ -71,12 +71,11 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.3c: a measurement ladder
-has named-hardware reports that are not an SLA, and a two-row
-dataset-row CLI compile has been measured. `scale-baseline` v1 still
-refuses dataset-row. A modest fig-leaf tier is forbidden. There is
-still no published corpus tier. Sequential PRs 15.1–15.9. Item 15.4
-stays closed. Do not start Phase 16 from this packet.
+Phase 15 scale work is in progress at item 15.4: the operator reviewed
+the measurement ladder. `scale-support` discovery publishes an empty
+tier list. Observed reports are not an SLA. A modest fig-leaf tier is
+forbidden. Unmet sizes stay unmeasured. Sequential PRs 15.1–15.9. Do
+not start Phase 16 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -156,12 +155,13 @@ Read these current authorities before changing code:
     `docs/contracts/llama-factory-export-v1.md`,
     `docs/contracts/aptus-export-v1.md`,
     `docs/contracts/collection-plan-v1.md`,
-    `docs/contracts/parser-identity-v1.md`, and
-    `docs/contracts/ocr-recovery-identity-v1.md`, and
-    `docs/contracts/quality-report-v1.md`, and
+    `docs/contracts/parser-identity-v1.md`,
+    `docs/contracts/ocr-recovery-identity-v1.md`,
+    `docs/contracts/quality-report-v1.md`,
     `docs/contracts/review-v1.md`,
-    `docs/contracts/scale-corpus-v1.md`, and
-    `docs/contracts/scale-baseline-v1.md`
+    `docs/contracts/scale-corpus-v1.md`,
+    `docs/contracts/scale-baseline-v1.md`, and
+    `docs/contracts/scale-support-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and

@@ -213,6 +213,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def scale_support() -> str:
+        """Return operator-reviewed scale support discovery. Tiers stay empty."""
+        return json.dumps(
+            pipeline.discover_scale_support(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def scale_baseline(corpus_id: str, work_root: str) -> str:
         """Record a named-hardware compile baseline. The report is not an SLA."""
         return json.dumps(
