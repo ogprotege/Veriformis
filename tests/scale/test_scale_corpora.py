@@ -18,8 +18,11 @@ from veriformis.scale import (
     ScaleCorpusSpec,
     ci_tiny_specs,
     materialize_scale_corpus,
+    measurement_ladder_specs,
+    packaged_scale_specs,
     record_payload,
     render_text_pdf,
+    spec_by_corpus_id,
 )
 
 
@@ -163,6 +166,33 @@ def test_ci_tiny_specs_cover_roadmap_dimensions(tmp_path: Path) -> None:
     assert any(item.duplicate_rate_ppm > 0 for item in specs)
     assert set(item.container for item in specs) <= set(GENERIC_SCALE_CONTAINERS)
     for spec in specs:
+        dest = tmp_path / spec.corpus_id
+        corpus = materialize_scale_corpus(spec, dest)
+        assert corpus.file_count == spec.file_count
+        assert corpus.total_bytes == sum(
+            (dest / item.path).stat().st_size for item in corpus.files
+        )
+
+
+def test_measurement_ladder_specs_are_not_tiers(tmp_path: Path) -> None:
+    ladder = measurement_ladder_specs()
+    assert [item.corpus_id for item in ladder] == [
+        "measure-markdown-10-40",
+        "measure-markdown-25-100",
+        "measure-markdown-50-400",
+        "measure-markdown-100-1000",
+        "measure-pdf-2-8",
+        "measure-markdown-duplicates-10-40",
+    ]
+    assert all(item.input_mode == "document-source" for item in ladder)
+    packaged = packaged_scale_specs()
+    assert {item.corpus_id for item in ci_tiny_specs()} <= {
+        item.corpus_id for item in packaged
+    }
+    found = spec_by_corpus_id("measure-markdown-50-400")
+    assert found.file_count == 50
+    assert found.record_count == 400
+    for spec in ladder:
         dest = tmp_path / spec.corpus_id
         corpus = materialize_scale_corpus(spec, dest)
         assert corpus.file_count == spec.file_count

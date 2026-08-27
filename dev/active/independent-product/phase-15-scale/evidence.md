@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.3
+**Status:** Open — item 15.3b
 
 **Opened:** 2026-08-26
 
@@ -67,3 +67,14 @@ That run is not a retained scale benchmark.
 - [x] Recorded-local tiny-markdown report at
       [baselines/2026-08-26-ci-tiny-markdown.json](baselines/2026-08-26-ci-tiny-markdown.json);
       `sla_claim` is false.
+
+## Required item 15.3b evidence
+
+- [x] Operator lock recorded: never publish a modest fig-leaf tier.
+- [x] Measurement ladder specs packaged; they are not support tiers.
+- [x] Named-hardware reports for markdown 10×40, 25×100, 50×400,
+      100×1000, PDF 2×8, plus tiny PDF and tiny duplicates.
+- [x] `measure-markdown-duplicates-10-40` compile refused:
+      coverage `coverage-blocker-present`.
+- [x] Dataset-row compile remains unmeasured.
+- [x] Core pytest materializes the ladder and does not compile 100×1000.

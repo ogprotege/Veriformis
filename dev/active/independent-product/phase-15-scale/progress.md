@@ -95,3 +95,37 @@ core pytest 2268 passed, 17 deselected, 1 expected durability warning;
 **Next action:** Open the item 15.3 pull request. Require every GitHub
 check, merge, and synchronize clean main. Stop for operator review of
 baselines before 15.4.
+
+## 2026-08-26 — Item 15.3 merged
+
+**Status:** Phase 15.3 merged as PR #134 at
+`367cf4e4a484983f9b858ba527e1f054402ae1c5`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Operator said measure more first; never a modest
+fig-leaf tier.
+
+## 2026-08-26 — Item 15.3b measurement ladder
+
+**Status:** Packaged measurement-point specs and named-hardware reports
+for markdown 10×40 through 100×1000, PDF, and tiny duplicates. Duplicate
+ladder 10×40 refused coverage. Dataset-row compile unmeasured.
+`sla_claim` stays false. No published tier.
+
+**Next action:** Record local gates, then publish the item 15.3b pull
+request. Do not start 15.4 until the operator reviews the ladder.
+
+## 2026-08-26 — Item 15.3b local gates green
+
+**Status:** Measurement ladder and named-hardware reports are on
+`phase15/03b-measurement-ladder`. Duplicate 10×40 compile refused
+coverage. Dataset-row compile unmeasured.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale 31 passed;
+core pytest 2269 passed, 17 deselected, 1 expected durability warning;
+`git diff --check` clean.
+
+**Next action:** Open the item 15.3b pull request. Require every GitHub
+check, merge, and synchronize clean main. Do not start 15.4 until the
+operator reviews the ladder.

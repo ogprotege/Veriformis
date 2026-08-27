@@ -1,6 +1,6 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.3
+**Status:** In progress — item 15.3b
 
 **Last updated:** 2026-08-26
 
@@ -42,8 +42,8 @@ ergonomics stay the default.
 - Synthetic retained corpora only. Owner library bytes never enter the
   repo or CI.
 - Named hardware is evidence, not a product SLA.
-- 15.5–15.8 fire only against measured, named bottlenecks. Stopping
-  after a modest declared tier is success.
+- 15.5–15.8 fire only against measured, named bottlenecks. A modest
+  fig-leaf tier is forbidden. Keep measuring until a claim has evidence.
 - Sharding is export, not a second compiler. Canonical JSON v1 keeps
   its no-scale claim.
 - Small-corpus golden path stays the default unless a versioned
@@ -117,14 +117,30 @@ ergonomics stay the default.
       evidence, not SLAs. CI smoke only under an excluded marker. No
       published tiers.
 
+### 15.3b Expand the named-hardware measurement ladder
+
+**Branch:** `phase15/03b-measurement-ladder`
+**Title:** `Phase 15.3b: Expand the named-hardware measurement ladder`
+
+- [x] Record the operator lock: never publish a modest fig-leaf tier;
+      keep measuring until a claim has evidence.
+- [x] Packaged measurement-point specs (not support tiers) covering
+      10×40, 25×100, 50×400, 100×1000 markdown, PDF pages, and
+      duplicates.
+- [x] Named-hardware reports retained as evidence. `sla_claim` stays
+      false. Dataset-row compile remains unmeasured.
+- [x] Core pytest materializes the ladder; it does not compile the
+      large points. No published tier.
+
 ### 15.4 Publish operator-reviewed support tiers
 
 **Branch:** `phase15/04-support-tiers`
 **Title:** `Phase 15.4: Publish operator-reviewed support tiers`
 
-- [ ] Operator reviews 15.3. Publish named tiers with measured ceilings
-      and explicit refusals above them. Unmet desired tiers are targets,
-      not current support. No rewrite.
+- [ ] Operator reviews the measurement ladder. Publish named tiers
+      only from evidenced ceilings. A modest fig-leaf tier is
+      forbidden. Unmet sizes stay unmeasured, not "supported small".
+      No rewrite.
 
 ### 15.5 Profile and optimize measured bottlenecks
 
@@ -183,7 +199,7 @@ ergonomics stay the default.
 | U2 | After any scale change, the same sources and recipe produce the same sealed-bundle identities. |
 | U3 | Retained corpora are synthetic. Owner library bytes never enter the repo or CI. |
 | U4 | Public numbers cite named hardware and corpus identity. They are not unbounded SLAs. |
-| U5 | 15.5–15.8 run only against measured, named bottlenecks, or are skipped with a record. |
+| U5 | 15.5–15.8 run only against measured, named bottlenecks, or are skipped with a record. A modest unpublished-as-tier fig leaf is forbidden. |
 | U6 | Sharding is a derivative. The workspace remains one machine and one identity. |
 | U7 | Small-corpus fixtures, seventeen gates, and default recipes stay unchanged unless a versioned migration is named. |
 | U8 | Disk preflight and bounded queues refuse to guess. |

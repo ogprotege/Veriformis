@@ -67,16 +67,16 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.3: a named-hardware
-baseline harness records wall, CPU, peak RSS, disk amplification,
-object count, startup, cancel, and resume. Reports are not an SLA.
-There is still no published corpus tier. Sequential PRs 15.1–15.9.
-Stop after 15.3 for operator review of baselines. Do not start Phase
-16 from this packet.
+Phase 15 scale work is in progress at item 15.3b: a measurement ladder
+of synthetic document-source corpora has named-hardware reports.
+Reports are not an SLA. A modest fig-leaf tier is forbidden. There is
+still no published corpus tier. Dataset-row compile is unmeasured.
+Do not start 15.4 until the operator reviews the ladder. Do not start
+Phase 16 from this packet.
 
-**Review date:** 2026-08-26 (independent-product Phase 15.3 baselines)
+**Review date:** 2026-08-26 (independent-product Phase 15.3b ladder)
 
-**Next review:** Operator review of 15.3 baseline reports before item
+**Next review:** Operator review of the measurement ladder before item
 15.4, or any contract change. Do not start Phase 16 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`

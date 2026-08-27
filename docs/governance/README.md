@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 15.3 baselines)
+**Last reviewed:** 2026-08-26 (independent-product Phase 15.3b ladder)
 
-**Next review:** Operator review of 15.3 baseline reports before item
+**Next review:** Operator review of the measurement ladder before item
 15.4, or governance-schema change. Do not start Phase 16 from the
 Phase 15 packet.
 
@@ -54,7 +54,7 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–14 are complete on `main`
-and Phase 15 is in progress at item 15.3. Phase 14 closeout merged as
+and Phase 15 is in progress at item 15.3b. Phase 14 closeout merged as
 PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`. There is no
 retained scale benchmark, published corpus tier, or public scale
 guarantee. The quality report is preview-only. Construction

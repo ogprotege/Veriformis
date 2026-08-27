@@ -196,7 +196,7 @@ def run_named_tiny_baseline(
     *,
     service: PipelineService | None = None,
 ) -> ScaleBaselineReport:
-    """Run the harness on one packaged tiny spec."""
+    """Run the harness on one packaged spec (tiny CI or measurement ladder)."""
     return run_scale_baseline(
         spec_by_corpus_id(corpus_id),
         work_root,

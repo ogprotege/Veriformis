@@ -18,6 +18,7 @@ from veriformis.pipeline import PipelineService
 from veriformis.scale import (
     ci_tiny_specs,
     materialize_scale_corpus,
+    measurement_ladder_specs,
     run_named_tiny_baseline,
 )
 
@@ -179,6 +180,7 @@ def test_scale_package_has_harness_and_no_published_tiers() -> None:
     assert materialize_scale_corpus is module.materialize_scale_corpus
     assert run_named_tiny_baseline is module.run_named_tiny_baseline
     assert ci_tiny_specs()
+    assert measurement_ladder_specs()
     assert not hasattr(module, "publish_scale_tiers")
     assert not hasattr(module, "ScaleTier")
 

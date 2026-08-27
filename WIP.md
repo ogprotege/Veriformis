@@ -8,11 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-26 (Phase 15.3 baseline harness)
+**Last reviewed:** 2026-08-26 (Phase 15.3b measurement ladder)
 
-**Next review:** Operator review of 15.3 baseline reports before item
-15.4 support tiers, or any listed-item status change. Do not start
-Phase 16 from this packet.
+**Next review:** Operator review of the measurement ladder before item
+15.4. No modest fig-leaf tier. Do not start Phase 16 from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -128,9 +127,9 @@ local, offline, and free of LLM generation.
       18. Do not start Phase 15 from that packet.
 - [ ] Independent product Phase 15 is in progress under its
       [packet](dev/active/independent-product/phase-15-scale/README.md).
-      Item 15.3 records named-hardware baselines. Reports are evidence,
-      not SLAs. There is still no published corpus tier. Sequential PRs
-      15.1–15.9. Stop after 15.3 for operator review of baselines.
+      Item 15.3b expands the measurement ladder. Reports are evidence,
+      not SLAs. A modest fig-leaf tier is forbidden. Sequential PRs
+      15.1–15.9. Do not start 15.4 until the ladder is reviewed.
       Do not start Phase 16 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).

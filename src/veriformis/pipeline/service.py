@@ -3756,7 +3756,7 @@ class PipelineService:
         )
 
     def run_scale_baseline(self, corpus_id: str, work_root: Path) -> dict[str, Any]:
-        """Compile one packaged tiny corpus and record named-hardware evidence."""
+        """Compile one packaged corpus and record named-hardware evidence."""
         from veriformis.scale import run_named_tiny_baseline
 
         return run_named_tiny_baseline(

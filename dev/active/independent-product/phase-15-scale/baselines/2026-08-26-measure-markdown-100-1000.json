@@ -1,0 +1,50 @@
+{
+  "corpus_id": "scb-v1-983d6ac9ed43b64dceb593b76a5f3f079f33cd57a3a6afa24d3d2b044bdc6601",
+  "hardware": {
+    "implementation": "CPython",
+    "machine": "arm64",
+    "platform": "darwin",
+    "python_version": "3.12.13",
+    "veriformis_version": "0.1.0"
+  },
+  "limitations": [
+    "cancel-is-between-stage",
+    "document-source-only",
+    "no-published-tier",
+    "rss-is-process-peak",
+    "sla-claim-false",
+    "statistical-meaning-false"
+  ],
+  "metrics": {
+    "bundle_bytes": 4958579,
+    "cancel_observed": true,
+    "cpu_system_ns": 2853395000,
+    "cpu_user_ns": 83027987000,
+    "disk_amplification_ppm": 33545397,
+    "object_count": 517,
+    "peak_rss_bytes": 682885120,
+    "resume_observed": true,
+    "source_bytes": 1042810,
+    "startup_ns": 1041,
+    "wall_ns": 86914409125,
+    "workspace_bytes": 30022897
+  },
+  "operation": "compile-document",
+  "report_id": "sbr-v1-b5bab9b765740586dad16f535e0d223cabaf19d94fd4ed582fe894e809cc3731",
+  "schema_id": "veriformis.scale-baseline-report/v1",
+  "sla_claim": false,
+  "spec_id": "scs-v1-eb96e2d3c2930729fdb5fc2cb1f1dcd4bd7b55dc6b06963230e8732097d4ba55",
+  "stages": [
+    "parse",
+    "clean",
+    "chunk",
+    "construct",
+    "curate",
+    "split",
+    "format",
+    "validate",
+    "seal",
+    "verify"
+  ],
+  "statistical_meaning": false
+}

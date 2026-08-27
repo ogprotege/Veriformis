@@ -10,6 +10,8 @@ from veriformis.scale.baseline import (
 from veriformis.scale.corpora import (
     ci_tiny_specs,
     materialize_scale_corpus,
+    measurement_ladder_specs,
+    packaged_scale_specs,
     render_text_pdf,
     spec_by_corpus_id,
 )
@@ -41,6 +43,8 @@ __all__ = [
     "compile_document_corpus",
     "duplicate_indexes",
     "materialize_scale_corpus",
+    "measurement_ladder_specs",
+    "packaged_scale_specs",
     "record_payload",
     "record_scale_hardware",
     "render_text_pdf",
