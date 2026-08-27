@@ -71,11 +71,12 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.3b: a measurement ladder
-has named-hardware reports that are not an SLA. A modest fig-leaf
-tier is forbidden. There is still no published corpus tier. Sequential
-PRs 15.1–15.9. Do not start 15.4 until the ladder is reviewed. Do not
-start Phase 16 from this packet.
+Phase 15 scale work is in progress at item 15.3c: a measurement ladder
+has named-hardware reports that are not an SLA, and a two-row
+dataset-row CLI compile has been measured. `scale-baseline` v1 still
+refuses dataset-row. A modest fig-leaf tier is forbidden. There is
+still no published corpus tier. Sequential PRs 15.1–15.9. Item 15.4
+stays closed. Do not start Phase 16 from this packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

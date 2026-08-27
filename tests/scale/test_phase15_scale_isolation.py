@@ -189,3 +189,29 @@ def test_pytest_declares_excluded_scale_benchmark_marker() -> None:
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     markers = config["tool"]["pytest"]["ini_options"]["markers"]
     assert any(marker.startswith("scale_benchmark:") for marker in markers)
+
+
+def test_dataset_row_cli_compile_evidence_is_not_a_tier() -> None:
+    packet = (
+        ROOT
+        / "dev/active/independent-product/phase-15-scale/baselines"
+    )
+    refused = json.loads(
+        (packet / "2026-08-27-scale-baseline-ci-tiny-jsonl.refused.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert refused["kind"] == "scale-baseline-refused"
+    assert refused["sla_claim"] is False
+    assert refused["exit"] == 2
+    measured = json.loads(
+        (packet / "2026-08-27-dataset-row-text-jsonl-cli.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert measured["kind"] == "cli-compile-measured"
+    assert measured["compile_path"] == "dataset-row"
+    assert measured["sla_claim"] is False
+    assert measured["seal_passed"] is True
+    assert "schema_id" not in measured
+    assert measured["rss_method"] == "max-of-per-stage-/usr/bin/time-l"

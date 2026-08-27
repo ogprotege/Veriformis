@@ -20,3 +20,5 @@
 | Stop after 15.3 for operator review of baselines before 15.4 | Accepted | Lock 1 and lock 5; operator accepted 2026-08-26 |
 | Never publish a modest support tier from an unrepresentative fixture; keep measuring until a claim has evidence | Accepted | Operator instruction 2026-08-26: measure more first always; only honesty |
 | Do not start Phase 16 from this packet | Accepted | Roadmap: Phase 16 depends on 15 |
+| Dataset-row compile is measured with the existing CLI path; `scale-baseline` v1 still refuses dataset-row; 15.4 stays closed | Accepted | Operator instruction 2026-08-27; Ollama stopped; no oracle module; no new extra |
+| CLI multi-process RSS is not the 15.3b single-process `ru_maxrss` | Accepted | Operator-reported limitation on the 2026-08-27 dataset-row run |

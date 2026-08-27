@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.3b
+**Status:** Open — item 15.3c
 
 **Opened:** 2026-08-26
 
@@ -76,5 +76,25 @@ That run is not a retained scale benchmark.
       100×1000, PDF 2×8, plus tiny PDF and tiny duplicates.
 - [x] `measure-markdown-duplicates-10-40` compile refused:
       coverage `coverage-blocker-present`.
-- [x] Dataset-row compile remains unmeasured.
+- [x] Dataset-row compile remains unmeasured in 15.3b.
 - [x] Core pytest materializes the ladder and does not compile 100×1000.
+
+## Required item 15.3c evidence
+
+- [x] `scale-baseline --corpus-id ci-tiny-jsonl` refused:
+      `error[scale-invalid]: scale baseline v1 compiles document-source corpora only`,
+      exit 2. Retained at
+      [baselines/2026-08-27-scale-baseline-ci-tiny-jsonl.refused.json](baselines/2026-08-27-scale-baseline-ci-tiny-jsonl.refused.json).
+- [x] Operator CLI compile of `tests/regressions/fixtures/phase7/text.jsonl`
+      (55 bytes, two rows) through parse → map → curate → split → format →
+      validate → seal → verify. Confirmed plan
+      `mpl-v1-99155c717e9729d19f8cd3032fa4d58ce8dc719f06070f2294644a43b039668c`.
+      Seal passed. Verify grade `external_digest` on manifest
+      `d55fbddb01359dbb958b7b09bdd5110dd3e48ed53c1d8b81c17f5844028e2a0f`.
+- [x] Compile wall parse→verify 3.24 s. Peak RSS 74,399,744 bytes as the
+      max of separate CLI processes (~71.0 MiB). Workspace 114,954 bytes.
+      Bundle 12,052 bytes. Amplification is overhead. Not a support tier.
+      Recorded at
+      [baselines/2026-08-27-dataset-row-text-jsonl-cli.json](baselines/2026-08-27-dataset-row-text-jsonl-cli.json).
+- [x] Ollama was stopped. No oracle module. No new extra. `sla_claim`
+      false. Item 15.4 stays closed.
