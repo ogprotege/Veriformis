@@ -8,7 +8,7 @@
 | P15-R2 | Controlled for 15.2 | High | High | Generators become a second compiler or commit owner-library bytes | Synthetic specs only; no compile/export; destination must be empty |
 | P15-R3 | Controlled for 15.3 | High | High | GitHub CI is treated as the baseline machine | Tiny unmarked smoke; `scale_benchmark` excluded from core |
 | P15-R4 | Controlled for 15.4 | High | High | Targets are set before operator review of 15.3 | Empty `published_tiers`; observations are not SLAs |
-| P15-R5 | Open until 15.5 | High | High | Scale rewrite breaks determinism | Lock 2; sealed-bundle oracle; semantic fingerprints |
+| P15-R5 | Controlled for 15.5 | High | High | Scale rewrite breaks determinism | 15.5 skipped; no stage rewrite |
 | P15-R6 | Open until 15.8 | Medium | High | Sharding becomes a second compiler | Lock 6; derivatives only |
 | P15-R7 | Controlled | Medium | High | Mac scale UX invents policy in Swift | Lock 8; no Mac work in this packet |
 | P15-R8 | Controlled | Low | High | Phase 16 extension work starts from this packet | Packet and ledger forbid it |

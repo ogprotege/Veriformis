@@ -194,3 +194,30 @@ Local gates: `uv lock --check`; `ruff check src tests`;
 
 **Next action:** Open the item 15.4 pull request. Require every GitHub
 check, merge, and synchronize clean main. Do not start Phase 16.
+
+## 2026-08-27 — Item 15.4 merged
+
+**Status:** Phase 15.4 merged as PR #137 at
+`1c5c5a9fd296d66778881dd38964729026ec5e44`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Item 15.5 skips with a record; 15.4 named no bottleneck.
+
+## 2026-08-27 — Item 15.5 skipped: no named bottleneck
+
+**Status:** 15.5 is skipped. 15.4 published no tier and named no
+hot path to rewrite. No profiler. No stage rewrite.
+
+**Next action:** Record local gates, then publish the item 15.5 pull
+request. Do not start Phase 16.
+
+## 2026-08-27 — Item 15.5 local gates green
+
+**Status:** 15.5 skip record is on `phase15/05-measured-optimize`.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale 35 passed;
+`git diff --check` clean.
+
+**Next action:** Open the item 15.5 pull request. Require every GitHub
+check, merge, and synchronize clean main. Do not start Phase 16.

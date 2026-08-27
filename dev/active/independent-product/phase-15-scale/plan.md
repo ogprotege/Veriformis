@@ -1,6 +1,6 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.4
+**Status:** In progress — item 15.5
 
 **Last updated:** 2026-08-27
 
@@ -162,10 +162,9 @@ ergonomics stay the default.
 **Branch:** `phase15/05-measured-optimize`
 **Title:** `Phase 15.5: Profile and optimize measured bottlenecks`
 
-- [ ] Only hot paths 15.3 measured and 15.4 named. Profiler evidence in
-      the packet. Sealed-bundle oracle on shared fixtures. Small-corpus
-      results unchanged. Skip this item if 15.4 declared the current
-      path sufficient.
+- [x] Skipped with a record. 15.4 named no bottleneck and published no
+      tier. The current compile path stays. No profiler rewrite. Small-
+      corpus results unchanged.
 
 ### 15.6 Add streaming only where the oracle allows
 

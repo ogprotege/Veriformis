@@ -26,19 +26,19 @@ non-executable candidate; Phase 11 collection-plan ingest complete;
 Phase 12 optional Tesseract 5 OCR complete with `ocr-image` still
 explicitly unsupported for default parse; closeout merged as PR #112 at
 `892939f527974b69282296ded04eb3b43643554f`; Phase 13 quality intelligence
-complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only, no heuristic blocks seal; Phase 14 review workflows complete; Phase 15 scale work in progress at item 15.4; version `0.1.0` development alpha
+complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only, no heuristic blocks seal; Phase 14 review workflows complete; Phase 15 scale work in progress at item 15.5; version `0.1.0` development alpha
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–14 complete; Phase 15 in progress at item 15.4; quality report
+Phases 0–14 complete; Phase 15 in progress at item 15.5; quality report
 is preview-only; maturity alpha;
 public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command. Mac
 Review belongs to Phase 18. There is no published corpus tier.
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 15.4 scale support)
+**Last reviewed:** 2026-08-27 (independent-product Phase 15.5 skip)
 
-**Next review:** Sequential items 15.5–15.9, skipped with a record
+**Next review:** Sequential items 15.6–15.9, skipped with a record
 unless a named bottleneck exists, or any product-contract change. Do
 not start Phase 16 from this packet. No modest fig-leaf tier.
 

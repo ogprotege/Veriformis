@@ -1,6 +1,6 @@
 # Phase 15 — Measure and Engineer Scale, Streaming, and Sharding
 
-**Status:** In progress — item 15.4
+**Status:** In progress — item 15.5
 
 **Started:** 2026-08-26
 
@@ -42,7 +42,5 @@ Phase 18. Do not start Phase 16 from this packet.
 
 ## Current state
 
-Item 15.4 records the operator review of the measurement ladder.
-`published_tiers` is empty. Observed measurements are not an SLA. A
-modest fig-leaf tier is forbidden. Do not start Phase 16 from this
-packet.
+Item 15.5 is skipped with a record: 15.4 named no bottleneck. The
+current compile path stays. Do not start Phase 16 from this packet.

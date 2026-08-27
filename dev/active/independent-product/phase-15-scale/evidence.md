@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.4
+**Status:** Open — item 15.5
 
 **Opened:** 2026-08-26
 
@@ -109,3 +109,9 @@ That run is not a retained scale benchmark.
 - [x] `gap-retained-scale-benchmarks` closes; retained reports exist.
       No published corpus support tier.
 - [x] No rewrite. Item 15.5 may skip if no named bottleneck.
+
+## Required item 15.5 evidence
+
+- [x] Skipped with a record. 15.4 published no tier and named no
+      bottleneck. No profiler. No stage rewrite. Small-corpus path
+      unchanged.

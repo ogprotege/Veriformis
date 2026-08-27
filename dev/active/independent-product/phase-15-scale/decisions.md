@@ -23,3 +23,4 @@
 | Dataset-row compile is measured with the existing CLI path; `scale-baseline` v1 still refuses dataset-row; 15.4 stays closed | Accepted | Operator instruction 2026-08-27; Ollama stopped; no oracle module; no new extra |
 | CLI multi-process RSS is not the 15.3b single-process `ru_maxrss` | Accepted | Operator-reported limitation on the 2026-08-27 dataset-row run |
 | Operator reviewed the ladder; `published_tiers` stays empty; unmet sizes stay unmeasured | Accepted | Operator instruction 2026-08-27 to finish Phase 15; lock 5; no fig-leaf tier |
+| Item 15.5 is skipped; 15.4 named no bottleneck rewrite | Accepted | Packet skip rule; lock 5 |

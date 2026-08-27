@@ -49,7 +49,7 @@ under empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported. Phase 13 quality intelligence
 is complete with previewable gates and labeled fixtures. No heuristic
 blocks seal. Phase 14 review workflows are complete. Phase 15 scale
-work is in progress at item 15.4. Do not start Phase 16 from that
+work is in progress at item 15.5. Do not start Phase 16 from that
 packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
