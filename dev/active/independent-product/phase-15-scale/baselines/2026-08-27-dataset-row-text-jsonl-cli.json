@@ -1,0 +1,89 @@
+{
+  "bundle_id": "bundle-v1-8c9ba1e893c5cd804a9ffd60792e4305f11b211615e85073da7954b76ffae550",
+  "compile_path": "dataset-row",
+  "confirmation_digest": "7e7c7123f65a5407e7d69818355a2e9bab08f8c5499702d0a3f2b83a36f80241",
+  "dataset_rows": 2,
+  "fixture": "tests/regressions/fixtures/phase7/text.jsonl",
+  "goal_id": "learn-the-text",
+  "hardware": {
+    "implementation": "CPython",
+    "machine": "arm64",
+    "platform": "darwin",
+    "python_version": "3.12.13",
+    "veriformis_version": "0.1.0"
+  },
+  "kind": "cli-compile-measured",
+  "limitations": [
+    "amplification-is-overhead",
+    "compile-offline-ollama-stopped",
+    "multi-process-cli",
+    "not-a-support-tier",
+    "rss-is-max-of-stages-not-single-process",
+    "scale-baseline-v1-refuses-dataset-row",
+    "sla-claim-false",
+    "statistical-meaning-false",
+    "two-row-fixture"
+  ],
+  "mapping_plan_id": "mpl-v1-99155c717e9729d19f8cd3032fa4d58ce8dc719f06070f2294644a43b039668c",
+  "metrics": {
+    "bundle_amplification_approx": 219,
+    "bundle_bytes": 12052,
+    "peak_rss_bytes": 74399744,
+    "source_bytes": 55,
+    "wall_s": 3.24,
+    "workspace_amplification_approx": 2090,
+    "workspace_bytes": 114954
+  },
+  "note": "Two-row fixture. Amplification is workspace overhead. Peak RSS is the max of separate CLI processes, not the 15.3b single-process ru_maxrss. Not a support tier.",
+  "operation": "compile-dataset-row-cli",
+  "representation_id": "whole-text",
+  "rss_method": "max-of-per-stage-/usr/bin/time-l",
+  "seal_passed": true,
+  "seal_printed_grade": "self_consistent",
+  "sla_claim": false,
+  "stages": [
+    {
+      "name": "parse",
+      "rss_bytes": 72925184,
+      "wall_s": 0.4
+    },
+    {
+      "name": "map",
+      "rss_bytes": 73285632,
+      "wall_s": 0.28
+    },
+    {
+      "name": "curate",
+      "rss_bytes": 73875456,
+      "wall_s": 0.36
+    },
+    {
+      "name": "split",
+      "rss_bytes": 73842688,
+      "wall_s": 0.62
+    },
+    {
+      "name": "format",
+      "rss_bytes": 73990144,
+      "wall_s": 0.41
+    },
+    {
+      "name": "validate",
+      "rss_bytes": 73613312,
+      "wall_s": 0.31
+    },
+    {
+      "name": "seal",
+      "rss_bytes": 74399744,
+      "wall_s": 0.53
+    },
+    {
+      "name": "verify",
+      "rss_bytes": 73023488,
+      "wall_s": 0.33
+    }
+  ],
+  "statistical_meaning": false,
+  "verify_grade": "external_digest",
+  "verify_manifest_sha256": "d55fbddb01359dbb958b7b09bdd5110dd3e48ed53c1d8b81c17f5844028e2a0f"
+}

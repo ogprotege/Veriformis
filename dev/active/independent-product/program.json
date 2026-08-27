@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-26",
+  "last_updated": "2026-08-27",
   "status_values": [
     "planned",
     "in_progress",
@@ -172,7 +172,7 @@
       "packet": "dev/active/independent-product/phase-15-scale",
       "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Item 15.3b expands the measurement ladder. Reports are evidence, not SLAs. No modest fig-leaf tier. Do not start 15.4 until the operator reviews the ladder. Do not start Phase 16 from this packet."
+      "next_gate": "Item 15.3c records dataset-row CLI compile evidence and the scale-baseline dataset-row refusal. Reports are evidence, not SLAs. No modest fig-leaf tier. Item 15.4 stays closed. Do not start Phase 16 from this packet."
     },
     {
       "number": 16,

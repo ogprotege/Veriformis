@@ -1,0 +1,10 @@
+{
+  "corpus_id": "ci-tiny-jsonl",
+  "error_code": "scale-invalid",
+  "exit": 2,
+  "kind": "scale-baseline-refused",
+  "message": "scale baseline v1 compiles document-source corpora only",
+  "note": "Dataset-row compile was measured with the existing CLI path. This refusal is not a passing baseline and not a support tier.",
+  "sla_claim": false,
+  "statistical_meaning": false
+}

@@ -1,8 +1,8 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.3b
+**Status:** In progress — item 15.3c
 
-**Last updated:** 2026-08-26
+**Last updated:** 2026-08-27
 
 **Authority:** [Independent Product Roadmap](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 15; [program.json](../program.json); [Finished Dataset Contract v1](../../../../docs/contracts/finished-dataset-v1.md); [Verified Export Contract v1](../../../../docs/contracts/verified-export-v1.md).
 
@@ -128,9 +128,23 @@ ergonomics stay the default.
       10×40, 25×100, 50×400, 100×1000 markdown, PDF pages, and
       duplicates.
 - [x] Named-hardware reports retained as evidence. `sla_claim` stays
-      false. Dataset-row compile remains unmeasured.
+      false. Dataset-row compile remains unmeasured in 15.3b.
 - [x] Core pytest materializes the ladder; it does not compile the
       large points. No published tier.
+
+### 15.3c Record dataset-row CLI compile evidence
+
+**Branch:** `phase15/03c-dataset-row-cli-compile`
+**Title:** `Phase 15.3c: Record dataset-row CLI compile evidence`
+
+- [x] `scale-baseline --corpus-id ci-tiny-jsonl` refuses; retain that
+      as a refusal, not a passing baseline.
+- [x] Operator CLI compile of the two-row `text.jsonl` fixture through
+      seal/verify, with confirmed mapping plan, wall, RSS, workspace,
+      and bundle sizes. `sla_claim` stays false.
+- [x] Peak RSS is the max of separate CLI processes, not the 15.3b
+      single-process number. Amplification is overhead. Not a support
+      tier. Item 15.4 stays closed.
 
 ### 15.4 Publish operator-reviewed support tiers
 

@@ -129,3 +129,38 @@ core pytest 2269 passed, 17 deselected, 1 expected durability warning;
 **Next action:** Open the item 15.3b pull request. Require every GitHub
 check, merge, and synchronize clean main. Do not start 15.4 until the
 operator reviews the ladder.
+
+## 2026-08-26 — Item 15.3b merged
+
+**Status:** Phase 15.3b merged as PR #135 at
+`f4527a378c0b10141f34a710481aced12594a396`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Operator compiles dataset-row through the existing CLI.
+`scale-baseline` still refuses dataset-row. Item 15.4 stays closed.
+
+## 2026-08-27 — Item 15.3c dataset-row CLI compile
+
+**Status:** Operator dataset-row compile of the two-row `text.jsonl`
+fixture sealed and verified. `scale-baseline --corpus-id ci-tiny-jsonl`
+refused. Peak RSS is the max of separate CLI processes. Amplification
+is overhead. `sla_claim` stays false. No published tier. Item 15.4
+stays closed.
+
+**Next action:** Record local gates, then publish the item 15.3c pull
+request. Do not start 15.4. Do not start Phase 16.
+
+## 2026-08-27 — Item 15.3c local gates green
+
+**Status:** Dataset-row CLI compile evidence and the `scale-baseline`
+refusal are on `phase15/03c-dataset-row-cli-compile`. Two-row fixture
+sealed. Amplification is overhead. `sla_claim` stays false. Item 15.4
+stays closed.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale isolation and
+baseline 20 passed; `git diff --check` clean.
+
+**Next action:** Open the item 15.3c pull request. Require every GitHub
+check, merge, and synchronize clean main. Do not start 15.4. Do not
+start Phase 16.

@@ -10,7 +10,7 @@
 are named-hardware evidence. They are not a product SLA and do not
 publish a support tier.
 
-**Last reviewed:** 2026-08-26
+**Last reviewed:** 2026-08-27
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 15.
 
@@ -47,4 +47,5 @@ marker.
 
 Published support tiers. Throughput SLAs. Streaming or sharding. Mac
 progress chrome. Mid-stage compile cancellation. Dataset-row mapping
-compile in this report version.
+compile in this report version. An operator CLI compile of a two-row
+JSONL fixture is packet evidence, not this report schema.

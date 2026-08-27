@@ -14,3 +14,4 @@
 | P15-R8 | Controlled | Low | High | Phase 16 extension work starts from this packet | Packet and ledger forbid it |
 | P15-R9 | Open until 15.7 | Medium | High | Disk preflight guesses amplification | Lock 9; measure first |
 | P15-R10 | Controlled | Medium | Medium | Owner library bytes enter retained fixtures | Lock 3; synthetic generators only |
+| P15-R11 | Controlled for 15.3c | High | Medium | Dataset-row CLI RSS is compared to the 15.3b single-process peak | Record max-of-stages and the harness refusal separately |
