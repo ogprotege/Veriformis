@@ -1,32 +1,29 @@
 # Phase 15 — Measure and Engineer Scale, Streaming, and Sharding
 
-**Status:** In progress — item 15.5
+**Status:** Complete
 
 **Started:** 2026-08-26
 
-**Completed:**
+**Completed:** 2026-08-27
 
 **Roadmap phase:** [Phase 15](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-15--measure-and-engineer-scale-streaming-and-sharding)
 
 **Predecessor:** [Phase 14 closeout](../phase-14-review-workflows/closeout.md),
 merged as PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`.
-Clean local `main` equals `origin/main` there.
 
 ## Purpose
 
 Replace unknown scale behavior with named, reproducible support tiers
-and bounded-resource execution. There is no retained corpus benchmark
-or public scale guarantee today. Exact targets must follow measurement.
+and bounded-resource execution. Exact targets must follow measurement.
 
 ## Phase boundary
 
 Phase 15 owns measurement, declared tiers after operator-reviewed
 baselines, measured-bottleneck engineering, streaming and sharding only
 where the oracle and locks allow, and bounded-resource execution on
-`PipelineService` plus CLI/MCP. Item 15.1 opens the packet and proves
-current scale facts. It does not add generators, targets, streaming
-APIs, shard plans, or Mac progress chrome. Mac scale UX belongs to
-Phase 18. Do not start Phase 16 from this packet.
+`PipelineService` plus CLI/MCP. A modest fig-leaf tier is forbidden.
+Mac scale UX belongs to Phase 18. Do not start Phase 16 from this
+packet.
 
 ## Packet contents
 
@@ -42,5 +39,5 @@ Phase 18. Do not start Phase 16 from this packet.
 
 ## Current state
 
-Item 15.5 is skipped with a record: 15.4 named no bottleneck. The
-current compile path stays. Do not start Phase 16 from this packet.
+Phase 15 is complete. `published_tiers` is empty. 15.5–15.8 were
+skipped with a record. Do not start Phase 16 from this packet.

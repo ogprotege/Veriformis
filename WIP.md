@@ -8,11 +8,10 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 15.5 skipped: no named bottleneck)
+**Last reviewed:** 2026-08-27 (Phase 15 closeout)
 
-**Next review:** Sequential Phase 15 items 15.6–15.9, skipped with a
-record unless a named bottleneck exists. No modest fig-leaf tier.
-Do not start Phase 16 from this packet.
+**Next review:** Do not start Phase 16 from the Phase 15 packet. No
+modest fig-leaf tier.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -126,11 +125,10 @@ local, offline, and free of LLM generation.
       create new identities. Supersession keeps prior reviews auditable.
       Default `review_policy` stays `none`. Mac Review belongs to Phase
       18. Do not start Phase 15 from that packet.
-- [ ] Independent product Phase 15 is in progress under its
+- [x] Independent product Phase 15 is complete under its
       [packet](dev/active/independent-product/phase-15-scale/README.md).
-      Item 15.5 is skipped with a record: 15.4 named no bottleneck.
-      Reports are evidence, not SLAs. Sequential PRs 15.1–15.9. Do not
-      start Phase 16 from this packet.
+      `published_tiers` is empty. 15.5–15.8 skipped with a record. Do
+      not start Phase 16 from that packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -158,7 +156,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 12 | Add optional local OCR with accountable recovery | Completed | [Completed packet](dev/active/independent-product/phase-12-optional-ocr/README.md) |
 | 13 | Build dataset quality intelligence | Completed | [Completed packet](dev/active/independent-product/phase-13-quality-intelligence/README.md) |
 | 14 | Deliver human review and correction workflows | Completed | [Completed packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
-| 15 | Measure and engineer scale, streaming, and sharding | In progress | [Active packet](dev/active/independent-product/phase-15-scale/README.md) |
+| 15 | Measure and engineer scale, streaming, and sharding | Completed | [Completed packet](dev/active/independent-product/phase-15-scale/README.md) |
 | 16 | Establish a safe extension architecture | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 17 | Add governed advanced dataset families | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 18 | Complete the goal-first Mac workbench | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

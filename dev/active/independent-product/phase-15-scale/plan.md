@@ -1,6 +1,6 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.5
+**Status:** Complete
 
 **Last updated:** 2026-08-27
 
@@ -171,39 +171,37 @@ ergonomics stay the default.
 **Branch:** `phase15/06-streaming`
 **Title:** `Phase 15.6: Add streaming only where the oracle allows`
 
-- [ ] Iterator APIs and external sort only if compatible with ordering,
-      identity, curation, and leakage grouping, and only if 15.3/15.4
-      named them. Streaming output matches the non-streaming oracle. Not
-      for canonical JSON v1.
+- [x] Skipped with a record. 15.3/15.4 did not name streaming.
+      `streaming-compile` stays unmeasured. Canonical JSON v1 stays
+      unsharded.
 
 ### 15.7 Add bounded-resource execution
 
 **Branch:** `phase15/07-bounded-execution`
 **Title:** `Phase 15.7: Add bounded-resource execution`
 
-- [ ] Incremental parse/clean reuse, bounded queues, backpressure,
-      progress facts, checkpoint/resume, and measured disk-space
-      preflight. Build on Phase 2 cancel/workspace. No guessed preflight.
-      No Mac UI.
+- [x] Skipped with a record. Disk preflight would guess amplification
+      for unmeasured sizes. Phase 2 cancel and 15.3 between-stage cancel
+      remain. No Mac UI.
 
 ### 15.8 Add deterministic JSONL and Parquet sharding
 
 **Branch:** `phase15/08-deterministic-sharding`
 **Title:** `Phase 15.8: Add deterministic JSONL and Parquet sharding`
 
-- [ ] Shard plans with shard receipts and existing global semantic
-      fingerprints. Hugging Face `num_shards` only if 15.3 showed
-      one-shard export as the bottleneck. No workspace sharding. Canonical
-      JSON stays unsharded.
+- [x] Skipped with a record. One-shard export was not the measured
+      bottleneck. Hugging Face `num_shards` stays 1. Canonical JSON stays
+      unsharded. No workspace sharding.
 
 ### 15.9 Add adversarial scale tests and close Phase 15
 
 **Branch:** `phase15/09-adversarial-closeout`
 **Title:** `Phase 15.9: Add adversarial scale tests and close Phase 15`
 
-- [ ] Crash, cancel, disk exhaustion, file-descriptor limits, large
-      individual records, and cross-platform reproducibility. Small-corpus
-      invariant proven. Closeout. Do not start Phase 16 from this packet.
+- [x] Between-stage cancel leaves no bundle. Long rows materialize at
+      exact length. File count matches the spec. No guessed disk
+      preflight. Small-corpus generators replay. CI remains Ubuntu and
+      macOS. Closeout. Do not start Phase 16 from this packet.
 
 ## Usability criteria
 

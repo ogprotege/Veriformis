@@ -67,16 +67,15 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.5, skipped with a
-record: 15.4 named no bottleneck rewrite. `scale-support` discovery
-publishes an empty tier list. Observed reports are not an SLA. A modest
-fig-leaf tier is forbidden. Do not start Phase 16 from this packet.
+Phase 15 scale work is complete. Named-hardware reports exist.
+`scale-support` discovery publishes an empty tier list. 15.5–15.8 were
+skipped with a record. Observed reports are not an SLA. A modest
+fig-leaf tier is forbidden. Do not start Phase 16 from that packet.
 
-**Review date:** 2026-08-27 (independent-product Phase 15.5 skip)
+**Review date:** 2026-08-27 (independent-product Phase 15 closeout)
 
-**Next review:** Sequential items 15.6–15.9, skipped with a record
-unless a named bottleneck exists, or any contract change. Do not start
-Phase 16 from this packet.
+**Next review:** Do not start Phase 16 from the Phase 15 packet, or any
+contract change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
