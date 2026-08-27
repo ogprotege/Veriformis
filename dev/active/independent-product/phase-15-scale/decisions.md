@@ -10,7 +10,7 @@
 | Oracle is the sealed bundle; speed never licenses a different dataset | Accepted | Operator lock 2; product invariant 4 |
 | Retained corpora are synthetic generators; owner library bytes never enter the repo or CI | Accepted | Operator lock 3; corpus-demand `representative-scale` |
 | Named hardware is evidence, not a product SLA; CI smoke is tiny | Accepted | Operator lock 4 |
-| 15.5–15.8 fire only against bottlenecks 15.3 measured and 15.4 named; stopping after a modest declared tier is success | Accepted | Operator lock 5 |
+| 15.5–15.8 fire only against bottlenecks measured and later named; a modest fig-leaf tier is forbidden | Accepted | Operator lock 5, restated 2026-08-26: measure more first; only honesty |
 | Sharding is export, not a second compiler; canonical JSON v1 keeps its no-scale claim; distributed execution is a non-goal | Accepted | Operator lock 6 |
 | Small-corpus golden path stays the default unless a versioned migration is named | Accepted | Operator lock 7 |
 | Surfaces are `PipelineService` plus CLI/MCP; Mac scale UX belongs to Phase 18 | Accepted | Operator lock 8; composition-root invariant |
@@ -18,4 +18,5 @@
 | Phase 13 quality and Phase 14 review stay orthogonal; they are not a default scale compile tax | Accepted | Operator lock 10 |
 | No generators, targets, streaming APIs, or shard plans in 15.1 | Accepted | Honesty pattern of 13.1 and 14.1 |
 | Stop after 15.3 for operator review of baselines before 15.4 | Accepted | Lock 1 and lock 5; operator accepted 2026-08-26 |
+| Never publish a modest support tier from an unrepresentative fixture; keep measuring until a claim has evidence | Accepted | Operator instruction 2026-08-26: measure more first always; only honesty |
 | Do not start Phase 16 from this packet | Accepted | Roadmap: Phase 16 depends on 15 |

@@ -5,13 +5,12 @@ append-only history.
 
 **Updated:** 2026-08-26
 
-**Local branch:** `phase15/03-baseline-harness`
+**Local branch:** `phase15/03b-measurement-ladder`
 
-**Completed:** 15.1 (PR #132), 15.2 (PR #133 at
-`481fb32ee68ab546ad151e4c520b5761bf6135a4`)
+**Completed:** 15.1 (PR #132), 15.2 (PR #133), 15.3 (PR #134 at
+`367cf4e4a484983f9b858ba527e1f054402ae1c5`)
 
-**Current item:** 15.3 Record named-hardware baselines. Reports are not
-SLAs. No published tiers.
+**Current item:** 15.3b Expand the measurement ladder. No modest
+fig-leaf tier. No published support table.
 
-**Not started:** 15.4–15.9. Phase 16. Stop after 15.3 for operator
-review.
+**Not started:** 15.4–15.9. Phase 16.

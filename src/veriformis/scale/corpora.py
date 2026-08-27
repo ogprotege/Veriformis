@@ -185,9 +185,92 @@ def ci_tiny_specs() -> tuple[ScaleCorpusSpec, ...]:
     )
 
 
+def measurement_ladder_specs() -> tuple[ScaleCorpusSpec, ...]:
+    """Named measurement points. These are not support tiers."""
+    return (
+        ScaleCorpusSpec.create(
+            corpus_id="measure-markdown-10-40",
+            input_mode="document-source",
+            file_count=10,
+            record_count=40,
+            row_length=128,
+            nesting_depth=0,
+            pdf_pages=0,
+            duplicate_rate_ppm=0,
+            container="split-jsonl-directory",
+            seed="measure-markdown-10-40",
+        ),
+        ScaleCorpusSpec.create(
+            corpus_id="measure-markdown-25-100",
+            input_mode="document-source",
+            file_count=25,
+            record_count=100,
+            row_length=256,
+            nesting_depth=0,
+            pdf_pages=0,
+            duplicate_rate_ppm=0,
+            container="split-jsonl-directory",
+            seed="measure-markdown-25-100",
+        ),
+        ScaleCorpusSpec.create(
+            corpus_id="measure-markdown-50-400",
+            input_mode="document-source",
+            file_count=50,
+            record_count=400,
+            row_length=512,
+            nesting_depth=0,
+            pdf_pages=0,
+            duplicate_rate_ppm=0,
+            container="split-jsonl-directory",
+            seed="measure-markdown-50-400",
+        ),
+        ScaleCorpusSpec.create(
+            corpus_id="measure-markdown-100-1000",
+            input_mode="document-source",
+            file_count=100,
+            record_count=1000,
+            row_length=1024,
+            nesting_depth=0,
+            pdf_pages=0,
+            duplicate_rate_ppm=0,
+            container="split-jsonl-directory",
+            seed="measure-markdown-100-1000",
+        ),
+        ScaleCorpusSpec.create(
+            corpus_id="measure-pdf-2-8",
+            input_mode="document-source",
+            file_count=2,
+            record_count=8,
+            row_length=32,
+            nesting_depth=0,
+            pdf_pages=4,
+            duplicate_rate_ppm=0,
+            container="split-jsonl-directory",
+            seed="measure-pdf-2-8",
+        ),
+        ScaleCorpusSpec.create(
+            corpus_id="measure-markdown-duplicates-10-40",
+            input_mode="document-source",
+            file_count=10,
+            record_count=40,
+            row_length=128,
+            nesting_depth=0,
+            pdf_pages=0,
+            duplicate_rate_ppm=500000,
+            container="split-jsonl-directory",
+            seed="measure-markdown-duplicates-10-40",
+        ),
+    )
+
+
+def packaged_scale_specs() -> tuple[ScaleCorpusSpec, ...]:
+    """Tiny CI specs plus the measurement ladder. Unknown ids fail closed."""
+    return tuple((*ci_tiny_specs(), *measurement_ladder_specs()))
+
+
 def spec_by_corpus_id(corpus_id: str) -> ScaleCorpusSpec:
-    """Return one packaged tiny spec. Unknown ids fail closed."""
-    for spec in ci_tiny_specs():
+    """Return one packaged spec. Unknown ids fail closed."""
+    for spec in packaged_scale_specs():
         if spec.corpus_id == corpus_id:
             return spec
     raise ScaleError(f"unknown scale corpus id {corpus_id!r}")

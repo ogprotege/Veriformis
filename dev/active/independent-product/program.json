@@ -172,7 +172,7 @@
       "packet": "dev/active/independent-product/phase-15-scale",
       "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Item 15.3 records named-hardware baselines. Reports are evidence, not SLAs. Stop after 15.3 for operator review before 15.4. Do not start Phase 16 from this packet."
+      "next_gate": "Item 15.3b expands the measurement ladder. Reports are evidence, not SLAs. No modest fig-leaf tier. Do not start 15.4 until the operator reviews the ladder. Do not start Phase 16 from this packet."
     },
     {
       "number": 16,

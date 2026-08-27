@@ -1,0 +1,11 @@
+{
+  "corpus_id": "measure-markdown-duplicates-10-40",
+  "finding_codes": [
+    "coverage-blocker-present"
+  ],
+  "gate_id": "coverage",
+  "kind": "compile-refused",
+  "note": "A 50 percent exact-duplicate markdown corpus under default full_text failed the coverage gate after curation. This is not a support tier and not a passing baseline.",
+  "sla_claim": false,
+  "statistical_meaning": false
+}

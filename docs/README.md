@@ -6,9 +6,9 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–14 complete; Phase 15 in progress).
 
-**Last reviewed:** 2026-08-26 (independent-product Phase 15.3 baselines)
+**Last reviewed:** 2026-08-26 (independent-product Phase 15.3b ladder)
 
-**Next review:** Operator review of 15.3 baseline reports before item
+**Next review:** Operator review of the measurement ladder before item
 15.4, or any contract change. Do not start Phase 16 from this
 packet. Default parse still refuses image-only PDF.
 
@@ -117,7 +117,7 @@ packet. Default parse still refuses image-only PDF.
 | [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
 | [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Completed; closeout PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680` |
 | [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows | Completed implementation record |
-| [Phase 15 packet](../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding | Active packet; item 15.3 records named-hardware baselines |
+| [Phase 15 packet](../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding | Active packet; item 15.3b measurement ladder |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |
