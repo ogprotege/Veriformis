@@ -5,11 +5,12 @@ append-only history.
 
 **Updated:** 2026-08-27
 
-**Local branch:** `phase15/05-measured-optimize`
+**Local branch:** `phase15/06-09-close-scale`
 
-**Completed:** 15.1–15.4 (PR #137 at
-`1c5c5a9fd296d66778881dd38964729026ec5e44`)
+**Completed:** 15.1–15.5 (PR #138 at
+`f3c6bd4a300048358a9453b168ee4e8270e47b4e`)
 
-**Current item:** 15.5 skipped with a record. 15.4 named no bottleneck.
+**Current item:** 15.6–15.9 skip unmeasured work, adversarial checks,
+and closeout.
 
-**Not started:** 15.6–15.9. Phase 16.
+**Not started:** Phase 16.

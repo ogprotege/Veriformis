@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.5
+**Status:** Closed — Phase 15 complete
 
 **Opened:** 2026-08-26
 
@@ -115,3 +115,24 @@ That run is not a retained scale benchmark.
 - [x] Skipped with a record. 15.4 published no tier and named no
       bottleneck. No profiler. No stage rewrite. Small-corpus path
       unchanged.
+
+## Required item 15.6 evidence
+
+- [x] Skipped with a record. Streaming was not named. Canonical JSON
+      v1 stays unsharded.
+
+## Required item 15.7 evidence
+
+- [x] Skipped with a record. Disk preflight would guess. No
+      `disk-preflight` command. Between-stage cancel remains.
+
+## Required item 15.8 evidence
+
+- [x] Skipped with a record. Hugging Face `num_shards` stays 1. No
+      workspace sharding.
+
+## Required item 15.9 evidence
+
+- [x] Long rows materialize at exact length. File count matches the
+      spec. Cancel leaves no bundle. No guessed preflight. Small-corpus
+      generators replay. Closeout. Do not start Phase 16.

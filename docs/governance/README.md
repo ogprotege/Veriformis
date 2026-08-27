@@ -2,11 +2,10 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 15.5 skip)
+**Last reviewed:** 2026-08-27 (independent-product Phase 15 closeout)
 
-**Next review:** Sequential items 15.6–15.9, skipped with a record
-unless a named bottleneck exists, or governance-schema change. Do not
-start Phase 16 from the Phase 15 packet.
+**Next review:** Do not start Phase 16 from the Phase 15 packet, or
+governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -54,7 +53,7 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–14 are complete on `main`
-and Phase 15 is in progress at item 15.5. Phase 14 closeout merged as
+and Phase 15 is complete. Phase 14 closeout merged as
 PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`. There is no
 retained scale benchmark, published corpus tier, or public scale
 guarantee. The quality report is preview-only. Construction

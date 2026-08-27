@@ -112,9 +112,9 @@ item 15.1 proves there is no retained benchmark; item 15.2 adds
 deterministic synthetic corpora; item 15.3 records named-hardware
 baselines; item 15.3b expands the measurement ladder; item 15.3c
 records dataset-row CLI compile evidence; item 15.4 records empty
-published support tiers; item 15.5 is skipped because 15.4 named no
-bottleneck. A modest fig-leaf tier is forbidden. Do not start Phase 16
-from that packet.
+published support tiers; items 15.5–15.8 are skipped with a record;
+item 15.9 closes the phase. A modest fig-leaf tier is forbidden. Do
+not start Phase 16 from that packet.
 
 ## State change procedure
 

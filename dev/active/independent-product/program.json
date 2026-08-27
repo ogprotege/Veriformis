@@ -167,12 +167,12 @@
     {
       "number": 15,
       "title": "Measure and engineer scale, streaming, and sharding",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [4, 7, 9, 11],
       "packet": "dev/active/independent-product/phase-15-scale",
       "started_on": "2026-08-26",
-      "completed_on": null,
-      "next_gate": "Item 15.5 is skipped with a record: 15.4 named no bottleneck. Do not start Phase 16 from this packet."
+      "completed_on": "2026-08-27",
+      "next_gate": "Completed. Named-hardware reports exist. published_tiers is empty. 15.5–15.8 skipped with a record. Do not start Phase 16 from this packet."
     },
     {
       "number": 16,

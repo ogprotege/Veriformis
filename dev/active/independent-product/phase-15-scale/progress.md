@@ -221,3 +221,33 @@ Local gates: `uv lock --check`; `ruff check src tests`;
 
 **Next action:** Open the item 15.5 pull request. Require every GitHub
 check, merge, and synchronize clean main. Do not start Phase 16.
+
+## 2026-08-27 — Item 15.5 merged
+
+**Status:** Phase 15.5 merged as PR #138 at
+`f3c6bd4a300048358a9453b168ee4e8270e47b4e`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Skip 15.6–15.8 with a record. Close Phase 15 at 15.9.
+
+## 2026-08-27 — Items 15.6–15.9 skip unmeasured work and closeout
+
+**Status:** 15.6 streaming, 15.7 bounded execution, and 15.8 sharding
+are skipped with a record. 15.9 adds cancel, long-row, file-count, and
+no-preflight checks and closes the packet. `published_tiers` stays
+empty. Do not start Phase 16.
+
+**Next action:** Record local gates, then publish the closeout pull
+request.
+
+## 2026-08-27 — Items 15.6–15.9 local gates green
+
+**Status:** Skip records, adversarial checks, and closeout are on
+`phase15/06-09-close-scale`.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale 40 passed;
+`git diff --check` clean.
+
+**Next action:** Open the closeout pull request. Require every GitHub
+check, merge, and synchronize clean main. Do not start Phase 16.

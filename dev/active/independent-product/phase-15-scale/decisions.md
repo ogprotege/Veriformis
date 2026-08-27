@@ -24,3 +24,5 @@
 | CLI multi-process RSS is not the 15.3b single-process `ru_maxrss` | Accepted | Operator-reported limitation on the 2026-08-27 dataset-row run |
 | Operator reviewed the ladder; `published_tiers` stays empty; unmet sizes stay unmeasured | Accepted | Operator instruction 2026-08-27 to finish Phase 15; lock 5; no fig-leaf tier |
 | Item 15.5 is skipped; 15.4 named no bottleneck rewrite | Accepted | Packet skip rule; lock 5 |
+| Items 15.6–15.8 are skipped; streaming, guessed preflight, and sharding were not named | Accepted | Packet skip rule; U5; U8 |
+| Phase 15 closes without a published corpus support tier | Accepted | Operator review; lock 5; empty `published_tiers` |
