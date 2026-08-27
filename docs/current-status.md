@@ -71,11 +71,15 @@ Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
 skipped with a record. Observed reports are not an SLA. A modest
 fig-leaf tier is forbidden. Do not start Phase 16 from that packet.
+Phase 16 extension architecture is in progress under its own packet. Item
+16.1 records the pre-extension baseline only. No extension contract,
+executable registry, loader, public plugin API, or additional capability is
+implemented yet.
 
-**Review date:** 2026-08-27 (independent-product Phase 15 closeout)
+**Review date:** 2026-08-27 (independent-product Phase 16.1 packet open)
 
-**Next review:** Do not start Phase 16 from the Phase 15 packet, or any
-contract change.
+**Next review:** Phase 16.1 merge, item 16.2 extension contract, or any
+capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -768,8 +772,13 @@ See [docs/release.md](release.md).
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
 | Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
 | Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
+| Completed independent Phase 11 | Shared collection plan v1, deterministic inventory, parser hardening, and parser identity pins; archives, parser subprocesses, and new input families skipped |
+| Completed independent Phase 12 | Optional local Tesseract 5 OCR with classified recovery, thresholds, and preview; empty `ocr` extra; default parse still refuses image-only PDF |
+| Completed independent Phase 13 | Versioned quality report, preview-only gates, and labeled fixtures; no heuristic blocks seal |
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–14 complete and Phase 15 in progress under the [Phase 15 packet](../dev/active/independent-product/phase-15-scale/README.md); do not start Phase 16 from that packet |
+| Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
+| In-progress independent Phase 16.1 | [Extension architecture packet](../dev/active/independent-product/phase-16-extension-architecture/README.md), tracking truth, and pre-extension isolation tests only; no protocol, executable registry, loader, or public plugin API yet |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–15 complete and Phase 16 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -825,40 +834,24 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–4 are complete, and Phase 5.1–5.3 supply the first
-three supported generic derivative containers. The completed
-[taxonomy packet](../dev/active/independent-product/phase-03-taxonomy/README.md)
-records the contract, compile compatibility, cross-surface discovery, public
-vocabulary cleanup, and persisted-v1 compatibility evidence. The completed
-Phase 4 verified-export foundation is recorded in its
-[closeout packet](../dev/active/independent-product/phase-04-verified-export-foundation/README.md).
-Its strict cross-surface export API and adversarial closeout harness preserve
-the boundary: private hooks are trusted conformance code, not an
-untrusted plugin boundary, and semantic replay currently retains each complete
-produced file in memory. The statically bounded fixture does not establish a
-scalable public parser; any future shipped semantic profile must enforce
-explicit resource limits. Phase 5.1–5.3 add production exact-byte split-JSONL,
-canonical-JSON, and constrained-CSV renderers without adding a semantic
-replayer. Shipped discovery lists `constrained-csv`, `json`, and
-`split-jsonl-directory` v1 with no consumer profile. Split JSONL's v1 defaults
-and strict v2 options change only derivative filenames and provenance
-inclusion; canonical JSON and constrained CSV have fixed v1 trees and no
-options. None changes dataset membership. Constrained CSV's supported-schema
-subset excludes nested `messages`. Phase 5.4's post-export transport and Phase
-5.5's test-only consolidated matrix are merged; the latter proves the eleven compatible
-ordinary-file round trips and three container tamper failures without adding an
-importer or replayer. Phase 5.6's runtime preview merged as PR #58 and changes
-no persisted or support state. Phase 5.7's operator guide closes the phase
-without changing that capability boundary. New trainer-specific profiles are
-not current capabilities; the canonical and optional Aptus
-profiles remain the implemented profile set. A deliberate beta label and
-public Mac checklist remain separate decisions.
+Independent-product Phases 0–15 are complete. The current critical-path work is
+Phase 16 under the
+[extension-architecture packet](../dev/active/independent-product/phase-16-extension-architecture/README.md).
+Item 16.1 changes tracking truth and adds isolation tests only. Parser dispatch
+remains the suffix chain, constructors retain their private exact lookup, row
+mapping remains a compiler path, quality gates remain preview-only, exporters
+and consumer profiles retain one private catalog, optional extras stay empty,
+and the seven-axis taxonomy gains no extension axis. Phase 4.7 render and
+replay hooks remain trusted conformance code rather than a public plugin
+boundary.
 
-See the [generic export operator guide](generic-exports.md),
-[Phase 5 closeout](../dev/active/independent-product/phase-05-generic-local-exports/closeout.md),
-[independent product analysis](analysis/2026-08-11-independent-product-analysis.md),
+The next behavior change is the item 16.2 internal declaration contract. It
+cannot load code or change dispatch. Public executable plugins remain
+prohibited unless the Phase 16.8 threat model and a later operator decision
+approve a sandbox. Phase 17 semantics, Mac extension UI, YAML plugin config,
+and Hub publication remain outside Phase 16.
+
+See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),
-[historical private beta workbench plan](plans/2026-08-06-private-beta-workbench.md),
-[install guide](install.md), [release guide](release.md),
-[beta limitations](beta-limitations.md), and
-[beta readiness audit](../dev/active/group-9-public-release/beta-readiness-audit.md).
+[product contract](product-contract.md), [install guide](install.md),
+[release guide](release.md), and [beta limitations](beta-limitations.md).

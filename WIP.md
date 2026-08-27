@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `47297f6` on `main` after PR #98
+**Implementation baseline reviewed:** `435bd63` on `main` after PR #139
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
+Phases 0–2; independent-product Phases 0–15 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 15 closeout)
+**Last reviewed:** 2026-08-27 (Phase 16.1 packet open)
 
-**Next review:** Do not start Phase 16 from the Phase 15 packet. No
-modest fig-leaf tier.
+**Next review:** Phase 16.1 packet and pre-extension isolation PR. No extension
+contract or executable registry before item 16.2.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -129,6 +129,10 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-15-scale/README.md).
       `published_tiers` is empty. 15.5–15.8 skipped with a record. Do
       not start Phase 16 from that packet.
+- [ ] Independent product Phase 16 is in progress under its
+      [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
+      Item 16.1 records the existing architecture only. No extension contract,
+      executable registry, loader, extra, or public plugin API exists yet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -157,7 +161,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 13 | Build dataset quality intelligence | Completed | [Completed packet](dev/active/independent-product/phase-13-quality-intelligence/README.md) |
 | 14 | Deliver human review and correction workflows | Completed | [Completed packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Completed | [Completed packet](dev/active/independent-product/phase-15-scale/README.md) |
-| 16 | Establish a safe extension architecture | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 16 | Establish a safe extension architecture | In progress | [Active packet](dev/active/independent-product/phase-16-extension-architecture/README.md) |
 | 17 | Add governed advanced dataset families | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 18 | Complete the goal-first Mac workbench | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 19 | Complete automation and optional publication boundaries | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
@@ -584,7 +588,9 @@ Remaining documentation debt:
 
 ## Known current limitations
 
-- OCR is unsupported (empty-text PDFs refuse with a named limitation).
+- Default parse refuses image-only PDFs with a named limitation. Optional
+  Tesseract 5 recovery is explicit, local, and isolated under the empty `ocr`
+  extra; `ocr-image` remains unsupported as a default input family.
 - Declared inputs are text, Markdown, DOCX, HTML, digitally-born PDF, CSV,
   JSON, JSONL, and listed source-code formats — not arbitrary binary.
 - The checked-in optional Aptus adapter policy rejects plain `text` rows; live

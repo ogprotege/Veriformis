@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–14 complete; Phase 15 in progress
+**Status:** Active program — Phases 0–15 complete; Phase 16 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -30,7 +30,8 @@ with roadmap headings.
 - [Phase 12 — Add optional local OCR with accountable recovery](phase-12-optional-ocr/README.md) — complete
 - [Phase 13 — Build dataset quality intelligence](phase-13-quality-intelligence/README.md) — complete
 - [Phase 14 — Deliver human review and correction workflows](phase-14-review-workflows/README.md) — complete
-- [Phase 15 — Measure and engineer scale, streaming, and sharding](phase-15-scale/README.md) — in progress
+- [Phase 15 — Measure and engineer scale, streaming, and sharding](phase-15-scale/README.md) — complete
+- [Phase 16 — Establish a safe extension architecture](phase-16-extension-architecture/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -113,8 +114,15 @@ deterministic synthetic corpora; item 15.3 records named-hardware
 baselines; item 15.3b expands the measurement ladder; item 15.3c
 records dataset-row CLI compile evidence; item 15.4 records empty
 published support tiers; items 15.5–15.8 are skipped with a record;
-item 15.9 closes the phase. A modest fig-leaf tier is forbidden. Do
+item 15.9 closed the phase. A modest fig-leaf tier is forbidden. Do
 not start Phase 16 from that packet.
+
+Phase 15 closeout merged as PR #139 at
+`435bd63c90778674ff4eb68a5d882a168349baca`. Phase 16 opened from that clean
+baseline under its own [packet](phase-16-extension-architecture/README.md).
+Item 16.1 records the existing architecture and adds isolation tests only. No
+extension contract, executable registry, loader, extra, or public plugin API
+exists yet.
 
 ## State change procedure
 
