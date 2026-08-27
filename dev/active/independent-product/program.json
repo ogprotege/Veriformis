@@ -172,7 +172,7 @@
       "packet": "dev/active/independent-product/phase-15-scale",
       "started_on": "2026-08-26",
       "completed_on": null,
-      "next_gate": "Item 15.3c records dataset-row CLI compile evidence and the scale-baseline dataset-row refusal. Reports are evidence, not SLAs. No modest fig-leaf tier. Item 15.4 stays closed. Do not start Phase 16 from this packet."
+      "next_gate": "Item 15.4 records operator-reviewed scale support with empty published_tiers. Observations are not SLAs. No modest fig-leaf tier. Do not start Phase 16 from this packet."
     },
     {
       "number": 16,

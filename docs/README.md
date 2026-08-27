@@ -6,11 +6,12 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–14 complete; Phase 15 in progress).
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 15.3c dataset-row CLI compile)
+**Last reviewed:** 2026-08-27 (independent-product Phase 15.4 scale support)
 
-**Next review:** Item 15.4 stays closed until the operator says the
-evidence is enough, or any contract change. Do not start Phase 16
-from this packet. Default parse still refuses image-only PDF.
+**Next review:** Sequential items 15.5–15.9, skipped with a record
+unless a named bottleneck exists, or any contract change. Do not
+start Phase 16 from this packet. Default parse still refuses
+image-only PDF.
 
 ## Start here
 
@@ -73,6 +74,7 @@ from this packet. Default parse still refuses image-only PDF.
 | [Review v1](contracts/review-v1.md) | Reviewer, queues, packet exchange, corrections, sampling, seal block, supersession | Implemented through Phase 14; Mac Review is Phase 18 |
 | [Scale Corpus v1](contracts/scale-corpus-v1.md) | Deterministic synthetic benchmark corpora | Generators implemented |
 | [Scale Baseline v1](contracts/scale-baseline-v1.md) | Named-hardware compile evidence | Reports are not an SLA; no published tier |
+| [Scale Support v1](contracts/scale-support-v1.md) | Operator-reviewed scale support discovery | Empty `published_tiers`; observations are not an SLA |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
@@ -117,7 +119,7 @@ from this packet. Default parse still refuses image-only PDF.
 | [Phase 12 packet](../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR | Completed implementation record; closeout PR #112 at `892939f527974b69282296ded04eb3b43643554f` |
 | [Phase 13 packet](../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence | Completed; closeout PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680` |
 | [Phase 14 packet](../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows | Completed implementation record |
-| [Phase 15 packet](../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding | Active packet; item 15.3c dataset-row CLI compile evidence |
+| [Phase 15 packet](../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding | Active packet; item 15.4 empty published tiers |
 | [Existing-dataset import](mapping.md) | Document-source vs dataset-row vs mixed, confirmation, partitions, JSON/CSV | Operator guide |
 | [Historical build roadmap](plans/2026-07-29-veriformis-roadmap.md) | Implemented Groups 1–7 and release-gate history | Historical evidence |
 | [Historical private beta workbench vision](plans/2026-08-06-private-beta-workbench.md) | Implemented private workbench Phases 0–2 | Historical evidence |

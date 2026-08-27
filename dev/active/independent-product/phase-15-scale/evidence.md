@@ -1,6 +1,6 @@
 # Phase 15 Evidence
 
-**Status:** Open — item 15.3c
+**Status:** Open — item 15.4
 
 **Opened:** 2026-08-26
 
@@ -98,3 +98,14 @@ That run is not a retained scale benchmark.
       [baselines/2026-08-27-dataset-row-text-jsonl-cli.json](baselines/2026-08-27-dataset-row-text-jsonl-cli.json).
 - [x] Ollama was stopped. No oracle module. No new extra. `sla_claim`
       false. Item 15.4 stays closed.
+
+## Required item 15.4 evidence
+
+- [x] Operator reviewed the ladder. `published_tiers` is empty. A modest
+      fig-leaf tier is forbidden.
+- [x] `veriformis.scale-support-discovery/v1` names observed reports,
+      retained refusals, and unmeasured work. `sla_claim` is false.
+- [x] Python, CLI `scale-support`, and MCP `scale_support` agree.
+- [x] `gap-retained-scale-benchmarks` closes; retained reports exist.
+      No published corpus support tier.
+- [x] No rewrite. Item 15.5 may skip if no named bottleneck.

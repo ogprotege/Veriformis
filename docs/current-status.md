@@ -67,18 +67,17 @@ identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
 recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
-Phase 15 scale work is in progress at item 15.3c: a measurement ladder
-of synthetic document-source corpora has named-hardware reports, and a
-two-row dataset-row CLI compile has been measured. `scale-baseline` v1
-still refuses dataset-row. Reports are not an SLA. A modest fig-leaf
-tier is forbidden. There is still no published corpus tier. Item 15.4
-stays closed. Do not start Phase 16 from this packet.
+Phase 15 scale work is in progress at item 15.4: the operator reviewed
+the measurement ladder. `scale-support` discovery publishes an empty
+tier list. Observed reports are not an SLA. A modest fig-leaf tier is
+forbidden. Unmet sizes stay unmeasured. `scale-baseline` v1 still
+refuses dataset-row. Do not start Phase 16 from this packet.
 
-**Review date:** 2026-08-27 (independent-product Phase 15.3c dataset-row CLI compile)
+**Review date:** 2026-08-27 (independent-product Phase 15.4 scale support)
 
-**Next review:** Item 15.4 stays closed until the operator says the
-evidence is enough, or any contract change. Do not start Phase 16
-from this packet.
+**Next review:** Sequential items 15.5–15.9, skipped with a record
+unless a named bottleneck exists, or any contract change. Do not start
+Phase 16 from this packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -416,6 +415,8 @@ The installed console entry point is `veriformis`.
 | `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
+| `scale-support` | Prints operator-reviewed scale support discovery (`veriformis.scale-support-discovery/v1`) | Empty `published_tiers`; observations are not an SLA; byte-identical to MCP `scale_support` |
+| `scale-baseline --corpus-id ID --work-root DIR` | Records a named-hardware compile baseline | Report is not an SLA; dataset-row corpora fail closed |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
 | `profile-admissions` | Prints implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not launch training |
 | `candidate-profile-admissions` | Prints remaining Phase 10 candidate pins (`veriformis.candidate-profile-admission-discovery/v1`): Unsloth experimental and not executable | Read-only terminal output, byte-identical to MCP `candidate_profile_admissions`; does not emit files or launch training |

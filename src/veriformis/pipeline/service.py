@@ -1126,6 +1126,12 @@ class PipelineService:
 
         return discover_candidate_profile_admissions()
 
+    def discover_scale_support(self) -> dict[str, Any]:
+        """Return operator-reviewed scale support discovery. Tiers stay empty."""
+        from veriformis.scale.support import scale_support_discovery
+
+        return scale_support_discovery()
+
     def discover_columnar_schemas(self) -> dict[str, Any]:
         """Return packaged Arrow and Hugging Face feature schema pins."""
         from veriformis.exports.columnar_schemas import discover_columnar_schemas

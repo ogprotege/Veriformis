@@ -1,6 +1,6 @@
 # Phase 15 Execution Plan
 
-**Status:** In progress — item 15.3c
+**Status:** In progress — item 15.4
 
 **Last updated:** 2026-08-27
 
@@ -151,10 +151,11 @@ ergonomics stay the default.
 **Branch:** `phase15/04-support-tiers`
 **Title:** `Phase 15.4: Publish operator-reviewed support tiers`
 
-- [ ] Operator reviews the measurement ladder. Publish named tiers
+- [x] Operator reviews the measurement ladder. Publish named tiers
       only from evidenced ceilings. A modest fig-leaf tier is
       forbidden. Unmet sizes stay unmeasured, not "supported small".
-      No rewrite.
+      No rewrite. `published_tiers` is empty. Observations and
+      refusals are discovery, not an SLA.
 
 ### 15.5 Profile and optimize measured bottlenecks
 

@@ -20,6 +20,7 @@ from veriformis.scale import (
     materialize_scale_corpus,
     measurement_ladder_specs,
     run_named_tiny_baseline,
+    scale_support_catalog,
 )
 
 
@@ -99,15 +100,13 @@ def test_seventeen_finished_dataset_gates_are_unchanged() -> None:
     assert len(V1_FINISHED_DATASET_GATES) == 17
 
 
-def test_retained_scale_benchmark_gap_stays_open() -> None:
+def test_retained_scale_benchmark_gap_is_closed() -> None:
     gaps = _support()["known_current_gaps"]
     assert isinstance(gaps, list)
-    retained = next(
-        item
+    assert all(
+        not (isinstance(item, dict) and item.get("id") == "gap-retained-scale-benchmarks")
         for item in gaps
-        if isinstance(item, dict) and item.get("id") == "gap-retained-scale-benchmarks"
     )
-    assert retained["state"] == "verified-open"
 
 
 def test_representative_scale_corpus_gap_stays_open() -> None:
@@ -133,6 +132,11 @@ def test_support_registry_publishes_no_corpus_tiers() -> None:
     assert isinstance(product, dict)
     for key in ("corpus_tiers", "scale_tiers", "support_tiers"):
         assert key not in product
+    scale = support["scale"]
+    assert isinstance(scale, dict)
+    assert scale["published_tiers"] == []
+    assert scale["sla_claim"] is False
+    assert scale["statistical_meaning"] is False
 
 
 def test_canonical_json_v1_makes_no_scale_claim() -> None:
@@ -152,18 +156,21 @@ def test_hugging_face_dataset_pins_one_shard_per_split() -> None:
 def test_cli_exposes_baseline_not_tiers() -> None:
     names = {command.name for command in app.registered_commands}
     assert "scale-baseline" in names
+    assert "scale-support" in names
     assert names.isdisjoint(_FORBIDDEN_CLI)
 
 
 def test_mcp_exposes_baseline_not_tiers() -> None:
     tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
     assert "scale_baseline" in tools
+    assert "scale_support" in tools
     assert tools.isdisjoint(_FORBIDDEN_MCP)
 
 
 def test_pipeline_service_exposes_baseline_not_tiers() -> None:
     service = PipelineService()
     assert hasattr(service, "run_scale_baseline")
+    assert hasattr(service, "discover_scale_support")
     for name in _FORBIDDEN_SERVICE:
         assert not hasattr(service, name)
 
@@ -177,10 +184,12 @@ def test_scale_package_has_harness_and_no_published_tiers() -> None:
     module = importlib.import_module("veriformis.scale")
     assert hasattr(module, "materialize_scale_corpus")
     assert hasattr(module, "run_named_tiny_baseline")
+    assert hasattr(module, "scale_support_discovery")
     assert materialize_scale_corpus is module.materialize_scale_corpus
     assert run_named_tiny_baseline is module.run_named_tiny_baseline
     assert ci_tiny_specs()
     assert measurement_ladder_specs()
+    assert scale_support_catalog().published_tiers == ()
     assert not hasattr(module, "publish_scale_tiers")
     assert not hasattr(module, "ScaleTier")
 

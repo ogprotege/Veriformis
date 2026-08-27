@@ -1,0 +1,121 @@
+{
+  "contract_id": "veriformis.scale-support",
+  "contract_version": 1,
+  "observed": [
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-ci-tiny-duplicates.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "ci-tiny-duplicates",
+      "peak_rss_bytes": 78643200,
+      "seal_observed": true,
+      "source_bytes": 182,
+      "wall_ns": 594725625
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-ci-tiny-markdown.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "ci-tiny-markdown",
+      "peak_rss_bytes": 75300864,
+      "seal_observed": true,
+      "source_bytes": 242,
+      "wall_ns": 677161584
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-ci-tiny-pdf.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "ci-tiny-pdf",
+      "peak_rss_bytes": 77725696,
+      "seal_observed": true,
+      "source_bytes": 860,
+      "wall_ns": 482553792
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-27-dataset-row-text-jsonl-cli.json",
+      "input_mode": "dataset-row",
+      "kind": "cli-compile-measured",
+      "observation_id": "dataset-row-text-jsonl-cli",
+      "peak_rss_bytes": 74399744,
+      "seal_observed": true,
+      "source_bytes": 55,
+      "wall_s": 3.24
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-measure-markdown-10-40.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "measure-markdown-10-40",
+      "peak_rss_bytes": 81657856,
+      "seal_observed": true,
+      "source_bytes": 5530,
+      "wall_ns": 2676144667
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-measure-markdown-100-1000.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "measure-markdown-100-1000",
+      "peak_rss_bytes": 682885120,
+      "seal_observed": true,
+      "source_bytes": 1042810,
+      "wall_ns": 86914409125
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-measure-markdown-25-100.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "measure-markdown-25-100",
+      "peak_rss_bytes": 91930624,
+      "seal_observed": true,
+      "source_bytes": 26850,
+      "wall_ns": 7332244209
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-measure-markdown-50-400.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "measure-markdown-50-400",
+      "peak_rss_bytes": 173522944,
+      "seal_observed": true,
+      "source_bytes": 209710,
+      "wall_ns": 31852469625
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-measure-pdf-2-8.json",
+      "input_mode": "document-source",
+      "kind": "named-hardware-baseline",
+      "observation_id": "measure-pdf-2-8",
+      "peak_rss_bytes": 682885120,
+      "seal_observed": true,
+      "source_bytes": 2944,
+      "wall_ns": 870824583
+    }
+  ],
+  "operator_review": "2026-08-27",
+  "published_tiers": [],
+  "refusals": [
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-27-scale-baseline-ci-tiny-jsonl.refused.json",
+      "kind": "scale-baseline-refused",
+      "observation_id": "ci-tiny-jsonl",
+      "sla_claim": false
+    },
+    {
+      "evidence": "dev/active/independent-product/phase-15-scale/baselines/2026-08-26-measure-markdown-duplicates-10-40.refused.json",
+      "kind": "compile-refused",
+      "observation_id": "measure-markdown-duplicates-10-40",
+      "sla_claim": false
+    }
+  ],
+  "schema_id": "veriformis.scale-support-discovery/v1",
+  "sla_claim": false,
+  "statistical_meaning": false,
+  "unmeasured": [
+    "dataset-row-at-ladder-scale",
+    "document-source-above-1-mib",
+    "export-sharding-as-bottleneck",
+    "streaming-compile"
+  ]
+}

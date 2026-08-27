@@ -8,11 +8,11 @@ Phases 0–2; independent-product Phases 0–9 complete; Phase 10.2 pinned)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 15.3c dataset-row CLI compile)
+**Last reviewed:** 2026-08-27 (Phase 15.4 scale support declaration)
 
-**Next review:** Item 15.4 stays closed until the operator says the
-evidence is enough. No modest fig-leaf tier. Do not start Phase 16
-from this packet.
+**Next review:** Sequential Phase 15 items 15.5–15.9, skipped with a
+record unless a named bottleneck exists. No modest fig-leaf tier.
+Do not start Phase 16 from this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -128,11 +128,10 @@ local, offline, and free of LLM generation.
       18. Do not start Phase 15 from that packet.
 - [ ] Independent product Phase 15 is in progress under its
       [packet](dev/active/independent-product/phase-15-scale/README.md).
-      Item 15.3c records dataset-row CLI compile evidence and the
-      `scale-baseline` dataset-row refusal. Reports are evidence,
-      not SLAs. A modest fig-leaf tier is forbidden. Sequential PRs
-      15.1–15.9. Item 15.4 stays closed. Do not start Phase 16 from
-      this packet.
+      Item 15.4 records operator-reviewed scale support with empty
+      `published_tiers`. Reports are evidence, not SLAs. A modest
+      fig-leaf tier is forbidden. Sequential PRs 15.1–15.9. Do not
+      start Phase 16 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

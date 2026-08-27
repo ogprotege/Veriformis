@@ -111,9 +111,9 @@ merged as PR #131 at `44a1a94150171d9bca4049f5d8069885494e4192`. Phase
 item 15.1 proves there is no retained benchmark; item 15.2 adds
 deterministic synthetic corpora; item 15.3 records named-hardware
 baselines; item 15.3b expands the measurement ladder; item 15.3c
-records dataset-row CLI compile evidence. A modest fig-leaf tier is
-forbidden. Item 15.4 stays closed. Do not start Phase 16 from that
-packet.
+records dataset-row CLI compile evidence; item 15.4 records empty
+published support tiers. A modest fig-leaf tier is forbidden. Do not
+start Phase 16 from that packet.
 
 ## State change procedure
 

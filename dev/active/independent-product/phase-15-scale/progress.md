@@ -164,3 +164,33 @@ baseline 20 passed; `git diff --check` clean.
 **Next action:** Open the item 15.3c pull request. Require every GitHub
 check, merge, and synchronize clean main. Do not start 15.4. Do not
 start Phase 16.
+
+## 2026-08-27 — Item 15.3c merged
+
+**Status:** Phase 15.3c merged as PR #136 at
+`56e54dccf7a40ab6fd8c72fe6d1fdcfa8171a978`. Clean local `main` equals
+`origin/main` there.
+
+**Next action:** Operator instructed to finish Phase 15. Item 15.4
+records the review: no published corpus support tier.
+
+## 2026-08-27 — Item 15.4 operator-reviewed support declaration
+
+**Status:** `veriformis.scale-support-discovery/v1` publishes an empty
+tier list. Observed reports and refusals are discovery. `sla_claim`
+is false. Unmet sizes stay unmeasured. No rewrite.
+
+**Next action:** Record local gates, then publish the item 15.4 pull
+request. Do not start Phase 16.
+
+## 2026-08-27 — Item 15.4 local gates green
+
+**Status:** Scale support discovery is on `phase15/04-support-tiers`.
+`published_tiers` is empty. `sla_claim` is false.
+
+Local gates: `uv lock --check`; `ruff check src tests`;
+`scripts/check_project_tracking.py` PASS; focused scale 35 passed;
+`git diff --check` clean.
+
+**Next action:** Open the item 15.4 pull request. Require every GitHub
+check, merge, and synchronize clean main. Do not start Phase 16.

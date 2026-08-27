@@ -15,6 +15,11 @@ from veriformis.scale.corpora import (
     render_text_pdf,
     spec_by_corpus_id,
 )
+from veriformis.scale.support import (
+    scale_support_catalog,
+    scale_support_catalog_json,
+    scale_support_discovery,
+)
 from veriformis.scale.models import (
     BASELINE_LIMITATIONS,
     BASELINE_STAGES,
@@ -51,5 +56,8 @@ __all__ = [
     "request_scale_cancellation",
     "run_named_tiny_baseline",
     "run_scale_baseline",
+    "scale_support_catalog",
+    "scale_support_catalog_json",
+    "scale_support_discovery",
     "spec_by_corpus_id",
 ]
