@@ -74,10 +74,11 @@ Phase 15 from that packet.
 Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
 skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
-architecture is in progress. Item 16.4 merged as PR #143 at
-`e70c13d6f42cc884c1599a96fd92cda052dd1d42`. Item 16.5 migrates the text
-parser through the protocol. Other suffixes keep existing dispatch. No
-third-party plugin support or loader.
+architecture is in progress. Item 16.5 merged as PR #144 at
+`858b2833f041480e22fd415f484ad4075da4c4d0`. Item 16.6 binds generic
+`split-jsonl-directory` through the protocol. Other containers and
+consumer profiles stay on the private catalog. No third-party plugin
+support or loader.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `e70c13d` on `main` after PR #143
+**Implementation baseline reviewed:** `858b283` on `main` after PR #144
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–15 complete; Phase 16.1 packet open)
+Phases 0–2; independent-product Phases 0–15 complete; Phase 16.5 text parser)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.5 text parser migration)
+**Last reviewed:** 2026-08-27 (Phase 16.6 split-JSONL migration)
 
-**Next review:** Phase 16.5 text-parser PR. No exporter migration before
-item 16.6.
+**Next review:** Phase 16.6 split-JSONL PR. No compatibility kit before
+item 16.7.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -131,10 +131,10 @@ local, offline, and free of LLM generation.
       not start Phase 16 from that packet.
 - [ ] Independent product Phase 16 is in progress under its
       [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
-      Item 16.4 merged as PR #143 at
-      `e70c13d6f42cc884c1599a96fd92cda052dd1d42`. Item 16.5 migrates the
-      text parser through the protocol. Other suffixes keep existing
-      dispatch.
+      Item 16.5 merged as PR #144 at
+      `858b2833f041480e22fd415f484ad4075da4c4d0`. Item 16.6 binds generic
+      `split-jsonl-directory` through the protocol. Other containers and
+      consumer profiles stay on the private catalog.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

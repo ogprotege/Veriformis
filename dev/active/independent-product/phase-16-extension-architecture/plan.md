@@ -114,8 +114,8 @@ operation is permitted in this item.
 
 **Branch:** `phase16/06-migrate-split-jsonl`
 
-- [ ] Bind `split-jsonl-directory` only through the protocol.
-- [ ] Preserve exact files, membership, receipt digest, and the single export
+- [x] Bind `split-jsonl-directory` only through the protocol.
+- [x] Preserve exact files, membership, receipt digest, and the single export
       catalog. Leave all other containers and profiles unchanged.
 
 ### 16.7 Publish the compatibility test kit

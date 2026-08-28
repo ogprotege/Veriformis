@@ -37,6 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.4 merged as PR #143 at `e70c13d6f42cc884c1599a96fd92cda052dd1d42`.
-Item 16.5 migrates the text parser through the protocol. Other suffixes keep
-existing dispatch.
+Item 16.5 merged as PR #144 at `858b2833f041480e22fd415f484ad4075da4c4d0`.
+Item 16.6 binds generic `split-jsonl-directory` only through the protocol.
+Other containers and consumer profiles stay on the private catalog.

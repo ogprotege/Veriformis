@@ -145,6 +145,12 @@ def test_exports_and_profiles_still_share_one_private_catalog() -> None:
     assert any(item.descriptor.consumer_profile is None for item in catalog)
     assert any(item.descriptor.consumer_profile is not None for item in catalog)
     assert implementation_module.__all__ == []
+    source = inspect.getsource(ExportService._resolve_implementation)
+    assert "bound_split_jsonl_exporter" in source
+    assert "request.consumer_id is None" in source
+    assert source.index("bound_split_jsonl_exporter") < source.index(
+        "for implementation in self._catalog()"
+    )
 
 
 def test_quality_gates_remain_preview_only() -> None:

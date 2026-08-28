@@ -5,14 +5,14 @@ append-only history.
 
 **Updated:** 2026-08-27
 
-**Local branch:** `phase16/05-migrate-text-parser`
+**Local branch:** `phase16/06-migrate-split-jsonl`
 
-**Completed:** Item 16.4, PR #143 at
-`e70c13d6f42cc884c1599a96fd92cda052dd1d42`.
+**Completed:** Item 16.5, PR #144 at
+`858b2833f041480e22fd415f484ad4075da4c4d0`.
 
-**Current item:** 16.5 migrate the text parser through the protocol.
+**Current item:** 16.6 migrate split-jsonl-directory through the protocol.
 
-**Next gate:** Publish the 16.5 pull request, require every GitHub check,
-merge, and synchronize clean `main` before 16.6.
+**Next gate:** Publish the 16.6 pull request, require every GitHub check,
+merge, and synchronize clean `main` before 16.7.
 
-**Not started:** 16.6 through 16.10. Phase 17.
+**Not started:** 16.7 through 16.10. Phase 17.

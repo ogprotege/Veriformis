@@ -136,3 +136,28 @@ The core suite passed 2,331 tests with 17 deselected.
 
 **Next action:** Publish the item 16.5 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.6.
+
+## 2026-08-27: Item 16.5 merged; item 16.6 in progress
+
+**Status:** Item 16.5 merged as PR #144 at
+`858b2833f041480e22fd415f484ad4075da4c4d0` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.6 began.
+
+Item 16.6 binds generic `split-jsonl-directory` only through the protocol and
+returns the same private catalog object. Canonical JSON, constrained CSV,
+columnar containers, and every consumer profile stay on the catalog loop.
+Unknown exporter contract versions fail closed and name the supported version.
+Still one catalog. Still no trainer claim.
+
+**Next action:** Run the complete item 16.6 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.7.
+
+## 2026-08-27: Item 16.6 local gates green
+
+**Status:** Generic `split-jsonl-directory` is bound through the protocol and
+is the same catalog object. Focused tests passed. The core suite passed 2,337
+tests with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 16.6 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.7.
