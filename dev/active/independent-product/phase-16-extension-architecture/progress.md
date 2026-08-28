@@ -62,3 +62,30 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 16.2 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.3.
+
+## 2026-08-27: Item 16.2 merged; item 16.3 in progress
+
+**Status:** Item 16.2 merged as PR #141 at
+`4534975fb7d97aef392c6ba0481ea7bd4af1e052` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.3 began.
+
+Item 16.3 wraps existing parser functions, `execute_mapping`, `_CONSTRUCTORS`,
+quality detectors and preview-only gates, and the one export catalog behind a
+built-in-only registry owned by `PipelineService`. Suffix dispatch, constructor
+lookup, mapping execution, and export selectors stay on their current
+functions. Third-party origin is refused. No loader, extra, CLI operation, or
+MCP operation is added.
+
+**Next action:** Run the complete item 16.3 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.4.
+
+## 2026-08-27: Item 16.3 local gates green
+
+**Status:** Existing bindings are wrapped without changing dispatch. The
+focused registry and isolation suite passed 45 tests. Project tracking, Ruff,
+the lock check, and `git diff --check` passed. The core suite passed 2,323
+tests with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 16.3 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.4.

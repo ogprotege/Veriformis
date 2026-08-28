@@ -57,13 +57,13 @@ def test_extension_package_is_protocol_only() -> None:
     assert not (ROOT / "src/veriformis/extensions.py").exists()
     assert not (ROOT / "src/veriformis/_extensions.py").exists()
     assert not (ROOT / "src/veriformis/_extensions").exists()
-    assert not (ROOT / "src/veriformis/extensions/registry.py").exists()
+    assert (ROOT / "src/veriformis/extensions/registry.py").exists()
     assert not (ROOT / "src/veriformis/extensions/loader.py").exists()
     from veriformis.extensions import __all__ as exported
 
     assert "load_capability_declaration" in exported
+    assert "builtin_registry" in exported
     assert "install" not in exported
-    assert "registry" not in exported
     assert "load_entry_points" not in exported
 
 

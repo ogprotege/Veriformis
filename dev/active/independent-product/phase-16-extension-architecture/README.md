@@ -37,6 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.1 merged as PR #140 at `76c0e2e90d95874b3e117f95554c428c70da1daf`.
-Item 16.2 pins `veriformis.extension-protocol/v1`. No executable registry,
-loader, extra, or public plugin API exists yet.
+Item 16.2 merged as PR #141 at `4534975fb7d97aef392c6ba0481ea7bd4af1e052`.
+Item 16.3 wraps existing bindings in a built-in-only registry. No loader,
+dispatch change, extra, or public plugin API.

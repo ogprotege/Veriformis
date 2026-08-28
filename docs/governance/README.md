@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.2 protocol pin)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.3 internal registries)
 
-**Next review:** Phase 16.2 merge, item 16.3 internal registries, or
+**Next review:** Phase 16.3 merge, item 16.4 capability declarations, or
 governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability

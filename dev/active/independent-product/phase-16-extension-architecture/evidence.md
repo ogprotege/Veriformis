@@ -64,8 +64,34 @@ GitHub checks: all 18 passed on PR #140. Merge SHA
 - [x] No loader, executable registry, extra, CLI operation, MCP operation, or
       dispatch change.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.3.
+
+GitHub checks: all 18 passed on PR #141. Merge SHA
+`4534975fb7d97aef392c6ba0481ea7bd4af1e052`.
+
+## Required item 16.3 evidence
+
+- [x] Built-in-only registry wraps parsers, mapping, constructors, quality
+      checks, and the one export catalog.
+- [x] Suffix dispatch, constructor lookup, and export selectors unchanged.
+- [x] Third-party origin refused. No loader, extra, CLI, or MCP operation.
+- [x] Parse reports, constructor selectors, export selectors, and a sealed
+      bundle identity remain identical on existing fixtures.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.3.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.4.
+
+## Item 16.3 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/extensions/test_internal_registries.py tests/extensions/test_phase16_extension_isolation.py tests/extensions/test_extension_protocol.py` | 45 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,323 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 16.2 local gate evidence
 

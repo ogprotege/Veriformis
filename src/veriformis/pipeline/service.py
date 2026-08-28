@@ -93,6 +93,10 @@ from veriformis.errors import (
     TaxonomyError,
     UnsupportedWorkspaceVersionError,
 )
+from veriformis.extensions.registry import (
+    BuiltinExtensionRegistry,
+    builtin_registry,
+)
 from veriformis.exports import (
     CancellationCheck,
     DEFAULT_EXPORT_SERVICE,
@@ -1041,11 +1045,23 @@ class PipelineService:
         self._export_service = (
             DEFAULT_EXPORT_SERVICE if export_service is None else export_service
         )
+        self._extensions = builtin_registry(
+            export_catalog=self._export_service._catalog()
+        )
 
     @property
     def export_service(self) -> ExportService:
         """Return the sole service authorized to derive exports from bundles."""
         return getattr(self, "_export_service", DEFAULT_EXPORT_SERVICE)
+
+    @property
+    def extension_registry(self) -> BuiltinExtensionRegistry:
+        """Return the built-in-only wrap of existing executable bindings."""
+        return getattr(
+            self,
+            "_extensions",
+            builtin_registry(export_catalog=self.export_service._catalog()),
+        )
 
     def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
         """Return a fresh, adapter-safe copy of implemented taxonomy discovery."""

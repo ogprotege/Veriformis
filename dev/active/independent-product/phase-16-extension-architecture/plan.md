@@ -85,10 +85,10 @@ operation is permitted in this item.
 
 **Branch:** `phase16/03-internal-registries`
 
-- [ ] Wrap existing parser dispatch, row mapping, constructors, quality
+- [x] Wrap existing parser dispatch, row mapping, constructors, quality
       checks, exporters, and profiles behind built-in-only typed registries.
-- [ ] Preserve one export catalog and the unchanged default runtime path.
-- [ ] Prove unchanged parse reports, constructor selectors, export selectors,
+- [x] Preserve one export catalog and the unchanged default runtime path.
+- [x] Prove unchanged parse reports, constructor selectors, export selectors,
       and sealed-bundle identities.
 
 ### 16.4 Declare built-in capabilities

@@ -74,9 +74,9 @@ Phase 15 from that packet.
 Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
 skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
-architecture is in progress. Item 16.1 merged as PR #140 at
-`76c0e2e90d95874b3e117f95554c428c70da1daf`. Item 16.2 pins
-`veriformis.extension-protocol/v1`. No loader, executable registry, extra,
+architecture is in progress. Item 16.2 merged as PR #141 at
+`4534975fb7d97aef392c6ba0481ea7bd4af1e052`. Item 16.3 wraps existing
+bindings in a built-in-only registry. No loader, dispatch change, extra,
 or public plugin API.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
@@ -249,7 +249,7 @@ Key modules under `src/veriformis/` are:
 - `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
 - `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing);
 - `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
-- `extensions/` for the internal extension protocol (16.2 schema pin; no loader);
+- `extensions/` for the internal extension protocol and built-in-only registry (no loader);
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

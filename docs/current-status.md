@@ -72,13 +72,13 @@ Phase 15 scale work is complete. Named-hardware reports exist.
 skipped with a record. Observed reports are not an SLA. A modest
 fig-leaf tier is forbidden. Do not start Phase 16 from that packet.
 Phase 16 extension architecture is in progress under its own packet. Item
-16.1 merged as PR #140 at `76c0e2e90d95874b3e117f95554c428c70da1daf`.
-Item 16.2 pins `veriformis.extension-protocol/v1`. No executable registry,
-loader, public plugin API, extra, or additional capability is implemented.
+16.2 merged as PR #141 at `4534975fb7d97aef392c6ba0481ea7bd4af1e052`.
+Item 16.3 wraps existing bindings in a built-in-only registry. No loader,
+dispatch change, extra, or public plugin API.
 
-**Review date:** 2026-08-27 (independent-product Phase 16.2 protocol pin)
+**Review date:** 2026-08-27 (independent-product Phase 16.3 internal registries)
 
-**Next review:** Phase 16.2 merge, item 16.3 internal registries, or any
+**Next review:** Phase 16.3 merge, item 16.4 capability declarations, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -777,7 +777,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 13 | Versioned quality report, preview-only gates, and labeled fixtures; no heuristic blocks seal |
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
-| In-progress independent Phase 16.2 | [Extension protocol v1](contracts/extension-protocol-v1.md) schema pin for six kinds, origins, and lifecycles; load/refuse only; no executable registry, loader, dispatch change, extra, or public plugin API |
+| In-progress independent Phase 16.3 | Built-in-only wraps of existing parsers, the mapping function, constructors, quality checks, and the one export catalog; suffix dispatch and constructor lookup unchanged; no loader or public plugin API |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–15 complete and Phase 16 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
@@ -837,16 +837,17 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–15 are complete. The current critical-path work is
 Phase 16 under the
 [extension-architecture packet](../dev/active/independent-product/phase-16-extension-architecture/README.md).
-Item 16.1 recorded the pre-extension baseline. Item 16.2 pins
-`veriformis.extension-protocol/v1`. Parser dispatch remains the suffix chain,
-constructors retain their private exact lookup, row mapping remains a compiler
-path, quality gates remain preview-only, exporters and consumer profiles retain
-one private catalog, optional extras stay empty, and the seven-axis taxonomy
-gains no extension axis. Phase 4.7 render and replay hooks remain trusted
-conformance code rather than a public plugin boundary.
+Item 16.2 pinned `veriformis.extension-protocol/v1`. Item 16.3 wraps existing
+bindings in a built-in-only registry owned by `PipelineService`. Parser dispatch
+remains the suffix chain, constructors retain their private exact lookup, row
+mapping remains a compiler path, quality gates remain preview-only, exporters
+and consumer profiles retain one private catalog, optional extras stay empty,
+and the seven-axis taxonomy gains no extension axis. Phase 4.7 render and
+replay hooks remain trusted conformance code rather than a public plugin
+boundary.
 
-The next behavior change is the item 16.3 internal typed registry wrap. It
-cannot load entry points or migrate a kind off its current function. Public
+The next behavior change is the item 16.4 read-only capability declarations.
+It cannot make declarations executable or load third-party code. Public
 executable plugins remain prohibited unless the Phase 16.8 threat model and a
 later operator decision approve a sandbox. Phase 17 semantics, Mac extension
 UI, YAML plugin config, and Hub publication remain outside Phase 16.
