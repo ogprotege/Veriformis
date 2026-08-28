@@ -212,3 +212,29 @@ durability warning.
 
 **Next action:** Publish the item 17.8 pull request, require every
 GitHub check, merge, and synchronize clean `main` before item 17.9.
+
+## 2026-08-28: Item 17.8 merged; item 17.9 in progress
+
+**Status:** Item 17.8 merged as PR #157 at
+`d4070236512dbf4f1827de1500360bb2d41c535b` after all 18 GitHub checks
+passed. Clean local `main` equaled `origin/main` there before 17.9
+began.
+
+Item 17.9 publishes ADR-0018 covering offline default, model identity,
+supplied evidence, output identity, required review, isolation from
+deterministic v1 claims, and dataset-project code execution. Decision A:
+no compile-path generator in Phase 17. This PR adds no `GeneratorPass`.
+
+**Next action:** Run the complete item 17.9 local gates, publish the
+pull request, require every GitHub check, merge, and synchronize clean
+`main` before item 17.10.
+
+## 2026-08-28: Item 17.9 local gates green
+
+**Status:** ADR-0018 records Decision A. Focused tests passed 39.
+Project tracking, Ruff, the lock check, and `git diff --check` passed.
+The core suite passed 2,452 tests with 17 deselected and the one
+expected durability warning. No `GeneratorPass` was added.
+
+**Next action:** Publish the item 17.9 pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 17.10.

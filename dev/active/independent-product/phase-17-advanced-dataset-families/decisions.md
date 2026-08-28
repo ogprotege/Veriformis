@@ -18,6 +18,7 @@
 | Keep taxonomy as capability state, not the executable registry; add no eighth axis | Accepted | Taxonomy v1 |
 | Do not admit families through the extension protocol | Accepted | ADR-0017 |
 | Keep generation off by default; stop after 17.9 for operator review | Accepted | Phase 17 operator gate |
+| Record ADR-0018 Decision A: no compile-path generator in Phase 17 | Accepted | 17.9 threat model; generation skipped in 17.10 |
 | Keep multimodal `explicitly_unsupported` and pre-tokenized planned | Accepted | Taxonomy v1 and Phase 17 non-goals |
 | Keep `PipelineService` as policy owner; no Mac UI; do not start Phase 18 from this packet | Accepted | Product invariant 2 |
 | Pin `veriformis.advanced-family-admission/v1` as a schema-only contract in 17.2 | Accepted | No execute; taxonomy stays planned |

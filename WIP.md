@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–16 complete; Phase 17.1 packet open
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 17.8 stepwise admission)
+**Last reviewed:** 2026-08-28 (Phase 17.9 generator boundary)
 
-**Next review:** Phase 17.8 merge, or item 17.9 generator boundary. Do not
-map trainer profiles onto stepwise rows in this item.
+**Next review:** Phase 17.9 merge, or item 17.10 closeout. Do not add a
+`GeneratorPass` in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -146,7 +146,8 @@ local, offline, and free of LLM generation.
       user-provided pairs; unpaired and ranking schemas skipped with a
       record. Item 17.7 admits `tool-call-conversations` from
       user-provided traces without widening two-turn `messages`. Item
-      17.8 admits `stepwise-supervision` from user-provided steps. Do
+      17.8 admits `stepwise-supervision` from user-provided steps. Item
+      17.9 records ADR-0018 Decision A: no compile-path generator. Do
       not start Phase 18 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).

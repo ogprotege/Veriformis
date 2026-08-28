@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.8 stepwise)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.9 generator)
 
-**Next review:** Phase 17.8 merge, or governance-schema change.
+**Next review:** Phase 17.9 merge, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -64,4 +64,5 @@ Phase 18. Optional Tesseract 5 recovery is isolated under empty extra
 explicitly unsupported. Axolotl, LLaMA-Factory, and Aptus are
 implemented optional adapters. Unsloth remains a non-executable
 candidate. Extra lists for those names stay empty. ADR-0017 Decision A
-stands. Do not start Phase 18 from this packet.
+stands. ADR-0018 Decision A: no compile-path generator. Do not start
+Phase 18 from this packet.

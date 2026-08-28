@@ -53,9 +53,9 @@ work is complete. Phase 16 extension architecture is
 complete. ADR-0017 Decision A: no untrusted loader.
 Public plugins skipped with a record. Phase 17 advanced dataset
 families is in progress under its own packet. Item 17.8 admits
-`stepwise-supervision` from user-provided ordered steps. Copied source
-text is never labeled reasoning. Existing trainer profiles refuse the
-new schema. Do not start Phase 18 from that packet.
+`stepwise-supervision` from user-provided ordered steps. Item 17.9
+records ADR-0018 Decision A: no compile-path generator. Do not start
+Phase 18 from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

@@ -13,6 +13,6 @@
 | P17-R7 | Open | High | High | Trainer profiles claim DPO, tools, or ranking before a family pin | Profiles keep refusing until an independently admitted mapping |
 | P17-R8 | Open | Medium | High | Quality heuristics or default review start blocking seal | Preview-only gates; default `review_policy` remains `none` |
 | P17-R9 | Open | High | High | Family admission is smuggled through the extension protocol | L12; closed six-kind protocol; ADR-0017 |
-| P17-R10 | Open | Medium | High | A generator enters the compile path before 17.9 | Operator gate; no `GeneratorPass` until licensed |
+| P17-R10 | Controlled | Medium | High | A generator enters the compile path before 17.9 | ADR-0018 Decision A; no `GeneratorPass`; `generation_allowed` stays false |
 | P17-R11 | Controlled | Medium | High | Multimodal or pre-tokenized generic family is treated as admitted | Taxonomy states; skip records at closeout |
 | P17-R12 | Controlled | Low | High | Mac UI invents family policy | Mac work excluded until Phase 18 |

@@ -34,16 +34,16 @@ Phases 0–16 complete; Phase 17 in progress with
 `explicit-label-classification`, `preference-and-ranking`,
 `tool-call-conversations`, and `stepwise-supervision` admitted on
 the dataset-row path and no
-generator; `veriformis.extension-protocol/v1`
+generator under ADR-0018 Decision A; `veriformis.extension-protocol/v1`
 remains built-in-only with no loader; quality report is preview-only;
 maturity alpha;
 public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command. Mac
 Review belongs to Phase 18. There is no published corpus tier.
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.8 stepwise)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.9 generator)
 
-**Next review:** Phase 17.8 merge, item 17.9 generator boundary, or any
+**Next review:** Phase 17.9 merge, item 17.10 closeout, or any
 product-contract change. No modest fig-leaf tier. No public plugin API.
 Do not start Phase 18 from the Phase 17 packet.
 
@@ -323,7 +323,7 @@ The product may describe this as faithful, source-grounded, loss-accounted, or p
 
 The v1 dataset pipeline makes no LLM calls and performs no remote model generation. The implemented deterministic builders create full-text, continuation, section-reconstruction, before-and-after transformation, and structured-field candidates when the recipe states a truthful task and every constructed field has evidence. Structured-field construction binds each selected strict-IR scalar to its immutable artifact, RFC 6901 pointer, exact value digest, encoding, output digest, and construction context.
 
-The roadmap's future `GeneratorPass` is optional, post-v1 work. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, row-lowering, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
+The roadmap's future `GeneratorPass` is optional, post-v1 work. ADR-0018 Decision A records that Phase 17 does not install it. It is not required for the deterministic product release. It requires a separate owner-approved implementation plan. Any future generator must record model identity and immutable revision, prompt and system-prompt digests, parameters, source evidence supplied to the model, candidate output, provider version, reproducibility limits, and review policy. Its candidates must pass through the same construction promotion, curation, split, row-lowering, validation, and sealing contracts. It may not bypass them or weaken deterministic workflows.
 
 ## Trainer-facing semantics and optional Aptus integration
 

@@ -186,7 +186,7 @@ def test_generation_allowed_fails_closed() -> None:
     )
     with pytest.raises(
         FamilyAdmissionError,
-        match="cannot allow generation until the generator boundary",
+        match="ADR-0018 Decision A forbids a compile-path generator",
     ):
         load_family_admission(payload)
 

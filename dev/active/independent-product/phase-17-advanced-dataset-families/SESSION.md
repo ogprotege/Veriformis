@@ -5,18 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-28
 
-**Local branch:** `phase17/08-admit-stepwise`
+**Local branch:** `phase17/09-generator-boundary`
 
-**Completed:** Item 17.7, PR #156 at
-`132fd478bdd9f65518450a5ce3c8a93da5a6dad0`.
+**Completed:** Item 17.8, PR #157 at
+`d4070236512dbf4f1827de1500360bb2d41c535b`.
 
-**Current item:** 17.8 admit `stepwise-supervision`. Prompt plus ordered
-user-provided steps. Last step is the target. Profiles refuse the new
-schema. Constrained CSV refuses it.
+**Current item:** 17.9 threat-model governed generation. ADR-0018
+Decision A: no compile-path generator. This PR adds no `GeneratorPass`.
 
-**Next gate:** Publish the 17.8 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 17.9.
+**Next gate:** Publish the 17.9 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 17.10.
 
-**Decision:** Steps are user-provided `mapped_value` fields. The compiler
-does not invent chain-of-thought. Synthetic JSONL is the retained
-fixture.
+**Decision:** Decision A. Phase 17 does not install a generator.
+Generated data is not source truth. ADR-0017 Decision A still holds.

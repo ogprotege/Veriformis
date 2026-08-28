@@ -37,7 +37,7 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.8 admits `stepwise-supervision` from user-provided ordered
-steps on the dataset-row path. Copied source text is never labeled
-reasoning. Existing trainer profiles refuse the new schema. Default
-`review_policy` stays `none`.
+Item 17.9 records ADR-0018 Decision A: no compile-path generator.
+User-provided classification, preference, tool-call, and stepwise
+families remain the executable surface. Default `review_policy` stays
+`none`.
