@@ -1,6 +1,6 @@
 # Phase 17 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-28
 
@@ -158,13 +158,15 @@ item.
 
 **Branch:** `phase17/10-adversarial-closeout`
 
-- [ ] Refuse unknown families, missing labels/pairs/traces, shared-prompt
+- [x] Refuse unknown families, missing labels/pairs/traces, shared-prompt
       leakage, two-turn widening, nested CSV, profile mapping, declaration
       tamper, and invented supervision.
-- [ ] Reprove small-corpus SFT goldens and Phase 16 kit goldens.
-- [ ] Skip generation, multimodal, pre-tokenized generic families, and
+- [x] Reprove small-corpus SFT goldens and Phase 16 kit goldens.
+- [x] Skip generation, multimodal, pre-tokenized generic families, and
       unmapped profiles with records unless earlier items licensed them.
       Close Phase 17. Do not start Phase 18 from this packet.
+
+Generation is skipped with a record: ADR-0018 Decision A.
 
 ## Skip rules
 

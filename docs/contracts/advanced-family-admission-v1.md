@@ -6,12 +6,13 @@
 
 **Schema:** `veriformis.advanced-family-admission/v1`
 
-**Status:** Schema pin plus leakage grouping substrate. Items 17.5–17.8
-admit `explicit-label-classification`, `preference-and-ranking`,
-`tool-call-conversations`, and `stepwise-supervision` as executes on the
-dataset-row path. ADR-0018 Decision A forbids generation. Loading a pin
-is not itself an execute. Extra grouping keys do not change default SFT
-split identities. Trainer-profile mappings remain empty.
+**Status:** Implemented through independent-product Phase 17 closeout.
+Items 17.5–17.8 admit `explicit-label-classification`,
+`preference-and-ranking`, `tool-call-conversations`, and
+`stepwise-supervision` as executes on the dataset-row path. ADR-0018
+Decision A forbids generation. Loading a pin is not itself an execute.
+Extra grouping keys do not change default SFT split identities.
+Trainer-profile mappings remain empty.
 
 **Last reviewed:** 2026-08-28
 
