@@ -50,9 +50,8 @@ under empty extra `ocr`. Default parse still refuses image-only PDF.
 is complete with previewable gates and labeled fixtures. No heuristic
 blocks seal. Phase 14 review workflows are complete. Phase 15 scale
 work is complete. Phase 16 extension architecture is in
-progress. Item 16.6 binds generic `split-jsonl-directory`
-through the protocol. Other containers and consumer profiles
-stay on the private catalog.
+progress. Item 16.7 publishes a test-only compatibility kit
+for the text parser and generic `split-jsonl-directory`.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

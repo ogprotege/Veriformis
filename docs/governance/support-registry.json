@@ -434,7 +434,9 @@
       "src/veriformis/extensions/protocol.py",
       "src/veriformis/extensions/registry.py",
       "src/veriformis/extensions/declarations.py",
-      "src/veriformis/extensions/runtime.py"
+      "src/veriformis/extensions/runtime.py",
+      "tests/regressions/fixtures/phase16/compatibility-kit.json",
+      "tests/extensions/test_compatibility_kit.py"
     ]
   },
   "scale": {

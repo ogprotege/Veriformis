@@ -118,8 +118,30 @@ GitHub checks: all 18 passed on PR #144. Merge SHA
 - [x] Other containers and consumer profiles stay on the catalog loop.
 - [x] Unknown contract versions name requested versus supported identity.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.7.
+
+GitHub checks: all 18 passed on PR #145. Merge SHA
+`13e3280ac6f27a3e8c6484f0c6e380836723ddc9`.
+
+## Required item 16.7 evidence
+
+- [x] Frozen text-parser and split-JSONL goldens match protocol-bound output.
+- [x] Unknown kind, unknown version, missing extra, broken identity, and
+      third-party origin fail closed.
+- [x] Compatibility errors name requested versus supported contract identity.
+- [x] The kit is test-only. No product plugin runner or project-local path.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.7.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.8.
+
+## Item 16.7 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused compatibility-kit tests | 36 passed |
+| Tracking, Ruff, lock, diff check | PASS |
+| Core pytest excluding optional markers | 2,348 passed, 17 deselected, one expected durability warning |
 
 ## Item 16.6 local gate evidence
 

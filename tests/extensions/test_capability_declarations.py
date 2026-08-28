@@ -45,6 +45,11 @@ def test_declarations_cover_the_registry_and_are_supported_builtins() -> None:
     assert ("unsloth", "unsloth") not in selectors
     assert all("ocr-image" not in item.discovery.selector for item in declarations)
     assert all(item.discovery.selector != "unsloth" for item in declarations)
+    by_selector = {(item.kind, item.discovery.selector): item for item in declarations}
+    assert by_selector[("source-parser", "text")].fixture_ids == ("phase16-text",)
+    assert by_selector[("container-exporter", "split-jsonl-directory")].fixture_ids == (
+        "phase16-split-jsonl",
+    )
 
 
 def test_consumer_profiles_keep_consumer_id_and_empty_extras_stay_named() -> None:
