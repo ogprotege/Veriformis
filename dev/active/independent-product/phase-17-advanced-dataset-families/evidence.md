@@ -119,8 +119,34 @@ Phase 16 completed. Closeout merged as PR #149 at
       and existing trainer profiles refuse it. Two-turn `messages`
       stays exactly two turns.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #156 merged. Clean `main` equals
+      `origin/main` at `132fd47`.
+
+## Required item 17.8 evidence
+
+- [x] `stepwise-supervision` is implemented with objective `stepwise`,
+      row schema `stepwise-trace`, and loss `final-step-only`.
+- [x] Dataset-row mapping binds prompt and ordered steps with
+      `mapped_value`. Empty or single-step traces refuse.
+      Document-source construction cannot invent steps.
+- [x] Shared-prompt leakage keeps one prompt in one partition.
+      split-jsonl and canonical json emit the schema. Constrained CSV
+      and existing trainer profiles refuse it. Copied source text is
+      never labeled reasoning.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.8.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.9.
+
+## Item 17.8 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_stepwise_supervision.py` | 10 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,447 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 17.7 local gate evidence
 

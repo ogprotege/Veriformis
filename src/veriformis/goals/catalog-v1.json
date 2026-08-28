@@ -441,6 +441,57 @@
       "training_family": "tool-call-conversations",
       "what_the_model_learns": "To follow the operator-supplied tool traces for each conversation. The compiler does not invent, execute, or rewrite those turns.",
       "what_you_provide": "JSONL or JSON rows that already contain a conversation identity and ordered turns with a tool or function trace."
+    },
+    {
+      "compatible_representations": [
+        "prompt-and-steps"
+      ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "default_representation": "prompt-and-steps",
+      "eligible_input_families": [
+        "delimited-table",
+        "json-records"
+      ],
+      "goal_id": "use-provided-steps",
+      "instruction_task": "provided steps",
+      "instruction_template": "Emit the provided steps for this prompt.",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
+      "not_this": [
+        "It does not invent intermediate steps.",
+        "It does not generate a chain of thought.",
+        "It does not label copied source text as reasoning."
+      ],
+      "objective": "stepwise",
+      "plain_language": "Teach the model the exact ordered steps you already supplied for a prompt. The compiler copies those steps; it does not invent them.",
+      "recipe_library_id": "stepwise.default",
+      "required_evidence_diagnostics": [
+        "mapped-stepwise-unavailable"
+      ],
+      "required_source_evidence": "Imported rows that already contain a non-empty prompt and at least two non-empty ordered steps.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
+      "state": "implemented",
+      "supervision_boundary": "The prompt and earlier steps are context. Only the last supplied step is the target.",
+      "target_construction": "The imported prompt and ordered steps are copied exactly; no step is invented.",
+      "title": "Use provided steps",
+      "training_family": "stepwise-supervision",
+      "what_the_model_learns": "To follow the operator-supplied ordered steps for each prompt. The compiler does not invent or reorder those steps.",
+      "what_you_provide": "JSONL or JSON rows that already contain a prompt and ordered steps."
     }
   ],
   "representations": [
@@ -549,6 +600,19 @@
       "row_schema": "tool-call-conversation",
       "supervised_region": "The ordered tool trace including the final assistant turn; earlier user context is not the target.",
       "title": "Conversation and tool trace"
+    },
+    {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json"
+      ],
+      "loss_policy": "final-step-only",
+      "plain_language": "A prompt and the exact ordered steps the operator supplied. Only the last step is the target.",
+      "representation_id": "prompt-and-steps",
+      "requires_operator_instruction": false,
+      "row_schema": "stepwise-trace",
+      "supervised_region": "The last supplied step only; the prompt and earlier steps are context.",
+      "title": "Prompt and steps"
     }
   ],
   "schema_id": "veriformis.goal-catalog/v1"

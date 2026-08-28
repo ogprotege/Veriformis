@@ -429,7 +429,8 @@
       "source-grounded-supervised-fine-tuning",
       "explicit-label-classification",
       "preference-and-ranking",
-      "tool-call-conversations"
+      "tool-call-conversations",
+      "stepwise-supervision"
     ],
     "implemented_goals": [
       "learn-the-text",
@@ -439,7 +440,8 @@
       "extract-a-structured-value",
       "classify-with-provided-labels",
       "prefer-chosen-over-rejected",
-      "use-provided-tool-traces"
+      "use-provided-tool-traces",
+      "use-provided-steps"
     ],
     "implemented_loss_policies": [
       "full-sequence",
@@ -448,7 +450,8 @@
       "final-assistant-suffix",
       "label-only",
       "pair-supervision",
-      "tool-trace-suffix"
+      "tool-trace-suffix",
+      "final-step-only"
     ],
     "implemented_objectives": [
       "before_after_transformation",
@@ -457,6 +460,7 @@
       "full_text",
       "preference_pair",
       "section_reconstruction",
+      "stepwise",
       "structured_field",
       "tool_call"
     ],
@@ -468,7 +472,8 @@
       "extract-a-structured-value.safe",
       "classify-with-provided-labels.safe",
       "prefer-chosen-over-rejected.safe",
-      "use-provided-tool-traces.safe"
+      "use-provided-tool-traces.safe",
+      "use-provided-steps.safe"
     ],
     "implemented_row_schemas": [
       "instruction_output",
@@ -476,11 +481,11 @@
       "messages",
       "preference-pair",
       "prompt_completion",
+      "stepwise-trace",
       "text",
       "tool-call-conversation"
     ],
     "planned_families": [
-      "stepwise-supervision",
       "pre-tokenized-training",
       "governed-generated-candidates"
     ]

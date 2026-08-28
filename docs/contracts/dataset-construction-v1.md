@@ -585,8 +585,9 @@ Constructor non-output facts use this exact closed v1 diagnostic-code registry:
 - `transformation-pair-empty-or-unchanged`;
 - `transformation-pair-unavailable`;
 - `mapped-label-unavailable`;
-- `mapped-preference-unavailable`; and
-- `mapped-tool-trace-unavailable`.
+- `mapped-preference-unavailable`;
+- `mapped-tool-trace-unavailable`; and
+- `mapped-stepwise-unavailable`.
 
 Each `ConstructionDiagnostic` contains exactly `schema_version`,
 `diagnostic_id`, one registered `code`, non-empty `message`, `pass_id`,

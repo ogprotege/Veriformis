@@ -139,9 +139,9 @@ item.
 
 **Branch:** `phase17/08-admit-stepwise`
 
-- [ ] Promote `stepwise-supervision` with a stepwise row schema.
-- [ ] Require user-provided steps. Do not invent chain-of-thought.
-- [ ] Skip with a record if no retained stepwise fixture can be named.
+- [x] Promote `stepwise-supervision` with a stepwise row schema.
+- [x] Require user-provided steps. Do not invent chain-of-thought.
+- [x] Skip with a record if no retained stepwise fixture can be named.
 
 ### 17.9 Threat-model governed generation
 

@@ -57,7 +57,7 @@ ROUND_TRIP_FIXTURE = (
     / "generic-export-semantic-round-trip.json"
 )
 ROUND_TRIP_FIXTURE_SHA256 = (
-    "049df12c50c87521fceb0f543aa54f3e2f90e9a7f90736127653796af79c3036"
+    "ec22a171ee96b7a99a1d1c6e1c2a6db082d93603dd8c90e59684382c020fa371"
 )
 ROW_SCHEMAS = (
     "instruction_output",
@@ -500,6 +500,7 @@ def test_fixture_closes_the_discovered_container_schema_matrix(
     assert ("constrained-csv", "label-classification") not in observed_pairs
     assert ("constrained-csv", "preference-pair") not in observed_pairs
     assert ("constrained-csv", "tool-call-conversation") not in observed_pairs
+    assert ("constrained-csv", "stepwise-trace") not in observed_pairs
 
 
 @pytest.mark.parametrize(("container_id", "row_schema"), SUCCESSFUL_PAIRS)

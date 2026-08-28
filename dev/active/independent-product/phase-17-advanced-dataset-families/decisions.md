@@ -26,3 +26,4 @@
 | Admit classification from mapped_value labels only; refuse invented document-source labels | Accepted | Phase 17 lock L4 |
 | Admit preference pairs from mapped_value chosen/rejected only; skip unpaired and ranking-order schemas | Accepted | Pair leakage/evidence does not cover unpaired; ranking needs a user-provided total order not present in the pair fixture |
 | Admit tool-call conversations from mapped_value traces; keep two-turn messages exact | Accepted | Synthetic JSONL is a retained fixture; do not widen `messages` |
+| Admit stepwise supervision from mapped_value ordered steps; do not invent chain-of-thought | Accepted | Synthetic JSONL is a retained fixture; copied source text is never labeled reasoning |

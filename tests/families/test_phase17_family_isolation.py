@@ -47,7 +47,6 @@ _FORBIDDEN_OPERATIONS = frozenset(
     }
 )
 _PLANNED_FAMILIES = (
-    "stepwise-supervision",
     "pre-tokenized-training",
     "governed-generated-candidates",
 )
@@ -71,6 +70,7 @@ def test_planned_families_remain_planned_and_multimodal_unsupported() -> None:
         "explicit-label-classification",
         "preference-and-ranking",
         "tool-call-conversations",
+        "stepwise-supervision",
     )
     assert PLANNED_TRAINING_FAMILIES == _PLANNED_FAMILIES
     assert EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES == ("multimodal-training",)
@@ -99,6 +99,7 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
         "conversation_id",
         "turns",
     )
+    assert ROW_SCHEMA_PAYLOAD_KEYS["stepwise-trace"] == ("prompt", "steps")
     assert LOSS_POLICY_IDS[:4] == (
         "full-sequence",
         "completion-only",
@@ -108,6 +109,7 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
     assert "label-only" in LOSS_POLICY_IDS
     assert "pair-supervision" in LOSS_POLICY_IDS
     assert "tool-trace-suffix" in LOSS_POLICY_IDS
+    assert "final-step-only" in LOSS_POLICY_IDS
 
 
 def test_messages_still_require_exactly_two_turns() -> None:
@@ -145,6 +147,7 @@ def test_mapping_still_has_only_sft_payloads() -> None:
         "conversation_id",
         "turns",
     )
+    assert ROW_SCHEMA_PAYLOAD_KEYS["stepwise-trace"] == ("prompt", "steps")
     mapping_docs = (ROOT / "docs/mapping.md").read_text(encoding="utf-8")
     assert "mapped_value" in mapping_docs
 
@@ -168,6 +171,10 @@ def test_constructors_remain_five_sft_constructors() -> None:
         "veriformis.constructor.tool-call",
         "1",
     ) in constructors
+    assert (
+        "veriformis.constructor.stepwise",
+        "1",
+    ) in constructors
     assert DETERMINISTIC_V1_OBJECTIVE_KINDS == (
         "full_text",
         "continuation",
@@ -183,6 +190,7 @@ def test_constructors_remain_five_sft_constructors() -> None:
             "veriformis.constructor.explicit-label",
             "veriformis.constructor.preference-pair",
             "veriformis.constructor.tool-call",
+            "veriformis.constructor.stepwise",
         }
     )
     assert all(token not in sft_joined for token in _ADVANCED_TOKENS)
@@ -193,6 +201,7 @@ def test_goal_catalog_still_resolves_only_sft_objectives() -> None:
     assert "explicit_label" in tuple(goal.objective for goal in catalog.goals)
     assert "preference_pair" in tuple(goal.objective for goal in catalog.goals)
     assert "tool_call" in tuple(goal.objective for goal in catalog.goals)
+    assert "stepwise" in tuple(goal.objective for goal in catalog.goals)
     joined = " ".join(goal.goal_id for goal in catalog.goals)
     assert all(family not in joined for family in _PLANNED_FAMILIES)
 

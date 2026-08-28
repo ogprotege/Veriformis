@@ -146,6 +146,26 @@
       "representation_id": "conversation-and-tool-trace",
       "row_schema": "tool-call-conversation",
       "template_id": "conversation-and-tool-trace"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "prompt-and-steps",
+      "field_mappings": [
+        {
+          "source_path": "prompt",
+          "target_key": "prompt"
+        },
+        {
+          "source_path": "steps",
+          "target_key": "steps"
+        }
+      ],
+      "goal_id": "use-provided-steps",
+      "membership_policy": "replaced",
+      "plain_language": "Map a prompt and ordered steps into the stepwise row.",
+      "representation_id": "prompt-and-steps",
+      "row_schema": "stepwise-trace",
+      "template_id": "prompt-and-steps"
     }
   ]
 }

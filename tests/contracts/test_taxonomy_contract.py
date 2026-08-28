@@ -50,7 +50,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "679ceb0e81f76d1346c852dc8698a15f4f02a01bcc86f9c2217eacdab1f26652"
+    "4d6cb06d9675d3c0a2f836c1f42d9dfeac26d1ad9d43861344a9434df4bacc97"
 )
 
 
@@ -121,11 +121,13 @@ def test_implemented_families_are_conservative_and_complete_for_current_objectiv
         "explicit-label-classification",
         "preference-and-ranking",
         "tool-call-conversations",
+        "stepwise-supervision",
     )
     assert family_for_objective("full_text") == "source-grounded-language-modeling"
     assert family_for_objective("explicit_label") == "explicit-label-classification"
     assert family_for_objective("preference_pair") == "preference-and-ranking"
     assert family_for_objective("tool_call") == "tool-call-conversations"
+    assert family_for_objective("stepwise") == "stepwise-supervision"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -141,7 +143,8 @@ def test_future_families_are_named_but_not_implemented() -> None:
     assert "explicit-label-classification" in IMPLEMENTED_TRAINING_FAMILIES
     assert "tool-call-conversations" not in PLANNED_TRAINING_FAMILIES
     assert "tool-call-conversations" in IMPLEMENTED_TRAINING_FAMILIES
-    assert "stepwise-supervision" in PLANNED_TRAINING_FAMILIES
+    assert "stepwise-supervision" not in PLANNED_TRAINING_FAMILIES
+    assert "stepwise-supervision" in IMPLEMENTED_TRAINING_FAMILIES
     assert "pre-tokenized-training" in PLANNED_TRAINING_FAMILIES
     assert "governed-generated-candidates" in PLANNED_TRAINING_FAMILIES
     assert EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES == ("multimodal-training",)
@@ -160,6 +163,7 @@ def test_objective_row_compatibility_matches_construction_rules() -> None:
     assert compatible_row_schemas("explicit_label") == ("label-classification",)
     assert compatible_row_schemas("preference_pair") == ("preference-pair",)
     assert compatible_row_schemas("tool_call") == ("tool-call-conversation",)
+    assert compatible_row_schemas("stepwise") == ("stepwise-trace",)
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -187,6 +191,7 @@ def test_default_row_schema_matches_current_surfaces() -> None:
     assert default_row_schema("explicit_label") == "label-classification"
     assert default_row_schema("preference_pair") == "preference-pair"
     assert default_row_schema("tool_call") == "tool-call-conversation"
+    assert default_row_schema("stepwise") == "stepwise-trace"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -225,6 +230,11 @@ def test_each_row_schema_has_one_loss_policy() -> None:
             "The ordered tool trace, including the final assistant turn, is "
             "supervised; earlier user context is not.",
         ),
+        "stepwise-trace": (
+            "final-step-only",
+            "Only the last user-provided step is supervised; earlier steps "
+            "and the prompt are context.",
+        ),
     }
     assert LOSS_POLICY_IDS == (
         "full-sequence",
@@ -234,6 +244,7 @@ def test_each_row_schema_has_one_loss_policy() -> None:
         "label-only",
         "pair-supervision",
         "tool-trace-suffix",
+        "final-step-only",
     )
     assert set(expected) == set(PRODUCT_ROW_SCHEMA_KINDS)
     for row_schema, (policy, notes) in expected.items():
@@ -321,7 +332,8 @@ def test_implemented_discovery_names_axes_and_omits_format() -> None:
     assert discovery["consumer_profile"] == IMPLEMENTED_CONSUMER_PROFILES
     assert "preference-and-ranking" in discovery["training_family"]
     assert "tool-call-conversations" in discovery["training_family"]
-    assert "stepwise-supervision" not in discovery["training_family"]
+    assert "stepwise-supervision" in discovery["training_family"]
+    assert "pre-tokenized-training" not in discovery["training_family"]
     assert "split-jsonl-directory" in discovery["physical_container"]
     assert "json" in discovery["physical_container"]
     assert "constrained-csv" in discovery["physical_container"]

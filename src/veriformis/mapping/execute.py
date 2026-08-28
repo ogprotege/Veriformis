@@ -255,6 +255,15 @@ def _normalized_field_value(
             raise MappingError(f"row {row_index} {exc}") from exc
         encoded = lossless_json_bytes(turns).decode("utf-8")
         return encoded, sha256_digest(lossless_json_bytes(original))
+    if row_schema == "stepwise-trace" and target_key == "steps":
+        from veriformis.families.stepwise import normalize_steps
+
+        try:
+            steps = normalize_steps(original)
+        except ValueError as exc:
+            raise MappingError(f"row {row_index} {exc}") from exc
+        encoded = lossless_json_bytes(steps).decode("utf-8")
+        return encoded, sha256_digest(lossless_json_bytes(original))
     if not isinstance(original, str):
         raise MappingError(
             f"row {row_index} field {target_key!r} must be a string; coercion is refused"
@@ -300,6 +309,11 @@ def _payload_from_fields(
         return {
             "conversation_id": values["conversation_id"],
             "turns": json.loads(values["turns"]),
+        }
+    if row_schema == "stepwise-trace":
+        return {
+            "prompt": values["prompt"],
+            "steps": json.loads(values["steps"]),
         }
     return dict(values)
 

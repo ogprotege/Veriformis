@@ -93,9 +93,9 @@ IMPLEMENTED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
     "explicit-label-classification",
     "preference-and-ranking",
     "tool-call-conversations",
+    "stepwise-supervision",
 )
 PLANNED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
-    "stepwise-supervision",
     "pre-tokenized-training",
     "governed-generated-candidates",
 )
@@ -160,6 +160,7 @@ LOSS_POLICY_IDS: Final[tuple[str, ...]] = SFT_LOSS_POLICY_IDS + (
     "label-only",
     "pair-supervision",
     "tool-trace-suffix",
+    "final-step-only",
 )
 
 ROW_SCHEMA_UI_ALIASES: Final[Mapping[str, str]] = MappingProxyType(
@@ -180,6 +181,7 @@ OBJECTIVE_FAMILY: Final[Mapping[str, str]] = MappingProxyType(
         "explicit_label": "explicit-label-classification",
         "preference_pair": "preference-and-ranking",
         "tool_call": "tool-call-conversations",
+        "stepwise": "stepwise-supervision",
     }
 )
 
@@ -201,6 +203,7 @@ OBJECTIVE_ROW_COMPATIBILITY: Final[Mapping[str, tuple[str, ...]]] = MappingProxy
         "explicit_label": ("label-classification",),
         "preference_pair": ("preference-pair",),
         "tool_call": ("tool-call-conversation",),
+        "stepwise": ("stepwise-trace",),
     }
 )
 
@@ -214,6 +217,7 @@ DEFAULT_ROW_SCHEMA: Final[Mapping[str, str]] = MappingProxyType(
         "explicit_label": "label-classification",
         "preference_pair": "preference-pair",
         "tool_call": "tool-call-conversation",
+        "stepwise": "stepwise-trace",
     }
 )
 
@@ -226,6 +230,7 @@ ROW_LOSS_POLICY: Final[Mapping[str, str]] = MappingProxyType(
         "label-classification": "label-only",
         "preference-pair": "pair-supervision",
         "tool-call-conversation": "tool-trace-suffix",
+        "stepwise-trace": "final-step-only",
     }
 )
 
@@ -248,6 +253,10 @@ LOSS_POLICY_BOUNDARIES: Final[Mapping[str, str]] = MappingProxyType(
             "The ordered tool trace, including the final assistant turn, is "
             "supervised; earlier user context is not."
         ),
+        "final-step-only": (
+            "Only the last user-provided step is supervised; earlier steps "
+            "and the prompt are context."
+        ),
     }
 )
 
@@ -259,32 +268,38 @@ PROFILE_FORBIDDEN_ROW_SCHEMAS: Final[Mapping[str, tuple[str, ...]]] = MappingPro
             "label-classification",
             "preference-pair",
             "tool-call-conversation",
+            "stepwise-trace",
         ),
         "mlx-lm": (
             "label-classification",
             "preference-pair",
             "tool-call-conversation",
+            "stepwise-trace",
         ),
         "trl": (
             "label-classification",
             "preference-pair",
             "tool-call-conversation",
+            "stepwise-trace",
         ),
         "axolotl": (
             "label-classification",
             "preference-pair",
             "tool-call-conversation",
+            "stepwise-trace",
         ),
         "llama-factory": (
             "label-classification",
             "preference-pair",
             "tool-call-conversation",
+            "stepwise-trace",
         ),
         "aptus": (
             "text",
             "label-classification",
             "preference-pair",
             "tool-call-conversation",
+            "stepwise-trace",
         ),
     }
 )

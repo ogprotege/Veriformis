@@ -56,6 +56,7 @@ ROW_SCHEMAS = (
     "messages",
     "preference-pair",
     "prompt_completion",
+    "stepwise-trace",
     "text",
     "tool-call-conversation",
 )

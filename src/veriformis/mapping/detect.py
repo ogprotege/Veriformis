@@ -33,6 +33,7 @@ class MappingDetector(_StrictModel):
         "label-classification",
         "preference-pair",
         "tool-call-conversation",
+        "stepwise-trace",
     ]
     required_paths: tuple[str, ...]
     plain_language: str

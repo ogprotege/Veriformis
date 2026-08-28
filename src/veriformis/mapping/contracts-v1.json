@@ -52,6 +52,10 @@
       "prompt",
       "completion"
     ],
+    "stepwise-trace": [
+      "prompt",
+      "steps"
+    ],
     "text": [
       "text"
     ],
@@ -81,7 +85,8 @@
     "messages",
     "label-classification",
     "preference-pair",
-    "tool-call-conversation"
+    "tool-call-conversation",
+    "stepwise-trace"
   ],
   "schema_id": "veriformis.mapping-contract-discovery/v1",
   "schema_versions": [

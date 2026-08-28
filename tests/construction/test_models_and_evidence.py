@@ -45,6 +45,7 @@ def test_objective_contracts_use_semantic_fields_only():
         "explicit_label": ("context", "label"),
         "preference_pair": ("prompt", "chosen", "rejected"),
         "tool_call": ("conversation_id", "turns"),
+        "stepwise": ("prompt", "steps"),
     }
 
     assert OBJECTIVE_FIELD_CONTRACTS == expected

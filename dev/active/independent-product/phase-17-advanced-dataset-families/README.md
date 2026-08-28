@@ -37,7 +37,7 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.7 admits `tool-call-conversations` from user-provided tool
-traces on the dataset-row path. Two-turn `messages` stays exactly two
-turns. Existing trainer profiles refuse the new schema. Default
+Item 17.8 admits `stepwise-supervision` from user-provided ordered
+steps on the dataset-row path. Copied source text is never labeled
+reasoning. Existing trainer profiles refuse the new schema. Default
 `review_policy` stays `none`.

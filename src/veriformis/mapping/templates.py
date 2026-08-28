@@ -33,6 +33,7 @@ class MappingTemplate(_StrictModel):
         "label-classification",
         "preference-pair",
         "tool-call-conversation",
+        "stepwise-trace",
     ]
     container_kind: Literal["jsonl", "json", "csv"]
     membership_policy: Literal["replaced", "advisory", "authoritative"]
