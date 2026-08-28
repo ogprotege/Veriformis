@@ -59,6 +59,36 @@ V1_QUALITY_GATES: tuple[QualityGateSpec, ...] = (
     QualityGateSpec("preview-detector-pii", "detector-pii-hit-count", 1, False),
     QualityGateSpec("preview-detector-secret", "detector-secret-hit-count", 1, False),
     QualityGateSpec(
+        "preview-family-missing-label",
+        "family-missing-label-count",
+        1,
+        False,
+    ),
+    QualityGateSpec(
+        "preview-family-ranking-tie",
+        "family-ranking-tie-count",
+        1,
+        False,
+    ),
+    QualityGateSpec(
+        "preview-family-singleton-label-set",
+        "family-singleton-label-set-count",
+        1,
+        False,
+    ),
+    QualityGateSpec(
+        "preview-family-tool-role-gap",
+        "family-tool-role-gap-count",
+        1,
+        False,
+    ),
+    QualityGateSpec(
+        "preview-family-unpaired-without-policy",
+        "family-unpaired-without-policy-count",
+        1,
+        False,
+    ),
+    QualityGateSpec(
         "preview-leakage-cross-partition",
         "leakage-cross-partition-exact-target-count",
         1,
@@ -91,6 +121,36 @@ LABELED_FIXTURES: tuple[LabeledFixture, ...] = (
         "detector-pii-email-positive",
         "detector-pii",
         "positive",
+    ),
+    LabeledFixture(
+        "family-missing-label-count",
+        "family-missing-label-sft-negative",
+        "missing-label",
+        "negative",
+    ),
+    LabeledFixture(
+        "family-ranking-tie-count",
+        "family-ranking-tie-sft-negative",
+        "ranking-tie",
+        "negative",
+    ),
+    LabeledFixture(
+        "family-singleton-label-set-count",
+        "family-singleton-label-sft-negative",
+        "singleton-label-set",
+        "negative",
+    ),
+    LabeledFixture(
+        "family-tool-role-gap-count",
+        "family-tool-role-gap-sft-negative",
+        "tool-role-gap",
+        "negative",
+    ),
+    LabeledFixture(
+        "family-unpaired-without-policy-count",
+        "family-unpaired-without-policy-sft-negative",
+        "unpaired-without-policy",
+        "negative",
     ),
     LabeledFixture(
         "leakage-cross-partition-exact-target-count",

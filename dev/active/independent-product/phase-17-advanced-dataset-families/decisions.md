@@ -22,3 +22,4 @@
 | Keep `PipelineService` as policy owner; no Mac UI; do not start Phase 18 from this packet | Accepted | Product invariant 2 |
 | Pin `veriformis.advanced-family-admission/v1` as a schema-only contract in 17.2 | Accepted | No execute; taxonomy stays planned |
 | Keep extra grouping keys off the default SFT SplitPolicy and algorithm name | Accepted | Sealed-bundle identities must stay byte-identical |
+| Keep family review queues opt-in and family quality hooks preview-only | Accepted | Phase 13/14 closeouts; no heuristic seal block |

@@ -77,8 +77,8 @@ skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
 architecture is complete. Sequential PRs 16.1–16.10. ADR-0017 Decision
 A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.3 adds leakage grouping keys without changing default SFT split.
-Do not start Phase 18 from that packet.
+Item 17.4 adds opt-in family review queues and preview-only quality
+hooks. Do not start Phase 18 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
