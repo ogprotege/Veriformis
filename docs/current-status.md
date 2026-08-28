@@ -72,14 +72,14 @@ Phase 15 scale work is complete. Named-hardware reports exist.
 skipped with a record. Observed reports are not an SLA. A modest
 fig-leaf tier is forbidden. Do not start Phase 16 from that packet.
 Phase 16 extension architecture is in progress under its own packet. Item
-16.7 merged as PR #146 at `194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`.
-Item 16.8 records ADR-0017 Decision A: no untrusted loader in Phase 16.
-There is no third-party plugin support claim or loader.
+16.8 merged as PR #147 at `27ad5cd53f627a35ef6a2b35a5bb428fb992869d`.
+Item 16.9 isolates missing and broken optional extras. ADR-0017 Decision A:
+no untrusted loader. There is no third-party plugin support claim.
 
-**Review date:** 2026-08-27 (independent-product Phase 16.8 ADR-0017)
+**Review date:** 2026-08-27 (independent-product Phase 16.9 extra isolation)
 
-**Next review:** Phase 16.8 merge, item 16.9 broken-extra isolation, or any
-capability claim change.
+**Next review:** Phase 16.9 merge, item 16.10 closeout, or any capability
+claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -777,7 +777,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 13 | Versioned quality report, preview-only gates, and labeled fixtures; no heuristic blocks seal |
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
-| In-progress independent Phase 16.8 | ADR-0017 Decision A: no untrusted loader; third-party origin remains a declaration token only |
+| In-progress independent Phase 16.9 | Missing extras do not block core startup; a broken optional fixture cannot advance HEAD or write a bundle |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–15 complete and Phase 16 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |

@@ -37,5 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.7 merged as PR #146 at `194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`.
-Item 16.8 records ADR-0017 Decision A: no untrusted loader in Phase 16.
+Item 16.8 merged as PR #147 at `27ad5cd53f627a35ef6a2b35a5bb428fb992869d`.
+Item 16.9 proves missing extras do not block core startup and a broken
+optional fixture cannot advance `HEAD` or write a bundle.

@@ -141,10 +141,10 @@ operation is permitted in this item.
 
 **Branch:** `phase16/09-broken-extension-isolation`
 
-- [ ] Prove core CLI, MCP, and `PipelineService` start with a missing extra.
-- [ ] Prove a broken test-only optional binding cannot advance `HEAD`, write a
+- [x] Prove core CLI, MCP, and `PipelineService` start with a missing extra.
+- [x] Prove a broken test-only optional binding cannot advance `HEAD`, write a
       bundle, or corrupt a workspace.
-- [ ] If 16.8 selects B, prove the approved sandbox against crashes, network
+- [x] If 16.8 selects B, prove the approved sandbox against crashes, network
       attempts, and unsigned artifacts. Otherwise add no untrusted loader.
 
 ### 16.10 Add adversarial tests and close Phase 16

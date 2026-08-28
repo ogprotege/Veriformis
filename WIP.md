@@ -2,15 +2,15 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `194cfd6` on `main` after PR #146
+**Implementation baseline reviewed:** `27ad5cd` on `main` after PR #147
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–15 complete; Phase 16.7 kit)
+Phases 0–2; independent-product Phases 0–15 complete; Phase 16.8 ADR-0017)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.8 ADR-0017 threat model)
+**Last reviewed:** 2026-08-27 (Phase 16.9 broken-extra isolation)
 
-**Next review:** Phase 16.8 threat-model PR. Isolation in 16.9. No
+**Next review:** Phase 16.9 isolation PR. Closeout in 16.10. No
 untrusted loader.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
@@ -131,9 +131,9 @@ local, offline, and free of LLM generation.
       not start Phase 16 from that packet.
 - [ ] Independent product Phase 16 is in progress under its
       [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
-      Item 16.7 merged as PR #146 at
-      `194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`. Item 16.8 records
-      ADR-0017 Decision A: no untrusted loader in Phase 16.
+      Item 16.8 merged as PR #147 at
+      `27ad5cd53f627a35ef6a2b35a5bb428fb992869d`. Item 16.9 isolates
+      missing and broken optional extras. ADR-0017 Decision A remains.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

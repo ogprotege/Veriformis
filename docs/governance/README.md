@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.8 ADR-0017)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.9 extra isolation)
 
-**Next review:** Phase 16.8 merge, item 16.9 broken-extra isolation, or
+**Next review:** Phase 16.9 merge, item 16.10 closeout, or
 governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability

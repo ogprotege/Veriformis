@@ -182,7 +182,7 @@
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
       "completed_on": null,
-      "next_gate": "Item 16.8 records ADR-0017 Decision A: no untrusted loader in Phase 16."
+      "next_gate": "Item 16.9 isolates missing and broken optional extras. ADR-0017 Decision A remains: no untrusted loader."
     },
     {
       "number": 17,

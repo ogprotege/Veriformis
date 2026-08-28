@@ -74,10 +74,9 @@ Phase 15 from that packet.
 Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
 skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
-architecture is in progress. Item 16.7 merged as PR #146 at
-`194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`. Item 16.8 records
-ADR-0017 Decision A: no untrusted loader in Phase 16. No third-party
-plugin support or loader.
+architecture is in progress. Item 16.8 merged as PR #147 at
+`27ad5cd53f627a35ef6a2b35a5bb428fb992869d`. Item 16.9 isolates missing
+and broken optional extras. ADR-0017 Decision A: no untrusted loader.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

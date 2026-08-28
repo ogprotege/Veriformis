@@ -145,8 +145,29 @@ GitHub checks: all 18 passed on PR #146. Merge SHA
 - [x] Decision A: no untrusted loader in Phase 16.
 - [x] No entry points, loader module, or workspace `plugins/` path.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.9.
+
+GitHub checks: all 18 passed on PR #147. Merge SHA
+`27ad5cd53f627a35ef6a2b35a5bb428fb992869d`.
+
+## Required item 16.9 evidence
+
+- [x] Core CLI, MCP, and `PipelineService` start with missing extras.
+- [x] Empty extras stay empty. Optional runtime packages stay unloaded.
+- [x] A broken extra=ocr fixture cannot advance `HEAD` or write a bundle.
+- [x] No untrusted loader (Decision A).
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.9.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.10.
+
+## Item 16.9 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused broken-extra isolation tests | 4 passed |
+| Tracking, Ruff, lock, diff check | PASS |
+| Core pytest excluding optional markers | 2,355 passed, 17 deselected, one expected durability warning |
 
 ## Item 16.8 local gate evidence
 

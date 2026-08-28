@@ -6,9 +6,9 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–15 complete; Phase 16 in progress).
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.8 ADR-0017)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.9 extra isolation)
 
-**Next review:** Phase 16.8 merge, item 16.9 broken-extra isolation, or any
+**Next review:** Phase 16.9 merge, item 16.10 closeout, or any
 contract change. Default parse still refuses image-only PDF.
 
 ## Start here
