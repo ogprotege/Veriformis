@@ -47,7 +47,6 @@ _FORBIDDEN_OPERATIONS = frozenset(
     }
 )
 _PLANNED_FAMILIES = (
-    "tool-call-conversations",
     "stepwise-supervision",
     "pre-tokenized-training",
     "governed-generated-candidates",
@@ -71,6 +70,7 @@ def test_planned_families_remain_planned_and_multimodal_unsupported() -> None:
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
         "preference-and-ranking",
+        "tool-call-conversations",
     )
     assert PLANNED_TRAINING_FAMILIES == _PLANNED_FAMILIES
     assert EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES == ("multimodal-training",)
@@ -95,6 +95,10 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
         "chosen",
         "rejected",
     )
+    assert ROW_SCHEMA_PAYLOAD_KEYS["tool-call-conversation"] == (
+        "conversation_id",
+        "turns",
+    )
     assert LOSS_POLICY_IDS[:4] == (
         "full-sequence",
         "completion-only",
@@ -103,6 +107,7 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
     )
     assert "label-only" in LOSS_POLICY_IDS
     assert "pair-supervision" in LOSS_POLICY_IDS
+    assert "tool-trace-suffix" in LOSS_POLICY_IDS
 
 
 def test_messages_still_require_exactly_two_turns() -> None:
@@ -136,6 +141,10 @@ def test_mapping_still_has_only_sft_payloads() -> None:
         "chosen",
         "rejected",
     )
+    assert ROW_SCHEMA_PAYLOAD_KEYS["tool-call-conversation"] == (
+        "conversation_id",
+        "turns",
+    )
     mapping_docs = (ROOT / "docs/mapping.md").read_text(encoding="utf-8")
     assert "mapped_value" in mapping_docs
 
@@ -155,6 +164,10 @@ def test_constructors_remain_five_sft_constructors() -> None:
         "veriformis.constructor.preference-pair",
         "1",
     ) in constructors
+    assert (
+        "veriformis.constructor.tool-call",
+        "1",
+    ) in constructors
     assert DETERMINISTIC_V1_OBJECTIVE_KINDS == (
         "full_text",
         "continuation",
@@ -169,6 +182,7 @@ def test_constructors_remain_five_sft_constructors() -> None:
         not in {
             "veriformis.constructor.explicit-label",
             "veriformis.constructor.preference-pair",
+            "veriformis.constructor.tool-call",
         }
     )
     assert all(token not in sft_joined for token in _ADVANCED_TOKENS)
@@ -178,6 +192,7 @@ def test_goal_catalog_still_resolves_only_sft_objectives() -> None:
     catalog = goal_catalog()
     assert "explicit_label" in tuple(goal.objective for goal in catalog.goals)
     assert "preference_pair" in tuple(goal.objective for goal in catalog.goals)
+    assert "tool_call" in tuple(goal.objective for goal in catalog.goals)
     joined = " ".join(goal.goal_id for goal in catalog.goals)
     assert all(family not in joined for family in _PLANNED_FAMILIES)
 

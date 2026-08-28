@@ -54,6 +54,10 @@
     ],
     "text": [
       "text"
+    ],
+    "tool-call-conversation": [
+      "conversation_id",
+      "turns"
     ]
   },
   "rejection_reason_codes": [
@@ -76,7 +80,8 @@
     "instruction_output",
     "messages",
     "label-classification",
-    "preference-pair"
+    "preference-pair",
+    "tool-call-conversation"
   ],
   "schema_id": "veriformis.mapping-contract-discovery/v1",
   "schema_versions": [

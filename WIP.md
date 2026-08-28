@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–16 complete; Phase 17.1 packet open
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 17.6 preference admission)
+**Last reviewed:** 2026-08-28 (Phase 17.7 tool-call admission)
 
-**Next review:** Phase 17.6 merge, or item 17.7 tool-call conversations. Do not
-map trainer profiles onto preference in this item.
+**Next review:** Phase 17.7 merge, or item 17.8 stepwise-supervision. Do not
+map trainer profiles onto tool-call rows in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -144,7 +144,9 @@ local, offline, and free of LLM generation.
       17.5 admits `explicit-label-classification` from user-provided
       labels. Item 17.6 admits `preference-and-ranking` from
       user-provided pairs; unpaired and ranking schemas skipped with a
-      record. Do not start Phase 18 from this packet.
+      record. Item 17.7 admits `tool-call-conversations` from
+      user-provided traces without widening two-turn `messages`. Do not
+      start Phase 18 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

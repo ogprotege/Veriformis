@@ -38,6 +38,7 @@ def test_templates_are_canonical_digest_bound_and_shared() -> None:
         "messages",
         "label-classification",
         "preference-pair",
+        "tool-call-conversation",
     }
     detector_shapes = {
         tuple(item.required_paths) for item in mapping_detector_catalog().detectors

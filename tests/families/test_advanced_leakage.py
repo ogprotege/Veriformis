@@ -359,6 +359,8 @@ def test_keyed_grouping_does_not_admit_other_families() -> None:
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
         "preference-and-ranking",
+        "tool-call-conversations",
     )
     assert "preference-and-ranking" not in PLANNED_TRAINING_FAMILIES
     assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
+    assert "tool-call-conversations" not in PLANNED_TRAINING_FAMILIES

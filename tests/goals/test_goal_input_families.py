@@ -115,6 +115,7 @@ _EVIDENCE_KIND = {
     "extract-a-structured-value": "scalar",
     "classify-with-provided-labels": "rows",
     "prefer-chosen-over-rejected": "rows",
+    "use-provided-tool-traces": "rows",
 }
 
 

@@ -32,6 +32,7 @@ class MappingDetector(_StrictModel):
         "messages",
         "label-classification",
         "preference-pair",
+        "tool-call-conversation",
     ]
     required_paths: tuple[str, ...]
     plain_language: str

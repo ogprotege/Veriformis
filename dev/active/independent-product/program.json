@@ -192,7 +192,7 @@
       "packet": "dev/active/independent-product/phase-17-advanced-dataset-families",
       "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Item 17.6 preference-and-ranking admission must merge green before tool-call conversations. Admit each semantic family separately."
+      "next_gate": "Item 17.7 tool-call-conversations admission must merge green before stepwise-supervision. Admit each semantic family separately."
     },
     {
       "number": 18,

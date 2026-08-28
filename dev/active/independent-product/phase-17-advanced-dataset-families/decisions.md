@@ -25,3 +25,4 @@
 | Keep family review queues opt-in and family quality hooks preview-only | Accepted | Phase 13/14 closeouts; no heuristic seal block |
 | Admit classification from mapped_value labels only; refuse invented document-source labels | Accepted | Phase 17 lock L4 |
 | Admit preference pairs from mapped_value chosen/rejected only; skip unpaired and ranking-order schemas | Accepted | Pair leakage/evidence does not cover unpaired; ranking needs a user-provided total order not present in the pair fixture |
+| Admit tool-call conversations from mapped_value traces; keep two-turn messages exact | Accepted | Synthetic JSONL is a retained fixture; do not widen `messages` |

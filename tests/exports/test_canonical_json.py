@@ -56,6 +56,7 @@ DISCOVERY_ROW_SCHEMAS = (
     "preference-pair",
     "prompt_completion",
     "text",
+    "tool-call-conversation",
 )
 
 

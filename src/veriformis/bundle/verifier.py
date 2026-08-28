@@ -653,6 +653,8 @@ def _verify_imported_row_provenance_alignment(
                         row_schema = "label-classification"
                     elif keys == {"chosen", "prompt", "rejected"}:
                         row_schema = "preference-pair"
+                    elif keys == {"conversation_id", "turns"}:
+                        row_schema = "tool-call-conversation"
                     else:
                         raise BundleVerificationError(
                             "imported payload does not match a v1 row schema"

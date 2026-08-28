@@ -32,6 +32,7 @@ class MappingTemplate(_StrictModel):
         "messages",
         "label-classification",
         "preference-pair",
+        "tool-call-conversation",
     ]
     container_kind: Literal["jsonl", "json", "csv"]
     membership_policy: Literal["replaced", "advisory", "authoritative"]

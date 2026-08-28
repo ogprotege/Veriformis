@@ -1090,6 +1090,22 @@ def construct_preference_pair(
     raise AssertionError("preference_pair constructor must refuse")
 
 
+def construct_tool_call(
+    recipe: DatasetRecipe,
+    construction_pass: ConstructionPass,
+    sources: Mapping[str, SourceRef],
+    chunks: Sequence[Chunk],
+    transforms: Sequence[TransformRecord],
+    ir_artifacts: Mapping[str, IRArtifactLike],
+) -> ConstructorOutput:
+    """Refuse document-source invented tool traces."""
+    del recipe, construction_pass, sources, chunks, transforms, ir_artifacts
+    from veriformis.families.tool_call import refuse_document_source_tool_traces
+
+    refuse_document_source_tool_traces()
+    raise AssertionError("tool_call constructor must refuse")
+
+
 _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ("veriformis.constructor.full-text", "1"): construct_full_text,
     ("veriformis.constructor.continuation", "1"): construct_continuation,
@@ -1104,6 +1120,7 @@ _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ("veriformis.constructor.structured-field", "1"): construct_structured_field,
     ("veriformis.constructor.explicit-label", "1"): construct_explicit_label,
     ("veriformis.constructor.preference-pair", "1"): construct_preference_pair,
+    ("veriformis.constructor.tool-call", "1"): construct_tool_call,
 }
 
 
@@ -1129,6 +1146,7 @@ __all__ = [
     "construct_preference_pair",
     "construct_section_reconstruction",
     "construct_structured_field",
+    "construct_tool_call",
     "construction_field_context",
     "get_constructor",
 ]

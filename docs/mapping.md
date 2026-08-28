@@ -28,7 +28,7 @@ or `prompt_completion`) do not auto-publish.
 
 Packaged templates from `veriformis mapping-templates` cover the unique
 detector shapes (`text`, `prompt_completion`, `instruction_output`,
-`messages`, `label-classification`, `preference-pair`). Load a template, bind the confirmation digest for the captured
+`messages`, `label-classification`, `preference-pair`, `tool-call-conversation`). Load a template, bind the confirmation digest for the captured
 files, then pass that plan to `map`.
 
 ## Partition policy

@@ -9,6 +9,7 @@ provenance stream.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar, get_origin
 
@@ -61,6 +62,7 @@ RowSchema = Literal[
     "messages",
     "label-classification",
     "preference-pair",
+    "tool-call-conversation",
 ]
 
 V1_ROW_SCHEMAS: tuple[RowSchema, ...] = (
@@ -73,6 +75,7 @@ PRODUCT_ROW_SCHEMAS: tuple[RowSchema, ...] = (
     *V1_ROW_SCHEMAS,
     "label-classification",
     "preference-pair",
+    "tool-call-conversation",
 )
 V1_PARTITION_ORDER: tuple[Partition, ...] = ("train", "evaluation")
 
@@ -205,6 +208,20 @@ def _payload_contract(row_schema: RowSchema, payload: dict[str, Any]) -> None:
         _require_nonempty(payload["prompt"], "preference-pair prompt")
         _require_nonempty(payload["chosen"], "preference-pair chosen")
         _require_nonempty(payload["rejected"], "preference-pair rejected")
+        return
+
+    if row_schema == "tool-call-conversation":
+        if set(payload) != {"conversation_id", "turns"}:
+            raise ValueError(
+                "tool-call-conversation payload requires exactly conversation_id "
+                "and turns"
+            )
+        _require_nonempty(
+            payload["conversation_id"], "tool-call-conversation conversation_id"
+        )
+        from veriformis.families.tool_call import normalize_tool_turns
+
+        normalize_tool_turns(payload["turns"])
         return
 
     if row_schema != "messages":
@@ -1052,6 +1069,8 @@ def _record_payload(
                 "record is missing objective rejected field 'rejected'"
             ) from exc
         return {"prompt": context, "chosen": target, "rejected": rejected}
+    if row_schema == "tool-call-conversation":
+        return {"conversation_id": context, "turns": json.loads(target)}
     raise SerializationError(f"unsupported product row schema {row_schema!r}")
 
 

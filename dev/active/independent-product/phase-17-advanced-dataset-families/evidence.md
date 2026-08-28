@@ -103,8 +103,35 @@ Phase 16 completed. Closeout merged as PR #149 at
 - [x] Unpaired feedback and ranking-order schemas skipped with a
       record: the pair contract does not cover them.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #155 merged. Clean `main` equals
+      `origin/main` at `4496d0e`.
+
+## Required item 17.7 evidence
+
+- [x] `tool-call-conversations` is implemented with objective
+      `tool_call`, row schema `tool-call-conversation`, and loss
+      `tool-trace-suffix`.
+- [x] Dataset-row mapping binds conversation identity and ordered
+      turns with `mapped_value`. Malformed traces refuse.
+      Document-source construction cannot invent traces.
+- [x] Conversation leakage keeps one thread in one partition.
+      split-jsonl and canonical json emit the schema. Constrained CSV
+      and existing trainer profiles refuse it. Two-turn `messages`
+      stays exactly two turns.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.7.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.8.
+
+## Item 17.7 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_tool_call_conversations.py` | 10 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,437 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 17.6 local gate evidence
 

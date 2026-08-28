@@ -297,6 +297,7 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
             "preference-pair",
             "prompt_completion",
             "text",
+            "tool-call-conversation",
         ),
         "parquet": (
             "instruction_output",
@@ -311,6 +312,7 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
             "preference-pair",
             "prompt_completion",
             "text",
+            "tool-call-conversation",
         ),
     }
     trainer_row_schemas = (

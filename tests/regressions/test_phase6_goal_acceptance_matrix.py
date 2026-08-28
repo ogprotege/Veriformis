@@ -305,7 +305,7 @@ def _source_descriptors() -> list[dict[str, object]]:
 def _cell_selections() -> list[dict[str, object]]:
     selections: list[dict[str, object]] = []
     for goal in goal_catalog().goals:
-        if goal.objective in {"explicit_label", "preference_pair"}:
+        if goal.objective in {"explicit_label", "preference_pair", "tool_call"}:
             continue
         for family in goal.eligible_input_families:
             for representation_id in goal.compatible_representations:

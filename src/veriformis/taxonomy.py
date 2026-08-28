@@ -92,9 +92,9 @@ IMPLEMENTED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
     "source-grounded-supervised-fine-tuning",
     "explicit-label-classification",
     "preference-and-ranking",
+    "tool-call-conversations",
 )
 PLANNED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
-    "tool-call-conversations",
     "stepwise-supervision",
     "pre-tokenized-training",
     "governed-generated-candidates",
@@ -159,6 +159,7 @@ SFT_LOSS_POLICY_IDS: Final[tuple[str, ...]] = (
 LOSS_POLICY_IDS: Final[tuple[str, ...]] = SFT_LOSS_POLICY_IDS + (
     "label-only",
     "pair-supervision",
+    "tool-trace-suffix",
 )
 
 ROW_SCHEMA_UI_ALIASES: Final[Mapping[str, str]] = MappingProxyType(
@@ -178,6 +179,7 @@ OBJECTIVE_FAMILY: Final[Mapping[str, str]] = MappingProxyType(
         "structured_field": "source-grounded-supervised-fine-tuning",
         "explicit_label": "explicit-label-classification",
         "preference_pair": "preference-and-ranking",
+        "tool_call": "tool-call-conversations",
     }
 )
 
@@ -198,6 +200,7 @@ OBJECTIVE_ROW_COMPATIBILITY: Final[Mapping[str, tuple[str, ...]]] = MappingProxy
         "structured_field": ("prompt_completion", "instruction_output", "messages"),
         "explicit_label": ("label-classification",),
         "preference_pair": ("preference-pair",),
+        "tool_call": ("tool-call-conversation",),
     }
 )
 
@@ -210,6 +213,7 @@ DEFAULT_ROW_SCHEMA: Final[Mapping[str, str]] = MappingProxyType(
         "structured_field": "prompt_completion",
         "explicit_label": "label-classification",
         "preference_pair": "preference-pair",
+        "tool_call": "tool-call-conversation",
     }
 )
 
@@ -221,6 +225,7 @@ ROW_LOSS_POLICY: Final[Mapping[str, str]] = MappingProxyType(
         "messages": "final-assistant-suffix",
         "label-classification": "label-only",
         "preference-pair": "pair-supervision",
+        "tool-call-conversation": "tool-trace-suffix",
     }
 )
 
@@ -239,18 +244,48 @@ LOSS_POLICY_BOUNDARIES: Final[Mapping[str, str]] = MappingProxyType(
             "The chosen and rejected completions are supervised as a pair; "
             "the prompt is context."
         ),
+        "tool-trace-suffix": (
+            "The ordered tool trace, including the final assistant turn, is "
+            "supervised; earlier user context is not."
+        ),
     }
 )
 
 PROFILE_FORBIDDEN_ROW_SCHEMAS: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType(
     {
         CANONICAL_CONSUMER_PROFILE: (),
-        "aptus-handoff-v1": ("text", "label-classification", "preference-pair"),
-        "mlx-lm": ("label-classification", "preference-pair"),
-        "trl": ("label-classification", "preference-pair"),
-        "axolotl": ("label-classification", "preference-pair"),
-        "llama-factory": ("label-classification", "preference-pair"),
-        "aptus": ("text", "label-classification", "preference-pair"),
+        "aptus-handoff-v1": (
+            "text",
+            "label-classification",
+            "preference-pair",
+            "tool-call-conversation",
+        ),
+        "mlx-lm": (
+            "label-classification",
+            "preference-pair",
+            "tool-call-conversation",
+        ),
+        "trl": (
+            "label-classification",
+            "preference-pair",
+            "tool-call-conversation",
+        ),
+        "axolotl": (
+            "label-classification",
+            "preference-pair",
+            "tool-call-conversation",
+        ),
+        "llama-factory": (
+            "label-classification",
+            "preference-pair",
+            "tool-call-conversation",
+        ),
+        "aptus": (
+            "text",
+            "label-classification",
+            "preference-pair",
+            "tool-call-conversation",
+        ),
     }
 )
 

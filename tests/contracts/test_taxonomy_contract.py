@@ -50,7 +50,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "a4fff0f3930bda2808247709db948335a142f12113a15b5bf3634be209d3a34b"
+    "679ceb0e81f76d1346c852dc8698a15f4f02a01bcc86f9c2217eacdab1f26652"
 )
 
 
@@ -120,10 +120,12 @@ def test_implemented_families_are_conservative_and_complete_for_current_objectiv
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
         "preference-and-ranking",
+        "tool-call-conversations",
     )
     assert family_for_objective("full_text") == "source-grounded-language-modeling"
     assert family_for_objective("explicit_label") == "explicit-label-classification"
     assert family_for_objective("preference_pair") == "preference-and-ranking"
+    assert family_for_objective("tool_call") == "tool-call-conversations"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -137,7 +139,8 @@ def test_future_families_are_named_but_not_implemented() -> None:
     assert "preference-and-ranking" in IMPLEMENTED_TRAINING_FAMILIES
     assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
     assert "explicit-label-classification" in IMPLEMENTED_TRAINING_FAMILIES
-    assert "tool-call-conversations" in PLANNED_TRAINING_FAMILIES
+    assert "tool-call-conversations" not in PLANNED_TRAINING_FAMILIES
+    assert "tool-call-conversations" in IMPLEMENTED_TRAINING_FAMILIES
     assert "stepwise-supervision" in PLANNED_TRAINING_FAMILIES
     assert "pre-tokenized-training" in PLANNED_TRAINING_FAMILIES
     assert "governed-generated-candidates" in PLANNED_TRAINING_FAMILIES
@@ -156,6 +159,7 @@ def test_objective_row_compatibility_matches_construction_rules() -> None:
     assert compatible_row_schemas("full_text") == ("text",)
     assert compatible_row_schemas("explicit_label") == ("label-classification",)
     assert compatible_row_schemas("preference_pair") == ("preference-pair",)
+    assert compatible_row_schemas("tool_call") == ("tool-call-conversation",)
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -182,6 +186,7 @@ def test_default_row_schema_matches_current_surfaces() -> None:
     assert default_row_schema("full_text") == "text"
     assert default_row_schema("explicit_label") == "label-classification"
     assert default_row_schema("preference_pair") == "preference-pair"
+    assert default_row_schema("tool_call") == "tool-call-conversation"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -215,6 +220,11 @@ def test_each_row_schema_has_one_loss_policy() -> None:
             "The chosen and rejected completions are supervised as a pair; "
             "the prompt is context.",
         ),
+        "tool-call-conversation": (
+            "tool-trace-suffix",
+            "The ordered tool trace, including the final assistant turn, is "
+            "supervised; earlier user context is not.",
+        ),
     }
     assert LOSS_POLICY_IDS == (
         "full-sequence",
@@ -223,6 +233,7 @@ def test_each_row_schema_has_one_loss_policy() -> None:
         "final-assistant-suffix",
         "label-only",
         "pair-supervision",
+        "tool-trace-suffix",
     )
     assert set(expected) == set(PRODUCT_ROW_SCHEMA_KINDS)
     for row_schema, (policy, notes) in expected.items():
@@ -309,7 +320,8 @@ def test_implemented_discovery_names_axes_and_omits_format() -> None:
     assert discovery["physical_container"] == IMPLEMENTED_PHYSICAL_CONTAINERS
     assert discovery["consumer_profile"] == IMPLEMENTED_CONSUMER_PROFILES
     assert "preference-and-ranking" in discovery["training_family"]
-    assert "tool-call-conversations" not in discovery["training_family"]
+    assert "tool-call-conversations" in discovery["training_family"]
+    assert "stepwise-supervision" not in discovery["training_family"]
     assert "split-jsonl-directory" in discovery["physical_container"]
     assert "json" in discovery["physical_container"]
     assert "constrained-csv" in discovery["physical_container"]
