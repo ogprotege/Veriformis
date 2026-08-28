@@ -37,6 +37,7 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.5 admits `explicit-label-classification` from user-provided
-labels on the dataset-row path. Existing trainer profiles refuse the
-new schema. Default `review_policy` stays `none`.
+Item 17.6 admits `preference-and-ranking` from user-provided
+chosen/rejected pairs on the dataset-row path. Unpaired feedback and
+ranking-order schemas are skipped with a record. Existing trainer
+profiles refuse the new schema. Default `review_policy` stays `none`.

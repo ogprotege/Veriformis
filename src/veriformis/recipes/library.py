@@ -29,6 +29,7 @@ RECIPE_LIBRARY_IDS: tuple[str, ...] = (
     "before_after_transformation.default",
     "structured_field.default",
     "explicit_label.default",
+    "preference_pair.default",
 )
 
 _OBJECTIVE_BY_RECIPE = {
@@ -38,6 +39,7 @@ _OBJECTIVE_BY_RECIPE = {
     "before_after_transformation.default": "before_after_transformation",
     "structured_field.default": "structured_field",
     "explicit_label.default": "explicit_label",
+    "preference_pair.default": "preference_pair",
 }
 
 def list_named_recipes() -> tuple[dict[str, str], ...]:

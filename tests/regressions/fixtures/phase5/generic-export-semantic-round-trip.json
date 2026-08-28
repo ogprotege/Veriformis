@@ -9,6 +9,7 @@
       "instruction_output",
       "label-classification",
       "messages",
+      "preference-pair",
       "prompt_completion",
       "text"
     ],
@@ -16,6 +17,7 @@
       "instruction_output",
       "label-classification",
       "messages",
+      "preference-pair",
       "prompt_completion",
       "text"
     ]

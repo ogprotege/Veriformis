@@ -5,17 +5,19 @@ append-only history.
 
 **Updated:** 2026-08-28
 
-**Local branch:** `phase17/05-admit-classification`
+**Local branch:** `phase17/06-admit-preference`
 
-**Completed:** Item 17.4, PR #153 at
-`07bb0d0fc7ca427db297bf55d1c5ed9d26627c95`.
+**Completed:** Item 17.5, PR #154 at
+`301d1a6c4477480a12bfcba66a9246f5a4607f61`.
 
-**Current item:** 17.5 admit `explicit-label-classification`. Local gates
-are green. Dataset-row mapping with user-provided context, label, and
-annotator. Profiles refuse the new schema. Constrained CSV refuses it.
+**Current item:** 17.6 admit `preference-and-ranking`. Pair schema with
+user-provided prompt, chosen, and rejected. Unpaired feedback and
+ranking-order schemas skipped with a record. Profiles refuse the new
+schema. Constrained CSV refuses it.
 
-**Next gate:** Publish the 17.5 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 17.6.
+**Next gate:** Publish the 17.6 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 17.7.
 
-**Decision:** Labels are user-provided `mapped_value` fields. Document-source
-construction cannot invent them.
+**Decision:** Chosen and rejected are user-provided `mapped_value`
+fields. Document-source construction cannot invent them. Shared-prompt
+leakage keeps one prompt in one partition.

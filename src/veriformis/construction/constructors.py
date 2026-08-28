@@ -1074,6 +1074,22 @@ def construct_explicit_label(
     raise AssertionError("explicit_label constructor must refuse")
 
 
+def construct_preference_pair(
+    recipe: DatasetRecipe,
+    construction_pass: ConstructionPass,
+    sources: Mapping[str, SourceRef],
+    chunks: Sequence[Chunk],
+    transforms: Sequence[TransformRecord],
+    ir_artifacts: Mapping[str, IRArtifactLike],
+) -> ConstructorOutput:
+    """Refuse document-source invented preference pairs."""
+    del recipe, construction_pass, sources, chunks, transforms, ir_artifacts
+    from veriformis.families.preference import refuse_document_source_preference
+
+    refuse_document_source_preference()
+    raise AssertionError("preference_pair constructor must refuse")
+
+
 _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ("veriformis.constructor.full-text", "1"): construct_full_text,
     ("veriformis.constructor.continuation", "1"): construct_continuation,
@@ -1087,6 +1103,7 @@ _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ): construct_before_after_transformation,
     ("veriformis.constructor.structured-field", "1"): construct_structured_field,
     ("veriformis.constructor.explicit-label", "1"): construct_explicit_label,
+    ("veriformis.constructor.preference-pair", "1"): construct_preference_pair,
 }
 
 
@@ -1109,6 +1126,7 @@ __all__ = [
     "construct_continuation",
     "construct_explicit_label",
     "construct_full_text",
+    "construct_preference_pair",
     "construct_section_reconstruction",
     "construct_structured_field",
     "construction_field_context",

@@ -905,6 +905,8 @@ def _target_length(record: ImportedRecord, row_schema: str) -> int:
         return len(payload["output"])
     if row_schema == "label-classification":
         return len(payload["label"])
+    if row_schema == "preference-pair":
+        return len(payload["chosen"])
     messages = payload["messages"]
     return len(messages[1]["content"])
 
@@ -919,6 +921,8 @@ def _context_key(record: ImportedRecord, row_schema: str) -> tuple[Any, ...]:
         return (payload["instruction"], payload["input"])
     if row_schema == "label-classification":
         return (payload["context"],)
+    if row_schema == "preference-pair":
+        return (payload["prompt"],)
     return (payload["messages"][0]["content"],)
 
 
@@ -1097,6 +1101,8 @@ def _target_token(record: ImportedRecord, row_schema: str) -> Any:
         return payload["output"]
     if row_schema == "label-classification":
         return payload["label"]
+    if row_schema == "preference-pair":
+        return payload["chosen"]
     return payload["messages"][1]["content"]
 
 
@@ -1187,6 +1193,10 @@ def split_imported_records(
         from veriformis.families.classification import imported_classification_groups
 
         groups = imported_classification_groups(included, raw_digests)
+    elif mapping_result.row_schema == "preference-pair":
+        from veriformis.families.preference import imported_preference_groups
+
+        groups = imported_preference_groups(included, raw_digests)
     else:
         groups = tuple(
             ImportedLeakageGroup.create(

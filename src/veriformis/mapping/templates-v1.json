@@ -102,6 +102,30 @@
       "representation_id": "context-and-label",
       "row_schema": "label-classification",
       "template_id": "context-label-annotator"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "prompt-chosen-rejected",
+      "field_mappings": [
+        {
+          "source_path": "prompt",
+          "target_key": "prompt"
+        },
+        {
+          "source_path": "chosen",
+          "target_key": "chosen"
+        },
+        {
+          "source_path": "rejected",
+          "target_key": "rejected"
+        }
+      ],
+      "goal_id": "prefer-chosen-over-rejected",
+      "membership_policy": "replaced",
+      "plain_language": "Map prompt, chosen, and rejected strings into the preference pair row.",
+      "representation_id": "prompt-chosen-rejected",
+      "row_schema": "preference-pair",
+      "template_id": "prompt-chosen-rejected"
     }
   ]
 }

@@ -221,8 +221,10 @@ def test_taxonomy_is_unchanged_by_loading_a_pin() -> None:
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
+        "preference-and-ranking",
     )
     assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
+    assert "preference-and-ranking" not in PLANNED_TRAINING_FAMILIES
 
 
 def test_public_surfaces_still_have_no_family_execute() -> None:

@@ -114,6 +114,7 @@ _EVIDENCE_KIND = {
     "recover-a-section-from-its-heading": "heading",
     "extract-a-structured-value": "scalar",
     "classify-with-provided-labels": "rows",
+    "prefer-chosen-over-rejected": "rows",
 }
 
 

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.5 classification)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.6 preference)
 
 **Next review:** Any service-boundary or architecture change
 

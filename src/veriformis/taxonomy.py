@@ -91,9 +91,9 @@ IMPLEMENTED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
     "source-grounded-language-modeling",
     "source-grounded-supervised-fine-tuning",
     "explicit-label-classification",
+    "preference-and-ranking",
 )
 PLANNED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
-    "preference-and-ranking",
     "tool-call-conversations",
     "stepwise-supervision",
     "pre-tokenized-training",
@@ -156,7 +156,10 @@ SFT_LOSS_POLICY_IDS: Final[tuple[str, ...]] = (
     "output-only",
     "final-assistant-suffix",
 )
-LOSS_POLICY_IDS: Final[tuple[str, ...]] = SFT_LOSS_POLICY_IDS + ("label-only",)
+LOSS_POLICY_IDS: Final[tuple[str, ...]] = SFT_LOSS_POLICY_IDS + (
+    "label-only",
+    "pair-supervision",
+)
 
 ROW_SCHEMA_UI_ALIASES: Final[Mapping[str, str]] = MappingProxyType(
     {
@@ -174,6 +177,7 @@ OBJECTIVE_FAMILY: Final[Mapping[str, str]] = MappingProxyType(
         "before_after_transformation": "source-grounded-supervised-fine-tuning",
         "structured_field": "source-grounded-supervised-fine-tuning",
         "explicit_label": "explicit-label-classification",
+        "preference_pair": "preference-and-ranking",
     }
 )
 
@@ -193,6 +197,7 @@ OBJECTIVE_ROW_COMPATIBILITY: Final[Mapping[str, tuple[str, ...]]] = MappingProxy
         ),
         "structured_field": ("prompt_completion", "instruction_output", "messages"),
         "explicit_label": ("label-classification",),
+        "preference_pair": ("preference-pair",),
     }
 )
 
@@ -204,6 +209,7 @@ DEFAULT_ROW_SCHEMA: Final[Mapping[str, str]] = MappingProxyType(
         "before_after_transformation": "prompt_completion",
         "structured_field": "prompt_completion",
         "explicit_label": "label-classification",
+        "preference_pair": "preference-pair",
     }
 )
 
@@ -214,6 +220,7 @@ ROW_LOSS_POLICY: Final[Mapping[str, str]] = MappingProxyType(
         "instruction_output": "output-only",
         "messages": "final-assistant-suffix",
         "label-classification": "label-only",
+        "preference-pair": "pair-supervision",
     }
 )
 
@@ -228,18 +235,22 @@ LOSS_POLICY_BOUNDARIES: Final[Mapping[str, str]] = MappingProxyType(
             "Only the final assistant message receives supervision."
         ),
         "label-only": "Only the user-provided label receives supervision.",
+        "pair-supervision": (
+            "The chosen and rejected completions are supervised as a pair; "
+            "the prompt is context."
+        ),
     }
 )
 
 PROFILE_FORBIDDEN_ROW_SCHEMAS: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType(
     {
         CANONICAL_CONSUMER_PROFILE: (),
-        "aptus-handoff-v1": ("text", "label-classification"),
-        "mlx-lm": ("label-classification",),
-        "trl": ("label-classification",),
-        "axolotl": ("label-classification",),
-        "llama-factory": ("label-classification",),
-        "aptus": ("text", "label-classification"),
+        "aptus-handoff-v1": ("text", "label-classification", "preference-pair"),
+        "mlx-lm": ("label-classification", "preference-pair"),
+        "trl": ("label-classification", "preference-pair"),
+        "axolotl": ("label-classification", "preference-pair"),
+        "llama-factory": ("label-classification", "preference-pair"),
+        "aptus": ("text", "label-classification", "preference-pair"),
     }
 )
 

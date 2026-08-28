@@ -60,6 +60,7 @@ RowSchema = Literal[
     "instruction_output",
     "messages",
     "label-classification",
+    "preference-pair",
 ]
 
 V1_ROW_SCHEMAS: tuple[RowSchema, ...] = (
@@ -71,6 +72,7 @@ V1_ROW_SCHEMAS: tuple[RowSchema, ...] = (
 PRODUCT_ROW_SCHEMAS: tuple[RowSchema, ...] = (
     *V1_ROW_SCHEMAS,
     "label-classification",
+    "preference-pair",
 )
 V1_PARTITION_ORDER: tuple[Partition, ...] = ("train", "evaluation")
 
@@ -193,6 +195,16 @@ def _payload_contract(row_schema: RowSchema, payload: dict[str, Any]) -> None:
         _require_nonempty(payload["annotator"], "label-classification annotator")
         _require_nonempty(payload["context"], "label-classification context")
         _require_nonempty(payload["label"], "label-classification label")
+        return
+
+    if row_schema == "preference-pair":
+        if set(payload) != {"chosen", "prompt", "rejected"}:
+            raise ValueError(
+                "preference-pair payload requires exactly prompt, chosen, and rejected"
+            )
+        _require_nonempty(payload["prompt"], "preference-pair prompt")
+        _require_nonempty(payload["chosen"], "preference-pair chosen")
+        _require_nonempty(payload["rejected"], "preference-pair rejected")
         return
 
     if row_schema != "messages":
@@ -1032,6 +1044,14 @@ def _record_payload(
                 "record is missing objective annotator field 'annotator'"
             ) from exc
         return {"annotator": annotator, "context": context, "label": target}
+    if row_schema == "preference-pair":
+        try:
+            rejected = fields["rejected"]
+        except KeyError as exc:
+            raise SerializationError(
+                "record is missing objective rejected field 'rejected'"
+            ) from exc
+        return {"prompt": context, "chosen": target, "rejected": rejected}
     raise SerializationError(f"unsupported product row schema {row_schema!r}")
 
 
