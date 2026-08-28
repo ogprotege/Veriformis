@@ -1,5 +1,10 @@
 """Internal extension protocol and built-in-only registry. There is no loader."""
 
+from veriformis.contracts import EXTENSION_DISCOVERY_SCHEMA_ID
+from veriformis.extensions.declarations import (
+    builtin_declarations,
+    discover_extensions,
+)
 from veriformis.extensions.protocol import (
     EXTENSION_KINDS,
     EXTENSION_LIFECYCLES,
@@ -19,6 +24,7 @@ from veriformis.extensions.registry import (
 )
 
 __all__ = [
+    "EXTENSION_DISCOVERY_SCHEMA_ID",
     "EXTENSION_KINDS",
     "EXTENSION_LIFECYCLES",
     "EXTENSION_ORIGINS",
@@ -29,7 +35,9 @@ __all__ = [
     "CapabilityDeclaration",
     "DeterministicRequirements",
     "DiscoveryMetadata",
+    "builtin_declarations",
     "builtin_registry",
     "create_capability_declaration",
+    "discover_extensions",
     "load_capability_declaration",
 ]

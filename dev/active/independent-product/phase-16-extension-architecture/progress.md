@@ -89,3 +89,28 @@ tests with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 16.3 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.4.
+
+## 2026-08-27: Item 16.3 merged; item 16.4 in progress
+
+**Status:** Item 16.3 merged as PR #142 at
+`ccf97f7de863d09cb71acd742df468fb19854740` after all 18 GitHub checks passed.
+
+Item 16.4 adds one read-only `supported` declaration per built-in registry
+binding. Discovery is `PipelineService.discover_extensions`, CLI
+`extension-capabilities`, and MCP `extension_capabilities`. Unsloth stays
+candidate. `ocr-image` stays explicitly unsupported. Empty extras stay empty.
+Declarations are not executable bindings.
+
+**Next action:** Run the complete item 16.4 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.5.
+
+## 2026-08-27: Item 16.4 local gates green
+
+**Status:** Read-only built-in declarations and discovery are in place. The
+focused extension suite passed 50 tests. Project tracking, Ruff, the lock
+check, and `git diff --check` passed. The core suite passed 2,328 tests with
+17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 16.4 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.5.

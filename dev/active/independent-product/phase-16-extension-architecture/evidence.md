@@ -79,8 +79,32 @@ GitHub checks: all 18 passed on PR #141. Merge SHA
 - [x] Parse reports, constructor selectors, export selectors, and a sealed
       bundle identity remain identical on existing fixtures.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.4.
+
+GitHub checks: all 18 passed on PR #142. Merge SHA
+`ccf97f7de863d09cb71acd742df468fb19854740`.
+
+## Required item 16.4 evidence
+
+- [x] One read-only supported declaration per built-in registry binding.
+- [x] Discovery through `PipelineService`, CLI, and MCP. No third-party loading.
+- [x] Unknown contract versions name requested versus supported identity.
+- [x] Unsloth remains candidate. `ocr-image` remains unsupported. Extras empty.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.4.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.5.
+
+## Item 16.4 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused extension tests | 50 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,328 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 16.3 local gate evidence
 
