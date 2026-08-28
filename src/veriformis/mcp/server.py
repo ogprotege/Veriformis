@@ -213,6 +213,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def extension_capabilities() -> str:
+        """Return read-only built-in extension declarations. No plugin loader."""
+        return json.dumps(
+            pipeline.discover_extensions(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def scale_support() -> str:
         """Return operator-reviewed scale support discovery. Tiers stay empty."""
         return json.dumps(

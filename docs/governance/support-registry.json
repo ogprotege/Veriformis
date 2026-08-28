@@ -423,6 +423,19 @@
       "roadmap_phase": 10
     }
   ],
+  "extensions": {
+    "protocol": "veriformis.extension-protocol/v1",
+    "discovery": "veriformis.extension-discovery/v1",
+    "registry": "builtin-only",
+    "public_plugin_api": false,
+    "third_party_loading": false,
+    "evidence": [
+      "docs/contracts/extension-protocol-v1.md",
+      "src/veriformis/extensions/protocol.py",
+      "src/veriformis/extensions/registry.py",
+      "src/veriformis/extensions/declarations.py"
+    ]
+  },
   "scale": {
     "discovery": "veriformis.scale-support-discovery/v1",
     "evidence": [

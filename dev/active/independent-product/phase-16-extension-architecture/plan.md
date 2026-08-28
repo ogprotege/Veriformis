@@ -95,10 +95,10 @@ operation is permitted in this item.
 
 **Branch:** `phase16/04-capability-declarations`
 
-- [ ] Add one read-only declaration per built-in with exact contract version,
+- [x] Add one read-only declaration per built-in with exact contract version,
       extra, deterministic requirements, diagnostics, fixtures, discovery
       metadata, and supported lifecycle state.
-- [ ] Surface declarations through `PipelineService` and thin adapters only
+- [x] Surface declarations through `PipelineService` and thin adapters only
       where needed. Keep third-party loading absent.
 
 ### 16.5 Migrate the text parser

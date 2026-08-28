@@ -840,6 +840,19 @@ def review_submit(packet: Path) -> None:
     typer.echo(json.dumps(bundle, ensure_ascii=False, indent=2, sort_keys=True))
 
 
+@app.command(name="extension-capabilities")
+def extension_capabilities() -> None:
+    """Print read-only built-in extension declarations. No plugin loader."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_extensions(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="scale-support")
 def scale_support() -> None:
     """Print operator-reviewed scale support discovery. Tiers stay empty."""

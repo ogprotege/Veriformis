@@ -6,9 +6,9 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–15 complete; Phase 16 in progress).
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.3 internal registries)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.4 capability declarations)
 
-**Next review:** Phase 16.3 merge, item 16.4 capability declarations, or any
+**Next review:** Phase 16.4 merge, item 16.5 text-parser migration, or any
 contract change. Default parse still refuses image-only PDF.
 
 ## Start here
@@ -73,7 +73,7 @@ contract change. Default parse still refuses image-only PDF.
 | [Scale Corpus v1](contracts/scale-corpus-v1.md) | Deterministic synthetic benchmark corpora | Generators implemented |
 | [Scale Baseline v1](contracts/scale-baseline-v1.md) | Named-hardware compile evidence | Reports are not an SLA; no published tier |
 | [Scale Support v1](contracts/scale-support-v1.md) | Operator-reviewed scale support discovery | Empty `published_tiers`; observations are not an SLA |
-| [Extension Protocol v1](contracts/extension-protocol-v1.md) | Internal capability declarations for six kinds | Schema pin; no loader, registry, extra, or public plugin API |
+| [Extension Protocol v1](contracts/extension-protocol-v1.md) | Internal capability declarations for six kinds | Built-in-only registry and read-only discovery; no loader or public plugin API |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

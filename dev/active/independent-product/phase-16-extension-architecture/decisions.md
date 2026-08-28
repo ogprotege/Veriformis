@@ -22,3 +22,4 @@
 | Do not start Phase 17 from this packet | Accepted | Roadmap ordering rule 10 |
 | Pin `veriformis.extension-protocol/v1` as a schema-only contract in 16.2 | Accepted | No loader; ADR-0017 remains the 16.8 trust-boundary decision |
 | Wrap existing bindings in a built-in-only registry without changing dispatch | Accepted | One export catalog; third-party origin refused |
+| Surface built-in declarations as read-only discovery in 16.4 | Accepted | CLI `extension-capabilities`; no public plugin API |

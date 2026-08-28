@@ -37,6 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.2 merged as PR #141 at `4534975fb7d97aef392c6ba0481ea7bd4af1e052`.
-Item 16.3 wraps existing bindings in a built-in-only registry. No loader,
-dispatch change, extra, or public plugin API.
+Item 16.3 merged as PR #142 at `ccf97f7de863d09cb71acd742df468fb19854740`.
+Item 16.4 declares read-only built-in capabilities. No executable binding
+change, loader, extra, or public plugin API.

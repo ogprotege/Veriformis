@@ -1057,11 +1057,19 @@ class PipelineService:
     @property
     def extension_registry(self) -> BuiltinExtensionRegistry:
         """Return the built-in-only wrap of existing executable bindings."""
-        return getattr(
-            self,
-            "_extensions",
-            builtin_registry(export_catalog=self.export_service._catalog()),
-        )
+        existing = getattr(self, "_extensions", None)
+        if existing is None:
+            existing = builtin_registry(
+                export_catalog=self.export_service._catalog()
+            )
+            self._extensions = existing
+        return existing
+
+    def discover_extensions(self) -> dict[str, Any]:
+        """Return read-only built-in capability declarations. No plugin loader."""
+        from veriformis.extensions.declarations import discover_extensions
+
+        return discover_extensions(self.extension_registry)
 
     def discover_taxonomy(self) -> dict[str, tuple[str, ...]]:
         """Return a fresh, adapter-safe copy of implemented taxonomy discovery."""

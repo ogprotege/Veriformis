@@ -6,9 +6,10 @@
 
 **Schema:** `veriformis.extension-protocol/v1`
 
-**Status:** Schema pin through independent-product Phase 16.2. The contract
-loads and refuses declarations. It does not register parsers or exporters,
-does not change dispatch, and is not a public plugin API.
+**Status:** Schema pin through independent-product Phase 16.4. Built-in
+declarations are read-only discovery over the internal registry. The
+contract does not change dispatch, does not load third-party code, and is
+not a public plugin API.
 
 **Last reviewed:** 2026-08-27
 

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.3 internal registries)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.4 capability declarations)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -52,7 +52,7 @@ extra `ocr`; default parse still refuses image-only PDF);
 and recommendations; not enforcing);
 `review/` (queues, corrections as new identities, named-seed sampling,
 packet exchange, required-review seal blocking, auditable supersession);
-`extensions/` (internal declaration protocol and built-in-only registry; no loader);
+`extensions/` (internal protocol, built-in-only registry, read-only declarations; no loader);
 and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
