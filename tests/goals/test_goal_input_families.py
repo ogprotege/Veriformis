@@ -116,6 +116,7 @@ _EVIDENCE_KIND = {
     "classify-with-provided-labels": "rows",
     "prefer-chosen-over-rejected": "rows",
     "use-provided-tool-traces": "rows",
+    "use-provided-steps": "rows",
 }
 
 

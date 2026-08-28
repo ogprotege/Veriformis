@@ -46,8 +46,9 @@ def test_named_recipe_library_lists_six_objectives():
         "explicit_label.default",
         "preference_pair.default",
         "tool_call.default",
+        "stepwise.default",
     }
-    assert len(recipes) == 8
+    assert len(recipes) == 9
 
 
 def test_named_recipe_uses_shared_profile_compatibility():

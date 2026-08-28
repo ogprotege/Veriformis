@@ -77,9 +77,9 @@ skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
 architecture is complete. Sequential PRs 16.1–16.10. ADR-0017 Decision
 A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.7 admits `tool-call-conversations` from user-provided tool
-traces on the dataset-row path. Two-turn `messages` stays exactly two
-turns. Existing trainer profiles refuse the new schema. Do not start
+Item 17.8 admits `stepwise-supervision` from user-provided ordered
+steps on the dataset-row path. Copied source text is never labeled
+reasoning. Existing trainer profiles refuse the new schema. Do not start
 Phase 18 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal

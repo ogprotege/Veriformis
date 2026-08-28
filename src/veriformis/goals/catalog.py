@@ -110,6 +110,7 @@ ObjectiveKind = Literal[
     "explicit_label",
     "preference_pair",
     "tool_call",
+    "stepwise",
 ]
 RowSchemaKind = Literal[
     "text",
@@ -119,6 +120,7 @@ RowSchemaKind = Literal[
     "label-classification",
     "preference-pair",
     "tool-call-conversation",
+    "stepwise-trace",
 ]
 LossPolicyKind = Literal[
     "full-sequence",
@@ -128,6 +130,7 @@ LossPolicyKind = Literal[
     "label-only",
     "pair-supervision",
     "tool-trace-suffix",
+    "final-step-only",
 ]
 
 

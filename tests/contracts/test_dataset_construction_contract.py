@@ -65,6 +65,7 @@ def test_dataset_construction_contract_constants_are_exact():
         "mapped-label-unavailable",
         "mapped-preference-unavailable",
         "mapped-tool-trace-unavailable",
+        "mapped-stepwise-unavailable",
     )
     assert V1_PROMOTION_REASON_CODES == (
         "construction-integrity-v1",

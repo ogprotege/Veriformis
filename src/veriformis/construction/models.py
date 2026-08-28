@@ -55,6 +55,7 @@ ObjectiveKind = Literal[
     "explicit_label",
     "preference_pair",
     "tool_call",
+    "stepwise",
 ]
 ProductRowSchema = Literal[
     "text",
@@ -64,6 +65,7 @@ ProductRowSchema = Literal[
     "label-classification",
     "preference-pair",
     "tool-call-conversation",
+    "stepwise-trace",
 ]
 ReviewPolicy = Literal["none", "required"]
 DecisionStatus = Literal["accepted", "rejected", "pending_review"]
@@ -83,6 +85,7 @@ DiagnosticCode = Literal[
     "mapped-label-unavailable",
     "mapped-preference-unavailable",
     "mapped-tool-trace-unavailable",
+    "mapped-stepwise-unavailable",
 ]
 PromotionReasonCode = Literal[
     "construction-integrity-v1",
@@ -101,6 +104,7 @@ OBJECTIVE_FIELD_CONTRACTS: Mapping[str, tuple[str, ...]] = MappingProxyType({
     "explicit_label": ("context", "label"),
     "preference_pair": ("prompt", "chosen", "rejected"),
     "tool_call": ("conversation_id", "turns"),
+    "stepwise": ("prompt", "steps"),
 })
 
 BUILTIN_CONSTRUCTOR_IDS: Mapping[str, str] = MappingProxyType({
@@ -114,6 +118,7 @@ BUILTIN_CONSTRUCTOR_IDS: Mapping[str, str] = MappingProxyType({
     "explicit_label": "veriformis.constructor.explicit-label",
     "preference_pair": "veriformis.constructor.preference-pair",
     "tool_call": "veriformis.constructor.tool-call",
+    "stepwise": "veriformis.constructor.stepwise",
 })
 
 CONSTRUCTION_GATES = ("field-evidence", "objective-shape")

@@ -1106,6 +1106,22 @@ def construct_tool_call(
     raise AssertionError("tool_call constructor must refuse")
 
 
+def construct_stepwise(
+    recipe: DatasetRecipe,
+    construction_pass: ConstructionPass,
+    sources: Mapping[str, SourceRef],
+    chunks: Sequence[Chunk],
+    transforms: Sequence[TransformRecord],
+    ir_artifacts: Mapping[str, IRArtifactLike],
+) -> ConstructorOutput:
+    """Refuse document-source invented stepwise traces."""
+    del recipe, construction_pass, sources, chunks, transforms, ir_artifacts
+    from veriformis.families.stepwise import refuse_document_source_steps
+
+    refuse_document_source_steps()
+    raise AssertionError("stepwise constructor must refuse")
+
+
 _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ("veriformis.constructor.full-text", "1"): construct_full_text,
     ("veriformis.constructor.continuation", "1"): construct_continuation,
@@ -1121,6 +1137,7 @@ _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ("veriformis.constructor.explicit-label", "1"): construct_explicit_label,
     ("veriformis.constructor.preference-pair", "1"): construct_preference_pair,
     ("veriformis.constructor.tool-call", "1"): construct_tool_call,
+    ("veriformis.constructor.stepwise", "1"): construct_stepwise,
 }
 
 
@@ -1145,6 +1162,7 @@ __all__ = [
     "construct_full_text",
     "construct_preference_pair",
     "construct_section_reconstruction",
+    "construct_stepwise",
     "construct_structured_field",
     "construct_tool_call",
     "construction_field_context",

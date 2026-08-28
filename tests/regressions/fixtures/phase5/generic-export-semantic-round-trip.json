@@ -11,6 +11,7 @@
       "messages",
       "preference-pair",
       "prompt_completion",
+      "stepwise-trace",
       "text",
       "tool-call-conversation"
     ],
@@ -20,6 +21,7 @@
       "messages",
       "preference-pair",
       "prompt_completion",
+      "stepwise-trace",
       "text",
       "tool-call-conversation"
     ]

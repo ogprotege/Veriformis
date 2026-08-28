@@ -184,3 +184,31 @@ tests with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 17.7 pull request, require every
 GitHub check, merge, and synchronize clean `main` before item 17.8.
+
+## 2026-08-28: Item 17.7 merged; item 17.8 in progress
+
+**Status:** Item 17.7 merged as PR #156 at
+`132fd478bdd9f65518450a5ce3c8a93da5a6dad0`. Clean local `main` equals
+`origin/main` there.
+
+Item 17.8 admits `stepwise-supervision` from user-provided ordered
+steps. Copied source text is never labeled reasoning. Synthetic JSONL
+is the retained fixture.
+
+**Next action:** Run item 17.8 local gates, publish the pull request,
+merge green, and synchronize clean `main` before item 17.9.
+
+## 2026-08-28: Item 17.8 local gates green
+
+**Status:** `stepwise-supervision` compiles from user-provided ordered
+steps through map, curate, split, format, validate, seal, and verify.
+Shared-prompt leakage keeps one prompt in one partition.
+Document-source construction cannot invent steps. Constrained CSV and
+existing trainer profiles refuse the schema. Copied source text is
+never labeled reasoning. Focused stepwise tests passed 10. Project
+tracking, Ruff, the lock check, and `git diff --check` passed. The core
+suite passed 2,447 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 17.8 pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 17.9.

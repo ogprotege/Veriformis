@@ -89,6 +89,17 @@
         "turns"
       ],
       "row_schema": "tool-call-conversation"
+    },
+    {
+      "detector_id": "prompt-and-steps",
+      "goal_id": "use-provided-steps",
+      "plain_language": "Each object has a prompt and an ordered list of steps supplied by the operator.",
+      "representation_id": "prompt-and-steps",
+      "required_paths": [
+        "prompt",
+        "steps"
+      ],
+      "row_schema": "stepwise-trace"
     }
   ],
   "schema_id": "veriformis.mapping-detector-discovery/v1"

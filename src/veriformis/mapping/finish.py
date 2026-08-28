@@ -894,6 +894,11 @@ def imported_payload(record: ImportedRecord, row_schema: str) -> dict[str, Any]:
             "conversation_id": values["conversation_id"],
             "turns": json.loads(values["turns"]),
         }
+    elif row_schema == "stepwise-trace":
+        payload = {
+            "prompt": values["prompt"],
+            "steps": json.loads(values["steps"]),
+        }
     else:
         payload = dict(values)
     _payload_contract(row_schema, payload)  # type: ignore[arg-type]
@@ -914,6 +919,8 @@ def _target_length(record: ImportedRecord, row_schema: str) -> int:
         return len(payload["chosen"])
     if row_schema == "tool-call-conversation":
         return len(payload["turns"][-1]["content"])
+    if row_schema == "stepwise-trace":
+        return len(payload["steps"][-1])
     messages = payload["messages"]
     return len(messages[1]["content"])
 
@@ -932,6 +939,8 @@ def _context_key(record: ImportedRecord, row_schema: str) -> tuple[Any, ...]:
         return (payload["prompt"],)
     if row_schema == "tool-call-conversation":
         return (payload["conversation_id"],)
+    if row_schema == "stepwise-trace":
+        return (payload["prompt"],)
     return (payload["messages"][0]["content"],)
 
 
@@ -1114,6 +1123,8 @@ def _target_token(record: ImportedRecord, row_schema: str) -> Any:
         return payload["chosen"]
     if row_schema == "tool-call-conversation":
         return payload["turns"][-1]["content"]
+    if row_schema == "stepwise-trace":
+        return payload["steps"][-1]
     return payload["messages"][1]["content"]
 
 
@@ -1212,6 +1223,10 @@ def split_imported_records(
         from veriformis.families.tool_call import imported_tool_call_groups
 
         groups = imported_tool_call_groups(included, raw_digests)
+    elif mapping_result.row_schema == "stepwise-trace":
+        from veriformis.families.stepwise import imported_stepwise_groups
+
+        groups = imported_stepwise_groups(included, raw_digests)
     else:
         groups = tuple(
             ImportedLeakageGroup.create(

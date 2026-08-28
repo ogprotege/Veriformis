@@ -63,6 +63,7 @@ RowSchema = Literal[
     "label-classification",
     "preference-pair",
     "tool-call-conversation",
+    "stepwise-trace",
 ]
 
 V1_ROW_SCHEMAS: tuple[RowSchema, ...] = (
@@ -76,6 +77,7 @@ PRODUCT_ROW_SCHEMAS: tuple[RowSchema, ...] = (
     "label-classification",
     "preference-pair",
     "tool-call-conversation",
+    "stepwise-trace",
 )
 V1_PARTITION_ORDER: tuple[Partition, ...] = ("train", "evaluation")
 
@@ -222,6 +224,17 @@ def _payload_contract(row_schema: RowSchema, payload: dict[str, Any]) -> None:
         from veriformis.families.tool_call import normalize_tool_turns
 
         normalize_tool_turns(payload["turns"])
+        return
+
+    if row_schema == "stepwise-trace":
+        if set(payload) != {"prompt", "steps"}:
+            raise ValueError(
+                "stepwise-trace payload requires exactly prompt and steps"
+            )
+        _require_nonempty(payload["prompt"], "stepwise-trace prompt")
+        from veriformis.families.stepwise import normalize_steps
+
+        normalize_steps(payload["steps"])
         return
 
     if row_schema != "messages":
@@ -1071,6 +1084,8 @@ def _record_payload(
         return {"prompt": context, "chosen": target, "rejected": rejected}
     if row_schema == "tool-call-conversation":
         return {"conversation_id": context, "turns": json.loads(target)}
+    if row_schema == "stepwise-trace":
+        return {"prompt": context, "steps": json.loads(target)}
     raise SerializationError(f"unsupported product row schema {row_schema!r}")
 
 

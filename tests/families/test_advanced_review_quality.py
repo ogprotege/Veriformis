@@ -98,7 +98,9 @@ def test_explicit_family_fields_are_counted_without_executing_a_family() -> None
         "explicit-label-classification",
         "preference-and-ranking",
         "tool-call-conversations",
+        "stepwise-supervision",
     )
     assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
     assert "preference-and-ranking" not in PLANNED_TRAINING_FAMILIES
     assert "tool-call-conversations" not in PLANNED_TRAINING_FAMILIES
+    assert "stepwise-supervision" not in PLANNED_TRAINING_FAMILIES
