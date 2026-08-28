@@ -37,6 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.3 merged as PR #142 at `ccf97f7de863d09cb71acd742df468fb19854740`.
-Item 16.4 declares read-only built-in capabilities. No executable binding
-change, loader, extra, or public plugin API.
+Item 16.4 merged as PR #143 at `e70c13d6f42cc884c1599a96fd92cda052dd1d42`.
+Item 16.5 migrates the text parser through the protocol. Other suffixes keep
+existing dispatch.

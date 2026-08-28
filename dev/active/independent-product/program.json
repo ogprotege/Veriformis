@@ -182,7 +182,7 @@
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
       "completed_on": null,
-      "next_gate": "Item 16.4 declares read-only built-in capabilities. No executable binding change, loader, extra, or public plugin API."
+      "next_gate": "Item 16.5 migrates the text parser through the protocol. Other suffixes keep existing dispatch."
     },
     {
       "number": 17,

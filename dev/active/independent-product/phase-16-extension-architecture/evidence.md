@@ -92,8 +92,29 @@ GitHub checks: all 18 passed on PR #142. Merge SHA
 - [x] Unknown contract versions name requested versus supported identity.
 - [x] Unsloth remains candidate. `ocr-image` remains unsupported. Extras empty.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.5.
+
+GitHub checks: all 18 passed on PR #143. Merge SHA
+`e70c13d6f42cc884c1599a96fd92cda052dd1d42`.
+
+## Required item 16.5 evidence
+
+- [x] `.txt` is selected only through the protocol.
+- [x] Parse reports and source identities match `parse_text`.
+- [x] Other suffixes keep existing dispatch.
+- [x] Unknown contract versions name requested versus supported identity.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.5.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.6.
+
+## Item 16.5 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused extension and text parser tests | 59 passed |
+| Tracking, Ruff, lock, diff check | PASS |
+| Core pytest excluding optional markers | 2,331 passed, 17 deselected, one expected durability warning |
 
 ## Item 16.4 local gate evidence
 

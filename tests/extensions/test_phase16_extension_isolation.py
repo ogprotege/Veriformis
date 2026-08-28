@@ -118,6 +118,8 @@ def test_parser_dispatch_is_still_the_suffix_chain() -> None:
     assert "extension = Path(logical_path).suffix.lower()" in source
     assert 'if extension == ".txt"' in source
     assert "if extension in CODE_EXTENSIONS" in source
+    assert "parse_text_via_protocol" in source
+    assert "parse_md_file" in source
     assert "registry" not in source
     assert "extension_protocol" not in source
 
