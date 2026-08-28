@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.6 split-JSONL migration)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.7 compatibility kit)
 
-**Next review:** Phase 16.6 merge, item 16.7 compatibility kit, or
+**Next review:** Phase 16.7 merge, item 16.8 threat-model ADR, or
 governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability

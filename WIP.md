@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `858b283` on `main` after PR #144
+**Implementation baseline reviewed:** `13e3280` on `main` after PR #145
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–15 complete; Phase 16.5 text parser)
+Phases 0–2; independent-product Phases 0–15 complete; Phase 16.6 split JSONL)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.6 split-JSONL migration)
+**Last reviewed:** 2026-08-27 (Phase 16.7 compatibility kit)
 
-**Next review:** Phase 16.6 split-JSONL PR. No compatibility kit before
-item 16.7.
+**Next review:** Phase 16.7 compatibility-kit PR. No untrusted loader
+before item 16.8.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -131,10 +131,10 @@ local, offline, and free of LLM generation.
       not start Phase 16 from that packet.
 - [ ] Independent product Phase 16 is in progress under its
       [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
-      Item 16.5 merged as PR #144 at
-      `858b2833f041480e22fd415f484ad4075da4c4d0`. Item 16.6 binds generic
-      `split-jsonl-directory` through the protocol. Other containers and
-      consumer profiles stay on the private catalog.
+      Item 16.6 merged as PR #145 at
+      `13e3280ac6f27a3e8c6484f0c6e380836723ddc9`. Item 16.7 publishes a
+      test-only compatibility kit for the text parser and generic
+      `split-jsonl-directory`.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

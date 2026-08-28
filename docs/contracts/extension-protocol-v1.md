@@ -6,12 +6,12 @@
 
 **Schema:** `veriformis.extension-protocol/v1`
 
-**Status:** Schema pin through independent-product Phase 16.6. Built-in
+**Status:** Schema pin through independent-product Phase 16.7. Built-in
 declarations are read-only discovery over the internal registry. `.txt`
 and generic `split-jsonl-directory` are selected through the protocol;
 other suffixes, containers, and consumer profiles keep their existing
-paths. The contract does not load third-party code and is not a public
-plugin API.
+paths. Compatibility goldens live in a test-only kit. The contract does
+not load third-party code and is not a public plugin API.
 
 **Last reviewed:** 2026-08-27
 

@@ -82,6 +82,11 @@ def _export_declaration(item: object) -> CapabilityDeclaration:
             extra=None,
             selector=container_id,
             title=f"{container_id} exporter",
+            fixture_ids=(
+                ("phase16-split-jsonl",)
+                if container_id == "split-jsonl-directory"
+                else ()
+            ),
         )
     consumer_id = consumer.consumer_id
     extra = _PROFILE_EXTRAS.get(consumer_id)

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.6 split-JSONL migration)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.7 compatibility kit)
 
 **Next review:** Any service-boundary or architecture change
 

@@ -182,3 +182,11 @@ def test_phase47_hooks_remain_trusted_conformance_code() -> None:
 def test_seventeen_finished_dataset_gates_are_unchanged() -> None:
     assert len(V1_FINISHED_DATASET_GATES) == 17
     assert V1_FINISHED_DATASET_GATES[-1] == "snapshot"
+
+
+def test_compatibility_kit_is_test_only() -> None:
+    assert (
+        ROOT / "tests/regressions/fixtures/phase16/compatibility-kit.json"
+    ).exists()
+    assert not (ROOT / "src/veriformis/extensions/kit.py").exists()
+    assert not (ROOT / "src/veriformis/extensions/loader.py").exists()

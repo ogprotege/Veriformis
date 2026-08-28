@@ -14,6 +14,14 @@ from veriformis.extensions.protocol import CapabilityDeclaration
 from veriformis.sources import ParseResult
 
 
+def _require_null_extra(declaration: object, *, label: str) -> None:
+    requested = getattr(declaration, "extra", None)
+    if requested is not None:
+        raise ExtensionProtocolError(
+            f"{label} requires extra null; requested extra {requested!r}"
+        )
+
+
 def bound_text_parser(
     *,
     declaration: CapabilityDeclaration | None = None,
@@ -38,6 +46,7 @@ def bound_text_parser(
         raise ExtensionProtocolError(
             "text parser selection requires a builtin source-parser declaration"
         )
+    _require_null_extra(declaration, label="text parser")
     if declaration.contract_version != EXTENSION_PROTOCOL_CONTRACT_VERSION:
         raise ExtensionProtocolError(
             "unknown extension contract version: requested "
@@ -85,6 +94,7 @@ def bound_split_jsonl_exporter(
             "split-jsonl-directory selection requires a builtin "
             "container-exporter declaration"
         )
+    _require_null_extra(declaration, label="split-jsonl-directory")
     if declaration.contract_version != EXTENSION_PROTOCOL_CONTRACT_VERSION:
         raise ExtensionProtocolError(
             "unknown extension contract version: requested "

@@ -5,14 +5,14 @@ append-only history.
 
 **Updated:** 2026-08-27
 
-**Local branch:** `phase16/06-migrate-split-jsonl`
+**Local branch:** `phase16/07-compatibility-kit`
 
-**Completed:** Item 16.5, PR #144 at
-`858b2833f041480e22fd415f484ad4075da4c4d0`.
+**Completed:** Item 16.6, PR #145 at
+`13e3280ac6f27a3e8c6484f0c6e380836723ddc9`.
 
-**Current item:** 16.6 migrate split-jsonl-directory through the protocol.
+**Current item:** 16.7 publish the extension compatibility test kit.
 
-**Next gate:** Publish the 16.6 pull request, require every GitHub check,
-merge, and synchronize clean `main` before 16.7.
+**Next gate:** Publish the 16.7 pull request, require every GitHub check,
+merge, and synchronize clean `main` before 16.8.
 
-**Not started:** 16.7 through 16.10. Phase 17.
+**Not started:** 16.8 through 16.10. Phase 17.

@@ -122,10 +122,10 @@ operation is permitted in this item.
 
 **Branch:** `phase16/07-compatibility-kit`
 
-- [ ] Freeze source, row, and export fixtures for the two exemplars.
-- [ ] Add refusals for unknown kind, unknown version, missing extra, broken
+- [x] Freeze source, row, and export fixtures for the two exemplars.
+- [x] Add refusals for unknown kind, unknown version, missing extra, broken
       declaration, and unapproved third-party origin.
-- [ ] Keep the kit test-only. Add no product plugin runner or project-local
+- [x] Keep the kit test-only. Add no product plugin runner or project-local
       plugin path.
 
 ### 16.8 Threat-model third-party plugins

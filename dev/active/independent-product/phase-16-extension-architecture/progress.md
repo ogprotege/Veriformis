@@ -161,3 +161,28 @@ tests with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 16.6 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.7.
+
+## 2026-08-27: Item 16.6 merged; item 16.7 in progress
+
+**Status:** Item 16.6 merged as PR #145 at
+`13e3280ac6f27a3e8c6484f0c6e380836723ddc9` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.7 began.
+
+Item 16.7 freezes source and export goldens for the two migrated exemplars
+and adds negative cases: unknown kind, unknown contract version, missing
+extra, broken declaration identity, and unapproved third-party origin.
+Errors name exact contract versions. The kit is test-only.
+
+**Next action:** Run the complete item 16.7 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.8.
+
+## 2026-08-27: Item 16.7 local gates green
+
+**Status:** Frozen text and split-JSONL goldens match protocol-bound output.
+Negative cases fail closed and name contract versions. Focused tests passed.
+The core suite passed 2,348 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 16.7 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.8.

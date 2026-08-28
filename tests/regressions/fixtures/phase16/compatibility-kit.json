@@ -1,0 +1,52 @@
+{
+  "contract_id": "veriformis.extension-protocol",
+  "contract_version": 1,
+  "fixture_version": 1,
+  "schema_id": "veriformis.extension-protocol/v1",
+  "schema_version": "veriformis.phase16-extension-compatibility-kit/v1",
+  "split_jsonl": {
+    "container_id": "split-jsonl-directory",
+    "files": {
+      "README.md": {
+        "sha256": "18391ab32d59181e4993f22b6c2b8e468fe5ca5caab66cd65656ac1b32d7ba9e",
+        "size": 1052
+      },
+      "data/learn.jsonl": {
+        "sha256": "013e9debe42abf29be9b94c29b971af43a4b87b37e4563c020e7f59cbce4f417",
+        "size": 101
+      },
+      "data/score.jsonl": {
+        "sha256": "20bff1129969a89d648d169ccfb7930c17401b6cc7355fe890cc9882ae3e7f37",
+        "size": 245
+      },
+      "export-receipt.json": {
+        "sha256": "08cb5b2067c2821eccd710c56e501d320bb29e0bc616169d6f3304f2fd3ce1d0",
+        "size": 10420
+      },
+      "metadata/dataset-card.json": {
+        "sha256": "f36605eae6d3059c30ec6ab915aa14b9fb0fc8b080c26950ef75b13ab2c705d2",
+        "size": 770
+      },
+      "metadata/row-provenance.jsonl": {
+        "sha256": "5ed55e59a6fd12e12549bd1b3a97c34bd5dc5195d427a2abc4f4be95f16924ea",
+        "size": 11465
+      }
+    },
+    "fixture_id": "phase16-split-jsonl",
+    "options": {
+      "evaluation": "score",
+      "provenance": true,
+      "train": "learn"
+    },
+    "source_fixture": "tests/regressions/fixtures/phase3/pre-taxonomy-full-text.vfbundle.json",
+    "source_manifest_sha256": "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
+  },
+  "text_parser": {
+    "bytes_sha256": "63bc07a07275f7ba14a5c62a5ba8110db4d62aa3530634015edc2449bd41ba67",
+    "fixture_id": "phase16-text",
+    "logical_path": "note.txt",
+    "report_digest": "d52a26ef514d28c9dbfea4d86ce4accc651f03a6e9a85dd63bc373e5b36e0d1d",
+    "source_id": "src-v1-4b8b97c40658a5c971728569f3168c9d3ca10a5b060c91378b8b0af375562263",
+    "utf8": "Hello.\n\nWorld.\n"
+  }
+}

@@ -37,6 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.5 merged as PR #144 at `858b2833f041480e22fd415f484ad4075da4c4d0`.
-Item 16.6 binds generic `split-jsonl-directory` only through the protocol.
-Other containers and consumer profiles stay on the private catalog.
+Item 16.6 merged as PR #145 at `13e3280ac6f27a3e8c6484f0c6e380836723ddc9`.
+Item 16.7 publishes a test-only compatibility kit for the text parser and
+generic `split-jsonl-directory`. There is no product plugin runner.
