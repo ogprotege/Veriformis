@@ -5,17 +5,14 @@ append-only history.
 
 **Updated:** 2026-08-27
 
-**Local branch:** `phase16/04-capability-declarations`
+**Local branch:** `phase16/05-migrate-text-parser`
 
-**Completed:** Item 16.3, PR #142 at
-`ccf97f7de863d09cb71acd742df468fb19854740`.
+**Completed:** Item 16.4, PR #143 at
+`e70c13d6f42cc884c1599a96fd92cda052dd1d42`.
 
-**Current item:** 16.4 read-only built-in capability declarations.
-Discovery through PipelineService, CLI `extension-capabilities`, and MCP
-`extension_capabilities`. No executable binding change, loader, extra, or
-public plugin API.
+**Current item:** 16.5 migrate the text parser through the protocol.
 
-**Next gate:** Publish the 16.4 pull request, require every GitHub check,
-merge, and synchronize clean `main` before 16.5.
+**Next gate:** Publish the 16.5 pull request, require every GitHub check,
+merge, and synchronize clean `main` before 16.6.
 
-**Not started:** 16.5 through 16.10. Phase 17.
+**Not started:** 16.6 through 16.10. Phase 17.

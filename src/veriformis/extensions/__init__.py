@@ -17,6 +17,7 @@ from veriformis.extensions.protocol import (
     create_capability_declaration,
     load_capability_declaration,
 )
+from veriformis.extensions.runtime import bound_text_parser, parse_text_via_protocol
 from veriformis.extensions.registry import (
     BuiltinBinding,
     BuiltinExtensionRegistry,
@@ -35,9 +36,11 @@ __all__ = [
     "CapabilityDeclaration",
     "DeterministicRequirements",
     "DiscoveryMetadata",
+    "bound_text_parser",
     "builtin_declarations",
     "builtin_registry",
     "create_capability_declaration",
     "discover_extensions",
     "load_capability_declaration",
+    "parse_text_via_protocol",
 ]

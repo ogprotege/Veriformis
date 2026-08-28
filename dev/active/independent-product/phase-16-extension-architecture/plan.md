@@ -105,9 +105,9 @@ operation is permitted in this item.
 
 **Branch:** `phase16/05-migrate-text-parser`
 
-- [ ] Select `text` only through the protocol while every other suffix retains
+- [x] Select `text` only through the protocol while every other suffix retains
       existing dispatch.
-- [ ] Preserve byte-identical parse reports and source identities. Refuse
+- [x] Preserve byte-identical parse reports and source identities. Refuse
       unknown contract versions with exact version diagnostics.
 
 ### 16.6 Migrate split JSONL

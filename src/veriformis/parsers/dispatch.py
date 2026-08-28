@@ -62,7 +62,9 @@ def parse_captured_source(
     display_path = Path(path)
     extension = Path(logical_path).suffix.lower()
     if extension == ".txt":
-        return parse_text(
+        from veriformis.extensions.runtime import parse_text_via_protocol
+
+        return parse_text_via_protocol(
             display_path,
             logical_path=logical_path,
             raw_bytes=raw_bytes,

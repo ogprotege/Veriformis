@@ -114,3 +114,25 @@ check, and `git diff --check` passed. The core suite passed 2,328 tests with
 
 **Next action:** Publish the item 16.4 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.5.
+
+## 2026-08-27: Item 16.4 merged; item 16.5 in progress
+
+**Status:** Item 16.4 merged as PR #143 at
+`e70c13d6f42cc884c1599a96fd92cda052dd1d42` after all 18 GitHub checks passed.
+
+Item 16.5 selects `.txt` only through the internal protocol. Parse reports and
+source identities stay identical to `parse_text`. Markdown, code, and other
+suffixes keep existing dispatch. Unknown text-parser contract versions fail
+closed and name the supported version.
+
+**Next action:** Run the complete item 16.5 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.6.
+
+## 2026-08-27: Item 16.5 local gates green
+
+**Status:** `.txt` is selected through the protocol. Focused tests passed.
+The core suite passed 2,331 tests with 17 deselected.
+
+**Next action:** Publish the item 16.5 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.6.
