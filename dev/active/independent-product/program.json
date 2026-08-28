@@ -182,7 +182,7 @@
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
       "completed_on": null,
-      "next_gate": "Item 16.7 publishes the test-only compatibility kit for the text parser and generic split-jsonl-directory."
+      "next_gate": "Item 16.8 records ADR-0017 Decision A: no untrusted loader in Phase 16."
     },
     {
       "number": 17,

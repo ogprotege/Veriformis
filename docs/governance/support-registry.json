@@ -436,7 +436,8 @@
       "src/veriformis/extensions/declarations.py",
       "src/veriformis/extensions/runtime.py",
       "tests/regressions/fixtures/phase16/compatibility-kit.json",
-      "tests/extensions/test_compatibility_kit.py"
+      "tests/extensions/test_compatibility_kit.py",
+      "docs/adr/0017-no-untrusted-extension-loader.md"
     ]
   },
   "scale": {

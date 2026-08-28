@@ -74,10 +74,10 @@ Phase 15 from that packet.
 Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
 skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
-architecture is in progress. Item 16.6 merged as PR #145 at
-`13e3280ac6f27a3e8c6484f0c6e380836723ddc9`. Item 16.7 publishes a
-test-only compatibility kit for the text parser and generic
-`split-jsonl-directory`. No third-party plugin support or loader.
+architecture is in progress. Item 16.7 merged as PR #146 at
+`194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`. Item 16.8 records
+ADR-0017 Decision A: no untrusted loader in Phase 16. No third-party
+plugin support or loader.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -173,8 +173,9 @@ Read these current authorities before changing code:
     `docs/adr/0012-consumer-profile-as-optional-adapter.md`,
     `docs/adr/0013-columnar-containers-as-optional-generic-exports.md`, and
     `docs/adr/0014-independently-admitted-consumer-profiles.md`,
-    `docs/adr/0015-collection-plan-as-ingest-contract.md`, and
-    `docs/adr/0016-optional-local-tesseract-ocr.md`
+    `docs/adr/0015-collection-plan-as-ingest-contract.md`,
+    `docs/adr/0016-optional-local-tesseract-ocr.md`, and
+    `docs/adr/0017-no-untrusted-extension-loader.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

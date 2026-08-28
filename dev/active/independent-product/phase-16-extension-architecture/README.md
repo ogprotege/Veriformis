@@ -37,6 +37,5 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.6 merged as PR #145 at `13e3280ac6f27a3e8c6484f0c6e380836723ddc9`.
-Item 16.7 publishes a test-only compatibility kit for the text parser and
-generic `split-jsonl-directory`. There is no product plugin runner.
+Item 16.7 merged as PR #146 at `194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`.
+Item 16.8 records ADR-0017 Decision A: no untrusted loader in Phase 16.

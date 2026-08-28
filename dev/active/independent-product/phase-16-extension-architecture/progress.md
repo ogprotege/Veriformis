@@ -186,3 +186,27 @@ durability warning.
 
 **Next action:** Publish the item 16.7 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.8.
+
+## 2026-08-27: Item 16.7 merged; item 16.8 in progress
+
+**Status:** Item 16.7 merged as PR #146 at
+`194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.8 began.
+
+Item 16.8 publishes ADR-0017 covering process isolation, filesystem
+permissions, network, resource limits, signing, crash containment,
+workspace corruption, and dataset-project code execution. Decision A: no
+untrusted loader in Phase 16. This PR adds no loader.
+
+**Next action:** Run the complete item 16.8 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.9.
+
+## 2026-08-27: Item 16.8 local gates green
+
+**Status:** ADR-0017 records Decision A. Focused tests passed. The core
+suite passed 2,351 tests with 17 deselected and the one expected
+durability warning. No loader was added.
+
+**Next action:** Publish the item 16.8 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.9.
