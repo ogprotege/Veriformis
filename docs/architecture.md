@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.2 admission contract)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.3 leakage grouping)
 
 **Next review:** Any service-boundary or architecture change
 

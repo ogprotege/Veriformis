@@ -52,9 +52,8 @@ blocks seal. Phase 14 review workflows are complete. Phase 15 scale
 work is complete. Phase 16 extension architecture is
 complete. ADR-0017 Decision A: no untrusted loader.
 Public plugins skipped with a record. Phase 17 advanced dataset
-families is in progress under its own packet. Item 17.2 pins
-`veriformis.advanced-family-admission/v1` without execute. Do not start
-Phase 18 from that packet.
+families is in progress under its own packet. Item 17.3 adds leakage grouping keys without changing default SFT
+split. Do not start Phase 18 from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

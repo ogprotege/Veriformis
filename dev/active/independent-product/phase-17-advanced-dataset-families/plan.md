@@ -83,16 +83,17 @@ item.
       lifecycle.
 - [x] Refuse unknown families, unknown fields, and missing versions. Add no
       execute and no taxonomy promotion.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.3 Add leakage grouping keys for advanced families
 
 **Branch:** `phase17/03-advanced-leakage-grouping`
 
-- [ ] Name grouping keys `source`, `shared-prompt`, `conversation`,
+- [x] Name grouping keys `source`, `shared-prompt`, `conversation`,
       `annotator`, and `entity`.
-- [ ] Keep the default SFT split `transitive-leakage-prefix-v1`.
-- [ ] Prove shared-prompt and annotator grouping without changing SFT goldens.
+- [x] Keep the default SFT split `transitive-leakage-prefix-v1`.
+- [x] Prove shared-prompt and annotator grouping without changing SFT goldens.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.4 Add review and quality hooks for advanced families
 

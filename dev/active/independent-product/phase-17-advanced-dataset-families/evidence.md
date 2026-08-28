@@ -49,8 +49,31 @@ Phase 16 completed. Closeout merged as PR #149 at
       requested versus supported identity.
 - [x] Taxonomy, constructors, and SFT row schemas unchanged.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #151 merged. Clean `main` equals
+      `origin/main` at `c919485`.
+
+## Required item 17.3 evidence
+
+- [x] Grouping keys `source`, `shared-prompt`, `conversation`, `annotator`,
+      `entity` with fail-closed missing values.
+- [x] Default SFT split algorithm and SplitPolicy fields unchanged.
+- [x] Shared-prompt and annotator/entity grouping tests.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.3.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.4.
+
+## Item 17.3 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/ tests/datasets/test_splitting.py` | 52 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,403 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
+GitHub checks for item 17.3 remain pending.
 
 ## Item 17.1 local gate evidence
 
@@ -76,4 +99,4 @@ PR #150 merged; clean `main` synchronized.
 | Core pytest excluding optional integration and scale markers | 2,394 passed, 17 deselected, one expected durability warning |
 | `git diff --check` | PASS |
 
-GitHub checks for item 17.2 remain pending.
+PR #151 merged; clean `main` synchronized.
