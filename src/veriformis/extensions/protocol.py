@@ -211,7 +211,12 @@ class CapabilityDeclaration(_StrictModel):
             raise ExtensionProtocolError(
                 "only consumer-profile declarations may set discovery.consumer_id"
             )
-        validate_id(self.declaration_id, kind="exd")
+        try:
+            validate_id(self.declaration_id, kind="exd")
+        except ValueError as exc:
+            raise ExtensionProtocolError(
+                "extension declaration identity mismatch"
+            ) from exc
         expected = derive_id(
             "exd",
             self.model_dump(mode="json", exclude={"declaration_id"}),
@@ -258,6 +263,58 @@ def create_capability_declaration(
     )
 
 
+def _supported_contract_label() -> str:
+    return (
+        f"contract_id={EXTENSION_PROTOCOL_CONTRACT_ID!r} "
+        f"contract_version={EXTENSION_PROTOCOL_CONTRACT_VERSION} "
+        f"schema_id={EXTENSION_PROTOCOL_SCHEMA_ID!r}"
+    )
+
+
+def _require_known_contract(payload: dict[str, Any]) -> None:
+    missing = [
+        name
+        for name in ("contract_id", "contract_version", "schema_id")
+        if name not in payload
+    ]
+    if missing:
+        raise ExtensionProtocolError(
+            "unknown extension contract version: requested missing "
+            f"{', '.join(missing)}, supported {_supported_contract_label()}"
+        )
+    requested_id = payload["contract_id"]
+    requested_version = payload["contract_version"]
+    requested_schema = payload["schema_id"]
+    if (
+        requested_id != EXTENSION_PROTOCOL_CONTRACT_ID
+        or requested_version != EXTENSION_PROTOCOL_CONTRACT_VERSION
+        or requested_schema != EXTENSION_PROTOCOL_SCHEMA_ID
+    ):
+        raise ExtensionProtocolError(
+            "unknown extension contract version: requested "
+            f"contract_id={requested_id!r} "
+            f"contract_version={requested_version!r} "
+            f"schema_id={requested_schema!r}, supported "
+            f"{_supported_contract_label()}"
+        )
+
+
+def _require_closed_token(
+    payload: dict[str, Any],
+    field: str,
+    admitted: tuple[str, ...],
+    label: str,
+) -> None:
+    if field not in payload:
+        raise ExtensionProtocolError(f"extension declaration missing {field}")
+    value = payload[field]
+    if value not in admitted:
+        raise ExtensionProtocolError(
+            f"unknown extension {label}: {value!r}; admitted {label}s are "
+            + ", ".join(admitted)
+        )
+
+
 def _protocol_error_from_validation(exc: ValidationError) -> ExtensionProtocolError:
     for error in exc.errors():
         loc = ".".join(str(part) for part in error.get("loc", ()))
@@ -265,6 +322,10 @@ def _protocol_error_from_validation(exc: ValidationError) -> ExtensionProtocolEr
         if error_type == "extra_forbidden":
             return ExtensionProtocolError(
                 f"extension declaration contains unknown field {loc}"
+            )
+        if error_type == "missing":
+            return ExtensionProtocolError(
+                f"extension declaration missing {loc or 'required field'}"
             )
         if loc == "kind":
             return ExtensionProtocolError(
@@ -285,12 +346,7 @@ def _protocol_error_from_validation(exc: ValidationError) -> ExtensionProtocolEr
             return ExtensionProtocolError(
                 "unknown extension contract version: requested "
                 f"{error.get('input')!r}, supported "
-                f"{EXTENSION_PROTOCOL_CONTRACT_VERSION} "
-                f"({EXTENSION_PROTOCOL_SCHEMA_ID})"
-            )
-        if error_type == "missing":
-            return ExtensionProtocolError(
-                f"extension declaration missing {loc or 'required field'}"
+                f"{_supported_contract_label()}"
             )
     return ExtensionProtocolError("extension declaration is invalid")
 
@@ -299,26 +355,10 @@ def load_capability_declaration(payload: object) -> CapabilityDeclaration:
     """Load one declaration. Unknown kinds, versions, and fields fail closed."""
     if not isinstance(payload, dict):
         raise ExtensionProtocolError("extension declaration must be an object")
-    requested_id = payload.get("contract_id")
-    requested_version = payload.get("contract_version")
-    requested_schema = payload.get("schema_id")
-    if (
-        requested_id != EXTENSION_PROTOCOL_CONTRACT_ID
-        or requested_version != EXTENSION_PROTOCOL_CONTRACT_VERSION
-        or requested_schema != EXTENSION_PROTOCOL_SCHEMA_ID
-    ):
-        raise ExtensionProtocolError(
-            "unknown extension contract version: requested "
-            f"{requested_version!r}, supported "
-            f"{EXTENSION_PROTOCOL_CONTRACT_VERSION} "
-            f"({EXTENSION_PROTOCOL_SCHEMA_ID})"
-        )
-    kind = payload.get("kind")
-    if kind not in EXTENSION_KINDS:
-        raise ExtensionProtocolError(
-            f"unknown extension kind: {kind!r}; admitted kinds are "
-            + ", ".join(EXTENSION_KINDS)
-        )
+    _require_known_contract(payload)
+    _require_closed_token(payload, "kind", EXTENSION_KINDS, "kind")
+    _require_closed_token(payload, "origin", EXTENSION_ORIGINS, "origin")
+    _require_closed_token(payload, "lifecycle", EXTENSION_LIFECYCLES, "lifecycle")
     try:
         return CapabilityDeclaration.model_validate(payload)
     except ExtensionProtocolError:

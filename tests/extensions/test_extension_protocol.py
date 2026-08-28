@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import pytest
-from pydantic import ValidationError
-
 from veriformis.cli import app
 from veriformis.contracts import (
     EXTENSION_PROTOCOL_CONTRACT_VERSION,
@@ -103,7 +101,13 @@ def test_unknown_contract_version_names_requested_and_supported() -> None:
     payload["contract_version"] = 2
     with pytest.raises(
         ExtensionProtocolError,
-        match=r"unknown extension contract version: requested 2, supported 1 \(veriformis.extension-protocol/v1\)",
+        match=(
+            r"unknown extension contract version: requested "
+            r"contract_id='veriformis.extension-protocol' contract_version=2 "
+            r"schema_id='veriformis.extension-protocol/v1', supported "
+            r"contract_id='veriformis.extension-protocol' contract_version=1 "
+            r"schema_id='veriformis.extension-protocol/v1'"
+        ),
     ):
         load_capability_declaration(payload)
 
@@ -113,7 +117,40 @@ def test_missing_contract_version_names_supported_version() -> None:
     del payload["contract_version"]
     with pytest.raises(
         ExtensionProtocolError,
-        match=r"unknown extension contract version: requested None, supported 1 \(veriformis.extension-protocol/v1\)",
+        match=(
+            r"unknown extension contract version: requested missing "
+            r"contract_version, supported contract_id='veriformis.extension-protocol' "
+            r"contract_version=1 schema_id='veriformis.extension-protocol/v1'"
+        ),
+    ):
+        load_capability_declaration(payload)
+
+
+def test_unknown_contract_id_names_requested_identity() -> None:
+    payload = _declaration().model_dump(mode="json")
+    payload["contract_id"] = "veriformis.plugin-protocol"
+    with pytest.raises(
+        ExtensionProtocolError,
+        match=(
+            r"requested contract_id='veriformis.plugin-protocol' "
+            r"contract_version=1 schema_id='veriformis.extension-protocol/v1', "
+            r"supported contract_id='veriformis.extension-protocol'"
+        ),
+    ):
+        load_capability_declaration(payload)
+
+
+def test_unknown_schema_id_names_requested_identity() -> None:
+    payload = _declaration().model_dump(mode="json")
+    payload["schema_id"] = "veriformis.extension-protocol/v2"
+    with pytest.raises(
+        ExtensionProtocolError,
+        match=(
+            r"requested contract_id='veriformis.extension-protocol' "
+            r"contract_version=1 schema_id='veriformis.extension-protocol/v2', "
+            r"supported contract_id='veriformis.extension-protocol' "
+            r"contract_version=1 schema_id='veriformis.extension-protocol/v1'"
+        ),
     ):
         load_capability_declaration(payload)
 
@@ -173,16 +210,60 @@ def test_non_profile_cannot_set_consumer_id() -> None:
         )
 
 
+def test_missing_origin_and_lifecycle_do_not_dump_the_payload() -> None:
+    payload = _declaration().model_dump(mode="json")
+    del payload["origin"]
+    with pytest.raises(
+        ExtensionProtocolError,
+        match="extension declaration missing origin",
+    ):
+        load_capability_declaration(payload)
+    payload = _declaration().model_dump(mode="json")
+    del payload["lifecycle"]
+    with pytest.raises(
+        ExtensionProtocolError,
+        match="extension declaration missing lifecycle",
+    ):
+        load_capability_declaration(payload)
+
+
+def test_unknown_origin_hyphen_is_refused() -> None:
+    payload = _declaration().model_dump(mode="json")
+    payload["origin"] = "third-party"
+    with pytest.raises(
+        ExtensionProtocolError,
+        match="unknown extension origin: 'third-party'; admitted origins are builtin, third_party",
+    ):
+        load_capability_declaration(payload)
+
+
+def test_nested_unknown_field_fails_closed() -> None:
+    payload = _declaration().model_dump(mode="json")
+    payload["requirements"]["plugin_path"] = "./plugins"
+    with pytest.raises(
+        ExtensionProtocolError,
+        match="unknown field requirements.plugin_path",
+    ):
+        load_capability_declaration(payload)
+
+
+def test_missing_kind_is_missing_not_unknown_none() -> None:
+    payload = _declaration().model_dump(mode="json")
+    del payload["kind"]
+    with pytest.raises(
+        ExtensionProtocolError,
+        match="extension declaration missing kind",
+    ):
+        load_capability_declaration(payload)
+
+
 def test_declaration_identity_is_stable_and_mismatch_fails() -> None:
     first = _declaration()
     second = _declaration()
     assert first == second
     payload = first.model_dump(mode="json")
     payload["declaration_id"] = derive_id("exd", {"tampered": True})
-    with pytest.raises(
-        (ExtensionProtocolError, ValidationError),
-        match="identity mismatch",
-    ):
+    with pytest.raises(ExtensionProtocolError, match="identity mismatch"):
         load_capability_declaration(payload)
 
 
