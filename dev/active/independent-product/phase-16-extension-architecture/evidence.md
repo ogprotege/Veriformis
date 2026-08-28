@@ -1,6 +1,6 @@
 # Phase 16 Evidence
 
-**Status:** Open
+**Status:** Complete
 
 **Opened:** 2026-08-27
 
@@ -158,8 +158,30 @@ GitHub checks: all 18 passed on PR #147. Merge SHA
 - [x] A broken extra=ocr fixture cannot advance `HEAD` or write a bundle.
 - [x] No untrusted loader (Decision A).
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.10.
+
+GitHub checks: all 18 passed on PR #148. Merge SHA
+`45949de8665a0345d9f4b17bb39957b9c54e8e4e`.
+
+## Required item 16.10 evidence
+
+- [x] Unknown version, duplicate selector, third-party origin, plugins
+      path, declaration tamper, and registry mutation fail closed.
+- [x] Text, split-JSONL, and sealed-bundle goldens unchanged.
+- [x] Public plugin loading skipped with a record (ADR-0017 Decision A).
+- [x] Phase 16 marked completed. Do not start Phase 17 from this packet.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.10.
+- [ ] PR merges and clean local `main` equals `origin/main`.
+
+## Item 16.10 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused adversarial closeout tests | 5 passed |
+| Tracking, Ruff, lock, diff check | PASS |
+| Core pytest excluding optional markers | 2,360 passed, 17 deselected, one expected durability warning |
 
 ## Item 16.9 local gate evidence
 

@@ -1,8 +1,10 @@
 # Phase 16: Establish a Safe Extension Architecture
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-27
+
+**Completed:** 2026-08-27
 
 **Roadmap phase:** [Phase 16](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-16--establish-a-safe-extension-architecture)
 
@@ -37,6 +39,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.8 merged as PR #147 at `27ad5cd53f627a35ef6a2b35a5bb428fb992869d`.
-Item 16.9 proves missing extras do not block core startup and a broken
-optional fixture cannot advance `HEAD` or write a bundle.
+Phase 16 is complete. ADR-0017 Decision A: no untrusted loader. Public
+plugin loading is skipped with a record. Do not start Phase 17 from this
+packet.

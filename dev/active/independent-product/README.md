@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–15 complete; Phase 16 in progress
+**Status:** Active program — Phases 0–16 complete
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -31,7 +31,7 @@ with roadmap headings.
 - [Phase 13 — Build dataset quality intelligence](phase-13-quality-intelligence/README.md) — complete
 - [Phase 14 — Deliver human review and correction workflows](phase-14-review-workflows/README.md) — complete
 - [Phase 15 — Measure and engineer scale, streaming, and sharding](phase-15-scale/README.md) — complete
-- [Phase 16 — Establish a safe extension architecture](phase-16-extension-architecture/README.md) — in progress
+- [Phase 16 — Establish a safe extension architecture](phase-16-extension-architecture/README.md) — complete
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -119,10 +119,11 @@ not start Phase 16 from that packet.
 
 Phase 15 closeout merged as PR #139 at
 `435bd63c90778674ff4eb68a5d882a168349baca`. Phase 16 opened from that clean
-baseline under its own [packet](phase-16-extension-architecture/README.md).
-Item 16.1 records the existing architecture and adds isolation tests only. No
-extension contract, executable registry, loader, extra, or public plugin API
-exists yet.
+baseline under its own [packet](phase-16-extension-architecture/README.md)
+and is complete. Internal protocol, two exemplar migrations, compatibility
+kit, ADR-0017 Decision A, and isolation evidence are on `main`. Public
+plugin loading is skipped with a record. Do not start Phase 17 from that
+packet.
 
 ## State change procedure
 

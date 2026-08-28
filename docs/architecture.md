@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.9 extra isolation)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.10 closeout)
 
 **Next review:** Any service-boundary or architecture change
 

@@ -5,16 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-27
 
-**Local branch:** `phase16/09-broken-extension-isolation`
+**Local branch:** `phase16/10-adversarial-closeout`
 
-**Completed:** Item 16.8, PR #147 at
-`27ad5cd53f627a35ef6a2b35a5bb428fb992869d`.
+**Completed:** Item 16.9, PR #148 at
+`45949de8665a0345d9f4b17bb39957b9c54e8e4e`.
 
-**Current item:** 16.9 isolate missing and broken optional extras.
+**Current item:** 16.10 adversarial closeout. Public plugin loading skipped
+under ADR-0017 Decision A.
 
-**Next gate:** Publish the 16.9 pull request, require every GitHub check,
-merge, and synchronize clean `main` before 16.10.
+**Next gate:** Publish the 16.10 pull request, require every GitHub check,
+merge, and synchronize clean `main`. Phase 16 complete. Do not start
+Phase 17 from this packet.
 
 **Decision:** A — no untrusted loader in Phase 16.
-
-**Not started:** 16.10. Phase 17.

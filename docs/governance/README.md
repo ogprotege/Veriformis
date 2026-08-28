@@ -2,10 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.9 extra isolation)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.10 closeout)
 
-**Next review:** Phase 16.9 merge, item 16.10 closeout, or
-governance-schema change.
+**Next review:** Phase 16.10 merge, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

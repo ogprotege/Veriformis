@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `27ad5cd` on `main` after PR #147
+**Implementation baseline reviewed:** `45949de` on `main` after PR #148
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–15 complete; Phase 16.8 ADR-0017)
+Phases 0–2; independent-product Phases 0–16 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.9 broken-extra isolation)
+**Last reviewed:** 2026-08-27 (Phase 16.10 adversarial closeout)
 
-**Next review:** Phase 16.9 isolation PR. Closeout in 16.10. No
-untrusted loader.
+**Next review:** Phase 16.10 closeout PR. Do not start Phase 17 from
+this packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -129,11 +129,12 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-15-scale/README.md).
       `published_tiers` is empty. 15.5–15.8 skipped with a record. Do
       not start Phase 16 from that packet.
-- [ ] Independent product Phase 16 is in progress under its
+- [x] Independent product Phase 16 is complete under its
       [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
-      Item 16.8 merged as PR #147 at
-      `27ad5cd53f627a35ef6a2b35a5bb428fb992869d`. Item 16.9 isolates
-      missing and broken optional extras. ADR-0017 Decision A remains.
+      Internal protocol; text parser and generic `split-jsonl-directory`
+      migrated with identical goldens; isolation proven; ADR-0017
+      Decision A: no untrusted loader. Public plugins skipped with a
+      record. Do not start Phase 17 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -162,7 +163,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 13 | Build dataset quality intelligence | Completed | [Completed packet](dev/active/independent-product/phase-13-quality-intelligence/README.md) |
 | 14 | Deliver human review and correction workflows | Completed | [Completed packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Completed | [Completed packet](dev/active/independent-product/phase-15-scale/README.md) |
-| 16 | Establish a safe extension architecture | In progress | [Active packet](dev/active/independent-product/phase-16-extension-architecture/README.md) |
+| 16 | Establish a safe extension architecture | Completed | [Completed packet](dev/active/independent-product/phase-16-extension-architecture/README.md) |
 | 17 | Add governed advanced dataset families | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 18 | Complete the goal-first Mac workbench | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 19 | Complete automation and optional publication boundaries | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
