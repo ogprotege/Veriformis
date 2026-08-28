@@ -339,6 +339,57 @@
       "training_family": "explicit-label-classification",
       "what_the_model_learns": "To emit the exact label the operator supplied for each context. The compiler does not invent, guess, or score labels.",
       "what_you_provide": "JSONL, JSON, or CSV rows that already contain a context, a label, and an annotator identity."
+    },
+    {
+      "compatible_representations": [
+        "prompt-chosen-rejected"
+      ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "default_representation": "prompt-chosen-rejected",
+      "eligible_input_families": [
+        "delimited-table",
+        "json-records"
+      ],
+      "goal_id": "prefer-chosen-over-rejected",
+      "instruction_task": "provided chosen completion",
+      "instruction_template": "Emit the provided chosen completion for this prompt.",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
+      "not_this": [
+        "It does not invent a chosen or rejected completion.",
+        "It does not infer a ranking from scores.",
+        "It does not run DPO, KTO, or ORPO training."
+      ],
+      "objective": "preference_pair",
+      "plain_language": "Teach the model the exact preference you already supplied: one chosen completion and one rejected completion for the same prompt. The compiler copies those strings; it does not guess which is better.",
+      "recipe_library_id": "preference_pair.default",
+      "required_evidence_diagnostics": [
+        "mapped-preference-unavailable"
+      ],
+      "required_source_evidence": "Imported rows that already contain a non-empty prompt, a non-empty chosen completion, and a non-empty rejected completion.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
+      "state": "implemented",
+      "supervision_boundary": "The prompt is context. The chosen and rejected completions are kept as a pair rather than one lone completion target.",
+      "target_construction": "The imported prompt, chosen, and rejected strings are copied exactly; no preference is invented.",
+      "title": "Prefer a chosen completion over a rejected one",
+      "training_family": "preference-and-ranking",
+      "what_the_model_learns": "To treat the operator-supplied chosen completion as preferred over the rejected completion for that prompt. The compiler does not invent, score, or rank the pair.",
+      "what_you_provide": "JSONL, JSON, or CSV rows that already contain a prompt, a chosen completion, and a rejected completion."
     }
   ],
   "representations": [
@@ -421,6 +472,19 @@
       "row_schema": "label-classification",
       "supervised_region": "The provided label only; context and annotator are not the target.",
       "title": "Context and label"
+    },
+    {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json"
+      ],
+      "loss_policy": "pair-supervision",
+      "plain_language": "A prompt, the exact chosen completion the operator supplied, and the exact rejected completion. The pair is trained on together; the prompt is context.",
+      "representation_id": "prompt-chosen-rejected",
+      "requires_operator_instruction": false,
+      "row_schema": "preference-pair",
+      "supervised_region": "The chosen and rejected completions as a pair; the prompt is context.",
+      "title": "Prompt, chosen, and rejected"
     }
   ],
   "schema_id": "veriformis.goal-catalog/v1"

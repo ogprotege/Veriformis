@@ -128,3 +128,32 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 17.5 pull request, require every
 GitHub check, merge, and synchronize clean `main` before item 17.6.
+
+## 2026-08-28: Item 17.5 merged; item 17.6 in progress
+
+**Status:** Item 17.5 merged as PR #154 at
+`301d1a6c4477480a12bfcba66a9246f5a4607f61`. Clean local `main` equals
+`origin/main` there.
+
+Item 17.6 admits `preference-and-ranking` from user-provided
+chosen/rejected pairs. Unpaired feedback and ranking-order schemas are
+skipped because the pair leakage and evidence contract does not cover
+them. Existing trainer profiles refuse the new schema.
+
+**Next action:** Run item 17.6 local gates, publish the pull request,
+merge green, and synchronize clean `main` before item 17.7.
+
+## 2026-08-28: Item 17.6 local gates green
+
+**Status:** `preference-and-ranking` compiles from user-provided
+chosen/rejected pairs through map, curate, split, format, validate,
+seal, and verify. Shared-prompt leakage keeps one prompt in one
+partition. Document-source construction cannot invent pairs.
+Constrained CSV and existing trainer profiles refuse the schema.
+Unpaired feedback and ranking-order schemas are skipped with a record.
+Focused preference tests passed 11. Project tracking, Ruff, the lock
+check, and `git diff --check` passed. The core suite passed 2,427 tests
+with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 17.6 pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 17.7.

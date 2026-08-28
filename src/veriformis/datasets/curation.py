@@ -37,6 +37,7 @@ ObjectiveKind = Literal[
     "before_after_transformation",
     "structured_field",
     "explicit_label",
+    "preference_pair",
 ]
 
 OBJECTIVE_FIELD_ROLES: Mapping[
@@ -53,6 +54,7 @@ OBJECTIVE_FIELD_ROLES: Mapping[
         "before_after_transformation": (("before",), ("after",)),
         "structured_field": (("input",), ("fields",)),
         "explicit_label": (("context",), ("label",)),
+        "preference_pair": (("prompt",), ("chosen",)),
     }
 )
 

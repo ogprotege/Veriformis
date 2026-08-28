@@ -427,7 +427,8 @@
     "implemented_families": [
       "source-grounded-language-modeling",
       "source-grounded-supervised-fine-tuning",
-      "explicit-label-classification"
+      "explicit-label-classification",
+      "preference-and-ranking"
     ],
     "implemented_goals": [
       "learn-the-text",
@@ -435,20 +436,23 @@
       "recover-a-section-from-its-heading",
       "reproduce-a-recorded-change",
       "extract-a-structured-value",
-      "classify-with-provided-labels"
+      "classify-with-provided-labels",
+      "prefer-chosen-over-rejected"
     ],
     "implemented_loss_policies": [
       "full-sequence",
       "completion-only",
       "output-only",
       "final-assistant-suffix",
-      "label-only"
+      "label-only",
+      "pair-supervision"
     ],
     "implemented_objectives": [
       "before_after_transformation",
       "continuation",
       "explicit_label",
       "full_text",
+      "preference_pair",
       "section_reconstruction",
       "structured_field"
     ],
@@ -458,17 +462,18 @@
       "recover-a-section-from-its-heading.safe",
       "reproduce-a-recorded-change.safe",
       "extract-a-structured-value.safe",
-      "classify-with-provided-labels.safe"
+      "classify-with-provided-labels.safe",
+      "prefer-chosen-over-rejected.safe"
     ],
     "implemented_row_schemas": [
       "instruction_output",
       "label-classification",
       "messages",
+      "preference-pair",
       "prompt_completion",
       "text"
     ],
     "planned_families": [
-      "preference-and-ranking",
       "tool-call-conversations",
       "stepwise-supervision",
       "pre-tokenized-training",

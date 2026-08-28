@@ -43,6 +43,11 @@
     "messages": [
       "messages"
     ],
+    "preference-pair": [
+      "prompt",
+      "chosen",
+      "rejected"
+    ],
     "prompt_completion": [
       "prompt",
       "completion"
@@ -70,7 +75,8 @@
     "prompt_completion",
     "instruction_output",
     "messages",
-    "label-classification"
+    "label-classification",
+    "preference-pair"
   ],
   "schema_id": "veriformis.mapping-contract-discovery/v1",
   "schema_versions": [

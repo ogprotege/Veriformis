@@ -50,7 +50,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "a04dafd75db244215f5cd48151b84c802a8ed8f9d8f44a36a65673b2b8ea458f"
+    "a4fff0f3930bda2808247709db948335a142f12113a15b5bf3634be209d3a34b"
 )
 
 
@@ -119,9 +119,11 @@ def test_implemented_families_are_conservative_and_complete_for_current_objectiv
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
+        "preference-and-ranking",
     )
     assert family_for_objective("full_text") == "source-grounded-language-modeling"
     assert family_for_objective("explicit_label") == "explicit-label-classification"
+    assert family_for_objective("preference_pair") == "preference-and-ranking"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -131,7 +133,8 @@ def test_implemented_families_are_conservative_and_complete_for_current_objectiv
 
 
 def test_future_families_are_named_but_not_implemented() -> None:
-    assert "preference-and-ranking" in PLANNED_TRAINING_FAMILIES
+    assert "preference-and-ranking" not in PLANNED_TRAINING_FAMILIES
+    assert "preference-and-ranking" in IMPLEMENTED_TRAINING_FAMILIES
     assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
     assert "explicit-label-classification" in IMPLEMENTED_TRAINING_FAMILIES
     assert "tool-call-conversations" in PLANNED_TRAINING_FAMILIES
@@ -152,6 +155,7 @@ def test_future_families_are_named_but_not_implemented() -> None:
 def test_objective_row_compatibility_matches_construction_rules() -> None:
     assert compatible_row_schemas("full_text") == ("text",)
     assert compatible_row_schemas("explicit_label") == ("label-classification",)
+    assert compatible_row_schemas("preference_pair") == ("preference-pair",)
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -177,6 +181,7 @@ def test_objective_row_compatibility_matches_construction_rules() -> None:
 def test_default_row_schema_matches_current_surfaces() -> None:
     assert default_row_schema("full_text") == "text"
     assert default_row_schema("explicit_label") == "label-classification"
+    assert default_row_schema("preference_pair") == "preference-pair"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -205,6 +210,11 @@ def test_each_row_schema_has_one_loss_policy() -> None:
             "label-only",
             "Only the user-provided label receives supervision.",
         ),
+        "preference-pair": (
+            "pair-supervision",
+            "The chosen and rejected completions are supervised as a pair; "
+            "the prompt is context.",
+        ),
     }
     assert LOSS_POLICY_IDS == (
         "full-sequence",
@@ -212,6 +222,7 @@ def test_each_row_schema_has_one_loss_policy() -> None:
         "output-only",
         "final-assistant-suffix",
         "label-only",
+        "pair-supervision",
     )
     assert set(expected) == set(PRODUCT_ROW_SCHEMA_KINDS)
     for row_schema, (policy, notes) in expected.items():
@@ -297,7 +308,8 @@ def test_implemented_discovery_names_axes_and_omits_format() -> None:
     assert discovery["semantic_row"] == PRODUCT_ROW_SCHEMA_KINDS
     assert discovery["physical_container"] == IMPLEMENTED_PHYSICAL_CONTAINERS
     assert discovery["consumer_profile"] == IMPLEMENTED_CONSUMER_PROFILES
-    assert "preference-and-ranking" not in discovery["training_family"]
+    assert "preference-and-ranking" in discovery["training_family"]
+    assert "tool-call-conversations" not in discovery["training_family"]
     assert "split-jsonl-directory" in discovery["physical_container"]
     assert "json" in discovery["physical_container"]
     assert "constrained-csv" in discovery["physical_container"]

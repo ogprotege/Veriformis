@@ -241,6 +241,7 @@ def test_v1_diagnostic_and_promotion_reason_registries_are_exact():
         "transformation-pair-empty-or-unchanged",
         "transformation-pair-unavailable",
         "mapped-label-unavailable",
+        "mapped-preference-unavailable",
     )
     assert V1_PROMOTION_REASON_CODES == (
         "construction-integrity-v1",

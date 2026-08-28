@@ -66,6 +66,18 @@
         "annotator"
       ],
       "row_schema": "label-classification"
+    },
+    {
+      "detector_id": "prompt-chosen-rejected",
+      "goal_id": "prefer-chosen-over-rejected",
+      "plain_language": "Each object has prompt, chosen, and rejected strings supplied by the operator.",
+      "representation_id": "prompt-chosen-rejected",
+      "required_paths": [
+        "prompt",
+        "chosen",
+        "rejected"
+      ],
+      "row_schema": "preference-pair"
     }
   ],
   "schema_id": "veriformis.mapping-detector-discovery/v1"

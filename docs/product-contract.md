@@ -31,7 +31,8 @@ complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only,
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–16 complete; Phase 17 in progress with
-`explicit-label-classification` admitted on the dataset-row path and no
+`explicit-label-classification` and `preference-and-ranking` admitted on
+the dataset-row path and no
 generator; `veriformis.extension-protocol/v1`
 remains built-in-only with no loader; quality report is preview-only;
 maturity alpha;
@@ -39,9 +40,9 @@ public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command. Mac
 Review belongs to Phase 18. There is no published corpus tier.
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.5 classification)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.6 preference)
 
-**Next review:** Phase 17.5 merge, item 17.6 preference pairs, or any
+**Next review:** Phase 17.6 merge, item 17.7 tool-call conversations, or any
 product-contract change. No modest fig-leaf tier. No public plugin API.
 Do not start Phase 18 from the Phase 17 packet.
 

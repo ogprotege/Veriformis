@@ -75,13 +75,14 @@ Phase 16 extension architecture is complete under its own packet.
 ADR-0017 Decision A: no untrusted loader. Public plugin loading is skipped
 with a record. There is no third-party plugin support claim.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.5 admits `explicit-label-classification` from user-provided
-labels. Default `review_policy` stays `none`. No heuristic blocks seal.
-Preference, tool-call, and stepwise remain planned.
+Item 17.6 admits `preference-and-ranking` from user-provided
+chosen/rejected pairs. Unpaired feedback and ranking-order schemas are
+skipped with a record. Default `review_policy` stays `none`. No heuristic
+blocks seal. Tool-call and stepwise remain planned.
 
-**Review date:** 2026-08-28 (independent-product Phase 17.5 classification)
+**Review date:** 2026-08-28 (independent-product Phase 17.6 preference)
 
-**Next review:** Phase 17.5 merge, item 17.6 preference pairs, or any
+**Next review:** Phase 17.6 merge, item 17.7 tool-call conversations, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -781,7 +782,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
-| In-progress independent Phase 17.5 | `explicit-label-classification` admitted from user-provided labels; profiles refuse the new schema |
+| In-progress independent Phase 17.6 | `preference-and-ranking` admitted from user-provided pairs; unpaired and ranking schemas skipped with a record; profiles refuse the new schema |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–16 complete and Phase 17 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
@@ -841,12 +842,13 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–16 are complete. The current critical-path work
 is Phase 17 under the
 [advanced-dataset-families packet](../dev/active/independent-product/phase-17-advanced-dataset-families/README.md).
-Item 17.5 admits `explicit-label-classification` from user-provided
-labels on the dataset-row path. Existing trainer profiles refuse the new
-schema. Preference, tool-call, and stepwise remain planned. There is no
+Item 17.6 admits `preference-and-ranking` from user-provided
+chosen/rejected pairs on the dataset-row path. Existing trainer profiles
+refuse the new schema. Unpaired feedback and ranking-order schemas are
+skipped with a record. Tool-call and stepwise remain planned. There is no
 `GeneratorPass`.
 
-The next behavior change is item 17.6 preference pairs. Mac family
+The next behavior change is item 17.7 tool-call conversations. Mac family
 UI and Phase 18 remain outside this packet.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),

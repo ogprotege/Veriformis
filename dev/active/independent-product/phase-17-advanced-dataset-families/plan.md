@@ -114,17 +114,17 @@ item.
 - [x] Bind user-provided labels with `mapped_value`. Refuse invented labels.
 - [x] Seal through split JSONL and canonical JSON. Existing profiles refuse
       the new schema.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.6 Admit preference-and-ranking
 
 **Branch:** `phase17/06-admit-preference`
 
-- [ ] Promote `preference-and-ranking` with a pair schema and pair
+- [x] Promote `preference-and-ranking` with a pair schema and pair
       supervision reading.
-- [ ] Map chosen and rejected with `mapped_value`. Rankings require a
+- [x] Map chosen and rejected with `mapped_value`. Rankings require a
       user-provided order.
-- [ ] Skip unpaired feedback with a record if the pair contract does not
+- [x] Skip unpaired feedback with a record if the pair contract does not
       cover it. Existing profiles keep refusing preference.
 
 ### 17.7 Admit tool-call-conversations

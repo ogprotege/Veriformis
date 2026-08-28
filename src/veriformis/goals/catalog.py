@@ -108,6 +108,7 @@ ObjectiveKind = Literal[
     "before_after_transformation",
     "structured_field",
     "explicit_label",
+    "preference_pair",
 ]
 RowSchemaKind = Literal[
     "text",
@@ -115,6 +116,7 @@ RowSchemaKind = Literal[
     "instruction_output",
     "messages",
     "label-classification",
+    "preference-pair",
 ]
 LossPolicyKind = Literal[
     "full-sequence",
@@ -122,6 +124,7 @@ LossPolicyKind = Literal[
     "output-only",
     "final-assistant-suffix",
     "label-only",
+    "pair-supervision",
 ]
 
 

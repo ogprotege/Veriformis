@@ -86,8 +86,36 @@ Phase 16 completed. Closeout merged as PR #149 at
 - [x] split-jsonl and canonical json emit the schema. Constrained CSV
       and existing trainer profiles refuse it.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #154 merged. Clean `main` equals
+      `origin/main` at `301d1a6`.
+
+## Required item 17.6 evidence
+
+- [x] `preference-and-ranking` is implemented with objective
+      `preference_pair`, row schema `preference-pair`, and loss
+      `pair-supervision`.
+- [x] Dataset-row mapping binds prompt, chosen, and rejected with
+      `mapped_value`. Empty chosen or rejected refuse. Document-source
+      construction cannot invent pairs.
+- [x] Shared-prompt leakage keeps one prompt in one partition.
+      split-jsonl and canonical json emit the schema. Constrained CSV
+      and existing trainer profiles refuse it.
+- [x] Unpaired feedback and ranking-order schemas skipped with a
+      record: the pair contract does not cover them.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.6.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.7.
+
+## Item 17.6 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_preference_ranking.py` | 11 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,427 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 17.4 local gate evidence
 

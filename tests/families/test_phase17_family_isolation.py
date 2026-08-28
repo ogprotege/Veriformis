@@ -47,7 +47,6 @@ _FORBIDDEN_OPERATIONS = frozenset(
     }
 )
 _PLANNED_FAMILIES = (
-    "preference-and-ranking",
     "tool-call-conversations",
     "stepwise-supervision",
     "pre-tokenized-training",
@@ -71,6 +70,7 @@ def test_planned_families_remain_planned_and_multimodal_unsupported() -> None:
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
+        "preference-and-ranking",
     )
     assert PLANNED_TRAINING_FAMILIES == _PLANNED_FAMILIES
     assert EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES == ("multimodal-training",)
@@ -90,6 +90,11 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
         "label",
         "annotator",
     )
+    assert ROW_SCHEMA_PAYLOAD_KEYS["preference-pair"] == (
+        "prompt",
+        "chosen",
+        "rejected",
+    )
     assert LOSS_POLICY_IDS[:4] == (
         "full-sequence",
         "completion-only",
@@ -97,6 +102,7 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
         "final-assistant-suffix",
     )
     assert "label-only" in LOSS_POLICY_IDS
+    assert "pair-supervision" in LOSS_POLICY_IDS
 
 
 def test_messages_still_require_exactly_two_turns() -> None:
@@ -125,6 +131,11 @@ def test_mapping_still_has_only_sft_payloads() -> None:
         assert ROW_SCHEMA_PAYLOAD_KEYS[schema] == keys
     sft_names = {name for keys in sft_payloads.values() for name in keys}
     assert sft_names.isdisjoint({"chosen", "rejected", "tools", "steps", "ranking"})
+    assert ROW_SCHEMA_PAYLOAD_KEYS["preference-pair"] == (
+        "prompt",
+        "chosen",
+        "rejected",
+    )
     mapping_docs = (ROOT / "docs/mapping.md").read_text(encoding="utf-8")
     assert "mapped_value" in mapping_docs
 
@@ -140,6 +151,10 @@ def test_constructors_remain_five_sft_constructors() -> None:
         "veriformis.constructor.explicit-label",
         "1",
     ) in constructors
+    assert (
+        "veriformis.constructor.preference-pair",
+        "1",
+    ) in constructors
     assert DETERMINISTIC_V1_OBJECTIVE_KINDS == (
         "full_text",
         "continuation",
@@ -150,7 +165,11 @@ def test_constructors_remain_five_sft_constructors() -> None:
     sft_joined = " ".join(
         selector[0]
         for selector in constructors
-        if selector[0] != "veriformis.constructor.explicit-label"
+        if selector[0]
+        not in {
+            "veriformis.constructor.explicit-label",
+            "veriformis.constructor.preference-pair",
+        }
     )
     assert all(token not in sft_joined for token in _ADVANCED_TOKENS)
 
@@ -158,6 +177,7 @@ def test_constructors_remain_five_sft_constructors() -> None:
 def test_goal_catalog_still_resolves_only_sft_objectives() -> None:
     catalog = goal_catalog()
     assert "explicit_label" in tuple(goal.objective for goal in catalog.goals)
+    assert "preference_pair" in tuple(goal.objective for goal in catalog.goals)
     joined = " ".join(goal.goal_id for goal in catalog.goals)
     assert all(family not in joined for family in _PLANNED_FAMILIES)
 

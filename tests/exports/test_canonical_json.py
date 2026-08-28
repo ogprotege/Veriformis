@@ -53,6 +53,7 @@ DISCOVERY_ROW_SCHEMAS = (
     "instruction_output",
     "label-classification",
     "messages",
+    "preference-pair",
     "prompt_completion",
     "text",
 )
