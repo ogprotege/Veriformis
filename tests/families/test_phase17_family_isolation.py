@@ -234,20 +234,17 @@ def test_split_quality_and_review_hooks_are_still_sft_only() -> None:
         "conflict",
         "construction-pending",
         "detector-finding",
+        "label-conflict",
         "mapping",
         "near-duplicate",
         "ocr-review",
         "parser-degradation",
+        "preference-inconsistency",
         "sample-acceptance",
+        "stepwise-gap",
+        "tool-trace-incomplete",
     )
-    assert set(QUEUE_KINDS).isdisjoint(
-        {
-            "label-conflict",
-            "preference-inconsistency",
-            "tool-trace-incomplete",
-            "stepwise-gap",
-        }
-    )
+    assert all(item.admitted_to_block is False for item in V1_QUALITY_GATES)
 
 
 def test_public_surfaces_have_no_family_or_generator_operation() -> None:

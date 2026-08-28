@@ -51,6 +51,10 @@ def test_queue_kinds_are_closed_and_sorted() -> None:
     assert SAMPLING_QUEUE_KIND in QUEUE_KINDS
     assert "near-duplicate" in OPT_IN_QUEUE_KINDS
     assert "detector-finding" in OPT_IN_QUEUE_KINDS
+    assert "label-conflict" in OPT_IN_QUEUE_KINDS
+    assert "preference-inconsistency" in OPT_IN_QUEUE_KINDS
+    assert "tool-trace-incomplete" in OPT_IN_QUEUE_KINDS
+    assert "stepwise-gap" in OPT_IN_QUEUE_KINDS
 
 
 def test_waiver_cannot_change_bytes() -> None:

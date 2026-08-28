@@ -59,8 +59,34 @@ Phase 16 completed. Closeout merged as PR #149 at
 - [x] Default SFT split algorithm and SplitPolicy fields unchanged.
 - [x] Shared-prompt and annotator/entity grouping tests.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #152 merged. Clean `main` equals
+      `origin/main` at `db75e5b`.
+
+## Required item 17.4 evidence
+
+- [x] Opt-in review queue kinds `label-conflict`,
+      `preference-inconsistency`, `tool-trace-incomplete`, and
+      `stepwise-gap`. Default `review_policy` stays `none`.
+- [x] Preview-only quality facts for missing label, ranking tie,
+      singleton label set, tool-role gap, and unpaired-without-policy.
+      Every family gate has `admitted_to_block` false.
+- [x] SFT records keep family-hook counts at zero. No family execute.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.4.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.5.
+
+## Item 17.4 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_advanced_review_quality.py tests/families/test_phase17_family_isolation.py tests/review/test_review_contracts.py tests/quality` | 60 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,407 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
+GitHub checks for item 17.4 remain pending.
 
 ## Item 17.3 local gate evidence
 

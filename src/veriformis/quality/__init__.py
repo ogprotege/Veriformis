@@ -5,6 +5,11 @@ from veriformis.quality.detectors import (
     DETECTOR_SET_ID,
     report_policy_detectors,
 )
+from veriformis.quality.family_hooks import (
+    FAMILY_HOOK_FACT_NAMES,
+    family_hook_facts,
+    report_family_hooks,
+)
 from veriformis.quality.distributions import (
     DISTRIBUTION_FACT_NAMES,
     LANGUAGE_UNQUALIFIED,
@@ -59,6 +64,7 @@ __all__ = [
     "BoundReferenceCorpus",
     "BoundTokenizerPin",
     "DETECTOR_FACT_NAMES",
+    "FAMILY_HOOK_FACT_NAMES",
     "DETECTOR_SET_ID",
     "DISTRIBUTION_FACT_NAMES",
     "GATE_FACT_NAMES",
@@ -86,7 +92,9 @@ __all__ = [
     "bound_reference_corpus",
     "bound_tokenizer_pin",
     "empty_quality_report",
+    "family_hook_facts",
     "report_dataset_distributions",
+    "report_family_hooks",
     "report_leakage_checks",
     "preview_quality_gates",
     "report_near_duplicates",

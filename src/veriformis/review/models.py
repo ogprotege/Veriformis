@@ -33,7 +33,11 @@ CORE_QUEUE_KINDS: tuple[str, ...] = (
 )
 OPT_IN_QUEUE_KINDS: tuple[str, ...] = (
     "detector-finding",
+    "label-conflict",
     "near-duplicate",
+    "preference-inconsistency",
+    "stepwise-gap",
+    "tool-trace-incomplete",
 )
 SAMPLING_QUEUE_KIND = "sample-acceptance"
 SAMPLE_ALGORITHM_ID = "veriformis.review-sample-hmac-sha256/v1"
@@ -54,11 +58,15 @@ QueueKind = Literal[
     "conflict",
     "construction-pending",
     "detector-finding",
+    "label-conflict",
     "mapping",
     "near-duplicate",
     "ocr-review",
     "parser-degradation",
+    "preference-inconsistency",
     "sample-acceptance",
+    "stepwise-gap",
+    "tool-trace-incomplete",
 ]
 ReviewVerdict = Literal["accepted", "rejected"]
 CorrectionKind = Literal["mapping-revision", "transform"]

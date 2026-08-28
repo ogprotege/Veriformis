@@ -39,11 +39,11 @@ public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command. Mac
 Review belongs to Phase 18. There is no published corpus tier.
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.3 leakage grouping)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.4 review/quality hooks)
 
-**Next review:** Phase 17.3 merge, or any product-contract change. No
+**Next review:** Phase 17.4 merge, or any product-contract change. No
 modest fig-leaf tier. No public plugin API. Do not execute a family from
-item 17.3. Do not start Phase 18 from the Phase 17 packet.
+item 17.4. Do not start Phase 18 from the Phase 17 packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 

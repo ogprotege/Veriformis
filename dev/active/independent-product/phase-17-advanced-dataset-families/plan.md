@@ -93,16 +93,17 @@ item.
       `annotator`, and `entity`.
 - [x] Keep the default SFT split `transitive-leakage-prefix-v1`.
 - [x] Prove shared-prompt and annotator grouping without changing SFT goldens.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.4 Add review and quality hooks for advanced families
 
 **Branch:** `phase17/04-advanced-review-quality`
 
-- [ ] Add opt-in review queue kinds for label, preference, tool-trace, and
+- [x] Add opt-in review queue kinds for label, preference, tool-trace, and
       stepwise facts.
-- [ ] Add previewable quality detectors. Keep `admitted_to_block` false.
-- [ ] Keep default `review_policy` `none`. Do not execute a family.
+- [x] Add previewable quality detectors. Keep `admitted_to_block` false.
+- [x] Keep default `review_policy` `none`. Do not execute a family.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.5 Admit explicit-label-classification
 

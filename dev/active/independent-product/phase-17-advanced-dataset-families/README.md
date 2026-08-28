@@ -37,7 +37,5 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.3 adds leakage grouping keys as a substrate. Default SFT split
-stays `transitive-leakage-prefix-v1`. No family execute, taxonomy
-promotion, constructor, mapping template, goal, generator, or profile
-mapping is added.
+Item 17.4 adds opt-in review queues and preview-only family quality
+hooks. Default `review_policy` stays `none`. No family execute.

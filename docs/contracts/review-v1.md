@@ -42,6 +42,10 @@ corrections through Python, CLI, and MCP.
 | `sample-acceptance` | Named-seed sample; not a required review |
 | `near-duplicate` | Opt-in only |
 | `detector-finding` | Opt-in only |
+| `label-conflict` | Opt-in only; advanced-family hook |
+| `preference-inconsistency` | Opt-in only; advanced-family hook |
+| `tool-trace-incomplete` | Opt-in only; advanced-family hook |
+| `stepwise-gap` | Opt-in only; advanced-family hook |
 
 ## Sampling
 

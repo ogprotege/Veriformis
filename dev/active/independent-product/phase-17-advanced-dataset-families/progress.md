@@ -83,3 +83,25 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 17.3 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 17.4.
+
+## 2026-08-28: Item 17.3 merged; item 17.4 in progress
+
+**Status:** Item 17.3 merged as PR #152 at
+`db75e5ba3b8cdc39ae7c03bdcea39fe50054fe28`. Item 17.4 adds opt-in family
+review queues and preview-only quality hooks. Default recipes stay `none`.
+No family is executed.
+
+**Next action:** Run item 17.4 local gates, publish the pull request, merge
+green, and synchronize clean `main` before item 17.5.
+
+## 2026-08-28: Item 17.4 local gates green
+
+**Status:** Opt-in family review queues and preview-only quality hooks
+are substrate only. Default `review_policy` stays `none`. No family
+execute. Focused review, quality, and isolation tests passed 60.
+Project tracking, Ruff, the lock check, and `git diff --check` passed.
+The core suite passed 2,407 tests with 17 deselected and the one
+expected durability warning.
+
+**Next action:** Publish the item 17.4 pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 17.5.

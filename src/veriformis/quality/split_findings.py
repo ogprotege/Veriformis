@@ -18,6 +18,7 @@ from veriformis.errors import QualityReportError
 from veriformis.identity import lossless_json_bytes
 from veriformis.quality.detectors import report_policy_detectors
 from veriformis.quality.distributions import included_dataset_records
+from veriformis.quality.family_hooks import report_family_hooks
 from veriformis.quality.report import (
     QualityFact,
     QualityPolicyDecision,
@@ -132,7 +133,13 @@ def report_split_findings(
         curation=curation,
         split=split,
     )
-    facts = tuple(sorted((*base.facts, *extra), key=lambda item: item.name))
+    family = report_family_hooks(
+        recipe=recipe,
+        construction=construction,
+        curation=curation,
+        split=split,
+    )
+    facts = tuple(sorted((*base.facts, *extra, *family), key=lambda item: item.name))
     policy = tuple(
         sorted(
             (
