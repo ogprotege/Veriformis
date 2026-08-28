@@ -50,8 +50,8 @@ under empty extra `ocr`. Default parse still refuses image-only PDF.
 is complete with previewable gates and labeled fixtures. No heuristic
 blocks seal. Phase 14 review workflows are complete. Phase 15 scale
 work is complete. Phase 16 extension architecture is in
-progress. Item 16.2 pins the internal extension protocol
-without a loader or public plugin API.
+progress. Item 16.3 wraps existing bindings in a
+built-in-only registry without a loader or public plugin API.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.
