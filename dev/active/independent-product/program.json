@@ -182,7 +182,7 @@
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
       "completed_on": null,
-      "next_gate": "Item 16.5 migrates the text parser through the protocol. Other suffixes keep existing dispatch."
+      "next_gate": "Item 16.6 binds generic split-jsonl-directory through the protocol. Other containers and profiles stay on the private catalog."
     },
     {
       "number": 17,

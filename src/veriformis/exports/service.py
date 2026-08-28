@@ -333,6 +333,18 @@ class ExportService:
             request.consumer_id,
             request.consumer_profile_version,
         )
+        if (
+            request.container_id == "split-jsonl-directory"
+            and request.consumer_id is None
+        ):
+            from veriformis.extensions.runtime import bound_split_jsonl_exporter
+
+            implementation = bound_split_jsonl_exporter(catalog=self._catalog())
+            if implementation.descriptor.selector != selector:
+                raise ExportContractError(
+                    "no executable export implementation matches the exact selector"
+                )
+            return implementation
         for implementation in self._catalog():
             if implementation.descriptor.selector == selector:
                 return implementation

@@ -72,13 +72,14 @@ Phase 15 scale work is complete. Named-hardware reports exist.
 skipped with a record. Observed reports are not an SLA. A modest
 fig-leaf tier is forbidden. Do not start Phase 16 from that packet.
 Phase 16 extension architecture is in progress under its own packet. Item
-16.4 merged as PR #143 at `e70c13d6f42cc884c1599a96fd92cda052dd1d42`.
-Item 16.5 migrates the text parser through the protocol. Other suffixes keep
-existing dispatch. There is no third-party plugin support claim or loader.
+16.5 merged as PR #144 at `858b2833f041480e22fd415f484ad4075da4c4d0`.
+Item 16.6 binds generic `split-jsonl-directory` through the protocol. Other
+containers and consumer profiles stay on the private catalog. There is no
+third-party plugin support claim or loader.
 
-**Review date:** 2026-08-27 (independent-product Phase 16.5 text parser migration)
+**Review date:** 2026-08-27 (independent-product Phase 16.6 split-JSONL migration)
 
-**Next review:** Phase 16.5 merge, item 16.6 split-JSONL migration, or any
+**Next review:** Phase 16.6 merge, item 16.7 compatibility kit, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -777,7 +778,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 13 | Versioned quality report, preview-only gates, and labeled fixtures; no heuristic blocks seal |
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
-| In-progress independent Phase 16.5 | Text parser selected only through the internal protocol with identical parse reports; other suffixes keep existing dispatch |
+| In-progress independent Phase 16.6 | Generic split-jsonl-directory bound only through the internal protocol with the same catalog object; other containers and profiles stay on the private catalog |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–15 complete and Phase 16 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |

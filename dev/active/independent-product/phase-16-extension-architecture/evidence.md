@@ -105,8 +105,29 @@ GitHub checks: all 18 passed on PR #143. Merge SHA
 - [x] Other suffixes keep existing dispatch.
 - [x] Unknown contract versions name requested versus supported identity.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.6.
+
+GitHub checks: all 18 passed on PR #144. Merge SHA
+`858b2833f041480e22fd415f484ad4075da4c4d0`.
+
+## Required item 16.6 evidence
+
+- [x] Generic `split-jsonl-directory` is bound only through the protocol.
+- [x] The bound object is the same private catalog entry.
+- [x] Other containers and consumer profiles stay on the catalog loop.
+- [x] Unknown contract versions name requested versus supported identity.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.6.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.7.
+
+## Item 16.6 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused extension and split-JSONL tests | 70 passed |
+| Tracking, Ruff, lock, diff check | PASS |
+| Core pytest excluding optional markers | 2,337 passed, 17 deselected, one expected durability warning |
 
 ## Item 16.5 local gate evidence
 

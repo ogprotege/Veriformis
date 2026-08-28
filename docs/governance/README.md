@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.4 capability declarations)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.6 split-JSONL migration)
 
-**Next review:** Phase 16.4 merge, item 16.5 text-parser migration, or
+**Next review:** Phase 16.6 merge, item 16.7 compatibility kit, or
 governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability

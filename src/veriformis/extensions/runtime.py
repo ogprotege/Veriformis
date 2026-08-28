@@ -9,6 +9,7 @@ from veriformis.contracts import (
     EXTENSION_PROTOCOL_SCHEMA_ID,
 )
 from veriformis.errors import ExtensionProtocolError
+from veriformis.exports._implementation import _ExportImplementation
 from veriformis.extensions.protocol import CapabilityDeclaration
 from veriformis.sources import ParseResult
 
@@ -45,6 +46,62 @@ def bound_text_parser(
             f"({EXTENSION_PROTOCOL_SCHEMA_ID})"
         )
     return registry.parser("text").target
+
+
+def bound_split_jsonl_exporter(
+    *,
+    catalog: tuple[_ExportImplementation, ...] | None = None,
+    declaration: CapabilityDeclaration | None = None,
+) -> _ExportImplementation:
+    """Return the generic split-JSONL catalog entry after protocol checks.
+
+    The catalog argument is required on the export-service path so this helper
+    never imports ``ExportService`` while that module is still initializing.
+    """
+    from veriformis.exports.split_jsonl import SPLIT_JSONL_CONTAINER_ID
+    from veriformis.extensions.protocol import create_capability_declaration
+
+    if catalog is None:
+        from veriformis.exports.service import DEFAULT_EXPORT_SERVICE
+
+        implementations = DEFAULT_EXPORT_SERVICE._catalog()
+    else:
+        implementations = catalog
+    if declaration is None:
+        declaration = create_capability_declaration(
+            kind="container-exporter",
+            origin="builtin",
+            lifecycle="supported",
+            extra=None,
+            selector=SPLIT_JSONL_CONTAINER_ID,
+            title="split-jsonl-directory exporter",
+        )
+    if (
+        declaration.kind != "container-exporter"
+        or declaration.discovery.selector != SPLIT_JSONL_CONTAINER_ID
+        or declaration.origin != "builtin"
+    ):
+        raise ExtensionProtocolError(
+            "split-jsonl-directory selection requires a builtin "
+            "container-exporter declaration"
+        )
+    if declaration.contract_version != EXTENSION_PROTOCOL_CONTRACT_VERSION:
+        raise ExtensionProtocolError(
+            "unknown extension contract version: requested "
+            f"{declaration.contract_version}, supported "
+            f"{EXTENSION_PROTOCOL_CONTRACT_VERSION} "
+            f"({EXTENSION_PROTOCOL_SCHEMA_ID})"
+        )
+    for item in implementations:
+        consumer = item.descriptor.consumer_profile
+        if (
+            item.descriptor.container_profile.container_id == SPLIT_JSONL_CONTAINER_ID
+            and consumer is None
+        ):
+            return item
+    raise ExtensionProtocolError(
+        "split-jsonl-directory is missing from the internal export catalog"
+    )
 
 
 def parse_text_via_protocol(

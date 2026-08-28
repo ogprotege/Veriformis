@@ -6,9 +6,9 @@ plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–15 complete; Phase 16 in progress).
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.4 capability declarations)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.6 split-JSONL migration)
 
-**Next review:** Phase 16.4 merge, item 16.5 text-parser migration, or any
+**Next review:** Phase 16.6 merge, item 16.7 compatibility kit, or any
 contract change. Default parse still refuses image-only PDF.
 
 ## Start here
