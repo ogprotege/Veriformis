@@ -220,8 +220,9 @@ def test_taxonomy_is_unchanged_by_loading_a_pin() -> None:
     assert IMPLEMENTED_TRAINING_FAMILIES == (
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
+        "explicit-label-classification",
     )
-    assert "explicit-label-classification" in PLANNED_TRAINING_FAMILIES
+    assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
 
 
 def test_public_surfaces_still_have_no_family_execute() -> None:

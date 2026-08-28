@@ -103,6 +103,7 @@ def _supplies(family: str) -> dict[str, bool]:
         "editable": editable,
         "heading": bool(real_headings) and body,
         "scalar": scalar,
+        "rows": family in {"delimited-table", "json-records"},
     }
 
 
@@ -112,6 +113,7 @@ _EVIDENCE_KIND = {
     "reproduce-a-recorded-change": "editable",
     "recover-a-section-from-its-heading": "heading",
     "extract-a-structured-value": "scalar",
+    "classify-with-provided-labels": "rows",
 }
 
 

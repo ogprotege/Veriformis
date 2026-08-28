@@ -11,11 +11,11 @@ from types import MappingProxyType
 from typing import Final, Literal, Mapping, NamedTuple
 
 from veriformis.contracts import (
-    DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    PRODUCT_OBJECTIVE_KINDS,
+    PRODUCT_ROW_SCHEMA_KINDS,
     TAXONOMY_CONTRACT_ID,
     TAXONOMY_CONTRACT_VERSION,
     TAXONOMY_SCHEMA_ID,
-    V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import TaxonomyError
 
@@ -90,10 +90,10 @@ INPUT_FAMILY_PARSERS: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType(
 IMPLEMENTED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
     "source-grounded-language-modeling",
     "source-grounded-supervised-fine-tuning",
+    "explicit-label-classification",
 )
 PLANNED_TRAINING_FAMILIES: Final[tuple[str, ...]] = (
     "preference-and-ranking",
-    "explicit-label-classification",
     "tool-call-conversations",
     "stepwise-supervision",
     "pre-tokenized-training",
@@ -150,12 +150,13 @@ PLANNED_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
 UNEXECUTABLE_CONSUMER_PROFILE_ITEMS: Final[Mapping[str, str]] = MappingProxyType({})
 CANDIDATE_CONSUMER_PROFILES: Final[tuple[str, ...]] = ("unsloth",)
 
-LOSS_POLICY_IDS: Final[tuple[str, ...]] = (
+SFT_LOSS_POLICY_IDS: Final[tuple[str, ...]] = (
     "full-sequence",
     "completion-only",
     "output-only",
     "final-assistant-suffix",
 )
+LOSS_POLICY_IDS: Final[tuple[str, ...]] = SFT_LOSS_POLICY_IDS + ("label-only",)
 
 ROW_SCHEMA_UI_ALIASES: Final[Mapping[str, str]] = MappingProxyType(
     {
@@ -172,6 +173,7 @@ OBJECTIVE_FAMILY: Final[Mapping[str, str]] = MappingProxyType(
         "section_reconstruction": "source-grounded-supervised-fine-tuning",
         "before_after_transformation": "source-grounded-supervised-fine-tuning",
         "structured_field": "source-grounded-supervised-fine-tuning",
+        "explicit_label": "explicit-label-classification",
     }
 )
 
@@ -190,6 +192,7 @@ OBJECTIVE_ROW_COMPATIBILITY: Final[Mapping[str, tuple[str, ...]]] = MappingProxy
             "messages",
         ),
         "structured_field": ("prompt_completion", "instruction_output", "messages"),
+        "explicit_label": ("label-classification",),
     }
 )
 
@@ -200,6 +203,7 @@ DEFAULT_ROW_SCHEMA: Final[Mapping[str, str]] = MappingProxyType(
         "section_reconstruction": "prompt_completion",
         "before_after_transformation": "prompt_completion",
         "structured_field": "prompt_completion",
+        "explicit_label": "label-classification",
     }
 )
 
@@ -209,6 +213,7 @@ ROW_LOSS_POLICY: Final[Mapping[str, str]] = MappingProxyType(
         "prompt_completion": "completion-only",
         "instruction_output": "output-only",
         "messages": "final-assistant-suffix",
+        "label-classification": "label-only",
     }
 )
 
@@ -222,18 +227,19 @@ LOSS_POLICY_BOUNDARIES: Final[Mapping[str, str]] = MappingProxyType(
         "final-assistant-suffix": (
             "Only the final assistant message receives supervision."
         ),
+        "label-only": "Only the user-provided label receives supervision.",
     }
 )
 
 PROFILE_FORBIDDEN_ROW_SCHEMAS: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType(
     {
         CANONICAL_CONSUMER_PROFILE: (),
-        "aptus-handoff-v1": ("text",),
-        "mlx-lm": (),
-        "trl": (),
-        "axolotl": (),
-        "llama-factory": (),
-        "aptus": ("text",),
+        "aptus-handoff-v1": ("text", "label-classification"),
+        "mlx-lm": ("label-classification",),
+        "trl": ("label-classification",),
+        "axolotl": ("label-classification",),
+        "llama-factory": ("label-classification",),
+        "aptus": ("text", "label-classification"),
     }
 )
 
@@ -251,8 +257,8 @@ def _known_identifiers() -> dict[str, set[str]]:
             + PLANNED_TRAINING_FAMILIES
             + EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES
         ),
-        "objective": set(DETERMINISTIC_V1_OBJECTIVE_KINDS),
-        "semantic_row": set(V1_ROW_SCHEMA_KINDS),
+        "objective": set(PRODUCT_OBJECTIVE_KINDS),
+        "semantic_row": set(PRODUCT_ROW_SCHEMA_KINDS),
         "physical_container": set(
             IMPLEMENTED_PHYSICAL_CONTAINERS + PLANNED_PHYSICAL_CONTAINERS
         ),
@@ -400,9 +406,9 @@ def catalog() -> tuple[TaxonomyEntry, ...]:
         entries.append(
             TaxonomyEntry("training_family", identifier, "explicitly_unsupported")
         )
-    for identifier in DETERMINISTIC_V1_OBJECTIVE_KINDS:
+    for identifier in PRODUCT_OBJECTIVE_KINDS:
         entries.append(TaxonomyEntry("objective", identifier, "implemented"))
-    for identifier in V1_ROW_SCHEMA_KINDS:
+    for identifier in PRODUCT_ROW_SCHEMA_KINDS:
         entries.append(TaxonomyEntry("semantic_row", identifier, "implemented"))
     for identifier in IMPLEMENTED_PHYSICAL_CONTAINERS:
         entries.append(TaxonomyEntry("physical_container", identifier, "implemented"))
@@ -433,8 +439,8 @@ def implemented_discovery() -> Mapping[str, tuple[str, ...]]:
             "contract_version": (str(TAXONOMY_CONTRACT_VERSION),),
             "schema_id": (TAXONOMY_SCHEMA_ID,),
             "training_family": IMPLEMENTED_TRAINING_FAMILIES,
-            "objective": DETERMINISTIC_V1_OBJECTIVE_KINDS,
-            "semantic_row": V1_ROW_SCHEMA_KINDS,
+            "objective": PRODUCT_OBJECTIVE_KINDS,
+            "semantic_row": PRODUCT_ROW_SCHEMA_KINDS,
             "physical_container": IMPLEMENTED_PHYSICAL_CONTAINERS,
             "consumer_profile": IMPLEMENTED_CONSUMER_PROFILES,
             "loss_policy": LOSS_POLICY_IDS,
@@ -470,6 +476,7 @@ __all__ = [
     "PROFILE_FORBIDDEN_ROW_SCHEMAS",
     "ROW_LOSS_POLICY",
     "ROW_SCHEMA_UI_ALIASES",
+    "SFT_LOSS_POLICY_IDS",
     "TAXONOMY_AXES",
     "TaxonomyEntry",
     "assert_compile_combination",

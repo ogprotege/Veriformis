@@ -8,11 +8,11 @@ from pathlib import Path
 import pytest
 
 from veriformis.contracts import (
-    DETERMINISTIC_V1_OBJECTIVE_KINDS,
     GOAL_CATALOG_CONTRACT_ID,
     GOAL_CATALOG_CONTRACT_VERSION,
     GOAL_CATALOG_SCHEMA_ID,
-    V1_ROW_SCHEMA_KINDS,
+    PRODUCT_OBJECTIVE_KINDS,
+    PRODUCT_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import GoalCatalogError
 from veriformis.goals import (
@@ -38,7 +38,7 @@ from veriformis.taxonomy import (
 )
 
 DATA_PATH = Path(__file__).parents[2] / "src" / "veriformis" / "goals" / "catalog-v1.json"
-DATA_SHA256 = "71ea925f2f874199353e2408c3d2067e7220bda87bf0f387af7dd89d15b70f33"
+DATA_SHA256 = "062ef539b73888c92289127300c8b63df61f08ddcce86fe5ad5b8887647ad09e"
 FROZEN_FIXTURE = (
     Path(__file__).parents[1] / "regressions" / "fixtures" / "phase6" / "goal-catalog.json"
 )
@@ -85,8 +85,8 @@ def test_frozen_discovery_fixture_equals_packaged_data() -> None:
 def test_catalog_closes_over_every_objective_and_row_schema() -> None:
     catalog = goal_catalog()
     objectives = tuple(goal.objective for goal in catalog.goals)
-    assert objectives == DETERMINISTIC_V1_OBJECTIVE_KINDS
-    assert tuple(rep.row_schema for rep in catalog.representations) == V1_ROW_SCHEMA_KINDS
+    assert objectives == PRODUCT_OBJECTIVE_KINDS
+    assert tuple(rep.row_schema for rep in catalog.representations) == PRODUCT_ROW_SCHEMA_KINDS
     by_rep = {rep.representation_id: rep for rep in catalog.representations}
     for goal in catalog.goals:
         assert goal.state == "implemented"
@@ -108,8 +108,8 @@ def test_catalog_closes_over_every_objective_and_row_schema() -> None:
 def test_plain_language_fields_contain_no_machine_identifiers() -> None:
     """Usability criterion U1: a person never needs the internal vocabulary."""
     machine_tokens = {
-        *(kind for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS),
-        *(kind for kind in V1_ROW_SCHEMA_KINDS),
+        *(kind for kind in PRODUCT_OBJECTIVE_KINDS),
+        *(kind for kind in PRODUCT_ROW_SCHEMA_KINDS),
         *LOSS_POLICY_IDS,
         *RECIPE_LIBRARY_IDS,
         *ROW_SCHEMA_UI_ALIASES,

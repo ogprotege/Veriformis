@@ -72,8 +72,22 @@ Phase 16 completed. Closeout merged as PR #149 at
       Every family gate has `admitted_to_block` false.
 - [x] SFT records keep family-hook counts at zero. No family execute.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #153 merged. Clean `main` equals
+      `origin/main` at `07bb0d0`.
+
+## Required item 17.5 evidence
+
+- [x] `explicit-label-classification` is implemented with objective
+      `explicit_label`, row schema `label-classification`, and loss
+      `label-only`.
+- [x] Dataset-row mapping binds context, label, and annotator with
+      `mapped_value`. Empty labels refuse. Document-source construction
+      cannot invent labels.
+- [x] split-jsonl and canonical json emit the schema. Constrained CSV
+      and existing trainer profiles refuse it.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.5.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.6.
 
 ## Item 17.4 local gate evidence
 
@@ -86,7 +100,18 @@ Phase 16 completed. Closeout merged as PR #149 at
 | Core pytest excluding optional integration and scale markers | 2,407 passed, 17 deselected, one expected durability warning |
 | `git diff --check` | PASS |
 
-GitHub checks for item 17.4 remain pending.
+## Item 17.5 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_explicit_label_classification.py` | 9 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,416 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
+GitHub checks for item 17.5 remain pending.
 
 ## Item 17.3 local gate evidence
 

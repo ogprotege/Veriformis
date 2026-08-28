@@ -77,8 +77,9 @@ skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
 architecture is complete. Sequential PRs 16.1–16.10. ADR-0017 Decision
 A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.4 adds opt-in family review queues and preview-only quality
-hooks. Do not start Phase 18 from that packet.
+Item 17.5 admits `explicit-label-classification` from user-provided
+labels on the dataset-row path. Existing trainer profiles refuse the
+new schema. Do not start Phase 18 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -253,6 +254,7 @@ Key modules under `src/veriformis/` are:
 - `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing);
 - `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
 - `extensions/` for the internal extension protocol, built-in-only registry, and read-only capability declarations (no loader);
+- `families/` for advanced-family admission pins, leakage grouping, and admitted classification execute;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

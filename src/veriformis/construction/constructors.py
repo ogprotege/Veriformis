@@ -1,4 +1,4 @@
-"""Pure deterministic constructors for the five v1 training objectives."""
+"""Pure deterministic constructors for SFT objectives plus refused labels."""
 
 from __future__ import annotations
 
@@ -1058,6 +1058,22 @@ def construct_structured_field(
     return ConstructorOutput(tuple(drafts), tuple(diagnostics))
 
 
+def construct_explicit_label(
+    recipe: DatasetRecipe,
+    construction_pass: ConstructionPass,
+    sources: Mapping[str, SourceRef],
+    chunks: Sequence[Chunk],
+    transforms: Sequence[TransformRecord],
+    ir_artifacts: Mapping[str, IRArtifactLike],
+) -> ConstructorOutput:
+    """Refuse document-source invented labels."""
+    del recipe, construction_pass, sources, chunks, transforms, ir_artifacts
+    from veriformis.families.classification import refuse_document_source_labels
+
+    refuse_document_source_labels()
+    raise AssertionError("explicit_label constructor must refuse")
+
+
 _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
     ("veriformis.constructor.full-text", "1"): construct_full_text,
     ("veriformis.constructor.continuation", "1"): construct_continuation,
@@ -1070,6 +1086,7 @@ _CONSTRUCTORS: dict[tuple[str, str], Constructor] = {
         "1",
     ): construct_before_after_transformation,
     ("veriformis.constructor.structured-field", "1"): construct_structured_field,
+    ("veriformis.constructor.explicit-label", "1"): construct_explicit_label,
 }
 
 
@@ -1090,6 +1107,7 @@ __all__ = [
     "IRArtifactLike",
     "construct_before_after_transformation",
     "construct_continuation",
+    "construct_explicit_label",
     "construct_full_text",
     "construct_section_reconstruction",
     "construct_structured_field",

@@ -1,16 +1,319 @@
 {
-  "schema_version": "veriformis.support-registry/v1",
+  "artifacts": {
+    "generic_export_containers": [
+      {
+        "consumer_profile": null,
+        "container": "split-jsonl-directory",
+        "container_version": 1,
+        "determinism_claim": "portable_exact_bytes",
+        "evidence": [
+          "src/veriformis/exports/split_jsonl.py",
+          "docs/contracts/split-jsonl-export-v1.md",
+          "tests/exports/test_split_jsonl.py",
+          "tests/exports/test_semantic_round_trip.py",
+          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
+        ],
+        "product_role": "consumer-neutral-generic-export",
+        "roadmap_phase": 5,
+        "state": "implemented",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ]
+      },
+      {
+        "consumer_profile": null,
+        "container": "json",
+        "container_version": 1,
+        "determinism_claim": "portable_exact_bytes",
+        "evidence": [
+          "src/veriformis/exports/canonical_json.py",
+          "docs/contracts/canonical-json-export-v1.md",
+          "tests/exports/test_canonical_json.py",
+          "tests/exports/test_semantic_round_trip.py",
+          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
+        ],
+        "product_role": "consumer-neutral-generic-export",
+        "roadmap_phase": 5,
+        "state": "implemented",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ]
+      },
+      {
+        "consumer_profile": null,
+        "container": "constrained-csv",
+        "container_version": 1,
+        "determinism_claim": "portable_exact_bytes",
+        "evidence": [
+          "src/veriformis/exports/constrained_csv.py",
+          "docs/contracts/constrained-csv-export-v1.md",
+          "tests/exports/test_constrained_csv.py",
+          "tests/exports/test_semantic_round_trip.py",
+          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
+        ],
+        "product_role": "consumer-neutral-generic-export",
+        "roadmap_phase": 5,
+        "state": "implemented",
+        "supported_row_schemas": [
+          "instruction_output",
+          "prompt_completion",
+          "text"
+        ]
+      },
+      {
+        "consumer_profile": null,
+        "container": "parquet",
+        "container_version": 1,
+        "determinism_claim": "semantic_content_only",
+        "evidence": [
+          "src/veriformis/exports/parquet.py",
+          "docs/contracts/parquet-export-v1.md",
+          "tests/exports/test_parquet.py",
+          "tests/exports/test_columnar_integration.py"
+        ],
+        "product_role": "consumer-neutral-generic-export",
+        "roadmap_phase": 9,
+        "state": "implemented",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ]
+      },
+      {
+        "consumer_profile": null,
+        "container": "arrow",
+        "container_version": 1,
+        "determinism_claim": "semantic_content_only",
+        "evidence": [
+          "src/veriformis/exports/arrow.py",
+          "docs/contracts/arrow-export-v1.md",
+          "tests/exports/test_arrow.py",
+          "tests/exports/test_columnar_integration.py"
+        ],
+        "product_role": "consumer-neutral-generic-export",
+        "roadmap_phase": 9,
+        "state": "implemented",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ]
+      },
+      {
+        "consumer_profile": null,
+        "container": "hugging-face-dataset",
+        "container_version": 1,
+        "determinism_claim": "semantic_content_only",
+        "evidence": [
+          "src/veriformis/exports/hugging_face_dataset.py",
+          "docs/contracts/hugging-face-dataset-export-v1.md",
+          "tests/exports/test_hugging_face_dataset.py",
+          "tests/exports/test_columnar_integration.py"
+        ],
+        "product_role": "consumer-neutral-generic-export",
+        "roadmap_phase": 9,
+        "state": "implemented",
+        "supported_row_schemas": [
+          "instruction_output",
+          "messages",
+          "prompt_completion",
+          "text"
+        ]
+      }
+    ],
+    "implemented_bundle_profiles": [
+      {
+        "evidence": "src/veriformis/bundle/finished.py",
+        "paths": [
+          "attestation.json",
+          "data/evaluation.jsonl",
+          "data/train.jsonl",
+          "manifest.json",
+          "metadata/row-provenance.jsonl",
+          "validation.json"
+        ],
+        "profile": "minimal-v1",
+        "state": "implemented"
+      }
+    ],
+    "implemented_physical_containers": [
+      "minimal-v1",
+      "deterministic-vfbundle-zip-v1",
+      "deterministic-export-pack-zip-v1",
+      "split-jsonl-directory",
+      "json",
+      "constrained-csv",
+      "parquet",
+      "arrow",
+      "hugging-face-dataset"
+    ],
+    "implemented_transport_profiles": [
+      {
+        "evidence": [
+          "src/veriformis/bundle/transport.py",
+          "docs/contracts/bundle-transport-v1.md",
+          "tests/bundle/test_finished_bundle.py"
+        ],
+        "is_trainer_export": false,
+        "product_role": "immutable-transport",
+        "profile": "deterministic-vfbundle-zip-v1",
+        "requires_external_manifest_digest": true,
+        "state": "implemented"
+      },
+      {
+        "evidence": [
+          "src/veriformis/exports/archive.py",
+          "docs/contracts/bundle-transport-v1.md",
+          "tests/exports/test_export_pack_archive.py"
+        ],
+        "is_trainer_export": false,
+        "product_role": "immutable-export-pack-transport",
+        "profile": "deterministic-export-pack-zip-v1",
+        "requires_external_export_receipt_digest": true,
+        "state": "implemented"
+      }
+    ]
+  },
   "baseline_commit": "7d116e9c09fb4c64f38b2db2572f820a83c53dba",
-  "last_reviewed": "2026-08-27",
   "claim_policy": "docs/governance/project-tracking.md",
-  "product": {
-    "name": "Veriformis",
-    "version": "0.1.0",
-    "maturity": "development-alpha",
-    "offline_deterministic_core": true,
-    "aptus_required": false
+  "consumer_profiles": [
+    {
+      "evidence": [
+        "src/veriformis/taxonomy.py",
+        "docs/contracts/taxonomy-v1.md",
+        "tests/contracts/test_taxonomy_contract.py"
+      ],
+      "product_role": "canonical-product",
+      "profile": "veriformis-canonical-v1",
+      "state": "implemented"
+    },
+    {
+      "default_handoff": {
+        "cli_seal": false,
+        "mcp_seal": false,
+        "workbench": false
+      },
+      "evidence": [
+        "src/veriformis/handoff/aptus_v1.py",
+        "src/veriformis/cli.py",
+        "src/veriformis/mcp/server.py",
+        "macos/Sources/ViewModels/WorkbenchViewModel.swift",
+        "tests/handoff/test_aptus_handoff_v1.py"
+      ],
+      "legacy_core_gate_id": "aptus-row-shape",
+      "product_role": "optional-integration",
+      "profile": "aptus-handoff-v1",
+      "state": "implemented"
+    },
+    {
+      "evidence": [
+        "src/veriformis/profiles/trl.py",
+        "docs/contracts/trl-export-v1.md",
+        "tests/profiles/test_trl.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ],
+      "product_role": "optional-export-adapter",
+      "profile": "trl",
+      "state": "implemented"
+    },
+    {
+      "evidence": [
+        "src/veriformis/profiles/mlx_lm.py",
+        "docs/contracts/mlx-lm-export-v1.md",
+        "tests/profiles/test_mlx_lm.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ],
+      "product_role": "optional-export-adapter",
+      "profile": "mlx-lm",
+      "state": "implemented"
+    },
+    {
+      "evidence": [
+        "src/veriformis/profiles/axolotl.py",
+        "docs/contracts/axolotl-export-v1.md",
+        "tests/profiles/test_axolotl.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ],
+      "product_role": "optional-export-adapter",
+      "profile": "axolotl",
+      "state": "implemented"
+    },
+    {
+      "evidence": [
+        "src/veriformis/profiles/llama_factory.py",
+        "docs/contracts/llama-factory-export-v1.md",
+        "tests/profiles/test_llama_factory.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ],
+      "product_role": "optional-export-adapter",
+      "profile": "llama-factory",
+      "state": "implemented"
+    },
+    {
+      "evidence": [
+        "src/veriformis/profiles/aptus.py",
+        "docs/contracts/aptus-export-v1.md",
+        "tests/profiles/test_aptus.py",
+        "tests/profiles/test_conformance.py",
+        "tests/profiles/test_sidecars.py"
+      ],
+      "product_role": "optional-export-adapter",
+      "profile": "aptus",
+      "state": "implemented"
+    },
+    {
+      "profile": "unsloth",
+      "roadmap_phase": 10,
+      "state": "candidate"
+    }
+  ],
+  "extensions": {
+    "discovery": "veriformis.extension-discovery/v1",
+    "evidence": [
+      "docs/contracts/extension-protocol-v1.md",
+      "src/veriformis/extensions/protocol.py",
+      "src/veriformis/extensions/registry.py",
+      "src/veriformis/extensions/declarations.py",
+      "src/veriformis/extensions/runtime.py",
+      "tests/regressions/fixtures/phase16/compatibility-kit.json",
+      "tests/extensions/test_compatibility_kit.py",
+      "docs/adr/0017-no-untrusted-extension-loader.md",
+      "tests/extensions/test_broken_extension_isolation.py",
+      "tests/extensions/test_phase16_adversarial_closeout.py"
+    ],
+    "protocol": "veriformis.extension-protocol/v1",
+    "public_plugin_api": false,
+    "registry": "builtin-only",
+    "third_party_loading": false
   },
   "inputs": {
+    "evidence": [
+      "src/veriformis/parsers/dispatch.py",
+      "src/veriformis/taxonomy.py",
+      "tests/regressions/test_group5_declared_format_pipeline.py",
+      "tests/contracts/test_taxonomy_contract.py"
+    ],
+    "explicitly_unsupported": [
+      {
+        "capability": "ocr",
+        "evidence": "docs/beta-limitations.md",
+        "family": "ocr-image",
+        "reason": "Image-only and empty-text PDFs fail closed with a named limitation."
+      }
+    ],
     "implemented_extensions": [
       ".c",
       ".cpp",
@@ -48,399 +351,32 @@
       "dataset-row",
       "mixed"
     ],
-    "planned_modes": [],
-    "explicitly_unsupported": [
-      {
-        "family": "ocr-image",
-        "capability": "ocr",
-        "reason": "Image-only and empty-text PDFs fail closed with a named limitation.",
-        "evidence": "docs/beta-limitations.md"
-      }
-    ],
-    "evidence": [
-      "src/veriformis/parsers/dispatch.py",
-      "src/veriformis/taxonomy.py",
-      "tests/regressions/test_group5_declared_format_pipeline.py",
-      "tests/contracts/test_taxonomy_contract.py"
-    ]
+    "planned_modes": []
   },
-  "training": {
-    "implemented_families": [
-      "source-grounded-language-modeling",
-      "source-grounded-supervised-fine-tuning"
-    ],
-    "implemented_objectives": [
-      "before_after_transformation",
-      "continuation",
-      "full_text",
-      "section_reconstruction",
-      "structured_field"
-    ],
-    "implemented_goals": [
-      "learn-the-text",
-      "continue-a-passage",
-      "recover-a-section-from-its-heading",
-      "reproduce-a-recorded-change",
-      "extract-a-structured-value"
-    ],
-    "implemented_presets": [
-      "learn-the-text.safe",
-      "continue-a-passage.safe",
-      "recover-a-section-from-its-heading.safe",
-      "reproduce-a-recorded-change.safe",
-      "extract-a-structured-value.safe"
-    ],
-    "implemented_row_schemas": [
-      "instruction_output",
-      "messages",
-      "prompt_completion",
-      "text"
-    ],
-    "implemented_loss_policies": [
-      "full-sequence",
-      "completion-only",
-      "output-only",
-      "final-assistant-suffix"
-    ],
-    "planned_families": [
-      "preference-and-ranking",
-      "explicit-label-classification",
-      "tool-call-conversations",
-      "stepwise-supervision",
-      "pre-tokenized-training",
-      "governed-generated-candidates"
-    ],
-    "explicitly_unsupported_families": [
-      {
-        "family": "multimodal-training",
-        "reason": "No multimodal recovery or row contract exists.",
-        "evidence": "docs/contracts/taxonomy-v1.md"
-      }
-    ],
-    "evidence": [
-      "src/veriformis/recipes/library.py",
-      "src/veriformis/datasets/serialization.py",
-      "src/veriformis/taxonomy.py",
-      "src/veriformis/goals/catalog.py",
-      "src/veriformis/goals/catalog-v1.json",
-      "src/veriformis/goals/presets.py",
-      "src/veriformis/goals/presets-v1.json",
-      "docs/contracts/dataset-construction-v1.md",
-      "docs/contracts/taxonomy-v1.md",
-      "docs/contracts/goal-catalog-v1.md"
-    ]
-  },
-  "artifacts": {
-    "implemented_physical_containers": [
-      "minimal-v1",
-      "deterministic-vfbundle-zip-v1",
-      "deterministic-export-pack-zip-v1",
-      "split-jsonl-directory",
-      "json",
-      "constrained-csv",
-      "parquet",
-      "arrow",
-      "hugging-face-dataset"
-    ],
-    "implemented_bundle_profiles": [
-      {
-        "profile": "minimal-v1",
-        "state": "implemented",
-        "paths": [
-          "attestation.json",
-          "data/evaluation.jsonl",
-          "data/train.jsonl",
-          "manifest.json",
-          "metadata/row-provenance.jsonl",
-          "validation.json"
-        ],
-        "evidence": "src/veriformis/bundle/finished.py"
-      }
-    ],
-    "implemented_transport_profiles": [
-      {
-        "profile": "deterministic-vfbundle-zip-v1",
-        "state": "implemented",
-        "product_role": "immutable-transport",
-        "requires_external_manifest_digest": true,
-        "is_trainer_export": false,
-        "evidence": [
-          "src/veriformis/bundle/transport.py",
-          "docs/contracts/bundle-transport-v1.md",
-          "tests/bundle/test_finished_bundle.py"
-        ]
-      },
-      {
-        "profile": "deterministic-export-pack-zip-v1",
-        "state": "implemented",
-        "product_role": "immutable-export-pack-transport",
-        "requires_external_export_receipt_digest": true,
-        "is_trainer_export": false,
-        "evidence": [
-          "src/veriformis/exports/archive.py",
-          "docs/contracts/bundle-transport-v1.md",
-          "tests/exports/test_export_pack_archive.py"
-        ]
-      }
-    ],
-    "generic_export_containers": [
-      {
-        "container": "split-jsonl-directory",
-        "state": "implemented",
-        "roadmap_phase": 5,
-        "product_role": "consumer-neutral-generic-export",
-        "container_version": 1,
-        "determinism_claim": "portable_exact_bytes",
-        "supported_row_schemas": [
-          "instruction_output",
-          "messages",
-          "prompt_completion",
-          "text"
-        ],
-        "consumer_profile": null,
-        "evidence": [
-          "src/veriformis/exports/split_jsonl.py",
-          "docs/contracts/split-jsonl-export-v1.md",
-          "tests/exports/test_split_jsonl.py",
-          "tests/exports/test_semantic_round_trip.py",
-          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
-        ]
-      },
-      {
-        "container": "json",
-        "state": "implemented",
-        "roadmap_phase": 5,
-        "product_role": "consumer-neutral-generic-export",
-        "container_version": 1,
-        "determinism_claim": "portable_exact_bytes",
-        "supported_row_schemas": [
-          "instruction_output",
-          "messages",
-          "prompt_completion",
-          "text"
-        ],
-        "consumer_profile": null,
-        "evidence": [
-          "src/veriformis/exports/canonical_json.py",
-          "docs/contracts/canonical-json-export-v1.md",
-          "tests/exports/test_canonical_json.py",
-          "tests/exports/test_semantic_round_trip.py",
-          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
-        ]
-      },
-      {
-        "container": "constrained-csv",
-        "state": "implemented",
-        "roadmap_phase": 5,
-        "product_role": "consumer-neutral-generic-export",
-        "container_version": 1,
-        "determinism_claim": "portable_exact_bytes",
-        "supported_row_schemas": [
-          "instruction_output",
-          "prompt_completion",
-          "text"
-        ],
-        "consumer_profile": null,
-        "evidence": [
-          "src/veriformis/exports/constrained_csv.py",
-          "docs/contracts/constrained-csv-export-v1.md",
-          "tests/exports/test_constrained_csv.py",
-          "tests/exports/test_semantic_round_trip.py",
-          "tests/regressions/fixtures/phase5/generic-export-semantic-round-trip.json"
-        ]
-      },
-      {
-        "container": "parquet",
-        "state": "implemented",
-        "roadmap_phase": 9,
-        "product_role": "consumer-neutral-generic-export",
-        "container_version": 1,
-        "determinism_claim": "semantic_content_only",
-        "supported_row_schemas": [
-          "instruction_output",
-          "messages",
-          "prompt_completion",
-          "text"
-        ],
-        "consumer_profile": null,
-        "evidence": [
-          "src/veriformis/exports/parquet.py",
-          "docs/contracts/parquet-export-v1.md",
-          "tests/exports/test_parquet.py",
-          "tests/exports/test_columnar_integration.py"
-        ]
-      },
-      {
-        "container": "arrow",
-        "state": "implemented",
-        "roadmap_phase": 9,
-        "product_role": "consumer-neutral-generic-export",
-        "container_version": 1,
-        "determinism_claim": "semantic_content_only",
-        "supported_row_schemas": [
-          "instruction_output",
-          "messages",
-          "prompt_completion",
-          "text"
-        ],
-        "consumer_profile": null,
-        "evidence": [
-          "src/veriformis/exports/arrow.py",
-          "docs/contracts/arrow-export-v1.md",
-          "tests/exports/test_arrow.py",
-          "tests/exports/test_columnar_integration.py"
-        ]
-      },
-      {
-        "container": "hugging-face-dataset",
-        "state": "implemented",
-        "roadmap_phase": 9,
-        "product_role": "consumer-neutral-generic-export",
-        "container_version": 1,
-        "determinism_claim": "semantic_content_only",
-        "supported_row_schemas": [
-          "instruction_output",
-          "messages",
-          "prompt_completion",
-          "text"
-        ],
-        "consumer_profile": null,
-        "evidence": [
-          "src/veriformis/exports/hugging_face_dataset.py",
-          "docs/contracts/hugging-face-dataset-export-v1.md",
-          "tests/exports/test_hugging_face_dataset.py",
-          "tests/exports/test_columnar_integration.py"
-        ]
-      }
-    ]
-  },
-  "surfaces": {
-    "implemented": [
-      "python-pipeline-service",
-      "typer-cli",
-      "local-mcp",
-      "macos-swiftui-workbench"
-    ],
-    "evidence": [
-      "src/veriformis/pipeline/service.py",
-      "src/veriformis/cli.py",
-      "src/veriformis/mcp/server.py",
-      "macos/Sources"
-    ]
-  },
-  "consumer_profiles": [
+  "known_current_gaps": [
     {
-      "profile": "veriformis-canonical-v1",
-      "state": "implemented",
-      "product_role": "canonical-product",
-      "evidence": [
-        "src/veriformis/taxonomy.py",
-        "docs/contracts/taxonomy-v1.md",
-        "tests/contracts/test_taxonomy_contract.py"
-      ]
+      "evidence": "docs/governance/corpus-demand-matrix.json",
+      "id": "gap-representative-owner-corpus",
+      "state": "verified-open"
     },
     {
-      "profile": "aptus-handoff-v1",
-      "state": "implemented",
-      "product_role": "optional-integration",
-      "default_handoff": {
-        "cli_seal": false,
-        "mcp_seal": false,
-        "workbench": false
-      },
-      "legacy_core_gate_id": "aptus-row-shape",
-      "evidence": [
-        "src/veriformis/handoff/aptus_v1.py",
-        "src/veriformis/cli.py",
-        "src/veriformis/mcp/server.py",
-        "macos/Sources/ViewModels/WorkbenchViewModel.swift",
-        "tests/handoff/test_aptus_handoff_v1.py"
-      ]
+      "evidence": "docs/governance/corpus-demand-matrix.json",
+      "id": "gap-observed-trainer-and-container-demand",
+      "state": "verified-open"
     },
     {
-      "profile": "trl",
-      "state": "implemented",
-      "product_role": "optional-export-adapter",
-      "evidence": [
-        "src/veriformis/profiles/trl.py",
-        "docs/contracts/trl-export-v1.md",
-        "tests/profiles/test_trl.py",
-        "tests/profiles/test_conformance.py",
-        "tests/profiles/test_sidecars.py"
-      ]
-    },
-    {
-      "profile": "mlx-lm",
-      "state": "implemented",
-      "product_role": "optional-export-adapter",
-      "evidence": [
-        "src/veriformis/profiles/mlx_lm.py",
-        "docs/contracts/mlx-lm-export-v1.md",
-        "tests/profiles/test_mlx_lm.py",
-        "tests/profiles/test_conformance.py",
-        "tests/profiles/test_sidecars.py"
-      ]
-    },
-    {
-      "profile": "axolotl",
-      "state": "implemented",
-      "product_role": "optional-export-adapter",
-      "evidence": [
-        "src/veriformis/profiles/axolotl.py",
-        "docs/contracts/axolotl-export-v1.md",
-        "tests/profiles/test_axolotl.py",
-        "tests/profiles/test_conformance.py",
-        "tests/profiles/test_sidecars.py"
-      ]
-    },
-    {
-      "profile": "llama-factory",
-      "state": "implemented",
-      "product_role": "optional-export-adapter",
-      "evidence": [
-        "src/veriformis/profiles/llama_factory.py",
-        "docs/contracts/llama-factory-export-v1.md",
-        "tests/profiles/test_llama_factory.py",
-        "tests/profiles/test_conformance.py",
-        "tests/profiles/test_sidecars.py"
-      ]
-    },
-    {
-      "profile": "aptus",
-      "state": "implemented",
-      "product_role": "optional-export-adapter",
-      "evidence": [
-        "src/veriformis/profiles/aptus.py",
-        "docs/contracts/aptus-export-v1.md",
-        "tests/profiles/test_aptus.py",
-        "tests/profiles/test_conformance.py",
-        "tests/profiles/test_sidecars.py"
-      ]
-    },
-    {
-      "profile": "unsloth",
-      "state": "candidate",
-      "roadmap_phase": 10
+      "evidence": "src/veriformis/contracts.py",
+      "id": "gap-legacy-aptus-row-shape-gate-id",
+      "state": "verified-open"
     }
   ],
-  "extensions": {
-    "protocol": "veriformis.extension-protocol/v1",
-    "discovery": "veriformis.extension-discovery/v1",
-    "registry": "builtin-only",
-    "public_plugin_api": false,
-    "third_party_loading": false,
-    "evidence": [
-      "docs/contracts/extension-protocol-v1.md",
-      "src/veriformis/extensions/protocol.py",
-      "src/veriformis/extensions/registry.py",
-      "src/veriformis/extensions/declarations.py",
-      "src/veriformis/extensions/runtime.py",
-      "tests/regressions/fixtures/phase16/compatibility-kit.json",
-      "tests/extensions/test_compatibility_kit.py",
-      "docs/adr/0017-no-untrusted-extension-loader.md",
-      "tests/extensions/test_broken_extension_isolation.py",
-      "tests/extensions/test_phase16_adversarial_closeout.py"
-    ]
+  "last_reviewed": "2026-08-28",
+  "product": {
+    "aptus_required": false,
+    "maturity": "development-alpha",
+    "name": "Veriformis",
+    "offline_deterministic_core": true,
+    "version": "0.1.0"
   },
   "scale": {
     "discovery": "veriformis.scale-support-discovery/v1",
@@ -453,21 +389,90 @@
     "sla_claim": false,
     "statistical_meaning": false
   },
-  "known_current_gaps": [
-    {
-      "id": "gap-representative-owner-corpus",
-      "state": "verified-open",
-      "evidence": "docs/governance/corpus-demand-matrix.json"
-    },
-    {
-      "id": "gap-observed-trainer-and-container-demand",
-      "state": "verified-open",
-      "evidence": "docs/governance/corpus-demand-matrix.json"
-    },
-    {
-      "id": "gap-legacy-aptus-row-shape-gate-id",
-      "state": "verified-open",
-      "evidence": "src/veriformis/contracts.py"
-    }
-  ]
+  "schema_version": "veriformis.support-registry/v1",
+  "surfaces": {
+    "evidence": [
+      "src/veriformis/pipeline/service.py",
+      "src/veriformis/cli.py",
+      "src/veriformis/mcp/server.py",
+      "macos/Sources"
+    ],
+    "implemented": [
+      "python-pipeline-service",
+      "typer-cli",
+      "local-mcp",
+      "macos-swiftui-workbench"
+    ]
+  },
+  "training": {
+    "evidence": [
+      "src/veriformis/recipes/library.py",
+      "src/veriformis/datasets/serialization.py",
+      "src/veriformis/taxonomy.py",
+      "src/veriformis/goals/catalog.py",
+      "src/veriformis/goals/catalog-v1.json",
+      "src/veriformis/goals/presets.py",
+      "src/veriformis/goals/presets-v1.json",
+      "docs/contracts/dataset-construction-v1.md",
+      "docs/contracts/taxonomy-v1.md",
+      "docs/contracts/goal-catalog-v1.md"
+    ],
+    "explicitly_unsupported_families": [
+      {
+        "evidence": "docs/contracts/taxonomy-v1.md",
+        "family": "multimodal-training",
+        "reason": "No multimodal recovery or row contract exists."
+      }
+    ],
+    "implemented_families": [
+      "source-grounded-language-modeling",
+      "source-grounded-supervised-fine-tuning",
+      "explicit-label-classification"
+    ],
+    "implemented_goals": [
+      "learn-the-text",
+      "continue-a-passage",
+      "recover-a-section-from-its-heading",
+      "reproduce-a-recorded-change",
+      "extract-a-structured-value",
+      "classify-with-provided-labels"
+    ],
+    "implemented_loss_policies": [
+      "full-sequence",
+      "completion-only",
+      "output-only",
+      "final-assistant-suffix",
+      "label-only"
+    ],
+    "implemented_objectives": [
+      "before_after_transformation",
+      "continuation",
+      "explicit_label",
+      "full_text",
+      "section_reconstruction",
+      "structured_field"
+    ],
+    "implemented_presets": [
+      "learn-the-text.safe",
+      "continue-a-passage.safe",
+      "recover-a-section-from-its-heading.safe",
+      "reproduce-a-recorded-change.safe",
+      "extract-a-structured-value.safe",
+      "classify-with-provided-labels.safe"
+    ],
+    "implemented_row_schemas": [
+      "instruction_output",
+      "label-classification",
+      "messages",
+      "prompt_completion",
+      "text"
+    ],
+    "planned_families": [
+      "preference-and-ranking",
+      "tool-call-conversations",
+      "stepwise-supervision",
+      "pre-tokenized-training",
+      "governed-generated-candidates"
+    ]
+  }
 }

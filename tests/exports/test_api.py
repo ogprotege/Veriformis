@@ -292,6 +292,7 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
         ),
         "json": (
             "instruction_output",
+            "label-classification",
             "messages",
             "prompt_completion",
             "text",
@@ -304,11 +305,18 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
         ),
         "split-jsonl-directory": (
             "instruction_output",
+            "label-classification",
             "messages",
             "prompt_completion",
             "text",
         ),
     }
+    trainer_row_schemas = (
+        "instruction_output",
+        "messages",
+        "prompt_completion",
+        "text",
+    )
     for profile in first.profiles:
         consumer = (
             None
@@ -321,6 +329,8 @@ def test_production_export_discovery_is_truthfully_shipped_and_fresh() -> None:
                 "messages",
                 "prompt_completion",
             )
+        elif consumer is not None:
+            assert profile.supported_row_schemas == trainer_row_schemas
         else:
             assert (
                 profile.supported_row_schemas

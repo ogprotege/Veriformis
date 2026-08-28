@@ -13,7 +13,7 @@ from pydantic import (
     model_validator,
 )
 
-from veriformis.contracts import V1_ROW_SCHEMA_KINDS
+from veriformis.contracts import PRODUCT_ROW_SCHEMA_KINDS
 from veriformis.datasets import ProductRow, RowSet
 from veriformis.errors import (
     ExportContractError,
@@ -46,7 +46,7 @@ CANONICAL_JSON_DATASET_PATH = "dataset.json"
 CANONICAL_JSON_PROVENANCE_PATH = "metadata/row-provenance.json"
 CANONICAL_JSON_README_PATH = "README.md"
 
-_SUPPORTED_ROW_SCHEMAS = tuple(sorted(V1_ROW_SCHEMA_KINDS))
+_SUPPORTED_ROW_SCHEMAS = tuple(sorted(PRODUCT_ROW_SCHEMA_KINDS))
 
 
 class _StrictCanonicalJsonModel(BaseModel):
@@ -180,7 +180,7 @@ class CanonicalJsonProvenance(_StrictCanonicalJsonModel):
     @field_validator("row_schema")
     @classmethod
     def _valid_row_schema(cls, value: str) -> str:
-        if value not in V1_ROW_SCHEMA_KINDS:
+        if value not in PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError("provenance names an unsupported row schema")
         return value
 
@@ -272,7 +272,7 @@ class CanonicalJsonDataset(_StrictCanonicalJsonModel):
     @field_validator("row_schema")
     @classmethod
     def _valid_row_schema(cls, value: str) -> str:
-        if value not in V1_ROW_SCHEMA_KINDS:
+        if value not in PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError("dataset names an unsupported row schema")
         return value
 

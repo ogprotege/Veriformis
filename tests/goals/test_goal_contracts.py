@@ -142,7 +142,14 @@ def test_goal_evidence_bindings_are_closed_and_ordered() -> None:
     assert "pdf-text" not in by_id["extract-a-structured-value"].eligible_input_families
     assert "pdf-text" not in by_id["recover-a-section-from-its-heading"].eligible_input_families
     for goal in catalog.goals:
+        if goal.objective == "explicit_label":
+            assert "mapped-label-unavailable" in goal.required_evidence_diagnostics
+            continue
         assert "source-chunks-unavailable" in goal.required_evidence_diagnostics, goal.goal_id
+    assert by_id["classify-with-provided-labels"].eligible_input_families == (
+        "delimited-table",
+        "json-records",
+    )
     assert by_id["recover-a-section-from-its-heading"].required_evidence_diagnostics == (
         "source-chunks-unavailable",
         "section-structure-unavailable",

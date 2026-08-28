@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–16 complete; Phase 17.1 packet open
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 17.4 review/quality hooks)
+**Last reviewed:** 2026-08-28 (Phase 17.5 classification admission)
 
-**Next review:** Phase 17.4 merge, or item 17.5 classification admission. Do
-not execute a family from these hooks.
+**Next review:** Phase 17.5 merge, or item 17.6 preference pairs. Do not
+map trainer profiles onto classification in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -140,8 +140,9 @@ local, offline, and free of LLM generation.
       Item 17.1 opened the packet. Item 17.2 pins
       `veriformis.advanced-family-admission/v1`. Item 17.3 adds leakage
       grouping keys without changing default SFT split. Item 17.4 adds
-      opt-in review queues and preview-only family quality hooks. No
-      family execute yet. Do not start Phase 18 from this packet.
+      opt-in review queues and preview-only family quality hooks. Item
+      17.5 admits `explicit-label-classification` from user-provided
+      labels. Do not start Phase 18 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

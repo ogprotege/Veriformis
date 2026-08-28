@@ -7,12 +7,14 @@
     ],
     "json": [
       "instruction_output",
+      "label-classification",
       "messages",
       "prompt_completion",
       "text"
     ],
     "split-jsonl-directory": [
       "instruction_output",
+      "label-classification",
       "messages",
       "prompt_completion",
       "text"

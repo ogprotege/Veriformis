@@ -1,5 +1,5 @@
 {
-  "catalog_sha256": "71ea925f2f874199353e2408c3d2067e7220bda87bf0f387af7dd89d15b70f33",
+  "catalog_sha256": "062ef539b73888c92289127300c8b63df61f08ddcce86fe5ad5b8887647ad09e",
   "cells": [
     {
       "cell_id": "learn-the-text__plain-text__whole-text",
@@ -2136,7 +2136,7 @@
       "supervision_sha256": "7e38a7294bf2c77886418dcca588b37772a9bdbf46d1af60002a0905c41cce92"
     }
   ],
-  "preset_catalog_sha256": "cf85c7207f0d1089aa3b64de59263ea9548bc1142042839375f0e278ebcae43c",
+  "preset_catalog_sha256": "faba31aa8d349872e0b4a7da0b231525ba4592a235a45a958a2a7f781308ed27",
   "schema_id": "veriformis.goal-acceptance-matrix/v1",
   "source_fixtures": [
     {

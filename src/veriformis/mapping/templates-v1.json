@@ -78,6 +78,30 @@
       "representation_id": "whole-text",
       "row_schema": "text",
       "template_id": "flat-text"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "context-label-annotator",
+      "field_mappings": [
+        {
+          "source_path": "context",
+          "target_key": "context"
+        },
+        {
+          "source_path": "label",
+          "target_key": "label"
+        },
+        {
+          "source_path": "annotator",
+          "target_key": "annotator"
+        }
+      ],
+      "goal_id": "classify-with-provided-labels",
+      "membership_policy": "replaced",
+      "plain_language": "Map context, label, and annotator strings into the label-classification row.",
+      "representation_id": "context-and-label",
+      "row_schema": "label-classification",
+      "template_id": "context-label-annotator"
     }
   ]
 }

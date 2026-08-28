@@ -36,6 +36,7 @@ ObjectiveKind = Literal[
     "section_reconstruction",
     "before_after_transformation",
     "structured_field",
+    "explicit_label",
 ]
 
 OBJECTIVE_FIELD_ROLES: Mapping[
@@ -51,6 +52,7 @@ OBJECTIVE_FIELD_ROLES: Mapping[
         "section_reconstruction": (("heading",), ("section",)),
         "before_after_transformation": (("before",), ("after",)),
         "structured_field": (("input",), ("fields",)),
+        "explicit_label": (("context",), ("label",)),
     }
 )
 

@@ -240,6 +240,7 @@ def test_v1_diagnostic_and_promotion_reason_registries_are_exact():
         "structured-ir-artifact-unavailable",
         "transformation-pair-empty-or-unchanged",
         "transformation-pair-unavailable",
+        "mapped-label-unavailable",
     )
     assert V1_PROMOTION_REASON_CODES == (
         "construction-integrity-v1",

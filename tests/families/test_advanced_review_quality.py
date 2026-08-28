@@ -95,5 +95,6 @@ def test_explicit_family_fields_are_counted_without_executing_a_family() -> None
     assert IMPLEMENTED_TRAINING_FAMILIES == (
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
+        "explicit-label-classification",
     )
-    assert "explicit-label-classification" in PLANNED_TRAINING_FAMILIES
+    assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES

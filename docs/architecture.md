@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.4 review/quality hooks)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.5 classification)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -53,6 +53,7 @@ and recommendations; not enforcing);
 `review/` (queues, corrections as new identities, named-seed sampling,
 packet exchange, required-review seal blocking, auditable supersession);
 `extensions/` (internal protocol, built-in-only registry, read-only declarations; `.txt` and generic `split-jsonl-directory` selected through the protocol; no loader);
+`families/` (admission pins, leakage grouping, admitted classification execute);
 and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict

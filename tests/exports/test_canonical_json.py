@@ -49,6 +49,13 @@ EXPECTED_MANIFEST_SHA256 = (
     "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
 )
 ROW_SCHEMAS = ("instruction_output", "messages", "prompt_completion", "text")
+DISCOVERY_ROW_SCHEMAS = (
+    "instruction_output",
+    "label-classification",
+    "messages",
+    "prompt_completion",
+    "text",
+)
 
 
 def _materialize_bundle(root: Path) -> Path:
@@ -191,7 +198,7 @@ def test_canonical_json_discovery_and_fixed_plan(tmp_path: Path) -> None:
     selector = (CANONICAL_JSON_CONTAINER_ID, 1, None, None)
 
     assert selector in profiles
-    assert profiles[selector].supported_row_schemas == ROW_SCHEMAS
+    assert profiles[selector].supported_row_schemas == DISCOVERY_ROW_SCHEMAS
     assert (
         profiles[selector].container_profile.determinism_claim
         == "portable_exact_bytes"

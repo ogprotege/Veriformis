@@ -17,7 +17,7 @@ from veriformis.errors import FamilyAdmissionError
 from veriformis.identity import derive_id, validate_id
 from veriformis.taxonomy import (
     EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES,
-    LOSS_POLICY_IDS,
+    SFT_LOSS_POLICY_IDS,
 )
 
 
@@ -244,7 +244,7 @@ class FamilyAdmission(_StrictModel):
                 f"{overlap[0]!r}; new families require new row schemas"
             )
         policy = _require_token(self.loss_policy_id, "loss policy id")
-        if policy in LOSS_POLICY_IDS:
+        if policy in SFT_LOSS_POLICY_IDS:
             raise FamilyAdmissionError(
                 "family admission cannot reuse SFT loss policy "
                 f"{policy!r}; new families require new loss policies"

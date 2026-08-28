@@ -103,17 +103,18 @@ item.
       stepwise facts.
 - [x] Add previewable quality detectors. Keep `admitted_to_block` false.
 - [x] Keep default `review_policy` `none`. Do not execute a family.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.5 Admit explicit-label-classification
 
 **Branch:** `phase17/05-admit-classification`
 
-- [ ] Promote `explicit-label-classification` with a new objective, row
+- [x] Promote `explicit-label-classification` with a new objective, row
       schema, loss policy, mapping path, and goal/preset entries.
-- [ ] Bind user-provided labels with `mapped_value`. Refuse invented labels.
-- [ ] Seal through split JSONL and canonical JSON. Existing profiles refuse
+- [x] Bind user-provided labels with `mapped_value`. Refuse invented labels.
+- [x] Seal through split JSONL and canonical JSON. Existing profiles refuse
       the new schema.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.6 Admit preference-and-ranking
 

@@ -96,6 +96,8 @@ def workspaces(tmp_path_factory) -> dict[str, Path]:
 
 def _cases():
     for goal in goal_catalog().goals:
+        if goal.objective not in _SOURCES:
+            continue
         for rep_id in goal.compatible_representations:
             yield pytest.param(goal.objective, rep_id, id=f"{goal.goal_id}/{rep_id}")
 

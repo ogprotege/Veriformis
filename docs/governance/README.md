@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.4 review/quality hooks)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.5 classification)
 
-**Next review:** Phase 17.4 merge, or governance-schema change.
+**Next review:** Phase 17.5 merge, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

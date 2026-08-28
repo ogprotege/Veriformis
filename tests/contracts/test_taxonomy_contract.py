@@ -6,10 +6,11 @@ import pytest
 
 from veriformis.contracts import (
     DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    PRODUCT_OBJECTIVE_KINDS,
+    PRODUCT_ROW_SCHEMA_KINDS,
     TAXONOMY_CONTRACT_ID,
     TAXONOMY_CONTRACT_VERSION,
     TAXONOMY_SCHEMA_ID,
-    V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import TaxonomyError
 from veriformis.identity import lossless_json_bytes, sha256_digest
@@ -49,7 +50,7 @@ TAXONOMY_V1_CATALOG = (
     Path(__file__).parent / "fixtures" / "taxonomy" / "v1" / "catalog.json"
 )
 TAXONOMY_V1_CATALOG_SHA256 = (
-    "f5b7522bab4dc46b3049e4b4d3fb84743911b393f3e6f97ca2f5ea22b1f885d6"
+    "a04dafd75db244215f5cd48151b84c802a8ed8f9d8f44a36a65673b2b8ea458f"
 )
 
 
@@ -103,12 +104,12 @@ def test_registry_reuses_existing_objective_and_row_identifiers() -> None:
         entry.identifier
         for entry in catalog()
         if entry.axis == "objective" and entry.state == "implemented"
-    ) == DETERMINISTIC_V1_OBJECTIVE_KINDS
+    ) == PRODUCT_OBJECTIVE_KINDS
     assert tuple(
         entry.identifier
         for entry in catalog()
         if entry.axis == "semantic_row" and entry.state == "implemented"
-    ) == V1_ROW_SCHEMA_KINDS
+    ) == PRODUCT_ROW_SCHEMA_KINDS
 
 
 def test_implemented_families_are_conservative_and_complete_for_current_objectives() -> (
@@ -117,8 +118,10 @@ def test_implemented_families_are_conservative_and_complete_for_current_objectiv
     assert IMPLEMENTED_TRAINING_FAMILIES == (
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
+        "explicit-label-classification",
     )
     assert family_for_objective("full_text") == "source-grounded-language-modeling"
+    assert family_for_objective("explicit_label") == "explicit-label-classification"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -129,7 +132,8 @@ def test_implemented_families_are_conservative_and_complete_for_current_objectiv
 
 def test_future_families_are_named_but_not_implemented() -> None:
     assert "preference-and-ranking" in PLANNED_TRAINING_FAMILIES
-    assert "explicit-label-classification" in PLANNED_TRAINING_FAMILIES
+    assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
+    assert "explicit-label-classification" in IMPLEMENTED_TRAINING_FAMILIES
     assert "tool-call-conversations" in PLANNED_TRAINING_FAMILIES
     assert "stepwise-supervision" in PLANNED_TRAINING_FAMILIES
     assert "pre-tokenized-training" in PLANNED_TRAINING_FAMILIES
@@ -147,6 +151,7 @@ def test_future_families_are_named_but_not_implemented() -> None:
 
 def test_objective_row_compatibility_matches_construction_rules() -> None:
     assert compatible_row_schemas("full_text") == ("text",)
+    assert compatible_row_schemas("explicit_label") == ("label-classification",)
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -171,6 +176,7 @@ def test_objective_row_compatibility_matches_construction_rules() -> None:
 
 def test_default_row_schema_matches_current_surfaces() -> None:
     assert default_row_schema("full_text") == "text"
+    assert default_row_schema("explicit_label") == "label-classification"
     for kind in DETERMINISTIC_V1_OBJECTIVE_KINDS:
         if kind == "full_text":
             continue
@@ -195,14 +201,19 @@ def test_each_row_schema_has_one_loss_policy() -> None:
             "final-assistant-suffix",
             "Only the final assistant message receives supervision.",
         ),
+        "label-classification": (
+            "label-only",
+            "Only the user-provided label receives supervision.",
+        ),
     }
     assert LOSS_POLICY_IDS == (
         "full-sequence",
         "completion-only",
         "output-only",
         "final-assistant-suffix",
+        "label-only",
     )
-    assert set(expected) == set(V1_ROW_SCHEMA_KINDS)
+    assert set(expected) == set(PRODUCT_ROW_SCHEMA_KINDS)
     for row_schema, (policy, notes) in expected.items():
         assert loss_policy_for_row(row_schema) == policy
         assert loss_boundary(policy) == notes
@@ -282,8 +293,8 @@ def test_implemented_discovery_names_axes_and_omits_format() -> None:
     discovery = implemented_discovery()
     assert "format" not in discovery
     assert discovery["training_family"] == IMPLEMENTED_TRAINING_FAMILIES
-    assert discovery["objective"] == DETERMINISTIC_V1_OBJECTIVE_KINDS
-    assert discovery["semantic_row"] == V1_ROW_SCHEMA_KINDS
+    assert discovery["objective"] == PRODUCT_OBJECTIVE_KINDS
+    assert discovery["semantic_row"] == PRODUCT_ROW_SCHEMA_KINDS
     assert discovery["physical_container"] == IMPLEMENTED_PHYSICAL_CONTAINERS
     assert discovery["consumer_profile"] == IMPLEMENTED_CONSUMER_PROFILES
     assert "preference-and-ranking" not in discovery["training_family"]

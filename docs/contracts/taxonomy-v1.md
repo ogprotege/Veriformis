@@ -71,6 +71,7 @@ Implemented v1 families are conservative:
 | --- | --- | --- |
 | `source-grounded-language-modeling` | implemented | The model continues or memorizes source-grounded text. The only current objective is `full_text`. |
 | `source-grounded-supervised-fine-tuning` | implemented | The model produces a source-grounded target from an explicit context. Current objectives are `continuation`, `section_reconstruction`, `before_after_transformation`, and `structured_field`. |
+| `explicit-label-classification` | implemented | The model emits a user-provided label. The objective is `explicit_label`. Labels are never invented. |
 
 Future-only families MAY be named. They MUST be recorded as `planned` or
 `explicitly_unsupported` and MUST NOT appear in discovery as implemented:
@@ -78,7 +79,6 @@ Future-only families MAY be named. They MUST be recorded as `planned` or
 | Family ID | State | Reason it is not implemented |
 | --- | --- | --- |
 | `preference-and-ranking` | planned | No preference objective, pair schema, or ranking loss |
-| `explicit-label-classification` | planned | No explicit label objective or label-set contract |
 | `tool-call-conversations` | planned | No tool/function-call row contract |
 | `stepwise-supervision` | planned | No stepwise or process-supervision schema |
 | `pre-tokenized-training` | planned | Tokenizer-bound rows require a named consumer/model profile |
@@ -97,9 +97,10 @@ fields are context or target. Persisted kinds remain exactly:
 - `section_reconstruction`
 - `before_after_transformation`
 - `structured_field`
+- `explicit_label`
 
-Field roles remain those in the construction contract. This taxonomy MUST NOT
-add, rename, or drop those kinds.
+Field roles remain those in the construction contract. SFT kinds stay
+frozen. Admitted family kinds are added only in the admitting pull request.
 
 Learning reading of the current kinds:
 
@@ -110,12 +111,14 @@ Learning reading of the current kinds:
 | `section_reconstruction` | `source-grounded-supervised-fine-tuning` | Recover the exact section body from its heading. |
 | `before_after_transformation` | `source-grounded-supervised-fine-tuning` | Reproduce the named deterministic transform. |
 | `structured_field` | `source-grounded-supervised-fine-tuning` | Emit one explicit IR scalar as the target. |
+| `explicit_label` | `explicit-label-classification` | Emit the operator-supplied label. Document-source construction is refused. |
 
 ### Semantic row schema
 
-A semantic row schema states field roles in the sealed product row. Persisted
-values remain exactly `text`, `prompt_completion`, `instruction_output`, and
-`messages`. Payload shapes remain those in the finished-dataset contract.
+A semantic row schema states field roles in the sealed product row. SFT v1
+values remain `text`, `prompt_completion`, `instruction_output`, and
+`messages`. Admitted family rows add `label-classification` without overloading
+those four SFT shapes.
 
 Legacy CLI names `completion`, `instruction`, and `chat` are UI aliases only.
 They MUST NOT appear in a `DatasetRecipe`, sealed row set, or taxonomy

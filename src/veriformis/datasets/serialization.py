@@ -59,6 +59,7 @@ RowSchema = Literal[
     "prompt_completion",
     "instruction_output",
     "messages",
+    "label-classification",
 ]
 
 V1_ROW_SCHEMAS: tuple[RowSchema, ...] = (
@@ -66,6 +67,10 @@ V1_ROW_SCHEMAS: tuple[RowSchema, ...] = (
     "prompt_completion",
     "instruction_output",
     "messages",
+)
+PRODUCT_ROW_SCHEMAS: tuple[RowSchema, ...] = (
+    *V1_ROW_SCHEMAS,
+    "label-classification",
 )
 V1_PARTITION_ORDER: tuple[Partition, ...] = ("train", "evaluation")
 
@@ -179,6 +184,17 @@ def _payload_contract(row_schema: RowSchema, payload: dict[str, Any]) -> None:
         _require_nonempty(payload["output"], "instruction payload target")
         return
 
+    if row_schema == "label-classification":
+        if set(payload) != {"annotator", "context", "label"}:
+            raise ValueError(
+                "label-classification payload requires exactly annotator, context, "
+                "and label"
+            )
+        _require_nonempty(payload["annotator"], "label-classification annotator")
+        _require_nonempty(payload["context"], "label-classification context")
+        _require_nonempty(payload["label"], "label-classification label")
+        return
+
     if row_schema != "messages":
         raise ValueError(f"unsupported product row schema {row_schema!r}")
     if set(payload) != {"messages"}:
@@ -208,7 +224,7 @@ class SerializationPlan(_StrictModel):
     @model_validator(mode="after")
     def _validate_plan(self) -> SerializationPlan:
         validate_id(self.serialization_plan_id, kind="srp")
-        if self.row_schema not in V1_ROW_SCHEMAS:
+        if self.row_schema not in PRODUCT_ROW_SCHEMAS:
             raise ValueError("serialization plan contains an unsupported row schema")
         if self.row_schema == "instruction_output":
             if self.instruction_text is None:
@@ -261,7 +277,7 @@ class ProductRow(_StrictModel):
         if record_kind not in {"rec", "irc"}:
             raise ValueError("product row record_id must be a rec or irc identity")
         validate_id(self.record_id, kind=record_kind)
-        if self.row_schema not in V1_ROW_SCHEMAS:
+        if self.row_schema not in PRODUCT_ROW_SCHEMAS:
             raise ValueError("product row contains an unsupported row schema")
         reject_floats(self.payload)
         _payload_contract(self.row_schema, self.payload)
@@ -545,7 +561,7 @@ class RowSet(_StrictModel):
         validate_id(self.construction_result_id, kind="run")
         validate_id(self.curation_result_id, kind="cur")
         validate_id(self.split_result_id, kind="spt")
-        if self.row_schema not in V1_ROW_SCHEMAS:
+        if self.row_schema not in PRODUCT_ROW_SCHEMAS:
             raise ValueError("row set contains an unsupported row schema")
 
         for row in (*self.train_rows, *self.evaluation_rows):
@@ -1008,6 +1024,14 @@ def _record_payload(
                 {"role": "assistant", "content": target},
             ]
         }
+    if row_schema == "label-classification":
+        try:
+            annotator = fields["annotator"]
+        except KeyError as exc:
+            raise SerializationError(
+                "record is missing objective annotator field 'annotator'"
+            ) from exc
+        return {"annotator": annotator, "context": context, "label": target}
     raise SerializationError(f"unsupported product row schema {row_schema!r}")
 
 
@@ -1134,6 +1158,7 @@ def serialize_dataset(
 __all__ = [
     "render_record_payload",
     "V1_PARTITION_ORDER",
+    "PRODUCT_ROW_SCHEMAS",
     "V1_ROW_SCHEMAS",
     "ProductRow",
     "RowProvenance",

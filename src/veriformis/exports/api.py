@@ -16,7 +16,7 @@ from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from veriformis.contracts import V1_ROW_SCHEMA_KINDS
+from veriformis.contracts import PRODUCT_ROW_SCHEMA_KINDS
 from veriformis.datasets import RowSet, row_set_from_json_bytes
 from veriformis.errors import (
     ExportContractError,
@@ -441,7 +441,7 @@ class ExportProfileDescriptor:
             not schemas
             or schemas != tuple(sorted(schemas))
             or len(schemas) != len(set(schemas))
-            or any(item not in V1_ROW_SCHEMA_KINDS for item in schemas)
+            or any(item not in PRODUCT_ROW_SCHEMA_KINDS for item in schemas)
         ):
             raise ExportContractError(
                 "supported_row_schemas must be non-empty, sorted, unique v1 rows"

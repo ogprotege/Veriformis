@@ -56,7 +56,9 @@ not a verified export. Accepted rows may still seal.
 
 - No trainer, spreadsheet, or Hub compatibility.
 - No portable exact bytes for Parquet or Arrow across library versions.
-- No preference, tool-call, multimodal, or arbitrary multi-turn chat family.
+- Preference, tool-call, multimodal, and arbitrary multi-turn chat remain
+  refused. Explicit-label classification is admitted only as mapped
+  `context` / `label` / `annotator` fields with `mapped_value` evidence.
 - No executable mapping functions and no LLM.
 - No construction chunks on imported fields. Provenance is `mapped_value`.
 - No full Mac mapping spreadsheet (Phase 18). The Mac workbench can show

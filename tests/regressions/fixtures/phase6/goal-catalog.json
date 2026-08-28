@@ -288,6 +288,57 @@
       "training_family": "source-grounded-supervised-fine-tuning",
       "what_the_model_learns": "Given the source context, emit exactly one attribute recorded during recovery: a heading level, a code block's language, a link or image address or title attribute, a math display flag, a citation key or locator, whether a list is ordered or an item is checked, or a table column alignment.",
       "what_you_provide": "Documents with recoverable formatting, such as Markdown, HTML, or Word documents, or source-code files whose language is recorded. Plain text, PDF, JSON, and CSV sources record none of these attributes and yield nothing for this goal."
+    },
+    {
+      "compatible_representations": [
+        "context-and-label"
+      ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "default_representation": "context-and-label",
+      "eligible_input_families": [
+        "delimited-table",
+        "json-records"
+      ],
+      "goal_id": "classify-with-provided-labels",
+      "instruction_task": "provided label",
+      "instruction_template": "Emit the provided label for this context.",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
+      "not_this": [
+        "It does not invent labels from the context text.",
+        "It does not train or score a classifier.",
+        "It is not a shortening, rewriting, or question task."
+      ],
+      "objective": "explicit_label",
+      "plain_language": "Teach the model to emit the exact label you already supplied for each context. The compiler copies those labels; it does not guess them.",
+      "recipe_library_id": "explicit_label.default",
+      "required_evidence_diagnostics": [
+        "mapped-label-unavailable"
+      ],
+      "required_source_evidence": "Imported rows that already contain a non-empty context, a non-empty operator-supplied label, and a non-empty annotator identity.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
+      "state": "implemented",
+      "supervision_boundary": "The context is not the target. Only the operator-supplied label is trained on. The annotator identity is leakage metadata copied from the row.",
+      "target_construction": "The imported context, label, and annotator strings are copied exactly; no label is invented.",
+      "title": "Classify with provided labels",
+      "training_family": "explicit-label-classification",
+      "what_the_model_learns": "To emit the exact label the operator supplied for each context. The compiler does not invent, guess, or score labels.",
+      "what_you_provide": "JSONL, JSON, or CSV rows that already contain a context, a label, and an annotator identity."
     }
   ],
   "representations": [
@@ -357,6 +408,19 @@
       "row_schema": "messages",
       "supervised_region": "The assistant turn only; the user turn is context.",
       "title": "Conversation"
+    },
+    {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json"
+      ],
+      "loss_policy": "label-only",
+      "plain_language": "A context string, the exact label the operator supplied, and the annotator who supplied it. Only the label is trained on.",
+      "representation_id": "context-and-label",
+      "requires_operator_instruction": false,
+      "row_schema": "label-classification",
+      "supervised_region": "The provided label only; context and annotator are not the target.",
+      "title": "Context and label"
     }
   ],
   "schema_id": "veriformis.goal-catalog/v1"
