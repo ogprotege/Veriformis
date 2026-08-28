@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `435bd63` on `main` after PR #139
+**Implementation baseline reviewed:** `76c0e2e` on `main` after PR #140
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–15 complete)
+Phases 0–2; independent-product Phases 0–15 complete; Phase 16.1 packet open)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.1 packet open)
+**Last reviewed:** 2026-08-27 (Phase 16.2 extension protocol)
 
-**Next review:** Phase 16.1 packet and pre-extension isolation PR. No extension
-contract or executable registry before item 16.2.
+**Next review:** Phase 16.2 protocol PR. No executable registry, loader, or
+dispatch change before item 16.3.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -131,8 +131,10 @@ local, offline, and free of LLM generation.
       not start Phase 16 from that packet.
 - [ ] Independent product Phase 16 is in progress under its
       [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
-      Item 16.1 records the existing architecture only. No extension contract,
-      executable registry, loader, extra, or public plugin API exists yet.
+      Item 16.1 merged as PR #140 at
+      `76c0e2e90d95874b3e117f95554c428c70da1daf`. Item 16.2 pins
+      `veriformis.extension-protocol/v1`. No executable registry, loader,
+      extra, or public plugin API.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

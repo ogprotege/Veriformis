@@ -73,8 +73,11 @@ recipes stay `none`. Mac Review belongs to Phase 18. Do not start
 Phase 15 from that packet.
 Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
-skipped with a record. Sequential PRs 15.1–15.9. Do not start Phase 16
-from that packet.
+skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
+architecture is in progress. Item 16.1 merged as PR #140 at
+`76c0e2e90d95874b3e117f95554c428c70da1daf`. Item 16.2 pins
+`veriformis.extension-protocol/v1`. No loader, executable registry, extra,
+or public plugin API.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -159,8 +162,9 @@ Read these current authorities before changing code:
     `docs/contracts/quality-report-v1.md`,
     `docs/contracts/review-v1.md`,
     `docs/contracts/scale-corpus-v1.md`,
-    `docs/contracts/scale-baseline-v1.md`, and
-    `docs/contracts/scale-support-v1.md`
+    `docs/contracts/scale-baseline-v1.md`,
+    `docs/contracts/scale-support-v1.md`, and
+    `docs/contracts/extension-protocol-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -245,6 +249,7 @@ Key modules under `src/veriformis/` are:
 - `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
 - `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing);
 - `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
+- `extensions/` for the internal extension protocol (16.2 schema pin; no loader);
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 15 closeout)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.2 protocol pin)
 
-**Next review:** Do not start Phase 16 from the Phase 15 packet, or
+**Next review:** Phase 16.2 merge, item 16.3 internal registries, or
 governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
@@ -32,7 +32,8 @@ claims from drifting away from code and evidence.
 | [Completed Phase 12 packet](../../dev/active/independent-product/phase-12-optional-ocr/README.md) | Optional local Tesseract 5 OCR |
 | [Completed Phase 13 packet](../../dev/active/independent-product/phase-13-quality-intelligence/README.md) | Dataset quality intelligence |
 | [Completed Phase 14 packet](../../dev/active/independent-product/phase-14-review-workflows/README.md) | Human review and correction workflows |
-| [Active Phase 15 packet](../../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding |
+| [Completed Phase 15 packet](../../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding |
+| [Active Phase 16 packet](../../dev/active/independent-product/phase-16-extension-architecture/README.md) | Safe extension architecture |
 
 Run the governance drift check with:
 

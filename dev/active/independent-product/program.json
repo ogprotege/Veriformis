@@ -182,7 +182,7 @@
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
       "completed_on": null,
-      "next_gate": "Item 16.1 opens the packet and proves the pre-extension architecture. No protocol, registry, loader, extra, or public plugin API in this item."
+      "next_gate": "Item 16.2 pins veriformis.extension-protocol/v1. No executable registry, loader, extra, or dispatch change in this item."
     },
     {
       "number": 17,

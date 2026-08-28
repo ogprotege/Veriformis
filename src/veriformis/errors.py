@@ -236,6 +236,12 @@ class ScaleCancelled(ScaleError):
     code = "scale-cancelled"
 
 
+class ExtensionProtocolError(VeriformisError):
+    """An extension declaration is malformed, unknown, or not yet executable."""
+
+    code = "extension-protocol-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

@@ -34,3 +34,31 @@ changed.
 
 **Next action:** Publish the item 16.1 pull request, require every GitHub check,
 merge, and synchronize clean `main` before item 16.2.
+
+## 2026-08-27: Item 16.1 merged; item 16.2 in progress
+
+**Status:** Item 16.1 merged as PR #140 at
+`76c0e2e90d95874b3e117f95554c428c70da1daf` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.2 began.
+
+Item 16.2 adds `veriformis.extension-protocol/v1` as a schema pin. Six kinds,
+two origins, five lifecycle states, extras, deterministic requirements,
+diagnostics, fixtures, and discovery metadata load and refuse. Unknown fields,
+kinds, and contract versions fail closed and name the supported version.
+Parser dispatch, constructors, the export catalog, and public surfaces stay
+unchanged. No loader, executable registry, extra, CLI operation, or MCP
+operation is added.
+
+**Next action:** Run the complete item 16.2 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.3.
+
+## 2026-08-27: Item 16.2 local gates green
+
+**Status:** The internal protocol is a schema pin only. The focused protocol
+and isolation suite passed 28 tests. Project tracking, Ruff, the lock check,
+and `git diff --check` passed. The core suite passed 2,306 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 16.2 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.3.
