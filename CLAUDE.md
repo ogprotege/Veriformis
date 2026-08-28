@@ -76,11 +76,10 @@ Phase 15 scale work is complete. Named-hardware reports exist.
 skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
 architecture is complete. Sequential PRs 16.1–16.10. ADR-0017 Decision
 A: no untrusted loader. Public plugins skipped with a record.
-Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.8 merged as PR #157 at
-`d4070236512dbf4f1827de1500360bb2d41c535b`. Item 17.9 records
-ADR-0018 Decision A: no compile-path generator in Phase 17. Do not
-start Phase 18 from that packet.
+Phase 17 advanced dataset families is complete. Sequential PRs
+17.1–17.10. ADR-0018 Decision A: no compile-path generator. Generation,
+multimodal, pre-tokenized, and unmapped trainer profiles skipped with
+records. Do not start Phase 18 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

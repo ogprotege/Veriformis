@@ -5,16 +5,18 @@ append-only history.
 
 **Updated:** 2026-08-28
 
-**Local branch:** `phase17/09-generator-boundary`
+**Local branch:** `phase17/10-adversarial-closeout`
 
-**Completed:** Item 17.8, PR #157 at
-`d4070236512dbf4f1827de1500360bb2d41c535b`.
+**Completed:** Item 17.9, PR #158 at
+`dcd9a541add1c8fa81eb680e6aceb3671ebad509`.
 
-**Current item:** 17.9 threat-model governed generation. ADR-0018
-Decision A: no compile-path generator. This PR adds no `GeneratorPass`.
+**Current item:** 17.10 adversarial closeout. Generation skipped under
+ADR-0018 Decision A.
 
-**Next gate:** Publish the 17.9 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 17.10.
+**Next gate:** Publish the 17.10 pull request, require every GitHub
+check, merge, and synchronize clean `main`. Phase 17 complete. Do not
+start Phase 18 from this packet.
 
-**Decision:** Decision A. Phase 17 does not install a generator.
-Generated data is not source truth. ADR-0017 Decision A still holds.
+Local gates are green.
+
+**Decision:** A — no compile-path generator in Phase 17.

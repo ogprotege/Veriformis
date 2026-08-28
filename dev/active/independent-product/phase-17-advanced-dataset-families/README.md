@@ -1,8 +1,10 @@
 # Phase 17: Add Governed Advanced Dataset Families
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-28
+
+**Completed:** 2026-08-28
 
 **Roadmap phase:** [Phase 17](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-17--add-governed-advanced-dataset-families)
 
@@ -37,7 +39,6 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.9 records ADR-0018 Decision A: no compile-path generator.
-User-provided classification, preference, tool-call, and stepwise
-families remain the executable surface. Default `review_policy` stays
-`none`.
+Phase 17 is complete. ADR-0018 Decision A: no compile-path generator.
+Generation, multimodal, pre-tokenized, and unmapped trainer profiles
+are skipped with records. Do not start Phase 18 from this packet.

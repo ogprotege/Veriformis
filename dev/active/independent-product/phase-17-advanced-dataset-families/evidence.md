@@ -146,8 +146,32 @@ Phase 16 completed. Closeout merged as PR #149 at
 - [x] No `GeneratorPass`, hosted-model extra, or generate operation.
 - [x] `generation_allowed` stays false and fails closed.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #158 merged. Clean `main` equals
+      `origin/main` at `dcd9a54`.
+
+## Required item 17.10 evidence
+
+- [x] Adversarial refusals: unknown family, unknown row schema, missing
+      steps/traces, shared-prompt grouping, two-turn messages, nested
+      CSV, profile mapping, declaration tamper, invented supervision.
+- [x] Phase 16 kit goldens and SFT sealed-bundle identities unchanged.
+- [x] Generation, multimodal, pre-tokenized, and unmapped profiles
+      skipped with records under ADR-0018 Decision A.
+- [x] Phase 17 marked completed. Do not start Phase 18 from this packet.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.10.
+- [ ] PR merges and clean local `main` equals `origin/main`.
+
+## Item 17.10 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_phase17_adversarial_closeout.py` | 11 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,463 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 17.9 local gate evidence
 

@@ -187,12 +187,12 @@
     {
       "number": 17,
       "title": "Add governed advanced dataset families",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [3, 7, 13, 14, 16],
       "packet": "dev/active/independent-product/phase-17-advanced-dataset-families",
       "started_on": "2026-08-28",
-      "completed_on": null,
-      "next_gate": "Item 17.9 records ADR-0018 Decision A: no compile-path generator. Item 17.10 adversarial closeout remains. Admit each semantic family separately."
+      "completed_on": "2026-08-28",
+      "next_gate": "Completed. Admission contract; classification, preference, tool-call, and stepwise admitted from user-provided evidence; ADR-0018 Decision A: no generator. Generation, multimodal, pre-tokenized, and unmapped profiles skipped with records. Do not start Phase 18 from this packet."
     },
     {
       "number": 18,

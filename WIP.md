@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `a1fbf04` on `main` after PR #149
+**Implementation baseline reviewed:** `dcd9a54` on `main` after PR #158
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–16 complete; Phase 17.1 packet open)
+Phases 0–2; independent-product Phases 0–17 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 17.9 generator boundary)
+**Last reviewed:** 2026-08-28 (Phase 17 closeout)
 
-**Next review:** Phase 17.9 merge, or item 17.10 closeout. Do not add a
-`GeneratorPass` in this item.
+**Next review:** Phase 18 packet open, or any capability claim change. Do
+not start Phase 18 from the Phase 17 packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -135,20 +135,13 @@ local, offline, and free of LLM generation.
       migrated with identical goldens; isolation proven; ADR-0017
       Decision A: no untrusted loader. Public plugins skipped with a
       record. Phase 17 opened under its own packet.
-- [ ] Independent product Phase 17 is in progress under its
+- [x] Independent product Phase 17 is complete under its
       [packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md).
-      Item 17.1 opened the packet. Item 17.2 pins
-      `veriformis.advanced-family-admission/v1`. Item 17.3 adds leakage
-      grouping keys without changing default SFT split. Item 17.4 adds
-      opt-in review queues and preview-only family quality hooks. Item
-      17.5 admits `explicit-label-classification` from user-provided
-      labels. Item 17.6 admits `preference-and-ranking` from
-      user-provided pairs; unpaired and ranking schemas skipped with a
-      record. Item 17.7 admits `tool-call-conversations` from
-      user-provided traces without widening two-turn `messages`. Item
-      17.8 admits `stepwise-supervision` from user-provided steps. Item
-      17.9 records ADR-0018 Decision A: no compile-path generator. Do
-      not start Phase 18 from this packet.
+      Admission contract; classification, preference, tool-call, and
+      stepwise admitted from user-provided evidence; ADR-0018 Decision
+      A: no compile-path generator. Generation, multimodal,
+      pre-tokenized, and unmapped profiles skipped with records. Do not
+      start Phase 18 from that packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -178,7 +171,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 14 | Deliver human review and correction workflows | Completed | [Completed packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Completed | [Completed packet](dev/active/independent-product/phase-15-scale/README.md) |
 | 16 | Establish a safe extension architecture | Completed | [Completed packet](dev/active/independent-product/phase-16-extension-architecture/README.md) |
-| 17 | Add governed advanced dataset families | In progress | [Active packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md) |
+| 17 | Add governed advanced dataset families | Completed | [Completed packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md) |
 | 18 | Complete the goal-first Mac workbench | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 19 | Complete automation and optional publication boundaries | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 20 | Cut the stable independent 1.0 product | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

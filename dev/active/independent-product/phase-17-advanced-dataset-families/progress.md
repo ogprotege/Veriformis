@@ -238,3 +238,32 @@ expected durability warning. No `GeneratorPass` was added.
 
 **Next action:** Publish the item 17.9 pull request, require every
 GitHub check, merge, and synchronize clean `main` before item 17.10.
+
+## 2026-08-28: Item 17.9 merged; item 17.10 in progress
+
+**Status:** Item 17.9 merged as PR #158 at
+`dcd9a541add1c8fa81eb680e6aceb3671ebad509` after all 18 GitHub checks
+passed. Clean local `main` equaled `origin/main` there before 17.10
+began.
+
+Item 17.10 adds adversarial family refusals, reproves SFT and Phase 16
+kit goldens, skips generation, multimodal, pre-tokenized, and unmapped
+profiles with records, and closes Phase 17. Do not start Phase 18 from
+this packet.
+
+**Next action:** Run the complete item 17.10 local gates, publish the
+pull request, require every GitHub check, merge, and synchronize clean
+`main`.
+
+## 2026-08-28: Item 17.10 local gates green
+
+**Status:** Adversarial family refusals pass. SFT and Phase 16 kit
+goldens hold. Generation, multimodal, pre-tokenized, and unmapped
+profiles are skipped with records. Focused tests passed 11. Project
+tracking, Ruff, the lock check, and `git diff --check` passed. The core
+suite passed 2,463 tests with 17 deselected and the one expected
+durability warning. Phase 17 is marked completed.
+
+**Next action:** Publish the item 17.10 pull request, require every
+GitHub check, merge, and synchronize clean `main`. Do not start Phase
+18 from this packet.
