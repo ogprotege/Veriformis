@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–16 complete
+**Status:** Active program — Phases 0–16 complete; Phase 17 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -32,6 +32,7 @@ with roadmap headings.
 - [Phase 14 — Deliver human review and correction workflows](phase-14-review-workflows/README.md) — complete
 - [Phase 15 — Measure and engineer scale, streaming, and sharding](phase-15-scale/README.md) — complete
 - [Phase 16 — Establish a safe extension architecture](phase-16-extension-architecture/README.md) — complete
+- [Phase 17 — Add governed advanced dataset families](phase-17-advanced-dataset-families/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
@@ -122,8 +123,11 @@ Phase 15 closeout merged as PR #139 at
 baseline under its own [packet](phase-16-extension-architecture/README.md)
 and is complete. Internal protocol, two exemplar migrations, compatibility
 kit, ADR-0017 Decision A, and isolation evidence are on `main`. Public
-plugin loading is skipped with a record. Do not start Phase 17 from that
-packet.
+plugin loading is skipped with a record. Phase 17 opened from that clean
+baseline under its own [packet](phase-17-advanced-dataset-families/README.md).
+Item 17.1 records the SFT-only baseline. No family execute, admission
+contract, generator, or Mac UI is added yet. Do not start Phase 18 from
+that packet.
 
 ## State change procedure
 

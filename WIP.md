@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `45949de` on `main` after PR #148
+**Implementation baseline reviewed:** `a1fbf04` on `main` after PR #149
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–16 complete)
+Phases 0–2; independent-product Phases 0–16 complete; Phase 17.1 packet open)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.10 adversarial closeout)
+**Last reviewed:** 2026-08-28 (Phase 17.1 packet open)
 
-**Next review:** Phase 16.10 closeout PR. Do not start Phase 17 from
-this packet.
+**Next review:** Phase 17.1 merge, or item 17.2 admission contract. Do not
+execute a family from this honesty-only item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -134,7 +134,12 @@ local, offline, and free of LLM generation.
       Internal protocol; text parser and generic `split-jsonl-directory`
       migrated with identical goldens; isolation proven; ADR-0017
       Decision A: no untrusted loader. Public plugins skipped with a
-      record. Do not start Phase 17 from this packet.
+      record. Phase 17 opened under its own packet.
+- [ ] Independent product Phase 17 is in progress under its
+      [packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md).
+      Item 17.1 records the SFT-only baseline. No family contract, row
+      schema, objective, constructor, mapping template, or generator is
+      added yet. Do not start Phase 18 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -164,7 +169,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 14 | Deliver human review and correction workflows | Completed | [Completed packet](dev/active/independent-product/phase-14-review-workflows/README.md) |
 | 15 | Measure and engineer scale, streaming, and sharding | Completed | [Completed packet](dev/active/independent-product/phase-15-scale/README.md) |
 | 16 | Establish a safe extension architecture | Completed | [Completed packet](dev/active/independent-product/phase-16-extension-architecture/README.md) |
-| 17 | Add governed advanced dataset families | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
+| 17 | Add governed advanced dataset families | In progress | [Active packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md) |
 | 18 | Complete the goal-first Mac workbench | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 19 | Complete automation and optional publication boundaries | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 | 20 | Cut the stable independent 1.0 product | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |

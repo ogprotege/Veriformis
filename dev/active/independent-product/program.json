@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-27",
+  "last_updated": "2026-08-28",
   "status_values": [
     "planned",
     "in_progress",
@@ -182,17 +182,17 @@
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
       "completed_on": "2026-08-27",
-      "next_gate": "Completed. Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader. Public plugins skipped with a record. Do not start Phase 17 from this packet."
+      "next_gate": "Completed. Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader. Public plugins skipped with a record. Phase 17 opened under its own packet."
     },
     {
       "number": 17,
       "title": "Add governed advanced dataset families",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [3, 7, 13, 14, 16],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-17-advanced-dataset-families",
+      "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Admit each semantic family separately."
+      "next_gate": "Item 17.1 packet and isolation tests must merge green before the 17.2 admission contract. Admit each semantic family separately."
     },
     {
       "number": 18,

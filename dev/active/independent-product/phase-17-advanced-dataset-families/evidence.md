@@ -1,0 +1,56 @@
+# Phase 17 Evidence
+
+**Status:** Open
+
+**Opened:** 2026-08-28
+
+## Predecessor evidence
+
+Phase 16 completed. Closeout merged as PR #149 at
+`a1fbf04d58d73692cc4237b7d741c5da27022581`. At Phase 17 open, clean local
+`main`, `origin/main`, and `HEAD` were equal at that commit. Dependencies 3,
+7, 13, 14, and 16 were complete in `program.json`.
+
+## Source-verified starting facts
+
+| Fact | Grade | Source |
+| --- | --- | --- |
+| Implemented training families remain language-modeling and SFT | `source-verified` | `src/veriformis/taxonomy.py` |
+| Six advanced families remain `planned`; multimodal remains `explicitly_unsupported` | `source-verified` | `src/veriformis/taxonomy.py`; `docs/contracts/taxonomy-v1.md` |
+| V1 row schemas remain `text`, `prompt_completion`, `instruction_output`, `messages` | `source-verified` | `src/veriformis/datasets/serialization.py` |
+| `messages` still requires exactly two user/assistant turns | `source-verified` | `src/veriformis/mapping/execute.py`; `src/veriformis/datasets/serialization.py` |
+| Mapping payloads are the four SFT shapes; docs refuse preference, tools, multimodal, and free multi-turn chat | `source-verified` | `src/veriformis/mapping/models.py`; `docs/mapping.md` |
+| Constructors remain the five deterministic SFT constructors | `source-verified` | `src/veriformis/construction/constructors.py` |
+| No `GeneratorPass` exists under `src/veriformis` | `source-verified` | package sources |
+| Implemented trainer profiles still refuse preference, tools, ranking, stepwise, unpaired preference, and vision | `source-verified` | `src/veriformis/profiles/admission-v1.json` |
+| Constrained CSV still admits only the three flat SFT schemas | `source-verified` | `src/veriformis/exports/constrained_csv.py` |
+| Extension protocol still has six kinds and no family kind; no loader | `source-verified` | `src/veriformis/extensions/protocol.py`; ADR-0017 |
+| No `veriformis.advanced-family-admission` contract exists | `source-verified` | `docs/contracts/` |
+| Split algorithm remains `transitive-leakage-prefix-v1` | `source-verified` | `src/veriformis/datasets/splitting.py` |
+| Quality gates remain preview-only; default review queues have no label/preference/tool/stepwise kinds | `source-verified` | `src/veriformis/quality/gates.py`; `src/veriformis/review/models.py` |
+| Seventeen Finished Dataset v1 gates remain unchanged | `source-verified` | `src/veriformis/contracts.py` |
+
+## Required item 17.1 evidence
+
+- [x] Standard packet opened from the Phase 16 closeout merge.
+- [x] Phase 17 moved from `planned` to `in_progress` with this packet path.
+- [x] L1 through L15 recorded.
+- [x] Active tracking documents reconciled to Phase 17 in progress without
+      claiming an implemented advanced family.
+- [x] Baseline isolation tests added.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [ ] Every GitHub check passes.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.2.
+
+## Item 17.1 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/test_phase17_family_isolation.py` | 16 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS; 21 roadmap phases and governed packets agree |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,376 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
+GitHub checks and the merged clean-main proof remain pending.
