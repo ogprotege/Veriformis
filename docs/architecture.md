@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.8 stepwise)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.9 generator)
 
 **Next review:** Any service-boundary or architecture change
 

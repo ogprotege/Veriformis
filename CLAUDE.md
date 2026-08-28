@@ -77,10 +77,10 @@ skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
 architecture is complete. Sequential PRs 16.1–16.10. ADR-0017 Decision
 A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.8 admits `stepwise-supervision` from user-provided ordered
-steps on the dataset-row path. Copied source text is never labeled
-reasoning. Existing trainer profiles refuse the new schema. Do not start
-Phase 18 from that packet.
+Item 17.8 merged as PR #157 at
+`d4070236512dbf4f1827de1500360bb2d41c535b`. Item 17.9 records
+ADR-0018 Decision A: no compile-path generator in Phase 17. Do not
+start Phase 18 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -178,8 +178,9 @@ Read these current authorities before changing code:
     `docs/adr/0013-columnar-containers-as-optional-generic-exports.md`, and
     `docs/adr/0014-independently-admitted-consumer-profiles.md`,
     `docs/adr/0015-collection-plan-as-ingest-contract.md`,
-    `docs/adr/0016-optional-local-tesseract-ocr.md`, and
-    `docs/adr/0017-no-untrusted-extension-loader.md`
+    `docs/adr/0016-optional-local-tesseract-ocr.md`,
+    `docs/adr/0017-no-untrusted-extension-loader.md`, and
+    `docs/adr/0018-no-compile-path-generator.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

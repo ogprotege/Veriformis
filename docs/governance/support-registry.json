@@ -291,6 +291,7 @@
       "tests/regressions/fixtures/phase16/compatibility-kit.json",
       "tests/extensions/test_compatibility_kit.py",
       "docs/adr/0017-no-untrusted-extension-loader.md",
+      "docs/adr/0018-no-compile-path-generator.md",
       "tests/extensions/test_broken_extension_isolation.py",
       "tests/extensions/test_phase16_adversarial_closeout.py"
     ],
@@ -415,7 +416,8 @@
       "src/veriformis/goals/presets-v1.json",
       "docs/contracts/dataset-construction-v1.md",
       "docs/contracts/taxonomy-v1.md",
-      "docs/contracts/goal-catalog-v1.md"
+      "docs/contracts/goal-catalog-v1.md",
+      "docs/adr/0018-no-compile-path-generator.md"
     ],
     "explicitly_unsupported_families": [
       {

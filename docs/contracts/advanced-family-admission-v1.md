@@ -6,11 +6,12 @@
 
 **Schema:** `veriformis.advanced-family-admission/v1`
 
-**Status:** Schema pin plus leakage grouping substrate. Items 17.5–17.7
-admit `explicit-label-classification`, `preference-and-ranking`, and
-`tool-call-conversations` as executes on the dataset-row path.
-Loading a pin is not itself an execute. Extra grouping keys do not change
-default SFT split identities. Trainer-profile mappings remain empty.
+**Status:** Schema pin plus leakage grouping substrate. Items 17.5–17.8
+admit `explicit-label-classification`, `preference-and-ranking`,
+`tool-call-conversations`, and `stepwise-supervision` as executes on the
+dataset-row path. ADR-0018 Decision A forbids generation. Loading a pin
+is not itself an execute. Extra grouping keys do not change default SFT
+split identities. Trainer-profile mappings remain empty.
 
 **Last reviewed:** 2026-08-28
 
@@ -56,7 +57,7 @@ name the requested and supported contract versions.
 | `leakage_grouping_keys` | Non-empty sorted unique subset of `source`, `shared-prompt`, `conversation`, `annotator`, `entity`. Must include `source`. Item 17.3 executes these keys as union-find tokens. Extra-key values are caller-supplied exact strings. Missing or empty values fail closed. Default SFT split does not use extra keys and keeps `transitive-leakage-prefix-v1`. |
 | `review_hook_ids` | Sorted unique subset of `label-conflict`, `preference-inconsistency`, `tool-trace-incomplete`, `stepwise-gap`. Empty is allowed. |
 | `quality_hook_ids` | Sorted unique subset of `missing-label`, `singleton-label-set`, `unpaired-without-policy`, `ranking-tie`, `tool-role-gap`. Empty is allowed. |
-| `generation_allowed` | `false`. True waits for the 17.9 generator boundary. |
+| `generation_allowed` | `false`. True is refused under ADR-0018 Decision A. |
 | `profile_eligibility` | Empty. Trainer-profile mappings wait for an independently admitted adapter. |
 | `admission_id` | `derive_id("afa", …)` over the payload excluding `admission_id` |
 

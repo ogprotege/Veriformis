@@ -190,8 +190,8 @@ class FamilyAdmission(_StrictModel):
             )
         if self.generation_allowed is not False:
             raise FamilyAdmissionError(
-                "advanced-family-admission/v1 cannot allow generation until "
-                "the generator boundary"
+                "advanced-family-admission/v1 cannot allow generation; "
+                "ADR-0018 Decision A forbids a compile-path generator"
             )
         _require_closed_subset(
             self.evidence_kinds,
