@@ -77,7 +77,8 @@ skipped with a record. Sequential PRs 15.1–15.9. Phase 16 extension
 architecture is complete. Sequential PRs 16.1–16.10. ADR-0017 Decision
 A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.1 is honesty only. Do not start Phase 18 from that packet.
+Item 17.2 pins `veriformis.advanced-family-admission/v1` without execute.
+Do not start Phase 18 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -163,8 +164,9 @@ Read these current authorities before changing code:
     `docs/contracts/review-v1.md`,
     `docs/contracts/scale-corpus-v1.md`,
     `docs/contracts/scale-baseline-v1.md`,
-    `docs/contracts/scale-support-v1.md`, and
-    `docs/contracts/extension-protocol-v1.md`
+    `docs/contracts/scale-support-v1.md`,
+    `docs/contracts/extension-protocol-v1.md`, and
+    `docs/contracts/advanced-family-admission-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and

@@ -242,6 +242,12 @@ class ExtensionProtocolError(VeriformisError):
     code = "extension-protocol-invalid"
 
 
+class FamilyAdmissionError(VeriformisError):
+    """An advanced-family admission pin is malformed, unknown, or not executable."""
+
+    code = "family-admission-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

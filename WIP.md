@@ -8,10 +8,10 @@ Phases 0–2; independent-product Phases 0–16 complete; Phase 17.1 packet open
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 17.1 packet open)
+**Last reviewed:** 2026-08-28 (Phase 17.2 admission contract)
 
-**Next review:** Phase 17.1 merge, or item 17.2 admission contract. Do not
-execute a family from this honesty-only item.
+**Next review:** Phase 17.2 merge, or item 17.3 leakage grouping. Do not
+execute a family from this schema pin.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -137,9 +137,10 @@ local, offline, and free of LLM generation.
       record. Phase 17 opened under its own packet.
 - [ ] Independent product Phase 17 is in progress under its
       [packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md).
-      Item 17.1 records the SFT-only baseline. No family contract, row
-      schema, objective, constructor, mapping template, or generator is
-      added yet. Do not start Phase 18 from this packet.
+      Item 17.1 opened the packet. Item 17.2 pins
+      `veriformis.advanced-family-admission/v1`. No family execute,
+      taxonomy promotion, constructor, mapping template, or generator
+      is added yet. Do not start Phase 18 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

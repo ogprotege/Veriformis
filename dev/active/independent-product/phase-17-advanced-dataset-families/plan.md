@@ -66,7 +66,7 @@ the admission path. Constrained CSV stays on the three flat SFT schemas.
 - [x] Create the standard packet and move Phase 17 to `in_progress`.
 - [x] Record L1 through L15 and reconcile active tracking documents.
 - [x] Add isolation tests for the pre-family architecture.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 No family contract, row schema, objective, loss policy, constructor, mapping
 template, goal, CLI family command, or profile mapping is permitted in this
@@ -76,13 +76,14 @@ item.
 
 **Branch:** `phase17/02-family-admission-contract`
 
-- [ ] Add strict `veriformis.advanced-family-admission/v1` models and a
+- [x] Add strict `veriformis.advanced-family-admission/v1` models and a
       contract document.
-- [ ] Name closed family vocabulary, row schemas, loss, evidence, leakage
+- [x] Name closed family vocabulary, row schemas, loss, evidence, leakage
       keys, review/quality hooks, generation flag, profile eligibility, and
       lifecycle.
-- [ ] Refuse unknown families, unknown fields, and missing versions. Add no
+- [x] Refuse unknown families, unknown fields, and missing versions. Add no
       execute and no taxonomy promotion.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 17.3 Add leakage grouping keys for advanced families
 

@@ -25,7 +25,7 @@ Phase 16 completed. Closeout merged as PR #149 at
 | Implemented trainer profiles still refuse preference, tools, ranking, stepwise, unpaired preference, and vision | `source-verified` | `src/veriformis/profiles/admission-v1.json` |
 | Constrained CSV still admits only the three flat SFT schemas | `source-verified` | `src/veriformis/exports/constrained_csv.py` |
 | Extension protocol still has six kinds and no family kind; no loader | `source-verified` | `src/veriformis/extensions/protocol.py`; ADR-0017 |
-| No `veriformis.advanced-family-admission` contract exists | `source-verified` | `docs/contracts/` |
+| `veriformis.advanced-family-admission/v1` is a schema pin; taxonomy stays planned | `source-verified` | `docs/contracts/advanced-family-admission-v1.md`; `src/veriformis/families/admission.py` |
 | Split algorithm remains `transitive-leakage-prefix-v1` | `source-verified` | `src/veriformis/datasets/splitting.py` |
 | Quality gates remain preview-only; default review queues have no label/preference/tool/stepwise kinds | `source-verified` | `src/veriformis/quality/gates.py`; `src/veriformis/review/models.py` |
 | Seventeen Finished Dataset v1 gates remain unchanged | `source-verified` | `src/veriformis/contracts.py` |
@@ -39,8 +39,18 @@ Phase 16 completed. Closeout merged as PR #149 at
       claiming an implemented advanced family.
 - [x] Baseline isolation tests added.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passed. PR #150 merged. Clean `main` equals
+      `origin/main` at `712d28a`.
+
+## Required item 17.2 evidence
+
+- [x] `veriformis.advanced-family-admission/v1` contract and strict models.
+- [x] Unknown families, fields, and contract versions fail closed with
+      requested versus supported identity.
+- [x] Taxonomy, constructors, and SFT row schemas unchanged.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 17.2.
+- [ ] PR merges and clean local `main` equals `origin/main` before 17.3.
 
 ## Item 17.1 local gate evidence
 
@@ -53,4 +63,17 @@ Phase 16 completed. Closeout merged as PR #149 at
 | Core pytest excluding optional integration and scale markers | 2,376 passed, 17 deselected, one expected durability warning |
 | `git diff --check` | PASS |
 
-GitHub checks and the merged clean-main proof remain pending.
+PR #150 merged; clean `main` synchronized.
+
+## Item 17.2 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/families/` | 34 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,394 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
+GitHub checks for item 17.2 remain pending.
