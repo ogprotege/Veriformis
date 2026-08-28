@@ -21,3 +21,4 @@
 | Keep multimodal `explicitly_unsupported` and pre-tokenized planned | Accepted | Taxonomy v1 and Phase 17 non-goals |
 | Keep `PipelineService` as policy owner; no Mac UI; do not start Phase 18 from this packet | Accepted | Product invariant 2 |
 | Pin `veriformis.advanced-family-admission/v1` as a schema-only contract in 17.2 | Accepted | No execute; taxonomy stays planned |
+| Keep extra grouping keys off the default SFT SplitPolicy and algorithm name | Accepted | Sealed-bundle identities must stay byte-identical |

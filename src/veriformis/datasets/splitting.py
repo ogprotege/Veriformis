@@ -607,70 +607,15 @@ def split_dataset(
         checked_construction,
         checked_curation,
     )
-    groups = _build_leakage_groups(
+    groups = build_leakage_groups(
         included_records,
         raw_digests,
         source_bases,
     )
-    if len(groups) < 2:
-        if checked_policy.evaluation_required:
-            raise SplitError(
-                "evaluation is required but fewer than two leakage groups exist"
-            )
-        assignments = tuple(
-            RecordAssignment.create(
-                policy_id=checked_policy.policy_id,
-                record_id=record.record_id,
-                group_id=groups[0].group_id,
-                partition="train",
-            )
-            for record in included_records
-        )
-        return SplitResult.create(
-            policy_id=checked_policy.policy_id,
-            plan_id=checked_curation.plan_id,
-            construction_result_id=checked_construction.result_id,
-            curation_result_id=checked_curation.result_id,
-            input_record_ids=checked_curation.included_record_ids,
-            groups=groups,
-            assignments=assignments,
-            requested_evaluation_record_count=0,
-        )
-
-    target = _rounded_clamped_evaluation_target(
-        len(included_records),
-        checked_policy.evaluation_ratio_ppm,
-    )
-    priority_order = tuple(
-        sorted(
-            groups,
-            key=lambda group: (
-                sha256_digest(
-                    checked_policy.policy_id + checked_policy.seed + group.group_id
-                ),
-                group.group_id,
-            ),
-        )
-    )
-    best_prefix_length = _nearest_proper_prefix(priority_order, target)
-    evaluation_group_ids = {
-        group.group_id for group in priority_order[:best_prefix_length]
-    }
-    group_by_record = {
-        record_id: group.group_id for group in groups for record_id in group.record_ids
-    }
-    assignments = tuple(
-        RecordAssignment.create(
-            policy_id=checked_policy.policy_id,
-            record_id=record.record_id,
-            group_id=group_by_record[record.record_id],
-            partition=(
-                "evaluation"
-                if group_by_record[record.record_id] in evaluation_group_ids
-                else "train"
-            ),
-        )
-        for record in included_records
+    assignments, requested_evaluation_record_count = assign_leakage_partitions(
+        checked_policy,
+        groups,
+        checked_curation.included_record_ids,
     )
     return SplitResult.create(
         policy_id=checked_policy.policy_id,
@@ -680,7 +625,7 @@ def split_dataset(
         input_record_ids=checked_curation.included_record_ids,
         groups=groups,
         assignments=assignments,
-        requested_evaluation_record_count=target,
+        requested_evaluation_record_count=requested_evaluation_record_count,
     )
 
 
@@ -901,15 +846,113 @@ class _DisjointSet:
         self._parents[high] = low
 
 
+def assign_leakage_partitions(
+    policy: SplitPolicy,
+    groups: Sequence[LeakageGroup],
+    ordered_record_ids: Sequence[str],
+) -> tuple[tuple[RecordAssignment, ...], int]:
+    """Assign whole leakage groups to train or evaluation.
+
+    The default SFT algorithm name remains ``transitive-leakage-prefix-v1``.
+    Extra grouping keys affect only how groups are formed, not this prefix
+    assignment.
+    """
+    checked_policy = _checked_policy(policy)
+    if not groups:
+        raise SplitError("splitting requires at least one leakage group")
+    group_by_record = {
+        record_id: group.group_id for group in groups for record_id in group.record_ids
+    }
+    missing = [record_id for record_id in ordered_record_ids if record_id not in group_by_record]
+    extra = [
+        record_id
+        for record_id in group_by_record
+        if record_id not in set(ordered_record_ids)
+    ]
+    if missing or extra:
+        raise SplitError("leakage groups do not cover included records exactly once")
+    if len(groups) < 2:
+        if checked_policy.evaluation_required:
+            raise SplitError(
+                "evaluation is required but fewer than two leakage groups exist"
+            )
+        assignments = tuple(
+            RecordAssignment.create(
+                policy_id=checked_policy.policy_id,
+                record_id=record_id,
+                group_id=groups[0].group_id,
+                partition="train",
+            )
+            for record_id in ordered_record_ids
+        )
+        return assignments, 0
+
+    target = _rounded_clamped_evaluation_target(
+        len(ordered_record_ids),
+        checked_policy.evaluation_ratio_ppm,
+    )
+    priority_order = tuple(
+        sorted(
+            groups,
+            key=lambda group: (
+                sha256_digest(
+                    checked_policy.policy_id + checked_policy.seed + group.group_id
+                ),
+                group.group_id,
+            ),
+        )
+    )
+    best_prefix_length = _nearest_proper_prefix(priority_order, target)
+    evaluation_group_ids = {
+        group.group_id for group in priority_order[:best_prefix_length]
+    }
+    assignments = tuple(
+        RecordAssignment.create(
+            policy_id=checked_policy.policy_id,
+            record_id=record_id,
+            group_id=group_by_record[record_id],
+            partition=(
+                "evaluation"
+                if group_by_record[record_id] in evaluation_group_ids
+                else "train"
+            ),
+        )
+        for record_id in ordered_record_ids
+    )
+    return assignments, target
+
+
+def build_leakage_groups(
+    records: Sequence[DatasetRecord],
+    raw_digests: Mapping[str, str],
+    source_bases: Mapping[str, tuple[str, ...]],
+    extra_tokens_by_record: Mapping[str, Sequence[tuple[str, str]]] | None = None,
+) -> tuple[LeakageGroup, ...]:
+    """Build transitive leakage components.
+
+    Default SFT grouping uses source identities, raw-source digests, and
+    exact-record fingerprints. Extra tokens are optional and unused by the
+    default compile path.
+    """
+    return _build_leakage_groups(
+        records,
+        raw_digests,
+        source_bases,
+        extra_tokens_by_record,
+    )
+
+
 def _build_leakage_groups(
     records: Sequence[DatasetRecord],
     raw_digests: Mapping[str, str],
     source_bases: Mapping[str, tuple[str, ...]],
+    extra_tokens_by_record: Mapping[str, Sequence[tuple[str, str]]] | None = None,
 ) -> tuple[LeakageGroup, ...]:
     ordered = tuple(sorted(records, key=lambda item: item.record_id))
     disjoint = _DisjointSet(len(ordered))
     token_owner: dict[tuple[str, str], int] = {}
     fingerprints: dict[str, str] = {}
+    extras = extra_tokens_by_record or {}
 
     for index, record in enumerate(ordered):
         fingerprint = exact_record_fingerprint(record)
@@ -919,6 +962,7 @@ def _build_leakage_groups(
             *(("source", source_id) for source_id in source_ids),
             *(("raw-sha256", raw_digests[source_id]) for source_id in source_ids),
             ("exact-record-fingerprint", fingerprint),
+            *tuple(extras.get(record.record_id, ())),
         }
         for token in sorted(tokens):
             owner = token_owner.setdefault(token, index)
@@ -987,6 +1031,8 @@ __all__ = [
     "SplitAlgorithm",
     "SplitPolicy",
     "SplitResult",
+    "assign_leakage_partitions",
+    "build_leakage_groups",
     "leakage_group_from_dict",
     "leakage_group_from_json_bytes",
     "leakage_group_to_dict",

@@ -37,6 +37,7 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.2 pins `veriformis.advanced-family-admission/v1`. Pins load and
-refuse. No family execute, taxonomy promotion, constructor, mapping
-template, goal, generator, or profile mapping is added.
+Item 17.3 adds leakage grouping keys as a substrate. Default SFT split
+stays `transitive-leakage-prefix-v1`. No family execute, taxonomy
+promotion, constructor, mapping template, goal, generator, or profile
+mapping is added.

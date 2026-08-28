@@ -220,6 +220,8 @@ def test_extension_protocol_has_no_family_kind() -> None:
 
     assert "load_family_admission" in exported
     assert "create_family_admission" in exported
+    assert "keyed_leakage_groups" in exported
+    assert (ROOT / "src/veriformis/families/leakage.py").is_file()
     assert "admit" not in exported
     assert "execute" not in exported
 

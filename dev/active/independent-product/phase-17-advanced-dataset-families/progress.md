@@ -58,3 +58,28 @@ expected durability warning.
 
 **Next action:** Publish the item 17.2 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 17.3.
+
+## 2026-08-28: Item 17.2 merged; item 17.3 in progress
+
+**Status:** Item 17.2 merged as PR #151 at
+`c91948521a086c5691290dd20eb92f906ebc2181`. Clean local `main` equals
+`origin/main` there.
+
+Item 17.3 adds named leakage grouping keys as a substrate. Default SFT split
+stays `transitive-leakage-prefix-v1`. Extra keys join records only when
+supplied as exact values. Missing or empty values fail closed. No family
+is executed.
+
+**Next action:** Run the complete item 17.3 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 17.4.
+
+## 2026-08-28: Item 17.3 local gates green
+
+**Status:** Leakage grouping keys are a substrate only. Focused family and
+split tests passed. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,403 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 17.3 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 17.4.
