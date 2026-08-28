@@ -38,6 +38,7 @@ ObjectiveKind = Literal[
     "structured_field",
     "explicit_label",
     "preference_pair",
+    "tool_call",
 ]
 
 OBJECTIVE_FIELD_ROLES: Mapping[
@@ -55,6 +56,7 @@ OBJECTIVE_FIELD_ROLES: Mapping[
         "structured_field": (("input",), ("fields",)),
         "explicit_label": (("context",), ("label",)),
         "preference_pair": (("prompt",), ("chosen",)),
+        "tool_call": (("conversation_id",), ("turns",)),
     }
 )
 

@@ -127,7 +127,7 @@ def test_parser_dispatch_is_still_the_suffix_chain() -> None:
 def test_constructors_are_still_one_private_exact_lookup() -> None:
     constructors = constructor_module._CONSTRUCTORS
     assert isinstance(constructors, dict)
-    assert len(constructors) == 7
+    assert len(constructors) == 8
     assert all(
         type(selector) is tuple
         and len(selector) == 2

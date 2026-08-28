@@ -204,6 +204,32 @@
         "strategy": "paragraph"
       },
       "title": "Prefer a chosen completion over a rejected one (safe)"
+    },
+    {
+      "construction": {
+        "consumer_profile": "veriformis-canonical-v1",
+        "require_review": false,
+        "split_ratio_ppm": 500000
+      },
+      "curation": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "goal_id": "use-provided-tool-traces",
+      "plain_language": "Imported conversation rows with operator-supplied tool traces; the final assistant turn after the trace is trained on; half of the leakage groups are held out for evaluation.",
+      "preset_id": "use-provided-tool-traces.safe",
+      "representation_id": "conversation-and-tool-trace",
+      "review_policy": "none",
+      "segmentation": {
+        "overlap": 100,
+        "size": 1000,
+        "strategy": "paragraph"
+      },
+      "title": "Use provided tool traces (safe)"
     }
   ],
   "schema_id": "veriformis.recipe-preset/v1"

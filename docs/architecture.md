@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17.6 preference)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.7 tool-call)
 
 **Next review:** Any service-boundary or architecture change
 

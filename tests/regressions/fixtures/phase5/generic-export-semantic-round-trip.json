@@ -11,7 +11,8 @@
       "messages",
       "preference-pair",
       "prompt_completion",
-      "text"
+      "text",
+      "tool-call-conversation"
     ],
     "split-jsonl-directory": [
       "instruction_output",
@@ -19,7 +20,8 @@
       "messages",
       "preference-pair",
       "prompt_completion",
-      "text"
+      "text",
+      "tool-call-conversation"
     ]
   },
   "fixture_version": 1,

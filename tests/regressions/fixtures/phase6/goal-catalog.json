@@ -390,6 +390,57 @@
       "training_family": "preference-and-ranking",
       "what_the_model_learns": "To treat the operator-supplied chosen completion as preferred over the rejected completion for that prompt. The compiler does not invent, score, or rank the pair.",
       "what_you_provide": "JSONL, JSON, or CSV rows that already contain a prompt, a chosen completion, and a rejected completion."
+    },
+    {
+      "compatible_representations": [
+        "conversation-and-tool-trace"
+      ],
+      "curation_defaults": {
+        "balance_mode": "none",
+        "evaluation_ratio_ppm": 500000,
+        "evaluation_required": true,
+        "maximum_records_per_primary_source": null,
+        "minimum_target_characters": 1,
+        "split_seed": "veriformis-v1"
+      },
+      "default_representation": "conversation-and-tool-trace",
+      "eligible_input_families": [
+        "delimited-table",
+        "json-records"
+      ],
+      "goal_id": "use-provided-tool-traces",
+      "instruction_task": "provided tool trace",
+      "instruction_template": "Emit the provided tool trace for this conversation.",
+      "non_claims": [
+        "no-trainer-compatibility",
+        "no-generated-text",
+        "no-invented-target",
+        "no-fine-tuning-suitability-judgment"
+      ],
+      "not_this": [
+        "It does not invent tool turns or function results.",
+        "It does not call tools.",
+        "It does not widen a two-turn conversation row."
+      ],
+      "objective": "tool_call",
+      "plain_language": "Teach the model the exact tool traces you already supplied for a conversation. The compiler copies those turns; it does not call tools or invent them.",
+      "recipe_library_id": "tool_call.default",
+      "required_evidence_diagnostics": [
+        "mapped-tool-trace-unavailable"
+      ],
+      "required_source_evidence": "Imported rows that already contain a non-empty conversation identity and ordered turns that include a tool or function trace.",
+      "review_policy_default": "none",
+      "review_policy_options": [
+        "none",
+        "required"
+      ],
+      "state": "implemented",
+      "supervision_boundary": "Earlier user context is not the target. The ordered tool trace, including the final assistant turn, is supervised.",
+      "target_construction": "The imported conversation identity and turns are copied exactly; no tool trace is invented.",
+      "title": "Use provided tool traces",
+      "training_family": "tool-call-conversations",
+      "what_the_model_learns": "To follow the operator-supplied tool traces for each conversation. The compiler does not invent, execute, or rewrite those turns.",
+      "what_you_provide": "JSONL or JSON rows that already contain a conversation identity and ordered turns with a tool or function trace."
     }
   ],
   "representations": [
@@ -485,6 +536,19 @@
       "row_schema": "preference-pair",
       "supervised_region": "The chosen and rejected completions as a pair; the prompt is context.",
       "title": "Prompt, chosen, and rejected"
+    },
+    {
+      "compatible_generic_exports": [
+        "split-jsonl-directory",
+        "json"
+      ],
+      "loss_policy": "tool-trace-suffix",
+      "plain_language": "A conversation identity and the exact ordered turns the operator supplied, including tool or function roles. The final assistant turn after the trace is the target.",
+      "representation_id": "conversation-and-tool-trace",
+      "requires_operator_instruction": false,
+      "row_schema": "tool-call-conversation",
+      "supervised_region": "The ordered tool trace including the final assistant turn; earlier user context is not the target.",
+      "title": "Conversation and tool trace"
     }
   ],
   "schema_id": "veriformis.goal-catalog/v1"

@@ -131,9 +131,9 @@ item.
 
 **Branch:** `phase17/07-admit-tool-calls`
 
-- [ ] Promote `tool-call-conversations` with a new conversation schema.
-- [ ] Keep two-turn `messages` exactly two turns.
-- [ ] Skip with a record if no retained license-safe fixture can be named.
+- [x] Promote `tool-call-conversations` with a new conversation schema.
+- [x] Keep two-turn `messages` exactly two turns.
+- [x] Skip with a record if no retained license-safe fixture can be named.
 
 ### 17.8 Admit stepwise-supervision
 

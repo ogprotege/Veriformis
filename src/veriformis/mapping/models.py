@@ -35,6 +35,7 @@ ROW_SCHEMA_PAYLOAD_KEYS: dict[str, tuple[str, ...]] = {
     "messages": ("messages",),
     "label-classification": ("context", "label", "annotator"),
     "preference-pair": ("prompt", "chosen", "rejected"),
+    "tool-call-conversation": ("conversation_id", "turns"),
 }
 ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl", "json", "csv", "parquet", "arrow")
 RESERVED_CONTAINERS: tuple[str, ...] = ()
@@ -67,6 +68,7 @@ RowSchema = Literal[
     "messages",
     "label-classification",
     "preference-pair",
+    "tool-call-conversation",
 ]
 ContainerKind = Literal["jsonl", "json", "csv", "parquet", "arrow"]
 

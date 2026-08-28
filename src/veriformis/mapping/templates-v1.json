@@ -126,6 +126,26 @@
       "representation_id": "prompt-chosen-rejected",
       "row_schema": "preference-pair",
       "template_id": "prompt-chosen-rejected"
+    },
+    {
+      "container_kind": "jsonl",
+      "detector_id": "conversation-and-tool-trace",
+      "field_mappings": [
+        {
+          "source_path": "conversation_id",
+          "target_key": "conversation_id"
+        },
+        {
+          "source_path": "turns",
+          "target_key": "turns"
+        }
+      ],
+      "goal_id": "use-provided-tool-traces",
+      "membership_policy": "replaced",
+      "plain_language": "Map a conversation identity and ordered tool traces into the tool conversation row.",
+      "representation_id": "conversation-and-tool-trace",
+      "row_schema": "tool-call-conversation",
+      "template_id": "conversation-and-tool-trace"
     }
   ]
 }

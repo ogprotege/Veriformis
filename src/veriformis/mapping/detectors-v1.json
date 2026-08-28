@@ -78,6 +78,17 @@
         "rejected"
       ],
       "row_schema": "preference-pair"
+    },
+    {
+      "detector_id": "conversation-and-tool-trace",
+      "goal_id": "use-provided-tool-traces",
+      "plain_language": "Each object has a conversation identity and ordered turns that include a tool or function trace supplied by the operator.",
+      "representation_id": "conversation-and-tool-trace",
+      "required_paths": [
+        "conversation_id",
+        "turns"
+      ],
+      "row_schema": "tool-call-conversation"
     }
   ],
   "schema_id": "veriformis.mapping-detector-discovery/v1"

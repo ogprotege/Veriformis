@@ -157,3 +157,30 @@ with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 17.6 pull request, require every
 GitHub check, merge, and synchronize clean `main` before item 17.7.
+
+## 2026-08-28: Item 17.6 merged; item 17.7 in progress
+
+**Status:** Item 17.6 merged as PR #155 at
+`4496d0ebc851af20b2a94316a7520b9d3f20b096`. Clean local `main` equals
+`origin/main` there.
+
+Item 17.7 admits `tool-call-conversations` from user-provided tool
+traces. Two-turn `messages` stays exactly two turns. Synthetic JSONL is
+the retained fixture.
+
+**Next action:** Run item 17.7 local gates, publish the pull request,
+merge green, and synchronize clean `main` before item 17.8.
+
+## 2026-08-28: Item 17.7 local gates green
+
+**Status:** `tool-call-conversations` compiles from user-provided tool
+traces through map, curate, split, format, validate, seal, and verify.
+Conversation leakage keeps one thread in one partition. Document-source
+construction cannot invent traces. Constrained CSV and existing trainer
+profiles refuse the schema. Two-turn `messages` stays exactly two
+turns. Focused tool-call tests passed 10. Project tracking, Ruff, the
+lock check, and `git diff --check` passed. The core suite passed 2,437
+tests with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 17.7 pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 17.8.

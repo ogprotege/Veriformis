@@ -37,7 +37,7 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.6 admits `preference-and-ranking` from user-provided
-chosen/rejected pairs on the dataset-row path. Unpaired feedback and
-ranking-order schemas are skipped with a record. Existing trainer
-profiles refuse the new schema. Default `review_policy` stays `none`.
+Item 17.7 admits `tool-call-conversations` from user-provided tool
+traces on the dataset-row path. Two-turn `messages` stays exactly two
+turns. Existing trainer profiles refuse the new schema. Default
+`review_policy` stays `none`.

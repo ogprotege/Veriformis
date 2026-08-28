@@ -6,9 +6,9 @@
 
 **Schema:** `veriformis.advanced-family-admission/v1`
 
-**Status:** Schema pin plus leakage grouping substrate. Item 17.5 admits
-`explicit-label-classification` and item 17.6 admits
-`preference-and-ranking` as executes on the dataset-row path.
+**Status:** Schema pin plus leakage grouping substrate. Items 17.5–17.7
+admit `explicit-label-classification`, `preference-and-ranking`, and
+`tool-call-conversations` as executes on the dataset-row path.
 Loading a pin is not itself an execute. Extra grouping keys do not change
 default SFT split identities. Trainer-profile mappings remain empty.
 
@@ -29,7 +29,7 @@ and not an extension-protocol event.
 | --- | --- |
 | `explicit-label-classification` | Admitted execute. User-provided labels. |
 | `preference-and-ranking` | Admitted execute. User-provided chosen/rejected pairs. Unpaired and ranking-order schemas skipped with a record. |
-| `tool-call-conversations` | Admittable. User-provided tool traces. New schema; do not widen two-turn `messages`. |
+| `tool-call-conversations` | Admitted execute. User-provided tool traces. New schema; two-turn `messages` stays two turns. |
 | `stepwise-supervision` | Admittable. User-provided ordered steps. |
 | `pre-tokenized-training` | Named, not admitted here. Tokenizer/model-bound. |
 | `governed-generated-candidates` | Named, not admitted here. Waits for the 17.9 generator boundary. |

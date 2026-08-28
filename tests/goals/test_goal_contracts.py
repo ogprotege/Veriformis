@@ -148,12 +148,19 @@ def test_goal_evidence_bindings_are_closed_and_ordered() -> None:
         if goal.objective == "preference_pair":
             assert "mapped-preference-unavailable" in goal.required_evidence_diagnostics
             continue
+        if goal.objective == "tool_call":
+            assert "mapped-tool-trace-unavailable" in goal.required_evidence_diagnostics
+            continue
         assert "source-chunks-unavailable" in goal.required_evidence_diagnostics, goal.goal_id
     assert by_id["classify-with-provided-labels"].eligible_input_families == (
         "delimited-table",
         "json-records",
     )
     assert by_id["prefer-chosen-over-rejected"].eligible_input_families == (
+        "delimited-table",
+        "json-records",
+    )
+    assert by_id["use-provided-tool-traces"].eligible_input_families == (
         "delimited-table",
         "json-records",
     )

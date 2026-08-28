@@ -57,6 +57,7 @@ ROW_SCHEMAS = (
     "preference-pair",
     "prompt_completion",
     "text",
+    "tool-call-conversation",
 )
 SFT_ROW_SCHEMAS = ("instruction_output", "messages", "prompt_completion", "text")
 CUSTOM_EXPORT_GOLDEN = {

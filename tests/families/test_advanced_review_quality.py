@@ -97,6 +97,8 @@ def test_explicit_family_fields_are_counted_without_executing_a_family() -> None
         "source-grounded-supervised-fine-tuning",
         "explicit-label-classification",
         "preference-and-ranking",
+        "tool-call-conversations",
     )
     assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES
     assert "preference-and-ranking" not in PLANNED_TRAINING_FAMILIES
+    assert "tool-call-conversations" not in PLANNED_TRAINING_FAMILIES

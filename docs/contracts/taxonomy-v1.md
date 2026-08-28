@@ -73,13 +73,13 @@ Implemented v1 families are conservative:
 | `source-grounded-supervised-fine-tuning` | implemented | The model produces a source-grounded target from an explicit context. Current objectives are `continuation`, `section_reconstruction`, `before_after_transformation`, and `structured_field`. |
 | `explicit-label-classification` | implemented | The model emits a user-provided label. The objective is `explicit_label`. Labels are never invented. |
 | `preference-and-ranking` | implemented | The model sees a user-provided chosen/rejected pair. The objective is `preference_pair`. Completions are never invented. |
+| `tool-call-conversations` | implemented | The model sees a user-provided tool trace. The objective is `tool_call`. Traces are never invented. Two-turn `messages` stays two turns. |
 
 Future-only families MAY be named. They MUST be recorded as `planned` or
 `explicitly_unsupported` and MUST NOT appear in discovery as implemented:
 
 | Family ID | State | Reason it is not implemented |
 | --- | --- | --- |
-| `tool-call-conversations` | planned | No tool/function-call row contract |
 | `stepwise-supervision` | planned | No stepwise or process-supervision schema |
 | `pre-tokenized-training` | planned | Tokenizer-bound rows require a named consumer/model profile |
 | `governed-generated-candidates` | planned | Owner-gated Group 8; not deterministic v1 |
@@ -99,6 +99,7 @@ fields are context or target. Persisted kinds remain exactly:
 - `structured_field`
 - `explicit_label`
 - `preference_pair`
+- `tool_call`
 
 Field roles remain those in the construction contract. SFT kinds stay
 frozen. Admitted family kinds are added only in the admitting pull request.
@@ -114,13 +115,15 @@ Learning reading of the current kinds:
 | `structured_field` | `source-grounded-supervised-fine-tuning` | Emit one explicit IR scalar as the target. |
 | `explicit_label` | `explicit-label-classification` | Emit the operator-supplied label. Document-source construction is refused. |
 | `preference_pair` | `preference-and-ranking` | Copy the operator-supplied chosen and rejected completions. Document-source construction is refused. Unpaired feedback and ranking-order schemas are skipped with a record. |
+| `tool_call` | `tool-call-conversations` | Copy the operator-supplied tool traces. Document-source construction is refused. Two-turn `messages` is unchanged. |
 
 ### Semantic row schema
 
 A semantic row schema states field roles in the sealed product row. SFT v1
 values remain `text`, `prompt_completion`, `instruction_output`, and
-`messages`. Admitted family rows add `label-classification` and
-`preference-pair` without overloading those four SFT shapes.
+`messages`. Admitted family rows add `label-classification`,
+`preference-pair`, and `tool-call-conversation` without overloading those
+four SFT shapes.
 
 Legacy CLI names `completion`, `instruction`, and `chat` are UI aliases only.
 They MUST NOT appear in a `DatasetRecipe`, sealed row set, or taxonomy
@@ -181,6 +184,7 @@ semantic row has exactly one:
 | `messages` | `final-assistant-suffix` | Only the final assistant message is supervised. |
 | `label-classification` | `label-only` | Only the user-provided label is supervised. |
 | `preference-pair` | `pair-supervision` | The chosen and rejected completions are supervised as a pair; the prompt is context. |
+| `tool-call-conversation` | `tool-trace-suffix` | The ordered tool trace, including the final assistant turn, is supervised. |
 
 A consumer profile MAY refuse a row schema or add a stricter masking
 expectation. It MUST NOT silently change the loss policy ID of an accepted

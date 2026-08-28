@@ -134,13 +134,18 @@ V1_ROW_SCHEMA_KINDS: Final = (
     "messages",
 )
 
-ADMITTED_FAMILY_OBJECTIVE_KINDS: Final = ("explicit_label", "preference_pair")
+ADMITTED_FAMILY_OBJECTIVE_KINDS: Final = (
+    "explicit_label",
+    "preference_pair",
+    "tool_call",
+)
 PRODUCT_OBJECTIVE_KINDS: Final = (
     DETERMINISTIC_V1_OBJECTIVE_KINDS + ADMITTED_FAMILY_OBJECTIVE_KINDS
 )
 ADMITTED_FAMILY_ROW_SCHEMA_KINDS: Final = (
     "label-classification",
     "preference-pair",
+    "tool-call-conversation",
 )
 PRODUCT_ROW_SCHEMA_KINDS: Final = (
     V1_ROW_SCHEMA_KINDS + ADMITTED_FAMILY_ROW_SCHEMA_KINDS
@@ -158,6 +163,7 @@ V1_CONSTRUCTION_DIAGNOSTIC_CODES: Final = (
     "transformation-pair-unavailable",
     "mapped-label-unavailable",
     "mapped-preference-unavailable",
+    "mapped-tool-trace-unavailable",
 )
 
 V1_PROMOTION_REASON_CODES: Final = (

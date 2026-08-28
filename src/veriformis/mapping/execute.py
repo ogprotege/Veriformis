@@ -246,6 +246,15 @@ def _normalized_field_value(
         messages = _require_two_turn_messages(original, row_index=row_index)
         encoded = lossless_json_bytes(messages).decode("utf-8")
         return encoded, sha256_digest(lossless_json_bytes(original))
+    if row_schema == "tool-call-conversation" and target_key == "turns":
+        from veriformis.families.tool_call import normalize_tool_turns
+
+        try:
+            turns = normalize_tool_turns(original)
+        except ValueError as exc:
+            raise MappingError(f"row {row_index} {exc}") from exc
+        encoded = lossless_json_bytes(turns).decode("utf-8")
+        return encoded, sha256_digest(lossless_json_bytes(original))
     if not isinstance(original, str):
         raise MappingError(
             f"row {row_index} field {target_key!r} must be a string; coercion is refused"
@@ -287,6 +296,11 @@ def _payload_from_fields(
     values = {field.name: field.value for field in fields}
     if row_schema == "messages":
         return {"messages": json.loads(values["messages"])}
+    if row_schema == "tool-call-conversation":
+        return {
+            "conversation_id": values["conversation_id"],
+            "turns": json.loads(values["turns"]),
+        }
     return dict(values)
 
 
