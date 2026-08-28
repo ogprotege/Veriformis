@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 12 closeout PR #112)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.8 ADR-0017)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -38,6 +38,7 @@ not substitutes for implementation or tests.
 | [0014](0014-independently-admitted-consumer-profiles.md) | Independently admitted Phase 10 consumer profiles | Accepted | Item 10.2 admission pins; any required trainer extra; Aptus profile migration |
 | [0015](0015-collection-plan-as-ingest-contract.md) | Collection plan as ingest contract | Accepted | Any new collection setting; archive ingest; parser isolation; new input family; Phase 12 OCR |
 | [0016](0016-optional-local-tesseract-ocr.md) | Optional local Tesseract 5 OCR | Accepted | Any new OCR engine; tessdata or language admission; promoting `ocr-image`; extra `ocr`; silent digital-text replacement |
+| [0017](0017-no-untrusted-extension-loader.md) | No untrusted extension loader in Phase 16 | Accepted | Any third-party load; entry points; workspace `plugins/`; in-process project import; plugin subprocess; Mac plugin UI |
 
 ## ADR template
 

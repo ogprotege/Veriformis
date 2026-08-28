@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `13e3280` on `main` after PR #145
+**Implementation baseline reviewed:** `194cfd6` on `main` after PR #146
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–15 complete; Phase 16.6 split JSONL)
+Phases 0–2; independent-product Phases 0–15 complete; Phase 16.7 kit)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-27 (Phase 16.7 compatibility kit)
+**Last reviewed:** 2026-08-27 (Phase 16.8 ADR-0017 threat model)
 
-**Next review:** Phase 16.7 compatibility-kit PR. No untrusted loader
-before item 16.8.
+**Next review:** Phase 16.8 threat-model PR. Isolation in 16.9. No
+untrusted loader.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -131,10 +131,9 @@ local, offline, and free of LLM generation.
       not start Phase 16 from that packet.
 - [ ] Independent product Phase 16 is in progress under its
       [packet](dev/active/independent-product/phase-16-extension-architecture/README.md).
-      Item 16.6 merged as PR #145 at
-      `13e3280ac6f27a3e8c6484f0c6e380836723ddc9`. Item 16.7 publishes a
-      test-only compatibility kit for the text parser and generic
-      `split-jsonl-directory`.
+      Item 16.7 merged as PR #146 at
+      `194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`. Item 16.8 records
+      ADR-0017 Decision A: no untrusted loader in Phase 16.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

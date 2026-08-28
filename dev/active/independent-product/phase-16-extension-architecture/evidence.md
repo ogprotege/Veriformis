@@ -132,8 +132,29 @@ GitHub checks: all 18 passed on PR #145. Merge SHA
 - [x] Compatibility errors name requested versus supported contract identity.
 - [x] The kit is test-only. No product plugin runner or project-local path.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.8.
+
+GitHub checks: all 18 passed on PR #146. Merge SHA
+`194cfd68fbd5c8cce7a4d3a3395beccc022fa1fc`.
+
+## Required item 16.8 evidence
+
+- [x] ADR-0017 covers isolation, permissions, network, resources, signing,
+      crash containment, workspace corruption, and project-code execution.
+- [x] Decision A: no untrusted loader in Phase 16.
+- [x] No entry points, loader module, or workspace `plugins/` path.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.8.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.9.
+
+## Item 16.8 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused threat-model and isolation tests | 25 passed |
+| Tracking, Ruff, lock, diff check | PASS |
+| Core pytest excluding optional markers | 2,351 passed, 17 deselected, one expected durability warning |
 
 ## Item 16.7 local gate evidence
 

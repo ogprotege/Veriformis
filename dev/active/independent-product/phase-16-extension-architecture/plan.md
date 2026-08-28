@@ -132,10 +132,10 @@ operation is permitted in this item.
 
 **Branch:** `phase16/08-plugin-threat-model`
 
-- [ ] Add ADR-0017 covering process isolation, permissions, network, resource
+- [x] Add ADR-0017 covering process isolation, permissions, network, resource
       limits, signing, crash containment, and workspace corruption.
-- [ ] Add no untrusted loader. Merge green, synchronize `main`, and stop for
-      operator decision A, B, or C.
+- [x] Add no untrusted loader. Record Decision A: no untrusted loader in
+      Phase 16. Merge green and synchronize `main` before 16.9.
 
 ### 16.9 Isolate missing and broken optional extensions
 

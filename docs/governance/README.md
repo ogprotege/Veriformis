@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.7 compatibility kit)
+**Last reviewed:** 2026-08-27 (independent-product Phase 16.8 ADR-0017)
 
-**Next review:** Phase 16.7 merge, item 16.8 threat-model ADR, or
+**Next review:** Phase 16.8 merge, item 16.9 broken-extra isolation, or
 governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
