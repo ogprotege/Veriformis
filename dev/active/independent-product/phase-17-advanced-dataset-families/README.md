@@ -37,5 +37,6 @@ Decision A stands. This packet does not start Phase 18.
 
 ## Current state
 
-Item 17.4 adds opt-in review queues and preview-only family quality
-hooks. Default `review_policy` stays `none`. No family execute.
+Item 17.5 admits `explicit-label-classification` from user-provided
+labels on the dataset-row path. Existing trainer profiles refuse the
+new schema. Default `review_policy` stays `none`.

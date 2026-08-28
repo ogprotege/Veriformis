@@ -8,7 +8,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from veriformis.contracts import V1_ROW_SCHEMA_KINDS
+from veriformis.contracts import PRODUCT_ROW_SCHEMA_KINDS
 from veriformis.datasets import ProductRow, RowProvenance, RowSet
 from veriformis.errors import ExportContractError, ExportVerificationError
 from veriformis.exports._implementation import (
@@ -41,7 +41,7 @@ SPLIT_JSONL_PROVENANCE_PATH = "metadata/row-provenance.jsonl"
 SPLIT_JSONL_README_PATH = "README.md"
 
 _PARTITION_NAME = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
-_SUPPORTED_ROW_SCHEMAS = tuple(sorted(V1_ROW_SCHEMA_KINDS))
+_SUPPORTED_ROW_SCHEMAS = tuple(sorted(PRODUCT_ROW_SCHEMA_KINDS))
 
 
 def _validate_partition_name(value: str) -> str:
@@ -178,7 +178,7 @@ class SplitJsonlDataCard(_StrictSplitJsonlModel):
     @field_validator("row_schema")
     @classmethod
     def _valid_row_schema(cls, value: str) -> str:
-        if value not in V1_ROW_SCHEMA_KINDS:
+        if value not in PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError("data card names an unsupported row schema")
         return value
 

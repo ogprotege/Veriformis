@@ -54,6 +54,18 @@
         "text"
       ],
       "row_schema": "text"
+    },
+    {
+      "detector_id": "context-label-annotator",
+      "goal_id": "classify-with-provided-labels",
+      "plain_language": "Each object has context, label, and annotator strings supplied by the operator.",
+      "representation_id": "context-and-label",
+      "required_paths": [
+        "context",
+        "label",
+        "annotator"
+      ],
+      "row_schema": "label-classification"
     }
   ],
   "schema_id": "veriformis.mapping-detector-discovery/v1"

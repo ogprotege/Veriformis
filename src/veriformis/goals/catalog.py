@@ -25,9 +25,9 @@ from pydantic import (
 )
 
 from veriformis.contracts import (
-    DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    PRODUCT_OBJECTIVE_KINDS,
+    PRODUCT_ROW_SCHEMA_KINDS,
     V1_CONSTRUCTION_DIAGNOSTIC_CODES,
-    V1_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import (
     GoalCatalogError,
@@ -91,8 +91,8 @@ _MACHINE_IDENTIFIERS: tuple[str, ...] = tuple(
     sorted(
         token
         for token in {
-            *DETERMINISTIC_V1_OBJECTIVE_KINDS,
-            *V1_ROW_SCHEMA_KINDS,
+            *PRODUCT_OBJECTIVE_KINDS,
+            *PRODUCT_ROW_SCHEMA_KINDS,
             *LOSS_POLICY_IDS,
             *RECIPE_LIBRARY_IDS,
             *ROW_SCHEMA_UI_ALIASES,
@@ -107,13 +107,21 @@ ObjectiveKind = Literal[
     "section_reconstruction",
     "before_after_transformation",
     "structured_field",
+    "explicit_label",
 ]
-RowSchemaKind = Literal["text", "prompt_completion", "instruction_output", "messages"]
+RowSchemaKind = Literal[
+    "text",
+    "prompt_completion",
+    "instruction_output",
+    "messages",
+    "label-classification",
+]
 LossPolicyKind = Literal[
     "full-sequence",
     "completion-only",
     "output-only",
     "final-assistant-suffix",
+    "label-only",
 ]
 
 
@@ -446,10 +454,10 @@ class GoalCatalog(_StrictModel):
         if len(set(ids)) != len(ids):
             raise ValueError("duplicate representation_id")
         rows = tuple(rep.row_schema for rep in value)
-        if rows != V1_ROW_SCHEMA_KINDS:
+        if rows != PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError(
                 "representations must cover every row schema exactly once in "
-                f"taxonomy order {list(V1_ROW_SCHEMA_KINDS)!r}; observed {list(rows)!r}"
+                f"taxonomy order {list(PRODUCT_ROW_SCHEMA_KINDS)!r}; observed {list(rows)!r}"
             )
         return value
 
@@ -462,10 +470,10 @@ class GoalCatalog(_StrictModel):
         objectives = tuple(goal.objective for goal in value)
         if len(set(objectives)) != len(objectives):
             raise ValueError("each objective may back exactly one goal")
-        if objectives != DETERMINISTIC_V1_OBJECTIVE_KINDS:
+        if objectives != PRODUCT_OBJECTIVE_KINDS:
             raise ValueError(
                 "goals must cover every objective exactly once in taxonomy order "
-                f"{list(DETERMINISTIC_V1_OBJECTIVE_KINDS)!r}; observed {list(objectives)!r}"
+                f"{list(PRODUCT_OBJECTIVE_KINDS)!r}; observed {list(objectives)!r}"
             )
         return value
 
@@ -583,7 +591,7 @@ def goal_for_objective(objective: str) -> Goal:
             return goal
     raise GoalCatalogError(
         f"unknown objective {objective!r}; expected one of "
-        f"{list(DETERMINISTIC_V1_OBJECTIVE_KINDS)!r}"
+        f"{list(PRODUCT_OBJECTIVE_KINDS)!r}"
     )
 
 
@@ -592,7 +600,7 @@ def representation_for_row_schema(row_schema: str) -> GoalRepresentation:
         if rep.row_schema == row_schema:
             return rep
     raise GoalCatalogError(
-        f"unknown row schema {row_schema!r}; expected one of {list(V1_ROW_SCHEMA_KINDS)!r}"
+        f"unknown row schema {row_schema!r}; expected one of {list(PRODUCT_ROW_SCHEMA_KINDS)!r}"
     )
 
 

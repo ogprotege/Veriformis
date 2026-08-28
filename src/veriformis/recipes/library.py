@@ -28,6 +28,7 @@ RECIPE_LIBRARY_IDS: tuple[str, ...] = (
     "section_reconstruction.default",
     "before_after_transformation.default",
     "structured_field.default",
+    "explicit_label.default",
 )
 
 _OBJECTIVE_BY_RECIPE = {
@@ -36,6 +37,7 @@ _OBJECTIVE_BY_RECIPE = {
     "section_reconstruction.default": "section_reconstruction",
     "before_after_transformation.default": "before_after_transformation",
     "structured_field.default": "structured_field",
+    "explicit_label.default": "explicit_label",
 }
 
 def list_named_recipes() -> tuple[dict[str, str], ...]:

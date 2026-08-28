@@ -49,6 +49,7 @@ from .splitting import (
     validate_split_result,
 )
 from .serialization import (
+    PRODUCT_ROW_SCHEMAS,
     V1_PARTITION_ORDER,
     V1_ROW_SCHEMAS,
     ProductRow,
@@ -112,6 +113,7 @@ __all__ = [
     "V1_PARTITIONS",
     "V1_PARTITION_ORDER",
     "V1_QUALITY_FINDING_CODES",
+    "PRODUCT_ROW_SCHEMAS",
     "V1_ROW_SCHEMAS",
     "V1_SPLIT_ALGORITHM",
     "V1_ARTIFACT_ROLES",

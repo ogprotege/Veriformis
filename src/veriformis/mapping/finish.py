@@ -353,7 +353,7 @@ class ImportedLeakageGroup(_StrictModel):
             "schema_version": "veriformis.imported-leakage-group/v1",
             "record_ids": tuple(sorted(record_ids)),
             "source_ids": tuple(sorted(source_ids)),
-            "raw_sha256_values": tuple(sorted(raw_sha256_values)),
+            "raw_sha256_values": tuple(raw_sha256_values),
             "exact_record_fingerprints": tuple(sorted(exact_record_fingerprints)),
         }
         return cls(group_id=derive_id("lkg", body), **body)
@@ -903,6 +903,8 @@ def _target_length(record: ImportedRecord, row_schema: str) -> int:
         return len(payload["completion"])
     if row_schema == "instruction_output":
         return len(payload["output"])
+    if row_schema == "label-classification":
+        return len(payload["label"])
     messages = payload["messages"]
     return len(messages[1]["content"])
 
@@ -915,6 +917,8 @@ def _context_key(record: ImportedRecord, row_schema: str) -> tuple[Any, ...]:
         return (payload["prompt"],)
     if row_schema == "instruction_output":
         return (payload["instruction"], payload["input"])
+    if row_schema == "label-classification":
+        return (payload["context"],)
     return (payload["messages"][0]["content"],)
 
 
@@ -1091,6 +1095,8 @@ def _target_token(record: ImportedRecord, row_schema: str) -> Any:
         return payload["completion"]
     if row_schema == "instruction_output":
         return payload["output"]
+    if row_schema == "label-classification":
+        return payload["label"]
     return payload["messages"][1]["content"]
 
 
@@ -1177,15 +1183,20 @@ def split_imported_records(
             included,
             raw_digests,
         )
-    groups = tuple(
-        ImportedLeakageGroup.create(
-            record_ids=(record.record_id,),
-            source_ids=(record.source_id,),
-            raw_sha256_values=(raw_digests[record.source_id],),
-            exact_record_fingerprints=(exact_imported_fingerprint(record),),
+    if mapping_result.row_schema == "label-classification":
+        from veriformis.families.classification import imported_classification_groups
+
+        groups = imported_classification_groups(included, raw_digests)
+    else:
+        groups = tuple(
+            ImportedLeakageGroup.create(
+                record_ids=(record.record_id,),
+                source_ids=(record.source_id,),
+                raw_sha256_values=(raw_digests[record.source_id],),
+                exact_record_fingerprints=(exact_imported_fingerprint(record),),
+            )
+            for record in included
         )
-        for record in included
-    )
     policy = plan.split_policy
     if len(groups) < 2:
         if policy.evaluation_required:
@@ -1353,11 +1364,21 @@ def validate_imported_dataset(
     replayed_curation = curate_imported_records(plan, recipe, mapping_result)
     if replayed_curation != curation:
         raise DatasetValidationError("imported curation does not match replay")
-    digest_map = {
-        source_id: group.raw_sha256_values[0]
-        for group in split_result.groups
-        for source_id in group.source_ids
-    }
+    digest_map: dict[str, str] = {}
+    for group in split_result.groups:
+        if len(group.source_ids) != len(group.raw_sha256_values):
+            raise DatasetValidationError(
+                "imported leakage group source digests are misaligned"
+            )
+        for source_id, digest in zip(
+            group.source_ids, group.raw_sha256_values, strict=True
+        ):
+            previous = digest_map.get(source_id)
+            if previous is not None and previous != digest:
+                raise DatasetValidationError(
+                    "imported leakage group source digests conflict"
+                )
+            digest_map[source_id] = digest
     replayed_split = split_imported_records(
         plan,
         mapping_result,

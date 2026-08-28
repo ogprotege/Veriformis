@@ -42,6 +42,7 @@ def test_objective_contracts_use_semantic_fields_only():
         "section_reconstruction": ("heading", "section"),
         "before_after_transformation": ("before", "after"),
         "structured_field": ("input", "fields"),
+        "explicit_label": ("context", "label"),
     }
 
     assert OBJECTIVE_FIELD_CONTRACTS == expected

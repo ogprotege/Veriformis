@@ -36,6 +36,7 @@ def test_templates_are_canonical_digest_bound_and_shared() -> None:
         "prompt_completion",
         "instruction_output",
         "messages",
+        "label-classification",
     }
     detector_shapes = {
         tuple(item.required_paths) for item in mapping_detector_catalog().detectors

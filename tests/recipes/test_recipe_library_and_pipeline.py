@@ -38,13 +38,14 @@ def _write_sources(root: Path) -> list[Path]:
     return [text, html]
 
 
-def test_named_recipe_library_lists_five_objectives():
+def test_named_recipe_library_lists_six_objectives():
     recipes = list_named_recipes()
     assert {item["recipe_library_id"] for item in recipes} >= {
         "full_text.default",
         "continuation.default",
+        "explicit_label.default",
     }
-    assert len(recipes) == 5
+    assert len(recipes) == 6
 
 
 def test_named_recipe_uses_shared_profile_compatibility():

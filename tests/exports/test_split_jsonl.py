@@ -50,7 +50,14 @@ FIXTURE = (
 EXPECTED_MANIFEST_SHA256 = (
     "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
 )
-ROW_SCHEMAS = ("instruction_output", "messages", "prompt_completion", "text")
+ROW_SCHEMAS = (
+    "instruction_output",
+    "label-classification",
+    "messages",
+    "prompt_completion",
+    "text",
+)
+SFT_ROW_SCHEMAS = ("instruction_output", "messages", "prompt_completion", "text")
 CUSTOM_EXPORT_GOLDEN = {
     "README.md": (
         "18391ab32d59181e4993f22b6c2b8e468fe5ca5caab66cd65656ac1b32d7ba9e",
@@ -428,7 +435,7 @@ def test_partition_name_safety_property(name: str, valid: bool) -> None:
     assert options.train_path != options.evaluation_path
 
 
-@pytest.mark.parametrize("row_schema", ROW_SCHEMAS)
+@pytest.mark.parametrize("row_schema", SFT_ROW_SCHEMAS)
 @pytest.mark.parametrize("include_provenance", [False, True])
 def test_every_current_row_schema_preserves_exact_rows_and_partitions(
     tmp_path: Path,

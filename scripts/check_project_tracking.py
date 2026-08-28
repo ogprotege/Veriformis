@@ -23,7 +23,7 @@ from veriformis.bundle.finished import (
     VALIDATION_PATH,
 )
 from veriformis.cli import seal
-from veriformis.datasets.serialization import V1_ROW_SCHEMAS
+from veriformis.datasets.serialization import PRODUCT_ROW_SCHEMAS, V1_ROW_SCHEMAS
 from veriformis.goals import goal_catalog, preset_catalog, recipe_defaults
 from veriformis.mapping import IMPLEMENTED_INPUT_MODES, PLANNED_INPUT_MODES
 from veriformis.mcp.server import create_mcp_server
@@ -293,8 +293,8 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
     )
     _check_no_recipe_default_literals(errors)
     _require(
-        training.get("implemented_row_schemas") == sorted(V1_ROW_SCHEMAS),
-        "support row schemas differ from V1_ROW_SCHEMAS",
+        training.get("implemented_row_schemas") == sorted(PRODUCT_ROW_SCHEMAS),
+        "support row schemas differ from PRODUCT_ROW_SCHEMAS",
         errors,
     )
     _require(

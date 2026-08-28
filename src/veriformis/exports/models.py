@@ -16,7 +16,7 @@ from pydantic import (
 )
 
 from veriformis.bundle.finished import VerificationResult
-from veriformis.contracts import V1_ROW_SCHEMA_KINDS
+from veriformis.contracts import PRODUCT_ROW_SCHEMA_KINDS, V1_ROW_SCHEMA_KINDS
 from veriformis.errors import ExportContractError, ExportVerificationError
 from veriformis.exports._json import canonical_export_object_from_bytes
 from veriformis.exports.paths import (
@@ -636,7 +636,7 @@ class ExportMembershipProjection(_IdentifiedExportModel):
     @field_validator("row_schema")
     @classmethod
     def _valid_row_schema(cls, value: str) -> str:
-        if value not in V1_ROW_SCHEMA_KINDS:
+        if value not in PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError("membership projection uses an unsupported row schema")
         return value
 
@@ -838,7 +838,7 @@ class ExportPlan(_IdentifiedExportModel):
     @field_validator("row_schema")
     @classmethod
     def _valid_row_schema(cls, value: str) -> str:
-        if value not in V1_ROW_SCHEMA_KINDS:
+        if value not in PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError("export plan uses an unsupported row schema")
         return value
 
@@ -1191,7 +1191,7 @@ class ExportVerification(_IdentifiedExportModel):
     @field_validator("row_schema")
     @classmethod
     def _valid_row_schema(cls, value: str) -> str:
-        if value not in V1_ROW_SCHEMA_KINDS:
+        if value not in PRODUCT_ROW_SCHEMA_KINDS:
             raise ValueError("export verification uses an unsupported row schema")
         return value
 

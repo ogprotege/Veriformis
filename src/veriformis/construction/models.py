@@ -22,7 +22,7 @@ from pydantic import (
 )
 
 from veriformis.contracts import (
-    DETERMINISTIC_V1_OBJECTIVE_KINDS,
+    PRODUCT_OBJECTIVE_KINDS,
     V1_CONSTRUCTION_DIAGNOSTIC_CODES,
     V1_PROMOTION_REASON_CODES,
 )
@@ -52,12 +52,14 @@ ObjectiveKind = Literal[
     "section_reconstruction",
     "before_after_transformation",
     "structured_field",
+    "explicit_label",
 ]
 ProductRowSchema = Literal[
     "text",
     "prompt_completion",
     "instruction_output",
     "messages",
+    "label-classification",
 ]
 ReviewPolicy = Literal["none", "required"]
 DecisionStatus = Literal["accepted", "rejected", "pending_review"]
@@ -74,6 +76,7 @@ DiagnosticCode = Literal[
     "structured-ir-artifact-unavailable",
     "transformation-pair-empty-or-unchanged",
     "transformation-pair-unavailable",
+    "mapped-label-unavailable",
 ]
 PromotionReasonCode = Literal[
     "construction-integrity-v1",
@@ -89,6 +92,7 @@ OBJECTIVE_FIELD_CONTRACTS: Mapping[str, tuple[str, ...]] = MappingProxyType({
     "section_reconstruction": ("heading", "section"),
     "before_after_transformation": ("before", "after"),
     "structured_field": ("input", "fields"),
+    "explicit_label": ("context", "label"),
 })
 
 BUILTIN_CONSTRUCTOR_IDS: Mapping[str, str] = MappingProxyType({
@@ -99,6 +103,7 @@ BUILTIN_CONSTRUCTOR_IDS: Mapping[str, str] = MappingProxyType({
         "veriformis.constructor.before-after-transformation"
     ),
     "structured_field": "veriformis.constructor.structured-field",
+    "explicit_label": "veriformis.constructor.explicit-label",
 })
 
 CONSTRUCTION_GATES = ("field-evidence", "objective-shape")
@@ -193,7 +198,7 @@ class TrainingObjective(_StrictModel):
     @model_validator(mode="after")
     def _validate_contract(self) -> TrainingObjective:
         validate_id(self.objective_id, kind="obj")
-        if self.kind not in DETERMINISTIC_V1_OBJECTIVE_KINDS:
+        if self.kind not in PRODUCT_OBJECTIVE_KINDS:
             raise ValueError(f"unsupported deterministic objective {self.kind!r}")
         expected_fields = OBJECTIVE_FIELD_CONTRACTS[self.kind]
         if self.field_names != expected_fields:

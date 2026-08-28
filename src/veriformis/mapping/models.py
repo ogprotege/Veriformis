@@ -20,7 +20,7 @@ from veriformis.contracts import (
     MAPPING_CONTRACT_ID,
     MAPPING_CONTRACT_VERSION,
     MAPPING_DISCOVERY_SCHEMA_ID,
-    V1_ROW_SCHEMA_KINDS,
+    PRODUCT_ROW_SCHEMA_KINDS,
 )
 from veriformis.errors import MappingError, RowSourceError
 from veriformis.goals import goal_catalog
@@ -33,6 +33,7 @@ ROW_SCHEMA_PAYLOAD_KEYS: dict[str, tuple[str, ...]] = {
     "prompt_completion": ("prompt", "completion"),
     "instruction_output": ("instruction", "input", "output"),
     "messages": ("messages",),
+    "label-classification": ("context", "label", "annotator"),
 }
 ADMITTED_CONTAINERS: tuple[str, ...] = ("jsonl", "json", "csv", "parquet", "arrow")
 RESERVED_CONTAINERS: tuple[str, ...] = ()
@@ -58,7 +59,13 @@ REJECTION_REASON_CODES: tuple[str, ...] = (
     "non-string-value",
     "unmapped-keys",
 )
-RowSchema = Literal["text", "prompt_completion", "instruction_output", "messages"]
+RowSchema = Literal[
+    "text",
+    "prompt_completion",
+    "instruction_output",
+    "messages",
+    "label-classification",
+]
 ContainerKind = Literal["jsonl", "json", "csv", "parquet", "arrow"]
 
 
@@ -453,8 +460,12 @@ def _packaged_contracts() -> tuple[str, dict[str, Any]]:
         raise MappingError("mapping contract admitted containers drifted")
     if tuple(payload.get("reserved_containers") or ()) != RESERVED_CONTAINERS:
         raise MappingError("mapping contract reserved containers drifted")
-    if tuple(payload.get("row_schemas") or ()) != V1_ROW_SCHEMA_KINDS:
+    if tuple(payload.get("row_schemas") or ()) != PRODUCT_ROW_SCHEMA_KINDS:
         raise MappingError("mapping contract row schemas drifted")
+    if payload.get("payload_keys") != {
+        schema: list(keys) for schema, keys in ROW_SCHEMA_PAYLOAD_KEYS.items()
+    }:
+        raise MappingError("mapping contract payload keys drifted")
     if tuple(payload.get("membership_policies") or ()) != MEMBERSHIP_POLICIES:
         raise MappingError("mapping contract membership policies drifted")
     if tuple(payload.get("rejection_reason_codes") or ()) != REJECTION_REASON_CODES:

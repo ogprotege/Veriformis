@@ -105,3 +105,26 @@ expected durability warning.
 
 **Next action:** Publish the item 17.4 pull request, require every
 GitHub check, merge, and synchronize clean `main` before item 17.5.
+
+## 2026-08-28: Item 17.4 merged; item 17.5 in progress
+
+**Status:** Item 17.4 merged as PR #153 at
+`07bb0d0fc7ca427db297bf55d1c5ed9d26627c95`. Item 17.5 admits
+`explicit-label-classification` from user-provided labels on the
+dataset-row path. Existing trainer profiles refuse the new schema.
+
+**Next action:** Run item 17.5 local gates, publish the pull request,
+merge green, and synchronize clean `main` before item 17.6.
+
+## 2026-08-28: Item 17.5 local gates green
+
+**Status:** `explicit-label-classification` compiles from user-provided
+labels through map, curate, split, format, validate, seal, and verify.
+Document-source construction cannot invent labels. Constrained CSV and
+existing trainer profiles refuse the schema. Focused classification
+tests passed 9. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,416 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 17.5 pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 17.6.

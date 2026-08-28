@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from veriformis.contracts import (
-    DETERMINISTIC_V1_OBJECTIVE_KINDS,
-    V1_ROW_SCHEMA_KINDS,
+    PRODUCT_OBJECTIVE_KINDS,
+    PRODUCT_ROW_SCHEMA_KINDS,
 )
 from veriformis.exports import (
     EXPORT_SURFACE_REQUEST_SCHEMA,
@@ -27,8 +27,8 @@ def _machine_tokens() -> set[str]:
     return {
         token
         for token in {
-            *DETERMINISTIC_V1_OBJECTIVE_KINDS,
-            *V1_ROW_SCHEMA_KINDS,
+            *PRODUCT_OBJECTIVE_KINDS,
+            *PRODUCT_ROW_SCHEMA_KINDS,
             *LOSS_POLICY_IDS,
             *RECIPE_LIBRARY_IDS,
             *ROW_SCHEMA_UI_ALIASES,

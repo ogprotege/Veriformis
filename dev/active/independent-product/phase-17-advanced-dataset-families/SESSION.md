@@ -5,15 +5,17 @@ append-only history.
 
 **Updated:** 2026-08-28
 
-**Local branch:** `phase17/04-advanced-review-quality`
+**Local branch:** `phase17/05-admit-classification`
 
-**Completed:** Item 17.3, PR #152 at
-`db75e5ba3b8cdc39ae7c03bdcea39fe50054fe28`.
+**Completed:** Item 17.4, PR #153 at
+`07bb0d0fc7ca427db297bf55d1c5ed9d26627c95`.
 
-**Current item:** 17.4 review and quality hooks. Local gates are green.
-Opt-in queues and preview-only detectors. Default recipes stay none.
+**Current item:** 17.5 admit `explicit-label-classification`. Local gates
+are green. Dataset-row mapping with user-provided context, label, and
+annotator. Profiles refuse the new schema. Constrained CSV refuses it.
 
-**Next gate:** Publish the 17.4 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 17.5.
+**Next gate:** Publish the 17.5 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 17.6.
 
-**Decision:** No heuristic blocks seal. Family queues are opt-in.
+**Decision:** Labels are user-provided `mapped_value` fields. Document-source
+construction cannot invent them.

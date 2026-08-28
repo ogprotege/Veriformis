@@ -353,10 +353,11 @@ def test_default_sft_assignment_digest_is_unchanged(tmp_path) -> None:
     assert source_bases
 
 
-def test_keyed_grouping_does_not_admit_a_family() -> None:
+def test_keyed_grouping_does_not_admit_other_families() -> None:
     assert IMPLEMENTED_TRAINING_FAMILIES == (
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
+        "explicit-label-classification",
     )
     assert "preference-and-ranking" in PLANNED_TRAINING_FAMILIES
-    assert "explicit-label-classification" in PLANNED_TRAINING_FAMILIES
+    assert "explicit-label-classification" not in PLANNED_TRAINING_FAMILIES

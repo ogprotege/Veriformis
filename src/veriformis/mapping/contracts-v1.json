@@ -35,6 +35,11 @@
       "input",
       "output"
     ],
+    "label-classification": [
+      "context",
+      "label",
+      "annotator"
+    ],
     "messages": [
       "messages"
     ],
@@ -64,7 +69,8 @@
     "text",
     "prompt_completion",
     "instruction_output",
-    "messages"
+    "messages",
+    "label-classification"
   ],
   "schema_id": "veriformis.mapping-contract-discovery/v1",
   "schema_versions": [

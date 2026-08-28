@@ -30,6 +30,7 @@ class MappingDetector(_StrictModel):
         "prompt_completion",
         "instruction_output",
         "messages",
+        "label-classification",
     ]
     required_paths: tuple[str, ...]
     plain_language: str

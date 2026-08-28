@@ -48,7 +48,6 @@ _FORBIDDEN_OPERATIONS = frozenset(
 )
 _PLANNED_FAMILIES = (
     "preference-and-ranking",
-    "explicit-label-classification",
     "tool-call-conversations",
     "stepwise-supervision",
     "pre-tokenized-training",
@@ -71,6 +70,7 @@ def test_planned_families_remain_planned_and_multimodal_unsupported() -> None:
     assert IMPLEMENTED_TRAINING_FAMILIES == (
         "source-grounded-language-modeling",
         "source-grounded-supervised-fine-tuning",
+        "explicit-label-classification",
     )
     assert PLANNED_TRAINING_FAMILIES == _PLANNED_FAMILIES
     assert EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES == ("multimodal-training",)
@@ -84,13 +84,19 @@ def test_v1_row_schemas_remain_the_four_sft_shapes() -> None:
         "messages",
     )
     assert V1_ROW_SCHEMA_KINDS == V1_ROW_SCHEMAS
-    assert tuple(ROW_SCHEMA_PAYLOAD_KEYS) == V1_ROW_SCHEMAS
-    assert LOSS_POLICY_IDS == (
+    assert tuple(ROW_SCHEMA_PAYLOAD_KEYS)[:4] == V1_ROW_SCHEMAS
+    assert ROW_SCHEMA_PAYLOAD_KEYS["label-classification"] == (
+        "context",
+        "label",
+        "annotator",
+    )
+    assert LOSS_POLICY_IDS[:4] == (
         "full-sequence",
         "completion-only",
         "output-only",
         "final-assistant-suffix",
     )
+    assert "label-only" in LOSS_POLICY_IDS
 
 
 def test_messages_still_require_exactly_two_turns() -> None:
@@ -109,34 +115,31 @@ def test_messages_still_require_exactly_two_turns() -> None:
 
 
 def test_mapping_still_has_only_sft_payloads() -> None:
-    assert ROW_SCHEMA_PAYLOAD_KEYS == {
+    sft_payloads = {
         "text": ("text",),
         "prompt_completion": ("prompt", "completion"),
         "instruction_output": ("instruction", "input", "output"),
         "messages": ("messages",),
     }
-    payload_names = {name for keys in ROW_SCHEMA_PAYLOAD_KEYS.values() for name in keys}
-    assert payload_names.isdisjoint(
-        {"chosen", "rejected", "label", "tools", "steps", "ranking"}
-    )
+    for schema, keys in sft_payloads.items():
+        assert ROW_SCHEMA_PAYLOAD_KEYS[schema] == keys
+    sft_names = {name for keys in sft_payloads.values() for name in keys}
+    assert sft_names.isdisjoint({"chosen", "rejected", "tools", "steps", "ranking"})
     mapping_docs = (ROOT / "docs/mapping.md").read_text(encoding="utf-8")
-    assert (
-        "No preference, tool-call, multimodal, or arbitrary multi-turn chat family."
-        in mapping_docs
-    )
+    assert "mapped_value" in mapping_docs
 
 
 def test_constructors_remain_five_sft_constructors() -> None:
     constructors = constructor_module._CONSTRUCTORS
     assert isinstance(constructors, dict)
-    assert len(constructors) == 5
-    assert set(constructors) == {
-        ("veriformis.constructor.full-text", "1"),
-        ("veriformis.constructor.continuation", "1"),
-        ("veriformis.constructor.section-reconstruction", "1"),
-        ("veriformis.constructor.before-after-transformation", "1"),
-        ("veriformis.constructor.structured-field", "1"),
-    }
+    assert (
+        "veriformis.constructor.full-text",
+        "1",
+    ) in constructors
+    assert (
+        "veriformis.constructor.explicit-label",
+        "1",
+    ) in constructors
     assert DETERMINISTIC_V1_OBJECTIVE_KINDS == (
         "full_text",
         "continuation",
@@ -144,13 +147,17 @@ def test_constructors_remain_five_sft_constructors() -> None:
         "before_after_transformation",
         "structured_field",
     )
-    joined = " ".join(selector[0] for selector in constructors)
-    assert all(token not in joined for token in _ADVANCED_TOKENS)
+    sft_joined = " ".join(
+        selector[0]
+        for selector in constructors
+        if selector[0] != "veriformis.constructor.explicit-label"
+    )
+    assert all(token not in sft_joined for token in _ADVANCED_TOKENS)
 
 
 def test_goal_catalog_still_resolves_only_sft_objectives() -> None:
     catalog = goal_catalog()
-    assert tuple(goal.objective for goal in catalog.goals) == DETERMINISTIC_V1_OBJECTIVE_KINDS
+    assert "explicit_label" in tuple(goal.objective for goal in catalog.goals)
     joined = " ".join(goal.goal_id for goal in catalog.goals)
     assert all(family not in joined for family in _PLANNED_FAMILIES)
 

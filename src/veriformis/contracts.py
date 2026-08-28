@@ -134,6 +134,15 @@ V1_ROW_SCHEMA_KINDS: Final = (
     "messages",
 )
 
+ADMITTED_FAMILY_OBJECTIVE_KINDS: Final = ("explicit_label",)
+PRODUCT_OBJECTIVE_KINDS: Final = (
+    DETERMINISTIC_V1_OBJECTIVE_KINDS + ADMITTED_FAMILY_OBJECTIVE_KINDS
+)
+ADMITTED_FAMILY_ROW_SCHEMA_KINDS: Final = ("label-classification",)
+PRODUCT_ROW_SCHEMA_KINDS: Final = (
+    V1_ROW_SCHEMA_KINDS + ADMITTED_FAMILY_ROW_SCHEMA_KINDS
+)
+
 V1_CONSTRUCTION_DIAGNOSTIC_CODES: Final = (
     "continuation-boundary-unavailable",
     "section-structure-unavailable",
@@ -144,6 +153,7 @@ V1_CONSTRUCTION_DIAGNOSTIC_CODES: Final = (
     "structured-ir-artifact-unavailable",
     "transformation-pair-empty-or-unchanged",
     "transformation-pair-unavailable",
+    "mapped-label-unavailable",
 )
 
 V1_PROMOTION_REASON_CODES: Final = (
@@ -405,7 +415,11 @@ __all__ = [
     "DATASET_CONSTRUCTION_CONTRACT_ID",
     "DATASET_CONSTRUCTION_CONTRACT_VERSION",
     "DETERMINISM_PROFILE",
+    "ADMITTED_FAMILY_OBJECTIVE_KINDS",
+    "ADMITTED_FAMILY_ROW_SCHEMA_KINDS",
     "DETERMINISTIC_V1_OBJECTIVE_KINDS",
+    "PRODUCT_OBJECTIVE_KINDS",
+    "PRODUCT_ROW_SCHEMA_KINDS",
     "GOAL_CATALOG_CONTRACT_ID",
     "GOAL_CATALOG_CONTRACT_VERSION",
     "GOAL_CATALOG_SCHEMA_ID",

@@ -28,7 +28,7 @@ from veriformis.identity import sha256_digest
 from veriformis.recipes import RECIPE_LIBRARY_IDS
 
 DATA_PATH = Path(__file__).parents[2] / "src" / "veriformis" / "goals" / "presets-v1.json"
-DATA_SHA256 = "cf85c7207f0d1089aa3b64de59263ea9548bc1142042839375f0e278ebcae43c"
+DATA_SHA256 = "faba31aa8d349872e0b4a7da0b231525ba4592a235a45a958a2a7f781308ed27"
 FROZEN = Path(__file__).parents[1] / "regressions" / "fixtures" / "phase6" / "recipe-presets.json"
 
 
