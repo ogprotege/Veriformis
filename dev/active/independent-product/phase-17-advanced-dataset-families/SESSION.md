@@ -5,16 +5,15 @@ append-only history.
 
 **Updated:** 2026-08-28
 
-**Local branch:** `phase17/01-family-packet`
+**Local branch:** `phase17/02-family-admission-contract`
 
-**Completed:** Phase 16 closeout, PR #149 at
-`a1fbf04d58d73692cc4237b7d741c5da27022581`.
+**Completed:** Item 17.1, PR #150 at
+`712d28a1a5d3201007601b6daf9681c97221fcf4`.
 
-**Current item:** 17.1 open the advanced-dataset-families packet. Honesty
-only. No family execute.
+**Current item:** 17.2 define `veriformis.advanced-family-admission/v1`.
+Schema pin only. No execute.
 
-**Next gate:** Publish the 17.1 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 17.2.
+**Next gate:** Publish the 17.2 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 17.3.
 
-**Decision:** Packet opening is 17.1. Family admission is not an
-extension-protocol event.
+**Decision:** Family admission is not an extension-protocol event.

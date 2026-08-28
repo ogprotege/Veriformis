@@ -212,9 +212,16 @@ def test_extension_protocol_has_no_family_kind() -> None:
         "consumer-profile",
     )
     assert all("family" not in kind for kind in EXTENSION_KINDS)
-    assert not (ROOT / "docs/contracts/advanced-family-admission-v1.md").exists()
-    assert not (ROOT / "src/veriformis/families").exists()
+    assert (ROOT / "docs/contracts/advanced-family-admission-v1.md").is_file()
+    assert (ROOT / "src/veriformis/families/admission.py").is_file()
     assert not (ROOT / "src/veriformis/families.py").exists()
+    assert not (ROOT / "src/veriformis/families/execute.py").exists()
+    from veriformis.families import __all__ as exported
+
+    assert "load_family_admission" in exported
+    assert "create_family_admission" in exported
+    assert "admit" not in exported
+    assert "execute" not in exported
 
 
 def test_split_quality_and_review_hooks_are_still_sft_only() -> None:

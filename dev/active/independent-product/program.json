@@ -192,7 +192,7 @@
       "packet": "dev/active/independent-product/phase-17-advanced-dataset-families",
       "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Item 17.1 packet and isolation tests must merge green before the 17.2 admission contract. Admit each semantic family separately."
+      "next_gate": "Item 17.2 admission contract must merge green before leakage grouping. Admit each semantic family separately."
     },
     {
       "number": 18,

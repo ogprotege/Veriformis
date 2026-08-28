@@ -75,15 +75,14 @@ Phase 16 extension architecture is complete under its own packet.
 ADR-0017 Decision A: no untrusted loader. Public plugin loading is skipped
 with a record. There is no third-party plugin support claim.
 Phase 17 advanced dataset families is in progress under its own packet.
-Item 17.1 records the SFT-only baseline only. No family contract, row
-schema, objective, constructor, mapping template, generator, or profile
-mapping is implemented yet.
+Item 17.2 pins `veriformis.advanced-family-admission/v1`. Loading a pin
+is not an execute. Planned families stay planned. No constructor,
+mapping template, generator, or profile mapping is implemented yet.
 
-**Review date:** 2026-08-28 (independent-product Phase 17.1 packet open)
+**Review date:** 2026-08-28 (independent-product Phase 17.2 admission contract)
 
-**Next review:** Phase 17.1 merge, item 17.2 admission contract, or any
-capability claim change. Do not execute a family from this honesty-only
-item.
+**Next review:** Phase 17.2 merge, item 17.3 leakage grouping, or any
+capability claim change. Do not execute a family from this schema pin.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -782,7 +781,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
-| In-progress independent Phase 17.1 | [Advanced dataset families packet](../dev/active/independent-product/phase-17-advanced-dataset-families/README.md), tracking truth, and SFT-only isolation tests; no family contract, execute, or generator yet |
+| In-progress independent Phase 17.2 | [Advanced family admission v1](contracts/advanced-family-admission-v1.md) schema pin; load and refuse only; no execute or taxonomy promotion |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–16 complete and Phase 17 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
@@ -842,7 +841,8 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–16 are complete. The current critical-path work
 is Phase 17 under the
 [advanced-dataset-families packet](../dev/active/independent-product/phase-17-advanced-dataset-families/README.md).
-Item 17.1 changes tracking truth and adds isolation tests only. Implemented
+Item 17.2 adds `veriformis.advanced-family-admission/v1` as a schema pin.
+Loading a pin is not an execute and does not promote taxonomy. Implemented
 families remain language-modeling and SFT. Row schemas remain the four SFT
 shapes. `messages` remains exactly two turns. Mapping still refuses
 preference, tool-call, multimodal, and free multi-turn chat. There is no
@@ -852,9 +852,9 @@ The extension protocol still has no family kind. ADR-0017 Decision A: no
 untrusted loader. Unsloth stays candidate. `ocr-image` stays explicitly
 unsupported.
 
-The next behavior change is the item 17.2 admission contract. It cannot
-execute a family or promote taxonomy state. Mac family UI, Hub publication,
-and Phase 18 workbench rebuilds remain outside this packet.
+The next behavior change is item 17.3 leakage grouping keys. It cannot
+execute a family. Mac family UI, Hub publication, and Phase 18 workbench
+rebuilds remain outside this packet.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),
