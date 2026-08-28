@@ -210,3 +210,28 @@ durability warning. No loader was added.
 
 **Next action:** Publish the item 16.8 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.9.
+
+## 2026-08-27: Item 16.8 merged; item 16.9 in progress
+
+**Status:** Item 16.8 merged as PR #147 at
+`27ad5cd53f627a35ef6a2b35a5bb428fb992869d` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.9 began.
+
+Item 16.9 proves core CLI, MCP, and `PipelineService` start with empty
+optional extras, and a broken extra=ocr fixture cannot run through the
+migrated exemplars, advance `HEAD`, or write a bundle. Decision A: no
+untrusted loader.
+
+**Next action:** Run the complete item 16.9 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 16.10.
+
+## 2026-08-27: Item 16.9 local gates green
+
+**Status:** Missing extras do not block core startup. A broken extra=ocr
+fixture cannot advance `HEAD` or write a bundle. Focused tests passed. The
+core suite passed 2,355 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 16.9 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 16.10.
