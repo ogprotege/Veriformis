@@ -30,19 +30,19 @@ complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only,
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–15 complete; Phase 16 in progress with
-`veriformis.extension-protocol/v1` pinned, a built-in-only registry, and
-read-only capability discovery, still with no loader; quality report
-is preview-only; maturity alpha;
+Phases 0–16 complete; Phase 17 in progress with an honesty-only packet
+and SFT-only isolation tests, still with no family contract, execute, or
+generator; `veriformis.extension-protocol/v1` remains built-in-only with
+no loader; quality report is preview-only; maturity alpha;
 public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command. Mac
 Review belongs to Phase 18. There is no published corpus tier.
 
-**Last reviewed:** 2026-08-27 (independent-product Phase 16.10 closeout)
+**Last reviewed:** 2026-08-28 (independent-product Phase 17.1 packet open)
 
-**Next review:** Phase 16.10 merge, or any product-contract change. No
-modest fig-leaf tier. No public plugin API. Do not start Phase 17 from
-the Phase 16 packet.
+**Next review:** Phase 17.1 merge, or any product-contract change. No
+modest fig-leaf tier. No public plugin API. Do not execute a family from
+item 17.1. Do not start Phase 18 from the Phase 17 packet.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
