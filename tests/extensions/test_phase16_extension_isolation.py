@@ -1,4 +1,4 @@
-"""Phase 16.1 isolation: record the architecture before a protocol exists."""
+"""Phase 16 isolation: protocol declarations exist; no loader or dispatch change."""
 
 from __future__ import annotations
 
@@ -51,13 +51,20 @@ _OPTIONAL_IMPORT_ROOTS = (
 )
 
 
-def test_no_extension_package_exists_before_phase16_contract() -> None:
-    assert importlib.util.find_spec("veriformis.extensions") is None
+def test_extension_package_is_protocol_only() -> None:
+    assert importlib.util.find_spec("veriformis.extensions") is not None
     assert importlib.util.find_spec("veriformis._extensions") is None
     assert not (ROOT / "src/veriformis/extensions.py").exists()
-    assert not (ROOT / "src/veriformis/extensions").exists()
     assert not (ROOT / "src/veriformis/_extensions.py").exists()
     assert not (ROOT / "src/veriformis/_extensions").exists()
+    assert not (ROOT / "src/veriformis/extensions/registry.py").exists()
+    assert not (ROOT / "src/veriformis/extensions/loader.py").exists()
+    from veriformis.extensions import __all__ as exported
+
+    assert "load_capability_declaration" in exported
+    assert "install" not in exported
+    assert "registry" not in exported
+    assert "load_entry_points" not in exported
 
 
 def test_packaging_has_no_plugin_entry_points_and_empty_extras() -> None:

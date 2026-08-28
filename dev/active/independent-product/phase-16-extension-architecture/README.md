@@ -37,5 +37,6 @@ or Phase 17 semantic family.
 
 ## Current state
 
-Item 16.1 opens the packet and records the existing architecture. No extension
-protocol, executable registry, public plugin API, or loader exists yet.
+Item 16.1 merged as PR #140 at `76c0e2e90d95874b3e117f95554c428c70da1daf`.
+Item 16.2 pins `veriformis.extension-protocol/v1`. No executable registry,
+loader, extra, or public plugin API exists yet.

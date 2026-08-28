@@ -64,7 +64,7 @@ trust controls. Exporters and consumer profiles remain in one catalog.
 - [x] Create the standard packet and move Phase 16 to `in_progress`.
 - [x] Record L1 through L15 and reconcile active tracking documents.
 - [x] Add isolation tests for the pre-Phase-16 architecture.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 No protocol, executable registry, loader, extra, CLI operation, or MCP
 operation is permitted in this item.
@@ -73,12 +73,12 @@ operation is permitted in this item.
 
 **Branch:** `phase16/02-extension-protocol`
 
-- [ ] Add strict `veriformis.extension-protocol/v1` declarations for six
+- [x] Add strict `veriformis.extension-protocol/v1` declarations for six
       kinds: source parser, row mapper, deterministic constructor, quality
       check, container exporter, and consumer profile.
-- [ ] Version origins, lifecycle, extras, deterministic requirements,
+- [x] Version origins, lifecycle, extras, deterministic requirements,
       diagnostics, fixtures, and discovery metadata.
-- [ ] Refuse unknown fields, kinds, and contract versions. Add no loader or
+- [x] Refuse unknown fields, kinds, and contract versions. Add no loader or
       dispatch change.
 
 ### 16.3 Install internal typed registries

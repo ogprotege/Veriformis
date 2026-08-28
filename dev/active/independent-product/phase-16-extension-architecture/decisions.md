@@ -20,3 +20,4 @@
 | Keep Phase 4.7 hooks trusted conformance code | Accepted | Product contract |
 | Stop after 16.8 for operator review | Accepted | Operator gate in approved Phase 16 plan |
 | Do not start Phase 17 from this packet | Accepted | Roadmap ordering rule 10 |
+| Pin `veriformis.extension-protocol/v1` as a schema-only contract in 16.2 | Accepted | No loader; ADR-0017 remains the 16.8 trust-boundary decision |

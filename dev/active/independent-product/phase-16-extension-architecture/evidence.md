@@ -36,9 +36,9 @@ Phase 15 completed. Closeout merged as PR #139 at
 - [x] Active tracking documents reconciled to Phase 16 in progress without
       claiming an implemented extension protocol.
 - [x] Baseline isolation tests added.
-- [ ] Focused tests, tracking, Ruff, lock, core pytest, diff check, and every
+- [x] Focused tests, tracking, Ruff, lock, core pytest, diff check, and every
       GitHub check pass.
-- [ ] PR merges and clean local `main` equals `origin/main` before 16.2.
+- [x] PR merges and clean local `main` equals `origin/main` before 16.2.
 
 ## Item 16.1 local gate evidence
 
@@ -51,4 +51,29 @@ Phase 15 completed. Closeout merged as PR #139 at
 | Core pytest excluding optional integration and scale markers | 2,289 passed, 17 deselected, one expected durability warning |
 | `git diff --check` | PASS |
 
-GitHub checks and the merged clean-main proof remain pending.
+GitHub checks: all 18 passed on PR #140. Merge SHA
+`76c0e2e90d95874b3e117f95554c428c70da1daf`. Clean local `main` equaled
+`origin/main` there before 16.2.
+
+## Required item 16.2 evidence
+
+- [x] `docs/contracts/extension-protocol-v1.md` published.
+- [x] Strict models for six kinds, origins, lifecycle, extras, deterministic
+      requirements, diagnostics, fixtures, and discovery metadata.
+- [x] Load/refuse tests for unknown fields, kinds, and contract versions.
+- [x] No loader, executable registry, extra, CLI operation, MCP operation, or
+      dispatch change.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [ ] Every GitHub check passes.
+- [ ] PR merges and clean local `main` equals `origin/main` before 16.3.
+
+## Item 16.2 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/extensions/test_extension_protocol.py tests/extensions/test_phase16_extension_isolation.py` | 28 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS; 21 roadmap phases and governed packets agree |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,306 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |

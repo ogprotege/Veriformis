@@ -77,6 +77,14 @@ SCALE_SUPPORT_CONTRACT_ID: Final = "veriformis.scale-support"
 SCALE_SUPPORT_CONTRACT_VERSION: Final = 1
 SCALE_SUPPORT_DISCOVERY_SCHEMA_ID: Final = "veriformis.scale-support-discovery/v1"
 
+EXTENSION_PROTOCOL_CONTRACT_ID: Final = "veriformis.extension-protocol"
+EXTENSION_PROTOCOL_CONTRACT_VERSION: Final = 1
+EXTENSION_PROTOCOL_SCHEMA_ID: Final = "veriformis.extension-protocol/v1"
+
+EXTENSION_PROTOCOL_CONTRACT_ID: Final = "veriformis.extension-protocol"
+EXTENSION_PROTOCOL_CONTRACT_VERSION: Final = 1
+EXTENSION_PROTOCOL_SCHEMA_ID: Final = "veriformis.extension-protocol/v1"
+
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
 
