@@ -24,3 +24,4 @@
 | Wrap existing bindings in a built-in-only registry without changing dispatch | Accepted | One export catalog; third-party origin refused |
 | Surface built-in declarations as read-only discovery in 16.4 | Accepted | CLI `extension-capabilities`; no public plugin API |
 | Record ADR-0017 Decision A: no untrusted loader in Phase 16 | Accepted | 16.8 threat model; public plugins skipped in 16.10 |
+| Skip public plugin loading in 16.10 with a record | Accepted | Same honesty as Phase 15.5–15.8 |

@@ -177,12 +177,12 @@
     {
       "number": 16,
       "title": "Establish a safe extension architecture",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [3, 4, 11, 13, 15],
       "packet": "dev/active/independent-product/phase-16-extension-architecture",
       "started_on": "2026-08-27",
-      "completed_on": null,
-      "next_gate": "Item 16.9 isolates missing and broken optional extras. ADR-0017 Decision A remains: no untrusted loader."
+      "completed_on": "2026-08-27",
+      "next_gate": "Completed. Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader. Public plugins skipped with a record. Do not start Phase 17 from this packet."
     },
     {
       "number": 17,

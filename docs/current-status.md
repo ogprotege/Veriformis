@@ -71,15 +71,15 @@ Phase 15 scale work is complete. Named-hardware reports exist.
 `scale-support` discovery publishes an empty tier list. 15.5–15.8 were
 skipped with a record. Observed reports are not an SLA. A modest
 fig-leaf tier is forbidden. Do not start Phase 16 from that packet.
-Phase 16 extension architecture is in progress under its own packet. Item
-16.8 merged as PR #147 at `27ad5cd53f627a35ef6a2b35a5bb428fb992869d`.
-Item 16.9 isolates missing and broken optional extras. ADR-0017 Decision A:
-no untrusted loader. There is no third-party plugin support claim.
+Phase 16 extension architecture is complete under its own packet.
+ADR-0017 Decision A: no untrusted loader. Public plugin loading is skipped
+with a record. There is no third-party plugin support claim. Do not start
+Phase 17 from that packet.
 
-**Review date:** 2026-08-27 (independent-product Phase 16.9 extra isolation)
+**Review date:** 2026-08-27 (independent-product Phase 16.10 closeout)
 
-**Next review:** Phase 16.9 merge, item 16.10 closeout, or any capability
-claim change.
+**Next review:** Phase 16.10 merge, or any capability claim change. Do not
+start Phase 17 from the Phase 16 packet.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -777,8 +777,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 13 | Versioned quality report, preview-only gates, and labeled fixtures; no heuristic blocks seal |
 | Completed independent Phase 14 | Review queues, corrections as new identities, named-seed sampling, CLI/MCP/Python packet exchange, required-review seal blocking, and auditable supersession; default recipes stay `none`; Mac Review belongs to Phase 18 |
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
-| In-progress independent Phase 16.9 | Missing extras do not block core startup; a broken optional fixture cannot advance HEAD or write a bundle |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–15 complete and Phase 16 in progress under its own packet |
+| Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–16 complete; do not start Phase 17 from the Phase 16 packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -834,22 +834,17 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–15 are complete. The current critical-path work is
-Phase 16 under the
+Independent-product Phases 0–16 are complete. Phase 16 closed under the
 [extension-architecture packet](../dev/active/independent-product/phase-16-extension-architecture/README.md).
-Item 16.3 wrapped existing bindings in a built-in-only registry. Item 16.4
-declares those bindings as read-only capabilities. Parser dispatch remains the
-suffix chain, constructors retain their private exact lookup, row mapping
-remains a compiler path, quality gates remain preview-only, exporters and
-consumer profiles retain one private catalog, optional extras stay empty, and
-the seven-axis taxonomy gains no extension axis. Phase 4.7 render and replay
-hooks remain trusted conformance code rather than a public plugin boundary.
-Unsloth stays candidate. `ocr-image` stays explicitly unsupported.
+The text parser and generic `split-jsonl-directory` exporter are selected
+through `veriformis.extension-protocol/v1`. Other suffixes, containers, and
+consumer profiles keep their existing paths. Optional extras stay empty.
+ADR-0017 Decision A: no untrusted loader. Public plugin loading is skipped
+with a record. Unsloth stays candidate. `ocr-image` stays explicitly
+unsupported.
 
-The next behavior change is the item 16.6 split-JSONL exporter migration.
-Public executable plugins remain prohibited unless the Phase 16.8 threat model
-and a later operator decision approve a sandbox. Phase 17 semantics, Mac
-extension UI, YAML plugin config, and Hub publication remain outside Phase 16.
+Do not start Phase 17 from the Phase 16 packet. Mac plugin UI, YAML plugin
+config, and Hub publication remain later phases.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

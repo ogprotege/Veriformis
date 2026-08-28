@@ -235,3 +235,26 @@ durability warning.
 
 **Next action:** Publish the item 16.9 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 16.10.
+
+## 2026-08-27: Item 16.9 merged; item 16.10 in progress
+
+**Status:** Item 16.9 merged as PR #148 at
+`45949de8665a0345d9f4b17bb39957b9c54e8e4e` after all 18 GitHub checks passed.
+Clean local `main` equaled `origin/main` there before 16.10 began.
+
+Item 16.10 adds adversarial refusals, reproves goldens, skips public plugin
+loading under ADR-0017 Decision A, and closes Phase 16. Do not start
+Phase 17 from this packet.
+
+**Next action:** Run the complete item 16.10 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`.
+
+## 2026-08-27: Item 16.10 local gates green
+
+**Status:** Adversarial refusals pass. Goldens unchanged. Public plugin
+loading skipped under ADR-0017 Decision A. Phase 16 is marked completed.
+The core suite passed 2,360 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 16.10 pull request, require every GitHub
+check, merge, and synchronize clean `main`. Do not start Phase 17.

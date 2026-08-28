@@ -6,13 +6,13 @@
 
 **Schema:** `veriformis.extension-protocol/v1`
 
-**Status:** Schema pin through independent-product Phase 16.8. Built-in
-declarations are read-only discovery over the internal registry. `.txt`
-and generic `split-jsonl-directory` are selected through the protocol;
-other suffixes, containers, and consumer profiles keep their existing
-paths. Compatibility goldens live in a test-only kit. ADR-0017 Decision A
-forbids an untrusted loader. The contract does not load third-party code
-and is not a public plugin API.
+**Status:** Implemented through independent-product Phase 16 closeout.
+Built-in declarations are read-only discovery over the internal registry.
+`.txt` and generic `split-jsonl-directory` are selected through the
+protocol; other suffixes, containers, and consumer profiles keep their
+existing paths. Compatibility goldens live in a test-only kit. ADR-0017
+Decision A forbids an untrusted loader. The contract does not load
+third-party code and is not a public plugin API.
 
 **Last reviewed:** 2026-08-27
 

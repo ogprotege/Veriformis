@@ -49,9 +49,10 @@ under empty extra `ocr`. Default parse still refuses image-only PDF.
 `ocr-image` stays explicitly unsupported. Phase 13 quality intelligence
 is complete with previewable gates and labeled fixtures. No heuristic
 blocks seal. Phase 14 review workflows are complete. Phase 15 scale
-work is complete. Phase 16 extension architecture is in
-progress. Item 16.9 isolates missing and broken optional
-extras. ADR-0017 Decision A: no untrusted loader.
+work is complete. Phase 16 extension architecture is
+complete. ADR-0017 Decision A: no untrusted loader.
+Public plugins skipped with a record. Do not start Phase 17
+from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

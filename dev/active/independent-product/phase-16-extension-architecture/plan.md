@@ -1,6 +1,6 @@
 # Phase 16 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-27
 
@@ -151,12 +151,14 @@ operation is permitted in this item.
 
 **Branch:** `phase16/10-adversarial-closeout`
 
-- [ ] Refuse unknown versions, duplicate selectors, unapproved third-party
+- [x] Refuse unknown versions, duplicate selectors, unapproved third-party
       origins, project-local plugins, declaration tampering, and registry
       mutation.
-- [ ] Reprove text, split-JSONL, and sealed-bundle goldens.
-- [ ] Record any skipped public loader, reconcile all tracking and support
+- [x] Reprove text, split-JSONL, and sealed-bundle goldens.
+- [x] Record any skipped public loader, reconcile all tracking and support
       claims, close Phase 16, and do not start Phase 17.
+
+Public plugin loading is skipped with a record: ADR-0017 Decision A.
 
 ## Exit gate
 
