@@ -3201,6 +3201,15 @@ final class CLIBridgeTests: XCTestCase {
         )
     }
 
+    func testPrepublicationSampleCopyDoesNotRequireReviewOrExportExecute() {
+        // ResultView is compile-result samples only. Exports and Review stay
+        // out of the sidebar until later items wire those packets.
+        XCTAssertEqual(
+            SidebarDestination.allCases.map(\.rawValue),
+            ["home", "compile", "history", "settings"]
+        )
+    }
+
     func testSidebarDestinationsRemainHomeCompileHistorySettings() {
         XCTAssertEqual(
             SidebarDestination.allCases.map(\.rawValue),

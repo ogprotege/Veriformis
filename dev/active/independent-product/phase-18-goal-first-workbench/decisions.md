@@ -24,3 +24,4 @@
 | Goal-first Home/Compile copy; Aptus optional Integrations | Accepted | Item 18.3; no required trainer |
 | Mode picker uses ADR-0010 identifiers; confirm-then-map; family goals only after confirmed mapping | Accepted | Item 18.4; no auto-confirm; no family-to-trainer |
 | Inspectable settings bind the versioned preset and goal contract; no Swift recipe defaults | Accepted | Item 18.5; validation and profiles inspect-only until 18.7 |
+| Pre-publication samples omit oversized payloads whole; quality stays preview-only; no renderer | Accepted | Item 18.6; destination tree waits until a container is selected |

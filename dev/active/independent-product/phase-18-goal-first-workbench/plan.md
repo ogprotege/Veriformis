@@ -103,7 +103,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/06-prepublication-samples`
 
-- [ ] Show recovery, mapping, row, supervised region, preview-only quality,
+- [x] Show recovery, mapping, row, supervised region, preview-only quality,
       exclusions, split facts, and export destination tree. Omit oversized
       payloads whole.
 

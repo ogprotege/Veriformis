@@ -17,7 +17,7 @@ struct ResultView: View {
                 digestRow(label: "Manifest SHA-256", value: sha, copyLabel: "manifest SHA-256")
             }
             if let digest = result.assignmentDigest {
-                digestRow(label: "Assignment digest", value: digest, copyLabel: "assignment digest")
+                digestRow(label: "Split assignment digest", value: digest, copyLabel: "assignment digest")
             }
             if let digest = result.transportArchiveSHA256 {
                 digestRow(
@@ -46,6 +46,8 @@ struct ResultView: View {
                 }
             }
 
+            prepublicationSamples
+
             GoalPreviewView(state: workbench.goalPreviewState)
 
             HStack {
@@ -67,6 +69,47 @@ struct ResultView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
+    }
+
+    private var prepublicationSamples: some View {
+        GroupBox("Pre-publication samples") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Samples are runtime-only. Oversized payloads are omitted whole with an exact reason. Quality findings are preview-only and do not block seal or require review.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if workbench.mappingIsConfirmed, let plan = workbench.confirmedMappingPlan {
+                    Text("Mapping plan \(plan.mappingPlanID) · \(plan.rowSchema)")
+                        .font(.caption.monospaced())
+                        .textSelection(.enabled)
+                    switch workbench.mappingPreviewState {
+                    case .ready(let preview):
+                        Text(
+                            "Mapped rows: \(preview.acceptedCount) accepted · \(preview.rejectedCount) rejected · \(preview.recordCount) records"
+                        )
+                        .font(.caption.monospaced())
+                        .textSelection(.enabled)
+                        if let omission = preview.omission {
+                            Text("Mapping sample omitted: \(omission)")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
+                    case .unavailable(let message):
+                        Text(message)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    default:
+                        EmptyView()
+                    }
+                }
+                Text("Export destination tree is shown from dry-run when a container is selected on Exports. This panel does not call a renderer or write a destination.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 2)
+        }
     }
 
     private func gridRow(_ label: String, _ value: String) -> some View {
@@ -158,8 +201,11 @@ struct GoalPreviewView: View {
             }
         }
         if !preview.diagnostics.isEmpty {
-            Text("Why some sources produced nothing")
+            Text("Quality findings (preview only)")
                 .font(.subheadline.weight(.semibold))
+            Text("These facts do not block seal and are not required review.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             ForEach(Array(preview.diagnostics.enumerated()), id: \.offset) { _, diagnostic in
                 Text("\(diagnostic.code): \(diagnostic.message)")
                     .font(.caption)
@@ -178,6 +224,17 @@ struct GoalPreviewView: View {
                 Text("Row omitted: \(omission)")
                     .font(.caption)
                     .foregroundStyle(.orange)
+            }
+            if !record.recoveredSource.isEmpty {
+                Text("Source recovery")
+                    .font(.caption.weight(.semibold))
+                ForEach(Array(record.recoveredSource.enumerated()), id: \.offset) { _, evidence in
+                    Text(
+                        "\(evidence.field) · \(evidence.kind)\(evidence.excerpt.map { " · \($0)" } ?? "")"
+                    )
+                    .font(.caption.monospaced())
+                    .textSelection(.enabled)
+                }
             }
             if let context = record.context, !context.isEmpty {
                 ForEach(context.keys.sorted(), id: \.self) { key in

@@ -134,3 +134,28 @@ durability warning.
 
 **Next action:** Publish the item 18.5 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.6.
+
+## 2026-08-29: Item 18.5 merged; item 18.6 in progress
+
+**Status:** Item 18.5 merged as PR #164 at `2faad0d`. Clean local `main`
+equals `origin/main` there.
+
+Item 18.6 shows pre-publication samples on the compile result. Quality
+findings stay preview-only. Dry-run destination tree waits until a
+container is selected. No renderer. No destination write.
+
+**Next action:** Run the complete item 18.6 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 18.7.
+
+## 2026-08-29: Item 18.6 local gates green
+
+**Status:** Pre-publication samples are on the compile result. Quality
+findings stay preview-only. No renderer. No destination write. Focused
+workbench tests passed 82. xcodebuild tests passed 111. Parity passed.
+Tracking, Ruff, lock, and `git diff --check` passed. The core suite
+passed 2,545 tests with 17 deselected and the one expected durability
+warning.
+
+**Next action:** Publish the item 18.6 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.7.
