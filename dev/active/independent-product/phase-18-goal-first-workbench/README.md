@@ -36,6 +36,6 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.4 merged as PR #163. Item 18.5 exposes inspectable preset and
-goal contract fields. Overrides stay explicit. Validation and profiles
-are inspect-only. Sidebar remains Home / Compile / History / Settings.
+Item 18.5 merged as PR #164. Item 18.6 shows pre-publication samples.
+Quality findings stay preview-only. Sidebar remains Home / Compile /
+History / Settings.

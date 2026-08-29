@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `c0c10b9` on `main` after PR #163
+**Implementation baseline reviewed:** `2faad0d` on `main` after PR #164
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.4
-merged; item 18.5 inspectable settings)
+Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.5
+merged; item 18.6 pre-publication samples)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-29 (Phase 18.5 inspectable settings)
+**Last reviewed:** 2026-08-29 (Phase 18.6 pre-publication samples)
 
-**Next review:** Phase 18.5 merge, or item 18.6 pre-publication samples.
-Do not add Review or Exports execute in this item.
+**Next review:** Phase 18.6 merge, or item 18.7 export flows. Do not add
+Review submit in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -145,8 +145,8 @@ local, offline, and free of LLM generation.
       start Phase 18 from that packet.
 - [ ] Independent product Phase 18 is in progress under its
       [packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-      Item 18.4 merged as PR #163. Item 18.5 exposes inspectable preset
-      and goal contract fields. Do not start Phase 19 from this packet.
+      Item 18.5 merged as PR #164. Item 18.6 shows pre-publication
+      samples. Do not start Phase 19 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
