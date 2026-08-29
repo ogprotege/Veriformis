@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–17 complete; do not start Phase 18 from the Phase 17 packet
+**Status:** Active program — Phases 0–17 complete; Phase 18 in progress
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -33,6 +33,7 @@ with roadmap headings.
 - [Phase 15 — Measure and engineer scale, streaming, and sharding](phase-15-scale/README.md) — complete
 - [Phase 16 — Establish a safe extension architecture](phase-16-extension-architecture/README.md) — complete
 - [Phase 17 — Add governed advanced dataset families](phase-17-advanced-dataset-families/README.md) — complete
+- [Phase 18 — Complete the goal-first Mac workbench](phase-18-goal-first-workbench/README.md) — in progress
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active

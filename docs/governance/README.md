@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 17 closeout)
+**Last reviewed:** 2026-08-28 (independent-product Phase 18.1 packet)
 
-**Next review:** Phase 18 packet open, or governance-schema change.
+**Next review:** Phase 18.1 merge, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -34,6 +34,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 15 packet](../../dev/active/independent-product/phase-15-scale/README.md) | Scale, streaming, and sharding |
 | [Completed Phase 16 packet](../../dev/active/independent-product/phase-16-extension-architecture/README.md) | Safe extension architecture |
 | [Completed Phase 17 packet](../../dev/active/independent-product/phase-17-advanced-dataset-families/README.md) | Governed advanced dataset families |
+| [Active Phase 18 packet](../../dev/active/independent-product/phase-18-goal-first-workbench/README.md) | Goal-first Mac workbench |
 
 Run the governance drift check with:
 
@@ -53,15 +54,15 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–17 are complete on `main`.
-Phase 16 closeout merged as PR #149 at
-`a1fbf04d58d73692cc4237b7d741c5da27022581`. Phase 17 closeout records
-ADR-0018 Decision A: no compile-path generator. The quality report is
-preview-only. Construction `review_policy` defaults to `none`. Mac
-Review belongs to Phase 18. Optional Tesseract 5 recovery is isolated
-under empty extra `ocr`. Default parse still refuses image-only PDF.
-`ocr-image` stays explicitly unsupported. Axolotl, LLaMA-Factory, and
-Aptus are implemented optional adapters. Unsloth remains a
-non-executable candidate. Extra lists for those names stay empty.
-ADR-0017 Decision A stands. Do not start Phase 18 from the Phase 17
-packet.
+At this review, independent-product Phases 0–17 are complete on `main`
+and Phase 18 is in progress. Phase 17 closeout merged as PR #159 at
+`7d851c8a531eac7217051effe000048403a3b866`. Item 18.1 is honesty only:
+no Review screen, export execute, or dataset-row compile. The quality
+report is preview-only. Construction `review_policy` defaults to `none`.
+Mac Review belongs to later Phase 18 items. Optional Tesseract 5
+recovery is isolated under empty extra `ocr`. Default parse still
+refuses image-only PDF. `ocr-image` stays explicitly unsupported.
+Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters.
+Unsloth remains a non-executable candidate. Extra lists for those names
+stay empty. ADR-0017 Decision A stands. ADR-0018 Decision A stands. Do
+not start Phase 19 from this packet.

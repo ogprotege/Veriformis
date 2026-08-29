@@ -192,17 +192,17 @@
       "packet": "dev/active/independent-product/phase-17-advanced-dataset-families",
       "started_on": "2026-08-28",
       "completed_on": "2026-08-28",
-      "next_gate": "Completed. Admission contract; classification, preference, tool-call, and stepwise admitted from user-provided evidence; ADR-0018 Decision A: no generator. Generation, multimodal, pre-tokenized, and unmapped profiles skipped with records. Do not start Phase 18 from this packet."
+      "next_gate": "Completed. Admission contract; classification, preference, tool-call, and stepwise admitted from user-provided evidence; ADR-0018 Decision A: no generator. Generation, multimodal, pre-tokenized, and unmapped profiles skipped with records. Phase 18 opened under its own packet."
     },
     {
       "number": 18,
       "title": "Complete the goal-first Mac workbench",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [6, 7, 8, 9, 10, 13, 14, 15],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-18-goal-first-workbench",
+      "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Expose only capabilities already owned by shared services."
+      "next_gate": "Item 18.1 packet/honesty must merge green before the 18.2 thin-adapter contract. Swift owns no dataset policy."
     },
     {
       "number": 19,

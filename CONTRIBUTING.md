@@ -54,7 +54,9 @@ complete. ADR-0017 Decision A: no untrusted loader.
 Public plugins skipped with a record. Phase 17 advanced dataset
 families is complete. ADR-0018 Decision A: no compile-path generator.
 Generation, multimodal, pre-tokenized, and unmapped trainer profiles
-skipped with records. Do not start Phase 18 from that packet.
+skipped with records. Phase 18 goal-first Mac workbench is in progress
+under its own packet. Item 18.1 is honesty only. Do not start Phase 19
+from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.
