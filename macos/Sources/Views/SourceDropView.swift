@@ -33,6 +33,7 @@ struct SourceDropView: View {
                         .foregroundStyle(.secondary)
                     Button("Browse…") { openPanel() }
                         .buttonStyle(.bordered)
+                        .accessibilityLabel("Browse source files")
                 }
                 .padding()
             }
@@ -55,6 +56,7 @@ struct SourceDropView: View {
                                 Image(systemName: "xmark.circle.fill")
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Remove source \(url.lastPathComponent)")
                         }
                     }
                 }
@@ -65,6 +67,7 @@ struct SourceDropView: View {
                     workbench.clearSources()
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Clear sources")
             }
         }
     }

@@ -5,16 +5,15 @@ append-only history.
 
 **Updated:** 2026-08-29
 
-**Local branch:** `phase18/08-review-flows`
+**Local branch:** `phase18/09-accessibility-and-cli-equivalents`
 
-**Completed:** Item 18.7, PR #166 at `259412d`.
+**Completed:** Item 18.8, PR #167 at `b39ac1a`.
 
-**Current item:** 18.8 review flows. Sidebar adds Review. Wrap
-review-export, review-import, and operator-confirmed review-submit.
-Default `review_policy` stays `none`. Corrections are new identities.
-Required unresolved reviews still block seal.
+**Current item:** 18.9 accessibility, keyboard, CLI equivalents, and
+error recovery. Virtualization skipped (no measured list bottleneck).
+Full localization skipped (English v1). No GitHub xcodebuild job.
 
-**Next gate:** Publish the 18.8 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 18.9.
+**Next gate:** Publish the 18.9 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.10.
 
 **Decision:** ADR-0019 Decision A. Swift is a process adapter.

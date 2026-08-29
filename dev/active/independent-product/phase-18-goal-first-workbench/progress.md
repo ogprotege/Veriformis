@@ -209,3 +209,31 @@ with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 18.8 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.9.
+
+## 2026-08-29: Item 18.8 merged; item 18.9 in progress
+
+**Status:** Item 18.8 merged as PR #167 at `b39ac1a`. Clean local `main`
+equals `origin/main` there.
+
+Item 18.9 adds accessibility labels, keyboard shortcuts, copyable CLI
+equivalents for mapping/compile/export/review, and error-recovery labels.
+Virtualization is skipped: source lists have no measured bottleneck.
+Full localization is skipped: English v1. GitHub xcodebuild is not
+licensed.
+
+**Next action:** Run the complete item 18.9 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 18.10.
+
+## 2026-08-29: Item 18.9 local gates green
+
+**Status:** Accessibility labels and keyboard shortcuts are on the
+primary workbench actions. Mapping, compile, export, and review each
+have a copyable CLI equivalent. Virtualization and full localization
+are skipped with records. Focused workbench tests passed 97. xcodebuild
+tests passed 112. Parity passed. Tracking, Ruff, lock, and
+`git diff --check` passed. The core suite passed 2,560 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 18.9 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.10.

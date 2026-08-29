@@ -81,11 +81,13 @@ struct RunSheetView: View {
                         workbench.cancelCompile()
                     }
                     .keyboardShortcut(.cancelAction)
+                    .accessibilityLabel("Cancel compile")
                 } else {
                     Button("Re-run") {
                         workbench.reRunLastConfiguration()
                     }
                     .disabled(workbench.sourceURLs.isEmpty && workbench.runHistory.isEmpty)
+                    .accessibilityLabel("Re-run compile")
                 }
                 Spacer()
                 if !workbench.isRunning {
@@ -182,6 +184,7 @@ struct RunSheetView: View {
                         label: "error"
                     )
                 }
+                .accessibilityLabel("Copy compile error")
                 if let log = failure.logFileURL {
                     Button("Open log") {
                         workbench.openLogFile(log)

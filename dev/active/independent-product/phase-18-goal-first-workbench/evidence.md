@@ -89,6 +89,32 @@ were also complete.
 - [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
       and diff check pass.
 
+## Required item 18.9 evidence
+
+- [x] Accessibility labels on compile, sources, mapping, export, review,
+      and error recovery.
+- [x] Keyboard: ⌘1–⌘6 destinations, ⌘Return compile, ⌘. cancel, ⇧⌘C copy
+      compile CLI.
+- [x] Copyable CLI for mapping, compile, export, and review.
+- [x] Virtualization skipped: no measured source-list bottleneck.
+- [x] Full localization skipped: English v1 (`developmentRegion = en`).
+- [x] GitHub xcodebuild job not licensed.
+- [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
+      and diff check pass.
+
+## Item 18.9 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 97 passed |
+| `xcodebuild … test` (Veriformis scheme) | 112 passed |
+| `macos/scripts/parity_check.sh` | PASS; manifest `1e5a842a56c5acdbc04e931a5e7a88229535a301fd579863508bb439d8fdd2eb` |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,560 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
 ## Required item 18.8 evidence
 
 - [x] Review sidebar wraps review-export, review-import, and

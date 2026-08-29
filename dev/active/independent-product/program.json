@@ -202,7 +202,7 @@
       "packet": "dev/active/independent-product/phase-18-goal-first-workbench",
       "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Item 18.7 merged as PR #166 at 259412d. Item 18.8 wraps review-export, review-import, and review-submit. Default review_policy stays none. Swift owns no dataset policy."
+      "next_gate": "Item 18.8 merged as PR #167 at b39ac1a. Item 18.9 adds accessibility, keyboard, CLI equivalents, and error recovery. Virtualization and full localization skipped with records. Swift owns no dataset policy."
     },
     {
       "number": 19,

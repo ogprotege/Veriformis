@@ -125,7 +125,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/09-accessibility-and-cli-equivalents`
 
-- [ ] Labels, keyboard, copyable CLI, error recovery. Skip virtualization
+- [x] Labels, keyboard, copyable CLI, error recovery. Skip virtualization
       and full localization with records.
 
 ### 18.10 Add adversarial workbench tests and close Phase 18
