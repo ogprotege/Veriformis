@@ -34,7 +34,9 @@ Phases 0–17 complete and Phase 18 in progress with
 `explicit-label-classification`, `preference-and-ranking`,
 `tool-call-conversations`, and `stepwise-supervision` admitted on
 the dataset-row path and no
-generator under ADR-0018 Decision A; Mac workbench still document-source;
+generator under ADR-0018 Decision A; Mac workbench still document-source
+under ADR-0019 Decision A (`veriformis.workbench-adapter/v1` is a schema
+pin, not a screen);
 `veriformis.extension-protocol/v1`
 remains built-in-only with no loader; quality report is preview-only;
 maturity alpha;
@@ -42,9 +44,9 @@ public Mac claim still owner-gated. `ocr-image` remains explicitly
 unsupported for default parse. There is no quality-report command. Mac
 Review belongs to Phase 18. There is no published corpus tier.
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 18.1 packet)
+**Last reviewed:** 2026-08-28 (independent-product Phase 18.2 thin-adapter)
 
-**Next review:** Phase 18.1 merge, item 18.2 thin-adapter contract, or any
+**Next review:** Phase 18.2 merge, item 18.3 goal-first IA, or any
 product-contract change. No modest fig-leaf tier. No public plugin API.
 Do not start Phase 19 from the Phase 18 packet.
 

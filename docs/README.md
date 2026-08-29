@@ -75,6 +75,7 @@ still refuses image-only PDF.
 | [Scale Support v1](contracts/scale-support-v1.md) | Operator-reviewed scale support discovery | Empty `published_tiers`; observations are not an SLA |
 | [Extension Protocol v1](contracts/extension-protocol-v1.md) | Internal capability declarations for six kinds | Built-in-only registry and read-only discovery; no loader or public plugin API |
 | [Advanced Family Admission v1](contracts/advanced-family-admission-v1.md) | Closed pins for advanced semantic families | Schema pin only; no execute or taxonomy promotion |
+| [Workbench Adapter v1](contracts/workbench-adapter-v1.md) | Closed pins for CLI packets a Mac screen may wrap | Schema pin only; no screen execute; ADR-0019 |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
@@ -91,7 +92,7 @@ still refuses image-only PDF.
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
 | [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
 | [Generic export operator guide](generic-exports.md) | When to use split JSONL, canonical JSON, or constrained CSV without conflating container, objective, row schema, or consumer compatibility | Implemented Phase 5.7 operator guidance; merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
-| [ADR index](adr/README.md) | Accepted product-boundary, catalog, mapping, profile-adapter, and columnar-container decisions (0001–0008, 0010–0013) | Decision records |
+| [ADR index](adr/README.md) | Accepted product-boundary, catalog, mapping, profile-adapter, columnar-container, extension, generator, and workbench-adapter decisions (0001–0008, 0010–0019) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |

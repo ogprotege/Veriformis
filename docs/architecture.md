@@ -1,13 +1,13 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 18.1 packet)
+**Last reviewed:** 2026-08-28 (independent-product Phase 18.2 thin-adapter)
 
 **Next review:** Any service-boundary or architecture change
 
 Veriformis `0.1.0` is a Python 3.11+ modular monolith with a typed
 composition root, `veriformis.pipeline.PipelineService`, and multiple thin
 adapters: the `veriformis` CLI, constrained local MCP (`veriformis.mcp`), and
-the SwiftUI workbench under `macos/` (CLI shell). Domain modules own strict
+the SwiftUI workbench under `macos/` (CLI process adapter; ADR-0019). Domain modules own strict
 persisted contracts and pure transformations; adapters must not reimplement
 stage policy. Workspace state is content-addressed and replay-gated.
 
@@ -54,6 +54,7 @@ and recommendations; not enforcing);
 packet exchange, required-review seal blocking, auditable supersession);
 `extensions/` (internal protocol, built-in-only registry, read-only declarations; `.txt` and generic `split-jsonl-directory` selected through the protocol; no loader);
 `families/` (admission pins, leakage grouping, admitted classification execute);
+`workbench/` (Mac wrap pins; loading is not a screen);
 and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict
@@ -123,8 +124,9 @@ stays empty. Parquet, Arrow IPC, and local Hugging Face DatasetDict v1
 are implemented generic containers. Extra `columnar` stays empty. There
 is no Hub upload.
 The macOS workbench lives
-outside the Python package under `macos/`. Retained legacy packages
-(`serializers/`, `validate/`) have no production callers.
+outside the Python package under `macos/` as a process adapter (ADR-0019).
+`workbench/` holds wrap pins only; loading a pin is not a screen. Retained
+legacy packages (`serializers/`, `validate/`) have no production callers.
 
 Deep dives: [Layers](architecture/layers.md) — stack and isolation;
 [Dependencies](architecture/dependencies.md) — fan-in and containment;

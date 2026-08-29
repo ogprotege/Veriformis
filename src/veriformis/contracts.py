@@ -86,6 +86,10 @@ ADVANCED_FAMILY_ADMISSION_CONTRACT_ID: Final = "veriformis.advanced-family-admis
 ADVANCED_FAMILY_ADMISSION_CONTRACT_VERSION: Final = 1
 ADVANCED_FAMILY_ADMISSION_SCHEMA_ID: Final = "veriformis.advanced-family-admission/v1"
 
+WORKBENCH_ADAPTER_CONTRACT_ID: Final = "veriformis.workbench-adapter"
+WORKBENCH_ADAPTER_CONTRACT_VERSION: Final = 1
+WORKBENCH_ADAPTER_SCHEMA_ID: Final = "veriformis.workbench-adapter/v1"
+
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
 

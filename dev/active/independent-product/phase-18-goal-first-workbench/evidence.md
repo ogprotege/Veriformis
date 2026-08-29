@@ -35,8 +35,36 @@ were also complete.
       claiming Review, Exports, or dataset-row execute.
 - [x] Baseline isolation tests added.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
-- [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 18.2.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 18.2.
+
+## Item 18.2 source-verified facts
+
+| Fact | Grade | Source |
+| --- | --- | --- |
+| ADR-0019 Decision A: Swift is a process adapter | `source-verified` | `docs/adr/0019-thin-workbench-adapter.md` |
+| `veriformis.workbench-adapter/v1` is a schema pin | `source-verified` | `docs/contracts/workbench-adapter-v1.md`; `src/veriformis/workbench/adapter.py` |
+| Loading a pin is not a screen execute | `source-verified` | `tests/workbench/test_workbench_adapter.py` |
+| Review, Exports, and mapping screens still absent | `source-verified` | `macos/Sources/Views` |
+
+## Required item 18.2 evidence
+
+- [x] ADR-0019 accepted with Decision A and the required threat rows.
+- [x] Strict `veriformis.workbench-adapter/v1` pin models.
+- [x] Unknown commands, fields, and versions fail closed.
+- [x] No Review, Exports, or dataset-row UI.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+
+## Item 18.2 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/test_workbench_adapter.py tests/workbench/test_phase18_workbench_isolation.py` | 62 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,525 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 18.1 local gate evidence
 

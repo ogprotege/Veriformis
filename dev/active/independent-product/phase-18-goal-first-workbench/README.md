@@ -36,7 +36,7 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.1 records the current private-beta workbench. Sidebar remains Home /
-Compile / History / Settings. Compile remains document-source. Mapping and
-export CLI bridges exist in Swift and are unused by views. Default Aptus
-handoff stays off.
+Item 18.1 merged as PR #160. Item 18.2 pins ADR-0019 and
+`veriformis.workbench-adapter/v1`. Sidebar remains Home / Compile /
+History / Settings. Compile remains document-source. Loading a wrap pin
+is not a screen.

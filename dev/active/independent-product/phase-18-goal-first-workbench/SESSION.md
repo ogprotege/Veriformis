@@ -5,16 +5,17 @@ append-only history.
 
 **Updated:** 2026-08-28
 
-**Local branch:** `phase18/01-workbench-packet`
+**Local branch:** `phase18/02-thin-adapter-contract`
 
-**Completed:** Item 17.10, PR #159 at
-`7d851c8a531eac7217051effe000048403a3b866`.
+**Completed:** Item 18.1, PR #160 at
+`73bf306bf53a650452f5d5dba5082ef842ced732`.
 
-**Current item:** 18.1 open the goal-first-workbench packet. Honesty
-records and isolation tests only. No new screen, mode, or CLI wrap.
+**Current item:** 18.2 pin the thin-adapter workbench contract. ADR-0019
+and `veriformis.workbench-adapter/v1`. No Review, Exports, or dataset-row
+UI.
 
-**Next gate:** Publish the 18.1 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 18.2.
+**Next gate:** Publish the 18.2 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.3.
 
-**Decision:** Swift remains a thin CLI adapter. PipelineService owns
-policy.
+**Decision:** ADR-0019 Decision A. Swift is a process adapter.
+PipelineService owns policy.
