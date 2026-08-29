@@ -9,8 +9,7 @@ a run sheet with live log.
 - **Thin adapter only.** The app shells to the `veriformis` CLI (`PipelineService`).
 - **Same digests as CLI.** Stage order and flags match
   `VeriformisCLI.compilePlan`.
-- **Sidebar:** Home / Compile / History / Settings. Review and Exports are
-  not destinations yet.
+- **Sidebar:** Home / Compile / Review / Exports / History / Settings.
 - **Compile:** Compiler path (`document-source`, `dataset-row`, or `mixed`),
   Sources, Goal (catalog picker), mapping confirm-then-map on dataset-row,
   copyable CLI equivalent, and a sealed `.vfbundle`. Aptus is optional

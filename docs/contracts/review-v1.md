@@ -9,7 +9,7 @@
 **Status:** Implemented through independent-product Phase 14 closeout.
 Required unresolved reviews block seal. Corrections create new
 identities. Supersession keeps prior reviews auditable. Mac Review
-belongs to Phase 18.
+wraps existing CLI packets; default `review_policy` stays `none`.
 
 **Last reviewed:** 2026-08-26
 

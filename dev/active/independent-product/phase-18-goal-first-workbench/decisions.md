@@ -1,6 +1,6 @@
 # Phase 18 Decision Index
 
-**Status:** Active
+**Status:** Closed with Phase 18
 
 | Decision | State | Basis |
 | --- | --- | --- |
@@ -28,3 +28,5 @@
 | Export flows wrap discover, dry-run, inspect, operator-confirmed execute, and verify; generic containers first; named profiles only for admitted schemas | Accepted | Item 18.7; no membership mutation, no Hub, no train |
 | Review wraps review-export, review-import, and operator-confirmed review-submit; default review_policy stays none | Accepted | Item 18.8; corrections are new identities |
 | Accessibility labels, keyboard shortcuts, copyable CLI, and error recovery; skip virtualization and full localization | Accepted | Item 18.9; English v1; no GitHub xcodebuild job |
+| Skip family-to-trainer, generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full localization with records | Accepted | Item 18.10 closeout; ADR-0017; ADR-0018; Group 9 owner remainder |
+| Do not start Phase 19 from the Phase 18 packet | Accepted | Item 18.10; Phase 19 stays planned with no packet |

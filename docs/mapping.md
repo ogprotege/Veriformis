@@ -61,7 +61,8 @@ not a verified export. Accepted rows may still seal.
   `context` / `label` / `annotator` fields with `mapped_value` evidence.
 - No executable mapping functions and no LLM.
 - No construction chunks on imported fields. Provenance is `mapped_value`.
-- No full Mac mapping spreadsheet (Phase 18). The Mac workbench can show
-  CLI-backed detect output.
+- No full Mac mapping spreadsheet. Compile wraps mapping-detect, operator
+  confirm, and mapping-preview on one row-source file. Unconfirmed plans
+  cannot compile.
 
 See [Row Mapping Contract v1](contracts/row-mapping-v1.md).

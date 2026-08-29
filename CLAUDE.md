@@ -79,9 +79,11 @@ A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is complete. Sequential PRs
 17.1–17.10. ADR-0018 Decision A: no compile-path generator. Generation,
 multimodal, pre-tokenized, and unmapped trainer profiles skipped with
-records. Phase 18 goal-first Mac workbench is in progress under its own
-packet. Item 18.2 merged as PR #161. Item 18.3 replaces Aptus-centered
-copy with goal-first IA. Do not start Phase 19 from that packet.
+records. Phase 18 goal-first Mac workbench is complete. Sequential PRs
+18.1–18.10. ADR-0019 Decision A: Swift is a process adapter. Confirm-then-map,
+export, and review wrap existing CLI packets. Family-to-trainer, generator,
+plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
+localization skipped with records. Do not start Phase 19 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 18.2 thin-adapter)
+**Last reviewed:** 2026-08-29 (independent-product Phase 18 closeout)
 
 **Next review:** Any service-boundary or architecture change
 

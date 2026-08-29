@@ -237,3 +237,34 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 18.9 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.10.
+
+## 2026-08-29: Item 18.9 merged; item 18.10 in progress
+
+**Status:** Item 18.9 merged as PR #168 at
+`2f92ceb857b93e00bf2b744ccfe430db7de5c135`. Clean local `main` equals
+`origin/main` there.
+
+Item 18.10 adds adversarial workbench refusals, reproves SFT and Phase
+16 kit identities, skips unlicensed extras with records, and closes
+Phase 18. Do not start Phase 19 from this packet.
+
+**Next action:** Run the complete item 18.10 local gates, publish the
+pull request, require every GitHub check, merge, and synchronize clean
+`main`.
+
+## 2026-08-29: Item 18.10 local gates green
+
+**Status:** Adversarial workbench refusals pass. Unconfirmed mapping,
+truncated discovery, family-on-refusing profiles, nested CSV,
+required-review seal, generator/plugin UI, and Aptus-on-by-default fail
+closed. SFT and Phase 16 kit goldens hold. Family-to-trainer, generator,
+plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
+localization are skipped with records. Focused workbench tests passed
+107. xcodebuild tests passed 112. Parity passed.
+Tracking, Ruff, lock, and `git diff --check` passed. The core suite
+passed 2,570 tests with 17 deselected and the one expected
+durability warning. Phase 18 is marked completed.
+
+**Next action:** Publish the item 18.10 pull request, require every
+GitHub check, merge, and synchronize clean `main`. Do not start Phase
+19 from this packet.

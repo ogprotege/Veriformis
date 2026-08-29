@@ -5,15 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-29
 
-**Local branch:** `phase18/09-accessibility-and-cli-equivalents`
+**Local branch:** `phase18/10-adversarial-closeout`
 
-**Completed:** Item 18.8, PR #167 at `b39ac1a`.
+**Completed:** Item 18.9, PR #168 at `2f92ceb`.
 
-**Current item:** 18.9 accessibility, keyboard, CLI equivalents, and
-error recovery. Virtualization skipped (no measured list bottleneck).
-Full localization skipped (English v1). No GitHub xcodebuild job.
+**Current item:** 18.10 adversarial closeout. Family-to-trainer,
+generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
+and full localization skipped with records.
 
-**Next gate:** Publish the 18.9 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 18.10.
+**Next gate:** Publish the 18.10 pull request, require every GitHub
+check, merge, and synchronize clean `main`. Phase 18 complete. Do not
+start Phase 19 from this packet.
 
 **Decision:** ADR-0019 Decision A. Swift is a process adapter.
