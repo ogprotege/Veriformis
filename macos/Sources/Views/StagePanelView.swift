@@ -14,7 +14,7 @@ struct StagePanelView: View {
                 alignment: .leading,
                 spacing: 8
             ) {
-                ForEach(WorkbenchStage.pipelineStages) { stage in
+                ForEach(workbench.currentPipelineStages) { stage in
                     stageChip(stage)
                 }
             }

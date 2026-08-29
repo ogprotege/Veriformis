@@ -3430,6 +3430,218 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(root?.path, "/data/raw")
     }
 
+    func testCompilerInputModeIdentifiersMatchADR0010() {
+        XCTAssertEqual(
+            CompilerInputMode.allCases.map(\.rawValue),
+            ["document-source", "dataset-row", "mixed"]
+        )
+        XCTAssertEqual(CompilerInputMode.documentSource.rawValue, "document-source")
+        XCTAssertTrue(TrainingObjective.explicitLabel.requiresMappedValueEvidence)
+        XCTAssertTrue(TrainingObjective.preferencePair.requiresMappedValueEvidence)
+        XCTAssertTrue(TrainingObjective.toolCall.requiresMappedValueEvidence)
+        XCTAssertTrue(TrainingObjective.stepwise.requiresMappedValueEvidence)
+        XCTAssertFalse(TrainingObjective.fullText.requiresMappedValueEvidence)
+    }
+
+    func testDatasetRowCompilePlanParsesThenMapsWithoutCleanChunkConstruct() {
+        let sources = [URL(fileURLWithPath: "/data/rows.jsonl")]
+        let root = URL(fileURLWithPath: "/data")
+        let workspace = URL(fileURLWithPath: "/tmp/ws")
+        let bundle = URL(fileURLWithPath: "/tmp/out.vfbundle")
+        let planURL = URL(fileURLWithPath: "/tmp/ws/confirmed-mapping-plan.json")
+        let plan = VeriformisCLI.compilePlan(
+            sources: sources,
+            sourceRoot: root,
+            workspace: workspace,
+            bundle: bundle,
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil,
+            representation: "whole-text",
+            mode: .datasetRow,
+            mappingPlanURL: planURL
+        )
+        XCTAssertEqual(plan.map(\.stage), [
+            .parse, .map, .curate, .split, .format, .validate, .seal,
+        ])
+        XCTAssertEqual(
+            plan[0].arguments,
+            [
+                "parse", "/data/rows.jsonl", "-o", workspace.path,
+                "--source-root", root.path, "--mode", "dataset-row",
+            ]
+        )
+        XCTAssertEqual(
+            plan[1].arguments,
+            [
+                "map", workspace.path, "--goal", "learn-the-text",
+                "--representation", "whole-text", "--plan", planURL.path,
+            ]
+        )
+        XCTAssertFalse(plan.flatMap(\.arguments).contains("clean"))
+        XCTAssertFalse(plan.flatMap(\.arguments).contains("chunk"))
+        XCTAssertFalse(plan.flatMap(\.arguments).contains("construct"))
+        let equivalent = VeriformisCLI.cliEquivalent(for: plan)
+        XCTAssertTrue(equivalent.contains("veriformis parse "))
+        XCTAssertTrue(equivalent.contains("--mode dataset-row"))
+        XCTAssertTrue(equivalent.contains("veriformis map "))
+        XCTAssertFalse(equivalent.contains("veriformis clean "))
+    }
+
+    func testDocumentSourceCompilePlanStillOmitsModeFlag() {
+        let plan = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data"),
+            workspace: URL(fileURLWithPath: "/tmp/ws"),
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil
+        )
+        XCTAssertEqual(plan.map(\.stage), WorkbenchStage.pipelineStages)
+        XCTAssertEqual(plan[0].arguments.prefix(2), ["parse", "/data/a.txt"])
+        XCTAssertFalse(plan[0].arguments.contains("--mode"))
+        XCTAssertFalse(plan.flatMap(\.arguments).contains("dataset-row"))
+        XCTAssertFalse(plan.flatMap(\.arguments).contains("map"))
+    }
+
+    func testMixedDocumentCompilePlanPassesModeAndKeepsDocumentTail() {
+        let plan = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data"),
+            workspace: URL(fileURLWithPath: "/tmp/ws"),
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil,
+            mode: .mixed
+        )
+        XCTAssertEqual(plan.map(\.stage), WorkbenchStage.pipelineStages)
+        XCTAssertTrue(plan[0].arguments.contains("--mode"))
+        XCTAssertTrue(plan[0].arguments.contains("mixed"))
+        XCTAssertTrue(plan.map(\.stage).contains(.clean))
+        XCTAssertFalse(plan.map(\.stage).contains(.map))
+    }
+
+    func testMixedRowCompilePlanMapsAfterParse() {
+        let planURL = URL(fileURLWithPath: "/tmp/plan.json")
+        let plan = VeriformisCLI.compilePlan(
+            sources: [URL(fileURLWithPath: "/data/rows.jsonl")],
+            sourceRoot: URL(fileURLWithPath: "/data"),
+            workspace: URL(fileURLWithPath: "/tmp/ws"),
+            bundle: URL(fileURLWithPath: "/tmp/out.vfbundle"),
+            goal: "classify-with-provided-labels",
+            preset: "classify-with-provided-labels.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil,
+            representation: "context-and-label",
+            mode: .mixed,
+            mappingPlanURL: planURL
+        )
+        XCTAssertEqual(plan.map(\.stage), WorkbenchStage.datasetRowPipelineStages)
+        XCTAssertTrue(plan[0].arguments.contains("mixed"))
+        XCTAssertEqual(plan[1].stage, .map)
+    }
+
+    @MainActor
+    func testUnconfirmedMappingCannotCompile() {
+        let workbench = WorkbenchViewModel(
+            defaults: UserDefaults(suiteName: "veriformis-tests-\(UUID().uuidString)")!,
+            supportDirectory: FileManager.default.temporaryDirectory
+        )
+        workbench.inputMode = .datasetRow
+        XCTAssertTrue(workbench.currentCompileUsesMapping)
+        XCTAssertNil(workbench.confirmedMappingPlan)
+        XCTAssertFalse(workbench.canCompile)
+        XCTAssertEqual(
+            workbench.compileBlockedReason,
+            "Add at least one source file."
+        )
+        workbench.inputMode = .documentSource
+        XCTAssertFalse(workbench.currentCompileUsesMapping)
+    }
+
+    @MainActor
+    func testMixedFusedSourcesAreRefused() {
+        let workbench = WorkbenchViewModel(
+            defaults: UserDefaults(suiteName: "veriformis-tests-\(UUID().uuidString)")!,
+            supportDirectory: FileManager.default.temporaryDirectory
+        )
+        workbench.inputMode = .mixed
+        workbench.addSources([
+            URL(fileURLWithPath: "/data/a.txt"),
+            URL(fileURLWithPath: "/data/rows.jsonl"),
+        ])
+        XCTAssertTrue(workbench.mixedSourcesAreFused)
+        XCTAssertFalse(workbench.canCompile)
+        XCTAssertTrue(
+            workbench.compileBlockedReason?.contains(
+                "imported-row provenance distinct"
+            ) == true
+        )
+    }
+
+    func testPreflightArgumentsOmitModeForDocumentSourceAndPassMixed() {
+        let request = CompilePreflightRequest(
+            sources: [URL(fileURLWithPath: "/data/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data"),
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
+            representation: "whole-text"
+        )
+        let arguments = VeriformisCLI.preflightArguments(request)
+        XCTAssertFalse(arguments.contains("--mode"))
+        let mixed = CompilePreflightRequest(
+            sources: [URL(fileURLWithPath: "/data/a.txt")],
+            sourceRoot: URL(fileURLWithPath: "/data"),
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
+            representation: "whole-text",
+            mode: .mixed
+        )
+        let mixedArguments = VeriformisCLI.preflightArguments(mixed)
+        XCTAssertTrue(mixedArguments.contains("--mode"))
+        XCTAssertTrue(mixedArguments.contains("mixed"))
+    }
+
+    func testMappingPlanRoundTripJSONUsesContractKeys() throws {
+        let json = """
+        {
+          "schema_version": "veriformis.mapping-plan/v1",
+          "mapping_plan_id": "mpl_test",
+          "goal_id": "learn-the-text",
+          "representation_id": "whole-text",
+          "row_schema": "text",
+          "container_kind": "jsonl",
+          "membership_policy": "replaced",
+          "review_policy": "none",
+          "confirmation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "field_mappings": [
+            {
+              "schema_version": "veriformis.field-mapping/v1",
+              "mapping_rule_id": "mrl_test",
+              "source_path": "text",
+              "target_key": "text",
+              "coercion_rule": "refuse",
+              "missing_value_rule": "refuse",
+              "invalid_row_rule": "refuse"
+            }
+          ]
+        }
+        """.data(using: .utf8)!
+        let plan = try JSONDecoder().decode(MappingPlan.self, from: json)
+        XCTAssertEqual(plan.goalID, "learn-the-text")
+        XCTAssertEqual(plan.rowSchema, "text")
+        XCTAssertEqual(plan.fieldMappings.first?.targetKey, "text")
+        let encoded = try JSONSerialization.jsonObject(with: plan.jsonData()) as? [String: Any]
+        XCTAssertEqual(encoded?["schema_version"] as? String, "veriformis.mapping-plan/v1")
+        XCTAssertEqual(encoded?["goal_id"] as? String, "learn-the-text")
+        XCTAssertNil(encoded?["goalID"])
+    }
+
     func testResolveFindsRepoVenvOrUvWhenRootProvided() throws {
         // Walk from this source file up to the repository root (…/macos/Tests → repo).
         var dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()

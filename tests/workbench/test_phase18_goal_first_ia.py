@@ -50,13 +50,15 @@ def test_home_and_compile_copy_does_not_require_aptus() -> None:
     assert "requires Aptus" not in home
     assert "Aptus is optional Integrations. It is not required." in home
     assert "sealed, independently verified .vfbundle" in home
-    assert "Add sources, choose a goal, and compile a sealed .vfbundle." in compile_view
+    assert "compiler path (document-source, dataset-row, or mixed)" in compile_view
+    assert "Dataset-row requires a confirmed mapping plan." in compile_view
     assert "Aptus is optional Integrations, not required." in compile_view
     assert "The workbench does not require a trainer." in settings
     for haystack in (home, compile_view, settings):
-        assert "dataset-row" not in haystack
         assert "Review queue" not in haystack
         assert "export execute" not in haystack.lower()
+    assert "dataset-row" in compile_view
+    assert "Confirm mapping plan" in compile_view or "Confirm a mapping plan" in compile_view
 
 
 def test_compile_surfaces_copyable_cli_equivalent() -> None:
@@ -72,7 +74,7 @@ def test_compile_surfaces_copyable_cli_equivalent() -> None:
     assert "includeHandoff: writeAptusHandoff" in model
 
 
-def test_compile_plan_remains_document_source() -> None:
+def test_compile_plan_default_remains_document_source() -> None:
     source = _read("macos/Sources/Services/VeriformisCLI.swift")
     match = re.search(
         r"static func compilePlan\([\s\S]*?\n    static func ",
@@ -80,20 +82,11 @@ def test_compile_plan_remains_document_source() -> None:
     )
     assert match is not None
     plan = match.group(0)
-    stages = tuple(re.findall(r"StageCommand\(stage: \.(\w+)", plan))
-    assert stages == (
-        "parse",
-        "clean",
-        "chunk",
-        "construct",
-        "curate",
-        "split",
-        "format",
-        "validate",
-        "seal",
-    )
-    assert "--mode" not in plan
-    assert "dataset-row" not in plan
+    assert "mode: CompilerInputMode = .documentSource" in plan
+    assert 'if mode != .documentSource' in plan
+    assert "StageCommand(stage: .map," in plan
+    assert "StageCommand(stage: .clean," in plan
+    assert "StageCommand(stage: .construct," in plan
 
 
 def test_public_surfaces_still_have_no_new_execute() -> None:

@@ -22,3 +22,4 @@
 | Do not start Phase 19 from this packet | Accepted | Signed/notarized Mac remains Group 9 owner remainder |
 | Pin `veriformis.workbench-adapter/v1` as a schema-only contract in 18.2 | Accepted | Loading a pin is not a screen; ADR-0019 Decision A |
 | Goal-first Home/Compile copy; Aptus optional Integrations | Accepted | Item 18.3; no required trainer |
+| Mode picker uses ADR-0010 identifiers; confirm-then-map; family goals only after confirmed mapping | Accepted | Item 18.4; no auto-confirm; no family-to-trainer |

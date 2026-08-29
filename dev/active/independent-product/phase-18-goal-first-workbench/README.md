@@ -36,6 +36,7 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.2 merged as PR #161. Item 18.3 is goal-first IA: Sources, Goal,
-copyable CLI equivalent, optional Integrations. Sidebar remains Home /
-Compile / History / Settings. Compile remains document-source.
+Item 18.3 merged as PR #162. Item 18.4 adds ADR-0010 compiler paths and
+confirm-then-map. Sidebar remains Home / Compile / History / Settings.
+Review and Exports stay out. Family goals compile only on dataset-row
+after a confirmed mapping plan.

@@ -243,6 +243,10 @@ struct VeriformisCLI: Sendable {
     /// The goal-first compile sequence. Every recipe default comes from the
     /// CLI's versioned preset data: the workbench passes only the selection
     /// (goal and preset) and explicit operator overrides.
+    ///
+    /// `document-source` omits `--mode` (ADR-0010 default). `dataset-row` and
+    /// mixed-with-rows run parse, map, then the finished-dataset tail. Mixed
+    /// document-only keeps the document-source tail with `--mode mixed`.
     static func compilePlan(
         sources: [URL],
         sourceRoot: URL,
@@ -258,11 +262,50 @@ struct VeriformisCLI: Sendable {
         cleaningCustom: String = "",
         chunkSize: Int? = nil,
         chunkOverlap: Int? = nil,
-        includeHandoff: Bool = false
+        includeHandoff: Bool = false,
+        mode: CompilerInputMode = .documentSource,
+        mappingPlanURL: URL? = nil
     ) -> [StageCommand] {
         var parseArgs = ["parse"]
         parseArgs.append(contentsOf: sources.map(\.path))
         parseArgs.append(contentsOf: ["-o", workspace.path, "--source-root", sourceRoot.path])
+        if mode != .documentSource {
+            parseArgs.append(contentsOf: ["--mode", mode.rawValue])
+        }
+
+        var curateArgs = ["curate", workspace.path, "--preset", preset]
+        if let instruction {
+            curateArgs.append(contentsOf: ["--instruction", instruction])
+        }
+        if allowEmptyEvaluation {
+            curateArgs.append("--allow-empty-evaluation")
+        }
+
+        var sealArgs = ["seal", workspace.path, "-o", bundle.path]
+        if includeHandoff {
+            sealArgs.append("--aptus-handoff")
+        }
+
+        let finishedTail: [StageCommand] = [
+            StageCommand(stage: .curate, arguments: curateArgs),
+            StageCommand(stage: .split, arguments: ["split", workspace.path]),
+            StageCommand(stage: .format, arguments: ["format", workspace.path]),
+            StageCommand(stage: .validate, arguments: ["validate", workspace.path]),
+            StageCommand(stage: .seal, arguments: sealArgs),
+        ]
+
+        let includesMapping = mappingPlanURL != nil && (mode == .datasetRow || mode == .mixed)
+        if includesMapping, let mappingPlanURL {
+            var mapArgs = ["map", workspace.path, "--goal", goal]
+            if let representation {
+                mapArgs.append(contentsOf: ["--representation", representation])
+            }
+            mapArgs.append(contentsOf: ["--plan", mappingPlanURL.path])
+            return [
+                StageCommand(stage: .parse, arguments: parseArgs),
+                StageCommand(stage: .map, arguments: mapArgs),
+            ] + finishedTail
+        }
 
         var cleanArgs = ["clean", workspace.path]
         if !cleaningRules.isEmpty {
@@ -295,30 +338,12 @@ struct VeriformisCLI: Sendable {
             constructArgs.append(contentsOf: ["--split-ratio-ppm", String(splitRatioPPM)])
         }
 
-        var curateArgs = ["curate", workspace.path, "--preset", preset]
-        if let instruction {
-            curateArgs.append(contentsOf: ["--instruction", instruction])
-        }
-        if allowEmptyEvaluation {
-            curateArgs.append("--allow-empty-evaluation")
-        }
-
-        var sealArgs = ["seal", workspace.path, "-o", bundle.path]
-        if includeHandoff {
-            sealArgs.append("--aptus-handoff")
-        }
-
         return [
             StageCommand(stage: .parse, arguments: parseArgs),
             StageCommand(stage: .clean, arguments: cleanArgs),
             StageCommand(stage: .chunk, arguments: chunkArgs),
             StageCommand(stage: .construct, arguments: constructArgs),
-            StageCommand(stage: .curate, arguments: curateArgs),
-            StageCommand(stage: .split, arguments: ["split", workspace.path]),
-            StageCommand(stage: .format, arguments: ["format", workspace.path]),
-            StageCommand(stage: .validate, arguments: ["validate", workspace.path]),
-            StageCommand(stage: .seal, arguments: sealArgs),
-        ]
+        ] + finishedTail
     }
 
     /// Quote one argv token for a copyable shell equivalent.
@@ -399,6 +424,9 @@ struct VeriformisCLI: Sendable {
         }
         if let reviewPolicy = request.reviewPolicy {
             arguments += ["--review-policy", reviewPolicy]
+        }
+        if request.mode != .documentSource {
+            arguments += ["--mode", request.mode.rawValue]
         }
         return arguments
     }
@@ -509,14 +537,23 @@ struct VeriformisCLI: Sendable {
     }
 
     /// Propose mapping plans for one JSONL file without writing a workspace.
+    /// Passing a goal or representation only filters detectors; it is not confirm.
     func detectMapping(
         path: String,
         sourceRoot: String? = nil,
+        goal: String? = nil,
+        representation: String? = nil,
         controller: CLIProcessController = CLIProcessController()
     ) async throws -> MappingDetectResponse {
         var arguments = ["mapping-detect", path]
         if let sourceRoot {
             arguments += ["--source-root", sourceRoot]
+        }
+        if let goal {
+            arguments += ["--goal", goal]
+        }
+        if let representation {
+            arguments += ["--representation", representation]
         }
         let result = try await run(arguments: arguments, controller: controller)
         if result.cancellation != nil || Task.isCancelled {
@@ -526,9 +563,7 @@ struct VeriformisCLI: Sendable {
             throw MappingDetectError.outputTruncated
         }
         do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            return try decoder.decode(
+            return try JSONDecoder().decode(
                 MappingDetectResponse.self,
                 from: result.standardOutputData
             )
@@ -536,6 +571,42 @@ struct VeriformisCLI: Sendable {
             throw error
         } catch {
             throw MappingDetectError.invalidPayload(error.localizedDescription)
+        }
+    }
+
+    /// Preview a confirmed mapping plan across one file without writing a workspace.
+    func previewMapping(
+        path: String,
+        planURL: URL,
+        sourceRoot: String? = nil,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> MappingPreview {
+        var arguments = ["mapping-preview", path, "--plan", planURL.path]
+        if let sourceRoot {
+            arguments += ["--source-root", sourceRoot]
+        }
+        let result = try await run(arguments: arguments, controller: controller)
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard !result.standardOutputTruncated else {
+            throw MappingPreviewError.outputTruncated
+        }
+        guard result.exitCode == 0 else {
+            throw MappingPreviewError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        do {
+            return try JSONDecoder().decode(
+                MappingPreview.self,
+                from: result.standardOutputData
+            )
+        } catch let error as MappingPreviewError {
+            throw error
+        } catch {
+            throw MappingPreviewError.invalidPayload(error.localizedDescription)
         }
     }
 

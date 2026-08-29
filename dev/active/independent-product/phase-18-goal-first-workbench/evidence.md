@@ -64,6 +64,33 @@ were also complete.
 - [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
       and diff check pass.
 
+## Required item 18.4 evidence
+
+- [x] Mode picker uses ADR-0010 identifiers `document-source`,
+      `dataset-row`, and `mixed`.
+- [x] Dataset-row wraps mapping-detect, operator confirm, mapping-preview,
+      then parse and map. Unconfirmed plans cannot compile.
+- [x] Mixed refuses fused document and row members with the CLI reason.
+- [x] Family goals wait for a confirmed mapping plan that binds their
+      schema.
+- [x] Mapping lives on Compile. MappingView, Review, and Exports screens
+      remain absent.
+- [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
+      and diff check pass.
+
+## Item 18.4 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 75 passed |
+| `xcodebuild … test` (Veriformis scheme) | 109 passed |
+| `macos/scripts/parity_check.sh` | PASS; manifest `1e5a842a56c5acdbc04e931a5e7a88229535a301fd579863508bb439d8fdd2eb` |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,538 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
 ## Item 18.3 local gate evidence
 
 | Gate | Result |

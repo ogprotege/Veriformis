@@ -29,7 +29,7 @@ struct HomeView: View {
 
                 GroupBox("Tips") {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("• On Compile: add Sources, choose a Goal, then compile.")
+                        Text("• On Compile: choose document-source, dataset-row, or mixed, add Sources, choose a Goal, then compile.")
                         Text("• Success is a sealed, independently verified .vfbundle — not file conversion and not a trainer handoff.")
                         Text("• Aptus is optional Integrations. It is not required.")
                         Text("• Output defaults to Documents/Veriformis (change in Settings).")
