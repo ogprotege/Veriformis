@@ -185,3 +185,27 @@ tests with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 18.7 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.8.
+
+## 2026-08-29: Item 18.7 merged; item 18.8 in progress
+
+**Status:** Item 18.7 merged as PR #166 at `259412d`. Clean local `main`
+equals `origin/main` there.
+
+Item 18.8 adds the Review sidebar destination and wraps review-export,
+review-import, and operator-confirmed review-submit. Default
+`review_policy` stays `none`. Corrections remain new identities.
+
+**Next action:** Run the complete item 18.8 local gates, including
+xcodebuild tests and parity, publish the pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 18.9.
+
+## 2026-08-29: Item 18.8 local gates green
+
+**Status:** Review wraps the existing CLI packets. Submit waits for
+operator confirm. Default recipes stay none. Focused workbench tests
+passed 93. xcodebuild tests passed 112. Parity passed. Tracking, Ruff,
+lock, and `git diff --check` passed. The core suite passed 2,556 tests
+with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 18.8 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.9.

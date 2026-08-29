@@ -127,7 +127,6 @@ def test_mapping_preview_is_wired_and_not_an_execute() -> None:
     assert "case .ready = mappingPreviewState" in model
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
     assert "MappingView.swift" not in views
-    assert "ReviewView.swift" not in views
 
 
 def test_no_family_to_trainer_chrome() -> None:

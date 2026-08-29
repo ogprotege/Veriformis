@@ -36,6 +36,6 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.6 merged as PR #165. Item 18.7 wires Exports over the existing
-CLI export bridge. Generic containers come first. Named profiles appear
-only for schemas they admit. Review stays out of the sidebar.
+Item 18.7 merged as PR #166. Item 18.8 wraps review-export, review-import,
+and review-submit. Default `review_policy` stays `none`. Corrections are
+new identities. Required unresolved reviews still block seal.

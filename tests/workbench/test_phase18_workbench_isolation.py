@@ -62,9 +62,9 @@ def test_sidebar_remains_home_compile_history_settings() -> None:
     )
     assert block is not None
     cases = re.findall(r"^\s*case (\w+)$", block.group("body"), re.M)
-    assert cases == ["home", "compile", "exports", "history", "settings"]
+    assert cases == ["home", "compile", "review", "exports", "history", "settings"]
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
-    assert "ReviewView.swift" not in views
+    assert "ReviewView.swift" in views
     assert "ExportsView.swift" in views
     assert "MappingView.swift" not in views
 
@@ -105,10 +105,12 @@ def test_mapping_is_wired_and_export_review_remain_unused_by_views() -> None:
     assert "mapping-detect" in views or "Detect mapping" in views
     assert "discoverExports" in model
     assert "executeConfirmedExport" in model
+    assert "exportReviewPacket" in model
+    assert "submitConfirmedReview" in model
     assert "ExportsView.swift" in {path.name for path in (MACOS / "Views").glob("*.swift")}
-    for haystack in (views, model):
-        assert "review-export" not in haystack
-        assert "review-submit" not in haystack
+    assert "ReviewView.swift" in {path.name for path in (MACOS / "Views").glob("*.swift")}
+    assert "review-export" in views
+    assert "review-submit" in views
 
 
 def test_workbench_aptus_handoff_defaults_off() -> None:

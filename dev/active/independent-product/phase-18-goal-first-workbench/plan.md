@@ -118,7 +118,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/08-review-flows`
 
-- [ ] Wrap review-export, review-import, and review-submit. Default
+- [x] Wrap review-export, review-import, and review-submit. Default
       `review_policy` stays `none`.
 
 ### 18.9 Add accessibility, keyboard, CLI equivalents, and error recovery

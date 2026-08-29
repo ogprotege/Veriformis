@@ -4,6 +4,7 @@ import Foundation
 enum SidebarDestination: String, CaseIterable, Identifiable {
     case home
     case compile
+    case review
     case exports
     case history
     case settings
@@ -14,6 +15,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .home: return "Home"
         case .compile: return "Compile"
+        case .review: return "Review"
         case .exports: return "Exports"
         case .history: return "History"
         case .settings: return "Settings"
@@ -24,6 +26,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .home: return "house"
         case .compile: return "shippingbox"
+        case .review: return "checklist"
         case .exports: return "square.and.arrow.up"
         case .history: return "clock"
         case .settings: return "gearshape"
@@ -2701,6 +2704,180 @@ enum ExportVerifyState: Equatable, Sendable {
     case idle
     case loading
     case ready(ExportVerifyResult)
+    case unavailable(String)
+}
+
+enum ReviewCLIError: LocalizedError, Equatable, Sendable {
+    case outputTruncated
+    case commandFailed(exitCode: Int32, message: String)
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .outputTruncated:
+            return "Review command output was truncated."
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "No diagnostic was returned." : message
+            return "Review command failed (exit \(exitCode)): \(detail)"
+        case .invalidPayload(let message):
+            return "Review command returned invalid JSON: \(message)"
+        }
+    }
+}
+
+struct ReviewItemRecord: Decodable, Equatable, Sendable {
+    let itemID: String
+    let queueKind: String
+    let required: Bool
+    let schemaVersion: String
+    let subjectID: String
+
+    enum CodingKeys: String, CodingKey {
+        case itemID = "item_id"
+        case queueKind = "queue_kind"
+        case required
+        case schemaVersion = "schema_version"
+        case subjectID = "subject_id"
+    }
+}
+
+struct ReviewCorrectionRecord: Decodable, Equatable, Sendable {
+    let correctionID: String
+    let itemID: String
+    let kind: String
+    let resultID: String
+    let schemaVersion: String
+
+    enum CodingKeys: String, CodingKey {
+        case correctionID = "correction_id"
+        case itemID = "item_id"
+        case kind
+        case resultID = "result_id"
+        case schemaVersion = "schema_version"
+    }
+}
+
+struct ReviewDecisionRecord: Decodable, Equatable, Sendable {
+    let decisionID: String
+    let itemID: String
+    let verdict: String
+
+    enum CodingKeys: String, CodingKey {
+        case decisionID = "decision_id"
+        case itemID = "item_id"
+        case verdict
+    }
+}
+
+struct ReviewWaiverRecord: Decodable, Equatable, Sendable {
+    let waiverID: String
+    let itemID: String
+    let changesBytes: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case waiverID = "waiver_id"
+        case itemID = "item_id"
+        case changesBytes = "changes_bytes"
+    }
+}
+
+/// Display-only packet decoded from CLI JSON. Identities stay CLI-authored.
+struct ReviewPacketSummary: Decodable, Equatable, Sendable {
+    let packetID: String
+    let planID: String
+    let schemaID: String
+    let items: [ReviewItemRecord]
+    let corrections: [ReviewCorrectionRecord]
+    let decisions: [ReviewDecisionRecord]
+    let waivers: [ReviewWaiverRecord]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        packetID = try container.decode(String.self, forKey: .packetID)
+        planID = try container.decode(String.self, forKey: .planID)
+        schemaID = try container.decode(String.self, forKey: .schemaID)
+        items = try container.decode([ReviewItemRecord].self, forKey: .items)
+        corrections = try container.decode([ReviewCorrectionRecord].self, forKey: .corrections)
+        decisions = try container.decode([ReviewDecisionRecord].self, forKey: .decisions)
+        waivers = try container.decode([ReviewWaiverRecord].self, forKey: .waivers)
+        guard schemaID == "veriformis.review-packet/v1" else {
+            throw ReviewCLIError.invalidPayload(
+                "Review packet schema_id is unsupported: \(schemaID)."
+            )
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case packetID = "packet_id"
+        case planID = "plan_id"
+        case schemaID = "schema_id"
+        case items
+        case corrections
+        case decisions
+        case waivers
+    }
+}
+
+struct ReviewBundleSummary: Decodable, Equatable, Sendable {
+    let bundleID: String
+    let planID: String
+    let schemaID: String
+    let blocksSeal: Bool
+    let items: [String]
+    let queues: [String]
+    let verdicts: [String]
+    let limitations: [String]
+    let corrections: [ReviewCorrectionRecord]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        bundleID = try container.decode(String.self, forKey: .bundleID)
+        planID = try container.decode(String.self, forKey: .planID)
+        schemaID = try container.decode(String.self, forKey: .schemaID)
+        blocksSeal = try container.decode(Bool.self, forKey: .blocksSeal)
+        items = try container.decode([String].self, forKey: .items)
+        queues = try container.decode([String].self, forKey: .queues)
+        verdicts = try container.decode([String].self, forKey: .verdicts)
+        limitations = try container.decode([String].self, forKey: .limitations)
+        corrections = try container.decode([ReviewCorrectionRecord].self, forKey: .corrections)
+        guard schemaID == "veriformis.review-bundle/v1" else {
+            throw ReviewCLIError.invalidPayload(
+                "Review bundle schema_id is unsupported: \(schemaID)."
+            )
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case bundleID = "bundle_id"
+        case planID = "plan_id"
+        case schemaID = "schema_id"
+        case blocksSeal = "blocks_seal"
+        case items
+        case queues
+        case verdicts
+        case limitations
+        case corrections
+    }
+}
+
+enum ReviewExportState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ReviewPacketSummary)
+    case unavailable(String)
+}
+
+enum ReviewImportState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ReviewPacketSummary)
+    case unavailable(String)
+}
+
+enum ReviewSubmitState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ReviewBundleSummary)
     case unavailable(String)
 }
 

@@ -89,6 +89,29 @@ were also complete.
 - [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
       and diff check pass.
 
+## Required item 18.8 evidence
+
+- [x] Review sidebar wraps review-export, review-import, and
+      operator-confirmed review-submit.
+- [x] Default `review_policy` stays `none`.
+- [x] Corrections display as new identities.
+- [x] Required unresolved reviews still block seal (CLI).
+- [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
+      and diff check pass.
+
+## Item 18.8 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 93 passed |
+| `xcodebuild … test` (Veriformis scheme) | 112 passed |
+| `macos/scripts/parity_check.sh` | PASS; manifest `1e5a842a56c5acdbc04e931a5e7a88229535a301fd579863508bb439d8fdd2eb` |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,556 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
 ## Required item 18.7 evidence
 
 - [x] Exports sidebar destination wraps discover, dry-run, inspect,
