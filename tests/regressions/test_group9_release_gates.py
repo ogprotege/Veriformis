@@ -103,6 +103,14 @@ def test_release_scripts_are_executable_entry_points():
         assert text.startswith("#!/"), name
 
 
+def test_install_smoke_does_not_pipe_cli_to_head():
+    """`set -o pipefail` plus `veriformis … | head` fails closed on SIGPIPE."""
+    text = (RELEASE_SCRIPTS / "smoke_install.sh").read_text(encoding="utf-8")
+    assert "list-recipes | head" not in text
+    assert 'veriformis list-recipes > "$TMP/list-recipes.txt"' in text
+    assert 'find "$TMP/dist"' not in text
+
+
 def test_core_golden_does_not_invoke_optional_handoff_commands():
     """The core product proof may assert absence, but never create/consume a handoff."""
     text = (RELEASE_SCRIPTS / "golden_compile.sh").read_text(encoding="utf-8")
