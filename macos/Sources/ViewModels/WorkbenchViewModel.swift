@@ -13,7 +13,10 @@ final class WorkbenchViewModel: ObservableObject {
     // Compile form
     @Published var sourceURLs: [URL] = [] {
         didSet {
-            if oldValue != sourceURLs { invalidateCompilePreflight() }
+            if oldValue != sourceURLs {
+                invalidateCompilePreflight()
+                invalidateMapping()
+            }
         }
     }
     @Published var sourceRootURL: URL? {
@@ -53,6 +56,20 @@ final class WorkbenchViewModel: ObservableObject {
             if oldValue != writeAptusHandoff { invalidateCompilePreflight() }
         }
     }
+    /// ADR-0010 compiler path. Default remains document-source.
+    @Published var inputMode: CompilerInputMode = .documentSource {
+        didSet {
+            if oldValue != inputMode {
+                invalidateCompilePreflight()
+                invalidateMapping()
+                adoptLoadedSelection()
+            }
+        }
+    }
+    @Published private(set) var mappingDetectState: MappingDetectState = .idle
+    @Published private(set) var mappingPreviewState: MappingPreviewState = .idle
+    @Published var selectedMappingProposalID: String?
+    @Published private(set) var confirmedMappingPlan: MappingPlan?
     @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
     @Published private(set) var goalCatalogState: GoalCatalogState = .idle
     @Published private(set) var recipePresetState: RecipePresetState = .idle
@@ -74,12 +91,43 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var lastCopiedNotice: String?
     @Published var runStatusMessage = "Ready"
 
-    /// Copyable CLI equivalent of the current document-source compile plan.
+    /// Copyable CLI equivalent of the current compile plan.
     /// Nil until sources, goal, preset, and output folder are chosen.
+    /// Dataset-row and mixed-with-rows wait for a confirmed mapping plan.
     var currentCompileCLIEquivalent: String? {
-        guard let request = currentCompilePreflightRequest(),
-              let output = outputDirectoryURL
+        guard let output = outputDirectoryURL,
+              let sourceRoot = resolvedSourceRoot,
+              !sourceURLs.isEmpty,
+              selectedGoalID != nil,
+              let presetID = selectedPresetID,
+              let preset = selectedPreset,
+              preset.presetID == presetID
         else { return nil }
+        if mixedSourcesAreFused {
+            return nil
+        }
+        if currentCompileUsesMapping {
+            guard let confirmedMappingPlan else { return nil }
+            let workspace = output.appendingPathComponent("workspace", isDirectory: true)
+            let bundle = output.appendingPathComponent("dataset.vfbundle")
+            let planURL = workspace.appendingPathComponent("confirmed-mapping-plan.json")
+            let plan = VeriformisCLI.compilePlan(
+                sources: sourceURLs,
+                sourceRoot: sourceRoot,
+                workspace: workspace,
+                bundle: bundle,
+                goal: confirmedMappingPlan.goalID,
+                preset: presetID,
+                allowEmptyEvaluation: allowEmptyEvaluation,
+                splitRatioPPM: splitRatioPPM,
+                representation: confirmedMappingPlan.representationID,
+                includeHandoff: writeAptusHandoff,
+                mode: inputMode,
+                mappingPlanURL: planURL
+            )
+            return VeriformisCLI.cliEquivalent(for: plan)
+        }
+        guard let request = currentCompilePreflightRequest() else { return nil }
         let workspace = output.appendingPathComponent("workspace", isDirectory: true)
         let bundle = output.appendingPathComponent("dataset.vfbundle")
         let plan = VeriformisCLI.compilePlan(
@@ -97,7 +145,8 @@ final class WorkbenchViewModel: ObservableObject {
             cleaningCustom: request.custom,
             chunkSize: request.size,
             chunkOverlap: request.overlap,
-            includeHandoff: writeAptusHandoff
+            includeHandoff: writeAptusHandoff,
+            mode: request.mode
         )
         return VeriformisCLI.cliEquivalent(for: plan)
     }
@@ -135,6 +184,52 @@ final class WorkbenchViewModel: ObservableObject {
     private var compilePreflightTask: Task<Void, Never>?
     private var compilePreflightController: CLIProcessController?
     private var compilePreflightRequestSnapshot: CompilePreflightRequest?
+    private var mappingDetectTask: Task<Void, Never>?
+    private var mappingDetectController: CLIProcessController?
+    private var mappingPreviewTask: Task<Void, Never>?
+    private var mappingPreviewController: CLIProcessController?
+
+    var rowSourceURLs: [URL] {
+        sourceURLs.filter { url in
+            CompilerInputMode.rowSourceSuffixes.contains(
+                "." + url.pathExtension.lowercased()
+            )
+        }
+    }
+
+    var documentSourceURLs: [URL] {
+        sourceURLs.filter { url in
+            !CompilerInputMode.rowSourceSuffixes.contains(
+                "." + url.pathExtension.lowercased()
+            )
+        }
+    }
+
+    var mixedSourcesAreFused: Bool {
+        inputMode == .mixed && !rowSourceURLs.isEmpty && !documentSourceURLs.isEmpty
+    }
+
+    var currentCompileUsesMapping: Bool {
+        inputMode == .datasetRow || (inputMode == .mixed && !rowSourceURLs.isEmpty)
+    }
+
+    var currentPipelineStages: [WorkbenchStage] {
+        WorkbenchStage.pipelineStages(
+            mode: inputMode,
+            includesMapping: currentCompileUsesMapping
+        )
+    }
+
+    var selectedMappingProposal: MappingPlan? {
+        guard case .ready(let detected) = mappingDetectState,
+              let selectedMappingProposalID
+        else { return nil }
+        return detected.proposals.first { $0.mappingPlanID == selectedMappingProposalID }
+    }
+
+    var mappingIsConfirmed: Bool {
+        confirmedMappingPlan != nil
+    }
 
     var canCompile: Bool {
         guard !isRunning,
@@ -142,7 +237,18 @@ final class WorkbenchViewModel: ObservableObject {
               !sourceURLs.isEmpty,
               resolvedSourceRoot != nil,
               outputDirectoryURL != nil,
-              let request = currentCompilePreflightRequest(),
+              selectedGoalID != nil,
+              selectedPresetID != nil
+        else { return false }
+        if mixedSourcesAreFused { return false }
+        if currentCompileUsesMapping {
+            guard let plan = confirmedMappingPlan,
+                  plan.goalID == selectedGoalID,
+                  case .ready = mappingPreviewState
+            else { return false }
+            return true
+        }
+        guard let request = currentCompilePreflightRequest(),
               compilePreflightRequestSnapshot == request,
               case .ready(let report) = compilePreflightState
         else { return false }
@@ -150,17 +256,45 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     var canPreflight: Bool {
-        !isRunning && currentCompilePreflightRequest() != nil
+        !isRunning && !currentCompileUsesMapping && currentCompilePreflightRequest() != nil
+    }
+
+    var canDetectMapping: Bool {
+        !isRunning && currentCompileUsesMapping && mappingRowSourceURL != nil
     }
 
     var compileBlockedReason: String? {
         if isRunning { return "A compile is already running." }
-        if cli == nil { return "CLI is not ready. Open Settings or relaunch via ./script/build_and_run.sh." }
         if sourceURLs.isEmpty { return "Add at least one source file." }
         if resolvedSourceRoot == nil { return "Source root directory is missing." }
+        if mixedSourcesAreFused {
+            return "mixed mode keeps construction and imported-row provenance distinct; compile document-source and dataset-row workspaces separately rather than fusing them in one stage graph"
+        }
+        if cli == nil { return "CLI is not ready. Open Settings or relaunch via ./script/build_and_run.sh." }
         if outputDirectoryURL == nil { return "Choose an output folder (or set a default in Settings)." }
         if selectedGoalID == nil || selectedPresetID == nil {
             return "Goal catalog and recipe presets are not loaded yet."
+        }
+        if currentCompileUsesMapping {
+            if mappingRowSourceURL == nil {
+                return "Dataset-row mapping-detect wraps one row-source file."
+            }
+            if confirmedMappingPlan == nil {
+                return "Confirm a mapping plan before compiling. The workbench does not auto-confirm."
+            }
+            if confirmedMappingPlan?.goalID != selectedGoalID {
+                return "The confirmed mapping plan goal must match the selected goal."
+            }
+            switch mappingPreviewState {
+            case .idle:
+                return "Preview the confirmed mapping plan before compiling."
+            case .loading:
+                return "Mapping preview is still running."
+            case .unavailable:
+                return "Mapping preview is unavailable; confirm and preview again before compiling."
+            case .ready:
+                return nil
+            }
         }
         switch compilePreflightState {
         case .idle:
@@ -177,6 +311,29 @@ final class WorkbenchViewModel: ObservableObject {
             }
         }
         return nil
+    }
+
+    /// Single row-source file mapping-detect wraps. Directories and extra files fail closed.
+    var mappingRowSourceURL: URL? {
+        guard currentCompileUsesMapping else { return nil }
+        let files = rowSourceURLs.filter { url in
+            !url.hasDirectoryPath
+        }
+        guard files.count == 1, documentSourceURLs.isEmpty else { return nil }
+        return files[0]
+    }
+
+    /// Goals the current compiler path may select. Family goals wait for a
+    /// confirmed mapping plan that binds their admitted schema.
+    var selectableGoals: [GoalCatalogGoal] {
+        guard case .ready(let catalog) = goalCatalogState else { return [] }
+        return catalog.goals.filter { goal in
+            if goal.objective.requiresMappedValueEvidence {
+                return currentCompileUsesMapping
+                    && confirmedMappingPlan?.goalID == goal.goalID
+            }
+            return true
+        }
     }
 
     /// The selected goal's catalog entry, when the catalog is loaded.
@@ -197,6 +354,10 @@ final class WorkbenchViewModel: ObservableObject {
         if case .ready(let catalog) = recipePresetState {
             selectedPresetID = catalog.safePreset(forGoal: goalID)?.presetID
         }
+        if confirmedMappingPlan?.goalID != goalID {
+            confirmedMappingPlan = nil
+            mappingPreviewState = .idle
+        }
     }
 
     private func adoptLoadedSelection() {
@@ -210,8 +371,13 @@ final class WorkbenchViewModel: ObservableObject {
             selectedGoalID = goal.goalID
             selectedPresetID = nil
         }
-        if selectedGoalID == nil || goals.goal(withID: selectedGoalID ?? "") == nil {
-            selectedGoalID = goals.goals.first?.goalID
+        let allowed = selectableGoals
+        if selectedGoalID == nil
+            || !allowed.contains(where: { $0.goalID == selectedGoalID })
+        {
+            selectedGoalID = allowed.first?.goalID ?? goals.goals.first(where: {
+                !$0.objective.requiresMappedValueEvidence
+            })?.goalID
         }
         if let goalID = selectedGoalID,
            selectedPresetID == nil || presets.preset(withID: selectedPresetID ?? "")?.goalID != goalID
@@ -509,6 +675,9 @@ final class WorkbenchViewModel: ObservableObject {
               preset.presetID == presetID,
               preset.goalID == goal
         else { return nil }
+        if currentCompileUsesMapping {
+            return nil
+        }
         return CompilePreflightRequest(
             sources: sourceURLs,
             sourceRoot: sourceRoot,
@@ -517,8 +686,151 @@ final class WorkbenchViewModel: ObservableObject {
             representation: preset.representationID,
             splitRatioPPM: splitRatioPPM,
             consumerProfile: writeAptusHandoff ? "aptus-handoff-v1" : nil,
-            evaluationRequired: allowEmptyEvaluation ? false : nil
+            evaluationRequired: allowEmptyEvaluation ? false : nil,
+            mode: inputMode
         )
+    }
+
+    private func invalidateMapping() {
+        mappingDetectTask?.cancel()
+        mappingDetectController?.cancel()
+        mappingDetectTask = nil
+        mappingDetectController = nil
+        mappingPreviewTask?.cancel()
+        mappingPreviewController?.cancel()
+        mappingPreviewTask = nil
+        mappingPreviewController = nil
+        mappingDetectState = .idle
+        mappingPreviewState = .idle
+        selectedMappingProposalID = nil
+        confirmedMappingPlan = nil
+    }
+
+    /// Propose mapping plans for the single selected row-source file.
+    func detectMapping() {
+        invalidateConfirmedMappingOnly()
+        mappingDetectTask?.cancel()
+        mappingDetectController?.cancel()
+        mappingDetectTask = nil
+        mappingDetectController = nil
+        guard !isRunning else { return }
+        guard let cli else {
+            mappingDetectState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let path = mappingRowSourceURL else {
+            mappingDetectState = .unavailable(
+                "mapping-detect wraps one row-source file; directories and extra files fail closed."
+            )
+            return
+        }
+        let controller = CLIProcessController()
+        mappingDetectController = controller
+        mappingDetectState = .loading
+        let sourceRoot = resolvedSourceRoot?.path
+        mappingDetectTask = Task { [weak self] in
+            let nextState: MappingDetectState
+            do {
+                let detected = try await cli.detectMapping(
+                    path: path.path,
+                    sourceRoot: sourceRoot,
+                    controller: controller
+                )
+                try Task.checkCancellation()
+                nextState = .ready(detected)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.mappingDetectController === controller else { return }
+            self.mappingDetectState = nextState
+            if case .ready(let detected) = nextState {
+                self.selectedMappingProposalID = detected.proposals.first?.mappingPlanID
+            } else {
+                self.selectedMappingProposalID = nil
+            }
+            self.mappingDetectController = nil
+            self.mappingDetectTask = nil
+        }
+    }
+
+    /// Operator confirm: store the selected proposal unchanged. Never auto-confirms.
+    func confirmSelectedMappingPlan() {
+        guard let plan = selectedMappingProposal else { return }
+        selectedGoalID = plan.goalID
+        if case .ready(let catalog) = recipePresetState {
+            selectedPresetID = catalog.safePreset(forGoal: plan.goalID)?.presetID
+        }
+        confirmedMappingPlan = plan
+        previewConfirmedMapping()
+    }
+
+    /// Preview the confirmed plan without writing a workspace.
+    func previewConfirmedMapping() {
+        mappingPreviewTask?.cancel()
+        mappingPreviewController?.cancel()
+        mappingPreviewTask = nil
+        mappingPreviewController = nil
+        guard let plan = confirmedMappingPlan else {
+            mappingPreviewState = .unavailable(
+                MappingPreviewError.unconfirmed.localizedDescription
+            )
+            return
+        }
+        guard let cli else {
+            mappingPreviewState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let path = mappingRowSourceURL else {
+            mappingPreviewState = .unavailable(
+                "mapping-preview wraps one row-source file."
+            )
+            return
+        }
+        let controller = CLIProcessController()
+        mappingPreviewController = controller
+        mappingPreviewState = .loading
+        let sourceRoot = resolvedSourceRoot?.path
+        mappingPreviewTask = Task { [weak self] in
+            let nextState: MappingPreviewState
+            do {
+                let planURL = try Self.writeTemporaryMappingPlan(plan)
+                defer { try? FileManager.default.removeItem(at: planURL) }
+                let preview = try await cli.previewMapping(
+                    path: path.path,
+                    planURL: planURL,
+                    sourceRoot: sourceRoot,
+                    controller: controller
+                )
+                try Task.checkCancellation()
+                nextState = .ready(preview)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.mappingPreviewController === controller else { return }
+            self.mappingPreviewState = nextState
+            self.mappingPreviewController = nil
+            self.mappingPreviewTask = nil
+        }
+    }
+
+    private func invalidateConfirmedMappingOnly() {
+        mappingPreviewTask?.cancel()
+        mappingPreviewController?.cancel()
+        mappingPreviewTask = nil
+        mappingPreviewController = nil
+        mappingPreviewState = .idle
+        confirmedMappingPlan = nil
+    }
+
+    private static func writeTemporaryMappingPlan(_ plan: MappingPlan) throws -> URL {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-mapping-\(plan.mappingPlanID).json")
+        try plan.write(to: url)
+        return url
     }
 
     func addSources(_ urls: [URL]) {
@@ -530,6 +842,7 @@ final class WorkbenchViewModel: ObservableObject {
         if sourceRootURL == nil || !userPinnedSourceRoot {
             sourceRootURL = Self.defaultSourceRoot(for: sourceURLs)
         }
+        invalidateMapping()
     }
 
     func removeSource(_ url: URL) {
@@ -537,6 +850,7 @@ final class WorkbenchViewModel: ObservableObject {
         if !userPinnedSourceRoot {
             sourceRootURL = Self.defaultSourceRoot(for: sourceURLs)
         }
+        invalidateMapping()
     }
 
     func clearSources() {
@@ -545,6 +859,7 @@ final class WorkbenchViewModel: ObservableObject {
         if !userPinnedSourceRoot {
             sourceRootURL = nil
         }
+        invalidateMapping()
     }
 
     func chooseOutputDirectory() {
@@ -641,12 +956,32 @@ final class WorkbenchViewModel: ObservableObject {
             lastError = "Goal catalog and recipe presets are not loaded yet."
             return
         }
-        guard let preflightRequest = currentCompilePreflightRequest() else {
-            lastError = "The selected goal, preset, and representation are not ready for preflight."
+        if mixedSourcesAreFused {
+            lastError = "mixed mode keeps construction and imported-row provenance distinct; compile document-source and dataset-row workspaces separately rather than fusing them in one stage graph"
             return
         }
+        let usesMappingSnapshot = currentCompileUsesMapping
+        let confirmedPlanSnapshot = confirmedMappingPlan
+        let inputModeSnapshot = inputMode
+        let representationSnapshot = selectedPreset?.representationID
+        let preflightRequest: CompilePreflightRequest?
+        if usesMappingSnapshot {
+            guard confirmedPlanSnapshot != nil else {
+                lastError = "Confirm a mapping plan before compiling. The workbench does not auto-confirm."
+                return
+            }
+            preflightRequest = nil
+        } else {
+            guard let request = currentCompilePreflightRequest() else {
+                lastError = "The selected goal, preset, and representation are not ready for preflight."
+                return
+            }
+            preflightRequest = request
+        }
         cancelCompilePreflight()
-        compilePreflightState = .loading
+        if !usesMappingSnapshot {
+            compilePreflightState = .loading
+        }
         isRunning = true
         showRunSheet = false
         let startedAt = Date()
@@ -676,49 +1011,69 @@ final class WorkbenchViewModel: ObservableObject {
             var transportArchive = outputDirectory
             var logFileURL: URL?
             let cli: VeriformisCLI
-            do {
-                cli = try self.cli ?? VeriformisCLI.resolve()
-                if self.cli == nil {
-                    self.cli = cli
-                    self.compilePreflightState = .loading
-                }
-                let report = try await cli.preflight(
-                    preflightRequest,
-                    controller: processController
-                )
-                try Task.checkCancellation()
-                guard currentCompilePreflightRequest() == preflightRequest else {
-                    compilePreflightRequestSnapshot = nil
-                    compilePreflightState = .idle
-                    runStatusMessage = "Configuration changed; check it again"
+            if usesMappingSnapshot {
+                do {
+                    cli = try self.cli ?? VeriformisCLI.resolve()
+                    if self.cli == nil {
+                        self.cli = cli
+                    }
+                } catch {
+                    lastError = error.localizedDescription
+                    runStatusMessage = "CLI unavailable"
                     return
                 }
-                compilePreflightRequestSnapshot = preflightRequest
-                compilePreflightState = .ready(report)
-                guard report.admitted else {
-                    runStatusMessage = "Preflight found blockers"
+            } else if let preflightRequest {
+                do {
+                    cli = try self.cli ?? VeriformisCLI.resolve()
+                    if self.cli == nil {
+                        self.cli = cli
+                        self.compilePreflightState = .loading
+                    }
+                    let report = try await cli.preflight(
+                        preflightRequest,
+                        controller: processController
+                    )
+                    try Task.checkCancellation()
+                    guard currentCompilePreflightRequest() == preflightRequest else {
+                        compilePreflightRequestSnapshot = nil
+                        compilePreflightState = .idle
+                        runStatusMessage = "Configuration changed; check it again"
+                        return
+                    }
+                    compilePreflightRequestSnapshot = preflightRequest
+                    compilePreflightState = .ready(report)
+                    guard report.admitted else {
+                        runStatusMessage = "Preflight found blockers"
+                        return
+                    }
+                } catch is CancellationError {
+                    if currentCompilePreflightRequest() == preflightRequest {
+                        compilePreflightRequestSnapshot = nil
+                        compilePreflightState = .idle
+                    }
+                    runStatusMessage = "Preflight cancelled"
+                    return
+                } catch {
+                    if currentCompilePreflightRequest() == preflightRequest {
+                        compilePreflightRequestSnapshot = nil
+                        compilePreflightState = .unavailable(error.localizedDescription)
+                    }
+                    runStatusMessage = "Preflight unavailable"
+                    lastError = error.localizedDescription
                     return
                 }
-            } catch is CancellationError {
-                if currentCompilePreflightRequest() == preflightRequest {
-                    compilePreflightRequestSnapshot = nil
-                    compilePreflightState = .idle
-                }
-                runStatusMessage = "Preflight cancelled"
-                return
-            } catch {
-                if currentCompilePreflightRequest() == preflightRequest {
-                    compilePreflightRequestSnapshot = nil
-                    compilePreflightState = .unavailable(error.localizedDescription)
-                }
-                runStatusMessage = "Preflight unavailable"
-                lastError = error.localizedDescription
+            } else {
+                lastError = "The selected goal, preset, and representation are not ready for preflight."
                 return
             }
 
             showRunSheet = true
             runStatusMessage = "Starting compile…"
-            appendLog("Preflight admitted the current captured source snapshot.")
+            if usesMappingSnapshot {
+                appendLog("Confirmed mapping plan admitted; compile preflight is mapping preview for dataset-row.")
+            } else {
+                appendLog("Preflight admitted the current captured source snapshot.")
+            }
             do {
 
                 let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
@@ -728,25 +1083,35 @@ final class WorkbenchViewModel: ObservableObject {
                 try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
                 logFileURL = workspace.appendingPathComponent("run.log")
 
+                var mappingPlanURL: URL?
+                if usesMappingSnapshot, let confirmed = confirmedPlanSnapshot {
+                    let planURL = workspace.appendingPathComponent("confirmed-mapping-plan.json")
+                    try confirmed.write(to: planURL)
+                    mappingPlanURL = planURL
+                }
                 let plan = VeriformisCLI.compilePlan(
                     sources: sourcesSnapshot,
                     sourceRoot: sourceRootSnapshot,
                     workspace: workspace,
                     bundle: bundle,
-                    goal: goalSnapshot,
+                    goal: confirmedPlanSnapshot?.goalID ?? goalSnapshot,
                     preset: presetSnapshot,
                     allowEmptyEvaluation: allowEmptySnapshot,
                     splitRatioPPM: splitSnapshot,
-                    representation: preflightRequest.representation,
-                    instruction: preflightRequest.instruction,
-                    cleaningRules: preflightRequest.rules,
-                    cleaningCustom: preflightRequest.custom,
-                    chunkSize: preflightRequest.size,
-                    chunkOverlap: preflightRequest.overlap,
-                    includeHandoff: handoffSnapshot
+                    representation: confirmedPlanSnapshot?.representationID
+                        ?? preflightRequest?.representation
+                        ?? representationSnapshot,
+                    instruction: preflightRequest?.instruction,
+                    cleaningRules: preflightRequest?.rules ?? "",
+                    cleaningCustom: preflightRequest?.custom ?? "",
+                    chunkSize: preflightRequest?.size,
+                    chunkOverlap: preflightRequest?.overlap,
+                    includeHandoff: handoffSnapshot,
+                    mode: inputModeSnapshot,
+                    mappingPlanURL: mappingPlanURL
                 )
 
-                let total = Double(WorkbenchStage.workbenchRunStages.count)
+                let total = Double(plan.count + 1)
                 for command in plan {
                     if Task.isCancelled {
                         throw WorkbenchError.cancelled(makeCancellationReceipt(

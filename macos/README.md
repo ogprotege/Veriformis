@@ -11,8 +11,11 @@ a run sheet with live log.
   `VeriformisCLI.compilePlan`.
 - **Sidebar:** Home / Compile / History / Settings. Review and Exports are
   not destinations yet.
-- **Compile:** Sources, Goal (catalog picker), copyable CLI equivalent, and
-  a sealed `.vfbundle`. Aptus is optional Integrations, not required.
+- **Compile:** Compiler path (`document-source`, `dataset-row`, or `mixed`),
+  Sources, Goal (catalog picker), mapping confirm-then-map on dataset-row,
+  copyable CLI equivalent, and a sealed `.vfbundle`. Aptus is optional
+  Integrations, not required. Unconfirmed mapping plans cannot compile.
+  Family goals wait for a confirmed mapping that binds their schema.
 - **Taxonomy help:** asynchronously loaded from `veriformis taxonomy`; the app
   does not maintain a second taxonomy help catalog.
 - **Run sheet:** progress %, stage chips, expandable live log.

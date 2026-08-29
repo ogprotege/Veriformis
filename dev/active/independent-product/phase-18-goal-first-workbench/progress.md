@@ -80,3 +80,33 @@ durability warning.
 
 **Next action:** Publish the item 18.3 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.4.
+
+## 2026-08-28: Item 18.3 merged; item 18.4 in progress
+
+**Status:** Item 18.3 merged as PR #162 at
+`acf8ee405616d3b6ae8fa443cc3eb49f77bc790a`. Clean local `main` equals
+`origin/main` there.
+
+Item 18.4 adds the ADR-0010 mode picker and confirm-then-map. Dataset-row
+wraps mapping-detect, operator confirm, mapping-preview, then
+`parse --mode dataset-row` and `map`. Mixed refuses fused document and
+row members. Family goals wait for a confirmed mapping plan. Review and
+Exports stay out of the sidebar.
+
+**Next action:** Run the complete item 18.4 local gates, including
+xcodebuild tests and parity, publish the pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 18.5.
+
+## 2026-08-29: Item 18.4 local gates green
+
+**Status:** ADR-0010 modes and confirm-then-map are on Compile. Document-source
+still omits `--mode`. Dataset-row runs parse, map, then the finished-dataset
+tail. Mixed refuses fused document and row members. Family goals wait for a
+confirmed mapping plan. Review and Exports stay out of the sidebar. Focused
+workbench tests passed 75. xcodebuild tests passed 109. Parity passed. Project
+tracking, Ruff, the lock check, and `git diff --check` passed. The core
+suite passed 2,538 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 18.4 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.5.

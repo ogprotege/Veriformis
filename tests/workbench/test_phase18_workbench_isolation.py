@@ -69,22 +69,29 @@ def test_sidebar_remains_home_compile_history_settings() -> None:
     assert "MappingView.swift" not in views
 
 
-def test_compile_plan_is_document_source_only() -> None:
+def test_default_compile_plan_still_omits_mode_flag() -> None:
     plan = _compile_plan_source()
-    stages = tuple(re.findall(r"StageCommand\(stage: \.(\w+)", plan))
-    assert stages == _COMPILE_PLAN_STAGES
-    assert "--mode" not in plan
-    assert "dataset-row" not in plan
-    assert "mapping-detect" not in plan
-    assert '"map"' not in plan
     parse = re.search(r"var parseArgs = \[([^\]]+)\]", plan)
     assert parse is not None
     assert parse.group(1) == '"parse"'
+    assert "mode: CompilerInputMode = .documentSource" in plan
+    assert 'parseArgs.append(contentsOf: ["--mode", mode.rawValue])' in plan
+    models = _read("macos/Sources/Models/WorkbenchModels.swift")
+    pipeline = re.search(
+        r"static var pipelineStages: \[WorkbenchStage\] \{\s*\[([^\]]+)\]",
+        models,
+    )
+    assert pipeline is not None
+    stages = tuple(re.findall(r"\.(\w+)", pipeline.group(1)))
+    assert stages == _COMPILE_PLAN_STAGES
+    assert '"map"' in plan
+    assert ".datasetRow" in plan
 
 
-def test_mapping_and_export_bridges_exist_and_are_unused_by_views() -> None:
+def test_mapping_is_wired_and_export_review_remain_unused_by_views() -> None:
     cli = _read("macos/Sources/Services/VeriformisCLI.swift")
     assert "mapping-detect" in cli
+    assert "mapping-preview" in cli
     assert "func discoverExports(" in cli
     assert '["export", "discover"]' in cli
     assert '["export", "dry-run"' in cli
@@ -93,8 +100,10 @@ def test_mapping_and_export_bridges_exist_and_are_unused_by_views() -> None:
         path.read_text(encoding="utf-8") for path in (MACOS / "Views").glob("*.swift")
     )
     model = _read("macos/Sources/ViewModels/WorkbenchViewModel.swift")
+    assert "detectMapping" in model
+    assert "confirmSelectedMappingPlan" in model
+    assert "mapping-detect" in views or "Detect mapping" in views
     for haystack in (views, model):
-        assert "mapping-detect" not in haystack
         assert "discoverExports" not in haystack
         assert "dryRunExport" not in haystack
         assert "executeExport" not in haystack

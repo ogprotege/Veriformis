@@ -14,7 +14,7 @@ struct CompileView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Compile")
                         .font(.title2.weight(.semibold))
-                    Text("Add sources, choose a goal, and compile a sealed .vfbundle. Aptus is optional Integrations, not required.")
+                    Text("Choose a compiler path (document-source, dataset-row, or mixed), add sources, choose a goal, and compile a sealed .vfbundle. Dataset-row requires a confirmed mapping plan. Aptus is optional Integrations, not required.")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
@@ -28,7 +28,11 @@ struct CompileView: View {
 
                     cliEquivalentPanel
 
-                    preflightPanel
+                    if workbench.currentCompileUsesMapping {
+                        mappingPanel
+                    } else {
+                        preflightPanel
+                    }
 
                     if let reason = workbench.compileBlockedReason, !workbench.isRunning {
                         Text(reason)
@@ -78,6 +82,20 @@ struct CompileView: View {
 
     private var configurationPanel: some View {
         VStack(alignment: .leading, spacing: 12) {
+            Text("Compiler path")
+                .font(.headline)
+            Picker("Compiler path", selection: $workbench.inputMode) {
+                ForEach(CompilerInputMode.allCases) { mode in
+                    Text(mode.rawValue).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .accessibilityLabel("Compiler path")
+            Text(workbench.inputMode.subtitle)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
             Text("Goal")
                 .font(.headline)
 
@@ -150,7 +168,7 @@ struct CompileView: View {
                     .controlSize(.small)
                     .accessibilityLabel("Copy CLI equivalent")
                 } else {
-                    Text("Choose sources, a goal, and an output folder to see the exact CLI equivalent of this compile plan.")
+                    Text("Choose sources, a compiler path, a goal, and an output folder to see the exact CLI equivalent of this compile plan. Dataset-row waits for a confirmed mapping plan.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -327,6 +345,128 @@ struct CompileView: View {
         }
     }
 
+    private var mappingPanel: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Dataset-row mapping is confirm-then-map with mapped_value evidence. Detecting a plan does not confirm it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if workbench.mixedSourcesAreFused {
+                    Text("mixed mode keeps construction and imported-row provenance distinct; compile document-source and dataset-row workspaces separately rather than fusing them in one stage graph")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Button("Detect mapping") {
+                    workbench.detectMapping()
+                }
+                .disabled(!workbench.canDetectMapping)
+                .accessibilityLabel("Detect mapping")
+
+                switch workbench.mappingDetectState {
+                case .idle:
+                    Text("Run mapping-detect on the selected row-source file.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                case .loading:
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Detecting mapping plans…")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                case .unavailable(let message):
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
+                case .ready(let detected):
+                    if let refusal = detected.refusal, detected.proposals.isEmpty {
+                        Text(refusal)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
+                    } else {
+                        Picker(
+                            "Mapping proposal",
+                            selection: Binding(
+                                get: { workbench.selectedMappingProposalID ?? "" },
+                                set: { workbench.selectedMappingProposalID = $0 }
+                            )
+                        ) {
+                            ForEach(detected.proposals) { proposal in
+                                Text(proposal.summary).tag(proposal.mappingPlanID)
+                            }
+                        }
+                        .accessibilityLabel("Mapping proposal")
+                        if let proposal = workbench.selectedMappingProposal {
+                            Text(proposal.confirmationDigest)
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                            ForEach(proposal.fieldMappings, id: \.mappingRuleID) { field in
+                                Text("\(field.sourcePath) → \(field.targetKey)")
+                                    .font(.caption.monospaced())
+                                    .textSelection(.enabled)
+                            }
+                        }
+                        Button("Confirm mapping plan") {
+                            workbench.confirmSelectedMappingPlan()
+                        }
+                        .disabled(workbench.selectedMappingProposal == nil || workbench.isRunning)
+                        .accessibilityLabel("Confirm mapping plan")
+                    }
+                }
+
+                if workbench.mappingIsConfirmed, let plan = workbench.confirmedMappingPlan {
+                    Text("Confirmed \(plan.mappingPlanID)")
+                        .font(.caption.monospaced())
+                        .textSelection(.enabled)
+                }
+
+                switch workbench.mappingPreviewState {
+                case .idle:
+                    EmptyView()
+                case .loading:
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Previewing confirmed mapping…")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                case .unavailable(let message):
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
+                case .ready(let preview):
+                    Text(
+                        "Preview \(preview.acceptedCount) accepted · \(preview.rejectedCount) rejected · \(preview.recordCount) records"
+                    )
+                    .font(.caption.monospaced())
+                    .textSelection(.enabled)
+                    if let omission = preview.omission {
+                        Text("Omitted: \(omission)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Label("Mapping", systemImage: "arrow.left.arrow.right")
+                .font(.headline)
+        }
+    }
+
     private func preflightMessages(_ messages: [String]) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             ForEach(Array(messages.enumerated()), id: \.offset) { _, message in
@@ -399,7 +539,7 @@ struct CompileView: View {
                         set: { workbench.selectGoal($0) }
                     )
                 ) {
-                    ForEach(goals.goals, id: \.goalID) { goal in
+                    ForEach(workbench.selectableGoals, id: \.goalID) { goal in
                         Text(goal.title).tag(goal.goalID)
                     }
                 }

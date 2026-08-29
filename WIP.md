@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `56b911d` on `main` after PR #161
+**Implementation baseline reviewed:** `acf8ee4` on `main` after PR #162
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.2
-merged; item 18.3 goal-first IA)
+Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.3
+merged; item 18.4 input modes and mapping)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 18.3 goal-first IA)
+**Last reviewed:** 2026-08-29 (Phase 18.4 input modes and mapping)
 
-**Next review:** Phase 18.3 merge, or item 18.4 input modes. Do not add
-Review, Exports, or dataset-row execute in this item.
+**Next review:** Phase 18.4 merge, or item 18.5 inspectable settings. Do
+not add Review or Exports screens in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -145,8 +145,8 @@ local, offline, and free of LLM generation.
       start Phase 18 from that packet.
 - [ ] Independent product Phase 18 is in progress under its
       [packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-      Item 18.2 merged as PR #161. Item 18.3 replaces Aptus-centered copy
-      with goal-first IA. Do not start Phase 19 from this packet.
+      Item 18.3 merged as PR #162. Item 18.4 adds input modes and
+      confirm-then-map. Do not start Phase 19 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

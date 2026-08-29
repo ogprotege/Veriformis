@@ -28,6 +28,37 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     }
 }
 
+/// ADR-0010 compiler paths. Identifiers are packaged CLI modes, not Swift inventions.
+enum CompilerInputMode: String, CaseIterable, Identifiable, Codable, Sendable {
+    case documentSource = "document-source"
+    case datasetRow = "dataset-row"
+    case mixed = "mixed"
+
+    var id: String { rawValue }
+
+    /// Suffixes the CLI treats as row-source members under dataset-row and mixed.
+    static let rowSourceSuffixes: Set<String> = [
+        ".jsonl", ".json", ".csv", ".parquet", ".arrow",
+    ]
+
+    var title: String { rawValue }
+
+    var subtitle: String {
+        switch self {
+        case .documentSource:
+            return "Recover documents, then construct rows from source text."
+        case .datasetRow:
+            return "Capture existing rows, confirm a mapping plan, then map."
+        case .mixed:
+            return "Collect documents or rows; refuse fusing both in one graph."
+        }
+    }
+
+    var usesRowMapping: Bool {
+        self == .datasetRow
+    }
+}
+
 enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
     case fullText = "full_text"
     case continuation = "continuation"
@@ -75,6 +106,16 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
             return "User-provided tool traces on the dataset-row path"
         case .stepwise:
             return "User-provided ordered steps on the dataset-row path"
+        }
+    }
+
+    /// Phase 17 family objectives compile only from dataset-row mapped_value evidence.
+    var requiresMappedValueEvidence: Bool {
+        switch self {
+        case .explicitLabel, .preferencePair, .toolCall, .stepwise:
+            return true
+        case .fullText, .continuation, .sectionReconstruction, .beforeAfterTransformation, .structuredField:
+            return false
         }
     }
 }
@@ -2167,6 +2208,7 @@ enum TaxonomyHelpState: Equatable, Sendable {
 
 enum WorkbenchStage: String, CaseIterable, Identifiable {
     case parse
+    case map
     case clean
     case chunk
     case construct
@@ -2197,9 +2239,25 @@ enum WorkbenchStage: String, CaseIterable, Identifiable {
         WorkbenchStage(rawValue: rawValue)?.title ?? rawValue
     }
 
-    /// Stages executed by the workbench compile plan (excludes verify).
+    /// Document-source compile stages (excludes verify). Dataset-row uses
+    /// `datasetRowPipelineStages` instead of inventing a fourth graph.
     static var pipelineStages: [WorkbenchStage] {
         [.parse, .clean, .chunk, .construct, .curate, .split, .format, .validate, .seal]
+    }
+
+    /// Dataset-row compile stages: parse, map, then the finished-dataset tail.
+    static var datasetRowPipelineStages: [WorkbenchStage] {
+        [.parse, .map, .curate, .split, .format, .validate, .seal]
+    }
+
+    static func pipelineStages(
+        mode: CompilerInputMode,
+        includesMapping: Bool
+    ) -> [WorkbenchStage] {
+        if mode == .datasetRow || includesMapping {
+            return datasetRowPipelineStages
+        }
+        return pipelineStages
     }
 
     /// Complete default workbench run, including immutable transport.
@@ -2417,16 +2475,145 @@ enum MappingDetectError: LocalizedError, Equatable, Sendable {
 /// Confirmation is required before `map`; the workbench never auto-publishes.
 struct MappingDetectResponse: Decodable, Equatable, Sendable {
     let schemaVersion: String
-    let proposals: [MappingPlanProposal]
+    let proposals: [MappingPlan]
     let refusal: String?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(String.self, forKey: .schemaVersion)
+        proposals = try container.decode([MappingPlan].self, forKey: .proposals)
+        refusal = try container.decodeIfPresent(String.self, forKey: .refusal)
+        guard schemaVersion == "veriformis.mapping-detect/v1" else {
+            throw MappingDetectError.invalidPayload(
+                "unexpected mapping-detect schema \(schemaVersion)"
+            )
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case proposals
+        case refusal
+    }
 }
 
-struct MappingPlanProposal: Decodable, Equatable, Sendable {
-    let mappingPlanId: String
-    let goalId: String
-    let representationId: String
+/// One field mapping from `veriformis.mapping-plan/v1`.
+struct MappingField: Codable, Equatable, Sendable {
+    let schemaVersion: String
+    let mappingRuleID: String
+    let sourcePath: String
+    let targetKey: String
+    let coercionRule: String
+    let missingValueRule: String
+    let invalidRowRule: String
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case mappingRuleID = "mapping_rule_id"
+        case sourcePath = "source_path"
+        case targetKey = "target_key"
+        case coercionRule = "coercion_rule"
+        case missingValueRule = "missing_value_rule"
+        case invalidRowRule = "invalid_row_rule"
+    }
+}
+
+/// Confirmed-ready mapping plan. Loading a proposal is not an execute.
+struct MappingPlan: Codable, Equatable, Sendable, Identifiable {
+    let schemaVersion: String
+    let mappingPlanID: String
+    let goalID: String
+    let representationID: String
     let rowSchema: String
+    let containerKind: String
+    let membershipPolicy: String
+    let reviewPolicy: String
     let confirmationDigest: String
+    let fieldMappings: [MappingField]
+
+    var id: String { mappingPlanID }
+
+    var summary: String {
+        "\(goalID) · \(representationID) · \(rowSchema)"
+    }
+
+    func jsonData() throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return try encoder.encode(self)
+    }
+
+    func write(to url: URL) throws {
+        try jsonData().write(to: url, options: .atomic)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case mappingPlanID = "mapping_plan_id"
+        case goalID = "goal_id"
+        case representationID = "representation_id"
+        case rowSchema = "row_schema"
+        case containerKind = "container_kind"
+        case membershipPolicy = "membership_policy"
+        case reviewPolicy = "review_policy"
+        case confirmationDigest = "confirmation_digest"
+        case fieldMappings = "field_mappings"
+    }
+}
+
+struct MappingPreview: Decodable, Equatable, Sendable {
+    let schemaVersion: String
+    let mappingPlanID: String
+    let rowSchema: String
+    let recordCount: Int
+    let acceptedCount: Int
+    let rejectedCount: Int
+    let omission: String?
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case mappingPlanID = "mapping_plan_id"
+        case rowSchema = "row_schema"
+        case recordCount = "record_count"
+        case acceptedCount = "accepted_count"
+        case rejectedCount = "rejected_count"
+        case omission
+    }
+}
+
+enum MappingPreviewError: LocalizedError, Equatable, Sendable {
+    case outputTruncated
+    case invalidPayload(String)
+    case commandFailed(exitCode: Int32, message: String)
+    case unconfirmed
+
+    var errorDescription: String? {
+        switch self {
+        case .outputTruncated:
+            return "Mapping preview output was truncated."
+        case .invalidPayload(let message):
+            return "Mapping preview returned invalid JSON: \(message)"
+        case .commandFailed(let exitCode, let message):
+            let detail = message.isEmpty ? "No diagnostic was returned." : message
+            return "Mapping preview failed (exit \(exitCode)): \(detail)"
+        case .unconfirmed:
+            return "Mapping preview requires a confirmed mapping plan for this file."
+        }
+    }
+}
+
+enum MappingDetectState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(MappingDetectResponse)
+    case unavailable(String)
+}
+
+enum MappingPreviewState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(MappingPreview)
+    case unavailable(String)
 }
 
 private struct GoalCatalogKey: CodingKey {
@@ -3377,6 +3564,7 @@ struct CompilePreflightRequest: Equatable, Sendable {
     let evaluationRequired: Bool?
     let splitSeed: String?
     let reviewPolicy: String?
+    let mode: CompilerInputMode
 
     init(
         sources: [URL],
@@ -3399,7 +3587,8 @@ struct CompilePreflightRequest: Equatable, Sendable {
         evaluationRatioPPM: Int? = nil,
         evaluationRequired: Bool? = nil,
         splitSeed: String? = nil,
-        reviewPolicy: String? = nil
+        reviewPolicy: String? = nil,
+        mode: CompilerInputMode = .documentSource
     ) {
         self.sources = sources
         self.sourceRoot = sourceRoot
@@ -3422,6 +3611,7 @@ struct CompilePreflightRequest: Equatable, Sendable {
         self.evaluationRequired = evaluationRequired
         self.splitSeed = splitSeed
         self.reviewPolicy = reviewPolicy
+        self.mode = mode
     }
 }
 

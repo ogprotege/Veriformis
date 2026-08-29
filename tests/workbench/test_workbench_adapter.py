@@ -350,5 +350,6 @@ def test_swift_already_fails_closed_on_truncated_and_cancelled_discovery() -> No
     model = (MACOS / "ViewModels/WorkbenchViewModel.swift").read_text(encoding="utf-8")
     for haystack in (views, model):
         assert "executeExport" not in haystack
-        assert "mapping-detect" not in haystack
         assert "review-submit" not in haystack
+    assert "mapping-detect" in views or "Detect mapping" in views
+    assert "detectMapping" in model

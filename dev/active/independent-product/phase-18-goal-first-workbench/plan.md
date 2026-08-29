@@ -89,7 +89,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/04-input-modes-and-mapping`
 
-- [ ] Select ADR-0010 modes. Confirm-then-map. Family goals only on
+- [x] Select ADR-0010 modes. Confirm-then-map. Family goals only on
       dataset-row.
 
 ### 18.5 Expose inspectable advanced settings from presets
