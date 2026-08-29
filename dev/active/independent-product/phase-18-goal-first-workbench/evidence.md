@@ -89,6 +89,30 @@ were also complete.
 - [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
       and diff check pass.
 
+## Required item 18.7 evidence
+
+- [x] Exports sidebar destination wraps discover, dry-run, inspect,
+      operator-confirmed execute, and verify.
+- [x] Source bundle identity, manifest digest, and receipt stay visible.
+- [x] Generic containers first. Named profiles only for admitted schemas.
+- [x] No membership mutation, Hub upload, or training launch.
+- [x] Review stays out of the sidebar.
+- [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
+      and diff check pass.
+
+## Item 18.7 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 88 passed |
+| `xcodebuild … test` (Veriformis scheme) | 112 passed |
+| `macos/scripts/parity_check.sh` | PASS; manifest `1e5a842a56c5acdbc04e931a5e7a88229535a301fd579863508bb439d8fdd2eb` |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,551 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
 ## Required item 18.6 evidence
 
 - [x] ResultView shows recovery, mapping, supervised region, preview-only

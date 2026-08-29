@@ -70,6 +70,33 @@ final class WorkbenchViewModel: ObservableObject {
     @Published private(set) var mappingPreviewState: MappingPreviewState = .idle
     @Published var selectedMappingProposalID: String?
     @Published private(set) var confirmedMappingPlan: MappingPlan?
+    @Published var exportBundleURL: URL? {
+        didSet {
+            if oldValue != exportBundleURL { invalidateExportConfirmation() }
+        }
+    }
+    @Published var exportDestinationURL: URL? {
+        didSet {
+            if oldValue != exportDestinationURL { invalidateExportConfirmation() }
+        }
+    }
+    @Published var selectedExportProfileKey: String = "" {
+        didSet {
+            if oldValue != selectedExportProfileKey { invalidateExportConfirmation() }
+        }
+    }
+    @Published var exportSourceTrustPolicy: ExportSourceTrustPolicy = .allowSelfConsistent {
+        didSet {
+            if oldValue != exportSourceTrustPolicy { invalidateExportConfirmation() }
+        }
+    }
+    @Published var exportPlanConfirmed = false
+    @Published var exportIsRunning = false
+    @Published private(set) var exportDiscoveryState: ExportDiscoveryState = .idle
+    @Published private(set) var exportDryRunState: ExportDryRunState = .idle
+    @Published private(set) var exportInspectState: ExportInspectState = .idle
+    @Published private(set) var exportExecuteState: ExportExecuteState = .idle
+    @Published private(set) var exportVerifyState: ExportVerifyState = .idle
     @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
     @Published private(set) var goalCatalogState: GoalCatalogState = .idle
     @Published private(set) var recipePresetState: RecipePresetState = .idle
@@ -188,6 +215,16 @@ final class WorkbenchViewModel: ObservableObject {
     private var mappingDetectController: CLIProcessController?
     private var mappingPreviewTask: Task<Void, Never>?
     private var mappingPreviewController: CLIProcessController?
+    private var exportDiscoveryTask: Task<Void, Never>?
+    private var exportDiscoveryController: CLIProcessController?
+    private var exportDryRunTask: Task<Void, Never>?
+    private var exportDryRunController: CLIProcessController?
+    private var exportInspectTask: Task<Void, Never>?
+    private var exportInspectController: CLIProcessController?
+    private var exportExecuteTask: Task<Void, Never>?
+    private var exportExecuteController: CLIProcessController?
+    private var exportVerifyTask: Task<Void, Never>?
+    private var exportVerifyController: CLIProcessController?
 
     var rowSourceURLs: [URL] {
         sourceURLs.filter { url in
@@ -229,6 +266,148 @@ final class WorkbenchViewModel: ObservableObject {
 
     var mappingIsConfirmed: Bool {
         confirmedMappingPlan != nil
+    }
+
+    var resolvedExportBundleURL: URL? {
+        exportBundleURL
+            ?? lastResult?.bundleURL
+            ?? selectedHistoryEntry.map { URL(fileURLWithPath: $0.bundlePath) }
+    }
+
+    var resolvedExportManifestSHA256: String? {
+        lastResult?.manifestSHA256 ?? selectedHistoryEntry?.manifestSHA256
+    }
+
+    var resolvedExportDestinationURL: URL? {
+        if let exportDestinationURL { return exportDestinationURL }
+        if let outputDirectoryURL {
+            return outputDirectoryURL.appendingPathComponent("export", isDirectory: true)
+        }
+        return nil
+    }
+
+    var knownExportRowSchema: String? {
+        if case .ready(let result) = exportDryRunState {
+            return result.plan.rowSchema
+        }
+        if let schema = confirmedMappingPlan?.rowSchema { return schema }
+        return selectedRepresentation?.rowSchema
+    }
+
+    var admittedExportProfiles: [ExportProfileDescriptorSummary] {
+        guard case .ready(let discovery) = exportDiscoveryState else { return [] }
+        return WorkbenchExportProfiles.admitted(
+            discovery.profiles,
+            rowSchema: knownExportRowSchema
+        )
+    }
+
+    var genericExportProfiles: [ExportProfileDescriptorSummary] {
+        admittedExportProfiles.filter(\.isGenericContainer)
+    }
+
+    var namedExportProfiles: [ExportProfileDescriptorSummary] {
+        admittedExportProfiles.filter { !$0.isGenericContainer }
+    }
+
+    var selectedExportProfile: ExportProfileDescriptorSummary? {
+        admittedExportProfiles.first { $0.selectionKey == selectedExportProfileKey }
+    }
+
+    var exportPlanSummary: ExportPlanSummary? {
+        if case .ready(let result) = exportExecuteState { return result.plan }
+        if case .visiblePartial(let result, _) = exportExecuteState { return result.plan }
+        if case .ready(let result) = exportVerifyState { return result.plan }
+        if case .ready(let result) = exportInspectState { return result.plan }
+        if case .ready(let result) = exportDryRunState { return result.plan }
+        return nil
+    }
+
+    var exportReceiptSummary: ExportReceiptSummary? {
+        if case .ready(let result) = exportExecuteState { return result.receipt }
+        if case .visiblePartial(let result, _) = exportExecuteState { return result.receipt }
+        if case .ready(let result) = exportVerifyState { return result.receipt }
+        if case .ready(let result) = exportInspectState { return result.receipt }
+        return nil
+    }
+
+    var hasExportDryRunPlan: Bool {
+        if case .ready = exportDryRunState { return true }
+        return false
+    }
+
+    var canDryRunExport: Bool {
+        cli != nil
+            && !exportIsRunning
+            && !isRunning
+            && resolvedExportBundleURL != nil
+            && selectedExportProfile != nil
+            && resolvedExportDestinationURL != nil
+    }
+
+    var canExecuteExport: Bool {
+        canDryRunExport && hasExportDryRunPlan && exportPlanConfirmed
+    }
+
+    var canInspectExport: Bool {
+        cli != nil && !exportIsRunning && resolvedExportDestinationURL != nil
+    }
+
+    var canVerifyExport: Bool {
+        canInspectExport && hasExportDryRunPlan && resolvedExportBundleURL != nil
+    }
+
+    var exportBlockedReason: String? {
+        if isRunning { return "Compile is running." }
+        if exportIsRunning { return nil }
+        if cli == nil { return "Veriformis CLI is unavailable." }
+        if resolvedExportBundleURL == nil {
+            return "Choose a sealed .vfbundle."
+        }
+        if selectedExportProfile == nil {
+            return "Choose a generic container or an admitted named profile."
+        }
+        if resolvedExportDestinationURL == nil {
+            return "Choose an export destination folder."
+        }
+        if !hasExportDryRunPlan {
+            return "Dry-run the selected container before execute."
+        }
+        if !exportPlanConfirmed {
+            return "Confirm the dry-run plan before execute."
+        }
+        return nil
+    }
+
+    /// Copyable CLI equivalent of discover plus the current dry-run, execute,
+    /// and verify requests. Loading this string is not an execute.
+    var currentExportCLIEquivalent: String? {
+        guard let dryRun = currentExportDryRunRequest() else { return nil }
+        var lines = [VeriformisCLI.exportCLIEquivalent(arguments: ["export", "discover"])]
+        do {
+            lines.append(
+                VeriformisCLI.exportCLIEquivalent(
+                    arguments: ["export", "dry-run", "--request-json", try dryRun.canonicalJSON()]
+                )
+            )
+            if let execute = try currentExportExecuteRequest() {
+                lines.append(
+                    VeriformisCLI.exportCLIEquivalent(
+                        arguments: ["export", "execute", "--request-json", try execute.canonicalJSON()]
+                    )
+                )
+            }
+            if let verify = try currentExportVerifyRequest() {
+                lines.append(
+                    VeriformisCLI.exportCLIEquivalent(
+                        arguments: ["export-verify", "--request-json", try verify.canonicalJSON()]
+                    )
+                )
+            }
+        } catch {
+            return nil
+        }
+        return lines.joined(separator: " && \\\n")
     }
 
     var canCompile: Bool {
@@ -841,6 +1020,404 @@ final class WorkbenchViewModel: ObservableObject {
         return url
     }
 
+    func adoptExportBundleIfNeeded(force: Bool = false) {
+        guard let lastResult else { return }
+        if force || exportBundleURL == nil {
+            exportBundleURL = lastResult.bundleURL
+        }
+        if exportDestinationURL == nil, let outputDirectoryURL {
+            exportDestinationURL = outputDirectoryURL.appendingPathComponent(
+                "export",
+                isDirectory: true
+            )
+        }
+    }
+
+    func openExports(for result: CompileResult) {
+        exportBundleURL = result.bundleURL
+        if exportDestinationURL == nil {
+            exportDestinationURL = result.workspaceURL
+                .deletingLastPathComponent()
+                .appendingPathComponent("export", isDirectory: true)
+        }
+        destination = .exports
+        if case .idle = exportDiscoveryState {
+            discoverExports()
+        }
+    }
+
+    func chooseExportBundle() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.prompt = "Choose Bundle"
+        if panel.runModal() == .OK, let url = panel.url {
+            exportBundleURL = url.standardizedFileURL
+        }
+    }
+
+    func chooseExportDestination() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
+        panel.prompt = "Choose Export Folder"
+        if panel.runModal() == .OK, let url = panel.url {
+            exportDestinationURL = url.standardizedFileURL
+        }
+    }
+
+    func discoverExports() {
+        exportDiscoveryTask?.cancel()
+        exportDiscoveryController?.cancel()
+        exportDiscoveryTask = nil
+        exportDiscoveryController = nil
+        guard let cli else {
+            exportDiscoveryState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        let controller = CLIProcessController()
+        exportDiscoveryController = controller
+        exportDiscoveryState = .loading
+        exportDiscoveryTask = Task { [weak self] in
+            let nextState: ExportDiscoveryState
+            do {
+                let response = try await cli.discoverExports(controller: controller)
+                try Task.checkCancellation()
+                nextState = Self.exportDiscoveryState(from: response)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.exportDiscoveryController === controller else { return }
+            self.exportDiscoveryState = nextState
+            if case .ready = nextState {
+                self.adoptDefaultExportProfileIfNeeded()
+            }
+            self.exportDiscoveryController = nil
+            self.exportDiscoveryTask = nil
+        }
+    }
+
+    func dryRunSelectedExport() {
+        exportDryRunTask?.cancel()
+        exportDryRunController?.cancel()
+        exportDryRunTask = nil
+        exportDryRunController = nil
+        exportPlanConfirmed = false
+        exportExecuteState = .idle
+        exportVerifyState = .idle
+        guard let cli else {
+            exportDryRunState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let request = currentExportDryRunRequest() else {
+            exportDryRunState = .unavailable(
+                exportBlockedReason ?? "Export dry-run is missing a bundle or container."
+            )
+            return
+        }
+        let controller = CLIProcessController()
+        exportDryRunController = controller
+        exportDryRunState = .loading
+        exportIsRunning = true
+        exportDryRunTask = Task { [weak self] in
+            let nextState: ExportDryRunState
+            do {
+                let response = try await cli.dryRunExport(request, controller: controller)
+                try Task.checkCancellation()
+                nextState = Self.exportDryRunState(from: response)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.exportDryRunController === controller else { return }
+            self.exportDryRunState = nextState
+            self.exportIsRunning = false
+            self.exportDryRunController = nil
+            self.exportDryRunTask = nil
+        }
+    }
+
+    func executeConfirmedExport() {
+        guard canExecuteExport else { return }
+        exportExecuteTask?.cancel()
+        exportExecuteController?.cancel()
+        exportExecuteTask = nil
+        exportExecuteController = nil
+        guard let cli else {
+            exportExecuteState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        let request: ExportExecuteRequest
+        do {
+            guard let built = try currentExportExecuteRequest() else {
+                exportExecuteState = .unavailable(
+                    "Execute needs a confirmed dry-run plan and a destination."
+                )
+                return
+            }
+            request = built
+        } catch {
+            exportExecuteState = .unavailable(error.localizedDescription)
+            return
+        }
+        let controller = CLIProcessController()
+        exportExecuteController = controller
+        exportExecuteState = .loading
+        exportIsRunning = true
+        exportExecuteTask = Task { [weak self] in
+            let nextState: ExportExecuteState
+            do {
+                let response = try await cli.executeExport(request, controller: controller)
+                try Task.checkCancellation()
+                nextState = Self.exportExecuteState(from: response)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.exportExecuteController === controller else { return }
+            self.exportExecuteState = nextState
+            self.exportIsRunning = false
+            self.exportExecuteController = nil
+            self.exportExecuteTask = nil
+        }
+    }
+
+    func inspectExportDestination() {
+        exportInspectTask?.cancel()
+        exportInspectController?.cancel()
+        exportInspectTask = nil
+        exportInspectController = nil
+        guard let cli else {
+            exportInspectState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let destination = resolvedExportDestinationURL else {
+            exportInspectState = .unavailable("Choose an export destination folder.")
+            return
+        }
+        let request: ExportInspectRequest
+        do {
+            request = try ExportInspectRequest(destinationRoot: destination.path)
+        } catch {
+            exportInspectState = .unavailable(error.localizedDescription)
+            return
+        }
+        let controller = CLIProcessController()
+        exportInspectController = controller
+        exportInspectState = .loading
+        exportIsRunning = true
+        exportInspectTask = Task { [weak self] in
+            let nextState: ExportInspectState
+            do {
+                let response = try await cli.inspectExport(request, controller: controller)
+                try Task.checkCancellation()
+                nextState = Self.exportInspectState(from: response)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.exportInspectController === controller else { return }
+            self.exportInspectState = nextState
+            self.exportIsRunning = false
+            self.exportInspectController = nil
+            self.exportInspectTask = nil
+        }
+    }
+
+    func verifyExportDestination() {
+        exportVerifyTask?.cancel()
+        exportVerifyController?.cancel()
+        exportVerifyTask = nil
+        exportVerifyController = nil
+        guard let cli else {
+            exportVerifyState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        let request: ExportVerifyRequest
+        do {
+            guard let built = try currentExportVerifyRequest() else {
+                exportVerifyState = .unavailable(
+                    "Verify needs the source bundle, dry-run plan, and destination."
+                )
+                return
+            }
+            request = built
+        } catch {
+            exportVerifyState = .unavailable(error.localizedDescription)
+            return
+        }
+        let controller = CLIProcessController()
+        exportVerifyController = controller
+        exportVerifyState = .loading
+        exportIsRunning = true
+        exportVerifyTask = Task { [weak self] in
+            let nextState: ExportVerifyState
+            do {
+                let response = try await cli.verifyExport(request, controller: controller)
+                try Task.checkCancellation()
+                nextState = Self.exportVerifyState(from: response)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.exportVerifyController === controller else { return }
+            self.exportVerifyState = nextState
+            self.exportIsRunning = false
+            self.exportVerifyController = nil
+            self.exportVerifyTask = nil
+        }
+    }
+
+    private func invalidateExportConfirmation() {
+        exportPlanConfirmed = false
+        exportDryRunState = .idle
+        exportExecuteState = .idle
+        exportInspectState = .idle
+        exportVerifyState = .idle
+    }
+
+    private func adoptDefaultExportProfileIfNeeded() {
+        if selectedExportProfile != nil { return }
+        selectedExportProfileKey = genericExportProfiles.first?.selectionKey ?? ""
+    }
+
+    private func currentExportDryRunRequest() -> ExportDryRunRequest? {
+        guard let bundle = resolvedExportBundleURL,
+              let profile = selectedExportProfile
+        else { return nil }
+        return try? ExportDryRunRequest(
+            bundle: bundle.path,
+            containerID: profile.containerProfile.containerID,
+            containerVersion: profile.containerProfile.containerVersion,
+            consumerID: profile.consumerProfile?.consumerID,
+            consumerProfileVersion: profile.consumerProfile?.profileVersion,
+            sourceTrustPolicy: exportSourceTrustPolicy,
+            expectedManifestSHA256: resolvedExportManifestSHA256
+        )
+    }
+
+    private func currentExportExecuteRequest() throws -> ExportExecuteRequest? {
+        guard let bundle = resolvedExportBundleURL,
+              let profile = selectedExportProfile,
+              let destination = resolvedExportDestinationURL,
+              case .ready(let dryRun) = exportDryRunState
+        else { return nil }
+        return try ExportExecuteRequest(
+            bundle: bundle.path,
+            containerID: profile.containerProfile.containerID,
+            containerVersion: profile.containerProfile.containerVersion,
+            consumerID: profile.consumerProfile?.consumerID,
+            consumerProfileVersion: profile.consumerProfile?.profileVersion,
+            sourceTrustPolicy: exportSourceTrustPolicy,
+            expectedManifestSHA256: resolvedExportManifestSHA256,
+            destinationRoot: destination.path,
+            expectedExportPlanID: dryRun.plan.exportPlanID
+        )
+    }
+
+    private func currentExportVerifyRequest() throws -> ExportVerifyRequest? {
+        guard let bundle = resolvedExportBundleURL,
+              let profile = selectedExportProfile,
+              let destination = resolvedExportDestinationURL,
+              case .ready(let dryRun) = exportDryRunState
+        else { return nil }
+        return try ExportVerifyRequest(
+            bundle: bundle.path,
+            containerID: profile.containerProfile.containerID,
+            containerVersion: profile.containerProfile.containerVersion,
+            consumerID: profile.consumerProfile?.consumerID,
+            consumerProfileVersion: profile.consumerProfile?.profileVersion,
+            sourceTrustPolicy: exportSourceTrustPolicy,
+            expectedManifestSHA256: resolvedExportManifestSHA256,
+            destinationRoot: destination.path,
+            expectedExportPlanID: dryRun.plan.exportPlanID
+        )
+    }
+
+    private static func exportDiscoveryState(
+        from response: ExportSurfaceResponse<ExportDiscovery>
+    ) -> ExportDiscoveryState {
+        switch response.status {
+        case .ok:
+            if let result = response.result { return .ready(result) }
+            return .unavailable("Export discovery returned no result.")
+        case .error, .cancelled:
+            return .unavailable(response.error?.message ?? "Export discovery failed.")
+        case .visiblePartial:
+            return .unavailable("Export discovery does not admit visible_partial.")
+        }
+    }
+
+    private static func exportDryRunState(
+        from response: ExportSurfaceResponse<ExportDryRunResult>
+    ) -> ExportDryRunState {
+        switch response.status {
+        case .ok:
+            if let result = response.result { return .ready(result) }
+            return .unavailable("Export dry-run returned no result.")
+        case .error, .cancelled:
+            return .unavailable(response.error?.message ?? "Export dry-run failed.")
+        case .visiblePartial:
+            return .unavailable("Export dry-run does not admit visible_partial.")
+        }
+    }
+
+    private static func exportInspectState(
+        from response: ExportSurfaceResponse<ExportInspectionResult>
+    ) -> ExportInspectState {
+        switch response.status {
+        case .ok:
+            if let result = response.result { return .ready(result) }
+            return .unavailable("Export inspect returned no result.")
+        case .error, .cancelled:
+            return .unavailable(response.error?.message ?? "Export inspect failed.")
+        case .visiblePartial:
+            return .unavailable("Export inspect does not admit visible_partial.")
+        }
+    }
+
+    private static func exportExecuteState(
+        from response: ExportSurfaceResponse<ExportExecutionResult>
+    ) -> ExportExecuteState {
+        switch response.status {
+        case .ok:
+            if let result = response.result { return .ready(result) }
+            return .unavailable("Export execute returned no result.")
+        case .error, .cancelled:
+            return .unavailable(response.error?.message ?? "Export execute failed.")
+        case .visiblePartial:
+            if let result = response.result {
+                return .visiblePartial(
+                    result,
+                    response.error?.message ?? "Export execute finished with visible partial evidence."
+                )
+            }
+            return .unavailable("Export execute visible_partial is missing result evidence.")
+        }
+    }
+
+    private static func exportVerifyState(
+        from response: ExportSurfaceResponse<ExportVerifyResult>
+    ) -> ExportVerifyState {
+        switch response.status {
+        case .ok:
+            if let result = response.result { return .ready(result) }
+            return .unavailable("Export verify returned no result.")
+        case .error, .cancelled:
+            return .unavailable(response.error?.message ?? "Export verify failed.")
+        case .visiblePartial:
+            return .unavailable("Export verify does not admit visible_partial.")
+        }
+    }
+
     func addSources(_ urls: [URL]) {
         let existing = Set(sourceURLs.map(\.path))
         for url in urls where !existing.contains(url.path) {
@@ -1237,6 +1814,7 @@ final class WorkbenchViewModel: ObservableObject {
                     log: combinedLog,
                     logFileURL: logFileURL
                 )
+                adoptExportBundleIfNeeded(force: true)
                 appendLog("Compile complete.")
                 if let logFileURL {
                     appendToLogFile(logFileURL, text: "Compile complete.\n")

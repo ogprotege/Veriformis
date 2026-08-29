@@ -5,16 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-29
 
-**Local branch:** `phase18/06-prepublication-samples`
+**Local branch:** `phase18/07-export-flows`
 
-**Completed:** Item 18.5, PR #164 at `2faad0d`.
+**Completed:** Item 18.6, PR #165 at `093a4fd`.
 
-**Current item:** 18.6 pre-publication samples. ResultView shows recovery,
-mapping, supervised region, preview-only quality, exclusions, and split
-facts. Dry-run destination tree waits until a container is selected.
-No renderer. No destination write. Quality does not block seal.
+**Current item:** 18.7 export flows. Sidebar adds Exports. Discover,
+dry-run, inspect, operator-confirmed execute, and verify wrap the
+existing CLI. Generic containers first. Named profiles only for admitted
+schemas. No membership mutation. No Hub. No train. Review stays out.
 
-**Next gate:** Publish the 18.6 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 18.7.
+**Next gate:** Publish the 18.7 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.8.
 
 **Decision:** ADR-0019 Decision A. Swift is a process adapter.

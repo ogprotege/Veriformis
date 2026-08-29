@@ -202,7 +202,7 @@
       "packet": "dev/active/independent-product/phase-18-goal-first-workbench",
       "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Item 18.5 merged as PR #164 at 2faad0d. Item 18.6 shows pre-publication samples before 18.7 export flows. Swift owns no dataset policy."
+      "next_gate": "Item 18.6 merged as PR #165 at 093a4fd. Item 18.7 wires export discover, dry-run, inspect, operator-confirmed execute, and verify. Review waits for 18.8. Swift owns no dataset policy."
     },
     {
       "number": 19,

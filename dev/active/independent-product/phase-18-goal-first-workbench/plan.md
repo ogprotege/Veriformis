@@ -111,7 +111,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/07-export-flows`
 
-- [ ] Wire the existing Swift export bridge. Always display bundle and
+- [x] Wire the existing Swift export bridge. Always display bundle and
       receipt. Profiles refuse family schemas.
 
 ### 18.8 Add Mac Review over existing review packets

@@ -54,6 +54,10 @@ struct ResultView: View {
                 Button("Reveal workspace") {
                     workbench.reveal(result.workspaceURL)
                 }
+                Button("Go to Exports") {
+                    workbench.openExports(for: result)
+                }
+                .accessibilityLabel("Go to Exports for this sealed bundle")
                 Button("Reveal transport archive") {
                     workbench.reveal(result.transportArchiveURL)
                 }

@@ -363,6 +363,11 @@ struct VeriformisCLI: Sendable {
         .joined(separator: " && \\\n")
     }
 
+    /// Exact CLI equivalent of one export-surface invocation.
+    static func exportCLIEquivalent(arguments: [String]) -> String {
+        "veriformis " + arguments.map(shellQuote).joined(separator: " ")
+    }
+
     /// Exact CLI argument projection for one runtime-only compile preflight.
     /// Omitted overrides leave the selected versioned preset authoritative.
     static func preflightArguments(_ request: CompilePreflightRequest) -> [String] {

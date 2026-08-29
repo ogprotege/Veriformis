@@ -18,7 +18,7 @@ def _read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
-def test_sidebar_still_excludes_review_and_exports() -> None:
+def test_sidebar_includes_exports_and_still_excludes_review() -> None:
     models = _read("macos/Sources/Models/WorkbenchModels.swift")
     block = re.search(
         r"enum SidebarDestination[^{]*\{(?P<body>.*?)\n\}",
@@ -27,7 +27,7 @@ def test_sidebar_still_excludes_review_and_exports() -> None:
     )
     assert block is not None
     cases = re.findall(r"^\s*case (\w+)$", block.group("body"), re.M)
-    assert cases == ["home", "compile", "history", "settings"]
+    assert cases == ["home", "compile", "exports", "history", "settings"]
     title_block = re.search(
         r"var title: String \{(?P<body>.*?)\n    \}",
         models,
@@ -35,10 +35,10 @@ def test_sidebar_still_excludes_review_and_exports() -> None:
     )
     assert title_block is not None
     titles = re.findall(r'case \.\w+: return "([^"]+)"', title_block.group("body"))
-    assert titles == ["Home", "Compile", "History", "Settings"]
+    assert titles == ["Home", "Compile", "Exports", "History", "Settings"]
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
     assert "ReviewView.swift" not in views
-    assert "ExportsView.swift" not in views
+    assert "ExportsView.swift" in views
     assert "MappingView.swift" not in views
 
 

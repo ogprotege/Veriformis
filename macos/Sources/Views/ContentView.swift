@@ -20,6 +20,8 @@ struct ContentView: View {
                 HomeView()
             case .compile:
                 CompileView()
+            case .exports:
+                ExportsView()
             case .history:
                 HistoryView()
             case .settings:

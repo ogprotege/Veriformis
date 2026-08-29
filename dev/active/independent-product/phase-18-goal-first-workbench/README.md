@@ -36,6 +36,6 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.5 merged as PR #164. Item 18.6 shows pre-publication samples.
-Quality findings stay preview-only. Sidebar remains Home / Compile /
-History / Settings.
+Item 18.6 merged as PR #165. Item 18.7 wires Exports over the existing
+CLI export bridge. Generic containers come first. Named profiles appear
+only for schemas they admit. Review stays out of the sidebar.
