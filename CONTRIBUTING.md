@@ -55,8 +55,9 @@ Public plugins skipped with a record. Phase 17 advanced dataset
 families is complete. ADR-0018 Decision A: no compile-path generator.
 Generation, multimodal, pre-tokenized, and unmapped trainer profiles
 skipped with records. Phase 18 goal-first Mac workbench is in progress
-under its own packet. Item 18.1 merged as PR #160. Item 18.2 pins
-ADR-0019. Do not start Phase 19 from that packet.
+under its own packet. Item 18.2 merged as PR #161. Item 18.3 replaces
+Aptus-centered copy with goal-first IA. Do not start Phase 19 from that
+packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

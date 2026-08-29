@@ -782,13 +782,22 @@ final class CLIBridgeTests: XCTestCase {
         let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalData)
         let presets = try JSONDecoder().decode(RecipePresetCatalog.self, from: presetData)
 
-        let expectedCellIDs = goals.goals.flatMap { goal in
-            goal.eligibleInputFamilies.flatMap { family in
-                goal.compatibleRepresentations.map { representation in
-                    "\(goal.goalID)__\(family)__\(representation)"
+        let documentSourceObjectives: Set<TrainingObjective> = [
+            .fullText,
+            .continuation,
+            .sectionReconstruction,
+            .beforeAfterTransformation,
+            .structuredField,
+        ]
+        let expectedCellIDs = goals.goals
+            .filter { documentSourceObjectives.contains($0.objective) }
+            .flatMap { goal in
+                goal.eligibleInputFamilies.flatMap { family in
+                    goal.compatibleRepresentations.map { representation in
+                        "\(goal.goalID)__\(family)__\(representation)"
+                    }
                 }
             }
-        }
         XCTAssertEqual(fixture.cells.map(\.cellID), expectedCellIDs)
         XCTAssertEqual(Set(expectedCellIDs).count, 74)
 
@@ -1121,7 +1130,7 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(catalog.defaults.segmentation, RecipeSegmentationSettings(strategy: "paragraph", size: 1000, overlap: 100))
         XCTAssertEqual(catalog.defaults.construction.splitRatioPPM, 500_000)
         XCTAssertEqual(catalog.defaults.curation.splitSeed, "veriformis-v1")
-        XCTAssertEqual(catalog.presets.count, 5)
+        XCTAssertEqual(catalog.presets.count, 9)
         let section = try XCTUnwrap(catalog.safePreset(forGoal: "recover-a-section-from-its-heading"))
         XCTAssertEqual(section.segmentation.strategy, "structure")
         XCTAssertEqual(section.representationID, "prompt-and-completion")
@@ -1191,7 +1200,7 @@ final class CLIBridgeTests: XCTestCase {
             """
         )
         let catalog = try await VeriformisCLI(executableURL: executable, prefixArguments: []).discoverPresets()
-        XCTAssertEqual(catalog.presets.count, 5)
+        XCTAssertEqual(catalog.presets.count, 9)
         XCTAssertEqual(try String(contentsOf: arguments, encoding: .utf8), "presets\n")
     }
 
@@ -1426,6 +1435,10 @@ final class CLIBridgeTests: XCTestCase {
                 "recover-a-section-from-its-heading",
                 "reproduce-a-recorded-change",
                 "extract-a-structured-value",
+                "classify-with-provided-labels",
+                "prefer-chosen-over-rejected",
+                "use-provided-tool-traces",
+                "use-provided-steps",
             ]
         )
         XCTAssertEqual(
@@ -1443,10 +1456,26 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(instruction.rowSchema, "instruction_output")
         XCTAssertEqual(
             instruction.compatibleGenericExports,
-            ["split-jsonl-directory", "json", "constrained-csv"]
+            [
+                "split-jsonl-directory",
+                "json",
+                "constrained-csv",
+                "parquet",
+                "arrow",
+                "hugging-face-dataset",
+            ]
         )
         let conversation = try XCTUnwrap(catalog.representation(withID: "conversation"))
-        XCTAssertEqual(conversation.compatibleGenericExports, ["split-jsonl-directory", "json"])
+        XCTAssertEqual(
+            conversation.compatibleGenericExports,
+            [
+                "split-jsonl-directory",
+                "json",
+                "parquet",
+                "arrow",
+                "hugging-face-dataset",
+            ]
+        )
         let structural = try XCTUnwrap(catalog.goal(withID: "extract-a-structured-value"))
         XCTAssertEqual(
             structural.eligibleInputFamilies,
@@ -1702,7 +1731,7 @@ final class CLIBridgeTests: XCTestCase {
             prefixArguments: []
         ).discoverGoals()
 
-        XCTAssertEqual(catalog.goals.count, 5)
+        XCTAssertEqual(catalog.goals.count, 9)
         XCTAssertEqual(
             try String(contentsOf: arguments, encoding: .utf8),
             "goals\n"
@@ -3145,6 +3174,49 @@ final class CLIBridgeTests: XCTestCase {
                 "--goal", "reproduce-a-recorded-change",
                 "--representation", "prompt-and-completion",
             ]
+        )
+    }
+
+    func testSidebarDestinationsRemainHomeCompileHistorySettings() {
+        XCTAssertEqual(
+            SidebarDestination.allCases.map(\.rawValue),
+            ["home", "compile", "history", "settings"]
+        )
+        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Review"))
+        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Exports"))
+    }
+
+    func testCLIEquivalentMatchesCompilePlanAndOmitsAptusByDefault() {
+        let sources = [URL(fileURLWithPath: "/data/raw/a.txt")]
+        let root = URL(fileURLWithPath: "/data/raw")
+        let workspace = URL(fileURLWithPath: "/tmp/ws")
+        let bundle = URL(fileURLWithPath: "/tmp/out.vfbundle")
+        let plan = VeriformisCLI.compilePlan(
+            sources: sources,
+            sourceRoot: root,
+            workspace: workspace,
+            bundle: bundle,
+            goal: "learn-the-text",
+            preset: "learn-the-text.safe",
+            allowEmptyEvaluation: false,
+            splitRatioPPM: nil
+        )
+        let equivalent = VeriformisCLI.cliEquivalent(for: plan)
+        XCTAssertTrue(equivalent.hasPrefix("veriformis parse "))
+        XCTAssertTrue(equivalent.contains(" && \\\nveriformis clean "))
+        XCTAssertTrue(equivalent.contains("veriformis seal "))
+        XCTAssertFalse(equivalent.lowercased().contains("aptus"))
+        XCTAssertEqual(
+            equivalent.split(separator: "\n").count,
+            plan.count
+        )
+        XCTAssertEqual(
+            VeriformisCLI.shellQuote("/tmp/ws"),
+            "/tmp/ws"
+        )
+        XCTAssertEqual(
+            VeriformisCLI.shellQuote("path with space"),
+            "'path with space'"
         )
     }
 

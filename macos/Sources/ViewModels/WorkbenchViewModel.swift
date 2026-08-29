@@ -74,6 +74,34 @@ final class WorkbenchViewModel: ObservableObject {
     @Published var lastCopiedNotice: String?
     @Published var runStatusMessage = "Ready"
 
+    /// Copyable CLI equivalent of the current document-source compile plan.
+    /// Nil until sources, goal, preset, and output folder are chosen.
+    var currentCompileCLIEquivalent: String? {
+        guard let request = currentCompilePreflightRequest(),
+              let output = outputDirectoryURL
+        else { return nil }
+        let workspace = output.appendingPathComponent("workspace", isDirectory: true)
+        let bundle = output.appendingPathComponent("dataset.vfbundle")
+        let plan = VeriformisCLI.compilePlan(
+            sources: request.sources,
+            sourceRoot: request.sourceRoot,
+            workspace: workspace,
+            bundle: bundle,
+            goal: request.goal,
+            preset: request.preset,
+            allowEmptyEvaluation: allowEmptyEvaluation,
+            splitRatioPPM: splitRatioPPM,
+            representation: request.representation,
+            instruction: request.instruction,
+            cleaningRules: request.rules,
+            cleaningCustom: request.custom,
+            chunkSize: request.size,
+            chunkOverlap: request.overlap,
+            includeHandoff: writeAptusHandoff
+        )
+        return VeriformisCLI.cliEquivalent(for: plan)
+    }
+
     // History + settings
     @Published var runHistory: [RunHistoryEntry] = []
     @Published var selectedHistoryID: UUID?

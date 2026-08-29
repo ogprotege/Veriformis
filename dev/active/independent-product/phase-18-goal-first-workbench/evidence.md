@@ -55,6 +55,28 @@ were also complete.
 - [x] No Review, Exports, or dataset-row UI.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 
+## Required item 18.3 evidence
+
+- [x] Home and Compile copy is goal-first. Aptus is optional, not required.
+- [x] Copyable CLI equivalent of the current document-source compile plan.
+- [x] Sidebar remains Home / Compile / History / Settings.
+- [x] No dataset-row, export execute, or review submit.
+- [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
+      and diff check pass.
+
+## Item 18.3 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 67 passed |
+| `xcodebuild … test` (Veriformis scheme) | 100 passed |
+| `macos/scripts/parity_check.sh` | PASS |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,530 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
 ## Item 18.2 local gate evidence
 
 | Gate | Result |

@@ -321,6 +321,23 @@ struct VeriformisCLI: Sendable {
         ]
     }
 
+    /// Quote one argv token for a copyable shell equivalent.
+    static func shellQuote(_ value: String) -> String {
+        let safe = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_./:@+,"))
+        if !value.isEmpty, value.unicodeScalars.allSatisfy({ safe.contains($0) }) {
+            return value
+        }
+        return "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+
+    /// Exact CLI equivalent of a compile plan. Loading this string is not an execute.
+    static func cliEquivalent(for plan: [StageCommand]) -> String {
+        plan.map { command in
+            "veriformis " + command.arguments.map(shellQuote).joined(separator: " ")
+        }
+        .joined(separator: " && \\\n")
+    }
+
     /// Exact CLI argument projection for one runtime-only compile preflight.
     /// Omitted overrides leave the selected versioned preset authoritative.
     static func preflightArguments(_ request: CompilePreflightRequest) -> [String] {

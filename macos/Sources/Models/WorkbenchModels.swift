@@ -34,6 +34,10 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
     case sectionReconstruction = "section_reconstruction"
     case beforeAfterTransformation = "before_after_transformation"
     case structuredField = "structured_field"
+    case explicitLabel = "explicit_label"
+    case preferencePair = "preference_pair"
+    case toolCall = "tool_call"
+    case stepwise = "stepwise"
 
     var id: String { rawValue }
 
@@ -44,6 +48,10 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
         case .sectionReconstruction: return "Section reconstruction"
         case .beforeAfterTransformation: return "Before / after"
         case .structuredField: return "Structured field"
+        case .explicitLabel: return "Explicit label"
+        case .preferencePair: return "Preference pair"
+        case .toolCall: return "Tool call"
+        case .stepwise: return "Stepwise"
         }
     }
 
@@ -59,6 +67,14 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
             return "Paired before/after transformation examples"
         case .structuredField:
             return "Structured field extraction rows"
+        case .explicitLabel:
+            return "User-provided labels on the dataset-row path"
+        case .preferencePair:
+            return "User-provided chosen and rejected pairs on the dataset-row path"
+        case .toolCall:
+            return "User-provided tool traces on the dataset-row path"
+        case .stepwise:
+            return "User-provided ordered steps on the dataset-row path"
         }
     }
 }
@@ -158,8 +174,9 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
         let inputFamilies = try Self.requireAxis("input_family", in: payload)
 
         let expectedObjectives = Set(TrainingObjective.allCases.map(\.rawValue))
-        guard objectives.count == expectedObjectives.count,
-              Set(objectives) == expectedObjectives
+        guard !objectives.isEmpty,
+              Set(objectives).count == objectives.count,
+              Set(objectives).isSubset(of: expectedObjectives)
         else {
             throw TaxonomyDiscoveryError.invalidObjectives(objectives)
         }
@@ -2502,7 +2519,16 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
         "schema_id", "contract_id", "contract_version", "goals", "representations",
     ]
     /// Taxonomy v1 row schemas in taxonomy order; Python discovery is authoritative.
-    static let rowSchemaOrder = ["text", "prompt_completion", "instruction_output", "messages"]
+    static let rowSchemaOrder = [
+        "text",
+        "prompt_completion",
+        "instruction_output",
+        "messages",
+        "label-classification",
+        "preference-pair",
+        "tool-call-conversation",
+        "stepwise-trace",
+    ]
 
     let schemaID: String
     let contractID: String
