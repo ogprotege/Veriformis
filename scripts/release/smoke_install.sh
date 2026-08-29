@@ -21,8 +21,10 @@ uv python install "$SMOKE_PYTHON"
 
 echo "==> smoke_install: build wheel"
 uv build --python "$SMOKE_PYTHON" --wheel --out-dir "$TMP/dist"
-WHEEL="$(find "$TMP/dist" -name 'veriformis-*.whl' | head -n 1)"
-test -n "$WHEEL"
+shopt -s nullglob
+wheels=("$TMP/dist"/veriformis-*.whl)
+test "${#wheels[@]}" -eq 1
+WHEEL="${wheels[0]}"
 test -f "$WHEEL"
 echo "wheel: $WHEEL"
 
@@ -53,7 +55,11 @@ echo "==> smoke_install: installed CLI smoke"
 command -v veriformis >/dev/null
 veriformis version
 veriformis --help >/dev/null
-veriformis list-recipes | head -n 5
+# Capture the full listing first. Piping the CLI to `head` under `pipefail`
+# exits 1 from SIGPIPE once five lines have been printed.
+veriformis list-recipes > "$TMP/list-recipes.txt"
+test -s "$TMP/list-recipes.txt"
+head -n 5 "$TMP/list-recipes.txt"
 
 echo "==> smoke_install: standalone golden compile via installed CLI"
 VERIFORMIS_USE_PATH=1 bash "$ROOT/scripts/release/golden_compile.sh"
