@@ -2,17 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `259412d` on `main` after PR #166
+**Implementation baseline reviewed:** `b39ac1a` on `main` after PR #167
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.7
-merged; item 18.8 review flows)
+Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.8
+merged; item 18.9 accessibility and CLI equivalents)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-29 (Phase 18.8 review flows)
+**Last reviewed:** 2026-08-29 (Phase 18.9 accessibility)
 
-**Next review:** Phase 18.8 merge, or item 18.9 accessibility and CLI
-equivalents. Default `review_policy` stays `none`.
+**Next review:** Phase 18.9 merge, or item 18.10 adversarial closeout.
+Virtualization and full localization skipped with records.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -145,9 +145,10 @@ local, offline, and free of LLM generation.
       start Phase 18 from that packet.
 - [ ] Independent product Phase 18 is in progress under its
       [packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-      Item 18.7 merged as PR #166. Item 18.8 wraps review-export,
-      review-import, and review-submit. Default `review_policy` stays
-      `none`. Do not start Phase 19 from this packet.
+      Item 18.8 merged as PR #167. Item 18.9 adds accessibility, keyboard,
+      CLI equivalents, and error recovery. Virtualization and full
+      localization skipped with records. Do not start Phase 19 from this
+      packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

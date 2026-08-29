@@ -53,12 +53,15 @@ struct CompileView: View {
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
                         .disabled(!workbench.canCompile)
+                        .accessibilityLabel("Compile to sealed bundle")
+                        .keyboardShortcut(.return, modifiers: .command)
 
                         if !workbench.runHistory.isEmpty {
                             Button("Re-run last") {
                                 workbench.reRunLastConfiguration()
                             }
                             .disabled(workbench.isRunning)
+                            .accessibilityLabel("Re-run last compile")
                         }
                     }
 
@@ -113,6 +116,7 @@ struct CompileView: View {
 
             HStack {
                 Button("Output folder…") { workbench.chooseOutputDirectory() }
+                    .accessibilityLabel("Choose output folder")
                 if let out = workbench.outputDirectoryURL {
                     Text(out.path)
                         .lineLimit(1)
@@ -125,6 +129,7 @@ struct CompileView: View {
             DisclosureGroup("Integrations (optional)", isExpanded: $showIntegrations) {
                 VStack(alignment: .leading, spacing: 6) {
                     Toggle("Write Aptus handoff file", isOn: $workbench.writeAptusHandoff)
+                        .accessibilityLabel("Write Aptus handoff file")
                     Text("Off by default. Writes a sibling compatibility descriptor; Veriformis compilation and verification do not require it.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -140,6 +145,7 @@ struct CompileView: View {
                         .foregroundStyle(.secondary)
                     HStack {
                         Button("Source root…") { workbench.chooseSourceRoot() }
+                            .accessibilityLabel("Choose source root")
                         if let root = workbench.resolvedSourceRoot {
                             Text(root.path)
                                 .lineLimit(1)
@@ -360,6 +366,18 @@ struct CompileView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
+                if let equivalent = workbench.currentMappingCLIEquivalent {
+                    Text(equivalent)
+                        .font(.system(.caption, design: .monospaced))
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Copy mapping CLI equivalent") {
+                        workbench.copyToPasteboard(equivalent, label: "mapping CLI equivalent")
+                    }
+                    .controlSize(.small)
+                    .accessibilityLabel("Copy mapping CLI equivalent")
+                }
+
                 Button("Detect mapping") {
                     workbench.detectMapping()
                 }
@@ -543,6 +561,7 @@ struct CompileView: View {
                         Text(goal.title).tag(goal.goalID)
                     }
                 }
+                .accessibilityLabel("Goal")
                 if let goal = workbench.selectedGoal {
                     Text(goal.plainLanguage)
                         .font(.caption)
@@ -569,6 +588,7 @@ struct CompileView: View {
                             Text(preset.title).tag(preset.presetID)
                         }
                     }
+                    .accessibilityLabel("Recipe preset")
                     if let preset = workbench.selectedPreset {
                         Text(preset.plainLanguage)
                             .font(.caption)

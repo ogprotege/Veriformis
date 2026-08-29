@@ -469,6 +469,27 @@ final class WorkbenchViewModel: ObservableObject {
         return lines.isEmpty ? nil : lines.joined(separator: " && \\\n")
     }
 
+    /// Copyable CLI equivalent of mapping-detect and, after confirm, mapping-preview.
+    var currentMappingCLIEquivalent: String? {
+        guard currentCompileUsesMapping, let path = mappingRowSourceURL else { return nil }
+        var detect = ["mapping-detect", path.path]
+        if let root = resolvedSourceRoot {
+            detect += ["--source-root", root.path]
+        }
+        var lines = [VeriformisCLI.exportCLIEquivalent(arguments: detect)]
+        if confirmedMappingPlan != nil, let output = outputDirectoryURL {
+            let planURL = output
+                .appendingPathComponent("workspace", isDirectory: true)
+                .appendingPathComponent("confirmed-mapping-plan.json")
+            var preview = ["mapping-preview", path.path, "--plan", planURL.path]
+            if let root = resolvedSourceRoot {
+                preview += ["--source-root", root.path]
+            }
+            lines.append(VeriformisCLI.exportCLIEquivalent(arguments: preview))
+        }
+        return lines.joined(separator: " && \\\n")
+    }
+
     var canCompile: Bool {
         guard !isRunning,
               cli != nil,

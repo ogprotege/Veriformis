@@ -23,11 +23,15 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                         TextField("/path/to/veriformis", text: $workbench.cliOverridePath)
                             .textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("CLI path override")
 
                         HStack {
                             Button("Apply override") { workbench.saveCLIOverride() }
+                                .accessibilityLabel("Apply CLI path override")
                             Button("Clear override") { workbench.clearCLIOverride() }
+                                .accessibilityLabel("Clear CLI path override")
                             Button("Re-detect CLI") { workbench.bootstrapCLI() }
+                                .accessibilityLabel("Re-detect CLI")
                         }
 
                         Text("GUI apps often lack your Terminal PATH. Prefer bash macos/scripts/run_workbench.sh or docs/install.md.")
@@ -45,6 +49,7 @@ struct SettingsView: View {
                             .font(.system(.body, design: .monospaced))
                             .textSelection(.enabled)
                         Button("Choose default…") { workbench.chooseDefaultOutputDirectory() }
+                            .accessibilityLabel("Choose default output folder")
                         Text("Used on Compile when no folder is selected yet. Defaults to ~/Documents/Veriformis.")
                             .font(.caption)
                             .foregroundStyle(.secondary)

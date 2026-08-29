@@ -35,6 +35,7 @@ struct HomeView: View {
                         Text("• On Exports: choose that bundle, a generic container first, then operator-confirmed execute. The source bundle and receipt stay visible. The exporter does not train.")
                         Text("• Aptus is optional Integrations. It is not required.")
                         Text("• Output defaults to Documents/Veriformis (change in Settings).")
+                        Text("• Keyboard: ⌘1–⌘6 switch Home, Compile, Review, Exports, History, Settings. ⌘Return compiles. ⌘. cancels. ⇧⌘C copies the compile CLI equivalent.")
                         Text("• Install / CLI help: docs/install.md in the repo.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

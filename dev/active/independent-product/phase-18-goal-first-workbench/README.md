@@ -36,6 +36,7 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.7 merged as PR #166. Item 18.8 wraps review-export, review-import,
-and review-submit. Default `review_policy` stays `none`. Corrections are
-new identities. Required unresolved reviews still block seal.
+Item 18.8 merged as PR #167. Item 18.9 adds accessibility labels, keyboard
+shortcuts, copyable CLI equivalents, and error recovery. Virtualization
+and full localization skipped with records. English v1. No GitHub
+xcodebuild job.

@@ -59,6 +59,35 @@ struct VeriformisApp: App {
         }
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandMenu("Go") {
+                Button("Home") { workbench.destination = .home }
+                    .keyboardShortcut("1", modifiers: .command)
+                Button("Compile") { workbench.destination = .compile }
+                    .keyboardShortcut("2", modifiers: .command)
+                Button("Review") { workbench.destination = .review }
+                    .keyboardShortcut("3", modifiers: .command)
+                Button("Exports") { workbench.destination = .exports }
+                    .keyboardShortcut("4", modifiers: .command)
+                Button("History") { workbench.destination = .history }
+                    .keyboardShortcut("5", modifiers: .command)
+                Button("Settings") { workbench.destination = .settings }
+                    .keyboardShortcut("6", modifiers: .command)
+            }
+            CommandMenu("Compile") {
+                Button("Compile to sealed bundle") { workbench.compile() }
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .disabled(!workbench.canCompile)
+                Button("Cancel compile") { workbench.cancelCompile() }
+                    .keyboardShortcut(".", modifiers: .command)
+                    .disabled(!workbench.isRunning)
+                Button("Copy compile CLI equivalent") {
+                    if let text = workbench.currentCompileCLIEquivalent {
+                        workbench.copyToPasteboard(text, label: "CLI equivalent")
+                    }
+                }
+                .keyboardShortcut("c", modifiers: [.command, .shift])
+                .disabled(workbench.currentCompileCLIEquivalent == nil)
+            }
         }
     }
 }

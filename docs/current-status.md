@@ -78,13 +78,14 @@ Phase 17 advanced dataset families is complete under its own packet.
 Classification, preference, tool-call, and stepwise compile from
 user-provided evidence. ADR-0018 Decision A: no compile-path generator.
 Phase 18 goal-first Mac workbench is in progress under its own packet.
-Item 18.7 merged as PR #166. Item 18.8 wraps review-export, review-import,
-and review-submit. Default `review_policy` stays `none`. No heuristic
-blocks seal.
+Item 18.8 merged as PR #167. Item 18.9 adds accessibility labels, keyboard
+shortcuts, copyable CLI equivalents, and error recovery. Virtualization
+and full localization are skipped with records. English v1. Default
+`review_policy` stays `none`. No heuristic blocks seal.
 
-**Review date:** 2026-08-29 (independent-product Phase 18.8 review flows)
+**Review date:** 2026-08-29 (independent-product Phase 18.9 accessibility)
 
-**Next review:** Phase 18.8 merge, item 18.9 accessibility, or any
+**Next review:** Phase 18.9 merge, item 18.10 adversarial closeout, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -845,11 +846,11 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–17 are complete. The current critical-path work
 is Phase 18 under the
 [goal-first-workbench packet](../dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-Item 18.8 wires Review over existing review packets. Sidebar is Home /
-Compile / Review / Exports / History / Settings. There is no
-`GeneratorPass`. Do not start Phase 19 from this packet.
+Item 18.9 adds accessibility, keyboard, CLI equivalents, and error
+recovery. Virtualization and full localization skipped with records.
+There is no `GeneratorPass`. Do not start Phase 19 from this packet.
 
-The next behavior change is item 18.9 accessibility and CLI equivalents.
+The next behavior change is item 18.10 adversarial closeout.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),
