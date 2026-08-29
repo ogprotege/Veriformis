@@ -31,6 +31,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("• On Compile: choose document-source, dataset-row, or mixed, add Sources, choose a Goal, then compile.")
                         Text("• Success is a sealed, independently verified .vfbundle — not file conversion and not a trainer handoff.")
+                        Text("• On Review: wrap review-export, review-import, and review-submit. Default review_policy stays none.")
                         Text("• On Exports: choose that bundle, a generic container first, then operator-confirmed execute. The source bundle and receipt stay visible. The exporter does not train.")
                         Text("• Aptus is optional Integrations. It is not required.")
                         Text("• Output defaults to Documents/Veriformis (change in Settings).")

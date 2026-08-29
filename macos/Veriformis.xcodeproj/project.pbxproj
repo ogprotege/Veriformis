@@ -15,6 +15,7 @@
 		8E278DA5292F7D7A83AD5459 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1189607C715AFA41B0533A8 /* SettingsView.swift */; };
 		92D9A1898D8127438EEEAC56 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB040350CF5A9FCB4330EE /* ContentView.swift */; };
 		A47C19E2B0D84F6A9C1E5D33 /* ExportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F31B6A4C9E2071B5A0D4E2 /* ExportsView.swift */; };
+		C91E4B7A2F8D41C09E6A5B12 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4A18F0B7C35E2A91D0C4B8 /* ReviewView.swift */; };
 		ACCAE40DD7DDCB25171806DB /* SourceDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */; };
 		AF846AA42ED1DFAC874E2735 /* VeriformisCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E01900D4217D4C71D78091 /* VeriformisCLI.swift */; };
 		BB49402B4D8C3096C9A8F1C9 /* CompileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000538D22DEB19336D0FA5 /* CompileView.swift */; };
@@ -51,6 +52,7 @@
 		9C6F40FCBC7EB09ED99275BE /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		B5BB040350CF5A9FCB4330EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D8F31B6A4C9E2071B5A0D4E2 /* ExportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportsView.swift; sourceTree = "<group>"; };
+		6D4A18F0B7C35E2A91D0C4B8 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		D43684FC8CB1F9FC5B922034 /* RunSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunSheetView.swift; sourceTree = "<group>"; };
 		E0000538D22DEB19336D0FA5 /* CompileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompileView.swift; sourceTree = "<group>"; };
 		F1189607C715AFA41B0533A8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 				82E889DF5653DBBD8CBF68D9 /* HomeView.swift */,
 				5975EE5DE33F44423DBF671F /* LogView.swift */,
 				9C6F40FCBC7EB09ED99275BE /* ResultView.swift */,
+				6D4A18F0B7C35E2A91D0C4B8 /* ReviewView.swift */,
 				D43684FC8CB1F9FC5B922034 /* RunSheetView.swift */,
 				F1189607C715AFA41B0533A8 /* SettingsView.swift */,
 				3714B8FA472A6DECC5096EA8 /* SourceDropView.swift */,
@@ -218,6 +221,7 @@
 				BF1FD6A5079B5063C7B62E9F /* HomeView.swift in Sources */,
 				FAA5A038686A1489C906C2FA /* LogView.swift in Sources */,
 				0E861917972A8445E9CAD4C5 /* ResultView.swift in Sources */,
+				C91E4B7A2F8D41C09E6A5B12 /* ReviewView.swift in Sources */,
 				2698325F12E7E4A07EF4D6E8 /* RunSheetView.swift in Sources */,
 				8E278DA5292F7D7A83AD5459 /* SettingsView.swift in Sources */,
 				ACCAE40DD7DDCB25171806DB /* SourceDropView.swift in Sources */,

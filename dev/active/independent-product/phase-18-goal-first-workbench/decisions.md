@@ -26,3 +26,4 @@
 | Inspectable settings bind the versioned preset and goal contract; no Swift recipe defaults | Accepted | Item 18.5; validation and profiles inspect-only until 18.7 |
 | Pre-publication samples omit oversized payloads whole; quality stays preview-only; no renderer | Accepted | Item 18.6; destination tree waits until a container is selected |
 | Export flows wrap discover, dry-run, inspect, operator-confirmed execute, and verify; generic containers first; named profiles only for admitted schemas | Accepted | Item 18.7; no membership mutation, no Hub, no train |
+| Review wraps review-export, review-import, and operator-confirmed review-submit; default review_policy stays none | Accepted | Item 18.8; corrections are new identities |

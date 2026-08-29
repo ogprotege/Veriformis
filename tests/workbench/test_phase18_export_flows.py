@@ -28,10 +28,10 @@ def test_sidebar_includes_exports_without_review() -> None:
     )
     assert block is not None
     cases = re.findall(r"^\s*case (\w+)$", block.group("body"), re.M)
-    assert cases == ["home", "compile", "exports", "history", "settings"]
+    assert cases == ["home", "compile", "review", "exports", "history", "settings"]
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
     assert "ExportsView.swift" in views
-    assert "ReviewView.swift" not in views
+    assert "ReviewView.swift" in views
     content = _read("macos/Sources/Views/ContentView.swift")
     assert "case .exports:" in content
     assert "ExportsView()" in content
@@ -63,7 +63,6 @@ def test_export_view_wires_discover_dry_run_confirmed_execute_and_verify() -> No
     assert "var currentExportCLIEquivalent: String?" in model
     assert "overwritePolicy" in view
     assert "review-submit" not in view
-    assert "review-submit" not in model
 
 
 def test_named_profiles_filter_to_admitted_schemas() -> None:

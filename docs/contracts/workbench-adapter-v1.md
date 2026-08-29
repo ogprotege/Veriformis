@@ -9,8 +9,8 @@
 **Status:** Schema pin through independent-product Phase 18.2. Loading a pin
 is not a screen execute. ADR-0019 Decision A: Swift is a process adapter;
 `PipelineService` owns policy. Item 18.4 licensed dataset-row mapping on
-Compile. Item 18.7 licensed Exports over existing wrap commands. Review
-waits for a later licensed item.
+Compile. Item 18.7 licensed Exports over existing wrap commands. Item
+18.8 licensed Review over existing wrap commands.
 
 **Last reviewed:** 2026-08-28
 

@@ -37,11 +37,8 @@ def test_recipe_settings_inspect_preset_and_goal_contract() -> None:
 def test_inspectable_settings_do_not_execute_export_or_review() -> None:
     compile_view = _read("macos/Sources/Views/CompileView.swift")
     model = _read("macos/Sources/ViewModels/WorkbenchViewModel.swift")
-    views = {path.name for path in (MACOS / "Views").glob("*.swift")}
-    assert "ReviewView.swift" not in views
     assert "executeExport" not in compile_view
     assert "review-submit" not in compile_view
-    assert "review-submit" not in model
     assert "review_policy = \"required\"" not in compile_view
     assert "reviewPolicy = \"required\"" not in compile_view
     assert "review_policy = \"required\"" not in model

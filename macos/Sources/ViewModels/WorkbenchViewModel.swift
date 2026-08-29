@@ -97,6 +97,14 @@ final class WorkbenchViewModel: ObservableObject {
     @Published private(set) var exportInspectState: ExportInspectState = .idle
     @Published private(set) var exportExecuteState: ExportExecuteState = .idle
     @Published private(set) var exportVerifyState: ExportVerifyState = .idle
+    @Published var reviewPlanID: String = ""
+    @Published var reviewItemsURL: URL?
+    @Published var reviewPacketURL: URL?
+    @Published var reviewSubmitConfirmed = false
+    @Published var reviewIsRunning = false
+    @Published private(set) var reviewExportState: ReviewExportState = .idle
+    @Published private(set) var reviewImportState: ReviewImportState = .idle
+    @Published private(set) var reviewSubmitState: ReviewSubmitState = .idle
     @Published private(set) var taxonomyHelpState: TaxonomyHelpState = .idle
     @Published private(set) var goalCatalogState: GoalCatalogState = .idle
     @Published private(set) var recipePresetState: RecipePresetState = .idle
@@ -225,6 +233,12 @@ final class WorkbenchViewModel: ObservableObject {
     private var exportExecuteController: CLIProcessController?
     private var exportVerifyTask: Task<Void, Never>?
     private var exportVerifyController: CLIProcessController?
+    private var reviewExportTask: Task<Void, Never>?
+    private var reviewExportController: CLIProcessController?
+    private var reviewImportTask: Task<Void, Never>?
+    private var reviewImportController: CLIProcessController?
+    private var reviewSubmitTask: Task<Void, Never>?
+    private var reviewSubmitController: CLIProcessController?
 
     var rowSourceURLs: [URL] {
         sourceURLs.filter { url in
@@ -408,6 +422,51 @@ final class WorkbenchViewModel: ObservableObject {
             return nil
         }
         return lines.joined(separator: " && \\\n")
+    }
+
+    var canExportReviewPacket: Bool {
+        cli != nil
+            && !reviewIsRunning
+            && !isRunning
+            && !reviewPlanID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && reviewItemsURL != nil
+    }
+
+    var canImportReviewPacket: Bool {
+        cli != nil && !reviewIsRunning && !isRunning && reviewPacketURL != nil
+    }
+
+    var canSubmitReviewPacket: Bool {
+        canImportReviewPacket && reviewSubmitConfirmed
+    }
+
+    var currentReviewCLIEquivalent: String? {
+        var lines: [String] = []
+        let planID = reviewPlanID.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !planID.isEmpty, let items = reviewItemsURL {
+            lines.append(
+                VeriformisCLI.exportCLIEquivalent(
+                    arguments: [
+                        "review-export",
+                        "--plan-id", planID,
+                        "--items", items.path,
+                    ]
+                )
+            )
+        }
+        if let packet = reviewPacketURL {
+            lines.append(
+                VeriformisCLI.exportCLIEquivalent(
+                    arguments: ["review-import", packet.path]
+                )
+            )
+            lines.append(
+                VeriformisCLI.exportCLIEquivalent(
+                    arguments: ["review-submit", packet.path]
+                )
+            )
+        }
+        return lines.isEmpty ? nil : lines.joined(separator: " && \\\n")
     }
 
     var canCompile: Bool {
@@ -1415,6 +1474,151 @@ final class WorkbenchViewModel: ObservableObject {
             return .unavailable(response.error?.message ?? "Export verify failed.")
         case .visiblePartial:
             return .unavailable("Export verify does not admit visible_partial.")
+        }
+    }
+
+    func chooseReviewItems() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [.json]
+        panel.prompt = "Choose Review Items"
+        if panel.runModal() == .OK, let url = panel.url {
+            reviewItemsURL = url.standardizedFileURL
+        }
+    }
+
+    func chooseReviewPacket() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [.json]
+        panel.prompt = "Choose Review Packet"
+        if panel.runModal() == .OK, let url = panel.url {
+            reviewPacketURL = url.standardizedFileURL
+            reviewSubmitConfirmed = false
+        }
+    }
+
+    func exportReviewPacket() {
+        reviewExportTask?.cancel()
+        reviewExportController?.cancel()
+        reviewExportTask = nil
+        reviewExportController = nil
+        guard let cli else {
+            reviewExportState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        let planID = reviewPlanID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !planID.isEmpty, let items = reviewItemsURL else {
+            reviewExportState = .unavailable("Choose a finished-dataset plan_id and an items JSON file.")
+            return
+        }
+        let controller = CLIProcessController()
+        reviewExportController = controller
+        reviewExportState = .loading
+        reviewIsRunning = true
+        reviewExportTask = Task { [weak self] in
+            let nextState: ReviewExportState
+            do {
+                let packet = try await cli.exportReviewPacket(
+                    planID: planID,
+                    itemsURL: items,
+                    controller: controller
+                )
+                try Task.checkCancellation()
+                nextState = .ready(packet)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.reviewExportController === controller else { return }
+            self.reviewExportState = nextState
+            self.reviewIsRunning = false
+            self.reviewExportController = nil
+            self.reviewExportTask = nil
+        }
+    }
+
+    func importReviewPacket() {
+        reviewImportTask?.cancel()
+        reviewImportController?.cancel()
+        reviewImportTask = nil
+        reviewImportController = nil
+        guard let cli else {
+            reviewImportState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let packet = reviewPacketURL else {
+            reviewImportState = .unavailable("Choose a review packet JSON file.")
+            return
+        }
+        let controller = CLIProcessController()
+        reviewImportController = controller
+        reviewImportState = .loading
+        reviewIsRunning = true
+        reviewImportTask = Task { [weak self] in
+            let nextState: ReviewImportState
+            do {
+                let loaded = try await cli.importReviewPacket(
+                    packetURL: packet,
+                    controller: controller
+                )
+                try Task.checkCancellation()
+                nextState = .ready(loaded)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.reviewImportController === controller else { return }
+            self.reviewImportState = nextState
+            self.reviewIsRunning = false
+            self.reviewImportController = nil
+            self.reviewImportTask = nil
+        }
+    }
+
+    func submitConfirmedReview() {
+        guard canSubmitReviewPacket else { return }
+        reviewSubmitTask?.cancel()
+        reviewSubmitController?.cancel()
+        reviewSubmitTask = nil
+        reviewSubmitController = nil
+        guard let cli else {
+            reviewSubmitState = .unavailable("Veriformis CLI is unavailable.")
+            return
+        }
+        guard let packet = reviewPacketURL else {
+            reviewSubmitState = .unavailable("Choose a review packet JSON file.")
+            return
+        }
+        let controller = CLIProcessController()
+        reviewSubmitController = controller
+        reviewSubmitState = .loading
+        reviewIsRunning = true
+        reviewSubmitTask = Task { [weak self] in
+            let nextState: ReviewSubmitState
+            do {
+                let bundle = try await cli.submitReview(
+                    packetURL: packet,
+                    controller: controller
+                )
+                try Task.checkCancellation()
+                nextState = .ready(bundle)
+            } catch is CancellationError {
+                nextState = .idle
+            } catch {
+                nextState = .unavailable(error.localizedDescription)
+            }
+            guard let self, self.reviewSubmitController === controller else { return }
+            self.reviewSubmitState = nextState
+            self.reviewIsRunning = false
+            self.reviewSubmitController = nil
+            self.reviewSubmitTask = nil
         }
     }
 

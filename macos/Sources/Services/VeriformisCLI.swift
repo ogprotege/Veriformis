@@ -658,6 +658,67 @@ struct VeriformisCLI: Sendable {
         return response
     }
 
+    func exportReviewPacket(
+        planID: String,
+        itemsURL: URL,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ReviewPacketSummary {
+        try await runReviewCommand(
+            arguments: [
+                "review-export",
+                "--plan-id", planID,
+                "--items", itemsURL.path,
+            ],
+            controller: controller
+        )
+    }
+
+    func importReviewPacket(
+        packetURL: URL,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ReviewPacketSummary {
+        try await runReviewCommand(
+            arguments: ["review-import", packetURL.path],
+            controller: controller
+        )
+    }
+
+    func submitReview(
+        packetURL: URL,
+        controller: CLIProcessController = CLIProcessController()
+    ) async throws -> ReviewBundleSummary {
+        try await runReviewCommand(
+            arguments: ["review-submit", packetURL.path],
+            controller: controller
+        )
+    }
+
+    private func runReviewCommand<Result: Decodable>(
+        arguments: [String],
+        controller: CLIProcessController
+    ) async throws -> Result {
+        let result = try await run(arguments: arguments, controller: controller)
+        if result.cancellation != nil || Task.isCancelled {
+            throw CancellationError()
+        }
+        guard !result.standardOutputTruncated else {
+            throw ReviewCLIError.outputTruncated
+        }
+        guard result.exitCode == 0 else {
+            throw ReviewCLIError.commandFailed(
+                exitCode: result.exitCode,
+                message: result.standardError.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        do {
+            return try JSONDecoder().decode(Result.self, from: result.standardOutputData)
+        } catch let error as ReviewCLIError {
+            throw error
+        } catch {
+            throw ReviewCLIError.invalidPayload(error.localizedDescription)
+        }
+    }
+
     /// Load the goal-specific preview for a constructed workspace without blocking the main actor.
     func previewGoal(
         workspace: URL,

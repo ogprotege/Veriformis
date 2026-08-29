@@ -27,7 +27,7 @@ def test_sidebar_includes_exports_and_still_excludes_review() -> None:
     )
     assert block is not None
     cases = re.findall(r"^\s*case (\w+)$", block.group("body"), re.M)
-    assert cases == ["home", "compile", "exports", "history", "settings"]
+    assert cases == ["home", "compile", "review", "exports", "history", "settings"]
     title_block = re.search(
         r"var title: String \{(?P<body>.*?)\n    \}",
         models,
@@ -35,9 +35,9 @@ def test_sidebar_includes_exports_and_still_excludes_review() -> None:
     )
     assert title_block is not None
     titles = re.findall(r'case \.\w+: return "([^"]+)"', title_block.group("body"))
-    assert titles == ["Home", "Compile", "Exports", "History", "Settings"]
+    assert titles == ["Home", "Compile", "Review", "Exports", "History", "Settings"]
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
-    assert "ReviewView.swift" not in views
+    assert "ReviewView.swift" in views
     assert "ExportsView.swift" in views
     assert "MappingView.swift" not in views
 

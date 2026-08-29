@@ -78,13 +78,13 @@ Phase 17 advanced dataset families is complete under its own packet.
 Classification, preference, tool-call, and stepwise compile from
 user-provided evidence. ADR-0018 Decision A: no compile-path generator.
 Phase 18 goal-first Mac workbench is in progress under its own packet.
-Item 18.6 merged as PR #165. Item 18.7 wires export discover, dry-run,
-inspect, operator-confirmed execute, and verify over sealed bundles.
-Default `review_policy` stays `none`. No heuristic blocks seal.
+Item 18.7 merged as PR #166. Item 18.8 wraps review-export, review-import,
+and review-submit. Default `review_policy` stays `none`. No heuristic
+blocks seal.
 
-**Review date:** 2026-08-29 (independent-product Phase 18.7 export flows)
+**Review date:** 2026-08-29 (independent-product Phase 18.8 review flows)
 
-**Next review:** Phase 18.7 merge, item 18.8 review flows, or any
+**Next review:** Phase 18.8 merge, item 18.9 accessibility, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -845,12 +845,11 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–17 are complete. The current critical-path work
 is Phase 18 under the
 [goal-first-workbench packet](../dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-Item 18.7 wires Exports over the existing CLI export bridge. Sidebar is
-Home / Compile / Exports / History / Settings. There is no `GeneratorPass`.
-Do not start Phase 19 from this packet.
+Item 18.8 wires Review over existing review packets. Sidebar is Home /
+Compile / Review / Exports / History / Settings. There is no
+`GeneratorPass`. Do not start Phase 19 from this packet.
 
-The next behavior change is item 18.8 review flows. Review submit remains
-outside this item.
+The next behavior change is item 18.9 accessibility and CLI equivalents.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

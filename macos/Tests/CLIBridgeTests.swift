@@ -3206,18 +3206,18 @@ final class CLIBridgeTests: XCTestCase {
         // Exports. Review stays out of the sidebar until that packet is wired.
         XCTAssertEqual(
             SidebarDestination.allCases.map(\.rawValue),
-            ["home", "compile", "exports", "history", "settings"]
+            ["home", "compile", "review", "exports", "history", "settings"]
         )
-        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Review"))
+        XCTAssertEqual(SidebarDestination.review.title, "Review")
     }
 
     func testSidebarIncludesExportsWithoutReview() {
         XCTAssertEqual(
             SidebarDestination.allCases.map(\.rawValue),
-            ["home", "compile", "exports", "history", "settings"]
+            ["home", "compile", "review", "exports", "history", "settings"]
         )
         XCTAssertEqual(SidebarDestination.exports.title, "Exports")
-        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Review"))
+        XCTAssertEqual(SidebarDestination.review.title, "Review")
         XCTAssertEqual(
             WorkbenchGenericExportContainers.order,
             [
@@ -3248,6 +3248,9 @@ final class CLIBridgeTests: XCTestCase {
         workbench.exportPlanConfirmed = true
         XCTAssertFalse(workbench.canExecuteExport)
         XCTAssertNil(workbench.currentExportCLIEquivalent)
+        XCTAssertFalse(workbench.canSubmitReviewPacket)
+        workbench.reviewSubmitConfirmed = true
+        XCTAssertFalse(workbench.canSubmitReviewPacket)
     }
 
     func testCLIEquivalentMatchesCompilePlanAndOmitsAptusByDefault() {

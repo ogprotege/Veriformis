@@ -5,16 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-29
 
-**Local branch:** `phase18/07-export-flows`
+**Local branch:** `phase18/08-review-flows`
 
-**Completed:** Item 18.6, PR #165 at `093a4fd`.
+**Completed:** Item 18.7, PR #166 at `259412d`.
 
-**Current item:** 18.7 export flows. Sidebar adds Exports. Discover,
-dry-run, inspect, operator-confirmed execute, and verify wrap the
-existing CLI. Generic containers first. Named profiles only for admitted
-schemas. No membership mutation. No Hub. No train. Review stays out.
+**Current item:** 18.8 review flows. Sidebar adds Review. Wrap
+review-export, review-import, and operator-confirmed review-submit.
+Default `review_policy` stays `none`. Corrections are new identities.
+Required unresolved reviews still block seal.
 
-**Next gate:** Publish the 18.7 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 18.8.
+**Next gate:** Publish the 18.8 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.9.
 
 **Decision:** ADR-0019 Decision A. Swift is a process adapter.

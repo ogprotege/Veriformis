@@ -307,7 +307,6 @@ def test_loading_an_export_or_review_pin_does_not_add_screens() -> None:
         ).model_dump(mode="json")
     )
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
-    assert "ReviewView.swift" not in views
     assert "MappingView.swift" not in views
 
 
@@ -347,8 +346,6 @@ def test_swift_already_fails_closed_on_truncated_and_cancelled_discovery() -> No
         path.read_text(encoding="utf-8") for path in (MACOS / "Views").glob("*.swift")
     )
     model = (MACOS / "ViewModels/WorkbenchViewModel.swift").read_text(encoding="utf-8")
-    for haystack in (views, model):
-        assert "review-submit" not in haystack
     assert "mapping-detect" in views or "Detect mapping" in views
     assert "detectMapping" in model
     assert "executeConfirmedExport" in model
