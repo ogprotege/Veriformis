@@ -36,7 +36,6 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.1 merged as PR #160. Item 18.2 pins ADR-0019 and
-`veriformis.workbench-adapter/v1`. Sidebar remains Home / Compile /
-History / Settings. Compile remains document-source. Loading a wrap pin
-is not a screen.
+Item 18.2 merged as PR #161. Item 18.3 is goal-first IA: Sources, Goal,
+copyable CLI equivalent, optional Integrations. Sidebar remains Home /
+Compile / History / Settings. Compile remains document-source.

@@ -202,7 +202,7 @@
       "packet": "dev/active/independent-product/phase-18-goal-first-workbench",
       "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Item 18.1 merged as PR #160 at 73bf306bf53a650452f5d5dba5082ef842ced732. Item 18.2 pins the thin-adapter contract (ADR-0019) before 18.3 IA. Swift owns no dataset policy."
+      "next_gate": "Item 18.2 merged as PR #161 at 56b911def5ffe04aa38a65bde2496f9f33367a01. Item 18.3 replaces Aptus-centered copy with goal-first IA before 18.4 modes. Swift owns no dataset policy."
     },
     {
       "number": 19,

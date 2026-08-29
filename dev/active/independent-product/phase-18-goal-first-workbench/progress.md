@@ -54,3 +54,29 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 18.2 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.3.
+
+## 2026-08-28: Item 18.2 merged; item 18.3 in progress
+
+**Status:** Item 18.2 merged as PR #161 at
+`56b911def5ffe04aa38a65bde2496f9f33367a01`. Clean local `main` equals
+`origin/main` there.
+
+Item 18.3 replaces Aptus-centered copy with goal-first IA. Compile is
+Sources, Goal, CLI equivalent, and optional Integrations. Sidebar stays
+Home / Compile / History / Settings. Compile stays document-source.
+
+**Next action:** Run the complete item 18.3 local gates, including
+xcodebuild tests and parity, publish the pull request, require every
+GitHub check, merge, and synchronize clean `main` before item 18.4.
+
+## 2026-08-28: Item 18.3 local gates green
+
+**Status:** Goal-first IA is copy and CLI equivalent only. Compile stays
+document-source. Aptus stays optional Integrations. Focused workbench
+tests passed 67. xcodebuild tests passed 100. Parity passed. Project
+tracking, Ruff, the lock check, and `git diff --check` passed. The core
+suite passed 2,530 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 18.3 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.4.

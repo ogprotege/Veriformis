@@ -81,8 +81,9 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/03-project-ia`
 
-- [ ] Reorganize copy around Sources, Goal, Compile, History, and optional
+- [x] Reorganize copy around Sources, Goal, Compile, History, and optional
       Integrations. Keep Review and Exports out of the sidebar.
+- [x] Surface a copyable CLI equivalent of the current compile plan.
 
 ### 18.4 Add document, dataset-row, and mixed modes with mapping preview
 

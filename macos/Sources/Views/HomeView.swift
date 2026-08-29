@@ -8,8 +8,9 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Veriformis")
                     .font(.largeTitle.weight(.semibold))
-                Text("Dataset compiler — private beta workbench")
+                Text("Go from sources and a goal to a sealed, independently verified .vfbundle.")
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 GroupBox("Status") {
                     VStack(alignment: .leading, spacing: 8) {
@@ -28,10 +29,10 @@ struct HomeView: View {
 
                 GroupBox("Tips") {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("• Start with one source file on Compile.")
+                        Text("• On Compile: add Sources, choose a Goal, then compile.")
+                        Text("• Success is a sealed, independently verified .vfbundle — not file conversion and not a trainer handoff.")
+                        Text("• Aptus is optional Integrations. It is not required.")
                         Text("• Output defaults to Documents/Veriformis (change in Settings).")
-                        Text("• Success means a sealed .vfbundle — not general-purpose file conversion.")
-                        Text("• Choose the training objective that matches the rows your trainer expects.")
                         Text("• Install / CLI help: docs/install.md in the repo.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

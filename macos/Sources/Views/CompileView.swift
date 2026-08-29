@@ -14,8 +14,9 @@ struct CompileView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Compile")
                         .font(.title2.weight(.semibold))
-                    Text("Turn sources into a sealed training dataset (.vfbundle).")
+                    Text("Add sources, choose a goal, and compile a sealed .vfbundle. Aptus is optional Integrations, not required.")
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     SourceDropView()
 
@@ -24,6 +25,8 @@ struct CompileView: View {
                         .foregroundStyle(.secondary)
 
                     configurationPanel
+
+                    cliEquivalentPanel
 
                     preflightPanel
 
@@ -75,7 +78,7 @@ struct CompileView: View {
 
     private var configurationPanel: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Configuration")
+            Text("Goal")
                 .font(.headline)
 
             goalSelection
@@ -130,6 +133,33 @@ struct CompileView: View {
                 }
                 .padding(.top, 4)
             }
+        }
+    }
+
+    private var cliEquivalentPanel: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
+                if let text = workbench.currentCompileCLIEquivalent {
+                    Text(text)
+                        .font(.system(.caption, design: .monospaced))
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Copy CLI equivalent") {
+                        workbench.copyToPasteboard(text, label: "CLI equivalent")
+                    }
+                    .controlSize(.small)
+                    .accessibilityLabel("Copy CLI equivalent")
+                } else {
+                    Text("Choose sources, a goal, and an output folder to see the exact CLI equivalent of this compile plan.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Label("CLI equivalent", systemImage: "terminal")
+                .font(.headline)
         }
     }
 

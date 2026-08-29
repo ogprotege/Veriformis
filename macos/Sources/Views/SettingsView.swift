@@ -48,6 +48,10 @@ struct SettingsView: View {
                         Text("Used on Compile when no folder is selected yet. Defaults to ~/Documents/Veriformis.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                        Text("Aptus is optional Integrations on Compile. The workbench does not require a trainer.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 4)

@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `73bf306` on `main` after PR #160
+**Implementation baseline reviewed:** `56b911d` on `main` after PR #161
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1 merged;
-item 18.2 thin-adapter contract)
+Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1–18.2
+merged; item 18.3 goal-first IA)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 18.2 thin-adapter contract)
+**Last reviewed:** 2026-08-28 (Phase 18.3 goal-first IA)
 
-**Next review:** Phase 18.2 merge, or item 18.3 goal-first IA. Do not add
+**Next review:** Phase 18.3 merge, or item 18.4 input modes. Do not add
 Review, Exports, or dataset-row execute in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
@@ -145,9 +145,8 @@ local, offline, and free of LLM generation.
       start Phase 18 from that packet.
 - [ ] Independent product Phase 18 is in progress under its
       [packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-      Item 18.1 merged as PR #160. Item 18.2 pins ADR-0019 and
-      `veriformis.workbench-adapter/v1`. Do not start Phase 19 from this
-      packet.
+      Item 18.2 merged as PR #161. Item 18.3 replaces Aptus-centered copy
+      with goal-first IA. Do not start Phase 19 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

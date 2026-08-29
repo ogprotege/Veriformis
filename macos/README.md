@@ -9,9 +9,10 @@ a run sheet with live log.
 - **Thin adapter only.** The app shells to the `veriformis` CLI (`PipelineService`).
 - **Same digests as CLI.** Stage order and flags match
   `VeriformisCLI.compilePlan`.
-- **Sidebar:** Home / Compile / History / Settings.
-- **Compile:** drag-and-drop sources, objective picker, output folder, and
-  sealed bundle; an Aptus sibling is an optional integration artifact.
+- **Sidebar:** Home / Compile / History / Settings. Review and Exports are
+  not destinations yet.
+- **Compile:** Sources, Goal (catalog picker), copyable CLI equivalent, and
+  a sealed `.vfbundle`. Aptus is optional Integrations, not required.
 - **Taxonomy help:** asynchronously loaded from `veriformis taxonomy`; the app
   does not maintain a second taxonomy help catalog.
 - **Run sheet:** progress %, stage chips, expandable live log.
