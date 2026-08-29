@@ -31,7 +31,7 @@ def test_recipe_settings_inspect_preset_and_goal_contract() -> None:
     assert "selectedRepresentation" in model
     assert "Validation and profiles (inspect only)" in compile_view
     assert "This panel does not mutate membership." in compile_view
-    assert "Named-profile export waits for a later item." in compile_view
+    assert "Named-profile export is on Exports and only for schemas the profile admits." in compile_view
 
 
 def test_inspectable_settings_do_not_execute_export_or_review() -> None:
@@ -39,12 +39,13 @@ def test_inspectable_settings_do_not_execute_export_or_review() -> None:
     model = _read("macos/Sources/ViewModels/WorkbenchViewModel.swift")
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
     assert "ReviewView.swift" not in views
-    assert "ExportsView.swift" not in views
-    for haystack in (compile_view, model):
-        assert "executeExport" not in haystack
-        assert "review-submit" not in haystack
-        assert "review_policy = \"required\"" not in haystack
-        assert "reviewPolicy = \"required\"" not in haystack
+    assert "executeExport" not in compile_view
+    assert "review-submit" not in compile_view
+    assert "review-submit" not in model
+    assert "review_policy = \"required\"" not in compile_view
+    assert "reviewPolicy = \"required\"" not in compile_view
+    assert "review_policy = \"required\"" not in model
+    assert "reviewPolicy = \"required\"" not in model
 
 
 def test_overrides_remain_explicit_and_preset_sourced() -> None:

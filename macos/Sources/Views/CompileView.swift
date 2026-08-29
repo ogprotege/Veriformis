@@ -663,7 +663,7 @@ struct CompileView: View {
 
                 Text("Validation and profiles (inspect only)")
                     .font(.caption.weight(.semibold))
-                Text("Finished-dataset validation stays the seal path. Named-profile export waits for a later item. This panel does not mutate membership.")
+                Text("Finished-dataset validation stays the seal path. Named-profile export is on Exports and only for schemas the profile admits. This panel does not mutate membership.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -3202,21 +3202,52 @@ final class CLIBridgeTests: XCTestCase {
     }
 
     func testPrepublicationSampleCopyDoesNotRequireReviewOrExportExecute() {
-        // ResultView is compile-result samples only. Exports and Review stay
-        // out of the sidebar until later items wire those packets.
+        // ResultView is compile-result samples only. Export execute lives on
+        // Exports. Review stays out of the sidebar until that packet is wired.
         XCTAssertEqual(
             SidebarDestination.allCases.map(\.rawValue),
-            ["home", "compile", "history", "settings"]
+            ["home", "compile", "exports", "history", "settings"]
+        )
+        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Review"))
+    }
+
+    func testSidebarIncludesExportsWithoutReview() {
+        XCTAssertEqual(
+            SidebarDestination.allCases.map(\.rawValue),
+            ["home", "compile", "exports", "history", "settings"]
+        )
+        XCTAssertEqual(SidebarDestination.exports.title, "Exports")
+        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Review"))
+        XCTAssertEqual(
+            WorkbenchGenericExportContainers.order,
+            [
+                "split-jsonl-directory",
+                "json",
+                "constrained-csv",
+                "parquet",
+                "arrow",
+                "hugging-face-dataset",
+            ]
         )
     }
 
-    func testSidebarDestinationsRemainHomeCompileHistorySettings() {
-        XCTAssertEqual(
-            SidebarDestination.allCases.map(\.rawValue),
-            ["home", "compile", "history", "settings"]
-        )
-        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Review"))
-        XCTAssertFalse(SidebarDestination.allCases.map(\.title).contains("Exports"))
+    @MainActor
+    func testExportExecuteRequiresOperatorConfirmedDryRun() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-export-\(UUID().uuidString)")
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(defaults: defaults, supportDirectory: support)
+        XCTAssertFalse(workbench.canExecuteExport)
+        XCTAssertFalse(workbench.canDryRunExport)
+        XCTAssertFalse(workbench.exportPlanConfirmed)
+        XCTAssertEqual(workbench.exportSourceTrustPolicy, .allowSelfConsistent)
+        workbench.exportPlanConfirmed = true
+        XCTAssertFalse(workbench.canExecuteExport)
+        XCTAssertNil(workbench.currentExportCLIEquivalent)
     }
 
     func testCLIEquivalentMatchesCompilePlanAndOmitsAptusByDefault() {

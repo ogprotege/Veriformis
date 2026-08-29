@@ -4,6 +4,7 @@ import Foundation
 enum SidebarDestination: String, CaseIterable, Identifiable {
     case home
     case compile
+    case exports
     case history
     case settings
 
@@ -13,6 +14,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .home: return "Home"
         case .compile: return "Compile"
+        case .exports: return "Exports"
         case .history: return "History"
         case .settings: return "Settings"
         }
@@ -22,6 +24,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .home: return "house"
         case .compile: return "shippingbox"
+        case .exports: return "square.and.arrow.up"
         case .history: return "clock"
         case .settings: return "gearshape"
         }
@@ -288,7 +291,7 @@ enum ExportResponseStatus: String, Codable, Equatable, Sendable {
     case visiblePartial = "visible_partial"
 }
 
-enum ExportSourceTrustPolicy: String, Codable, Equatable, Sendable {
+enum ExportSourceTrustPolicy: String, Codable, Equatable, Hashable, Sendable {
     case requireExternalDigest = "require_external_digest"
     case allowSelfConsistent = "allow_self_consistent"
 }
@@ -1557,9 +1560,7 @@ struct ExportDryRunPreview: Decodable, Equatable, Sendable {
                 "Export dry-run preview bindings differ from its plan summary."
             )
         }
-        guard [
-            "text", "prompt_completion", "instruction_output", "messages",
-        ].contains(rowSchema) else {
+        guard GoalCatalog.rowSchemaOrder.contains(rowSchema) else {
             throw ExportSurfaceModelError.invalidValue(
                 "Export dry-run preview row schema is unsupported: \(rowSchema)."
             )
@@ -1953,6 +1954,44 @@ private func validateExportPreviewPayload(
                 label: "message \(index) content"
             )
         }
+    case "label-classification":
+        guard Set(payload.keys) == ["annotator", "context", "label"] else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A label-classification export preview payload requires exactly annotator, context, and label."
+            )
+        }
+        try requireNonemptyString(payload["annotator"], label: "annotator")
+        try requireNonemptyString(payload["context"], label: "context")
+        try requireNonemptyString(payload["label"], label: "label")
+    case "preference-pair":
+        guard Set(payload.keys) == ["chosen", "prompt", "rejected"] else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A preference-pair export preview payload requires exactly prompt, chosen, and rejected."
+            )
+        }
+        try requireNonemptyString(payload["prompt"], label: "prompt")
+        try requireNonemptyString(payload["chosen"], label: "chosen")
+        try requireNonemptyString(payload["rejected"], label: "rejected")
+    case "tool-call-conversation":
+        guard Set(payload.keys) == ["conversation_id", "turns"],
+              case .array(let turns)? = payload["turns"],
+              !turns.isEmpty
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A tool-call-conversation export preview payload requires conversation_id and turns."
+            )
+        }
+        try requireNonemptyString(payload["conversation_id"], label: "conversation_id")
+    case "stepwise-trace":
+        guard Set(payload.keys) == ["prompt", "steps"],
+              case .array(let steps)? = payload["steps"],
+              !steps.isEmpty
+        else {
+            throw ExportSurfaceModelError.invalidValue(
+                "A stepwise-trace export preview payload requires prompt and steps."
+            )
+        }
+        try requireNonemptyString(payload["prompt"], label: "prompt")
     default:
         throw ExportSurfaceModelError.invalidValue(
             "Export dry-run preview row schema is unsupported: \(rowSchema)."
@@ -2614,6 +2653,108 @@ enum MappingPreviewState: Equatable, Sendable {
     case loading
     case ready(MappingPreview)
     case unavailable(String)
+}
+
+/// Implemented generic export containers in operator order. Discovery remains
+/// authoritative; this list only sorts already-admitted descriptors.
+enum WorkbenchGenericExportContainers {
+    static let order = [
+        "split-jsonl-directory",
+        "json",
+        "constrained-csv",
+        "parquet",
+        "arrow",
+        "hugging-face-dataset",
+    ]
+}
+
+enum ExportDiscoveryState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ExportDiscovery)
+    case unavailable(String)
+}
+
+enum ExportDryRunState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ExportDryRunResult)
+    case unavailable(String)
+}
+
+enum ExportInspectState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ExportInspectionResult)
+    case unavailable(String)
+}
+
+enum ExportExecuteState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ExportExecutionResult)
+    case unavailable(String)
+    case visiblePartial(ExportExecutionResult, String)
+}
+
+enum ExportVerifyState: Equatable, Sendable {
+    case idle
+    case loading
+    case ready(ExportVerifyResult)
+    case unavailable(String)
+}
+
+extension ExportProfileDescriptorSummary {
+    var isGenericContainer: Bool { consumerProfile == nil }
+
+    var selectionKey: String {
+        if let consumer = consumerProfile {
+            return consumer.consumerProfileID
+        }
+        return containerProfile.containerProfileID
+    }
+
+    var displayName: String {
+        if let consumer = consumerProfile {
+            return "\(consumer.consumerID) · \(containerProfile.containerID)"
+        }
+        return containerProfile.containerID
+    }
+}
+
+enum WorkbenchExportProfiles {
+    /// Generic containers first in the implemented order, then named profiles
+    /// whose accepted schemas include `rowSchema`. Named profiles stay hidden
+    /// until a row schema is known so family bundles cannot pick a refusing
+    /// trainer. Discovery remains the admission authority.
+    static func admitted(
+        _ profiles: [ExportProfileDescriptorSummary],
+        rowSchema: String?
+    ) -> [ExportProfileDescriptorSummary] {
+        let generic = profiles
+            .filter(\.isGenericContainer)
+            .sorted { lhs, rhs in
+                let left = WorkbenchGenericExportContainers.order.firstIndex(
+                    of: lhs.containerProfile.containerID
+                ) ?? WorkbenchGenericExportContainers.order.count
+                let right = WorkbenchGenericExportContainers.order.firstIndex(
+                    of: rhs.containerProfile.containerID
+                ) ?? WorkbenchGenericExportContainers.order.count
+                if left == right {
+                    return lhs.containerProfile.containerID
+                        < rhs.containerProfile.containerID
+                }
+                return left < right
+            }
+        guard let rowSchema else { return generic }
+        let named = profiles.filter { profile in
+            guard let consumer = profile.consumerProfile else { return false }
+            return profile.supportedRowSchemas.contains(rowSchema)
+                && consumer.acceptedRowSchemas.contains(rowSchema)
+        }
+        .sorted { $0.displayName < $1.displayName }
+        return generic + named
+    }
 }
 
 private struct GoalCatalogKey: CodingKey {

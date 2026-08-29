@@ -33,13 +33,10 @@ def test_result_view_shows_prepublication_samples() -> None:
 
 def test_samples_do_not_execute_export_or_quality_report() -> None:
     result = _read("macos/Sources/Views/ResultView.swift")
-    model = _read("macos/Sources/ViewModels/WorkbenchViewModel.swift")
     views = {path.name for path in (MACOS / "Views").glob("*.swift")}
-    assert "ExportsView.swift" not in views
     assert "ReviewView.swift" not in views
-    for haystack in (result, model):
-        assert "executeExport" not in haystack
-        assert "quality-report" not in haystack
+    assert "executeExport" not in result
+    assert "quality-report" not in result
     assert all(item.admitted_to_block is False for item in V1_QUALITY_GATES)
 
 
