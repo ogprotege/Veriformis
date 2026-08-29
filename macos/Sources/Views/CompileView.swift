@@ -587,11 +587,48 @@ struct CompileView: View {
         }
     }
 
-    /// Explicit operator overrides on top of the selected preset.
+    /// Inspectable preset and goal contract. Defaults come from `veriformis presets`.
     @ViewBuilder
     private var advancedEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             if let preset = workbench.selectedPreset {
+                Text("Values below are the selected versioned preset. Empty overrides keep that preset authoritative.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                inspectRow("Preset", preset.presetID)
+                inspectRow("Representation", preset.representationID)
+                if let representation = workbench.selectedRepresentation {
+                    inspectRow("Row schema", representation.rowSchema)
+                    inspectRow("Loss policy", representation.lossPolicy)
+                    inspectRow(
+                        "Compatible generic exports",
+                        representation.compatibleGenericExports.joined(separator: ", ")
+                    )
+                }
+                if let goal = workbench.selectedGoal {
+                    inspectRow("Review policy (preset)", preset.reviewPolicy)
+                    inspectRow("Review policy (goal default)", goal.reviewPolicyDefault)
+                    inspectRow(
+                        "Review policy options",
+                        goal.reviewPolicyOptions.joined(separator: ", ")
+                    )
+                    inspectRow("Supervision boundary", goal.supervisionBoundary)
+                    inspectRow("Non-claims", goal.nonClaims.joined(separator: ", "))
+                }
+
+                Text("Chunk")
+                    .font(.caption.weight(.semibold))
+                inspectRow("Strategy", preset.segmentation.strategy)
+                inspectRow("Size", String(preset.segmentation.size))
+                inspectRow("Overlap", String(preset.segmentation.overlap))
+
+                Text("Construct")
+                    .font(.caption.weight(.semibold))
+                inspectRow("Split ratio (ppm)", String(preset.construction.splitRatioPPM))
+                inspectRow("Require review", preset.construction.requireReview ? "true" : "false")
+                inspectRow("Consumer profile", preset.construction.consumerProfile.isEmpty ? "(none)" : preset.construction.consumerProfile)
                 if workbench.selectedGoal?.objective == .continuation {
                     HStack {
                         Text("Opening share (ppm)")
@@ -602,26 +639,69 @@ struct CompileView: View {
                         )
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 110)
+                        .accessibilityLabel("Opening share override in parts per million")
                     }
                     Text("Leave empty to use the preset value \(preset.construction.splitRatioPPM) ppm of the passage as the opening.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
+                Text("Curate and split")
+                    .font(.caption.weight(.semibold))
+                inspectRow("Minimum target characters", String(preset.curation.minimumTargetCharacters))
+                inspectRow("Balance mode", preset.curation.balanceMode)
+                inspectRow("Evaluation ratio (ppm)", String(preset.curation.evaluationRatioPPM))
+                inspectRow("Evaluation required", preset.curation.evaluationRequired ? "true" : "false")
+                inspectRow("Split seed", preset.curation.splitSeed)
                 Toggle("Allow empty evaluation partition", isOn: $workbench.allowEmptyEvaluation)
+                    .accessibilityLabel("Allow empty evaluation partition")
                 Text("Off by default: the preset requires an evaluation partition (\(preset.curation.evaluationRatioPPM) ppm held out), so compiles fail closed when it would be empty. Enable only when a single leakage group leaves evaluation empty.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Text("Segmentation \(preset.segmentation.strategy) · size \(preset.segmentation.size) · overlap \(preset.segmentation.overlap) · minimum target \(preset.curation.minimumTargetCharacters) · seed \(preset.curation.splitSeed)")
-                    .font(.caption.monospaced())
+
+                Text("Validation and profiles (inspect only)")
+                    .font(.caption.weight(.semibold))
+                Text("Finished-dataset validation stays the seal path. Named-profile export waits for a later item. This panel does not mutate membership.")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                inspectRow("Validation", "inspect-only; seal still runs validate")
+                switch workbench.taxonomyHelpState {
+                case .ready(let discovery):
+                    inspectRow(
+                        "Consumer profiles",
+                        discovery.consumerProfiles.joined(separator: ", ")
+                    )
+                    inspectRow(
+                        "Physical containers",
+                        discovery.physicalContainers.joined(separator: ", ")
+                    )
+                default:
+                    Text("Load Dataset taxonomy above to inspect consumer profiles and containers from CLI discovery.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             } else {
                 Text("Advanced settings appear once presets are loaded.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+
+    private func inspectRow(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+            Text(value)
+                .font(.caption.monospaced())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+                .accessibilityLabel("\(title): \(value)")
         }
     }
 

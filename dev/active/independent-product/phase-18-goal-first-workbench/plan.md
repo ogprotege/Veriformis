@@ -96,7 +96,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/05-inspectable-settings`
 
-- [ ] Progressive disclosure of the preset and goal contract. Overrides
+- [x] Progressive disclosure of the preset and goal contract. Overrides
       remain explicit.
 
 ### 18.6 Show pre-publication samples

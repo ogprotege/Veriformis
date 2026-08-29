@@ -348,6 +348,14 @@ final class WorkbenchViewModel: ObservableObject {
         return catalog.preset(withID: selectedPresetID)
     }
 
+    /// Catalog representation bound to the selected preset. Nil until both catalogs load.
+    var selectedRepresentation: GoalCatalogRepresentation? {
+        guard case .ready(let catalog) = goalCatalogState,
+              let preset = selectedPreset
+        else { return nil }
+        return catalog.representation(withID: preset.representationID)
+    }
+
     /// Choose a goal and move the preset to that goal's safe preset.
     func selectGoal(_ goalID: String) {
         selectedGoalID = goalID

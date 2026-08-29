@@ -110,3 +110,27 @@ durability warning.
 
 **Next action:** Publish the item 18.4 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.5.
+
+## 2026-08-29: Item 18.4 merged; item 18.5 in progress
+
+**Status:** Item 18.4 merged as PR #163 at
+`c0c10b9`. Clean local `main` equals `origin/main` there.
+
+Item 18.5 exposes inspectable preset and goal contract fields. Overrides
+stay explicit. Validation and profiles are inspect-only until 18.7.
+
+**Next action:** Run the complete item 18.5 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 18.6.
+
+## 2026-08-29: Item 18.5 local gates green
+
+**Status:** Inspectable Recipe settings bind the selected preset and goal
+contract. Overrides stay explicit. Validation and profiles are inspect-only.
+Focused workbench tests passed 79. xcodebuild tests passed 110. Parity
+passed. Tracking, Ruff, lock, and `git diff --check` passed. The core
+suite passed 2,542 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 18.5 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.6.

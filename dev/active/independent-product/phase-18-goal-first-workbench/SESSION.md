@@ -5,19 +5,18 @@ append-only history.
 
 **Updated:** 2026-08-29
 
-**Local branch:** `phase18/04-input-modes-and-mapping`
+**Local branch:** `phase18/05-inspectable-settings`
 
-**Completed:** Item 18.3, PR #162 at
-`acf8ee405616d3b6ae8fa443cc3eb49f77bc790a`.
+**Completed:** Item 18.4, PR #163 at
+`c0c10b9`.
 
-**Current item:** 18.4 input modes and mapping preview. Mode picker is
-`document-source`, `dataset-row`, and `mixed`. Dataset-row wraps
-mapping-detect, operator confirm, mapping-preview, then parse and map.
-Unconfirmed plans cannot compile. Family goals wait for a confirmed
-mapping plan.
+**Current item:** 18.5 inspectable advanced settings from presets. Progressive
+disclosure of chunk, construct, curate, split, review_policy,
+representation, compatible generic exports, and non-claims. Overrides
+stay explicit. Validation and profiles are inspect-only.
 
-**Next gate:** Publish the 18.4 pull request, require every GitHub
-check, merge, and synchronize clean `main` before item 18.5.
+**Next gate:** Publish the 18.5 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.6.
 
 **Decision:** ADR-0019 Decision A. Swift is a process adapter.
-PipelineService owns policy. Mapping is confirm-then-map.
+PipelineService owns policy.
