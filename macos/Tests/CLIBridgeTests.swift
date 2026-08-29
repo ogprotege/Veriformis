@@ -1227,6 +1227,30 @@ final class CLIBridgeTests: XCTestCase {
     }
 
     @MainActor
+    func testInspectableSettingsBindPresetAndGoalContractWithoutSwiftDefaults() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("veriformis-inspect-\(UUID().uuidString)")
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(defaults: defaults, supportDirectory: support)
+        let goals = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData())
+        let presets = try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+        workbench.applyCatalogs(goals: goals, presets: presets)
+        let preset = try XCTUnwrap(workbench.selectedPreset)
+        let representation = try XCTUnwrap(workbench.selectedRepresentation)
+        XCTAssertEqual(preset.reviewPolicy, workbench.selectedGoal?.reviewPolicyDefault)
+        XCTAssertEqual(representation.representationID, preset.representationID)
+        XCTAssertFalse(representation.compatibleGenericExports.isEmpty)
+        XCTAssertFalse(workbench.selectedGoal?.nonClaims.isEmpty ?? true)
+        XCTAssertEqual(workbench.splitRatioPPM, nil)
+        XCTAssertFalse(workbench.allowEmptyEvaluation)
+        XCTAssertEqual(preset.construction.requireReview, false)
+    }
+
+    @MainActor
     func testPhase6UsabilityWalkthroughThroughWorkbenchViewModel() throws {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("veriformis-u6-\(UUID().uuidString)")

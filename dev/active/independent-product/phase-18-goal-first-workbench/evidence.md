@@ -78,6 +78,30 @@ were also complete.
 - [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
       and diff check pass.
 
+## Required item 18.5 evidence
+
+- [x] Progressive disclosure of chunk, construct, curate, split,
+      review_policy, representation, compatible generic exports, and
+      non-claims from the selected preset and goal.
+- [x] Overrides remain explicit. No Swift-side default `review_policy`
+      other than the catalog value.
+- [x] Validation and profile selectors are inspect-only.
+- [x] Focused tests, xcodebuild, parity, tracking, Ruff, lock, core pytest,
+      and diff check pass.
+
+## Item 18.5 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 79 passed |
+| `xcodebuild … test` (Veriformis scheme) | 110 passed |
+| `macos/scripts/parity_check.sh` | PASS; manifest `1e5a842a56c5acdbc04e931a5e7a88229535a301fd579863508bb439d8fdd2eb` |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,542 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
 ## Item 18.4 local gate evidence
 
 | Gate | Result |

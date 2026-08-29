@@ -78,13 +78,13 @@ Phase 17 advanced dataset families is complete under its own packet.
 Classification, preference, tool-call, and stepwise compile from
 user-provided evidence. ADR-0018 Decision A: no compile-path generator.
 Phase 18 goal-first Mac workbench is in progress under its own packet.
-Item 18.3 merged as PR #162. Item 18.4 adds document-source, dataset-row,
-and mixed compiler paths with confirm-then-map. Default `review_policy`
-stays `none`. No heuristic blocks seal.
+Item 18.4 merged as PR #163. Item 18.5 exposes inspectable preset and
+goal contract fields. Default `review_policy` stays `none`. No heuristic
+blocks seal.
 
-**Review date:** 2026-08-29 (independent-product Phase 18.4 input modes)
+**Review date:** 2026-08-29 (independent-product Phase 18.5 inspectable settings)
 
-**Next review:** Phase 18.4 merge, item 18.5 inspectable settings, or any
+**Next review:** Phase 18.5 merge, item 18.6 pre-publication samples, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -785,7 +785,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
-| In-progress independent Phase 18.4 | Item 18.3 merged as PR #162; ADR-0010 mode picker; confirm-then-map; family goals only on dataset-row; no Review/Exports screens |
+| In-progress independent Phase 18.5 | Item 18.4 merged as PR #163; inspectable preset/goal contract; overrides explicit; validation and profiles inspect-only |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–17 complete and Phase 18 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
@@ -845,13 +845,12 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–17 are complete. The current critical-path work
 is Phase 18 under the
 [goal-first-workbench packet](../dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-Item 18.4 adds document-source, dataset-row, and mixed compiler paths.
-Dataset-row mapping is confirm-then-map. Sidebar remains Home / Compile /
-History / Settings. There is no `GeneratorPass`. Do not start Phase 19
-from this packet.
+Item 18.5 exposes inspectable preset and goal contract fields. Sidebar
+remains Home / Compile / History / Settings. There is no `GeneratorPass`.
+Do not start Phase 19 from this packet.
 
-The next behavior change is item 18.5 inspectable settings. Review and
-Exports screens remain outside this item.
+The next behavior change is item 18.6 pre-publication samples. Review and
+Exports execute remain outside this item.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

@@ -202,7 +202,7 @@
       "packet": "dev/active/independent-product/phase-18-goal-first-workbench",
       "started_on": "2026-08-28",
       "completed_on": null,
-      "next_gate": "Item 18.3 merged as PR #162 at acf8ee405616d3b6ae8fa443cc3eb49f77bc790a. Item 18.4 adds ADR-0010 modes and confirm-then-map before 18.5 inspectable settings. Swift owns no dataset policy."
+      "next_gate": "Item 18.4 merged as PR #163 at c0c10b9. Item 18.5 exposes inspectable preset and goal contract fields before 18.6 samples. Swift owns no dataset policy."
     },
     {
       "number": 19,
