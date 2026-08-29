@@ -2,16 +2,17 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `7d851c8` on `main` after PR #159
+**Implementation baseline reviewed:** `73bf306` on `main` after PR #160
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1 packet open)
+Phases 0–2; independent-product Phases 0–17 complete; Phase 18.1 merged;
+item 18.2 thin-adapter contract)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-28 (Phase 18.1 workbench packet)
+**Last reviewed:** 2026-08-28 (Phase 18.2 thin-adapter contract)
 
-**Next review:** Phase 18.1 merge, or item 18.2 thin-adapter contract. Do
-not add Review, Exports, or dataset-row execute in this item.
+**Next review:** Phase 18.2 merge, or item 18.3 goal-first IA. Do not add
+Review, Exports, or dataset-row execute in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -144,8 +145,9 @@ local, offline, and free of LLM generation.
       start Phase 18 from that packet.
 - [ ] Independent product Phase 18 is in progress under its
       [packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-      Item 18.1 opened the packet. Honesty only: the workbench remains a
-      document-source CLI shell. Do not start Phase 19 from this packet.
+      Item 18.1 merged as PR #160. Item 18.2 pins ADR-0019 and
+      `veriformis.workbench-adapter/v1`. Do not start Phase 19 from this
+      packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

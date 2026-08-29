@@ -5,7 +5,7 @@
 | ID | State | Likelihood | Impact | Risk | Control |
 | --- | --- | --- | --- | --- | --- |
 | P18-R1 | Controlled for 18.1 | High | High | Packet opening implies Review, Exports, or dataset-row are implemented | Isolation tests and explicit non-claims |
-| P18-R2 | Open | High | High | Swift becomes a second policy engine | L3; ADR-0019 in 18.2; no second catalog |
+| P18-R2 | Controlled for 18.2 | High | High | Swift becomes a second policy engine | L3; ADR-0019 Decision A; `veriformis.workbench-adapter/v1` |
 | P18-R3 | Open | High | High | Empty Review or Exports tabs imply later execute | Keep those destinations out until 18.7/18.8 |
 | P18-R4 | Open | High | High | Dataset-row compile runs without a confirmed mapping | Confirm-then-map; isolation until 18.4 |
 | P18-R5 | Open | High | High | Document-source compile invents Phase 17 family supervision | Family goals only on dataset-row |

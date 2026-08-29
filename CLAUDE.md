@@ -80,8 +80,8 @@ Phase 17 advanced dataset families is complete. Sequential PRs
 17.1–17.10. ADR-0018 Decision A: no compile-path generator. Generation,
 multimodal, pre-tokenized, and unmapped trainer profiles skipped with
 records. Phase 18 goal-first Mac workbench is in progress under its own
-packet. Item 18.1 is honesty only: the workbench remains a
-document-source CLI shell. Do not start Phase 19 from that packet.
+packet. Item 18.1 merged as PR #160. Item 18.2 pins ADR-0019 and
+`veriformis.workbench-adapter/v1`. Do not start Phase 19 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -168,8 +168,9 @@ Read these current authorities before changing code:
     `docs/contracts/scale-corpus-v1.md`,
     `docs/contracts/scale-baseline-v1.md`,
     `docs/contracts/scale-support-v1.md`,
-    `docs/contracts/extension-protocol-v1.md`, and
-    `docs/contracts/advanced-family-admission-v1.md`
+    `docs/contracts/extension-protocol-v1.md`,
+    `docs/contracts/advanced-family-admission-v1.md`, and
+    `docs/contracts/workbench-adapter-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -180,8 +181,9 @@ Read these current authorities before changing code:
     `docs/adr/0014-independently-admitted-consumer-profiles.md`,
     `docs/adr/0015-collection-plan-as-ingest-contract.md`,
     `docs/adr/0016-optional-local-tesseract-ocr.md`,
-    `docs/adr/0017-no-untrusted-extension-loader.md`, and
-    `docs/adr/0018-no-compile-path-generator.md`
+    `docs/adr/0017-no-untrusted-extension-loader.md`,
+    `docs/adr/0018-no-compile-path-generator.md`, and
+    `docs/adr/0019-thin-workbench-adapter.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`
@@ -258,6 +260,7 @@ Key modules under `src/veriformis/` are:
 - `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
 - `extensions/` for the internal extension protocol, built-in-only registry, and read-only capability declarations (no loader);
 - `families/` for advanced-family admission pins, leakage grouping, and admitted classification execute;
+- `workbench/` for Mac wrap pins (`veriformis.workbench-adapter/v1`; loading is not a screen);
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;

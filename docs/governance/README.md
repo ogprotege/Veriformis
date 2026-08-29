@@ -56,7 +56,8 @@ of proof.
 
 At this review, independent-product Phases 0–17 are complete on `main`
 and Phase 18 is in progress. Phase 17 closeout merged as PR #159 at
-`7d851c8a531eac7217051effe000048403a3b866`. Item 18.1 is honesty only:
+`7d851c8a531eac7217051effe000048403a3b866`. Item 18.1 merged as PR #160
+at `73bf306bf53a650452f5d5dba5082ef842ced732`. Item 18.2 pins ADR-0019:
 no Review screen, export execute, or dataset-row compile. The quality
 report is preview-only. Construction `review_policy` defaults to `none`.
 Mac Review belongs to later Phase 18 items. Optional Tesseract 5
@@ -64,5 +65,5 @@ recovery is isolated under empty extra `ocr`. Default parse still
 refuses image-only PDF. `ocr-image` stays explicitly unsupported.
 Axolotl, LLaMA-Factory, and Aptus are implemented optional adapters.
 Unsloth remains a non-executable candidate. Extra lists for those names
-stay empty. ADR-0017 Decision A stands. ADR-0018 Decision A stands. Do
-not start Phase 19 from this packet.
+stay empty. ADR-0017 Decision A stands. ADR-0018 Decision A stands.
+ADR-0019 Decision A stands. Do not start Phase 19 from this packet.

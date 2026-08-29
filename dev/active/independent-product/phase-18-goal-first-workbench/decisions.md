@@ -20,3 +20,4 @@
 | Phase 17 families appear only through dataset-row mapping | Accepted | Phase 17 closeout; no family-to-trainer chrome |
 | Accessibility and keyboard required for new screens; skip virtualization and full localization with records | Accepted | Operator Phase 18 plan |
 | Do not start Phase 19 from this packet | Accepted | Signed/notarized Mac remains Group 9 owner remainder |
+| Pin `veriformis.workbench-adapter/v1` as a schema-only contract in 18.2 | Accepted | Loading a pin is not a screen; ADR-0019 Decision A |

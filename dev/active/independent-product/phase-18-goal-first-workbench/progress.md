@@ -29,3 +29,28 @@ durability warning.
 
 **Next action:** Publish the item 18.1 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 18.2.
+
+## 2026-08-28: Item 18.1 merged; item 18.2 in progress
+
+**Status:** Item 18.1 merged as PR #160 at
+`73bf306bf53a650452f5d5dba5082ef842ced732`. Clean local `main` equals
+`origin/main` there.
+
+Item 18.2 adds ADR-0019 Decision A and `veriformis.workbench-adapter/v1`
+as a schema pin. PipelineService owns policy. Swift is a process adapter.
+Unknown commands, fields, and contract versions fail closed. Loading a
+pin is not a screen. Review, Exports, and dataset-row UI remain absent.
+
+**Next action:** Run the complete item 18.2 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 18.3.
+
+## 2026-08-28: Item 18.2 local gates green
+
+**Status:** The thin-adapter contract is a schema pin only. Focused
+workbench tests passed 62. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,525 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 18.2 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 18.3.

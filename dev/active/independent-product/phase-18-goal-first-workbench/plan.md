@@ -63,7 +63,7 @@ defaults stay in versioned preset data.
 - [x] Create the standard packet and move Phase 18 to `in_progress`.
 - [x] Record L1 through L15 and reconcile active tracking documents.
 - [x] Add isolation tests for the current workbench.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 No new screen, input mode, mapping confirm path, export execute, review
 queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
@@ -72,9 +72,10 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/02-thin-adapter-contract`
 
-- [ ] Add ADR-0019 covering CLI ownership, no second catalog, fail-closed
+- [x] Add ADR-0019 covering CLI ownership, no second catalog, fail-closed
       truncated/cancelled discovery, ADR-0017, and ADR-0018.
-- [ ] Add no Review, Exports, or dataset-row UI.
+- [x] Add `veriformis.workbench-adapter/v1` as a schema pin.
+- [x] Add no Review, Exports, or dataset-row UI.
 
 ### 18.3 Replace Aptus-centered project copy with goal-first IA
 

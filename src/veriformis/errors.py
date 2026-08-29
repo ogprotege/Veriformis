@@ -248,6 +248,12 @@ class FamilyAdmissionError(VeriformisError):
     code = "family-admission-invalid"
 
 
+class WorkbenchAdapterError(VeriformisError):
+    """A workbench-adapter pin is malformed, unknown, or not a screen execute."""
+
+    code = "workbench-adapter-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

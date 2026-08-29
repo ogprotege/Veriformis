@@ -20,7 +20,7 @@ typed `PipelineService` methods and never call or reimplement it directly.
 | Python API | Call `PipelineService` methods directly |
 | CLI | Console script `veriformis` → thin Typer adapter |
 | MCP | `veriformis mcp` → local stdio tools over the same service |
-| macOS workbench | SwiftUI app builds and runs `veriformis` CLI commands |
+| macOS workbench | SwiftUI app builds and runs `veriformis` CLI commands (ADR-0019 process adapter; `veriformis.workbench-adapter/v1` names wraps, loading is not a screen) |
 
 There is no package `__main__.py`, so `python -m veriformis` is unsupported.
 Every mutating stage becomes visible through one atomic workspace `HEAD`

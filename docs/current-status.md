@@ -78,12 +78,13 @@ Phase 17 advanced dataset families is complete under its own packet.
 Classification, preference, tool-call, and stepwise compile from
 user-provided evidence. ADR-0018 Decision A: no compile-path generator.
 Phase 18 goal-first Mac workbench is in progress under its own packet.
-Item 18.1 records the current document-source CLI shell. Default
-`review_policy` stays `none`. No heuristic blocks seal.
+Item 18.1 merged as PR #160. Item 18.2 pins ADR-0019 and
+`veriformis.workbench-adapter/v1`. Default `review_policy` stays `none`.
+No heuristic blocks seal.
 
-**Review date:** 2026-08-28 (independent-product Phase 18.1 packet)
+**Review date:** 2026-08-28 (independent-product Phase 18.2 thin-adapter)
 
-**Next review:** Phase 18.1 merge, item 18.2 thin-adapter contract, or any
+**Next review:** Phase 18.2 merge, item 18.3 goal-first IA, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -784,7 +785,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
-| In-progress independent Phase 18.1 | Workbench packet open; document-source CLI shell; no Review/Exports/dataset-row execute |
+| In-progress independent Phase 18.2 | Item 18.1 merged as PR #160; ADR-0019 thin adapter; `veriformis.workbench-adapter/v1` schema pin; no Review/Exports/dataset-row execute |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–17 complete and Phase 18 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
