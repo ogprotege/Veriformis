@@ -77,13 +77,14 @@ with a record. There is no third-party plugin support claim.
 Phase 17 advanced dataset families is complete under its own packet.
 Classification, preference, tool-call, and stepwise compile from
 user-provided evidence. ADR-0018 Decision A: no compile-path generator.
-Generation, multimodal, pre-tokenized, and unmapped trainer profiles
-are skipped with records. Default `review_policy` stays `none`. No
-heuristic blocks seal.
+Phase 18 goal-first Mac workbench is in progress under its own packet.
+Item 18.1 records the current document-source CLI shell. Default
+`review_policy` stays `none`. No heuristic blocks seal.
 
-**Review date:** 2026-08-28 (independent-product Phase 17 closeout)
+**Review date:** 2026-08-28 (independent-product Phase 18.1 packet)
 
-**Next review:** Phase 18 packet open, or any capability claim change.
+**Next review:** Phase 18.1 merge, item 18.2 thin-adapter contract, or any
+capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -783,7 +784,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 15 | Named-hardware observations with no published support tier; streaming, guessed disk preflight, and sharding skipped because no measured bottleneck licensed them |
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–17 complete; do not start Phase 18 from the Phase 17 packet |
+| In-progress independent Phase 18.1 | Workbench packet open; document-source CLI shell; no Review/Exports/dataset-row execute |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–17 complete and Phase 18 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -839,16 +841,15 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–17 are complete. Phase 17 closeout lives
-under the
-[advanced-dataset-families packet](../dev/active/independent-product/phase-17-advanced-dataset-families/README.md).
-Classification, preference, tool-call, and stepwise compile from
-user-provided evidence. ADR-0018 Decision A: there is no
-`GeneratorPass`. Generation, multimodal, pre-tokenized, and unmapped
-trainer profiles are skipped with records.
+Independent-product Phases 0–17 are complete. The current critical-path work
+is Phase 18 under the
+[goal-first-workbench packet](../dev/active/independent-product/phase-18-goal-first-workbench/README.md).
+Item 18.1 records the current private-beta workbench. Sidebar remains
+Home / Compile / History / Settings. Compile remains document-source.
+There is no `GeneratorPass`. Do not start Phase 19 from this packet.
 
-The next behavior change is Phase 18 under its own packet. Mac family
-UI remains outside this packet. Do not start Phase 18 from this packet.
+The next behavior change is item 18.2 thin-adapter contract. Review,
+Exports, and dataset-row execute remain outside this item.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

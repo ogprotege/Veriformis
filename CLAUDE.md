@@ -79,7 +79,9 @@ A: no untrusted loader. Public plugins skipped with a record.
 Phase 17 advanced dataset families is complete. Sequential PRs
 17.1–17.10. ADR-0018 Decision A: no compile-path generator. Generation,
 multimodal, pre-tokenized, and unmapped trainer profiles skipped with
-records. Do not start Phase 18 from that packet.
+records. Phase 18 goal-first Mac workbench is in progress under its own
+packet. Item 18.1 is honesty only: the workbench remains a
+document-source CLI shell. Do not start Phase 19 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
