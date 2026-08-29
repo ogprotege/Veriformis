@@ -4,7 +4,7 @@
   "title": "Veriformis Independent Product",
   "roadmap": "docs/plans/2026-08-11-veriformis-independent-product-roadmap.md",
   "baseline_commit": "a76e0fe3185b0e317cd453b9c28a1d2054e617dd",
-  "last_updated": "2026-08-28",
+  "last_updated": "2026-08-29",
   "status_values": [
     "planned",
     "in_progress",
@@ -197,12 +197,12 @@
     {
       "number": 18,
       "title": "Complete the goal-first Mac workbench",
-      "status": "in_progress",
+      "status": "completed",
       "depends_on": [6, 7, 8, 9, 10, 13, 14, 15],
       "packet": "dev/active/independent-product/phase-18-goal-first-workbench",
       "started_on": "2026-08-28",
-      "completed_on": null,
-      "next_gate": "Item 18.8 merged as PR #167 at b39ac1a. Item 18.9 adds accessibility, keyboard, CLI equivalents, and error recovery. Virtualization and full localization skipped with records. Swift owns no dataset policy."
+      "completed_on": "2026-08-29",
+      "next_gate": "Completed. Goal-first Mac workbench wraps CLI compile, confirm-then-map, export, and review. Swift owns no dataset policy. ADR-0019 Decision A. Family-to-trainer, generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full localization skipped with records. Do not start Phase 19 from this packet."
     },
     {
       "number": 19,

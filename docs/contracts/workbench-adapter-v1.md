@@ -6,13 +6,12 @@
 
 **Schema:** `veriformis.workbench-adapter/v1`
 
-**Status:** Schema pin through independent-product Phase 18.2. Loading a pin
-is not a screen execute. ADR-0019 Decision A: Swift is a process adapter;
-`PipelineService` owns policy. Item 18.4 licensed dataset-row mapping on
-Compile. Item 18.7 licensed Exports over existing wrap commands. Item
-18.8 licensed Review over existing wrap commands.
+**Status:** Schema pin. Loading a pin is not a screen execute. ADR-0019
+Decision A: Swift is a process adapter; `PipelineService` owns policy.
+Phase 18 licensed dataset-row mapping on Compile, Exports over existing
+wrap commands, and Review over existing wrap commands.
 
-**Last reviewed:** 2026-08-28
+**Last reviewed:** 2026-08-29
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 18; [ADR-0019](../adr/0019-thin-workbench-adapter.md).
 

@@ -1,8 +1,10 @@
 # Phase 18: Complete the Goal-First Mac Workbench
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-28
+
+**Completed:** 2026-08-29
 
 **Roadmap phase:** [Phase 18](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md#phase-18--complete-the-goal-first-mac-workbench)
 
@@ -17,10 +19,10 @@ contracts or rebuilding them in Swift.
 ## Phase boundary
 
 Phase 18 begins with honesty records. The workbench remains a thin CLI
-adapter. Document-source compile, goal picker, preflight, and post-compile
-preview already exist. Dataset-row mapping, export screens, and Mac Review
-wait for later licensed items. Swift owns no dataset policy. ADR-0017 and
-ADR-0018 Decision A stand. This packet does not start Phase 19.
+adapter. Document-source, dataset-row, and mixed are the compiler paths.
+Mapping is confirm-then-map. Export and review wrap existing CLI packets.
+Swift owns no dataset policy. ADR-0017, ADR-0018, and ADR-0019 Decision A
+stand. This packet does not start Phase 19.
 
 ## Packet contents
 
@@ -36,7 +38,8 @@ ADR-0018 Decision A stand. This packet does not start Phase 19.
 
 ## Current state
 
-Item 18.8 merged as PR #167. Item 18.9 adds accessibility labels, keyboard
-shortcuts, copyable CLI equivalents, and error recovery. Virtualization
-and full localization skipped with records. English v1. No GitHub
-xcodebuild job.
+Phase 18 is complete. The Mac workbench is a thin CLI adapter over
+`PipelineService`. Confirm-then-map, export, and review wrap existing
+packets. Family-to-trainer, generator, plugin, Hub, signed Mac, GitHub
+xcodebuild, virtualization, and full localization are skipped with
+records. Do not start Phase 19 from this packet.

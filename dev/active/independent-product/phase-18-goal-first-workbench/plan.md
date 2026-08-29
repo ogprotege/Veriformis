@@ -1,8 +1,8 @@
 # Phase 18 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
-**Last updated:** 2026-08-28
+**Last updated:** 2026-08-29
 
 **Authority:** [Independent Product Roadmap](../../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 18; [program.json](../program.json); [project tracking policy](../../../../docs/governance/project-tracking.md); operator plan `/Users/biscuit/Desktop/Phase18-Plan.txt`.
 
@@ -132,7 +132,7 @@ queue, accessibility audit, or CLI-equivalent copy is permitted in this item.
 
 **Branch:** `phase18/10-adversarial-closeout`
 
-- [ ] Refuse unconfirmed mapping, truncated discovery, family-on-refusing
+- [x] Refuse unconfirmed mapping, truncated discovery, family-on-refusing
       profile, nested CSV, required-review seal, generator/plugin UI, and
       Aptus-on-by-default. Reprove digest parity. Close Phase 18. Do not
       start Phase 19 from this packet.

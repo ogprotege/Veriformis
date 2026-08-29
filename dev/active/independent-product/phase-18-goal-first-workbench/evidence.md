@@ -1,6 +1,6 @@
 # Phase 18 Evidence
 
-**Status:** Open
+**Status:** Closed with Phase 18
 
 **Opened:** 2026-08-28
 
@@ -113,6 +113,34 @@ were also complete.
 | `uv run ruff check src tests` | PASS |
 | `uv lock --check` | PASS |
 | Core pytest excluding optional integration and scale markers | 2,560 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
+
+## Required item 18.10 evidence
+
+- [x] Unconfirmed mapping cannot compile. Detect does not auto-confirm.
+- [x] Truncated discovery fails closed.
+- [x] Named profiles refuse family schemas. Constrained CSV refuses nested
+      and family rows.
+- [x] Required unresolved reviews still block seal. Default
+      `review_policy` stays `none`. Quality stays preview-only.
+- [x] Generator UI, plugin UI, and Hub upload are absent.
+- [x] Aptus handoff stays off by default.
+- [x] SFT sealed-bundle and Phase 16 kit identities hold.
+- [x] Skip records for family-to-trainer, generator, plugin, Hub, signed
+      Mac, GitHub xcodebuild, virtualization, and full localization.
+- [x] Phase 18 marked completed. Phase 19 stays planned with no packet.
+
+## Item 18.10 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/workbench/` | 107 passed |
+| `xcodebuild … test` (Veriformis scheme) | 112 passed |
+| `macos/scripts/parity_check.sh` | PASS; manifest `1e5a842a56c5acdbc04e931a5e7a88229535a301fd579863508bb439d8fdd2eb` |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS |
+| Core pytest excluding optional integration and scale markers | 2,570 passed, 17 deselected, one expected durability warning |
 | `git diff --check` | PASS |
 
 ## Required item 18.8 evidence
