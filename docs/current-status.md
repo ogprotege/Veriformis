@@ -82,12 +82,15 @@ The workbench is a thin CLI adapter. Document-source, dataset-row, and
 mixed are the compiler paths. Mapping is confirm-then-map. Export and
 review wrap existing packets. Swift owns no dataset policy. Family-to-trainer,
 generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
-and full localization are skipped with records. Default `review_policy`
+and full localization are skipped with records. Phase 19 automation and
+optional publication is in progress under its own packet. Item 19.1
+records the current pipeline/v1 boundary. Default `review_policy`
 stays `none`. No heuristic blocks seal.
 
-**Review date:** 2026-08-29 (independent-product Phase 18 closeout)
+**Review date:** 2026-08-31 (independent-product Phase 19.1 packet)
 
-**Next review:** Phase 19 packet open, or any capability claim change.
+**Next review:** Phase 19.1 merge, item 19.2 project-spec pin, or any
+capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -788,7 +791,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
 | Completed independent Phase 18 | Goal-first Mac workbench as a thin CLI adapter; confirm-then-map; export and review wrap existing packets; Swift owns no dataset policy; ADR-0019 Decision A; family-to-trainer, generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full localization skipped with records |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–18 complete; do not start Phase 19 from the Phase 18 packet |
+| In-progress independent Phase 19.1 | Automation packet open; pipeline/v1; no project spec, lockfile, dry-run, MCP tool, CI example, or Hub path |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–18 complete and Phase 19 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -844,18 +848,16 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–18 are complete. Phase 18 closeout lives
-under the
-[goal-first-workbench packet](../dev/active/independent-product/phase-18-goal-first-workbench/README.md).
-The Mac workbench is a thin CLI adapter over `PipelineService`.
-Document-source, dataset-row, and mixed are the compiler paths. Mapping
-is confirm-then-map. Export and review wrap existing packets. There is
-no `GeneratorPass`. Family-to-trainer, generator, plugin, Hub, signed
-Mac, GitHub xcodebuild, virtualization, and full localization are
-skipped with records.
+Independent-product Phases 0–18 are complete. The current critical-path work
+is Phase 19 under the
+[automation-and-publication packet](../dev/active/independent-product/phase-19-automation-and-publication/README.md).
+Item 19.1 records the current pipeline/v1, MCP, and publication boundary.
+There is no project spec, lockfile, spec dry-run, Hub execute, or
+quality-report command. There is no `GeneratorPass`. Do not start Phase
+20 from this packet.
 
-The next behavior change is Phase 19 under its own packet. Do not start
-Phase 19 from this packet.
+The next behavior change is item 19.2 project-spec pin. Spec execute,
+MCP tools, CI examples, and Hub paths remain outside this item.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

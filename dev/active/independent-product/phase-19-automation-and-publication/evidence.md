@@ -1,0 +1,52 @@
+# Phase 19 Evidence
+
+**Status:** Open
+
+**Opened:** 2026-08-31
+
+## Predecessor evidence
+
+Phase 18 completed. Closeout merged as PR #169 at
+`9f384eeedb401441c564c511b642904c403dad38`. Clean local `main` at packet open
+is PR #170 at `2737476eb2df83d82f575e3735b68487ee7cabc8` (install-smoke
+SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
+`program.json`. Phases 5, 6, 11–14, 16, and 17 were also complete.
+
+## Source-verified starting facts
+
+| Fact | Grade | Source |
+| --- | --- | --- |
+| `PIPELINE_SCHEMA_VERSION` is `veriformis.pipeline/v1` | `source-verified` | `src/veriformis/recipes/pipeline_spec.py` |
+| Stage order omits `map` and `export` | `source-verified` | `_STAGE_ORDER` in `pipeline_spec.py` |
+| Pipeline documents have no mode, map, or export keys | `source-verified` | `_TOP_LEVEL_KEYS`; unknown keys fail closed |
+| Parse in `run_pipeline_spec` does not pass `mode` | `source-verified` | `src/veriformis/recipes/runner.py` |
+| `veriformis run` exists | `source-verified` | `src/veriformis/cli.py` |
+| CLI and MCP names are disjoint from generator, install-extension, hub-upload, and quality-report | `source-verified` | CLI app; MCP tool manager |
+| Package metadata has no `HF_TOKEN` | `source-verified` | `pyproject.toml` |
+| Default `review_policy` is `none` | `source-verified` | `recipe_defaults()` |
+| Quality gates remain `admitted_to_block is False` | `source-verified` | `src/veriformis/quality/gates.py` |
+| Core compile names no network client | `source-verified` | runner, pipeline spec, PipelineService AST |
+| Project spec, lock, resume, and ADR-0020 are absent | `source-verified` | contracts, CLI, MCP, `src/veriformis` |
+
+## Required item 19.1 evidence
+
+- [x] Standard packet opened from clean `main` after Phase 18 closeout.
+- [x] Phase 19 moved from `planned` to `in_progress` with this packet path.
+- [x] L1 through L15 recorded.
+- [x] Active tracking documents reconciled to Phase 19 in progress without
+      claiming a project spec, lockfile, dry-run, MCP tool, CI example, or Hub.
+- [x] Baseline isolation tests added.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [ ] Every GitHub check passes.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.2.
+
+## Item 19.1 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/test_phase19_automation_isolation.py` | 9 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,580 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |

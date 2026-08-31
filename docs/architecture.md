@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-29 (independent-product Phase 18 closeout)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.1 packet)
 
 **Next review:** Any service-boundary or architecture change
 
