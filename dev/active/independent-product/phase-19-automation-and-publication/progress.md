@@ -32,3 +32,29 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 19.1 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.2.
+
+## 2026-08-31: Item 19.1 merged; item 19.2 in progress
+
+**Status:** Item 19.1 merged as PR #171 at
+`d8d91c264868438e4c8b91d66e754e1dd0cdf68e`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.2 pins additive `veriformis.project-spec/v1`. Loading is not
+execute. `veriformis.pipeline/v1` stays. Unknown fields, unknown versions,
+unconfirmed mapping, mixed fused members, and family-on-refusing profiles
+fail closed. No dry-run, lock, resume, MCP, CI, or Hub.
+
+**Next action:** Run the complete item 19.2 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.3.
+
+## 2026-08-31: Item 19.2 local gates green
+
+**Status:** Additive `veriformis.project-spec/v1` is a schema pin only.
+Focused project-spec and isolation tests passed 27. Pipeline spec
+defect-close tests still pass. Project tracking, Ruff, the lock check,
+and `git diff --check` passed. The core suite passed 2,598 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 19.2 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.3.

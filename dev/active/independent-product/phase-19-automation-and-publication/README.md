@@ -39,8 +39,7 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.1 records the current automation boundary. Pipeline specs still omit
-mode, map, and export. `veriformis run` exists. MCP has no Hub tool and no
-quality-report tool. CLI has no hub-upload. Credentials are absent from
-package metadata. Default `review_policy` stays `none`. Quality gates remain
-preview-only.
+Item 19.2 pins additive `veriformis.project-spec/v1`. Loading a spec is not
+execute. Pipeline/v1 stays. There is no dry-run, lockfile, resume path, Hub
+execute, or new MCP tool. Default `review_policy` stays `none`. Quality gates
+remain preview-only.

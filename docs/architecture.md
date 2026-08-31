@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.1 packet)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.2 project-spec pin)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -55,6 +55,7 @@ packet exchange, required-review seal blocking, auditable supersession);
 `extensions/` (internal protocol, built-in-only registry, read-only declarations; `.txt` and generic `split-jsonl-directory` selected through the protocol; no loader);
 `families/` (admission pins, leakage grouping, admitted classification execute);
 `workbench/` (Mac wrap pins; loading is not a screen);
+`automation/` (project-spec pin; loading is not execute);
 and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict

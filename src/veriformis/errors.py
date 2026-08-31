@@ -254,6 +254,12 @@ class WorkbenchAdapterError(VeriformisError):
     code = "workbench-adapter-invalid"
 
 
+class ProjectSpecError(VeriformisError):
+    """A project-spec pin is malformed, unknown, or not an execute."""
+
+    code = "project-spec-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

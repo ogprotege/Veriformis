@@ -22,3 +22,4 @@
 | Do not start Phase 20 from this packet | Accepted | L15; signed/notarized Mac remains Group 9 owner remainder |
 | Skip package/package-verify MCP wraps with a record unless 19.5 audit requires them | Accepted | Operator Phase 19 plan |
 | Skip Mac project-spec UI and GitHub xcodebuild | Accepted | Operator Phase 19 plan |
+| Pin additive `veriformis.project-spec/v1`; loading is not execute | Accepted | Item 19.2; pipeline/v1 stays |
