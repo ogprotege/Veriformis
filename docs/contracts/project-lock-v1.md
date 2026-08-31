@@ -7,7 +7,7 @@
 **Schema:** `veriformis.project-lock/v1`
 
 **Status:** Schema pin. A lock is not execute and does not replace `uv.lock`.
-Independent-product item 19.3.
+Independent-product item 19.4.
 
 **Last reviewed:** 2026-08-31
 
@@ -29,13 +29,17 @@ presence so a later clean host can compare the same semantic identity.
 | `veriformis_version` | Installed package version |
 | `python_version` | `major.minor` |
 | `extras` | Sorted map of declared extra name to `empty` or `present` |
-| `lock_id` | `derive_id("plk", …)` over the payload excluding `lock_id` |
+| `lock_id` | `derive_id("plk", …)` over the payload excluding `lock_id` and null optional fields |
+| `workspace_head` | Optional revision identity. Required for resume. |
+| `source_identities` | Optional sorted source identities. Required for resume. |
 
 Unknown fields fail closed. Credentials cannot appear. The lock is not
-`uv.lock` and does not upload.
+`uv.lock` and does not upload. Locks without resume pins still load.
+`spec-run` and `spec-resume` emit a lock with HEAD and source identities.
+`spec-lock --workspace` pins those fields from an existing workspace.
 
 ## Exit codes
 
-`spec-schema`, `spec-dry-run`, `spec-lock`, and `env-inspect` use `0` on
-success and `2` on invalid input. Partial publication `1` is unused on
-these surfaces.
+`spec-schema`, `spec-dry-run`, `spec-lock`, `env-inspect`, `spec-run`,
+and `spec-resume` use `0` on success and `2` on invalid input or
+identity drift. Partial publication `1` is unused on these surfaces.

@@ -80,6 +80,17 @@ def test_dry_run_writes_nothing(tmp_path: Path) -> None:
     assert "parse" in preview.stages
     assert "map" not in preview.stages
     assert preview.stages[-1] == "seal"
+    assert preview.stages == (
+        "parse",
+        "clean",
+        "chunk",
+        "construct",
+        "curate",
+        "split",
+        "format",
+        "validate",
+        "seal",
+    )
 
 
 def test_dataset_row_dry_run_inserts_map() -> None:
@@ -95,6 +106,15 @@ def test_dataset_row_dry_run_inserts_map() -> None:
     assert preview.mapping_required is True
     assert preview.mapping_confirmed is True
     assert preview.stages[:2] == ("parse", "map")
+    assert preview.stages == (
+        "parse",
+        "map",
+        "curate",
+        "split",
+        "format",
+        "validate",
+        "seal",
+    )
 
 
 def test_lockfile_pins_digest_version_and_empty_extras() -> None:

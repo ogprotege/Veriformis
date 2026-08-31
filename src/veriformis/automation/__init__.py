@@ -1,5 +1,12 @@
 """Automation pins. Loading a project spec is not execute."""
 
+from veriformis.automation.execute import (
+    load_project_spec_diagnostic,
+    lock_after_workspace,
+    project_spec_diagnostic,
+    resume_project_spec,
+    run_project_spec,
+)
 from veriformis.automation.inspect import (
     EnvironmentInspect,
     ProjectLock,
@@ -37,5 +44,10 @@ __all__ = [
     "load_project_lock",
     "load_project_spec",
     "load_project_spec_document",
+    "load_project_spec_diagnostic",
+    "lock_after_workspace",
+    "project_spec_diagnostic",
     "project_spec_json_schema",
+    "resume_project_spec",
+    "run_project_spec",
 ]

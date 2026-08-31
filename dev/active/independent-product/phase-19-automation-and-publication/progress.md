@@ -85,3 +85,34 @@ durability warning.
 
 **Next action:** Publish the item 19.3 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.4.
+
+## 2026-08-31: Item 19.3 merged; item 19.4 in progress
+
+**Status:** Item 19.3 merged as PR #173 at
+`0a29f44ffa00182d0f9ac430ef880f8d8a940ec9`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.4 adds machine-readable diagnostics, confirmed spec execute
+through PipelineService, and lock-matched resume. Document-source parse
+omits `--mode`. Dataset-row is parse `--mode dataset-row` then `map`
+then the finished-dataset tail. Resume requires matching lock, HEAD,
+and source identities. Export is not auto-run. No Hub. No MCP spec
+tool.
+
+**Next action:** Run the complete item 19.4 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.5.
+
+## 2026-08-31: Item 19.4 local gates green
+
+**Status:** Machine-readable diagnostics fail closed on truncated JSON.
+Confirmed spec-run executes through PipelineService. Document-source
+parse omits `--mode`. Dataset-row is parse `--mode dataset-row` then
+`map` then the finished-dataset tail. Resume requires matching lock,
+HEAD, and source identities. Export is not auto-run. Focused automation
+tests passed 50. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,621 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 19.4 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.5.

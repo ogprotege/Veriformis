@@ -31,7 +31,8 @@ complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only,
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
 Phases 0–18 complete and Phase 19 in progress with additive
-`veriformis.project-spec/v1` (loading is not execute) plus
+`veriformis.project-spec/v1` (loading is not execute; spec-run executes
+a confirmed spec; resume requires matching lock, HEAD, and sources) plus
 `explicit-label-classification`, `preference-and-ranking`,
 `tool-call-conversations`, and `stepwise-supervision` admitted on
 the dataset-row path and no
@@ -47,9 +48,9 @@ unsupported for default parse. There is no quality-report command. Mac
 Review wraps existing CLI packets; default `review_policy` stays `none`.
 There is no published corpus tier.
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.3 dry-run and lock)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.4 diagnostics and resume)
 
-**Next review:** Phase 19.3 merge, item 19.4 diagnostics and resume, or any
+**Next review:** Phase 19.4 merge, item 19.5 MCP parity, or any
 product-contract change. No modest fig-leaf tier. No public plugin API.
 Do not start Phase 20 from the Phase 19 packet.
 

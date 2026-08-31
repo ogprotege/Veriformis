@@ -6,9 +6,10 @@
 
 **Schema:** `veriformis.project-spec/v1`
 
-**Status:** Schema pin. Loading a spec is not execute. Additive over
-`veriformis.pipeline/v1`. Dry-run writes nothing. A lock is not execute.
-Independent-product item 19.3.
+**Status:** Schema pin plus confirmed execute and lock-matched resume.
+Loading a spec is not execute. Additive over `veriformis.pipeline/v1`.
+Dry-run writes nothing. A lock is not execute. Independent-product
+item 19.4.
 
 **Last reviewed:** 2026-08-31
 
@@ -20,8 +21,10 @@ Name one locked compile intent: compiler path, confirmed mapping when
 required, goal, preset, optional export selection, and independently
 admitted consumer profile. Existing `veriformis.pipeline/v1` documents
 still run. Loading is not execute. Dry-run writes no workspace, bundle,
-or destination. A project lock is not execute. Resume, Hub, MCP spec
-tools, and CI examples wait for later items.
+or destination. A project lock is not execute. Confirmed `spec-run`
+executes through `PipelineService`. Resume requires matching lock,
+workspace HEAD, and source identities. Hub, MCP spec tools, and CI
+examples wait for later items.
 
 ## Closed vocabularies
 
@@ -60,15 +63,28 @@ requested version and the supported version `1`
 (`veriformis.project-spec/v1`). Mixed fused document and row members
 fail closed. Family goals cannot select a refusing trainer profile.
 
+## Execute and resume
+
+`spec-run` executes a confirmed spec through `PipelineService`. Document-
+source parse omits `--mode`. Dataset-row is parse `--mode dataset-row`
+then `map` then the finished-dataset tail. Mixed still refuses fused
+members. Export is not auto-run.
+
+`spec-resume` continues only when the lock pins the same spec digest,
+workspace HEAD, and source identities. Drift names the mismatched
+identity. Resume is not a second policy engine.
+
+Failures emit `veriformis.project-spec-diagnostic/v1`. Truncated JSON
+fails closed. Human CLI text stays.
+
 ## Limitations
 
-- `no-execute`
 - `no-hub-upload`
-- `no-resume`
 
 Dry-run reconstructs the planned stage graph and writes no workspace,
 bundle, or destination. A project lock pins spec digest, versions, and
-declared extra presence; it is not execute.
+declared extra presence; it is not execute. Optional `workspace_head`
+and `source_identities` are resume pins, not a second catalog.
 
 Loading a spec is not execute. `veriformis.pipeline/v1` stays executable
 and byte-stable.
