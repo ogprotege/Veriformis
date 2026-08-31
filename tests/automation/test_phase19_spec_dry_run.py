@@ -236,9 +236,10 @@ def test_pipeline_service_owns_the_new_surfaces() -> None:
     assert "taxonomy_implemented_counts" in env
 
 
-def test_mcp_still_has_no_spec_or_hub_tools() -> None:
+def test_mcp_still_has_no_hub_tools() -> None:
     mcp_names = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
-    assert "spec_dry_run" not in mcp_names
-    assert "spec_lock" not in mcp_names
-    assert "env_inspect" not in mcp_names
+    assert "spec_dry_run" in mcp_names
+    assert "spec_lock" in mcp_names
+    assert "env_inspect" in mcp_names
     assert "hub_upload" not in mcp_names
+    assert "package_verify" not in mcp_names

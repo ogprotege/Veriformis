@@ -189,11 +189,10 @@ def test_spec_run_dataset_row_parses_with_mode_then_maps(tmp_path: Path) -> None
     assert not list(tmp_path.glob("**/*.vfexport.zip"))
 
 
-def test_mcp_has_no_spec_execute_tools() -> None:
+def test_mcp_has_no_hub_upload_tool() -> None:
     mcp_names = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
-    assert "spec_run" not in mcp_names
-    assert "spec_resume" not in mcp_names
     assert "hub_upload" not in mcp_names
+    assert "quality_report" not in mcp_names
 
 
 def test_cli_spec_resume_requires_matching_lock(tmp_path: Path) -> None:

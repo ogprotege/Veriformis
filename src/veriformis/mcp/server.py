@@ -793,6 +793,129 @@ def create_mcp_server(
             )
         )
 
+    def _spec_payload(call, *, spec_id_box: list[str | None] | None = None) -> str:
+        from veriformis.automation.execute import project_spec_diagnostic
+
+        try:
+            payload = call()
+        except SealPartialPublicationError as exc:
+            spec_id = spec_id_box[0] if spec_id_box else None
+            wrapped = VeriformisError(
+                f"published bundle remains visible at {exc.publication.bundle_path}; "
+                f"manifest SHA-256 {exc.publication.manifest_sha256}; workspace receipt "
+                "did not commit"
+            )
+            return json.dumps(
+                project_spec_diagnostic(wrapped, spec_id=spec_id, stage="seal"),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+        except (
+            VeriformisError,
+            OSError,
+            UnicodeError,
+            ValueError,
+            TypeError,
+            json.JSONDecodeError,
+        ) as exc:
+            spec_id = spec_id_box[0] if spec_id_box else None
+            return json.dumps(
+                project_spec_diagnostic(exc, spec_id=spec_id),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+        return json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+
+    @server.tool()
+    def spec_schema() -> str:
+        """Return JSON Schema generated from veriformis.project-spec/v1."""
+        return json.dumps(
+            pipeline.project_spec_schema(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
+    def spec_dry_run(spec_path: str) -> str:
+        """Reconstruct a project-spec plan. Write no workspace, bundle, or destination."""
+        from veriformis.automation import load_project_spec_document
+
+        path = Path(spec_path)
+        loaded_id: list[str | None] = [None]
+
+        def run() -> dict[str, Any]:
+            loaded = load_project_spec_document(path)
+            loaded_id[0] = loaded.spec_id
+            return pipeline.dry_run_project_spec(loaded, base_dir=path.parent)
+
+        return _spec_payload(run, spec_id_box=loaded_id)
+
+    @server.tool()
+    def spec_lock(spec_path: str, workspace: str | None = None) -> str:
+        """Pin spec digest, versions, and extras. The lock is not execute."""
+        from veriformis.automation import load_project_spec_document
+
+        path = Path(spec_path)
+        loaded_id: list[str | None] = [None]
+
+        def run() -> dict[str, Any]:
+            loaded = load_project_spec_document(path)
+            loaded_id[0] = loaded.spec_id
+            return pipeline.lock_project_spec(
+                loaded,
+                workspace=None if workspace is None else Path(workspace),
+            )
+
+        return _spec_payload(run, spec_id_box=loaded_id)
+
+    @server.tool()
+    def env_inspect() -> str:
+        """Return one read-only environment packet. No secrets."""
+        return json.dumps(
+            pipeline.inspect_environment(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
+    def spec_run(spec_path: str) -> str:
+        """Execute a confirmed project spec through PipelineService. Export is not auto-run."""
+        from veriformis.automation import load_project_spec_document
+
+        path = Path(spec_path)
+        loaded_id: list[str | None] = [None]
+
+        def run() -> dict[str, Any]:
+            loaded = load_project_spec_document(path)
+            loaded_id[0] = loaded.spec_id
+            return pipeline.run_project_spec(loaded, base_dir=path.parent)
+
+        return _spec_payload(run, spec_id_box=loaded_id)
+
+    @server.tool()
+    def spec_resume(spec_path: str, lock_path: str) -> str:
+        """Resume a spec only when lock, workspace HEAD, and source identities match."""
+        from veriformis.automation import load_project_spec_document
+        from veriformis.automation.inspect import load_project_lock
+
+        path = Path(spec_path)
+        loaded_id: list[str | None] = [None]
+
+        def run() -> dict[str, Any]:
+            loaded = load_project_spec_document(path)
+            loaded_id[0] = loaded.spec_id
+            return pipeline.resume_project_spec(
+                loaded,
+                load_project_lock(json.loads(Path(lock_path).read_text(encoding="utf-8"))),
+                base_dir=path.parent,
+            )
+
+        return _spec_payload(run, spec_id_box=loaded_id)
+
     @server.tool()
     def run_pipeline(pipeline_path: str) -> str:
         """Execute one versioned YAML pipeline document."""

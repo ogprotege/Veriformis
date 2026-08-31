@@ -71,8 +71,30 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
 - [x] Resume only when lock, workspace HEAD, and source identities match.
       Drift names the mismatched identity.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.5.
+
+## Required item 19.5 evidence
+
+- [x] MCP wraps spec-schema, spec-dry-run, spec-lock, env-inspect, spec-run,
+      and spec-resume over PipelineService.
+- [x] `run_pipeline` still executes `veriformis.pipeline/v1` only.
+- [x] `package` / `package-verify` skipped with a record. No Hub. No
+      quality-report.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.5.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.6.
+
+## Item 19.5 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 54 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,625 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.4 local gate evidence
 

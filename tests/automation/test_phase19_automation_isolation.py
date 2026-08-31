@@ -1,4 +1,4 @@
-"""Phase 19 isolation: pipeline/v1 stays, no Hub execute, no MCP spec tools."""
+"""Phase 19 isolation: pipeline/v1 stays, no Hub execute, no package MCP tools."""
 
 from __future__ import annotations
 
@@ -218,7 +218,13 @@ def test_project_spec_execute_surfaces_keep_hub_absent() -> None:
     assert "env-inspect" in cli_names
     assert "spec-run" in cli_names
     assert "spec-resume" in cli_names
-    assert "spec_run" not in mcp_names
-    assert "spec_resume" not in mcp_names
-    assert "spec_dry_run" not in mcp_names
+    assert "spec_schema" in mcp_names
+    assert "spec_dry_run" in mcp_names
+    assert "spec_lock" in mcp_names
+    assert "env_inspect" in mcp_names
+    assert "spec_run" in mcp_names
+    assert "spec_resume" in mcp_names
+    assert "run_pipeline" in mcp_names
+    assert "package" not in mcp_names
+    assert "package_verify" not in mcp_names
     assert "hub_upload" not in mcp_names
