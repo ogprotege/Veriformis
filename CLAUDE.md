@@ -84,10 +84,9 @@ records. Phase 18 goal-first Mac workbench is complete. Sequential PRs
 export, and review wrap existing CLI packets. Family-to-trainer, generator,
 plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
 localization skipped with records. Phase 19 automation and optional
-publication is in progress under its own packet. Item 19.5 wraps
-project-spec packets on MCP. `run_pipeline` stays pipeline/v1. package /
-package-verify MCP wraps are skipped with a record. No Hub. Do not start
-Phase 20 from that packet.
+publication is in progress under its own packet. Item 19.6 adds retained
+project-spec fixtures and a CI example that does not replace
+golden-compile. No Hub. Do not start Phase 20 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

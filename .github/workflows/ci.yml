@@ -88,6 +88,21 @@ jobs:
           path: ${{ runner.temp }}/golden-evidence
           if-no-files-found: ignore
 
+  project-spec-example:
+    name: project-spec-example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python 3.12
+        run: uv python install 3.12
+      - name: Sync test extras
+        run: uv sync --python 3.12 --extra test
+      - name: Retained project-spec example fingerprints
+        run: bash scripts/release/project_spec_example.sh
+
   # Explicit adapter self-conformance evidence. This signal is visible but cannot block
   # the standalone Veriformis release path.
   aptus-integration:

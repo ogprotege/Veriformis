@@ -1,0 +1,20 @@
+{
+  "contract_id": "veriformis.project-lock",
+  "contract_version": 1,
+  "extras": {
+    "axolotl": "empty",
+    "columnar": "empty",
+    "llama-factory": "empty",
+    "mlx-lm": "empty",
+    "ocr": "empty",
+    "test": "present",
+    "trl": "empty",
+    "unsloth": "empty"
+  },
+  "lock_id": "plk-v1-edd2d886be524bfcb4c3885f25e26d84cad9d307332a2ae8890abef4136ab579",
+  "python_version": "3.12",
+  "schema_id": "veriformis.project-lock/v1",
+  "spec_digest": "c1931fad48fccf088c104f5dec8ef8da48cd0d606bdb06bd09cda01dd7476ddf",
+  "spec_id": "psp-v1-129c7a1f842dfbc3d4db5f6e0a32277cbb2272ce3bd645b0b4bc6137f6176316",
+  "veriformis_version": "0.1.0"
+}

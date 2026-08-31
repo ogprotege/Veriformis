@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.5 MCP parity)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.6 CI examples)
 
 **Next review:** Any service-boundary or architecture change
 

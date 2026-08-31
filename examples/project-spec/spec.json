@@ -1,0 +1,32 @@
+{
+  "contract_id": "veriformis.project-spec",
+  "contract_version": 1,
+  "generation_allowed": false,
+  "goal_id": "learn-the-text",
+  "mode": "document-source",
+  "pipeline": {
+    "schema_version": "veriformis.pipeline/v1",
+    "source_root": "sources",
+    "sources": [
+      "alpha.txt",
+      "beta.txt"
+    ],
+    "stages": {
+      "construct": {
+        "goal": "learn-the-text"
+      },
+      "curate": {
+        "allow_empty_evaluation": true
+      },
+      "parse": {},
+      "seal": {
+        "out": "out.vfbundle"
+      }
+    },
+    "workspace": "ws"
+  },
+  "plugin_install_allowed": false,
+  "publication_allowed": false,
+  "schema_id": "veriformis.project-spec/v1",
+  "spec_id": "psp-v1-129c7a1f842dfbc3d4db5f6e0a32277cbb2272ce3bd645b0b4bc6137f6176316"
+}

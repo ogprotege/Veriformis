@@ -5,17 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase19/05-mcp-parity`
+**Local branch:** `phase19/06-ci-examples`
 
-**Completed:** Item 19.4, PR #174 at
-`f80bab4ffd714bec6dfcf354050b4aa71735bb0a`.
+**Completed:** Item 19.5, PR #175 at
+`95acb66787a6e7775bb4f9f1493296f76a163088`.
 
-**Current item:** 19.5 MCP parity. Wrap project-spec packets. Skip
-`package` / `package-verify` with a record. `run_pipeline` stays
-pipeline/v1. No Hub. No quality-report.
+**Current item:** 19.6 CI examples with committed semantic fingerprints.
+Do not replace golden-compile. No Hub. No secrets. No xcodebuild.
 
-**Next gate:** Publish the 19.5 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 19.6.
+**Next gate:** Publish the 19.6 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 19.7.
 
 **Decision:** ADR-0020 Decision A (pin only; no Hub execute). Operator
 approved the Phase 19 plan as written on 2026-08-31.

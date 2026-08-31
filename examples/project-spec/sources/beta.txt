@@ -1,0 +1,3 @@
+Beta paragraph with enough text for a second leakage group.
+
+Second beta paragraph keeps the corpus multi-block.
