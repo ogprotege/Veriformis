@@ -241,7 +241,7 @@ def test_public_surfaces_still_have_no_generator_plugin_or_hub() -> None:
     assert "entry-points" not in project
 
 
-def test_skipped_extras_have_records_and_phase_19_is_not_started() -> None:
+def test_skipped_extras_have_records_and_phase_19_did_not_start_from_this_packet() -> None:
     closeout = _read(
         "dev/active/independent-product/phase-18-goal-first-workbench/closeout.md"
     )
@@ -268,9 +268,13 @@ def test_skipped_extras_have_records_and_phase_19_is_not_started() -> None:
     program = json.loads(_read("dev/active/independent-product/program.json"))
     phases = {item["number"]: item for item in program["phases"]}
     assert phases[18]["status"] == "completed"
-    assert phases[19]["status"] == "planned"
-    assert phases[19]["packet"] is None
-    assert not list((ROOT / "dev/active/independent-product").glob("phase-19-*"))
+    assert phases[19]["packet"] == (
+        "dev/active/independent-product/phase-19-automation-and-publication"
+    )
+    assert phases[19]["status"] in {"in_progress", "completed"}
+    assert phases[20]["status"] == "planned"
+    assert phases[20]["packet"] is None
+    assert not list((ROOT / "dev/active/independent-product").glob("phase-20-*"))
 
 
 def test_phase16_kit_and_sft_sealed_bundle_identities_hold(tmp_path: Path) -> None:
