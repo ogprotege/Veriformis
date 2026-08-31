@@ -7,7 +7,8 @@
 **Schema:** `veriformis.project-spec/v1`
 
 **Status:** Schema pin. Loading a spec is not execute. Additive over
-`veriformis.pipeline/v1`. Independent-product item 19.2.
+`veriformis.pipeline/v1`. Dry-run writes nothing. A lock is not execute.
+Independent-product item 19.3.
 
 **Last reviewed:** 2026-08-31
 
@@ -18,8 +19,9 @@
 Name one locked compile intent: compiler path, confirmed mapping when
 required, goal, preset, optional export selection, and independently
 admitted consumer profile. Existing `veriformis.pipeline/v1` documents
-still run. This pin does not dry-run, lock, resume, upload, or add MCP
-or CI surfaces.
+still run. Loading is not execute. Dry-run writes no workspace, bundle,
+or destination. A project lock is not execute. Resume, Hub, MCP spec
+tools, and CI examples wait for later items.
 
 ## Closed vocabularies
 
@@ -61,10 +63,12 @@ fail closed. Family goals cannot select a refusing trainer profile.
 ## Limitations
 
 - `no-execute`
-- `no-dry-run`
-- `no-lockfile`
 - `no-hub-upload`
 - `no-resume`
+
+Dry-run reconstructs the planned stage graph and writes no workspace,
+bundle, or destination. A project lock pins spec digest, versions, and
+declared extra presence; it is not execute.
 
 Loading a spec is not execute. `veriformis.pipeline/v1` stays executable
 and byte-stable.

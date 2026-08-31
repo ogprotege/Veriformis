@@ -39,7 +39,7 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.2 pins additive `veriformis.project-spec/v1`. Loading a spec is not
-execute. Pipeline/v1 stays. There is no dry-run, lockfile, resume path, Hub
-execute, or new MCP tool. Default `review_policy` stays `none`. Quality gates
-remain preview-only.
+Item 19.3 adds project-spec schema, dry-run, lockfile, and environment
+inspection. Dry-run writes nothing. Loading a spec is not execute. There is
+no spec resume, Hub execute, or MCP spec tool. Default `review_policy` stays
+`none`. Quality gates remain preview-only.

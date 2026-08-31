@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.2 project-spec pin)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.3 dry-run and lock)
 
-**Next review:** Phase 19.2 merge, or governance-schema change.
+**Next review:** Phase 19.3 merge, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -57,9 +57,9 @@ of proof.
 
 At this review, independent-product Phases 0–18 are complete on `main`
 and Phase 19 is in progress. Phase 18 closeout merged as PR #169 at
-`9f384eeedb401441c564c511b642904c403dad38`. Item 19.2 pins additive
-`veriformis.project-spec/v1`. Loading is not execute. There is no
-lockfile, dry-run, MCP tool, CI example, or Hub path.
+`9f384eeedb401441c564c511b642904c403dad38`. Item 19.3 adds project-spec
+schema, dry-run, lockfile, and env inspect. Dry-run writes nothing.
+There is no spec resume, MCP spec tool, CI example, or Hub path.
 The quality report is preview-only. Construction `review_policy`
 defaults to `none`. Optional Tesseract 5 recovery is isolated under
 empty extra `ocr`. Default parse still refuses image-only PDF.

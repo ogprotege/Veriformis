@@ -10,7 +10,6 @@ from veriformis.recipes.pipeline_spec import (
     load_pipeline_spec,
     pipeline_spec_from_dict,
 )
-from veriformis.recipes.runner import run_pipeline_spec
 from veriformis.recipes.statistics import (
     DatasetStatistics,
     measure_construction_statistics,
@@ -29,3 +28,11 @@ __all__ = [
     "pipeline_spec_from_dict",
     "run_pipeline_spec",
 ]
+
+
+def __getattr__(name: str):
+    if name == "run_pipeline_spec":
+        from veriformis.recipes.runner import run_pipeline_spec
+
+        return run_pipeline_spec
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

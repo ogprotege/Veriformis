@@ -77,14 +77,15 @@ resume path is permitted in this item.
 
 - [x] Add additive `veriformis.project-spec/v1`. Mode, confirmed mapping,
       export, profiles. Loading is not execute. `pipeline/v1` stays.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.3 Add spec schema, dry-run, lockfile, and environment inspection
 
 **Branch:** `phase19/03-spec-dry-run-and-lock`
 
-- [ ] Schema from the model. Dry-run writes nothing. Lockfile pins spec
+- [x] Schema from the model. Dry-run writes nothing. Lockfile pins spec
       digest. Env inspect. Deterministic exit codes.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.4 Add machine-readable diagnostics and spec resume
 

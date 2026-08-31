@@ -47,8 +47,30 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
 - [x] Unknown fields, unknown versions, unconfirmed mapping, mixed fused
       members, and family-on-refusing profiles fail closed.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.3.
+
+## Required item 19.3 evidence
+
+- [x] JSON Schema generated from the project-spec model.
+- [x] Dry-run reconstructs stages, mode, mapping, export, and environment and
+      writes no workspace, bundle, or destination.
+- [x] `veriformis.project-lock/v1` pins spec digest, versions, and extras.
+- [x] Environment inspection names no secrets.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.3.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.4.
+
+## Item 19.3 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 40 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,611 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.2 local gate evidence
 

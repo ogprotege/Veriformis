@@ -58,3 +58,30 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 19.2 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.3.
+
+## 2026-08-31: Item 19.2 merged; item 19.3 in progress
+
+**Status:** Item 19.2 merged as PR #172 at
+`eb7777eae7b755637d4639a7316121303affc19f`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.3 emits JSON Schema from the project-spec model, dry-runs a spec
+without writing a workspace, bundle, or destination, writes
+`veriformis.project-lock/v1`, and adds environment inspection. No resume,
+map/export execute, or Hub.
+
+**Next action:** Run the complete item 19.3 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.4.
+
+## 2026-08-31: Item 19.3 local gates green
+
+**Status:** Schema is generated from the project-spec model. Dry-run writes
+nothing. The lock pins spec digest, versions, and extras. Environment
+inspection names no secrets. Focused automation tests passed 40. Project
+tracking, Ruff, the lock check, and `git diff --check` passed. The core
+suite passed 2,611 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 19.3 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.4.

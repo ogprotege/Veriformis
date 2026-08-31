@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-from veriformis.cli import app
 from veriformis.contracts import (
     PROJECT_SPEC_CONTRACT_ID,
     PROJECT_SPEC_CONTRACT_VERSION,
@@ -302,13 +301,12 @@ stages:
         )
 
 
-def test_project_spec_does_not_add_cli_or_mcp_execute() -> None:
-    cli_names = {command.name for command in app.registered_commands}
+def test_project_spec_does_not_add_mcp_execute() -> None:
     mcp_names = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
-    assert "project-spec" not in cli_names
-    assert "spec-dry-run" not in cli_names
     assert "project_spec" not in mcp_names
     assert "spec_dry_run" not in mcp_names
+    assert "spec_resume" not in mcp_names
+    assert "hub_upload" not in mcp_names
 
 
 def test_contract_document_exists() -> None:

@@ -37,6 +37,7 @@ from veriformis.pipeline.service import (
     PipelineService,
     SealPartialPublicationError,
     SealOutcome,
+    ServiceMessage,
     StageOutcome,
     _load_chunks,
     _load_sources,
@@ -720,6 +721,56 @@ def export_verify(
 @app.command()
 def version() -> None:
     _emit_outcome(_SERVICE.version())
+
+
+def _json_outcome(payload: dict[str, object]) -> StageOutcome:
+    text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+    return StageOutcome(messages=(ServiceMessage(text),), exit_status=0)
+
+
+@app.command(name="spec-schema")
+def spec_schema() -> None:
+    """Print JSON Schema generated from veriformis.project-spec/v1."""
+    _run(lambda: _json_outcome(_SERVICE.project_spec_schema()))
+
+
+@app.command(name="spec-dry-run")
+def spec_dry_run(spec: Path) -> None:
+    """Reconstruct a project-spec plan. Write no workspace, bundle, or destination."""
+    def run() -> StageOutcome:
+        from veriformis.automation import load_project_spec_document
+
+        payload = _SERVICE.dry_run_project_spec(load_project_spec_document(spec))
+        return _json_outcome(payload)
+
+    _run(run)
+
+
+@app.command(name="spec-lock")
+def spec_lock(
+    spec: Path,
+    out: Path | None = typer.Option(None, "--out", help="Write lock JSON; default stdout."),
+) -> None:
+    """Write veriformis.project-lock/v1 for one spec. The lock is not execute."""
+    def run() -> StageOutcome:
+        from veriformis.automation import load_project_spec_document
+
+        payload = _SERVICE.lock_project_spec(load_project_spec_document(spec))
+        text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        if out is not None:
+            if out.exists():
+                raise VeriformisError(f"lock destination already exists: {out}")
+            out.write_text(text, encoding="utf-8")
+            return StageOutcome(exit_status=0, messages=())
+        return _json_outcome(payload)
+
+    _run(run)
+
+
+@app.command(name="env-inspect")
+def env_inspect() -> None:
+    """Print one read-only environment packet. No secrets."""
+    _run(lambda: _json_outcome(_SERVICE.inspect_environment()))
 
 
 @app.command(name="taxonomy")

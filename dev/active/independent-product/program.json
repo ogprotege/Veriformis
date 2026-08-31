@@ -212,7 +212,7 @@
       "packet": "dev/active/independent-product/phase-19-automation-and-publication",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 19.2 project-spec pin must merge green before 19.3 dry-run, schema, and lockfile. Loading a spec is not execute."
+      "next_gate": "Item 19.3 dry-run, schema, and lockfile must merge green before 19.4 diagnostics and resume. Dry-run writes nothing."
     },
     {
       "number": 20,
