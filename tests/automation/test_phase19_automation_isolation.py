@@ -1,4 +1,4 @@
-"""Phase 19.1 isolation: pipeline/v1, no Hub, no project spec, no lock."""
+"""Phase 19 isolation: pipeline/v1, no Hub execute, no lockfile or resume CLI."""
 
 from __future__ import annotations
 
@@ -211,9 +211,8 @@ def test_core_compile_names_no_network_client() -> None:
 
 
 def test_project_spec_lock_and_resume_surfaces_are_absent() -> None:
-    assert not (ROOT / "src/veriformis/automation").exists()
-    assert not (ROOT / "src/veriformis/project_spec.py").exists()
-    assert not (ROOT / "docs/contracts/project-spec-v1.md").exists()
+    assert (ROOT / "docs/contracts/project-spec-v1.md").is_file()
+    assert (ROOT / "src/veriformis/automation/spec.py").is_file()
     assert not (ROOT / "docs/contracts/project-lock-v1.md").exists()
     assert not (ROOT / "docs/adr/0020-publication-boundary.md").exists()
     cli_names = _cli_names()

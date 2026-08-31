@@ -84,9 +84,9 @@ records. Phase 18 goal-first Mac workbench is complete. Sequential PRs
 export, and review wrap existing CLI packets. Family-to-trainer, generator,
 plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
 localization skipped with records. Phase 19 automation and optional
-publication is in progress under its own packet. Item 19.1 is honesty
-only: pipeline/v1, no Hub, no project spec. Do not start Phase 20 from
-that packet.
+publication is in progress under its own packet. Item 19.2 pins additive
+`veriformis.project-spec/v1`. Loading is not execute. Do not start Phase
+20 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -174,8 +174,9 @@ Read these current authorities before changing code:
     `docs/contracts/scale-baseline-v1.md`,
     `docs/contracts/scale-support-v1.md`,
     `docs/contracts/extension-protocol-v1.md`,
-    `docs/contracts/advanced-family-admission-v1.md`, and
-    `docs/contracts/workbench-adapter-v1.md`
+    `docs/contracts/advanced-family-admission-v1.md`,
+    `docs/contracts/workbench-adapter-v1.md`, and
+    `docs/contracts/project-spec-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and

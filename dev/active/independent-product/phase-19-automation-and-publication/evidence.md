@@ -37,8 +37,29 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
       claiming a project spec, lockfile, dry-run, MCP tool, CI example, or Hub.
 - [x] Baseline isolation tests added.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.2.
+
+## Required item 19.2 evidence
+
+- [x] Additive `veriformis.project-spec/v1` pin and contract document.
+- [x] Loading is not execute. `pipeline/v1` still loads and refuses mode/map.
+- [x] Unknown fields, unknown versions, unconfirmed mapping, mixed fused
+      members, and family-on-refusing profiles fail closed.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.2.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.3.
+
+## Item 19.2 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/test_phase19_project_spec.py tests/automation/test_phase19_automation_isolation.py` | 27 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,598 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.1 local gate evidence
 

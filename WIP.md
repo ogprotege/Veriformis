@@ -4,15 +4,14 @@
 
 **Implementation baseline reviewed:** `2737476` on `main` after PR #170
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–18 complete; Phase 19.1 packet open)
+Phases 0–2; independent-product Phases 0–18 complete; Phase 19.2 project-spec pin)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-31 (Phase 19.1 automation packet)
+**Last reviewed:** 2026-08-31 (Phase 19.2 project-spec pin)
 
-**Next review:** Phase 19.1 merge, or item 19.2 project-spec pin. Do not
-add a project spec, lockfile, dry-run, MCP tool, CI example, or Hub path
-in this item.
+**Next review:** Phase 19.2 merge, or item 19.3 dry-run and lockfile. Do
+not dry-run, lock, resume, upload, or add MCP/CI in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -152,8 +151,8 @@ local, offline, and free of LLM generation.
       with records. Phase 19 opened under its own packet.
 - [ ] Independent product Phase 19 is in progress under its
       [packet](dev/active/independent-product/phase-19-automation-and-publication/README.md).
-      Item 19.1 opened the packet. Honesty only: pipeline/v1, no Hub, no
-      project spec. Do not start Phase 20 from this packet.
+      Item 19.2 pins additive `veriformis.project-spec/v1`. Loading is
+      not execute. Do not start Phase 20 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

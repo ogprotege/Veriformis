@@ -66,7 +66,7 @@ default is Decision A: pin only.
 - [x] Create the standard packet and move Phase 19 to `in_progress`.
 - [x] Record L1 through L15 and reconcile active tracking documents.
 - [x] Add isolation tests for the current pipeline/MCP/publication boundary.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 No project spec, lockfile, dry-run command, MCP tool, CI example, Hub pin, or
 resume path is permitted in this item.
@@ -75,8 +75,9 @@ resume path is permitted in this item.
 
 **Branch:** `phase19/02-project-spec`
 
-- [ ] Add additive `veriformis.project-spec/v1`. Mode, confirmed mapping,
+- [x] Add additive `veriformis.project-spec/v1`. Mode, confirmed mapping,
       export, profiles. Loading is not execute. `pipeline/v1` stays.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.3 Add spec schema, dry-run, lockfile, and environment inspection
 

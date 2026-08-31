@@ -90,6 +90,10 @@ WORKBENCH_ADAPTER_CONTRACT_ID: Final = "veriformis.workbench-adapter"
 WORKBENCH_ADAPTER_CONTRACT_VERSION: Final = 1
 WORKBENCH_ADAPTER_SCHEMA_ID: Final = "veriformis.workbench-adapter/v1"
 
+PROJECT_SPEC_CONTRACT_ID: Final = "veriformis.project-spec"
+PROJECT_SPEC_CONTRACT_VERSION: Final = 1
+PROJECT_SPEC_SCHEMA_ID: Final = "veriformis.project-spec/v1"
+
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
 

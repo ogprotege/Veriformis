@@ -212,7 +212,7 @@
       "packet": "dev/active/independent-product/phase-19-automation-and-publication",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 19.1 packet/honesty must merge green before the 19.2 project-spec pin. No spec execute, MCP tool, CI job, or Hub path in 19.1."
+      "next_gate": "Item 19.2 project-spec pin must merge green before 19.3 dry-run, schema, and lockfile. Loading a spec is not execute."
     },
     {
       "number": 20,
