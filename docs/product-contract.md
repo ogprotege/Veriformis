@@ -47,9 +47,9 @@ unsupported for default parse. There is no quality-report command. Mac
 Review wraps existing CLI packets; default `review_policy` stays `none`.
 There is no published corpus tier.
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.2 project-spec pin)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.3 dry-run and lock)
 
-**Next review:** Phase 19.2 merge, item 19.3 dry-run and lockfile, or any
+**Next review:** Phase 19.3 merge, item 19.4 diagnostics and resume, or any
 product-contract change. No modest fig-leaf tier. No public plugin API.
 Do not start Phase 20 from the Phase 19 packet.
 

@@ -39,10 +39,8 @@ PROJECT_SPEC_EXPORT_CONTAINERS: tuple[str, ...] = (
     "split-jsonl-directory",
 )
 PROJECT_SPEC_LIMITATIONS: tuple[str, ...] = (
-    "no-dry-run",
     "no-execute",
     "no-hub-upload",
-    "no-lockfile",
     "no-resume",
 )
 OVERWRITE_POLICIES: tuple[str, ...] = ("refuse",)
@@ -86,10 +84,10 @@ class ProjectSpec(_StrictModel):
 
     contract_id: Literal["veriformis.project-spec"]
     contract_version: Literal[1]
-    generation_allowed: bool
+    generation_allowed: Literal[False]
     mode: InputModeId
-    plugin_install_allowed: bool
-    publication_allowed: bool
+    plugin_install_allowed: Literal[False]
+    publication_allowed: Literal[False]
     schema_id: Literal["veriformis.project-spec/v1"]
     spec_id: str
     consumer_profile: str | None = None

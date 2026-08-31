@@ -3801,6 +3801,34 @@ class PipelineService:
             messages=(ServiceMessage(veriformis.__version__),),
         )
 
+    def inspect_environment(self) -> dict[str, Any]:
+        """Return one read-only environment packet. No secrets."""
+        from veriformis.automation import inspect_environment
+
+        return inspect_environment().model_dump(mode="json")
+
+    def project_spec_schema(self) -> dict[str, Any]:
+        """Return JSON Schema generated from the project-spec model."""
+        from veriformis.automation import project_spec_json_schema
+
+        return project_spec_json_schema()
+
+    def dry_run_project_spec(self, spec: object) -> dict[str, Any]:
+        """Reconstruct a spec plan. Write no workspace, bundle, or destination."""
+        from veriformis.automation import dry_run_project_spec as run_dry
+        from veriformis.automation.spec import ProjectSpec, load_project_spec
+
+        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        return run_dry(loaded).model_dump(mode="json")
+
+    def lock_project_spec(self, spec: object) -> dict[str, Any]:
+        """Pin spec digest, versions, and declared extra presence. Not execute."""
+        from veriformis.automation import create_project_lock
+        from veriformis.automation.spec import ProjectSpec, load_project_spec
+
+        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        return create_project_lock(loaded).model_dump(mode="json")
+
 
 # Module-level singleton for adapters that do not need injection.
 DEFAULT_PIPELINE_SERVICE = PipelineService()
