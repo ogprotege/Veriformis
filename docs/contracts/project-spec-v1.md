@@ -6,10 +6,10 @@
 
 **Schema:** `veriformis.project-spec/v1`
 
-**Status:** Schema pin plus confirmed execute and lock-matched resume.
-Loading a spec is not execute. Additive over `veriformis.pipeline/v1`.
-Dry-run writes nothing. A lock is not execute. Independent-product
-item 19.4.
+**Status:** Schema pin plus confirmed execute, lock-matched resume, and
+MCP wraps. Loading a spec is not execute. Additive over
+`veriformis.pipeline/v1`. Dry-run writes nothing. A lock is not execute.
+Independent-product item 19.5.
 
 **Last reviewed:** 2026-08-31
 
@@ -23,8 +23,8 @@ admitted consumer profile. Existing `veriformis.pipeline/v1` documents
 still run. Loading is not execute. Dry-run writes no workspace, bundle,
 or destination. A project lock is not execute. Confirmed `spec-run`
 executes through `PipelineService`. Resume requires matching lock,
-workspace HEAD, and source identities. Hub, MCP spec tools, and CI
-examples wait for later items.
+workspace HEAD, and source identities. CLI and MCP wrap the same
+packets. Hub and CI examples wait for later items.
 
 ## Closed vocabularies
 

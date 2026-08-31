@@ -39,7 +39,8 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.4 adds machine-readable diagnostics, confirmed spec execute through
-PipelineService, and lock-matched resume. Loading a spec is not execute.
-Export is not auto-run. There is no Hub execute or MCP spec tool. Default
+Item 19.5 wraps project-spec schema, dry-run, lock, env inspect, run, and
+resume as MCP tools over PipelineService. `run_pipeline` still executes
+`veriformis.pipeline/v1`. `package` / `package-verify` MCP wraps are skipped
+with a record. There is no Hub execute or quality-report tool. Default
 `review_policy` stays `none`. Quality gates remain preview-only.

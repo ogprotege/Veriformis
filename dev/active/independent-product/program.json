@@ -212,7 +212,7 @@
       "packet": "dev/active/independent-product/phase-19-automation-and-publication",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 19.4 diagnostics and lock-matched resume must merge green before 19.5 MCP parity. Export is not auto-run."
+      "next_gate": "Item 19.5 MCP parity must merge green before 19.6 CI examples. No Hub. No quality-report. package/package-verify skipped with a record."
     },
     {
       "number": 20,

@@ -93,15 +93,16 @@ resume path is permitted in this item.
 
 - [x] JSON diagnostics. Spec execute through PipelineService. Resume only
       on matching lock + HEAD.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.5 Close remaining MCP parity gaps
 
 **Branch:** `phase19/05-mcp-parity`
 
-- [ ] Audit listed packets. Wrap missing service packets only. No Hub. No
+- [x] Audit listed packets. Wrap missing service packets only. No Hub. No
       quality-report. Skip `package` / `package-verify` with a record unless
       the audit treats them as verification.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.6 Add CI examples with committed semantic fingerprints
 

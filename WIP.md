@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `0a29f44` on `main` after PR #173
+**Implementation baseline reviewed:** `f80bab4` on `main` after PR #174
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–18 complete; Phase 19.4 diagnostics)
+Phases 0–2; independent-product Phases 0–18 complete; Phase 19.5 MCP parity)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-31 (Phase 19.4 diagnostics and resume)
+**Last reviewed:** 2026-08-31 (Phase 19.5 MCP parity)
 
-**Next review:** Phase 19.4 merge, or item 19.5 MCP parity. Do not add
-Hub execute, MCP spec tools, or CI examples in this item.
+**Next review:** Phase 19.5 merge, or item 19.6 CI examples. Do not add
+Hub execute, quality-report, or CI examples in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -151,8 +151,8 @@ local, offline, and free of LLM generation.
       with records. Phase 19 opened under its own packet.
 - [ ] Independent product Phase 19 is in progress under its
       [packet](dev/active/independent-product/phase-19-automation-and-publication/README.md).
-      Item 19.4 adds diagnostics, confirmed spec execute, and
-      lock-matched resume. Export is not auto-run. Do not start
+      Item 19.5 wraps project-spec packets on MCP. `package` /
+      `package-verify` MCP wraps are skipped with a record. Do not start
       Phase 20 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).

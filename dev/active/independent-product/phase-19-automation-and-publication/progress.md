@@ -116,3 +116,31 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 19.4 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.5.
+
+## 2026-08-31: Item 19.4 merged; item 19.5 in progress
+
+**Status:** Item 19.4 merged as PR #174 at
+`f80bab4ffd714bec6dfcf354050b4aa71735bb0a`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.5 wraps project-spec schema, dry-run, lock, env inspect, run, and
+resume as MCP tools. `run_pipeline` stays `veriformis.pipeline/v1`.
+`package` / `package-verify` MCP wraps are skipped with a record. No Hub.
+No quality-report.
+
+**Next action:** Run the complete item 19.5 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.6.
+
+## 2026-08-31: Item 19.5 local gates green
+
+**Status:** MCP wraps project-spec schema, dry-run, lock, env inspect,
+run, and resume. `run_pipeline` stays `veriformis.pipeline/v1`.
+`package` / `package-verify` MCP wraps are skipped with a record. No Hub.
+No quality-report. Focused automation tests passed 54. Project tracking,
+Ruff, the lock check, and `git diff --check` passed. The core suite
+passed 2,625 tests with 17 deselected and the one expected durability
+warning.
+
+**Next action:** Publish the item 19.5 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.6.
