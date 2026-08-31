@@ -85,14 +85,15 @@ resume path is permitted in this item.
 
 - [x] Schema from the model. Dry-run writes nothing. Lockfile pins spec
       digest. Env inspect. Deterministic exit codes.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.4 Add machine-readable diagnostics and spec resume
 
 **Branch:** `phase19/04-diagnostics-and-resume`
 
-- [ ] JSON diagnostics. Spec execute through PipelineService. Resume only
+- [x] JSON diagnostics. Spec execute through PipelineService. Resume only
       on matching lock + HEAD.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.5 Close remaining MCP parity gaps
 

@@ -6,6 +6,7 @@ import importlib.metadata
 import json
 import re
 import sys
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
@@ -95,6 +96,13 @@ class ProjectLock(_StrictModel):
     spec_digest: str
     spec_id: str
     veriformis_version: str
+    source_identities: tuple[str, ...] | None = None
+    workspace_head: str | None = None
+
+    @field_validator("source_identities", mode="before")
+    @classmethod
+    def _tuple_sources(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
 
     @model_validator(mode="after")
     def _closed(self) -> ProjectLock:
@@ -112,9 +120,26 @@ class ProjectLock(_StrictModel):
         if self.python_version.count(".") != 1:
             raise ProjectSpecError("project lock python_version must be major.minor")
         validate_id(self.lock_id, kind="plk")
+        if self.workspace_head is not None:
+            try:
+                validate_id(self.workspace_head, kind="rev")
+            except ValueError as exc:
+                raise ProjectSpecError(
+                    "lock workspace_head is not a revision identity"
+                ) from exc
+        if self.source_identities is not None:
+            if self.source_identities != tuple(sorted(self.source_identities)):
+                raise ProjectSpecError("lock source_identities must be sorted")
+            try:
+                for item in self.source_identities:
+                    validate_id(item, kind="src")
+            except ValueError as exc:
+                raise ProjectSpecError(
+                    "lock source_identities must be source identities"
+                ) from exc
         expected = derive_id(
             "plk",
-            self.model_dump(mode="json", exclude={"lock_id"}),
+            self.model_dump(mode="json", exclude={"lock_id"}, exclude_none=True),
         )
         if self.lock_id != expected:
             raise ProjectSpecError("project lock identity mismatch")
@@ -208,32 +233,65 @@ def spec_digest(spec: ProjectSpec) -> str:
     )
 
 
-def planned_stages(spec: ProjectSpec) -> tuple[str, ...]:
-    if spec.pipeline_ref is not None and spec.pipeline is None:
+def planned_stages(spec: ProjectSpec, *, pipeline_stages: dict[str, Any] | None = None) -> tuple[str, ...]:
+    stages_map = pipeline_stages
+    if stages_map is None and spec.pipeline is not None:
+        stages_map = spec.pipeline.get("stages") or {}
+    if stages_map is None and spec.pipeline_ref is not None and spec.pipeline is None:
         raise ProjectSpecError(
             "cannot reconstruct stages from unresolved pipeline_ref; embed pipeline sources"
         )
-    if spec.pipeline:
-        stages = spec.pipeline.get("stages") or {}
-        names = [name for name in PIPELINE_STAGE_ORDER if name in stages]
-        if spec.mode in {"dataset-row", "mixed"} and "map" not in names:
-            if "parse" in names:
-                names.insert(names.index("parse") + 1, "map")
-            else:
-                names.insert(0, "map")
+    if stages_map is not None:
+        order = (
+            DATASET_ROW_STAGES
+            if spec.mode in {"dataset-row", "mixed"}
+            else PIPELINE_STAGE_ORDER
+        )
+        names = [
+            name
+            for name in order
+            if name == "map" or name in stages_map
+        ]
         return tuple(names)
     if spec.mode == "document-source":
         return DOCUMENT_SOURCE_STAGES
     return DATASET_ROW_STAGES
 
 
-def dry_run_project_spec(spec: ProjectSpec) -> ProjectSpecDryRun:
+def resolve_spec_ref(value: str, *, base_dir: Path) -> Path:
+    path = Path(value)
+    if not path.is_absolute():
+        path = base_dir / path
+    return path
+
+
+def pipeline_for_spec(spec: ProjectSpec, *, base_dir: Path):
+    from veriformis.recipes.pipeline_spec import load_pipeline_spec, pipeline_spec_from_dict
+
+    if spec.pipeline is not None:
+        return pipeline_spec_from_dict(spec.pipeline, base_dir=base_dir)
+    if spec.pipeline_ref is None:
+        raise ProjectSpecError("spec execute requires embedded pipeline or pipeline_ref")
+    try:
+        return load_pipeline_spec(resolve_spec_ref(spec.pipeline_ref, base_dir=base_dir))
+    except FileNotFoundError as exc:
+        raise ProjectSpecError(
+            "cannot reconstruct stages from unresolved pipeline_ref; embed pipeline sources"
+        ) from exc
+
+
+def dry_run_project_spec(spec: ProjectSpec, *, base_dir: Path | None = None) -> ProjectSpecDryRun:
     required = spec.mode in {"dataset-row", "mixed"}
+    if spec.pipeline is not None or spec.pipeline_ref is not None:
+        pipeline = pipeline_for_spec(spec, base_dir=base_dir or Path("."))
+        stages = planned_stages(spec, pipeline_stages=pipeline.stages)
+    else:
+        stages = planned_stages(spec)
     return ProjectSpecDryRun(
         schema_id=PROJECT_SPEC_DRY_RUN_SCHEMA_ID,
         spec_id=spec.spec_id,
         mode=spec.mode,
-        stages=planned_stages(spec),
+        stages=stages,
         mapping_required=required,
         mapping_confirmed=required and spec.mapping is not None,
         export=spec.export,
@@ -244,7 +302,12 @@ def dry_run_project_spec(spec: ProjectSpec) -> ProjectSpecDryRun:
     )
 
 
-def create_project_lock(spec: ProjectSpec) -> ProjectLock:
+def create_project_lock(
+    spec: ProjectSpec,
+    *,
+    workspace_head: str | None = None,
+    source_identities: tuple[str, ...] | None = None,
+) -> ProjectLock:
     payload = {
         "contract_id": PROJECT_LOCK_CONTRACT_ID,
         "contract_version": PROJECT_LOCK_CONTRACT_VERSION,
@@ -255,6 +318,10 @@ def create_project_lock(spec: ProjectSpec) -> ProjectLock:
         "python_version": python_version(),
         "extras": declared_extra_presence(),
     }
+    if workspace_head is not None:
+        payload["workspace_head"] = workspace_head
+    if source_identities is not None:
+        payload["source_identities"] = list(source_identities)
     payload["lock_id"] = derive_id("plk", payload)
     return ProjectLock.model_validate(payload)
 

@@ -740,7 +740,10 @@ def spec_dry_run(spec: Path) -> None:
     def run() -> StageOutcome:
         from veriformis.automation import load_project_spec_document
 
-        payload = _SERVICE.dry_run_project_spec(load_project_spec_document(spec))
+        payload = _SERVICE.dry_run_project_spec(
+            load_project_spec_document(spec),
+            base_dir=spec.parent,
+        )
         return _json_outcome(payload)
 
     _run(run)
@@ -750,12 +753,20 @@ def spec_dry_run(spec: Path) -> None:
 def spec_lock(
     spec: Path,
     out: Path | None = typer.Option(None, "--out", help="Write lock JSON; default stdout."),
+    workspace: Path | None = typer.Option(
+        None,
+        "--workspace",
+        help="Pin workspace HEAD and source identities for resume.",
+    ),
 ) -> None:
     """Write veriformis.project-lock/v1 for one spec. The lock is not execute."""
     def run() -> StageOutcome:
         from veriformis.automation import load_project_spec_document
 
-        payload = _SERVICE.lock_project_spec(load_project_spec_document(spec))
+        payload = _SERVICE.lock_project_spec(
+            load_project_spec_document(spec),
+            workspace=workspace,
+        )
         text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
         if out is not None:
             if out.exists():
@@ -771,6 +782,93 @@ def spec_lock(
 def env_inspect() -> None:
     """Print one read-only environment packet. No secrets."""
     _run(lambda: _json_outcome(_SERVICE.inspect_environment()))
+
+
+def _run_spec(call, *, spec_id_box: list[str | None] | None = None, stage: str | None = None) -> None:
+    from veriformis.automation.execute import project_spec_diagnostic
+
+    try:
+        outcome = call()
+    except SealPartialPublicationError as exc:
+        spec_id = spec_id_box[0] if spec_id_box else None
+        message = (
+            f"published bundle remains visible at {exc.publication.bundle_path}; "
+            f"manifest SHA-256 {exc.publication.manifest_sha256}; workspace receipt "
+            "did not commit"
+        )
+        wrapped = VeriformisError(message)
+        typer.echo(f"error[{wrapped.code}]: {wrapped.message}", err=True)
+        typer.echo(
+            json.dumps(
+                project_spec_diagnostic(wrapped, spec_id=spec_id, stage="seal"),
+                ensure_ascii=False,
+                sort_keys=True,
+            ),
+            err=True,
+        )
+        raise typer.Exit(code=2) from exc
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        code = getattr(exc, "code", "invalid-data")
+        message = getattr(exc, "message", str(exc))
+        spec_id = spec_id_box[0] if spec_id_box else None
+        typer.echo(f"error[{code}]: {message}", err=True)
+        typer.echo(
+            json.dumps(
+                project_spec_diagnostic(exc, spec_id=spec_id, stage=stage),
+                ensure_ascii=False,
+                sort_keys=True,
+            ),
+            err=True,
+        )
+        raise typer.Exit(code=2) from exc
+    _emit_outcome(outcome)
+
+
+@app.command(name="spec-run")
+def spec_run(spec: Path) -> None:
+    """Execute a confirmed project spec through PipelineService. Export is not auto-run."""
+    loaded_id: list[str | None] = [None]
+
+    def run() -> StageOutcome:
+        from veriformis.automation import load_project_spec_document
+
+        loaded = load_project_spec_document(spec)
+        loaded_id[0] = loaded.spec_id
+        payload = _SERVICE.run_project_spec(loaded, base_dir=spec.parent)
+        return _json_outcome(payload)
+
+    _run_spec(run, spec_id_box=loaded_id)
+
+
+@app.command(name="spec-resume")
+def spec_resume(
+    spec: Path,
+    lock: Path = typer.Option(..., "--lock", help="Project lock pinning HEAD and sources."),
+) -> None:
+    """Resume a spec only when lock, workspace HEAD, and source identities match."""
+    loaded_id: list[str | None] = [None]
+
+    def run() -> StageOutcome:
+        from veriformis.automation import load_project_spec_document
+        from veriformis.automation.inspect import load_project_lock
+
+        loaded = load_project_spec_document(spec)
+        loaded_id[0] = loaded.spec_id
+        payload = _SERVICE.resume_project_spec(
+            loaded,
+            load_project_lock(json.loads(lock.read_text(encoding="utf-8"))),
+            base_dir=spec.parent,
+        )
+        return _json_outcome(payload)
+
+    _run_spec(run, spec_id_box=loaded_id)
 
 
 @app.command(name="taxonomy")

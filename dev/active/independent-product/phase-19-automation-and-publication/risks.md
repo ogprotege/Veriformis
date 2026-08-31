@@ -6,7 +6,7 @@
 | --- | --- | --- | --- | --- | --- |
 | P19-R1 | Controlled for 19.1 | High | High | Packet opening implies a project spec, lockfile, dry-run, or Hub path exists | Isolation tests and explicit non-claims |
 | P19-R2 | Open | High | High | Project spec smuggles mode/map/export into `pipeline/v1` | L3; additive spec in 19.2; unknown keys fail closed |
-| P19-R3 | Open | High | High | Spec execute or dry-run writes a workspace, bundle, or destination | L7; 19.3 dry-run writes nothing |
+| P19-R3 | Controlled for 19.4 | High | High | Spec execute or dry-run writes a workspace, bundle, or destination | L7; 19.3 dry-run writes nothing; 19.4 execute is operator-confirmed spec-run; export is not auto-run |
 | P19-R4 | Open | High | High | Unconfirmed mapping compiles from a spec | L5; confirm-then-map |
 | P19-R5 | Open | Medium | High | Spec invents a fourth compiler path | L6; ADR-0010 closed vocabulary |
 | P19-R6 | Open | High | High | MCP grows a Hub, quality-report, or plugin tool | L2; 19.5 audit; isolation names |

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.3 dry-run and lock)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.4 diagnostics and resume)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -55,7 +55,7 @@ packet exchange, required-review seal blocking, auditable supersession);
 `extensions/` (internal protocol, built-in-only registry, read-only declarations; `.txt` and generic `split-jsonl-directory` selected through the protocol; no loader);
 `families/` (admission pins, leakage grouping, admitted classification execute);
 `workbench/` (Mac wrap pins; loading is not a screen);
-`automation/` (project-spec pin, dry-run, lock; loading and lock are not execute);
+`automation/` (project-spec pin, dry-run, lock, diagnostics, confirmed execute and lock-matched resume; loading and lock are not execute; export is not auto-run);
 and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict

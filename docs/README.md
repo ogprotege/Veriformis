@@ -4,11 +4,11 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–18 complete; Phase 19.3 dry-run and lockfile in progress).
+Phases 0–18 complete; Phase 19.4 diagnostics and resume in progress).
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.3 dry-run and lock)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.4 diagnostics and resume)
 
-**Next review:** Phase 19.3 merge, or any contract change. Default parse
+**Next review:** Phase 19.4 merge, or any contract change. Default parse
 still refuses image-only PDF.
 
 ## Start here
@@ -76,8 +76,9 @@ still refuses image-only PDF.
 | [Extension Protocol v1](contracts/extension-protocol-v1.md) | Internal capability declarations for six kinds | Built-in-only registry and read-only discovery; no loader or public plugin API |
 | [Advanced Family Admission v1](contracts/advanced-family-admission-v1.md) | Closed pins for advanced semantic families | Schema pin only; no execute or taxonomy promotion |
 | [Workbench Adapter v1](contracts/workbench-adapter-v1.md) | Closed pins for CLI packets a Mac screen may wrap | Schema pin only; no screen execute; ADR-0019 |
-| [Project Spec v1](contracts/project-spec-v1.md) | Additive compile intent over pipeline/v1 | Schema pin; dry-run writes nothing; loading is not execute |
-| [Project Lock v1](contracts/project-lock-v1.md) | Spec digest, versions, declared extra presence | Lock is not execute and not `uv.lock` |
+| [Project Spec v1](contracts/project-spec-v1.md) | Additive compile intent over pipeline/v1 | Loading is not execute; spec-run executes; export is not auto-run |
+| [Project Lock v1](contracts/project-lock-v1.md) | Spec digest, versions, declared extra presence, optional HEAD and sources | Lock is not execute and not `uv.lock` |
+| [Project Spec Diagnostic v1](contracts/project-spec-diagnostic-v1.md) | Machine-readable spec execute/resume failure | Truncated JSON fails closed; human CLI text stays |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

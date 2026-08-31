@@ -3813,21 +3813,91 @@ class PipelineService:
 
         return project_spec_json_schema()
 
-    def dry_run_project_spec(self, spec: object) -> dict[str, Any]:
+    def dry_run_project_spec(
+        self,
+        spec: object,
+        *,
+        base_dir: Path | None = None,
+    ) -> dict[str, Any]:
         """Reconstruct a spec plan. Write no workspace, bundle, or destination."""
         from veriformis.automation import dry_run_project_spec as run_dry
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
         loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
-        return run_dry(loaded).model_dump(mode="json")
+        return run_dry(loaded, base_dir=base_dir).model_dump(mode="json")
 
-    def lock_project_spec(self, spec: object) -> dict[str, Any]:
+    def lock_project_spec(
+        self,
+        spec: object,
+        *,
+        workspace: Path | None = None,
+    ) -> dict[str, Any]:
         """Pin spec digest, versions, and declared extra presence. Not execute."""
         from veriformis.automation import create_project_lock
+        from veriformis.automation.execute import lock_after_workspace
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
         loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
-        return create_project_lock(loaded).model_dump(mode="json")
+        lock = (
+            lock_after_workspace(loaded, workspace)
+            if workspace is not None
+            else create_project_lock(loaded)
+        )
+        return lock.model_dump(mode="json", exclude_none=True)
+
+    def run_project_spec(
+        self,
+        spec: object,
+        *,
+        base_dir: Path | None = None,
+    ) -> dict[str, Any]:
+        """Execute a confirmed project spec. Export is not auto-run."""
+        from veriformis.automation.execute import lock_after_workspace, run_project_spec
+        from veriformis.automation.spec import ProjectSpec, load_project_spec
+
+        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        result = run_project_spec(loaded, service=self, base_dir=base_dir)
+        return {
+            "spec_id": loaded.spec_id,
+            "workspace": str(result.workspace),
+            "bundle": None if result.bundle is None else str(result.bundle),
+            "lock": lock_after_workspace(loaded, result.workspace).model_dump(
+                mode="json",
+                exclude_none=True,
+            ),
+            "exit_status": 0,
+        }
+
+    def resume_project_spec(
+        self,
+        spec: object,
+        lock: object,
+        *,
+        base_dir: Path | None = None,
+    ) -> dict[str, Any]:
+        """Resume only when lock, HEAD, and source identities match."""
+        from veriformis.automation.execute import lock_after_workspace, resume_project_spec
+        from veriformis.automation.inspect import ProjectLock, load_project_lock
+        from veriformis.automation.spec import ProjectSpec, load_project_spec
+
+        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        locked = lock if isinstance(lock, ProjectLock) else load_project_lock(lock)
+        result = resume_project_spec(
+            loaded,
+            locked,
+            service=self,
+            base_dir=base_dir,
+        )
+        return {
+            "spec_id": loaded.spec_id,
+            "workspace": str(result.workspace),
+            "bundle": None if result.bundle is None else str(result.bundle),
+            "lock": lock_after_workspace(loaded, result.workspace).model_dump(
+                mode="json",
+                exclude_none=True,
+            ),
+            "exit_status": 0,
+        }
 
 
 # Module-level singleton for adapters that do not need injection.

@@ -39,9 +39,7 @@ PROJECT_SPEC_EXPORT_CONTAINERS: tuple[str, ...] = (
     "split-jsonl-directory",
 )
 PROJECT_SPEC_LIMITATIONS: tuple[str, ...] = (
-    "no-execute",
     "no-hub-upload",
-    "no-resume",
 )
 OVERWRITE_POLICIES: tuple[str, ...] = ("refuse",)
 ADMITTED_COMPILE_PROFILES: frozenset[str] = frozenset(IMPLEMENTED_CONSUMER_PROFILES)

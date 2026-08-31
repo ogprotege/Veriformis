@@ -24,3 +24,4 @@
 | Skip Mac project-spec UI and GitHub xcodebuild | Accepted | Operator Phase 19 plan |
 | Pin additive `veriformis.project-spec/v1`; loading is not execute | Accepted | Item 19.2; pipeline/v1 stays |
 | Dry-run writes nothing; lockfile is not execute or `uv.lock` | Accepted | Item 19.3 |
+| Confirmed spec-run executes through PipelineService; resume matches lock HEAD and sources; export is not auto-run | Accepted | Item 19.4 |

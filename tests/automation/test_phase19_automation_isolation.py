@@ -1,4 +1,4 @@
-"""Phase 19 isolation: pipeline/v1, no Hub execute, no lockfile or resume CLI."""
+"""Phase 19 isolation: pipeline/v1 stays, no Hub execute, no MCP spec tools."""
 
 from __future__ import annotations
 
@@ -45,8 +45,6 @@ _PROJECT_SPEC_OPERATIONS = frozenset(
     {
         "hub-upload",
         "hub_upload",
-        "spec-resume",
-        "spec_resume",
     }
 )
 _NETWORK_MODULES = frozenset(
@@ -204,17 +202,23 @@ def test_core_compile_names_no_network_client() -> None:
         assert imported.isdisjoint(_NETWORK_MODULES), path
 
 
-def test_project_spec_lock_and_resume_surfaces_are_absent() -> None:
+def test_project_spec_execute_surfaces_keep_hub_absent() -> None:
     assert (ROOT / "docs/contracts/project-spec-v1.md").is_file()
     assert (ROOT / "docs/contracts/project-lock-v1.md").is_file()
+    assert (ROOT / "docs/contracts/project-spec-diagnostic-v1.md").is_file()
     assert (ROOT / "src/veriformis/automation/spec.py").is_file()
     assert not (ROOT / "docs/adr/0020-publication-boundary.md").exists()
     cli_names = _cli_names()
     mcp_names = _mcp_names()
-    assert "spec-resume" not in cli_names
     assert cli_names.isdisjoint(_PROJECT_SPEC_OPERATIONS)
     assert mcp_names.isdisjoint(_PROJECT_SPEC_OPERATIONS)
     assert "spec-schema" in cli_names
     assert "spec-dry-run" in cli_names
     assert "spec-lock" in cli_names
     assert "env-inspect" in cli_names
+    assert "spec-run" in cli_names
+    assert "spec-resume" in cli_names
+    assert "spec_run" not in mcp_names
+    assert "spec_resume" not in mcp_names
+    assert "spec_dry_run" not in mcp_names
+    assert "hub_upload" not in mcp_names

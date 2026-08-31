@@ -305,6 +305,7 @@ def test_project_spec_does_not_add_mcp_execute() -> None:
     mcp_names = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
     assert "project_spec" not in mcp_names
     assert "spec_dry_run" not in mcp_names
+    assert "spec_run" not in mcp_names
     assert "spec_resume" not in mcp_names
     assert "hub_upload" not in mcp_names
 
@@ -315,3 +316,4 @@ def test_contract_document_exists() -> None:
     assert PROJECT_SPEC_SCHEMA_ID in text
     assert "Loading a spec is not execute" in text
     assert "veriformis.pipeline/v1" in text
+    assert "no-hub-upload" in text

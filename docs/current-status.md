@@ -83,14 +83,15 @@ mixed are the compiler paths. Mapping is confirm-then-map. Export and
 review wrap existing packets. Swift owns no dataset policy. Family-to-trainer,
 generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
 and full localization are skipped with records. Phase 19 automation and
-optional publication is in progress under its own packet. Item 19.3
-adds project-spec JSON Schema, dry-run, `veriformis.project-lock/v1`, and
-environment inspection. Dry-run writes nothing. Loading a spec is not
-execute. Default `review_policy` stays `none`. No heuristic blocks seal.
+optional publication is in progress under its own packet. Item 19.4
+adds machine-readable diagnostics, confirmed spec execute through
+`PipelineService`, and lock-matched resume. Loading a spec is not
+execute. Export is not auto-run. Default `review_policy` stays `none`.
+No heuristic blocks seal.
 
-**Review date:** 2026-08-31 (independent-product Phase 19.3 dry-run and lock)
+**Review date:** 2026-08-31 (independent-product Phase 19.4 diagnostics and resume)
 
-**Next review:** Phase 19.3 merge, item 19.4 diagnostics and resume, or any
+**Next review:** Phase 19.4 merge, item 19.5 MCP parity, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -448,6 +449,12 @@ The installed console entry point is `veriformis`.
 | `export-verify --request-json JSON` | Re-verifies source authority, re-derives the confirmed plan, and independently verifies the destination | Canonical source-bound verification response |
 | `preview PATH` | Plans and replays cleaning without writes | Terminal output only |
 | `run PIPELINE.yaml` | Executes a versioned YAML pipeline through `PipelineService` | Workspace stages and optional sealed bundle |
+| `spec-schema` | Prints JSON Schema generated from `veriformis.project-spec/v1` | Terminal JSON |
+| `spec-dry-run PATH` | Reconstructs planned stages, mode, mapping, and environment | Writes nothing |
+| `spec-lock PATH` | Pins spec digest, versions, and extras as `veriformis.project-lock/v1` | Lock is not execute |
+| `env-inspect` | Declared extra presence, Python version, taxonomy counts | No secrets |
+| `spec-run PATH` | Executes a confirmed spec through `PipelineService` | Export is not auto-run; document-source parse omits `--mode` |
+| `spec-resume PATH --lock LOCK` | Resumes only when lock, HEAD, and source identities match | Drift names the mismatched identity |
 | `list-recipes` | Lists named deterministic recipe library identifiers | Terminal output only |
 | `mcp` | Runs the constrained local MCP adapter on stdio | MCP tool surface over `PipelineService` |
 | `handoff BUNDLE --manifest-sha256 DIGEST` | Builds the versioned Aptus handoff sibling descriptor | `*.aptus-handoff.json` |
@@ -852,14 +859,13 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–18 are complete. The current critical-path work
 is Phase 19 under the
 [automation-and-publication packet](../dev/active/independent-product/phase-19-automation-and-publication/README.md).
-Item 19.3 adds project-spec JSON Schema, dry-run, lockfile, and
-environment inspection. Dry-run writes no workspace, bundle, or
-destination. There is no spec resume, Hub execute, or quality-report
-command. There is no `GeneratorPass`. Do not start Phase 20 from this
-packet.
+Item 19.4 adds machine-readable diagnostics, confirmed spec execute,
+and lock-matched resume. Dry-run still writes nothing. There is no Hub
+execute, MCP spec tool, or quality-report command. There is no
+`GeneratorPass`. Do not start Phase 20 from this packet.
 
-The next behavior change is item 19.4 diagnostics and spec resume. MCP
-spec tools, CI examples, and Hub paths remain outside this item.
+The next behavior change is item 19.5 MCP parity. CI examples and Hub
+paths remain outside this item.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

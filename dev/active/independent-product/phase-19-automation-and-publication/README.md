@@ -39,7 +39,7 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.3 adds project-spec schema, dry-run, lockfile, and environment
-inspection. Dry-run writes nothing. Loading a spec is not execute. There is
-no spec resume, Hub execute, or MCP spec tool. Default `review_policy` stays
-`none`. Quality gates remain preview-only.
+Item 19.4 adds machine-readable diagnostics, confirmed spec execute through
+PipelineService, and lock-matched resume. Loading a spec is not execute.
+Export is not auto-run. There is no Hub execute or MCP spec tool. Default
+`review_policy` stays `none`. Quality gates remain preview-only.

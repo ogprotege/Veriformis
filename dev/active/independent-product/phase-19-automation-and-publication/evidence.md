@@ -58,8 +58,32 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
 - [x] `veriformis.project-lock/v1` pins spec digest, versions, and extras.
 - [x] Environment inspection names no secrets.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.4.
+
+## Required item 19.4 evidence
+
+- [x] JSON diagnostics `{schema_id, code, message, spec_id, stage}`. Truncated
+      JSON fails closed. Human CLI text stays.
+- [x] Confirmed spec execute through PipelineService. Document-source parse
+      omits `--mode`. Dataset-row is parse `--mode dataset-row` then `map`
+      then the finished-dataset tail. Export is not auto-run.
+- [x] Resume only when lock, workspace HEAD, and source identities match.
+      Drift names the mismatched identity.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.4.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.5.
+
+## Item 19.4 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 50 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,621 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.3 local gate evidence
 

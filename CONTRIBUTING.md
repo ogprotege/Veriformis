@@ -59,9 +59,10 @@ ADR-0019 Decision A: Swift is a process adapter. Confirm-then-map,
 export, and review wrap existing CLI packets. Family-to-trainer,
 generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
 and full localization skipped with records. Phase 19 automation and
-optional publication is in progress under its own packet. Item 19.3
-adds project-spec schema, dry-run, lockfile, and env inspect. Dry-run
-writes nothing. Do not start Phase 20 from that packet.
+optional publication is in progress under its own packet. Item 19.4
+adds diagnostics, confirmed spec execute, and lock-matched resume.
+Loading a spec is not execute. Export is not auto-run. Do not start
+Phase 20 from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

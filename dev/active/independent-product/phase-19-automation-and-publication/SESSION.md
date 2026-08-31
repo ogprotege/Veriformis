@@ -5,16 +5,17 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase19/03-spec-dry-run-and-lock`
+**Local branch:** `phase19/04-diagnostics-and-resume`
 
-**Completed:** Item 19.2, PR #172 at
-`eb7777eae7b755637d4639a7316121303affc19f`.
+**Completed:** Item 19.3, PR #173 at
+`0a29f44ffa00182d0f9ac430ef880f8d8a940ec9`.
 
-**Current item:** 19.3 project-spec schema, dry-run, lockfile, and env
-inspect. Dry-run writes nothing. No resume, map/export execute, or Hub.
+**Current item:** 19.4 machine-readable diagnostics, confirmed spec
+execute through PipelineService, and lock-matched resume. Export is not
+auto-run. No Hub. No MCP spec tool.
 
-**Next gate:** Publish the 19.3 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 19.4.
+**Next gate:** Publish the 19.4 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 19.5.
 
 **Decision:** ADR-0020 Decision A (pin only; no Hub execute). Operator
 approved the Phase 19 plan as written on 2026-08-31.
