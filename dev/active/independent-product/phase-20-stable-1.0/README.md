@@ -39,5 +39,6 @@ This packet does not invent a Phase 21.
 
 ## Current state
 
-Phase 20 is in progress. Item 20.7 inspects sdist and wheel. Version
-remains `0.1.0` development alpha. Binaries are not retained.
+Phase 20 is in progress. Item 20.8 freezes optional consumer profiles.
+Version remains `0.1.0` development alpha. Empty extras stay empty. The
+exporter does not train.

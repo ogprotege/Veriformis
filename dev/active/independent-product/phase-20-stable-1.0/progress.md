@@ -174,3 +174,26 @@ durability warning.
 
 **Next action:** Publish the item 20.7 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.8.
+
+## 2026-09-01: Item 20.7 merged; item 20.8 in progress
+
+**Status:** Item 20.7 merged as PR #187 at
+`1d4ee9398763bb61f4d8cd5f45d360c5fbf3daab`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.8 freezes optional consumer profiles. Empty extras stay empty.
+Unsloth is not executable. Isolated CI jobs cannot block core.
+
+**Next action:** Run the complete item 20.8 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.9.
+
+## 2026-09-01: Item 20.8 local gates green
+
+**Status:** Optional consumer profiles are frozen as isolated adapters.
+Focused tests passed. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,662 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 20.8 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.9.

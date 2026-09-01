@@ -5,15 +5,15 @@ append-only history.
 
 **Updated:** 2026-09-01
 
-**Local branch:** `phase20/07-python-artifacts`
+**Local branch:** `phase20/08-profile-freeze`
 
-**Completed:** Item 20.6, PR #186 at
-`94978a0ded5125e1c12f8e74aa1445572267eba7`.
+**Completed:** Item 20.7, PR #187 at
+`1d4ee9398763bb61f4d8cd5f45d360c5fbf3daab`.
 
-**Current item:** 20.7 inspect sdist and wheel. Version stays `0.1.0`.
-Binaries are not retained.
+**Current item:** 20.8 freeze optional profiles. Extras stay empty.
+Unsloth is not executable. Version stays `0.1.0`.
 
-**Next gate:** Run the 20.7 local gates, publish the pull request, require
+**Next gate:** Run the 20.8 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the
