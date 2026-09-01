@@ -4,9 +4,10 @@
 
 **Last reviewed:** 2026-09-01
 
-Consumer profiles are optional adapters over a verified bundle. The
-exporter does not train. Empty extras stay empty. A profile job failure
-does not block the independent core.
+Consumer profiles are optional adapters over a verified bundle.
+The exporter does not train.
+Empty extras stay empty. A profile job failure does not block the
+independent core.
 
 ## Frozen implemented optional adapters
 
@@ -24,5 +25,6 @@ CI jobs `profile-integration (optional)`, `columnar-integration (optional)`,
 and `aptus-integration (optional)` use `continue-on-error: true`. Core
 required jobs do not install trainer extras.
 
-See [Consumer Profile Admission v1](contracts/profile-admission-v1.md) and
-[Support Matrix v1](contracts/support-matrix-v1.md).
+See [Consumer Profile Admission v1](contracts/profile-admission-v1.md),
+[Support Matrix v1](contracts/support-matrix-v1.md), and
+[support-lifecycle.md](support-lifecycle.md).

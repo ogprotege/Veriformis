@@ -100,5 +100,6 @@ profile version rewrite and no trainer launch.
 - Legacy Aptus row-shape gate IDs (DOC-007); the ID stays until a versioned
   report migration exists
 
-See also [install.md](install.md), [release.md](release.md), and
-[Support Matrix v1](contracts/support-matrix-v1.md).
+See also [install.md](install.md), [release.md](release.md),
+[Support Matrix v1](contracts/support-matrix-v1.md), and
+[support-lifecycle.md](support-lifecycle.md).
