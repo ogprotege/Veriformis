@@ -2,7 +2,7 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `eff1bfa` on `main` after PR #189
+**Implementation baseline reviewed:** `7a776ca` on `main` after PR #190
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
 Phases 0–2; independent-product Phases 0–20 complete)
 

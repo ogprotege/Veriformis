@@ -30,7 +30,7 @@ complete as PR #122 at `ef31559c9184b553209a3c45eca5d943fbb9a680`; preview-only,
 
 **Implementation review state:** Groups 1–7 complete; Group 9 automated gates
 and beta-prep landed; private beta workbench Phases 0–2 and independent-product
-Phases 0–19 complete and Phase 20 in progress with additive
+Phases 0–20 complete and Phase 20 closed 2026-09-01 at `7a776ca` with additive
 `veriformis.project-spec/v1` (loading is not execute; spec-run executes
 a confirmed spec; MCP wraps the spec packets; resume requires matching
 lock, HEAD, and sources) plus
@@ -49,10 +49,10 @@ unsupported for default parse. There is no quality-report command. Mac
 Review wraps existing CLI packets; default `review_policy` stays `none`.
 There is no published corpus tier.
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
+**Last reviewed:** 2026-09-01 (Phase 20.10 closeout)
 
 **Next review:** Any product-contract change. No modest fig-leaf tier. No public plugin API. Version remains
-`0.1.0` development alpha until 20.10. The frozen support matrix is
+`0.1.0` development alpha. The frozen support matrix is
 CLI-first; public signed Mac and Hub execute stay excluded.
 
 **Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
