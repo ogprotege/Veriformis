@@ -115,7 +115,7 @@ item.
 
 **Branch:** `phase20/06-signed-mac-skip`
 
-- [ ] Public signed/notarized Mac is not in the 1.0 matrix. Skip with a
+- [x] Public signed/notarized Mac is not in the 1.0 matrix. Skip with a
       record unless the owner supplies signed, notarized, stapled evidence
       in this item. Do not add GitHub xcodebuild.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.

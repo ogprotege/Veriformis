@@ -24,3 +24,4 @@
 | Publish operator migration guide; no silent schema jumps | Accepted | Item 20.3 |
 | Record security review without a required network scanner | Accepted | Item 20.4 |
 | Retain isolated-wheel golden CLI evidence without Aptus | Accepted | Item 20.5 |
+| Skip signed/notarized Mac with a record | Accepted | Item 20.6 |

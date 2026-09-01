@@ -128,3 +128,26 @@ expected durability warning.
 
 **Next action:** Publish the item 20.5 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.6.
+
+## 2026-09-01: Item 20.5 merged; item 20.6 in progress
+
+**Status:** Item 20.5 merged as PR #185 at
+`f47afdf35d2520d8a76bd0a2de91303dec6150e3`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.6 skips signed, notarized, and stapled Mac with a record. GitHub
+has no xcodebuild job. `public_signed_mac` stays false.
+
+**Next action:** Run the complete item 20.6 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.7.
+
+## 2026-09-01: Item 20.6 local gates green
+
+**Status:** Signed Mac is skipped with a record. Focused tests passed.
+Project tracking, Ruff, the lock check, and `git diff --check` passed.
+The core suite passed 2,660 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 20.6 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.7.

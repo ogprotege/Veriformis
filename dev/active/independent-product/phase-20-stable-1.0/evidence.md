@@ -82,5 +82,13 @@ in `program.json`.
 - [x] External-digest verify and transport accepted. Automatic Aptus
       handoff absent. No Aptus distribution in the venv.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.6.
+
+## Required item 20.6 evidence
+
+- [x] Skip record names signed/notarized/stapled Mac and no xcodebuild.
+- [x] Support matrix `public_signed_mac` stays false.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.6.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.7.
