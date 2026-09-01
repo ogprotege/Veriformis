@@ -212,7 +212,7 @@
       "packet": "dev/active/independent-product/phase-19-automation-and-publication",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 19.5 MCP parity must merge green before 19.6 CI examples. No Hub. No quality-report. package/package-verify skipped with a record."
+      "next_gate": "Item 19.6 CI examples with committed fingerprints must merge green before 19.7 publication ADR. Do not replace golden-compile. No Hub."
     },
     {
       "number": 20,

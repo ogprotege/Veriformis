@@ -144,3 +144,29 @@ warning.
 
 **Next action:** Publish the item 19.5 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.6.
+
+## 2026-08-31: Item 19.5 merged; item 19.6 in progress
+
+**Status:** Item 19.5 merged as PR #175 at
+`95acb66787a6e7775bb4f9f1493296f76a163088`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.6 adds retained project-spec fixtures, a committed fingerprint,
+and a CI example that does not replace golden-compile. No Hub. No
+secrets. No xcodebuild.
+
+**Next action:** Run the complete item 19.6 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.7.
+
+## 2026-08-31: Item 19.6 local gates green
+
+**Status:** Retained project-spec fixtures compile to a committed
+manifest SHA-256. The CI example job does not replace golden-compile.
+No Hub. No secrets. No xcodebuild. Focused automation tests passed 56.
+Project tracking, Ruff, the lock check, and `git diff --check` passed.
+The core suite passed 2,627 tests with 17 deselected and the one
+expected durability warning.
+
+**Next action:** Publish the item 19.6 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.7.

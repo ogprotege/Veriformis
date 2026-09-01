@@ -102,14 +102,15 @@ resume path is permitted in this item.
 - [x] Audit listed packets. Wrap missing service packets only. No Hub. No
       quality-report. Skip `package` / `package-verify` with a record unless
       the audit treats them as verification.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.6 Add CI examples with committed semantic fingerprints
 
 **Branch:** `phase19/06-ci-examples`
 
-- [ ] Retained fixtures, example spec/lock, fingerprint verify. Do not
+- [x] Retained fixtures, example spec/lock, fingerprint verify. Do not
       replace golden-compile. No secrets. No xcodebuild.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.7 Pin the optional publication boundary
 

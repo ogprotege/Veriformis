@@ -39,8 +39,7 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.5 wraps project-spec schema, dry-run, lock, env inspect, run, and
-resume as MCP tools over PipelineService. `run_pipeline` still executes
-`veriformis.pipeline/v1`. `package` / `package-verify` MCP wraps are skipped
-with a record. There is no Hub execute or quality-report tool. Default
-`review_policy` stays `none`. Quality gates remain preview-only.
+Item 19.6 adds retained project-spec fixtures, a committed fingerprint, and
+a CI example job that does not replace golden-compile. There is no Hub
+execute, no GitHub secrets, and no xcodebuild. Default `review_policy`
+stays `none`. Quality gates remain preview-only.
