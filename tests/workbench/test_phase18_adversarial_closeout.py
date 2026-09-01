@@ -271,10 +271,9 @@ def test_skipped_extras_have_records_and_phase_19_did_not_start_from_this_packet
     assert phases[19]["packet"] == (
         "dev/active/independent-product/phase-19-automation-and-publication"
     )
-    assert phases[19]["status"] in {"in_progress", "completed"}
-    assert phases[20]["status"] == "planned"
-    assert phases[20]["packet"] is None
-    assert not list((ROOT / "dev/active/independent-product").glob("phase-20-*"))
+    assert phases[19]["status"] == "completed"
+    assert phases[20]["packet"] == "dev/active/independent-product/phase-20-stable-1.0"
+    assert phases[20]["status"] in {"in_progress", "completed"}
 
 
 def test_phase16_kit_and_sft_sealed_bundle_identities_hold(tmp_path: Path) -> None:

@@ -1,0 +1,42 @@
+# Phase 20 Evidence
+
+**Status:** Open
+
+**Opened:** 2026-08-31
+
+## Predecessor evidence
+
+Phase 19 completed. Closeout merged as PR #180 at
+`084e504a799b6c1c1cc130c8ee819b13de5d6bbe`. Clean local `main` equals
+`origin/main` there. All declared dependencies (Phases 0–19) were complete
+in `program.json`.
+
+## Source-verified starting facts
+
+| Fact | Grade | Source |
+| --- | --- | --- |
+| Package version is `0.1.0` | `source-verified` | `src/veriformis/__init__.py` |
+| PyPI classifier is `Development Status :: 3 - Alpha` | `source-verified` | `pyproject.toml` |
+| Support-registry maturity is `development-alpha` | `source-verified` | `docs/governance/support-registry.json` |
+| `PIPELINE_SCHEMA_VERSION` is `veriformis.pipeline/v1` | `source-verified` | `src/veriformis/recipes/pipeline_spec.py` |
+| CLI and MCP names are disjoint from generator, install-extension, hub-upload, and quality-report | `source-verified` | CLI app; MCP tool manager |
+| Package metadata has no `HF_TOKEN` | `source-verified` | `pyproject.toml` |
+| Optional extras `trl`, `mlx-lm`, `columnar`, `axolotl`, `llama-factory`, `unsloth`, and `ocr` are empty | `source-verified` | `pyproject.toml` |
+| Default `review_policy` is `none` | `source-verified` | `recipe_defaults()` |
+| Quality gates remain `admitted_to_block is False` | `source-verified` | `src/veriformis/quality/gates.py` |
+| Publication adapter `execute_allowed` is false | `source-verified` | `src/veriformis/publication/adapter.py` |
+| GitHub workflows contain no `xcodebuild` | `source-verified` | `.github/workflows` |
+| No 1.0 support-matrix contract exists yet | `source-verified` | `docs/contracts/` |
+| Phase 19 closeout forbids starting Phase 20 from that packet | `source-verified` | Phase 19 `closeout.md` |
+
+## Required item 20.1 evidence
+
+- [x] Standard packet opened from clean `main` after Phase 19 closeout.
+- [x] Phase 20 moved from `planned` to `in_progress` with this packet path.
+- [x] L1 through L15 recorded.
+- [x] Active tracking documents reconciled to Phase 20 in progress without
+      claiming 1.0, a frozen matrix, signed Mac, or a version bump.
+- [x] Baseline isolation tests added.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [ ] Every GitHub check passes.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.2.

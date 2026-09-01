@@ -86,7 +86,11 @@ plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
 localization skipped with records. Phase 19 automation and optional
 publication is complete under its own packet. ADR-0020 Decision A: no
 Hub execute. Publication retry skipped with a record. Do not start Phase
-20 from that packet.
+20 from that packet. Phase 20 (stable independent 1.0) is in progress
+under its own packet. Version stays `0.1.0` development alpha until
+item 20.10 after the evidence index is complete. Honest 1.0 is
+CLI-first. Public signed/notarized Mac is not in the 1.0 matrix unless
+20.6 produces owner-signed evidence.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

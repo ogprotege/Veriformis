@@ -87,10 +87,14 @@ optional publication is complete under its own packet. ADR-0020 Decision
 A stands. Hub execute is skipped. Publication retry is skipped with a
 record. There is no Hub execute. Default `review_policy` stays `none`.
 No heuristic blocks seal. Do not start Phase 20 from that packet.
+Phase 20 is in progress under its own packet. Version remains `0.1.0`
+development alpha. Item 20.1 records honesty locks only. There is no
+1.0 support-matrix pin, version bump, or public signed-Mac claim in
+20.1.
 
-**Review date:** 2026-08-31 (independent-product Phase 19 closeout)
+**Review date:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20 packet open, or any capability claim change.
+**Next review:** Phase 20.2 support-matrix freeze, or any capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -798,7 +802,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
 | Completed independent Phase 18 | Goal-first Mac workbench as a thin CLI adapter; confirm-then-map; export and review wrap existing packets; Swift owns no dataset policy; ADR-0019 Decision A; family-to-trainer, generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full localization skipped with records |
 | Completed independent Phase 19 | Project spec, resume, MCP wraps, CI fingerprints, ADR-0020 Decision A; Hub execute skipped |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–19 complete and Phase 20 planned |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–19 complete and Phase 20 in progress under its own packet; version remains `0.1.0` alpha |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |
@@ -854,13 +858,13 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–18 are complete. The current critical-path work
-is Phase 19 under the
-[automation-and-publication packet](../dev/active/independent-product/phase-19-automation-and-publication/README.md).
-Phase 19 is complete. There is no Hub execute or quality-report command.
-There is no `GeneratorPass`. Do not start Phase 20 from this packet.
-
-The next program phase is Phase 20 under its own packet.
+Independent-product Phases 0–19 are complete. The current critical-path work
+is Phase 20 under the
+[stable 1.0 packet](../dev/active/independent-product/phase-20-stable-1.0/README.md).
+Version remains `0.1.0` development alpha until item 20.10. There is no Hub
+execute or quality-report command. There is no `GeneratorPass`. Public
+signed/notarized Mac is not in the 1.0 matrix unless 20.6 produces
+owner-signed evidence.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

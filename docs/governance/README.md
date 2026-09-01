@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19 closeout)
+**Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20 packet open, or governance-schema change.
+**Next review:** Phase 20.2 support-matrix freeze, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -36,6 +36,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 17 packet](../../dev/active/independent-product/phase-17-advanced-dataset-families/README.md) | Governed advanced dataset families |
 | [Completed Phase 18 packet](../../dev/active/independent-product/phase-18-goal-first-workbench/README.md) | Goal-first Mac workbench |
 | [Completed Phase 19 packet](../../dev/active/independent-product/phase-19-automation-and-publication/README.md) | Automation and optional publication |
+| [Active Phase 20 packet](../../dev/active/independent-product/phase-20-stable-1.0/README.md) | Stable independent 1.0 cut |
 
 Run the governance drift check with:
 
@@ -55,11 +56,11 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–18 are complete on `main`
-and Phase 19 is complete. Phase 18 closeout merged as PR #169 at
-`9f384eeedb401441c564c511b642904c403dad38`. ADR-0020 Decision A stands.
-Hub execute is skipped. Dry-run writes nothing. Do not start Phase 20
-from that packet.
+At this review, independent-product Phases 0–19 are complete on `main`
+and Phase 20 is in progress under its own packet. Phase 19 closeout
+merged as PR #180 at `084e504a799b6c1c1cc130c8ee819b13de5d6bbe`.
+ADR-0020 Decision A stands. Hub execute is skipped. Dry-run writes
+nothing. Version remains `0.1.0` development alpha until 20.10.
 The quality report is preview-only. Construction `review_policy`
 defaults to `none`. Optional Tesseract 5 recovery is isolated under
 empty extra `ocr`. Default parse still refuses image-only PDF.
@@ -67,4 +68,4 @@ empty extra `ocr`. Default parse still refuses image-only PDF.
 Aptus are implemented optional adapters. Unsloth remains a
 non-executable candidate. Extra lists for those names stay empty.
 ADR-0017 Decision A stands. ADR-0018 Decision A stands. ADR-0019
-Decision A stands. Do not start Phase 20 from this packet.
+Decision A stands. Do not invent a Phase 21 from the Phase 20 packet.

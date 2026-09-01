@@ -217,7 +217,7 @@
     {
       "number": 20,
       "title": "Cut the stable independent 1.0 product",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         0,
         1,
@@ -240,10 +240,10 @@
         18,
         19
       ],
-      "packet": null,
-      "started_on": null,
+      "packet": "dev/active/independent-product/phase-20-stable-1.0",
+      "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Freeze only capabilities whose evidence gates passed."
+      "next_gate": "Item 20.1 records honesty locks. Version stays 0.1.0 alpha. Freeze only capabilities whose evidence gates passed. Do not bump version until 20.10."
     }
   ]
 }
