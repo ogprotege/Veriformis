@@ -87,19 +87,21 @@ optional publication is complete under its own packet. ADR-0020 Decision
 A stands. Hub execute is skipped. Publication retry is skipped with a
 record. There is no Hub execute. Default `review_policy` stays `none`.
 No heuristic blocks seal. Do not start Phase 20 from that packet.
-Phase 20 is in progress under its own packet. Version remains `0.1.0`
+Phase 20 is complete under its own packet. Version remains `0.1.0`
 development alpha. Item 20.2 freezes the CLI-first 1.0 support matrix.
 Item 20.3 publishes the operator migration guide. Item 20.4 records the
 license, parser-threat, secret, and provenance review. Item 20.5 retains
 clean-machine CLI evidence without Aptus. Item 20.6 skips signed Mac
 with a record. Item 20.7 inspects sdist and wheel. Item 20.8 freezes optional
 profiles as isolated adapters. Item 20.9 publishes support-lifecycle
-and troubleshooting docs. There is no version bump or public
-signed-Mac claim. Hub execute stays excluded.
+and troubleshooting docs. Item 20.10 retains `0.1.0` because sealed
+manifests bind `veriformis_version` and existing goldens stay
+byte-identical. There is no `1.0.0` tag or public signed-Mac claim.
+Hub execute stays excluded. Do not invent a Phase 21.
 
-**Review date:** 2026-09-01 (independent-product Phase 20.9 support lifecycle)
+**Review date:** 2026-09-01 (independent-product Phase 20.10 closeout)
 
-**Next review:** Phase 20.10 version/maturity closeout, or any capability claim change.
+**Next review:** Any capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -808,7 +810,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
 | Completed independent Phase 18 | Goal-first Mac workbench as a thin CLI adapter; confirm-then-map; export and review wrap existing packets; Swift owns no dataset policy; ADR-0019 Decision A; family-to-trainer, generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full localization skipped with records |
 | Completed independent Phase 19 | Project spec, resume, MCP wraps, CI fingerprints, ADR-0020 Decision A; Hub execute skipped |
-| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–19 complete and Phase 20 in progress under its own packet; version remains `0.1.0` alpha |
+| Completed independent Phase 20 | Frozen CLI-first support matrix; migration, security, clean-machine CLI, artifact inspect, optional profiles, support-lifecycle; signed Mac skipped; version remains `0.1.0` development alpha; no Phase 21 |
+| Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–20 complete; version remains `0.1.0` alpha |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
 | Later / optional | Group 8 model-assisted construction (owner plan) |

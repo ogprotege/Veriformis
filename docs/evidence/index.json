@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.evidence-index/v1",
-  "last_updated": "2026-08-23",
+  "last_updated": "2026-09-01",
   "evidence_grades": {
     "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
     "test-verified": "Claim is exercised by an automated passing test.",
@@ -801,6 +801,28 @@
         "uv lock --check",
         "uv run ruff check src tests",
         "python3 -m json.tool docs/evidence/index.json",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "independent-product-phase-20-closeout-2026-09-01",
+      "date": "2026-09-01",
+      "commit": "working-tree-on-eff1bfa",
+      "scope": "Independent-product Phase 20 closeout",
+      "grade": "recorded-local",
+      "summary": "Phase 20 frozen the CLI-first support matrix, migration, security review, clean-machine CLI evidence without Aptus, signed-Mac skip, Python artifact inspect, optional profile freeze, and support-lifecycle docs. Version remains 0.1.0 development alpha because sealed manifests bind veriformis_version and Phase 16-19 goldens stay byte-identical. Do not invent a Phase 21.",
+      "details": "dev/active/independent-product/phase-20-stable-1.0/closeout.md",
+      "related": [
+        "docs/contracts/support-matrix-v1.md",
+        "docs/support-lifecycle.md",
+        "docs/consumer-profiles.md",
+        "dev/active/independent-product/phase-20-stable-1.0/skipped-signed-mac.md"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/release",
+        "uv run python scripts/check_project_tracking.py",
+        "uv lock --check",
+        "uv run ruff check src tests",
         "git diff --check"
       ]
     }

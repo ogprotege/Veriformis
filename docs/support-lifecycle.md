@@ -8,7 +8,7 @@ This page records semantic versioning, compatibility windows, upstream
 profile review cadence, deprecation notice, vulnerability response, and
 release rollback for the frozen CLI-first matrix.
 This page is not a version bump.
-Version remains `0.1.0` development alpha until item 20.10.
+Version remains `0.1.0` development alpha.
 
 ## Semantic versioning
 
@@ -21,8 +21,9 @@ The Python package uses SemVer.
   accept.
 - PATCH: a defect fix that preserves identities and loaders.
 
-Loading `veriformis.support-matrix/v1` is not a version tag. Until 20.10
-the published package version stays `0.1.0`.
+Loading `veriformis.support-matrix/v1` is not a version tag.
+Item 20.10 retained `0.1.0` because sealed manifests bind
+`veriformis_version` and existing goldens stay byte-identical.
 
 ## Compatibility windows
 

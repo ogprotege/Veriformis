@@ -1,6 +1,6 @@
 # Phase 20 Execution Plan
 
-**Status:** In progress
+**Status:** Complete
 
 **Last updated:** 2026-08-31
 
@@ -154,11 +154,11 @@ item.
 
 **Branch:** `phase20/10-version-and-closeout`
 
-- [ ] Evidence index complete and reviewed. If the frozen matrix and
+- [x] Evidence index complete and reviewed. If the frozen matrix and
       retained gates support a CLI-first 1.0 claim, bump version and
       classifier with explicit Mac/Hub/generator/plugin non-claims. If
       they do not, keep `0.1.0` development alpha and say so.
-- [ ] Adversarial closeout. Do not invent a Phase 21 from this packet.
+- [x] Adversarial closeout. Do not invent a Phase 21 from this packet.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ## Skip rules

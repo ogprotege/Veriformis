@@ -220,3 +220,26 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 20.9 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.10.
+
+## 2026-09-01: Item 20.9 merged; item 20.10 in progress
+
+**Status:** Item 20.9 merged as PR #189 at
+`eff1bfa962d438863814f1449330fe12fa660a9d`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.10 retains `0.1.0` development alpha. Sealed manifests bind
+`veriformis_version`. Existing goldens stay byte-identical. Do not
+invent a Phase 21.
+
+**Next action:** Run the complete item 20.10 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`.
+
+## 2026-09-01: Item 20.10 local gates green
+
+**Status:** Phase 20 closeout retains `0.1.0` development alpha. Focused
+tests passed. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,666 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 20.10 pull request, require every GitHub
+check, merge, and synchronize clean `main`.
