@@ -29,3 +29,4 @@
 | CI example compiles retained fixtures and compares committed fingerprints; golden-compile stays | Accepted | Item 19.6 |
 | ADR-0020 Decision A: pin only; no Hub execute; loading is not upload | Accepted | Item 19.7 |
 | Credentials never persist in compiler artifacts | Accepted | Item 19.8 |
+| Skip publication retry/idempotency because Decision A has no execute adapter | Accepted | Item 19.9 skip record |

@@ -212,7 +212,7 @@
       "packet": "dev/active/independent-product/phase-19-automation-and-publication",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 19.8 credential isolation must merge green before 19.9 skip record. Credentials never persist in compiler artifacts."
+      "next_gate": "Item 19.9 skip record for publication retry must merge green before 19.10 adversarial closeout. ADR-0020 Decision A installs no execute adapter."
     },
     {
       "number": 20,

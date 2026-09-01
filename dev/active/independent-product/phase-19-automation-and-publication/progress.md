@@ -217,3 +217,27 @@ the lock check, and `git diff --check` passed. The core suite passed
 
 **Next action:** Publish the item 19.8 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.9.
+
+## 2026-08-31: Item 19.8 merged; item 19.9 in progress
+
+**Status:** Item 19.8 merged as PR #178 at
+`f74d5e0b0289f3526c50c99195bf052fde7e3a27`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.9 skips publication retry with a record because ADR-0020
+Decision A installs no execute adapter.
+
+**Next action:** Run the complete item 19.9 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.10.
+
+## 2026-08-31: Item 19.9 local gates green
+
+**Status:** Publication retry is skipped with a record. ADR-0020 Decision
+A installs no execute adapter. Focused automation tests passed 63.
+Project tracking, Ruff, the lock check, and `git diff --check` passed.
+The core suite passed 2,634 tests with 17 deselected and the one
+expected durability warning.
+
+**Next action:** Publish the item 19.9 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.10.

@@ -39,6 +39,6 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.8 proves credentials never persist in compiler artifacts. Specs
-and locks refuse credential-shaped fields. Default `review_policy` stays
-`none`. Quality gates remain preview-only. There is no Hub execute.
+Item 19.9 skips publication retry and idempotency with a record because
+ADR-0020 Decision A installs no execute adapter. Default `review_policy`
+stays `none`. Quality gates remain preview-only. There is no Hub execute.
