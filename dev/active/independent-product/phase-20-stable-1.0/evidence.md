@@ -38,5 +38,17 @@ in `program.json`.
       claiming 1.0, a frozen matrix, signed Mac, or a version bump.
 - [x] Baseline isolation tests added.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.2.
+
+## Required item 20.2 evidence
+
+- [x] Versioned `veriformis.support-matrix/v1` pin and contract document.
+- [x] Loading is not a version bump. Product stays `0.1.0` development alpha.
+- [x] Exclusions name Hub execute, public signed Mac, generator, plugin
+      loader, Unsloth execute, default-parse `ocr-image`, published corpus
+      tiers, quality-report command, hosted training, and required extras.
+- [x] Python, CLI, and MCP emit the same catalog.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.2.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.3.

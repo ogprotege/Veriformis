@@ -30,3 +30,29 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 20.1 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.2.
+
+## 2026-08-31: Item 20.1 merged; item 20.2 in progress
+
+**Status:** Item 20.1 merged as PR #181 at
+`1f6660944fccd3bdcfdfe1ac88270866211bd613`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.2 pins `veriformis.support-matrix/v1`. Loading is not a version
+bump. The frozen claim is CLI-first independent core. Public signed Mac,
+Hub execute, generator, plugin loader, Unsloth execute, default-parse
+`ocr-image`, published corpus tiers, quality-report command, hosted
+training, and required extras stay excluded.
+
+**Next action:** Run the complete item 20.2 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.3.
+
+## 2026-08-31: Item 20.2 local gates green
+
+**Status:** The CLI-first 1.0 support matrix is pinned without a version
+bump. Focused tests passed 18. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,646 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 20.2 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.3.

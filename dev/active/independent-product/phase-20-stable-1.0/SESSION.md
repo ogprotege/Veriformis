@@ -5,15 +5,15 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase20/01-stable-packet`
+**Local branch:** `phase20/02-support-matrix`
 
-**Completed:** Phase 19 closeout, PR #180 at
-`084e504a799b6c1c1cc130c8ee819b13de5d6bbe`.
+**Completed:** Item 20.1, PR #181 at
+`1f6660944fccd3bdcfdfe1ac88270866211bd613`.
 
-**Current item:** 20.1 packet and honesty locks. Version stays `0.1.0`.
-No matrix freeze, version bump, signed Mac, or Hub execute.
+**Current item:** 20.2 freeze the CLI-first 1.0 support matrix. Version
+stays `0.1.0`. No signed Mac, Hub execute, or version bump.
 
-**Next gate:** Run the 20.1 local gates, publish the pull request, require
+**Next gate:** Run the 20.2 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

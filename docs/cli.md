@@ -46,7 +46,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `support-matrix` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
@@ -797,6 +797,24 @@ preset per goal. `chunk`, `construct`, and `curate` accept `--goal GOAL` and
 literal default, so the same selection yields the same recipe on the CLI,
 MCP, YAML, Python, and the workbench. See the
 [Recipe Preset Contract v1](contracts/recipe-preset-v1.md).
+
+### `support-matrix`
+
+Print the frozen CLI-first 1.0 support matrix as read-only JSON.
+
+```text
+veriformis support-matrix
+```
+
+The output is the exact packaged `veriformis.support-matrix/v1` pin that
+`PipelineService` and MCP `support_matrix` also emit. It names implemented
+platforms, inputs, goals, rows, containers, and optional profiles, and it
+names exclusions (Hub execute, public signed Mac, generator, plugin loader,
+Unsloth execute, default-parse `ocr-image`, published corpus tiers,
+quality-report command, hosted training, required extras). Loading the pin
+is not a version bump. Version remains `0.1.0` development alpha until
+item 20.10. See
+[Support Matrix Contract v1](contracts/support-matrix-v1.md).
 
 ### `profile-admissions`
 

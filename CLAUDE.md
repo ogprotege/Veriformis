@@ -182,8 +182,9 @@ Read these current authorities before changing code:
     `docs/contracts/workbench-adapter-v1.md`,
     `docs/contracts/project-spec-v1.md`,
     `docs/contracts/project-lock-v1.md`,
-    `docs/contracts/project-spec-diagnostic-v1.md`, and
-    `docs/contracts/publication-adapter-v1.md`
+    `docs/contracts/project-spec-diagnostic-v1.md`,
+    `docs/contracts/publication-adapter-v1.md`, and
+    `docs/contracts/support-matrix-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and

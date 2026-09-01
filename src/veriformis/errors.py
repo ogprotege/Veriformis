@@ -266,6 +266,12 @@ class PublicationAdapterError(VeriformisError):
     code = "publication-adapter-invalid"
 
 
+class SupportMatrixError(VeriformisError):
+    """A 1.0 support-matrix pin is malformed, unknown, or over-claims."""
+
+    code = "support-matrix-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 
