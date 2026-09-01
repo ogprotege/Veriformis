@@ -1,6 +1,6 @@
 # Phase 19: Complete Automation and Optional Publication Boundaries
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-31
 
@@ -39,6 +39,7 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.9 skips publication retry and idempotency with a record because
-ADR-0020 Decision A installs no execute adapter. Default `review_policy`
-stays `none`. Quality gates remain preview-only. There is no Hub execute.
+Phase 19 is complete. ADR-0020 Decision A stands. Hub execute is skipped.
+Publication retry is skipped with a record. Default `review_policy` stays
+`none`. Quality gates remain preview-only. Do not start Phase 20 from this
+packet.

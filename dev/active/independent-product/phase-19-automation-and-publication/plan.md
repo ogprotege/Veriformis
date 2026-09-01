@@ -133,14 +133,15 @@ resume path is permitted in this item.
 **Branch:** `phase19/09-publication-retry`
 
 - [x] Skip with a record unless 19.7 Decision B shipped an execute adapter.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.10 Add adversarial automation tests and close Phase 19
 
 **Branch:** `phase19/10-adversarial-closeout`
 
-- [ ] Spec/mapping/export/Hub/credential refusals. Digest parity. Skip
+- [x] Spec/mapping/export/Hub/credential refusals. Digest parity. Skip
       records. Closeout. Do not start Phase 20 from this packet.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ## Skip rules
 

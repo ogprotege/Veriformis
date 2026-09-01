@@ -59,9 +59,8 @@ ADR-0019 Decision A: Swift is a process adapter. Confirm-then-map,
 export, and review wrap existing CLI packets. Family-to-trainer,
 generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
 and full localization skipped with records. Phase 19 automation and
-optional publication is in progress under its own packet. Item 19.9
-skips publication retry with a record. No Hub execute. Do not start
-Phase 20 from that packet.
+optional publication is complete under its own packet. ADR-0020
+Decision A. Hub execute skipped. Do not start Phase 20 from that packet.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

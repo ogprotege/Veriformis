@@ -5,16 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase19/09-publication-retry`
+**Local branch:** `phase19/10-adversarial-closeout`
 
-**Completed:** Item 19.8, PR #178 at
-`f74d5e0b0289f3526c50c99195bf052fde7e3a27`.
+**Completed:** Item 19.9, PR #179 at
+`2e081fbff4371ddad5dc321ade9ffc2c1cef1b4c`.
 
-**Current item:** 19.9 skip publication retry with a record. ADR-0020
-Decision A installs no execute adapter.
+**Current item:** 19.10 adversarial closeout. Phase 19 complete. Do not
+start Phase 20 from this packet.
 
-**Next gate:** Publish the 19.9 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 19.10.
+**Next gate:** Publish the 19.10 pull request, require every GitHub check,
+merge, and synchronize clean `main`.
 
 **Decision:** ADR-0020 Decision A (pin only; no Hub execute). Operator
 approved the Phase 19 plan as written on 2026-08-31.

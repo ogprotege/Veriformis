@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `f74d5e0` on `main` after PR #178
+**Implementation baseline reviewed:** `2e081fb` on `main` after PR #179
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–18 complete; Phase 19.9 skip)
+Phases 0–2; independent-product Phases 0–19 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-31 (Phase 19.9 publication retry skip)
+**Last reviewed:** 2026-08-31 (Phase 19 closeout)
 
-**Next review:** Phase 19.9 merge, or item 19.10 adversarial closeout. Do
-not add Hub execute in this item.
+**Next review:** Phase 19.10 merge. Do not start Phase 20 from this
+packet.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -149,10 +149,10 @@ local, offline, and free of LLM generation.
       Decision A. Family-to-trainer, generator, plugin, Hub, signed Mac,
       GitHub xcodebuild, virtualization, and full localization skipped
       with records. Phase 19 opened under its own packet.
-- [ ] Independent product Phase 19 is in progress under its
+- [x] Independent product Phase 19 is complete under its
       [packet](dev/active/independent-product/phase-19-automation-and-publication/README.md).
-      Item 19.9 skips publication retry with a record. Do not start
-      Phase 20 from this packet.
+      ADR-0020 Decision A. Hub execute skipped. Do not start Phase 20
+      from that packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -184,7 +184,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 16 | Establish a safe extension architecture | Completed | [Completed packet](dev/active/independent-product/phase-16-extension-architecture/README.md) |
 | 17 | Add governed advanced dataset families | Completed | [Completed packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md) |
 | 18 | Complete the goal-first Mac workbench | Completed | [Completed packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md) |
-| 19 | Complete automation and optional publication boundaries | In progress | [Active packet](dev/active/independent-product/phase-19-automation-and-publication/README.md) |
+| 19 | Complete automation and optional publication boundaries | Completed | [Completed packet](dev/active/independent-product/phase-19-automation-and-publication/README.md) |
 | 20 | Cut the stable independent 1.0 product | Planned | [Roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) |
 <!-- INDEPENDENT-PROGRAM:END -->
 
