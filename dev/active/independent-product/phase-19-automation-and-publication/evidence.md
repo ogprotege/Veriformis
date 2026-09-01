@@ -92,8 +92,28 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
 - [x] CI example job compiles from those fixtures. Golden-compile remains.
 - [x] No Hub upload, GitHub secrets, or xcodebuild.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.7.
+
+## Required item 19.7 evidence
+
+- [x] ADR-0020 Decision A: no Hub execute.
+- [x] `veriformis.publication-adapter/v1` pin. Loading is not upload.
+- [x] CLI/MCP have no hub-upload. Local Hugging Face Dataset is not Hub.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.7.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.8.
+
+## Item 19.7 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 60 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,631 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.6 local gate evidence
 

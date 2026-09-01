@@ -207,7 +207,7 @@ def test_project_spec_execute_surfaces_keep_hub_absent() -> None:
     assert (ROOT / "docs/contracts/project-lock-v1.md").is_file()
     assert (ROOT / "docs/contracts/project-spec-diagnostic-v1.md").is_file()
     assert (ROOT / "src/veriformis/automation/spec.py").is_file()
-    assert not (ROOT / "docs/adr/0020-publication-boundary.md").exists()
+    assert (ROOT / "docs/adr/0020-publication-boundary.md").is_file()
     cli_names = _cli_names()
     mcp_names = _mcp_names()
     assert cli_names.isdisjoint(_PROJECT_SPEC_OPERATIONS)
