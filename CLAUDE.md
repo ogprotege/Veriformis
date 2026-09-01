@@ -84,9 +84,9 @@ records. Phase 18 goal-first Mac workbench is complete. Sequential PRs
 export, and review wrap existing CLI packets. Family-to-trainer, generator,
 plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
 localization skipped with records. Phase 19 automation and optional
-publication is in progress under its own packet. Item 19.8 proves
-credentials never persist in compiler artifacts. No Hub execute. Do not
-start Phase 20 from that packet.
+publication is in progress under its own packet. Item 19.9 skips
+publication retry because ADR-0020 Decision A installs no execute
+adapter. No Hub execute. Do not start Phase 20 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source

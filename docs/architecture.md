@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.8 credential isolation)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.9 retry skip)
 
 **Next review:** Any service-boundary or architecture change
 

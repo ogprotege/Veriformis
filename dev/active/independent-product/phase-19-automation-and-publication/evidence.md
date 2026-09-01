@@ -111,8 +111,27 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
       specs, locks, CLI logs, or MCP payloads.
 - [x] Example CI workflow has no Hub secrets.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.9.
+
+## Required item 19.9 evidence
+
+- [x] Skip record: no retry/idempotency because ADR-0020 Decision A.
+- [x] CLI/MCP have no hub-upload or hub-retry. `retry_allowed` is false.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.9.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.10.
+
+## Item 19.9 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 63 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,634 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.8 local gate evidence
 

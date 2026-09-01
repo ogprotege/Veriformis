@@ -126,13 +126,14 @@ resume path is permitted in this item.
 
 - [x] Env/spec injection cannot appear in artifacts. Required even if Hub
       is skipped.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.9 Add network retry and idempotency — or skip with a record
 
 **Branch:** `phase19/09-publication-retry`
 
-- [ ] Skip with a record unless 19.7 Decision B shipped an execute adapter.
+- [x] Skip with a record unless 19.7 Decision B shipped an execute adapter.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.10 Add adversarial automation tests and close Phase 19
 
