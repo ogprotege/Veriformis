@@ -68,7 +68,10 @@ def test_support_matrix_pin_exists_without_version_bump_or_lifecycle_docs() -> N
     assert (ROOT / "src/veriformis/release/support-matrix-v1.json").is_file()
     assert (ROOT / "src/veriformis/release/matrix.py").is_file()
     assert not (ROOT / "docs/support-lifecycle.md").is_file()
-    assert not (ROOT / "docs/migration.md").is_file()
+    assert (ROOT / "docs/migration.md").is_file()
+    migration = (ROOT / "docs/migration.md").read_text(encoding="utf-8")
+    assert "upgrade-workspace" in migration
+    assert "Unknown versions fail closed" in migration
     from veriformis.release import support_matrix
 
     matrix = support_matrix()

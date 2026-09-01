@@ -56,3 +56,27 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 20.2 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.3.
+
+## 2026-08-31: Item 20.2 merged; item 20.3 in progress
+
+**Status:** Item 20.2 merged as PR #182 at
+`aa91d49331ab5fec264593287baf89d3fbb116e1`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.3 publishes `docs/migration.md` and proves workspace revisions 1
+and 2 upgrade to 3, revision 4 stays, unknown layouts and revisions fail
+closed, and mapping/recipe/export/profile v1 documents still load.
+
+**Next action:** Run the complete item 20.3 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.4.
+
+## 2026-08-31: Item 20.3 local gates green
+
+**Status:** The operator migration guide is published. Focused tests passed.
+Project tracking, Ruff, the lock check, and `git diff --check` passed. The
+core suite passed 2,651 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 20.3 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.4.
