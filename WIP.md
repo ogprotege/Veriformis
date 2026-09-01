@@ -8,9 +8,9 @@ Phases 0–2; independent-product Phases 0–19 complete; Phase 20 in progress)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-09-01 (Phase 20.7 Python artifact inspect)
+**Last reviewed:** 2026-09-01 (Phase 20.8 profile freeze)
 
-**Next review:** Phase 20.7 merge. Version stays `0.1.0` until 20.10.
+**Next review:** Phase 20.8 merge. Version stays `0.1.0` until 20.10.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`

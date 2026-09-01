@@ -243,7 +243,7 @@
       "packet": "dev/active/independent-product/phase-20-stable-1.0",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 20.7 inspects sdist and wheel. Version stays 0.1.0 alpha. Do not bump version until 20.10."
+      "next_gate": "Item 20.8 freezes optional profiles as isolated adapters. Version stays 0.1.0 alpha. Do not bump version until 20.10."
     }
   ]
 }

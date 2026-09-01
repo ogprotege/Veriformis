@@ -133,7 +133,7 @@ item.
 
 **Branch:** `phase20/08-profile-freeze`
 
-- [ ] Name accepted optional profiles and excluded candidates. Isolated
+- [x] Name accepted optional profiles and excluded candidates. Isolated
       profile jobs do not block core unless a profile is frozen into the
       1.0 matrix as required. Empty extras stay empty. The exporter does
       not train.
