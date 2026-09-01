@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.9 retry skip)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19 closeout)
 
 **Next review:** Any service-boundary or architecture change
 

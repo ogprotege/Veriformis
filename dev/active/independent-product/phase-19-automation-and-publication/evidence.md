@@ -119,8 +119,28 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
 - [x] Skip record: no retry/idempotency because ADR-0020 Decision A.
 - [x] CLI/MCP have no hub-upload or hub-retry. `retry_allowed` is false.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.10.
+
+## Required item 19.10 evidence
+
+- [x] Adversarial refusals: pipeline/v1, no Hub, no quality-report, no
+      package MCP, credentials, skip records.
+- [x] Closeout complete. Phase 20 stays planned.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.10.
+- [ ] PR merges and clean local `main` equals `origin/main`.
+
+## Item 19.10 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 67 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,638 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.9 local gate evidence
 

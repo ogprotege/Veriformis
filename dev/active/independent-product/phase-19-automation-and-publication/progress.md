@@ -241,3 +241,26 @@ expected durability warning.
 
 **Next action:** Publish the item 19.9 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.10.
+
+## 2026-08-31: Item 19.9 merged; item 19.10 in progress
+
+**Status:** Item 19.9 merged as PR #179 at
+`2e081fbff4371ddad5dc321ade9ffc2c1cef1b4c`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.10 closes Phase 19 with adversarial tests. Phase 20 stays
+planned. Do not start Phase 20 from this packet.
+
+**Next action:** Run the complete item 19.10 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`.
+
+## 2026-08-31: Item 19.10 local gates green
+
+**Status:** Phase 19 closeout. Adversarial tests hold pipeline/v1, no Hub,
+no quality-report, credential isolation, and skip records. Phase 20 stays
+planned. Focused automation tests passed 67. Project tracking, Ruff, the
+lock check, and `git diff --check` passed. The core suite passed 2,638
+tests with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 19.10 pull request, require every GitHub
+check, merge, and synchronize clean `main`.

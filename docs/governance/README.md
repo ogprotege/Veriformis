@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.9 retry skip)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19 closeout)
 
-**Next review:** Phase 19.9 merge, or governance-schema change.
+**Next review:** Phase 20 packet open, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -35,7 +35,7 @@ claims from drifting away from code and evidence.
 | [Completed Phase 16 packet](../../dev/active/independent-product/phase-16-extension-architecture/README.md) | Safe extension architecture |
 | [Completed Phase 17 packet](../../dev/active/independent-product/phase-17-advanced-dataset-families/README.md) | Governed advanced dataset families |
 | [Completed Phase 18 packet](../../dev/active/independent-product/phase-18-goal-first-workbench/README.md) | Goal-first Mac workbench |
-| [Active Phase 19 packet](../../dev/active/independent-product/phase-19-automation-and-publication/README.md) | Automation and optional publication |
+| [Completed Phase 19 packet](../../dev/active/independent-product/phase-19-automation-and-publication/README.md) | Automation and optional publication |
 
 Run the governance drift check with:
 
@@ -56,9 +56,10 @@ support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
 At this review, independent-product Phases 0–18 are complete on `main`
-and Phase 19 is in progress. Phase 18 closeout merged as PR #169 at
-`9f384eeedb401441c564c511b642904c403dad38`. Item 19.9 skips publication
-retry with a record. Dry-run writes nothing. There is no Hub execute.
+and Phase 19 is complete. Phase 18 closeout merged as PR #169 at
+`9f384eeedb401441c564c511b642904c403dad38`. ADR-0020 Decision A stands.
+Hub execute is skipped. Dry-run writes nothing. Do not start Phase 20
+from that packet.
 The quality report is preview-only. Construction `review_policy`
 defaults to `none`. Optional Tesseract 5 recovery is isolated under
 empty extra `ocr`. Default parse still refuses image-only PDF.
