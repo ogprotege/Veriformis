@@ -2,16 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `3987d6d` on `main` after PR #176
+**Implementation baseline reviewed:** `f9ec2e4` on `main` after PR #177
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–18 complete; Phase 19.7 ADR-0020)
+Phases 0–2; independent-product Phases 0–18 complete; Phase 19.8 credentials)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-08-31 (Phase 19.7 publication boundary)
+**Last reviewed:** 2026-08-31 (Phase 19.8 credential isolation)
 
-**Next review:** Phase 19.7 merge, or item 19.8 credential isolation. Do
-not add Hub execute in this item.
+**Next review:** Phase 19.8 merge, or item 19.9 skip record. Do not add
+Hub execute in this item.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -151,8 +151,8 @@ local, offline, and free of LLM generation.
       with records. Phase 19 opened under its own packet.
 - [ ] Independent product Phase 19 is in progress under its
       [packet](dev/active/independent-product/phase-19-automation-and-publication/README.md).
-      Item 19.7 pins ADR-0020 Decision A. Loading a publication pin is
-      not upload. Do not start Phase 20 from this packet.
+      Item 19.8 proves credentials never persist in compiler artifacts.
+      Do not start Phase 20 from this packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

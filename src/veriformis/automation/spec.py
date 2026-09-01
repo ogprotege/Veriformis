@@ -409,10 +409,31 @@ def create_project_spec(
     return load_project_spec(payload)
 
 
+_CREDENTIAL_FIELD_MARKERS: tuple[str, ...] = (
+    "authorization",
+    "aws_secret_access_key",
+    "hf_token",
+    "netrc",
+    "password",
+    "secret",
+    "token",
+)
+
+
+def refuse_credential_fields(payload: dict[str, Any], *, label: str) -> None:
+    for key in payload:
+        lowered = str(key).lower()
+        if any(marker in lowered for marker in _CREDENTIAL_FIELD_MARKERS):
+            raise ProjectSpecError(
+                f"credential-shaped field {key!r} is forbidden on {label}"
+            )
+
+
 def load_project_spec(payload: object) -> ProjectSpec:
     """Load one pin. Unknown fields, versions, and unconfirmed maps fail closed."""
     if not isinstance(payload, dict):
         raise ProjectSpecError("project spec must be an object")
+    refuse_credential_fields(payload, label="project spec")
     _require_known_contract(payload)
     if "mode" in payload and payload["mode"] not in INPUT_MODE_IDS:
         raise ProjectSpecError(

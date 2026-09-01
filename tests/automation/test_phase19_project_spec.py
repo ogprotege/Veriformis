@@ -197,8 +197,8 @@ def test_unknown_key_fails_closed() -> None:
     from veriformis.automation import load_project_spec
 
     payload = _spec().model_dump(mode="json")
-    payload["hub_token"] = "secret"
-    with pytest.raises(ProjectSpecError, match="unknown field hub_token"):
+    payload["invented_field"] = "secret"
+    with pytest.raises(ProjectSpecError, match="unknown field invented_field"):
         load_project_spec(payload)
 
 

@@ -194,3 +194,26 @@ with 17 deselected and the one expected durability warning.
 
 **Next action:** Publish the item 19.7 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.8.
+
+## 2026-08-31: Item 19.7 merged; item 19.8 in progress
+
+**Status:** Item 19.7 merged as PR #177 at
+`f9ec2e4a4857d9286b48a91de31e2650ac9cc3ab`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.8 proves credentials never persist in compiler artifacts.
+
+**Next action:** Run the complete item 19.8 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.9.
+
+## 2026-08-31: Item 19.8 local gates green
+
+**Status:** Specs and locks refuse credential-shaped fields. Injected
+env secrets do not appear in workspaces, bundles, CLI output, or MCP
+payloads. Focused automation tests passed 62. Project tracking, Ruff,
+the lock check, and `git diff --check` passed. The core suite passed
+2,633 tests with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 19.8 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.9.
