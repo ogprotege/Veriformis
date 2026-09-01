@@ -243,7 +243,7 @@
       "packet": "dev/active/independent-product/phase-20-stable-1.0",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 20.5 retains clean-machine CLI evidence without Aptus. Version stays 0.1.0 alpha. Do not bump version until 20.10."
+      "next_gate": "Item 20.6 skips signed Mac with a record. Version stays 0.1.0 alpha. Do not bump version until 20.10."
     }
   ]
 }
