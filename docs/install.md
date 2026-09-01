@@ -159,7 +159,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis run PIPELINE.yaml` | YAML pipeline |
 | `veriformis mcp` | Local MCP adapter |
 | `veriformis preview PATH` | Cleaning preview without commit |
-| `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions |
+| `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions; see [migration.md](migration.md) |
 
 ### Choose a generic export container
 

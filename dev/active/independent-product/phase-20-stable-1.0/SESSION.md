@@ -5,15 +5,15 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase20/02-support-matrix`
+**Local branch:** `phase20/03-migration-completeness`
 
-**Completed:** Item 20.1, PR #181 at
-`1f6660944fccd3bdcfdfe1ac88270866211bd613`.
+**Completed:** Item 20.2, PR #182 at
+`aa91d49331ab5fec264593287baf89d3fbb116e1`.
 
-**Current item:** 20.2 freeze the CLI-first 1.0 support matrix. Version
-stays `0.1.0`. No signed Mac, Hub execute, or version bump.
+**Current item:** 20.3 migration completeness and operator guide. Version
+stays `0.1.0`. Unknown versions fail closed.
 
-**Next gate:** Run the 20.2 local gates, publish the pull request, require
+**Next gate:** Run the 20.3 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

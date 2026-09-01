@@ -88,9 +88,9 @@ item.
 
 **Branch:** `phase20/03-migration-completeness`
 
-- [ ] Prove every supported workspace, bundle, mapping, recipe, export, and
+- [x] Prove every supported workspace, bundle, mapping, recipe, export, and
       profile version still loads or has an `upgrade-workspace` path.
-- [ ] Publish an operator migration guide. Do not invent silent schema jumps.
+- [x] Publish an operator migration guide. Do not invent silent schema jumps.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 20.4 Run license, vulnerability, parser-threat, secret, reproducibility, and provenance review

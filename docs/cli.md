@@ -1144,6 +1144,7 @@ stage-command redesign is planned solely for packaging.
 ## Related documentation
 
 - [Architecture: entry points](architecture/entry-points.md)
+- [Migration guide](migration.md)
 - [Product contract](product-contract.md)
 - [Integrity Contract v1](contracts/integrity-v1.md)
 - [Dataset Construction Contract v1](contracts/dataset-construction-v1.md)

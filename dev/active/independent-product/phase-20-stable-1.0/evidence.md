@@ -50,5 +50,16 @@ in `program.json`.
       tiers, quality-report command, hosted training, and required extras.
 - [x] Python, CLI, and MCP emit the same catalog.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.3.
+
+## Required item 20.3 evidence
+
+- [x] Operator migration guide names workspace, bundle, mapping, recipe,
+      export, and profile versions.
+- [x] Revision 1 and 2 upgrade to 3; revision 4 is a no-op; unknown versions
+      fail closed.
+- [x] Pre-taxonomy workspace and `minimal-v1` bundle still load.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.3.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.4.

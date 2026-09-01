@@ -8,7 +8,7 @@ Phases 0–19 complete; Phase 20 in progress).
 
 **Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.3 migration completeness, or any contract change.
+**Next review:** Phase 20.4 security review, or any contract change.
 Default parse still refuses image-only PDF. Version remains `0.1.0`
 development alpha.
 
@@ -82,6 +82,7 @@ development alpha.
 | [Project Spec Diagnostic v1](contracts/project-spec-diagnostic-v1.md) | Machine-readable spec execute/resume failure | Truncated JSON fails closed; human CLI text stays |
 | [Publication Adapter v1](contracts/publication-adapter-v1.md) | Optional publication pin over a verified export | Schema pin; loading is not upload; ADR-0020 Decision A |
 | [Support Matrix v1](contracts/support-matrix-v1.md) | Frozen CLI-first 1.0 capability pin | Not a version bump; public signed Mac and Hub execute excluded |
+| [Migration guide](migration.md) | Supported workspace, bundle, mapping, recipe, export, and profile versions | Unknown versions fail closed; no silent schema jumps |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

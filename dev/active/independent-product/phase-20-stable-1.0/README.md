@@ -39,7 +39,5 @@ This packet does not invent a Phase 21.
 
 ## Current state
 
-Phase 20 is in progress. Item 20.2 freezes the CLI-first 1.0 support matrix.
-Version remains `0.1.0` development alpha. ADR-0020 Decision A stands. Hub
-execute is skipped. Public signed/notarized Mac is not in the 1.0 matrix
-unless 20.6 produces owner-signed evidence (default: skip with a record).
+Phase 20 is in progress. Item 20.3 publishes the operator migration guide.
+Version remains `0.1.0` development alpha. Unknown versions fail closed.
