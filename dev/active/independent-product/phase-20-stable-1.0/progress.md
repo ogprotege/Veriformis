@@ -151,3 +151,26 @@ durability warning.
 
 **Next action:** Publish the item 20.6 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.7.
+
+## 2026-09-01: Item 20.6 merged; item 20.7 in progress
+
+**Status:** Item 20.6 merged as PR #186 at
+`94978a0ded5125e1c12f8e74aa1445572267eba7`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.7 inspects sdist and wheel listings. Version `0.1.0`. Binaries
+are not retained.
+
+**Next action:** Run the complete item 20.7 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.8.
+
+## 2026-09-01: Item 20.7 local gates green
+
+**Status:** Sdist and wheel listings are retained. Focused tests passed.
+Project tracking, Ruff, the lock check, and `git diff --check` passed.
+The core suite passed 2,661 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 20.7 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.8.

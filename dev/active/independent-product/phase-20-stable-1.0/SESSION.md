@@ -5,15 +5,15 @@ append-only history.
 
 **Updated:** 2026-09-01
 
-**Local branch:** `phase20/06-signed-mac-skip`
+**Local branch:** `phase20/07-python-artifacts`
 
-**Completed:** Item 20.5, PR #185 at
-`f47afdf35d2520d8a76bd0a2de91303dec6150e3`.
+**Completed:** Item 20.6, PR #186 at
+`94978a0ded5125e1c12f8e74aa1445572267eba7`.
 
-**Current item:** 20.6 skip signed Mac with a record. No xcodebuild.
-Version stays `0.1.0`.
+**Current item:** 20.7 inspect sdist and wheel. Version stays `0.1.0`.
+Binaries are not retained.
 
-**Next gate:** Run the 20.6 local gates, publish the pull request, require
+**Next gate:** Run the 20.7 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

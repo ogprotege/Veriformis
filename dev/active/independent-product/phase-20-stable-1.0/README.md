@@ -39,6 +39,5 @@ This packet does not invent a Phase 21.
 
 ## Current state
 
-Phase 20 is in progress. Item 20.6 skips signed Mac with a record.
-Version remains `0.1.0` development alpha. Public signed Mac is not in
-the 1.0 matrix.
+Phase 20 is in progress. Item 20.7 inspects sdist and wheel. Version
+remains `0.1.0` development alpha. Binaries are not retained.

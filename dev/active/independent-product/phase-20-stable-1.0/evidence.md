@@ -90,5 +90,14 @@ in `program.json`.
 - [x] Skip record names signed/notarized/stapled Mac and no xcodebuild.
 - [x] Support matrix `public_signed_mac` stays false.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.7.
+
+## Required item 20.7 evidence
+
+- [x] Sdist and wheel built and inspected. Version `0.1.0`. Console script
+      present. Support matrix packaged. LICENSE in sdist. No binaries
+      retained.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.7.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.8.

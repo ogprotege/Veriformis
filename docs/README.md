@@ -8,7 +8,7 @@ Phases 0–19 complete; Phase 20 in progress).
 
 **Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.7 Python artifact inspect, or any contract change.
+**Next review:** Phase 20.8 profile freeze, or any contract change.
 Default parse still refuses image-only PDF. Version remains `0.1.0`
 development alpha.
 
