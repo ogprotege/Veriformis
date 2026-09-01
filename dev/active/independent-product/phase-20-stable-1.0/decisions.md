@@ -28,3 +28,4 @@
 | Inspect sdist/wheel listings without retaining binaries | Accepted | Item 20.7 |
 | Freeze optional profiles; extras empty; exporter does not train | Accepted | Item 20.8 |
 | Publish support-lifecycle docs without a version bump | Accepted | Item 20.9 |
+| Retain `0.1.0` development alpha; do not invent Phase 21 | Accepted | Item 20.10 |

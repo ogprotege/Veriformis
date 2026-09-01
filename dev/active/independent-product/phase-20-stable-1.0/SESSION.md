@@ -5,15 +5,16 @@ append-only history.
 
 **Updated:** 2026-09-01
 
-**Local branch:** `phase20/09-support-lifecycle`
+**Local branch:** `phase20/10-version-and-closeout`
 
-**Completed:** Item 20.8, PR #188 at
-`c914106ddfeb2495072bda1f1e07bb34f2d9d66d`.
+**Completed:** Item 20.9, PR #189 at
+`eff1bfa962d438863814f1449330fe12fa660a9d`.
 
-**Current item:** 20.9 support-lifecycle documentation. Version stays
-`0.1.0`. This item is not a version bump.
+**Current item:** 20.10 retain `0.1.0` and close Phase 20. Sealed
+manifests bind `veriformis_version`. Goldens stay byte-identical.
+Do not invent a Phase 21.
 
-**Next gate:** Run the 20.9 local gates, publish the pull request, require
+**Next gate:** Run the 20.10 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

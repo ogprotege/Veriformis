@@ -1,6 +1,6 @@
 # Phase 20: Cut the Stable Independent 1.0 Product
 
-**Status:** In progress
+**Status:** Complete
 
 **Started:** 2026-08-31
 
@@ -39,6 +39,6 @@ This packet does not invent a Phase 21.
 
 ## Current state
 
-Phase 20 is in progress. Item 20.9 publishes support-lifecycle
-documentation. Version remains `0.1.0` development alpha. This item is
-not a version bump.
+Phase 20 is complete. Item 20.10 retained `0.1.0` development alpha.
+The frozen matrix is CLI-first. Do not invent a Phase 21 from this
+packet.

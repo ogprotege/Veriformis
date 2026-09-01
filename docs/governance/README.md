@@ -4,7 +4,7 @@
 
 **Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.10 version/maturity closeout, or governance-schema change.
+**Next review:** Any governance-schema change. Version remains `0.1.0` development alpha.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

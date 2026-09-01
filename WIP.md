@@ -2,15 +2,16 @@
 
 **Status:** Active, non-authoritative working inventory
 
-**Implementation baseline reviewed:** `084e504` on `main` after PR #180
+**Implementation baseline reviewed:** `eff1bfa` on `main` after PR #189
 (Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–19 complete; Phase 20 in progress)
+Phases 0–2; independent-product Phases 0–20 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-09-01 (Phase 20.9 support lifecycle)
+**Last reviewed:** 2026-09-01 (Phase 20.10 closeout retained 0.1.0)
 
-**Next review:** Phase 20.9 merge. Version stays `0.1.0` until 20.10.
+**Next review:** Any capability claim change. Version remains `0.1.0`.
+Do not invent a Phase 21.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -60,7 +61,7 @@ local, offline, and free of LLM generation.
 - [x] Private beta workbench plan Phases **0–2** on `main`
       ([historical plan](docs/plans/2026-08-06-private-beta-workbench.md): dogfood,
       KISS shell, and debugger power).
-- [ ] Independent product roadmap Phases 0–20; machine state and next gates:
+- [x] Independent product roadmap Phases 0–20; machine state and next gates:
       [program.json](dev/active/independent-product/program.json).
 - [x] Independent product Phase 4 is complete. Its closeout merged as PR #52
       at `a76e0fe3185b0e317cd453b9c28a1d2054e617dd`.
@@ -152,14 +153,11 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-19-automation-and-publication/README.md).
       ADR-0020 Decision A. Hub execute skipped. Do not start Phase 20
       from that packet.
-- [ ] Independent product Phase 20 is in progress under its
+- [x] Independent product Phase 20 is complete under its
       [packet](dev/active/independent-product/phase-20-stable-1.0/README.md).
-      Version stays `0.1.0` alpha until 20.10. Honest 1.0 is CLI-first.
-      Item 20.2 freezes the support matrix. Item 20.3 publishes the
-      migration guide. Item 20.4 records the security review. Item 20.5
-      retains clean-machine CLI evidence without Aptus. Item 20.6 skips
-      signed Mac with a record. Public signed Mac is not in the 1.0
-      matrix.
+      Frozen CLI-first matrix. Version remains `0.1.0` development alpha.
+      Public signed Mac, Hub execute, generator, and plugin loader stay
+      excluded. Do not invent a Phase 21 from that packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).
@@ -192,7 +190,7 @@ is checked against it by `scripts/check_project_tracking.py` and pytest.
 | 17 | Add governed advanced dataset families | Completed | [Completed packet](dev/active/independent-product/phase-17-advanced-dataset-families/README.md) |
 | 18 | Complete the goal-first Mac workbench | Completed | [Completed packet](dev/active/independent-product/phase-18-goal-first-workbench/README.md) |
 | 19 | Complete automation and optional publication boundaries | Completed | [Completed packet](dev/active/independent-product/phase-19-automation-and-publication/README.md) |
-| 20 | Cut the stable independent 1.0 product | In progress | [Active packet](dev/active/independent-product/phase-20-stable-1.0/README.md) |
+| 20 | Cut the stable independent 1.0 product | Completed | [Completed packet](dev/active/independent-product/phase-20-stable-1.0/README.md) |
 <!-- INDEPENDENT-PROGRAM:END -->
 
 ### Completed Phase 0 status

@@ -8,7 +8,7 @@
 
 **Status:** Frozen CLI-first capability pin in independent-product Phase 20.2.
 Loading the pin is not a version bump. Product version remains `0.1.0`
-development alpha until item 20.10.
+development alpha. Item 20.10 retained that version.
 
 **Last reviewed:** 2026-08-31
 
@@ -27,8 +27,8 @@ CLI `support-matrix`, and MCP `support_matrix` emit the same object.
 
 | Axis | Frozen claim |
 | --- | --- |
-| Product version | `0.1.0` until 20.10 |
-| Maturity | `development-alpha` until 20.10 |
+| Product version | `0.1.0` retained at 20.10 |
+| Maturity | `development-alpha` retained at 20.10 |
 | Claim | `cli-first-independent-core` |
 | Python | 3.11, 3.12, 3.13 |
 | CI hosts | Ubuntu 3.11–3.13 and macOS 3.12 |

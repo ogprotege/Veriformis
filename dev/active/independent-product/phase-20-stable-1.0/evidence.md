@@ -116,5 +116,14 @@ in `program.json`.
       deprecation, vulnerability response, and rollback. Operator docs
       stay honest to the frozen matrix. Version stays `0.1.0`.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.10.
+
+## Required item 20.10 evidence
+
+- [x] Evidence index reviewed. Version remains `0.1.0` development alpha
+      because sealed manifests bind `veriformis_version` and goldens stay
+      byte-identical. Adversarial closeout. Do not invent a Phase 21.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.10.
+- [ ] PR merges and clean local `main` equals `origin/main`.
