@@ -101,8 +101,29 @@ SIGPIPE fix). Dependencies 4, 7, 8, 9, 10, 15, and 18 were complete in
 - [x] `veriformis.publication-adapter/v1` pin. Loading is not upload.
 - [x] CLI/MCP have no hub-upload. Local Hugging Face Dataset is not Hub.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 19.8.
+
+## Required item 19.8 evidence
+
+- [x] Spec and lock refuse credential-shaped fields by name.
+- [x] Injected HF_TOKEN / AWS keys do not appear in workspaces, bundles,
+      specs, locks, CLI logs, or MCP payloads.
+- [x] Example CI workflow has no Hub secrets.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 19.8.
+- [ ] PR merges and clean local `main` equals `origin/main` before 19.9.
+
+## Item 19.8 local gate evidence
+
+| Gate | Result |
+| --- | --- |
+| `uv run pytest -q tests/automation/` | 62 passed |
+| `uv run python scripts/check_project_tracking.py` | PASS |
+| `uv run ruff check src tests` | PASS |
+| `uv lock --check` | PASS; 50 packages resolved |
+| Core pytest excluding optional integration and scale markers | 2,633 passed, 17 deselected, one expected durability warning |
+| `git diff --check` | PASS |
 
 ## Item 19.7 local gate evidence
 

@@ -5,16 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase19/07-publication-boundary`
+**Local branch:** `phase19/08-credential-isolation`
 
-**Completed:** Item 19.6, PR #176 at
-`3987d6d3fc9706f21e4182ee65388d0027d11aea`.
+**Completed:** Item 19.7, PR #177 at
+`f9ec2e4a4857d9286b48a91de31e2650ac9cc3ab`.
 
-**Current item:** 19.7 ADR-0020 Decision A. Pin publication-adapter/v1.
-Loading is not upload. No Hub execute.
+**Current item:** 19.8 credential isolation. Specs and locks refuse
+credential-shaped fields. Injected env secrets must not persist.
 
-**Next gate:** Publish the 19.7 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 19.8.
+**Next gate:** Publish the 19.8 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 19.9.
 
 **Decision:** ADR-0020 Decision A (pin only; no Hub execute). Operator
 approved the Phase 19 plan as written on 2026-08-31.

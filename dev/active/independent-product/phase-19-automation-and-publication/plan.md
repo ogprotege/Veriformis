@@ -118,14 +118,15 @@ resume path is permitted in this item.
 
 - [x] ADR-0020 Decision A: no Hub execute. Pin authenticated-action
       contract. Loading is not upload.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.8 Prove credentials never persist in compiler artifacts
 
 **Branch:** `phase19/08-credential-isolation`
 
-- [ ] Env/spec injection cannot appear in artifacts. Required even if Hub
+- [x] Env/spec injection cannot appear in artifacts. Required even if Hub
       is skipped.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.9 Add network retry and idempotency — or skip with a record
 

@@ -329,6 +329,9 @@ def create_project_lock(
 def load_project_lock(payload: object) -> ProjectLock:
     if not isinstance(payload, dict):
         raise ProjectSpecError("project lock must be an object")
+    from veriformis.automation.spec import refuse_credential_fields
+
+    refuse_credential_fields(payload, label="project lock")
     try:
         return ProjectLock.model_validate(payload)
     except ProjectSpecError:

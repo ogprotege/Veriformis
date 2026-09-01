@@ -83,14 +83,14 @@ mixed are the compiler paths. Mapping is confirm-then-map. Export and
 review wrap existing packets. Swift owns no dataset policy. Family-to-trainer,
 generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
 and full localization are skipped with records. Phase 19 automation and
-optional publication is in progress under its own packet. Item 19.7
-pins ADR-0020 Decision A: no Hub execute. Loading a publication adapter
-is not upload. Hugging Face Dataset remains a local container. Default
+optional publication is in progress under its own packet. Item 19.8
+proves credentials never persist in compiler artifacts. Specs and locks
+refuse credential-shaped fields. There is no Hub execute. Default
 `review_policy` stays `none`. No heuristic blocks seal.
 
-**Review date:** 2026-08-31 (independent-product Phase 19.7 publication boundary)
+**Review date:** 2026-08-31 (independent-product Phase 19.8 credential isolation)
 
-**Next review:** Phase 19.7 merge, item 19.8 credential isolation, or any
+**Next review:** Phase 19.8 merge, item 19.9 skip record, or any
 capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
@@ -798,7 +798,7 @@ See [docs/release.md](release.md).
 | Completed independent Phase 16 | Internal protocol; text parser and split-jsonl-directory migrated with identical goldens; isolation proven; ADR-0017 Decision A: no untrusted loader; public plugins skipped with a record |
 | Completed independent Phase 17 | Admission contract; classification, preference, tool-call, and stepwise from user-provided evidence; ADR-0018 Decision A: no generator; generation, multimodal, pre-tokenized, and unmapped profiles skipped with records |
 | Completed independent Phase 18 | Goal-first Mac workbench as a thin CLI adapter; confirm-then-map; export and review wrap existing packets; Swift owns no dataset policy; ADR-0019 Decision A; family-to-trainer, generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full localization skipped with records |
-| In-progress independent Phase 19.7 | ADR-0020 Decision A publication pin; loading is not upload; no Hub execute |
+| In-progress independent Phase 19.8 | Credential isolation; specs/locks refuse token fields; no Hub execute |
 | Authoritative active/future work | [Independent Product Roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md), with Phases 0–18 complete and Phase 19 in progress under its own packet |
 | Owner-gated Group 9 remainder | Signed/notarized Mac install evidence; public-ready Mac app claim |
 | Open product decision | Deliberate beta **label** cut (not automatic from green CI) |
@@ -858,12 +858,11 @@ private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 Independent-product Phases 0–18 are complete. The current critical-path work
 is Phase 19 under the
 [automation-and-publication packet](../dev/active/independent-product/phase-19-automation-and-publication/README.md).
-Item 19.7 pins ADR-0020 Decision A. Loading a publication pin is not
-upload. There is no Hub execute or quality-report command. There is no
-`GeneratorPass`. Do not start Phase 20 from this packet.
+Item 19.8 proves credentials never persist. There is no Hub execute or
+quality-report command. There is no `GeneratorPass`. Do not start Phase
+20 from this packet.
 
-The next behavior change is item 19.8 credential isolation. Hub execute
-remains outside this item.
+The next behavior change is item 19.9 skip record for publication retry.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

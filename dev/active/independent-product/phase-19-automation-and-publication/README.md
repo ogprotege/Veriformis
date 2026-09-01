@@ -39,6 +39,6 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.7 pins ADR-0020 Decision A: no Hub execute. Loading a publication
-adapter is not upload. Hugging Face Dataset remains a local container.
-Default `review_policy` stays `none`. Quality gates remain preview-only.
+Item 19.8 proves credentials never persist in compiler artifacts. Specs
+and locks refuse credential-shaped fields. Default `review_policy` stays
+`none`. Quality gates remain preview-only. There is no Hub execute.
