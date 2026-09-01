@@ -12,6 +12,7 @@ procedure and owner-only Mac signing/notarization steps live in
 | `aptus_integration.sh` | Optional, explicit Aptus descriptor construction and adapter self-conformance check |
 | `record_clean_path_evidence.sh` | Retained standalone logs/digests for wheel + golden via installed CLI |
 | `macos_package_local.sh` | Local unsigned macOS workbench archive dry-run |
+| `inspect_python_artifacts.sh` | Build sdist/wheel, inspect metadata, retain listings without binaries |
 
 ```bash
 # Prefer before every push:

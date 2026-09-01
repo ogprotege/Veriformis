@@ -1,0 +1,2 @@
+status=PASS
+notes=sdist and wheel inspected; binaries not retained; version 0.1.0

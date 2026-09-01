@@ -25,3 +25,4 @@
 | Record security review without a required network scanner | Accepted | Item 20.4 |
 | Retain isolated-wheel golden CLI evidence without Aptus | Accepted | Item 20.5 |
 | Skip signed/notarized Mac with a record | Accepted | Item 20.6 |
+| Inspect sdist/wheel listings without retaining binaries | Accepted | Item 20.7 |

@@ -1,0 +1,4 @@
+wheel_basename=veriformis-0.1.0-py3-none-any.whl
+wheel_sha256=0ef6d6264a4ba81d6618e407d248f162272d5897f7275d220219266be9830dc1
+sdist_basename=veriformis-0.1.0.tar.gz
+sdist_sha256=b90247a17541846e3bfaedcfc85814c2e189d4f14956f4bf4a7cd738f0ef2098

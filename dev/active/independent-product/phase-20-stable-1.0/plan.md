@@ -124,7 +124,7 @@ item.
 
 **Branch:** `phase20/07-python-artifacts`
 
-- [ ] Build and inspect sdist and wheel. Install in supported environments.
+- [x] Build and inspect sdist and wheel. Install in supported environments.
       Golden compile uses only declared dependencies. Existing
       `install-smoke` remains a required CI job.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.

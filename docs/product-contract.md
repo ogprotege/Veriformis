@@ -51,7 +51,7 @@ There is no published corpus tier.
 
 **Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.7 Python artifact inspect, or any product-contract change. No modest fig-leaf tier. No public plugin API. Version remains
+**Next review:** Phase 20.8 profile freeze, or any product-contract change. No modest fig-leaf tier. No public plugin API. Version remains
 `0.1.0` development alpha until 20.10. The frozen support matrix is
 CLI-first; public signed Mac and Hub execute stay excluded.
 
