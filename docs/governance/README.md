@@ -4,7 +4,7 @@
 
 **Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.4 security review, or governance-schema change.
+**Next review:** Phase 20.5 clean-machine CLI evidence, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

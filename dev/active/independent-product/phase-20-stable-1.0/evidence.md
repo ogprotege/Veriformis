@@ -61,5 +61,16 @@ in `program.json`.
       fail closed.
 - [x] Pre-taxonomy workspace and `minimal-v1` bundle still load.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.4.
+
+## Required item 20.4 evidence
+
+- [x] License inventory: first-party MIT; extras empty; lockfile present.
+- [x] Secret scan of src/scripts/examples; no Hub secrets in CI.
+- [x] Parser threat model recorded; unknown suffix fails closed; OOXML
+      disables entities and network.
+- [x] Compile path has no network client. Publication execute stays false.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.4.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.5.

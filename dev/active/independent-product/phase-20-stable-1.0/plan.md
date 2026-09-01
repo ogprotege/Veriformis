@@ -97,7 +97,7 @@ item.
 
 **Branch:** `phase20/04-security-review`
 
-- [ ] Inventory declared licenses. Scan for secrets. Record the parser threat
+- [x] Inventory declared licenses. Scan for secrets. Record the parser threat
       model. Prove artifact reproducibility and provenance for the Python
       path. Do not add a required cloud scanner or new runtime dependency.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.

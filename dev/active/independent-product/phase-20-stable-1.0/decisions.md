@@ -22,3 +22,4 @@
 | Do not invent a Phase 21 from this packet | Accepted | L15; Phase 20 is the last roadmap phase |
 | Freeze CLI-first 1.0 support matrix; loading is not a version bump | Accepted | Item 20.2 |
 | Publish operator migration guide; no silent schema jumps | Accepted | Item 20.3 |
+| Record security review without a required network scanner | Accepted | Item 20.4 |
