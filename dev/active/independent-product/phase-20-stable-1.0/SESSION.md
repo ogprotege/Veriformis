@@ -3,17 +3,17 @@
 Overwrite this file as the current item changes. `progress.md` remains
 append-only history.
 
-**Updated:** 2026-08-31
+**Updated:** 2026-09-01
 
-**Local branch:** `phase20/03-migration-completeness`
+**Local branch:** `phase20/04-security-review`
 
-**Completed:** Item 20.2, PR #182 at
-`aa91d49331ab5fec264593287baf89d3fbb116e1`.
+**Completed:** Item 20.3, PR #183 at
+`0d9919af31d1dfdd7e13baafacf4420cac9b9f55`.
 
-**Current item:** 20.3 migration completeness and operator guide. Version
-stays `0.1.0`. Unknown versions fail closed.
+**Current item:** 20.4 license, parser-threat, secret, and provenance
+review. Version stays `0.1.0`. No pip-audit CI job. No signed Mac.
 
-**Next gate:** Run the 20.3 local gates, publish the pull request, require
+**Next gate:** Run the 20.4 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

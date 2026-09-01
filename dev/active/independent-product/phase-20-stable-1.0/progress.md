@@ -80,3 +80,27 @@ durability warning.
 
 **Next action:** Publish the item 20.3 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.4.
+
+## 2026-09-01: Item 20.3 merged; item 20.4 in progress
+
+**Status:** Item 20.3 merged as PR #183 at
+`0d9919af31d1dfdd7e13baafacf4420cac9b9f55`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.4 records `docs/security.md`. First-party license stays MIT.
+Unknown suffixes fail closed. OOXML XML disables entities and network.
+Compile path has no network client. No required pip-audit CI job.
+
+**Next action:** Run the complete item 20.4 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.5.
+
+## 2026-09-01: Item 20.4 local gates green
+
+**Status:** The security review is recorded. Focused tests passed. Project
+tracking, Ruff, the lock check, and `git diff --check` passed. The core
+suite passed 2,658 tests with 17 deselected and the one expected
+durability warning.
+
+**Next action:** Publish the item 20.4 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.5.
