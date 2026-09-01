@@ -5,15 +5,15 @@ append-only history.
 
 **Updated:** 2026-09-01
 
-**Local branch:** `phase20/04-security-review`
+**Local branch:** `phase20/05-clean-machine-cli`
 
-**Completed:** Item 20.3, PR #183 at
-`0d9919af31d1dfdd7e13baafacf4420cac9b9f55`.
+**Completed:** Item 20.4, PR #184 at
+`484b6ff69682a64e4deb5b14d5bfd380236061c3`.
 
-**Current item:** 20.4 license, parser-threat, secret, and provenance
-review. Version stays `0.1.0`. No pip-audit CI job. No signed Mac.
+**Current item:** 20.5 clean-machine CLI evidence. Isolated wheel install
+then golden compile. No Aptus. Version stays `0.1.0`.
 
-**Next gate:** Run the 20.4 local gates, publish the pull request, require
+**Next gate:** Run the 20.5 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

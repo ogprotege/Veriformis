@@ -1,0 +1,111 @@
+==> golden_compile: full_text (parse → seal)
+parsed 3 source(s) into revision rev-v1-d8a982bc57f9469258b9448cd5089944852770166b7498c254669743c98f092f
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 3:4 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 20:21 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 23:24 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 29:33 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 39:40 touches a generated structural separator
+cleaned 3 document(s); 1 transform record(s); revision rev-v1-e4a3e6d55111d1b93ae2b130799f7eb71f18b6d89650c6aab2d5fab322d02a9f
+wrote 3 chunk(s); revision rev-v1-c4002a19929085c8fa7ea424313a1947241d9ac2300b08092fed5ce21e1975f7
+constructed 3 candidate(s), 3 accepted record(s), and 0 diagnostic(s); revision rev-v1-91b39fc9b25d0c133baadeb22d1e45bd36eb57f48c5c149e2f37d935773c2e57
+curated 3 included, 0 excluded, and 0 quarantined record(s); plan fdp-v1-fe0f430e9e371bffa94980d8a387216b28dc8c6af4279a75eabd93663458e982; revision rev-v1-defc159ebbc5c5c46db8635cd8a3520f5146ec49c24c743f47394c7447fd5060
+split 1 train and 2 evaluation record(s) across 3 leakage group(s); revision rev-v1-068edab7b55e4838b3d94a434c63491ecdf5d505318823d4a99ff4cc51743175
+wrote 1 train and 2 evaluation row(s) as text; revision rev-v1-c29d0e3d682d17b543acde5b349cc305a7a31d7c48770dfe0715261d21678e37
+construction-replay: PASSED
+record-lifecycle: PASSED
+curation: PASSED
+deduplication: PASSED
+quality: PASSED
+balance: PASSED
+coverage: PASSED
+split: PASSED
+leakage: PASSED
+row-binding: PASSED
+objective: PASSED
+schema: PASSED
+encoding: PASSED
+masking: PASSED
+partition-nonempty: PASSED
+aptus-row-shape: PASSED
+snapshot: PASSED
+snapshot dss-v1-2a404381be393491b24d92cc440b3ed60ac7f5aa4395df91528a2fa9f5ccf136
+validation revision rev-v1-4bcfa4db68bf8b2d2b6ddd4a54da0e266578913ef0e72861a55398e750273227
+sealed bundle: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.YkXSto/full_text.vfbundle
+manifest SHA-256: 2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733
+verification grade: self_consistent
+seal revision rev-v1-29acf1fe30f50cb1eed061f03e854f0e4d20f6b3d779b677ccdb2500eb08ae2c
+==> golden_compile: full_text external_digest verify
+verification grade: external_digest
+bundle: bundle-v1-49a6b50ed50218b8a22ce834dc69a64eb8d47f0605267bc029b3f938a6b13b4a
+snapshot: dss-v1-2a404381be393491b24d92cc440b3ed60ac7f5aa4395df91528a2fa9f5ccf136
+validation report: dvr-v1-a50965035c861807237ac7cad778dbbe4a360fe7acd57bca50e3a1ef5c094820
+manifest SHA-256: 2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733
+dataset rows: 3
+==> golden_compile: full_text deterministic transport
+transport archive: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.YkXSto/full_text.vfbundle.zip
+archive SHA-256: d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980
+manifest SHA-256: 2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733
+verification grade: external_digest
+archive members: 6
+transport archive status: accepted
+archive SHA-256: d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980
+manifest SHA-256: 2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733
+verification grade: external_digest
+archive members: 6
+golden_compile: full_text PASS (manifest=2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733 archive=d17217ace8e8929ce4d41f88b3a2bca54b6976ed95b9c7dc42122e97bdfb9980)
+==> golden_compile: continuation (parse → seal)
+parsed 3 source(s) into revision rev-v1-e8779c5747f59745b6eea15e0fc90e6a7827df5ce68ca6787b996cb4255e452b
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 3:4 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 20:21 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 23:24 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 29:33 touches a generated structural separator
+warning[src-v1-3107d80503f34a652d358478951693a150e3041e6360c9a7008c3ac825b0fcbd]: rule 'whitespace' skipped edit in block 0: edit 39:40 touches a generated structural separator
+cleaned 3 document(s); 1 transform record(s); revision rev-v1-01dbba7b60cfff5dd7c7daa28c3fcea174b276297cf2caf0a0807f01e868871a
+wrote 3 chunk(s); revision rev-v1-2f609f0c1d84ac3b07f155d01926c7e42a6c0cf90c3d336942b18499d31c381b
+constructed 3 candidate(s), 3 accepted record(s), and 0 diagnostic(s); revision rev-v1-bb6d0d341de8f574bd5dafe9e731c3fb055f053a4821ba90f24c3702f8ceda1d
+curated 3 included, 0 excluded, and 0 quarantined record(s); plan fdp-v1-1e666315bfd4a949d5b4e2c260099e2881f68799a3f6955733fb20e30348ae32; revision rev-v1-d494c16284399f5299e1b6d23c0dcada1d8a321ed90e41518f03d6812d738ee8
+split 1 train and 2 evaluation record(s) across 3 leakage group(s); revision rev-v1-4f748197a8e626017cbd54980a178e3203904091aa73345a2e7dbdb1b4436842
+wrote 1 train and 2 evaluation row(s) as prompt_completion; revision rev-v1-ae2132c3cc3cea145df00e0f301c29062230eecd421a2f9c01a0041df829cf8f
+construction-replay: PASSED
+record-lifecycle: PASSED
+curation: PASSED
+deduplication: PASSED
+quality: PASSED
+balance: PASSED
+coverage: PASSED
+split: PASSED
+leakage: PASSED
+row-binding: PASSED
+objective: PASSED
+schema: PASSED
+encoding: PASSED
+masking: PASSED
+partition-nonempty: PASSED
+aptus-row-shape: PASSED
+snapshot: PASSED
+snapshot dss-v1-845bf050969885ccd632d29c860a57838e40b21fc1ec451e86e513d4e0888ef2
+validation revision rev-v1-e8dfe6b69e4bc67f8c98bca839a55eedb327d669dc1cd9d51a118cd408cbb46c
+sealed bundle: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.YkXSto/continuation.vfbundle
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+verification grade: self_consistent
+seal revision rev-v1-003caa8b7f340886472667ebbf933a823c7947c463ddd0e6941f13d1d5eea0e7
+==> golden_compile: continuation external_digest verify
+verification grade: external_digest
+bundle: bundle-v1-0192a85a0cd4a0422cbde832eb8ab3adbe8617bc28267bafe56a7bb5052289d9
+snapshot: dss-v1-845bf050969885ccd632d29c860a57838e40b21fc1ec451e86e513d4e0888ef2
+validation report: dvr-v1-a7b1ae06fba39324a317cf3a139b4079b39ffcb8b71c74326b545c85ef99e078
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+dataset rows: 3
+==> golden_compile: continuation deterministic transport
+transport archive: /var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-golden-compile.YkXSto/continuation.vfbundle.zip
+archive SHA-256: d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+verification grade: external_digest
+archive members: 6
+transport archive status: accepted
+archive SHA-256: d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+verification grade: external_digest
+archive members: 6
+golden_compile: continuation PASS (manifest=58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b archive=d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b)
+golden_compile: PASS (standalone compile + external_digest + transport)

@@ -1,0 +1,18 @@
+objective=continuation
+manifest_sha256=58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+bundle=/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T//veriformis-golden-compile.YkXSto/continuation.vfbundle
+canonical_bundle=present
+automatic_handoff=absent
+transport_archive=/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T//veriformis-golden-compile.YkXSto/continuation.vfbundle.zip
+transport_archive_sha256=d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b
+verification grade: external_digest
+bundle: bundle-v1-0192a85a0cd4a0422cbde832eb8ab3adbe8617bc28267bafe56a7bb5052289d9
+snapshot: dss-v1-845bf050969885ccd632d29c860a57838e40b21fc1ec451e86e513d4e0888ef2
+validation report: dvr-v1-a7b1ae06fba39324a317cf3a139b4079b39ffcb8b71c74326b545c85ef99e078
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+dataset rows: 3
+transport archive status: accepted
+archive SHA-256: d898ccb3ade4a5fc2c129c4271e191a7e500b190a728fd8ee18095451b13ec3b
+manifest SHA-256: 58df8db589199821d1d51fefbe7d2a777a0e72ea8bb642dada4dfa350f89ef6b
+verification grade: external_digest
+archive members: 6

@@ -104,3 +104,27 @@ durability warning.
 
 **Next action:** Publish the item 20.4 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.5.
+
+## 2026-09-01: Item 20.4 merged; item 20.5 in progress
+
+**Status:** Item 20.4 merged as PR #184 at
+`484b6ff69682a64e4deb5b14d5bfd380236061c3`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.5 retains isolated-wheel golden compile evidence under
+`evidence/clean-machine-cli/`. Version `0.1.0`. No Aptus distribution.
+`full_text` and `continuation` verify at `external_digest`.
+
+**Next action:** Run the complete item 20.5 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.6.
+
+## 2026-09-01: Item 20.5 local gates green
+
+**Status:** Isolated-wheel golden compile evidence is retained. Focused
+tests passed. Project tracking, Ruff, the lock check, and `git diff --check`
+passed. The core suite passed 2,659 tests with 17 deselected and the one
+expected durability warning.
+
+**Next action:** Publish the item 20.5 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.6.

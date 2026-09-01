@@ -90,12 +90,13 @@ No heuristic blocks seal. Do not start Phase 20 from that packet.
 Phase 20 is in progress under its own packet. Version remains `0.1.0`
 development alpha. Item 20.2 freezes the CLI-first 1.0 support matrix.
 Item 20.3 publishes the operator migration guide. Item 20.4 records the
-license, parser-threat, secret, and provenance review. There is no version
+license, parser-threat, secret, and provenance review. Item 20.5 retains
+clean-machine CLI evidence without Aptus. There is no version
 bump or public signed-Mac claim. Hub execute stays excluded.
 
 **Review date:** 2026-09-01 (independent-product Phase 20.4 security review)
 
-**Next review:** Phase 20.5 clean-machine CLI evidence, or any capability claim change.
+**Next review:** Phase 20.6 signed-Mac skip, or any capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.

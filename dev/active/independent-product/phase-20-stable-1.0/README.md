@@ -39,5 +39,6 @@ This packet does not invent a Phase 21.
 
 ## Current state
 
-Phase 20 is in progress. Item 20.4 records the license, parser-threat,
-secret, and provenance review. Version remains `0.1.0` development alpha.
+Phase 20 is in progress. Item 20.5 retains clean-machine CLI evidence.
+Version remains `0.1.0` development alpha. The primary golden path contains
+no Aptus.
