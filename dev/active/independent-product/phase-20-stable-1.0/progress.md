@@ -197,3 +197,26 @@ deselected and the one expected durability warning.
 
 **Next action:** Publish the item 20.8 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 20.9.
+
+## 2026-09-01: Item 20.8 merged; item 20.9 in progress
+
+**Status:** Item 20.8 merged as PR #188 at
+`c914106ddfeb2495072bda1f1e07bb34f2d9d66d`. Clean local `main` equals
+`origin/main` there.
+
+Item 20.9 publishes support-lifecycle and troubleshooting documentation.
+Version stays `0.1.0`. This item is not a version bump.
+
+**Next action:** Run the complete item 20.9 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.10.
+
+## 2026-09-01: Item 20.9 local gates green
+
+**Status:** Support-lifecycle and troubleshooting documentation are
+published. Focused tests passed. Project tracking, Ruff, the lock check,
+and `git diff --check` passed. The core suite passed 2,663 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 20.9 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.10.

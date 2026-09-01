@@ -335,6 +335,8 @@ Debug workbench**.
 | `veriformis: command not found` | Use `uv run veriformis` or put `.venv/bin` on PATH / `uv tool install` |
 | `source root is not a directory` | Pass a directory to `--source-root`, not a file (fixed in recent workbench) |
 | Optional Aptus handoff rejected for `full_text` | Expected under the adapter policy: plain `text` schema; use a supported supervised objective only when that integration is your target |
+| Unknown suffix or image-only PDF | Fail closed. See [troubleshooting.md](troubleshooting.md). `ocr-image` stays unsupported. |
+| Trainer extra or Hub upload | Optional extras stay empty. There is no Hub execute. The exporter does not train. |
 
 ---
 
@@ -345,3 +347,5 @@ Debug workbench**.
 - [Beta limitations](beta-limitations.md)
 - [Private beta workbench plan](plans/2026-08-06-private-beta-workbench.md)
 - [Release guide](release.md) (public Mac packaging)
+- [Support lifecycle](support-lifecycle.md)
+- [Troubleshooting](troubleshooting.md)

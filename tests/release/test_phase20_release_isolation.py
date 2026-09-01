@@ -63,11 +63,13 @@ def test_version_and_maturity_remain_alpha() -> None:
     assert "Not a public beta. Not production." in readme
 
 
-def test_support_matrix_pin_exists_without_version_bump_or_lifecycle_docs() -> None:
+def test_support_matrix_pin_exists_without_version_bump() -> None:
     assert (ROOT / "docs/contracts/support-matrix-v1.md").is_file()
     assert (ROOT / "src/veriformis/release/support-matrix-v1.json").is_file()
     assert (ROOT / "src/veriformis/release/matrix.py").is_file()
-    assert not (ROOT / "docs/support-lifecycle.md").is_file()
+    assert (ROOT / "docs/support-lifecycle.md").is_file()
+    lifecycle = (ROOT / "docs/support-lifecycle.md").read_text(encoding="utf-8")
+    assert "This page is not a version bump" in lifecycle
     assert (ROOT / "docs/migration.md").is_file()
     migration = (ROOT / "docs/migration.md").read_text(encoding="utf-8")
     assert "upgrade-workspace" in migration

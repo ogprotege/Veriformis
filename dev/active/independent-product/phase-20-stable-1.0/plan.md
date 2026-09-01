@@ -143,7 +143,7 @@ item.
 
 **Branch:** `phase20/09-support-lifecycle`
 
-- [ ] Semantic versioning, compatibility windows, upstream profile review
+- [x] Semantic versioning, compatibility windows, upstream profile review
       cadence, deprecation notice, vulnerability response, and release
       rollback. User, mapping, goal, export, profile, troubleshooting,
       security, privacy, and migration docs stay honest to the frozen

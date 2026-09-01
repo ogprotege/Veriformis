@@ -202,3 +202,5 @@ that recognizes one of these file extensions.
 - [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md)
 - [Deterministic Archive Transport v1](contracts/bundle-transport-v1.md)
 - [Dataset Taxonomy Contract v1](contracts/taxonomy-v1.md)
+- [Support lifecycle](support-lifecycle.md)
+- [Consumer profile freeze](consumer-profiles.md)

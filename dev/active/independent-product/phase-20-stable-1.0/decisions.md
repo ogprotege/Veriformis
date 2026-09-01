@@ -27,3 +27,4 @@
 | Skip signed/notarized Mac with a record | Accepted | Item 20.6 |
 | Inspect sdist/wheel listings without retaining binaries | Accepted | Item 20.7 |
 | Freeze optional profiles; extras empty; exporter does not train | Accepted | Item 20.8 |
+| Publish support-lifecycle docs without a version bump | Accepted | Item 20.9 |

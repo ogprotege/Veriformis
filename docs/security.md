@@ -89,3 +89,6 @@ the default path.
 - Hub execute or hosted training
 - A required pip-audit / OSV CI job
 - A published corpus SLA
+
+See [support-lifecycle.md](support-lifecycle.md) for vulnerability response
+and release rollback. Privacy stays local and offline.

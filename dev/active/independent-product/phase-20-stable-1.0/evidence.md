@@ -107,5 +107,14 @@ in `program.json`.
 - [x] Optional profiles frozen. Extras empty. Unsloth not executable.
       Isolated CI jobs continue-on-error. Exporter does not train.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.9.
+
+## Required item 20.9 evidence
+
+- [x] Support-lifecycle docs name semver, compatibility, profile cadence,
+      deprecation, vulnerability response, and rollback. Operator docs
+      stay honest to the frozen matrix. Version stays `0.1.0`.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.9.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.10.

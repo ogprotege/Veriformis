@@ -5,15 +5,15 @@ append-only history.
 
 **Updated:** 2026-09-01
 
-**Local branch:** `phase20/08-profile-freeze`
+**Local branch:** `phase20/09-support-lifecycle`
 
-**Completed:** Item 20.7, PR #187 at
-`1d4ee9398763bb61f4d8cd5f45d360c5fbf3daab`.
+**Completed:** Item 20.8, PR #188 at
+`c914106ddfeb2495072bda1f1e07bb34f2d9d66d`.
 
-**Current item:** 20.8 freeze optional profiles. Extras stay empty.
-Unsloth is not executable. Version stays `0.1.0`.
+**Current item:** 20.9 support-lifecycle documentation. Version stays
+`0.1.0`. This item is not a version bump.
 
-**Next gate:** Run the 20.8 local gates, publish the pull request, require
+**Next gate:** Run the 20.9 local gates, publish the pull request, require
 every GitHub check, merge, and synchronize clean `main`.
 
 **Decision:** Honest 1.0 is CLI-first. Public signed Mac is not in the

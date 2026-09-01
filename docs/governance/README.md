@@ -4,7 +4,7 @@
 
 **Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.9 support-lifecycle docs, or governance-schema change.
+**Next review:** Phase 20.10 version/maturity closeout, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.

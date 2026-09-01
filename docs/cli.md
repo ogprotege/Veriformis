@@ -780,7 +780,8 @@ goal is not, and binds to exactly one existing objective and named recipe.
 Each representation binds to exactly one row schema and its loss policy. The
 catalog adds no objective or row schema; see the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md). The command accepts
-no workspace and writes no state.
+no workspace and writes no state. Goal discovery stays honest to the
+frozen CLI-first matrix; see [support-lifecycle.md](support-lifecycle.md).
 
 ### `presets`
 

@@ -65,4 +65,6 @@ not a verified export. Accepted rows may still seal.
   confirm, and mapping-preview on one row-source file. Unconfirmed plans
   cannot compile.
 
-See [Row Mapping Contract v1](contracts/row-mapping-v1.md).
+See [Row Mapping Contract v1](contracts/row-mapping-v1.md),
+[Support Matrix v1](contracts/support-matrix-v1.md), and
+[support-lifecycle.md](support-lifecycle.md).
