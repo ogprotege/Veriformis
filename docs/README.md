@@ -4,12 +4,13 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–19 complete; Phase 20 planned).
+Phases 0–19 complete; Phase 20 in progress).
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19 closeout)
+**Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20 packet open, or any contract change. Default parse
-still refuses image-only PDF.
+**Next review:** Phase 20.2 support-matrix freeze, or any contract change.
+Default parse still refuses image-only PDF. Version remains `0.1.0`
+development alpha.
 
 ## Start here
 

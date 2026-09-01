@@ -1,0 +1,32 @@
+# Phase 20 Progress
+
+Append-only. Corrections add a later entry.
+
+## 2026-08-31: Phase 20 opened; item 20.1 in progress
+
+**Status:** Packet created from clean `main` at
+`084e504a799b6c1c1cc130c8ee819b13de5d6bbe`, PR #180 after the Phase 19
+closeout. Phase 20 was `planned` with no packet. All declared dependencies
+(Phases 0–19) were complete.
+
+Item 20.1 records the current release boundary. Version is `0.1.0`. PyPI
+classifier is `Development Status :: 3 - Alpha`. Support-registry maturity
+is `development-alpha`. There is no 1.0 support-matrix pin, no version bump,
+no signed Mac claim, no Hub execute, and no support-lifecycle document.
+Phase 19 closeout still forbids starting Phase 20 from that packet; this
+packet is the Phase 20 start.
+
+**Next action:** Run the complete item 20.1 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 20.2.
+
+## 2026-08-31: Item 20.1 local gates green
+
+**Status:** The current release boundary is recorded without adding product
+behavior. The focused isolation suite passed 19 tests including Phase 18
+and Phase 19 closeout honesty. Project tracking, Ruff, the lock check, and
+`git diff --check` passed. The core suite passed 2,642 tests with 17
+deselected and the one expected durability warning.
+
+**Next action:** Publish the item 20.1 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 20.2.

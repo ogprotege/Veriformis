@@ -61,6 +61,8 @@ generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
 and full localization skipped with records. Phase 19 automation and
 optional publication is complete under its own packet. ADR-0020
 Decision A. Hub execute skipped. Do not start Phase 20 from that packet.
+Phase 20 is in progress under its own packet. Version remains `0.1.0`
+development alpha until 20.10.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.

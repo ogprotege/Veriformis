@@ -1,4 +1,4 @@
-"""Phase 19.10: adversarial automation closeout. Do not start Phase 20."""
+"""Phase 19.10: adversarial automation closeout. Do not start Phase 20 from that packet."""
 
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ def test_core_compile_names_no_network_client() -> None:
     assert imported.isdisjoint({"httpx", "huggingface_hub", "openai", "requests"})
 
 
-def test_closeout_and_phase_20_are_not_started() -> None:
+def test_closeout_does_not_start_phase_20_from_this_packet() -> None:
     closeout = (PACKET / "closeout.md").read_text(encoding="utf-8")
     assert "**Status:** Complete" in closeout
     assert "Do not start Phase 20 from this packet." in closeout
@@ -98,9 +98,8 @@ def test_closeout_and_phase_20_are_not_started() -> None:
     )
     phases = {item["number"]: item for item in program["phases"]}
     assert phases[19]["status"] == "completed"
-    assert phases[20]["status"] == "planned"
-    assert phases[20]["packet"] is None
-    assert not list((ROOT / "dev/active/independent-product").glob("phase-20-*"))
+    assert phases[20]["packet"] == "dev/active/independent-product/phase-20-stable-1.0"
+    assert phases[20]["status"] in {"in_progress", "completed"}
     assert (PACKET / "skipped-package-mcp.md").is_file()
     assert (PACKET / "skipped-publication-retry.md").is_file()
     assert (ROOT / "docs/adr/0020-publication-boundary.md").is_file()
