@@ -106,6 +106,10 @@ PUBLICATION_ADAPTER_CONTRACT_ID: Final = "veriformis.publication-adapter"
 PUBLICATION_ADAPTER_CONTRACT_VERSION: Final = 1
 PUBLICATION_ADAPTER_SCHEMA_ID: Final = "veriformis.publication-adapter/v1"
 
+SUPPORT_MATRIX_CONTRACT_ID: Final = "veriformis.support-matrix"
+SUPPORT_MATRIX_CONTRACT_VERSION: Final = 1
+SUPPORT_MATRIX_SCHEMA_ID: Final = "veriformis.support-matrix/v1"
+
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
 

@@ -37,6 +37,7 @@ from veriformis.taxonomy import (
     IMPLEMENTED_INPUT_FAMILIES,
     INPUT_FAMILY_SUFFIXES,
     IMPLEMENTED_CONSUMER_PROFILES,
+    IMPLEMENTED_EXPORT_CONSUMER_PROFILES,
     IMPLEMENTED_PHYSICAL_CONTAINERS,
     IMPLEMENTED_TRAINING_FAMILIES,
     LOSS_POLICY_IDS,
@@ -44,6 +45,7 @@ from veriformis.taxonomy import (
     PLANNED_PHYSICAL_CONTAINERS,
     PLANNED_TRAINING_FAMILIES,
 )
+from veriformis.release import REQUIRED_EXCLUSIONS, support_matrix
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -587,6 +589,84 @@ def _check_support(support: dict[str, Any], errors: list[str]) -> None:
     _require(
         not generic_export_gaps,
         "completed Phase 4 cannot retain the generic export service foundation gap",
+        errors,
+    )
+    _check_support_matrix(support, errors)
+
+
+def _check_support_matrix(support: dict[str, Any], errors: list[str]) -> None:
+    matrix = support_matrix()
+    product = support.get("product") if isinstance(support.get("product"), dict) else {}
+    training = support.get("training") if isinstance(support.get("training"), dict) else {}
+    inputs = support.get("inputs") if isinstance(support.get("inputs"), dict) else {}
+    artifacts = support.get("artifacts") if isinstance(support.get("artifacts"), dict) else {}
+    _require(
+        matrix.product_version == __version__ == product.get("version") == "0.1.0",
+        "support-matrix product_version differs from package or registry",
+        errors,
+    )
+    _require(
+        matrix.maturity == "development-alpha"
+        and product.get("maturity") == "development-alpha",
+        "support-matrix maturity is not development-alpha",
+        errors,
+    )
+    _require(
+        matrix.aptus_required is False and product.get("aptus_required") is False,
+        "support-matrix cannot require Aptus",
+        errors,
+    )
+    _require(
+        matrix.inputs.modes == tuple(IMPLEMENTED_INPUT_MODES)
+        and matrix.inputs.families == tuple(IMPLEMENTED_INPUT_FAMILIES)
+        and matrix.inputs.extensions == tuple(sorted(DECLARED_V1_EXTENSIONS))
+        and matrix.inputs.explicitly_unsupported
+        == tuple(EXPLICITLY_UNSUPPORTED_INPUT_FAMILIES),
+        "support-matrix inputs differ from executable input registries",
+        errors,
+    )
+    _require(
+        matrix.inputs.modes == tuple(inputs.get("implemented_modes") or ())
+        and matrix.inputs.families == tuple(inputs.get("implemented_families") or ()),
+        "support-matrix inputs differ from the support registry",
+        errors,
+    )
+    _require(
+        matrix.training.families == tuple(IMPLEMENTED_TRAINING_FAMILIES)
+        and matrix.training.planned_families == tuple(PLANNED_TRAINING_FAMILIES)
+        and matrix.training.explicitly_unsupported_families
+        == tuple(EXPLICITLY_UNSUPPORTED_TRAINING_FAMILIES)
+        and matrix.training.goals == tuple(training.get("implemented_goals") or ())
+        and matrix.training.objectives == tuple(training.get("implemented_objectives") or ())
+        and matrix.training.presets == tuple(training.get("implemented_presets") or ())
+        and matrix.training.row_schemas == tuple(training.get("implemented_row_schemas") or ())
+        and matrix.training.loss_policies == tuple(LOSS_POLICY_IDS),
+        "support-matrix training lists differ from the support registry",
+        errors,
+    )
+    _require(
+        matrix.containers == tuple(IMPLEMENTED_PHYSICAL_CONTAINERS)
+        and matrix.containers == tuple(artifacts.get("implemented_physical_containers") or ()),
+        "support-matrix containers differ from taxonomy or the support registry",
+        errors,
+    )
+    _require(
+        matrix.profiles.implemented == tuple(IMPLEMENTED_CONSUMER_PROFILES)
+        and matrix.profiles.optional_export_adapters
+        == tuple(IMPLEMENTED_EXPORT_CONSUMER_PROFILES)
+        and matrix.profiles.candidate_not_executable == tuple(CANDIDATE_CONSUMER_PROFILES)
+        and matrix.profiles.extras_required == (),
+        "support-matrix profiles differ from taxonomy",
+        errors,
+    )
+    _require(
+        tuple(item.exclusion_id for item in matrix.exclusions) == REQUIRED_EXCLUSIONS
+        and matrix.hub_execute is False
+        and matrix.generator is False
+        and matrix.plugin_loader is False
+        and matrix.platforms.public_signed_mac is False
+        and matrix.published_corpus_tiers == (),
+        "support-matrix exclusions drifted from the frozen 1.0 non-claims",
         errors,
     )
 

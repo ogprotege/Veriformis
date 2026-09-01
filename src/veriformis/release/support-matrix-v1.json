@@ -1,0 +1,244 @@
+{
+  "aptus_required": false,
+  "claim": "cli-first-independent-core",
+  "containers": [
+    "minimal-v1",
+    "deterministic-vfbundle-zip-v1",
+    "deterministic-export-pack-zip-v1",
+    "split-jsonl-directory",
+    "json",
+    "constrained-csv",
+    "parquet",
+    "arrow",
+    "hugging-face-dataset"
+  ],
+  "contract_id": "veriformis.support-matrix",
+  "contract_version": 1,
+  "core_surfaces": [
+    "local-mcp",
+    "python-pipeline-service",
+    "typer-cli"
+  ],
+  "exclusions": [
+    {
+      "exclusion_id": "default-parse-ocr-image",
+      "reason": "Default parse still refuses image-only PDF. ocr-image stays explicitly unsupported."
+    },
+    {
+      "exclusion_id": "generator",
+      "reason": "ADR-0018 Decision A: no compile-path generator."
+    },
+    {
+      "exclusion_id": "hosted-training",
+      "reason": "The exporter does not train. Hosted training stays out of scope."
+    },
+    {
+      "exclusion_id": "hub-execute",
+      "reason": "ADR-0020 Decision A: loading a publication pin is not upload."
+    },
+    {
+      "exclusion_id": "plugin-loader",
+      "reason": "ADR-0017 Decision A: no untrusted extension loader."
+    },
+    {
+      "exclusion_id": "public-signed-mac",
+      "reason": "Public signed, notarized, stapled Mac is not in the 1.0 matrix. The workbench is a local-dev thin CLI adapter."
+    },
+    {
+      "exclusion_id": "published-corpus-tiers",
+      "reason": "scale-support published_tiers stays empty. Observed reports are not an SLA."
+    },
+    {
+      "exclusion_id": "quality-report-command",
+      "reason": "Quality gates remain preview-only. There is no quality-report command."
+    },
+    {
+      "exclusion_id": "required-trainer-extras",
+      "reason": "Optional extras stay empty. A profile failure does not block the independent core."
+    },
+    {
+      "exclusion_id": "unsloth-execute",
+      "reason": "Unsloth remains a non-executable candidate."
+    }
+  ],
+  "generator": false,
+  "hosted_training": false,
+  "hub_execute": false,
+  "inputs": {
+    "explicitly_unsupported": [
+      "ocr-image"
+    ],
+    "extensions": [
+      ".c",
+      ".cpp",
+      ".csv",
+      ".docx",
+      ".go",
+      ".htm",
+      ".html",
+      ".java",
+      ".js",
+      ".json",
+      ".jsonl",
+      ".markdown",
+      ".md",
+      ".pdf",
+      ".py",
+      ".rb",
+      ".rs",
+      ".sh",
+      ".ts",
+      ".txt"
+    ],
+    "families": [
+      "plain-text",
+      "source-code",
+      "markdown",
+      "word-document",
+      "html",
+      "pdf-text",
+      "delimited-table",
+      "json-records"
+    ],
+    "modes": [
+      "document-source",
+      "dataset-row",
+      "mixed"
+    ]
+  },
+  "maturity": "development-alpha",
+  "platforms": {
+    "ci_hosts": [
+      {
+        "os": "macos",
+        "python": "3.12"
+      },
+      {
+        "os": "ubuntu",
+        "python": "3.11"
+      },
+      {
+        "os": "ubuntu",
+        "python": "3.12"
+      },
+      {
+        "os": "ubuntu",
+        "python": "3.13"
+      }
+    ],
+    "macos_workbench": "local-dev-thin-adapter",
+    "public_signed_mac": false,
+    "python": [
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  },
+  "plugin_loader": false,
+  "product_version": "0.1.0",
+  "profiles": {
+    "candidate_not_executable": [
+      "unsloth"
+    ],
+    "extras_empty": [
+      "axolotl",
+      "columnar",
+      "llama-factory",
+      "mlx-lm",
+      "ocr",
+      "trl",
+      "unsloth"
+    ],
+    "extras_required": [],
+    "implemented": [
+      "veriformis-canonical-v1",
+      "aptus-handoff-v1",
+      "trl",
+      "mlx-lm",
+      "axolotl",
+      "llama-factory",
+      "aptus"
+    ],
+    "optional_export_adapters": [
+      "trl",
+      "mlx-lm",
+      "axolotl",
+      "llama-factory",
+      "aptus"
+    ]
+  },
+  "published_corpus_tiers": [],
+  "quality_report_command": false,
+  "schema_id": "veriformis.support-matrix/v1",
+  "training": {
+    "explicitly_unsupported_families": [
+      "multimodal-training"
+    ],
+    "families": [
+      "source-grounded-language-modeling",
+      "source-grounded-supervised-fine-tuning",
+      "explicit-label-classification",
+      "preference-and-ranking",
+      "tool-call-conversations",
+      "stepwise-supervision"
+    ],
+    "goals": [
+      "learn-the-text",
+      "continue-a-passage",
+      "recover-a-section-from-its-heading",
+      "reproduce-a-recorded-change",
+      "extract-a-structured-value",
+      "classify-with-provided-labels",
+      "prefer-chosen-over-rejected",
+      "use-provided-tool-traces",
+      "use-provided-steps"
+    ],
+    "loss_policies": [
+      "full-sequence",
+      "completion-only",
+      "output-only",
+      "final-assistant-suffix",
+      "label-only",
+      "pair-supervision",
+      "tool-trace-suffix",
+      "final-step-only"
+    ],
+    "objectives": [
+      "before_after_transformation",
+      "continuation",
+      "explicit_label",
+      "full_text",
+      "preference_pair",
+      "section_reconstruction",
+      "stepwise",
+      "structured_field",
+      "tool_call"
+    ],
+    "planned_families": [
+      "pre-tokenized-training",
+      "governed-generated-candidates"
+    ],
+    "presets": [
+      "learn-the-text.safe",
+      "continue-a-passage.safe",
+      "recover-a-section-from-its-heading.safe",
+      "reproduce-a-recorded-change.safe",
+      "extract-a-structured-value.safe",
+      "classify-with-provided-labels.safe",
+      "prefer-chosen-over-rejected.safe",
+      "use-provided-tool-traces.safe",
+      "use-provided-steps.safe"
+    ],
+    "row_schemas": [
+      "instruction_output",
+      "label-classification",
+      "messages",
+      "preference-pair",
+      "prompt_completion",
+      "stepwise-trace",
+      "text",
+      "tool-call-conversation"
+    ]
+  },
+  "version_change_deferred_to": "20.10"
+}

@@ -233,6 +233,16 @@ def create_mcp_server(
         )
 
     @server.tool()
+    def support_matrix() -> str:
+        """Return the frozen CLI-first 1.0 support matrix. Not a version bump."""
+        return json.dumps(
+            pipeline.discover_support_matrix(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+
+    @server.tool()
     def scale_baseline(corpus_id: str, work_root: str) -> str:
         """Record a named-hardware compile baseline. The report is not an SLA."""
         return json.dumps(

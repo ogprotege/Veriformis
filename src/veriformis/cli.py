@@ -1015,6 +1015,19 @@ def scale_support() -> None:
     )
 
 
+@app.command(name="support-matrix")
+def support_matrix() -> None:
+    """Print the frozen CLI-first 1.0 support matrix. Not a version bump."""
+    typer.echo(
+        json.dumps(
+            _SERVICE.discover_support_matrix(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
 @app.command(name="scale-baseline")
 def scale_baseline(
     corpus_id: str = typer.Option(..., "--corpus-id"),

@@ -88,13 +88,13 @@ A stands. Hub execute is skipped. Publication retry is skipped with a
 record. There is no Hub execute. Default `review_policy` stays `none`.
 No heuristic blocks seal. Do not start Phase 20 from that packet.
 Phase 20 is in progress under its own packet. Version remains `0.1.0`
-development alpha. Item 20.1 records honesty locks only. There is no
-1.0 support-matrix pin, version bump, or public signed-Mac claim in
-20.1.
+development alpha. Item 20.2 freezes the CLI-first 1.0 support matrix.
+There is no version bump or public signed-Mac claim. Hub execute stays
+excluded.
 
 **Review date:** 2026-08-31 (independent-product Phase 20.1 packet open)
 
-**Next review:** Phase 20.2 support-matrix freeze, or any capability claim change.
+**Next review:** Phase 20.3 migration completeness, or any capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
@@ -433,6 +433,7 @@ The installed console entry point is `veriformis`.
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `scale-support` | Prints operator-reviewed scale support discovery (`veriformis.scale-support-discovery/v1`) | Empty `published_tiers`; observations are not an SLA; byte-identical to MCP `scale_support` |
+| `support-matrix` | Prints the frozen CLI-first 1.0 support matrix (`veriformis.support-matrix/v1`) | Not a version bump; public signed Mac and Hub execute stay excluded; byte-identical to MCP `support_matrix` |
 | `scale-baseline --corpus-id ID --work-root DIR` | Records a named-hardware compile baseline | Report is not an SLA; dataset-row corpora fail closed |
 | `mapping-contracts` | Prints row-mapping contract discovery (`veriformis.mapping-contract-discovery/v1`) | Read-only terminal output, byte-identical to MCP `mapping_contracts` |
 | `profile-admissions` | Prints implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins (`veriformis.profile-admission-discovery/v1`) | Read-only terminal output, byte-identical to MCP `profile_admissions`; does not launch training |

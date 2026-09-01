@@ -63,13 +63,21 @@ def test_version_and_maturity_remain_alpha() -> None:
     assert "Not a public beta. Not production." in readme
 
 
-def test_no_support_matrix_pin_or_lifecycle_doc_yet() -> None:
-    contracts = ROOT / "docs/contracts"
-    assert not (contracts / "support-matrix-v1.md").is_file()
+def test_support_matrix_pin_exists_without_version_bump_or_lifecycle_docs() -> None:
+    assert (ROOT / "docs/contracts/support-matrix-v1.md").is_file()
+    assert (ROOT / "src/veriformis/release/support-matrix-v1.json").is_file()
+    assert (ROOT / "src/veriformis/release/matrix.py").is_file()
     assert not (ROOT / "docs/support-lifecycle.md").is_file()
     assert not (ROOT / "docs/migration.md").is_file()
-    assert not list((ROOT / "src/veriformis").glob("**/support_matrix*.py"))
-    assert not list((ROOT / "src/veriformis").glob("**/support-matrix*.json"))
+    from veriformis.release import support_matrix
+
+    matrix = support_matrix()
+    assert matrix.product_version == "0.1.0"
+    assert matrix.maturity == "development-alpha"
+    assert matrix.platforms.public_signed_mac is False
+    assert matrix.hub_execute is False
+    assert "support-matrix" in _cli_names()
+    assert "support_matrix" in _mcp_names()
 
 
 def test_pipeline_hub_quality_and_extras_hold() -> None:

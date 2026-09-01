@@ -58,7 +58,7 @@ where = ["src"]
 version = { attr = "veriformis.__version__" }
 
 [tool.setuptools.package-data]
-veriformis = ["serializers/templates/chat/*.jinja", "goals/*.json", "mapping/*.json", "profiles/*.json", "exports/*.json"]
+veriformis = ["serializers/templates/chat/*.jinja", "goals/*.json", "mapping/*.json", "profiles/*.json", "exports/*.json", "release/*.json"]
 
 [tool.ruff]
 required-version = "==0.16.0"

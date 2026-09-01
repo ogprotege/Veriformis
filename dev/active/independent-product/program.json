@@ -243,7 +243,7 @@
       "packet": "dev/active/independent-product/phase-20-stable-1.0",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 20.1 records honesty locks. Version stays 0.1.0 alpha. Freeze only capabilities whose evidence gates passed. Do not bump version until 20.10."
+      "next_gate": "Item 20.2 freezes the CLI-first 1.0 support matrix. Version stays 0.1.0 alpha. Public signed Mac and Hub execute stay excluded. Do not bump version until 20.10."
     }
   ]
 }

@@ -75,11 +75,11 @@ item.
 
 **Branch:** `phase20/02-support-matrix`
 
-- [ ] Pin a versioned 1.0 support matrix over the current support registry
+- [x] Pin a versioned 1.0 support matrix over the current support registry
       and implemented contracts: platforms, Python, macOS claim, inputs,
       goals, semantic rows, containers, profiles, corpus tiers, and optional
       extras.
-- [ ] Name exclusions explicitly: Hub execute, public signed Mac, generator,
+- [x] Name exclusions explicitly: Hub execute, public signed Mac, generator,
       plugin loader, Unsloth execute, default-parse `ocr-image`, published
       corpus tiers, quality-report command, hosted training.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
