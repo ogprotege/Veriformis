@@ -867,13 +867,13 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–19 are complete. The current critical-path work
-is Phase 20 under the
-[stable 1.0 packet](../dev/active/independent-product/phase-20-stable-1.0/README.md).
-Version remains `0.1.0` development alpha until item 20.10. There is no Hub
-execute or quality-report command. There is no `GeneratorPass`. Public
-signed/notarized Mac is not in the 1.0 matrix unless 20.6 produces
-owner-signed evidence.
+Independent-product Phases 0–20 are complete on `7a776ca`. Current
+authority is the
+[post-20 claim-honesty remainder](../dev/active/independent-product/post-20-claim-honesty/README.md).
+Version remains `0.1.0` development alpha. Do not invent a Phase 21.
+There is no Hub execute or quality-report command. There is no
+`GeneratorPass`. Public signed/notarized Mac is not in the frozen
+CLI-first matrix.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

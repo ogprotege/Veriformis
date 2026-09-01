@@ -2,7 +2,7 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 20.1 packet open)
+**Last reviewed:** 2026-09-01 (Phase 20.10 closeout)
 
 **Next review:** Any governance-schema change. Version remains `0.1.0` development alpha.
 
@@ -36,7 +36,8 @@ claims from drifting away from code and evidence.
 | [Completed Phase 17 packet](../../dev/active/independent-product/phase-17-advanced-dataset-families/README.md) | Governed advanced dataset families |
 | [Completed Phase 18 packet](../../dev/active/independent-product/phase-18-goal-first-workbench/README.md) | Goal-first Mac workbench |
 | [Completed Phase 19 packet](../../dev/active/independent-product/phase-19-automation-and-publication/README.md) | Automation and optional publication |
-| [Active Phase 20 packet](../../dev/active/independent-product/phase-20-stable-1.0/README.md) | Stable independent 1.0 cut |
+| [Completed Phase 20 packet](../../dev/active/independent-product/phase-20-stable-1.0/README.md) | Stable independent 1.0 cut |
+| [Post-20 claim honesty](../../dev/active/independent-product/post-20-claim-honesty/README.md) | Remainder packet; not Phase 21; docs honesty only |
 
 Run the governance drift check with:
 
@@ -56,11 +57,13 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–19 are complete on `main`
-and Phase 20 is in progress under its own packet. Phase 19 closeout
-merged as PR #180 at `084e504a799b6c1c1cc130c8ee819b13de5d6bbe`.
+At this review, independent-product Phases 0–20 are complete on `main`
+at `7a776ca` (PR #190). Phase 20 closed 2026-09-01. Current remainder
+authority is [post-20-claim-honesty](../../dev/active/independent-product/post-20-claim-honesty/README.md).
+Phase 19 closeout merged as PR #180 at
+`084e504a799b6c1c1cc130c8ee819b13de5d6bbe`.
 ADR-0020 Decision A stands. Hub execute is skipped. Dry-run writes
-nothing. Version remains `0.1.0` development alpha until 20.10.
+nothing. Version remains `0.1.0` development alpha.
 The quality report is preview-only. Construction `review_policy`
 defaults to `none`. Optional Tesseract 5 recovery is isolated under
 empty extra `ocr`. Default parse still refuses image-only PDF.
