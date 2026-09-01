@@ -212,7 +212,7 @@
       "packet": "dev/active/independent-product/phase-19-automation-and-publication",
       "started_on": "2026-08-31",
       "completed_on": null,
-      "next_gate": "Item 19.6 CI examples with committed fingerprints must merge green before 19.7 publication ADR. Do not replace golden-compile. No Hub."
+      "next_gate": "Item 19.7 ADR-0020 Decision A must merge green before 19.8 credential isolation. Loading a publication pin is not upload."
     },
     {
       "number": 20,

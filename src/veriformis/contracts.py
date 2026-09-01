@@ -102,6 +102,10 @@ PROJECT_SPEC_DRY_RUN_SCHEMA_ID: Final = "veriformis.project-spec-dry-run/v1"
 PROJECT_SPEC_DIAGNOSTIC_SCHEMA_ID: Final = "veriformis.project-spec-diagnostic/v1"
 ENVIRONMENT_INSPECT_SCHEMA_ID: Final = "veriformis.environment-inspect/v1"
 
+PUBLICATION_ADAPTER_CONTRACT_ID: Final = "veriformis.publication-adapter"
+PUBLICATION_ADAPTER_CONTRACT_VERSION: Final = 1
+PUBLICATION_ADAPTER_SCHEMA_ID: Final = "veriformis.publication-adapter/v1"
+
 VERIFIED_EXPORT_CONTRACT_ID: Final = "veriformis.verified-export"
 VERIFIED_EXPORT_CONTRACT_VERSION: Final = 1
 

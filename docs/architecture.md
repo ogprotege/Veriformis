@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.6 CI examples)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.7 publication boundary)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -56,6 +56,7 @@ packet exchange, required-review seal blocking, auditable supersession);
 `families/` (admission pins, leakage grouping, admitted classification execute);
 `workbench/` (Mac wrap pins; loading is not a screen);
 `automation/` (project-spec pin, dry-run, lock, diagnostics, confirmed execute and lock-matched resume; CLI and MCP adapters; loading and lock are not execute; export is not auto-run);
+`publication/` (publication-adapter pin; loading is not upload; ADR-0020 Decision A);
 and `cli.py` (Typer adapter).
 Phase 4 establishes the
 typed export service, descriptor-anchored verified source view, strict

@@ -170,3 +170,27 @@ expected durability warning.
 
 **Next action:** Publish the item 19.6 pull request, require every GitHub
 check, merge, and synchronize clean `main` before item 19.7.
+
+## 2026-08-31: Item 19.6 merged; item 19.7 in progress
+
+**Status:** Item 19.6 merged as PR #176 at
+`3987d6d3fc9706f21e4182ee65388d0027d11aea`. Clean local `main` equals
+`origin/main` there.
+
+Item 19.7 pins ADR-0020 Decision A. `veriformis.publication-adapter/v1`
+is a schema pin. Loading is not upload. No Hub execute.
+
+**Next action:** Run the complete item 19.7 local gates, publish the pull
+request, require every GitHub check, merge, and synchronize clean `main`
+before item 19.8.
+
+## 2026-08-31: Item 19.7 local gates green
+
+**Status:** ADR-0020 Decision A stands. The publication adapter is a
+schema pin. Loading is not upload. CLI and MCP have no Hub tool.
+Focused automation tests passed 60. Project tracking, Ruff, the lock
+check, and `git diff --check` passed. The core suite passed 2,631 tests
+with 17 deselected and the one expected durability warning.
+
+**Next action:** Publish the item 19.7 pull request, require every GitHub
+check, merge, and synchronize clean `main` before item 19.8.

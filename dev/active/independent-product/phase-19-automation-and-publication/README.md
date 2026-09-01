@@ -39,7 +39,6 @@ CLI and MCP are adapters. This packet does not start Phase 20.
 
 ## Current state
 
-Item 19.6 adds retained project-spec fixtures, a committed fingerprint, and
-a CI example job that does not replace golden-compile. There is no Hub
-execute, no GitHub secrets, and no xcodebuild. Default `review_policy`
-stays `none`. Quality gates remain preview-only.
+Item 19.7 pins ADR-0020 Decision A: no Hub execute. Loading a publication
+adapter is not upload. Hugging Face Dataset remains a local container.
+Default `review_policy` stays `none`. Quality gates remain preview-only.

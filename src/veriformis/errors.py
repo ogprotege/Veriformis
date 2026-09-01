@@ -260,6 +260,12 @@ class ProjectSpecError(VeriformisError):
     code = "project-spec-invalid"
 
 
+class PublicationAdapterError(VeriformisError):
+    """A publication-adapter pin is malformed, unknown, or not an upload."""
+
+    code = "publication-adapter-invalid"
+
+
 class ExportContractError(VeriformisError):
     """A versioned export plan, profile, binding, or receipt is invalid."""
 

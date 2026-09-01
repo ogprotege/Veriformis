@@ -4,11 +4,11 @@ This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
 plus local automation and the private beta Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
-Phases 0–18 complete; Phase 19.6 CI examples in progress).
+Phases 0–18 complete; Phase 19.7 publication boundary in progress).
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.6 CI examples)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.7 publication boundary)
 
-**Next review:** Phase 19.6 merge, or any contract change. Default parse
+**Next review:** Phase 19.7 merge, or any contract change. Default parse
 still refuses image-only PDF.
 
 ## Start here
@@ -79,6 +79,7 @@ still refuses image-only PDF.
 | [Project Spec v1](contracts/project-spec-v1.md) | Additive compile intent over pipeline/v1 | Loading is not execute; spec-run executes; export is not auto-run |
 | [Project Lock v1](contracts/project-lock-v1.md) | Spec digest, versions, declared extra presence, optional HEAD and sources | Lock is not execute and not `uv.lock` |
 | [Project Spec Diagnostic v1](contracts/project-spec-diagnostic-v1.md) | Machine-readable spec execute/resume failure | Truncated JSON fails closed; human CLI text stays |
+| [Publication Adapter v1](contracts/publication-adapter-v1.md) | Optional publication pin over a verified export | Schema pin; loading is not upload; ADR-0020 Decision A |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |

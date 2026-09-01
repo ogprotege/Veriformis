@@ -84,9 +84,9 @@ records. Phase 18 goal-first Mac workbench is complete. Sequential PRs
 export, and review wrap existing CLI packets. Family-to-trainer, generator,
 plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
 localization skipped with records. Phase 19 automation and optional
-publication is in progress under its own packet. Item 19.6 adds retained
-project-spec fixtures and a CI example that does not replace
-golden-compile. No Hub. Do not start Phase 20 from that packet.
+publication is in progress under its own packet. Item 19.7 pins
+ADR-0020 Decision A: no Hub execute. Loading a publication pin is not
+upload. Do not start Phase 20 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal
 `ExportService` composition boundary and a descriptor-anchored verified source
@@ -177,8 +177,9 @@ Read these current authorities before changing code:
     `docs/contracts/advanced-family-admission-v1.md`,
     `docs/contracts/workbench-adapter-v1.md`,
     `docs/contracts/project-spec-v1.md`,
-    `docs/contracts/project-lock-v1.md`, and
-    `docs/contracts/project-spec-diagnostic-v1.md`
+    `docs/contracts/project-lock-v1.md`,
+    `docs/contracts/project-spec-diagnostic-v1.md`, and
+    `docs/contracts/publication-adapter-v1.md`
 12. `docs/adr/0006-receipt-anchored-export-pack-transport.md`,
     `docs/adr/0007-goal-first-catalog-as-versioned-data.md`,
     `docs/adr/0008-input-family-taxonomy-axis.md`, and
@@ -190,8 +191,9 @@ Read these current authorities before changing code:
     `docs/adr/0015-collection-plan-as-ingest-contract.md`,
     `docs/adr/0016-optional-local-tesseract-ocr.md`,
     `docs/adr/0017-no-untrusted-extension-loader.md`,
-    `docs/adr/0018-no-compile-path-generator.md`, and
-    `docs/adr/0019-thin-workbench-adapter.md`
+    `docs/adr/0018-no-compile-path-generator.md`,
+    `docs/adr/0019-thin-workbench-adapter.md`, and
+    `docs/adr/0020-publication-boundary.md`
 13. `docs/generic-exports.md`
 14. `docs/architecture.md`
 15. `docs/analysis/2026-08-11-independent-product-analysis.md`

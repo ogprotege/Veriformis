@@ -5,16 +5,16 @@ append-only history.
 
 **Updated:** 2026-08-31
 
-**Local branch:** `phase19/06-ci-examples`
+**Local branch:** `phase19/07-publication-boundary`
 
-**Completed:** Item 19.5, PR #175 at
-`95acb66787a6e7775bb4f9f1493296f76a163088`.
+**Completed:** Item 19.6, PR #176 at
+`3987d6d3fc9706f21e4182ee65388d0027d11aea`.
 
-**Current item:** 19.6 CI examples with committed semantic fingerprints.
-Do not replace golden-compile. No Hub. No secrets. No xcodebuild.
+**Current item:** 19.7 ADR-0020 Decision A. Pin publication-adapter/v1.
+Loading is not upload. No Hub execute.
 
-**Next gate:** Publish the 19.6 pull request, require every GitHub check,
-merge, and synchronize clean `main` before item 19.7.
+**Next gate:** Publish the 19.7 pull request, require every GitHub check,
+merge, and synchronize clean `main` before item 19.8.
 
 **Decision:** ADR-0020 Decision A (pin only; no Hub execute). Operator
 approved the Phase 19 plan as written on 2026-08-31.

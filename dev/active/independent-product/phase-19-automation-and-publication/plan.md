@@ -110,14 +110,15 @@ resume path is permitted in this item.
 
 - [x] Retained fixtures, example spec/lock, fingerprint verify. Do not
       replace golden-compile. No secrets. No xcodebuild.
-- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
+- [x] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.7 Pin the optional publication boundary
 
 **Branch:** `phase19/07-publication-boundary`
 
-- [ ] ADR-0020 Decision A: no Hub execute. Pin authenticated-action
+- [x] ADR-0020 Decision A: no Hub execute. Pin authenticated-action
       contract. Loading is not upload.
+- [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.
 
 ### 19.8 Prove credentials never persist in compiler artifacts
 

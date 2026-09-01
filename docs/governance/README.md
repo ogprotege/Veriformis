@@ -2,9 +2,9 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19.6 CI examples)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.7 publication boundary)
 
-**Next review:** Phase 19.6 merge, or governance-schema change.
+**Next review:** Phase 19.7 merge, or governance-schema change.
 
 This directory defines how Veriformis records work and prevents capability
 claims from drifting away from code and evidence.
@@ -57,9 +57,9 @@ of proof.
 
 At this review, independent-product Phases 0–18 are complete on `main`
 and Phase 19 is in progress. Phase 18 closeout merged as PR #169 at
-`9f384eeedb401441c564c511b642904c403dad38`. Item 19.6 adds retained
-project-spec fixtures and a CI example. Golden-compile remains. Dry-run
-writes nothing. There is no Hub path.
+`9f384eeedb401441c564c511b642904c403dad38`. Item 19.7 pins ADR-0020
+Decision A. Loading a publication pin is not upload. Dry-run writes
+nothing. There is no Hub execute.
 The quality report is preview-only. Construction `review_policy`
 defaults to `none`. Optional Tesseract 5 recovery is isolated under
 empty extra `ocr`. Default parse still refuses image-only PDF.

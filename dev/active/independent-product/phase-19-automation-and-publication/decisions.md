@@ -27,3 +27,4 @@
 | Confirmed spec-run executes through PipelineService; resume matches lock HEAD and sources; export is not auto-run | Accepted | Item 19.4 |
 | MCP wraps spec schema/dry-run/lock/env/run/resume; run_pipeline stays pipeline/v1; skip package/package-verify | Accepted | Item 19.5; skip record |
 | CI example compiles retained fixtures and compares committed fingerprints; golden-compile stays | Accepted | Item 19.6 |
+| ADR-0020 Decision A: pin only; no Hub execute; loading is not upload | Accepted | Item 19.7 |

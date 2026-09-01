@@ -2,7 +2,7 @@
 
 **Status:** Active index
 
-**Last reviewed:** 2026-08-28 (independent-product Phase 18.2 ADR-0019)
+**Last reviewed:** 2026-08-31 (independent-product Phase 19.7 ADR-0020)
 
 **Next review:** Every material architecture or product-boundary decision
 
@@ -41,6 +41,7 @@ not substitutes for implementation or tests.
 | [0017](0017-no-untrusted-extension-loader.md) | No untrusted extension loader in Phase 16 | Accepted | Any third-party load; entry points; workspace `plugins/`; in-process project import; plugin subprocess; Mac plugin UI |
 | [0018](0018-no-compile-path-generator.md) | No compile-path generator in Phase 17 | Accepted | Any compile-path LLM; hosted-model extra; `generation_allowed` true; default-on generation; synthetic data as source truth; Mac generator UI |
 | [0019](0019-thin-workbench-adapter.md) | Mac workbench is a process adapter; PipelineService owns policy | Accepted | Any Swift taxonomy/recipe/mapping/review/export catalog; fallback catalog on truncated CLI; required-review default; plugin or generator UI |
+| [0020](0020-publication-boundary.md) | Optional publication is a separate authenticated action; Decision A installs no Hub execute | Accepted | Any Hub upload command; credential persistence; treating local Hugging Face Dataset as upload |
 
 ## ADR template
 
