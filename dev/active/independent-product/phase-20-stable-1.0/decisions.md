@@ -23,3 +23,4 @@
 | Freeze CLI-first 1.0 support matrix; loading is not a version bump | Accepted | Item 20.2 |
 | Publish operator migration guide; no silent schema jumps | Accepted | Item 20.3 |
 | Record security review without a required network scanner | Accepted | Item 20.4 |
+| Retain isolated-wheel golden CLI evidence without Aptus | Accepted | Item 20.5 |

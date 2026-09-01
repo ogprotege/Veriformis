@@ -1,0 +1,2 @@
+veriformis.__file__=/private/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-clean-path.OuZBkx/venv/lib/python3.12/site-packages/veriformis/__init__.py
+site_packages=/private/var/folders/vj/q7n68rr93w32z0j2ygb81c1r0000gn/T/veriformis-clean-path.OuZBkx/venv/lib/python3.12/site-packages

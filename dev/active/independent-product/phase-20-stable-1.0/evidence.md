@@ -72,5 +72,15 @@ in `program.json`.
       disables entities and network.
 - [x] Compile path has no network client. Publication execute stays false.
 - [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
+- [x] Every GitHub check passes.
+- [x] PR merges and clean local `main` equals `origin/main` before 20.5.
+
+## Required item 20.5 evidence
+
+- [x] Isolated wheel install of `veriformis-0.1.0`.
+- [x] Golden compile through that CLI for `full_text` and `continuation`.
+- [x] External-digest verify and transport accepted. Automatic Aptus
+      handoff absent. No Aptus distribution in the venv.
+- [x] Focused tests, tracking, Ruff, lock, core pytest, and diff check pass.
 - [ ] Every GitHub check passes.
-- [ ] PR merges and clean local `main` equals `origin/main` before 20.5.
+- [ ] PR merges and clean local `main` equals `origin/main` before 20.6.

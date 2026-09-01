@@ -106,7 +106,7 @@ item.
 
 **Branch:** `phase20/05-clean-machine-cli`
 
-- [ ] Run the golden CLI path on a clean install. Retain logs, manifests,
+- [x] Run the golden CLI path on a clean install. Retain logs, manifests,
       expected digests, exports, receipts, and verification reports. Primary
       path contains no Aptus.
 - [ ] Pass all local and GitHub gates, merge, and synchronize clean `main`.

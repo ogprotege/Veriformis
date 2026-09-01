@@ -8,9 +8,9 @@ Phases 0–2; independent-product Phases 0–19 complete; Phase 20 in progress)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-09-01 (Phase 20.4 security review)
+**Last reviewed:** 2026-09-01 (Phase 20.5 clean-machine CLI evidence)
 
-**Next review:** Phase 20.4 merge. Version stays `0.1.0` until 20.10.
+**Next review:** Phase 20.5 merge. Version stays `0.1.0` until 20.10.
 
 **Operator compile:** `/Users/biscuit/Documents/Veriformis` at
 `2026-08-24T13-54-52Z`. Pius X *Pascendi* Markdown → `full_text`/`text`
@@ -156,7 +156,8 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-20-stable-1.0/README.md).
       Version stays `0.1.0` alpha until 20.10. Honest 1.0 is CLI-first.
       Item 20.2 freezes the support matrix. Item 20.3 publishes the
-      migration guide. Item 20.4 records the security review. Public
+      migration guide. Item 20.4 records the security review. Item 20.5
+      retains clean-machine CLI evidence without Aptus. Public
       signed Mac is not in the 1.0 matrix unless 20.6 produces
       owner-signed evidence.
 - [ ] Deliberate beta **label** cut (still alpha until then).
