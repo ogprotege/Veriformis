@@ -49,10 +49,6 @@
       "reason": "scale-support published_tiers stays empty. Observed reports are not an SLA."
     },
     {
-      "exclusion_id": "quality-report-command",
-      "reason": "Quality gates remain preview-only. There is no quality-report command."
-    },
-    {
       "exclusion_id": "required-trainer-extras",
       "reason": "Optional extras stay empty. A profile failure does not block the independent core."
     },
@@ -168,7 +164,7 @@
     ]
   },
   "published_corpus_tiers": [],
-  "quality_report_command": false,
+  "quality_report_command": true,
   "schema_id": "veriformis.support-matrix/v1",
   "training": {
     "explicitly_unsupported_families": [

@@ -69,7 +69,7 @@ development alpha.
 | [Collection Plan v1](contracts/collection-plan-v1.md) | File and directory membership before parse | Implemented contract |
 | [Parser Identity v1](contracts/parser-identity-v1.md) | Parser kind, version pins, and recovery-quality status | Implemented; parse-report bytes unchanged |
 | [OCR Recovery Identity v1](contracts/ocr-recovery-identity-v1.md) | Tesseract 5 engine/page pins | Optional Tesseract 5; default parse still refuses image-only PDF |
-| [Quality Report v1](contracts/quality-report-v1.md) | Facts, policy, recommendations; previewable gates; labeled fixtures | Schema pin; not enforcing; no heuristic admitted to block seal; no CLI command |
+| [Quality Report v1](contracts/quality-report-v1.md) | Facts, policy, recommendations; previewable gates; labeled fixtures | Schema pin; not enforcing; CLI preview is not a gate; no heuristic admitted to block seal |
 | [Review v1](contracts/review-v1.md) | Reviewer, queues, packet exchange, corrections, sampling, seal block, supersession | Implemented through Phase 14; Mac Review is Phase 18 |
 | [Scale Corpus v1](contracts/scale-corpus-v1.md) | Deterministic synthetic benchmark corpora | Generators implemented |
 | [Scale Baseline v1](contracts/scale-baseline-v1.md) | Named-hardware compile evidence | Reports are not an SLA; no published tier |

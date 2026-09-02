@@ -9,9 +9,10 @@
 **Status:** Schema pin through independent-product Phase 13.9. Item 13.9
 previews configurable quality gates and records labeled fixtures. No
 heuristic is admitted to block seal. Seal still uses the seventeen
-finished-dataset gates. There is no quality-report CLI command.
+finished-dataset gates. `veriformis quality-report` emits this preview;
+it is not a gate. There is no MCP wrap.
 
-**Last reviewed:** 2026-08-25
+**Last reviewed:** 2026-09-02
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 13.
 

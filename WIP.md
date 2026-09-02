@@ -118,7 +118,8 @@ local, offline, and free of LLM generation.
       Closeout merged as PR #122 at
       `ef31559c9184b553209a3c45eca5d943fbb9a680`. The versioned quality
       report previews configurable gates and records labeled fixtures.
-      No heuristic blocks seal. There is no quality-report command.
+      No heuristic blocks seal. `veriformis quality-report` emits that
+      preview; it is not a gate.
 - [x] Independent product Phase 14 is complete under its
       [packet](dev/active/independent-product/phase-14-review-workflows/README.md).
       Required-review fixtures cannot seal until resolved. Corrections

@@ -360,10 +360,10 @@ def test_labeled_fixture_catalog_is_closed_and_sorted() -> None:
     assert all(item.admitted_to_block is False for item in V1_QUALITY_GATES)
 
 
-def test_cli_and_service_still_have_no_quality_report_command() -> None:
+def test_cli_and_service_have_preview_quality_report_without_mcp() -> None:
     names = {command.name for command in app.registered_commands}
-    assert "quality-report" not in names
-    assert not hasattr(PipelineService(), "quality_report")
+    assert "quality-report" in names
+    assert hasattr(PipelineService(), "quality_report")
     assert not hasattr(PipelineService(), "quality_preview")
     tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
     assert "quality_report" not in tools

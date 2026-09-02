@@ -10,19 +10,18 @@ the dataset pipeline. Additional commands cover maintenance
 read-only inspection (`verify`, `preview`), recipes
 and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `ocr-preview`, `preflight`, `goal-preview`), local MCP (`mcp`), verified
+and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `ocr-preview`, `preflight`, `goal-preview`, `quality-report`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-39 commands; `export` contains four subcommands.
+40 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.1 quality packet)
+**Last reviewed:** 2026-09-02 (post-20 quality-report CLI)
 
 **Next review:** Any CLI surface or release-gate documentation change.
-Phase 13.1 adds no command.
 
 ## Run the CLI
 
@@ -46,7 +45,7 @@ examples below use the installed name.
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `preflight`, `goal-preview`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `support-matrix` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `preflight`, `goal-preview`, `quality-report`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `support-matrix` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
@@ -812,9 +811,8 @@ The output is the exact packaged `veriformis.support-matrix/v1` pin that
 platforms, inputs, goals, rows, containers, and optional profiles, and it
 names exclusions (Hub execute, public signed Mac, generator, plugin loader,
 Unsloth execute, default-parse `ocr-image`, published corpus tiers,
-quality-report command, hosted training, required extras). Loading the pin
-is not a version bump. Version remains `0.1.0` development alpha until
-item 20.10. See
+hosted training, required extras). Loading the pin
+is not a version bump. Version remains `0.1.0` development alpha. See
 [Support Matrix Contract v1](contracts/support-matrix-v1.md).
 
 ### `profile-admissions`
@@ -912,6 +910,22 @@ when omitted the catalog template is used unless a persisted instruction
 already exists. Records above 64 KiB or beyond the 256 KiB response budget are
 omitted whole with an exact reason. The command writes no state. See the
 [Goal Catalog Contract v1](contracts/goal-catalog-v1.md#goal-preview-v1).
+
+### `quality-report`
+
+Print the existing preview-only quality report. This is not a gate.
+
+```text
+veriformis quality-report WORKSPACE_OR_BUNDLE
+```
+
+Reads a compiler workspace whose `split` stage is complete and prints the
+same `veriformis.quality-report/v1` object `PipelineService.quality_report`
+and `preview_quality_gates` already produce. `enforcing` stays false. No
+heuristic is admitted to block seal. The seventeen finished-dataset gates
+remain the only seal path. A sealed bundle is refused because it does not
+retain recipe, construction, curation, or split state. There is no MCP wrap.
+See [Quality Report Contract v1](contracts/quality-report-v1.md).
 
 ### `verify`
 

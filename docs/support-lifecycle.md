@@ -36,7 +36,7 @@ Contract v1 documents remain loadable. Unknown fields fail closed. See
 [migration.md](migration.md).
 
 Public signed Mac, Hub execute, generator, plugin loader, hosted
-training, required extras, quality-report command, and published corpus
+training, required extras, and published corpus
 tiers stay excluded.
 
 ## Upstream profile review cadence

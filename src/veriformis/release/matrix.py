@@ -26,7 +26,6 @@ REQUIRED_EXCLUSIONS: tuple[str, ...] = (
     "plugin-loader",
     "public-signed-mac",
     "published-corpus-tiers",
-    "quality-report-command",
     "required-trainer-extras",
     "unsloth-execute",
 )
@@ -203,7 +202,7 @@ class SupportMatrix(_StrictModel):
     product_version: Literal["0.1.0"]
     profiles: SupportMatrixProfiles
     published_corpus_tiers: tuple[()]
-    quality_report_command: Literal[False]
+    quality_report_command: Literal[True]
     schema_id: Literal["veriformis.support-matrix/v1"]
     training: SupportMatrixTraining
     version_change_deferred_to: Literal["20.10"]

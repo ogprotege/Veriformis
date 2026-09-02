@@ -9,6 +9,7 @@ from veriformis.cli import app
 from veriformis.contracts import QUALITY_REPORT_SCHEMA_ID
 from veriformis.errors import QualityReportError
 from veriformis.identity import derive_id
+from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
 from veriformis.quality import (
     QualityFact,
@@ -93,7 +94,10 @@ def test_enforcing_literal_rejects_true() -> None:
         QualityReport.model_validate(payload)
 
 
-def test_cli_and_service_still_have_no_quality_report_command() -> None:
+def test_cli_and_service_have_preview_quality_report_without_mcp() -> None:
     names = {command.name for command in app.registered_commands}
-    assert "quality-report" not in names
-    assert not hasattr(PipelineService(), "quality_report")
+    assert "quality-report" in names
+    assert hasattr(PipelineService(), "quality_report")
+    tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
+    assert "quality_report" not in tools
+    assert "quality-report" not in tools

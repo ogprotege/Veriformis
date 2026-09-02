@@ -1229,6 +1229,28 @@ def preflight(
     _run(run)
 
 
+@app.command(name="quality-report")
+def quality_report(
+    workspace_or_bundle: Path = typer.Argument(
+        ...,
+        metavar="WORKSPACE_OR_BUNDLE",
+        help=(
+            "Compiler workspace at or beyond split. A sealed bundle is refused "
+            "because it does not retain construction state."
+        ),
+    ),
+) -> None:
+    """Print the preview-only quality report. This is not a gate."""
+
+    def run():
+        outcome = _SERVICE.quality_report(workspace_or_bundle)
+        assert outcome.report is not None
+        typer.echo(outcome.report.transport_text())
+        return outcome
+
+    _run(run)
+
+
 @app.command(name="goal-preview")
 def goal_preview(
     workspace: Path,

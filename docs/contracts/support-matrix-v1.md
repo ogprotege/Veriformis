@@ -10,7 +10,7 @@
 Loading the pin is not a version bump. Product version remains `0.1.0`
 development alpha. Item 20.10 retained that version.
 
-**Last reviewed:** 2026-08-31
+**Last reviewed:** 2026-09-02
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 20.
 
@@ -37,6 +37,7 @@ CLI `support-matrix`, and MCP `support_matrix` emit the same object.
 | Core surfaces | Python `PipelineService`, Typer CLI, local MCP |
 | Aptus | not required |
 | Corpus tiers | empty |
+| Quality-report command | preview CLI; not a gate |
 
 Inputs, goals, rows, containers, and optional profiles copy the live support
 registry and taxonomy. Optional extras stay empty. A profile failure does not
@@ -51,7 +52,6 @@ block the independent core.
 - `unsloth-execute` — candidate, not executable
 - `default-parse-ocr-image` — default parse still refuses image-only PDF
 - `published-corpus-tiers` — scale-support tiers stay empty
-- `quality-report-command` — quality stays preview-only
 - `hosted-training` — the exporter does not train
 - `required-trainer-extras` — extras stay empty
 

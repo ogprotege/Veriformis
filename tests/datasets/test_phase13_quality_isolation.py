@@ -1,4 +1,4 @@
-"""Phase 13.1 isolation: quality intelligence is not yet a report or gate."""
+"""Phase 13 isolation: quality report is preview-only; MCP has no wrap."""
 
 from __future__ import annotations
 
@@ -60,9 +60,9 @@ def test_no_quality_report_schema() -> None:
     assert all("quality-report" not in schema for schema in FINISHED_DATASET_SCHEMA_IDS)
 
 
-def test_cli_has_no_quality_report_command() -> None:
+def test_cli_has_preview_quality_report_command() -> None:
     names = {command.name for command in app.registered_commands}
-    assert "quality-report" not in names
+    assert "quality-report" in names
     assert "quality" not in names
 
 
@@ -72,7 +72,7 @@ def test_mcp_has_no_quality_report_tool() -> None:
     assert "quality-report" not in tools
 
 
-def test_pipeline_service_has_no_quality_report() -> None:
+def test_pipeline_service_has_preview_quality_report() -> None:
     service = PipelineService()
-    assert not hasattr(service, "quality_report")
+    assert hasattr(service, "quality_report")
     assert not hasattr(service, "quality_preview")

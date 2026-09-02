@@ -25,8 +25,6 @@ _FORBIDDEN = frozenset(
         "hub-upload",
         "hub_upload",
         "install-extension",
-        "quality-report",
-        "quality_report",
     }
 )
 _EMPTY_EXTRAS = (
@@ -92,6 +90,8 @@ def test_pipeline_hub_quality_and_extras_hold() -> None:
     mcp_names = _mcp_names()
     assert cli_names.isdisjoint(_FORBIDDEN)
     assert mcp_names.isdisjoint(_FORBIDDEN)
+    assert "quality-report" in cli_names
+    assert "quality_report" not in mcp_names
     assert not hasattr(PipelineService(), "hub_upload")
     assert all(item.admitted_to_block is False for item in V1_QUALITY_GATES)
     assert recipe_defaults().review_policy == "none"

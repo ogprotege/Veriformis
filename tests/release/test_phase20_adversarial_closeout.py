@@ -27,8 +27,6 @@ _FORBIDDEN = frozenset(
         "hub-upload",
         "hub_upload",
         "install-extension",
-        "quality-report",
-        "quality_report",
     }
 )
 
@@ -74,6 +72,8 @@ def test_goldens_and_forbidden_surfaces_hold() -> None:
     mcp_names = _mcp_names()
     assert cli_names.isdisjoint(_FORBIDDEN)
     assert mcp_names.isdisjoint(_FORBIDDEN)
+    assert "quality-report" in cli_names
+    assert "quality_report" not in mcp_names
     assert not hasattr(PipelineService(), "hub_upload")
     assert all(item.admitted_to_block is False for item in V1_QUALITY_GATES)
     pin = create_publication_adapter(repository="ogprotege/example", revision="main")
