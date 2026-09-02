@@ -171,3 +171,24 @@ jobs:
           HF_DATASETS_DISABLE_PROGRESS_BARS: "1"
           HF_HUB_OFFLINE: "1"
           HF_DATASETS_OFFLINE: "1"
+
+  # Unsigned Debug workbench. continue-on-error so a workbench job cannot
+  # fail the independent compiler. This is not a public Mac claim.
+  # No signing secrets. Signing and notarization remain owner-executed.
+  xcodebuild-debug:
+    name: xcodebuild-debug (optional)
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python 3.12 CLI for workbench tests
+        run: |
+          uv python install 3.12
+          uv sync --python 3.12 --extra test
+      - name: Build and test Debug scheme without signing
+        env:
+          VERIFORMIS_DERIVED_DATA: ${{ runner.temp }}/veriformis-xcode-dd
+        run: bash scripts/release/xcodebuild_debug.sh

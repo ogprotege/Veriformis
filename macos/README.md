@@ -47,7 +47,8 @@ uv sync
 
 The compatibility path `bash macos/scripts/run_workbench.sh` delegates to that
 same script. Optional modes are `--verify`, `--debug`, `--logs`, and
-`--telemetry`.
+`--telemetry`. GitHub may run an unsigned Debug `xcodebuild test` of this
+scheme with `continue-on-error`. That job is not a public Mac claim.
 
 Manual equivalent:
 

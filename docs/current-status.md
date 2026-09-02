@@ -874,7 +874,8 @@ authority is the
 Version remains `0.1.0` development alpha. Do not invent a Phase 21.
 There is no Hub execute. `quality-report` is a preview, not a gate. There is no
 `GeneratorPass`. Public signed/notarized Mac is not in the frozen
-CLI-first matrix.
+CLI-first matrix. Unsigned Debug `xcodebuild` on GitHub is optional
+`continue-on-error` CI. It is not a public Mac claim.
 
 See the [independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md),
 [tracking and evidence policy](governance/project-tracking.md),

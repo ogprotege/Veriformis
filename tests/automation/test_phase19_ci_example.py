@@ -29,7 +29,9 @@ def test_example_spec_lock_and_fingerprint_are_committed() -> None:
     assert lock.spec_digest == expected["spec_digest"]
     assert "HF_TOKEN" not in (EXAMPLE / "spec.json").read_text(encoding="utf-8")
     assert "HF_TOKEN" not in (EXAMPLE / "spec.lock.json").read_text(encoding="utf-8")
-    assert not (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8").count("xcodebuild")
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "xcodebuild-debug (optional)" in workflow
+    assert "continue-on-error: true" in workflow[workflow.index("xcodebuild-debug:") :]
 
 
 def test_example_spec_run_reproduces_committed_manifest(tmp_path: Path) -> None:

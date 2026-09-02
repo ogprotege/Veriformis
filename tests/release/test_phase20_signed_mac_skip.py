@@ -26,6 +26,8 @@ def test_signed_mac_is_skipped_with_a_record() -> None:
     workflows = "\n".join(
         path.read_text(encoding="utf-8") for path in (ROOT / ".github/workflows").glob("*.yml")
     )
-    assert "xcodebuild" not in workflows
+    assert "xcodebuild" in workflows
+    assert "xcodebuild-debug (optional)" in workflows
     ci = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "Signing/notarization remain owner-executed" in ci
+    assert "continue-on-error: true" in ci[ci.index("xcodebuild-debug:") :]

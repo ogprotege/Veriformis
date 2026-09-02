@@ -48,6 +48,8 @@ These are permanent or deferred product boundaries. Beta does not soft-pedal the
    (especially signed/notarized Mac install evidence when claiming a Mac app).
 7. **Quality-report is preview, not a gate.** `veriformis quality-report`
    emits `veriformis.quality-report/v1`. It does not block seal.
+8. **Unsigned Debug xcodebuild is not a public Mac claim.** GitHub may run
+   the Debug scheme with `continue-on-error`. `public_signed_mac` stays false.
 
 ## Operator limitations (beta-critical)
 

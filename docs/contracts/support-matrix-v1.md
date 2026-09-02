@@ -33,7 +33,7 @@ CLI `support-matrix`, and MCP `support_matrix` emit the same object.
 | Python | 3.11, 3.12, 3.13 |
 | CI hosts | Ubuntu 3.11–3.13 and macOS 3.12 |
 | Mac workbench | local-dev thin CLI adapter |
-| Public signed Mac | `false` |
+| Public signed Mac | `false` (unsigned Debug GitHub `xcodebuild` does not change this) |
 | Core surfaces | Python `PipelineService`, Typer CLI, local MCP |
 | Aptus | not required |
 | Corpus tiers | empty |

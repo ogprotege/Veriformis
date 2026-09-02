@@ -14,6 +14,7 @@ from veriformis.pipeline import PipelineService
 from veriformis.publication import create_publication_adapter
 from veriformis.quality.gates import V1_QUALITY_GATES
 from veriformis.recipes.pipeline_spec import PIPELINE_SCHEMA_VERSION, _STAGE_ORDER
+from veriformis.release import support_matrix
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -105,7 +106,9 @@ def test_pipeline_hub_quality_and_extras_hold() -> None:
     workflows = "\n".join(
         path.read_text(encoding="utf-8") for path in (ROOT / ".github/workflows").glob("*.yml")
     )
-    assert "xcodebuild" not in workflows
+    assert "xcodebuild" in workflows
+    assert "xcodebuild-debug (optional)" in workflows
+    assert support_matrix().platforms.public_signed_mac is False
     assert "HF_TOKEN" not in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
