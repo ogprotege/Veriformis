@@ -7,11 +7,14 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+import pytest
+
 from veriformis.cli import app
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
 from veriformis.quality import V1_QUALITY_GATES, require_quality_report_not_enforcing
 from veriformis.quality.report import QualityReport
+from veriformis.workspace import IMPORT_REVISION_SCHEMA_VERSION, Workspace
 
 
 RUNNER = CliRunner()
@@ -108,3 +111,20 @@ def test_sealed_bundle_is_refused(tmp_path: Path) -> None:
     mcp_names = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
     assert "quality_report" not in mcp_names
     assert "quality-report" not in mcp_names
+
+
+def test_cli_help_names_workspace_not_bundle() -> None:
+    help_text = RUNNER.invoke(app, ["quality-report", "--help"]).output
+    assert "WORKSPACE_OR_BUNDLE" not in help_text
+    assert "WORKSPACE" in help_text
+    assert "sealed bundle" in help_text
+
+
+def test_quality_report_dataset_row_does_not_ask_for_schema_3(tmp_path: Path) -> None:
+    workspace = tmp_path / "import-ws"
+    Workspace.create(workspace, schema_version=IMPORT_REVISION_SCHEMA_VERSION)
+    with pytest.raises(Exception) as exc:
+        PipelineService().quality_report(workspace)
+    message = str(exc.value)
+    assert "schema 3" not in message
+    assert "upgrade-workspace" not in message

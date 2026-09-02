@@ -46,3 +46,19 @@ def test_unsigned_debug_xcodebuild_is_optional_and_not_a_public_mac_claim() -> N
     matrix = support_matrix()
     assert matrix.platforms.public_signed_mac is False
     assert matrix.platforms.macos_workbench == "local-dev-thin-adapter"
+
+
+def test_live_copy_does_not_present_tense_skip_github_xcodebuild() -> None:
+    phrase = (
+        "GitHub xcodebuild, virtualization, and full localization are skipped"
+    )
+    for relative in ("docs/current-status.md", "CLAUDE.md", "CONTRIBUTING.md"):
+        collapsed = " ".join((ROOT / relative).read_text(encoding="utf-8").split())
+        assert phrase not in collapsed, relative
+
+
+def test_beta_limitations_does_not_claim_no_ocr() -> None:
+    text = (ROOT / "docs/beta-limitations.md").read_text(encoding="utf-8")
+    assert "**No OCR.**" not in text
+    assert "ocr-image" in text
+    assert "Last reviewed:** 2026-08-11" not in text

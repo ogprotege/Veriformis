@@ -2,7 +2,7 @@
 
 **Status:** Active limitations register for any future **beta** cut of `0.1.0`
 
-**Last reviewed:** 2026-08-11 (standalone defaults and release separation)
+**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
 
 **Maturity today:** Development **alpha** — this document exists so a beta cut
 can be honest. **Do not treat the current tag as beta** until the beta cut
@@ -35,7 +35,9 @@ is completed and the beta announcement says so explicitly.
 
 These are permanent or deferred product boundaries. Beta does not soft-pedal them.
 
-1. **No OCR.** Scanned / image-only PDFs and other OCR needs fail closed.
+1. **No default-parse `ocr-image`.** Image-only PDFs still refuse. Optional
+   Tesseract 5 exists under extra `ocr`, which stays empty. `ocr-preview` is
+   not default parse.
 2. **No network model generation.** The dataset pipeline does not call LLMs or
    remote generation services (Group 8 remains optional and owner-gated).
 3. **No multi-user service, accounts, cloud, billing, or telemetry.**

@@ -268,11 +268,14 @@ def create_mcp_server(
     @server.tool()
     def presets() -> str:
         """Return the versioned recipe presets and defaults from PipelineService."""
-        return json.dumps(
-            pipeline.discover_presets(),
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
+        return (
+            json.dumps(
+                pipeline.discover_presets(),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
         )
 
     @server.tool()
