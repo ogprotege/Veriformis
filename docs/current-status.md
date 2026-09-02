@@ -81,8 +81,10 @@ Phase 18 goal-first Mac workbench is complete under its own packet.
 The workbench is a thin CLI adapter. Document-source, dataset-row, and
 mixed are the compiler paths. Mapping is confirm-then-map. Export and
 review wrap existing packets. Swift owns no dataset policy. Family-to-trainer,
-generator, plugin, Hub, signed Mac, GitHub xcodebuild, virtualization,
-and full localization are skipped with records. Phase 19 automation and
+generator, plugin, Hub, signed Mac, virtualization,
+and full localization are skipped with records. Phase 18 skipped GitHub
+xcodebuild; remainder later added optional unsigned Debug CI, which is not
+a public Mac claim. Phase 19 automation and
 optional publication is complete under its own packet. ADR-0020 Decision
 A stands. Hub execute is skipped. Publication retry is skipped with a
 record. There is no Hub execute. Default `review_policy` stays `none`.
@@ -452,7 +454,7 @@ The installed console entry point is `veriformis`.
 | `mapping-rejections PATH --plan PLAN.json --output DIR` | Writes a content-addressed mapping rejection report beside a directory; `map` also writes one beside the workspace | `veriformis.mapping-rejection-report/v1` JSON; not a verified export |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
-| `quality-report WORKSPACE_OR_BUNDLE` | Emits the existing `veriformis.quality-report/v1` preview for a workspace at or beyond split; refuses a sealed bundle | Preview, not a gate; `enforcing` stays false; no MCP wrap; no heuristic blocks seal |
+| `quality-report WORKSPACE` | Emits the existing `veriformis.quality-report/v1` preview for a document-source workspace at or beyond split; refuses a sealed bundle | Preview, not a gate; `enforcing` stays false; no MCP wrap; no heuristic blocks seal |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `arrow`, `constrained-csv`, `hugging-face-dataset`, `json`, `parquet`, `split-jsonl-directory` v1, and TRL / MLX-LM adapters |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |

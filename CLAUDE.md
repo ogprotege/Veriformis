@@ -82,8 +82,9 @@ multimodal, pre-tokenized, and unmapped trainer profiles skipped with
 records. Phase 18 goal-first Mac workbench is complete. Sequential PRs
 18.1–18.10. ADR-0019 Decision A: Swift is a process adapter. Confirm-then-map,
 export, and review wrap existing CLI packets. Family-to-trainer, generator,
-plugin, Hub, signed Mac, GitHub xcodebuild, virtualization, and full
-localization skipped with records. Phase 19 automation and optional
+plugin, Hub, signed Mac, virtualization, and full
+localization skipped with records. Phase 18 skipped GitHub xcodebuild;
+remainder later added optional unsigned Debug CI, which is not a public Mac claim. Phase 19 automation and optional
 publication is complete under its own packet. ADR-0020 Decision A: no
 Hub execute. Publication retry skipped with a record. Do not start Phase
 20 from that packet. Phase 20 is complete under its own packet.

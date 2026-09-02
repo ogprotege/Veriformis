@@ -147,7 +147,7 @@ def test_presets_discovery_is_byte_identical_on_cli_and_mcp() -> None:
     assert result.exit_code == 0, result.output
     assert result.output == preset_catalog_json()
     tools = {t.name: t.fn for t in create_mcp_server(SERVICE)._tool_manager.list_tools()}
-    assert tools["presets"]() + "\n" == preset_catalog_json()
+    assert tools["presets"]() == preset_catalog_json()
     assert json.loads(result.output)["defaults"]["construction"]["split_ratio_ppm"] == 500_000
 
 

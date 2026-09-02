@@ -1376,9 +1376,10 @@ class PipelineService:
     def quality_report(self, path: Path) -> QualityReportOutcome:
         """Emit the existing preview-only quality report. This is not a gate.
 
-        Requires a compiler workspace whose ``split`` stage is complete.
-        A sealed bundle is refused: it does not retain recipe, construction,
-        curation, or split state. Never opens a transaction or touches seal.
+        Requires a document-source compiler workspace whose ``split`` stage
+        is complete. A sealed bundle is refused: it does not retain recipe,
+        construction, curation, or split state. Dataset-row revision 4 is
+        not loaded. Never opens a transaction or touches seal.
         """
         from veriformis.quality import (
             preview_quality_gates,
@@ -1394,6 +1395,11 @@ class PipelineService:
             )
         store = Workspace.open(root)
         revision = store.head()
+        if is_import_revision(revision.schema_version):
+            raise QualityReportError(
+                "quality-report preview requires a document-source workspace; "
+                "dataset-row revision 4 is not loaded"
+            )
         _require_group3_revision(revision)
         if revision.stages["split"].status != "complete":
             raise MissingStageInputError(

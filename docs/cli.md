@@ -916,10 +916,10 @@ omitted whole with an exact reason. The command writes no state. See the
 Print the existing preview-only quality report. This is not a gate.
 
 ```text
-veriformis quality-report WORKSPACE_OR_BUNDLE
+veriformis quality-report WORKSPACE
 ```
 
-Reads a compiler workspace whose `split` stage is complete and prints the
+Reads a document-source compiler workspace whose `split` stage is complete and prints the
 same `veriformis.quality-report/v1` object `PipelineService.quality_report`
 and `preview_quality_gates` already produce. `enforcing` stays false. No
 heuristic is admitted to block seal. The seventeen finished-dataset gates
