@@ -151,7 +151,7 @@ def test_run_exists_and_parse_omits_mode() -> None:
     assert "source_root=spec.source_root" in parse_block
 
 
-def test_public_surfaces_have_no_hub_generator_or_quality_report() -> None:
+def test_public_surfaces_have_no_hub_or_generator() -> None:
     cli_names = _cli_names()
     mcp_names = _mcp_names()
     assert cli_names.isdisjoint(_FORBIDDEN_OPERATIONS)

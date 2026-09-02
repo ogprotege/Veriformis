@@ -57,6 +57,63 @@ def test_live_copy_does_not_present_tense_skip_github_xcodebuild() -> None:
         assert phrase not in collapsed, relative
 
 
+def test_cli_reference_command_count_matches_typer() -> None:
+    from veriformis.cli import app
+
+    count = len(app.registered_commands)
+    cli = (ROOT / "docs/cli.md").read_text(encoding="utf-8")
+    entry = (ROOT / "docs/architecture/entry-points.md").read_text(encoding="utf-8")
+    assert f"{count} commands" in cli
+    assert f"{count} `@app.command`" in entry
+
+
+def test_quality_report_contract_names_family_hook_facts() -> None:
+    from veriformis.quality.family_hooks import FAMILY_HOOK_FACT_NAMES
+
+    text = (ROOT / "docs/contracts/quality-report-v1.md").read_text(encoding="utf-8")
+    for name in FAMILY_HOOK_FACT_NAMES:
+        assert name in text, name
+    assert "preview-family-missing-label" in text
+    assert "not a gate" in text.lower() or "admitted-to-block" in text
+
+
+def test_isolation_names_do_not_claim_cli_lacks_quality_report() -> None:
+    files = (
+        ROOT / "tests/automation/test_phase19_automation_isolation.py",
+        ROOT / "tests/automation/test_phase19_adversarial_closeout.py",
+    )
+    for path in files:
+        text = path.read_text(encoding="utf-8")
+        assert "have_no_hub_generator_or_quality_report" not in text
+        assert "test_hub_quality_report_and_package_mcp_stay_absent" not in text
+
+
+def test_tracking_script_pins_remainder_flags() -> None:
+    text = (ROOT / "scripts/check_project_tracking.py").read_text(encoding="utf-8")
+    assert "quality_report_command" in text
+    assert "xcodebuild-debug" in text
+
+
+def test_remainder_docs_last_reviewed_is_not_pre_remainder() -> None:
+    for relative, stale in (
+        ("WIP.md", "Last reviewed:** 2026-09-01"),
+        ("docs/product-contract.md", "Last reviewed:** 2026-09-01"),
+        ("docs/release.md", "Last reviewed:** 2026-08-11"),
+    ):
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        assert stale not in text, relative
+
+
+def test_quality_report_service_does_not_repeat_enforcing_check() -> None:
+    import inspect
+
+    from veriformis.pipeline.service import PipelineService
+
+    source = inspect.getsource(PipelineService.quality_report)
+    assert "require_quality_report_not_enforcing" in source
+    assert "if report.enforcing is not False" not in source
+
+
 def test_beta_limitations_does_not_claim_no_ocr() -> None:
     text = (ROOT / "docs/beta-limitations.md").read_text(encoding="utf-8")
     assert "**No OCR.**" not in text

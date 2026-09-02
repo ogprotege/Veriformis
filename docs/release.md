@@ -2,7 +2,7 @@
 
 **Status:** Active release-gate documentation for version `0.1.0` development alpha
 
-**Last reviewed:** 2026-08-11 (standalone release-gate separation)
+**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
 
 **Next review:** Any public-release claim, packaging change, or CI gate change
 

@@ -12,7 +12,7 @@ and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
 `handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
 and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `ocr-preview`, `preflight`, `goal-preview`, `quality-report`), local MCP (`mcp`), verified
 exports (`export`, `export-verify`), and `version`. The complete root surface is
-40 commands; `export` contains four subcommands.
+52 commands; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first

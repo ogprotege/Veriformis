@@ -205,3 +205,23 @@ def test_named_detectors_record_findings_not_certification(tmp_path: Path) -> No
     families = {item["family"] for item in _json(report, "detector-hits")}
     assert families == {"pii", "secret"}
     assert report.enforcing is False
+
+
+def test_secret_hit_count_is_records_not_pattern_hits(tmp_path: Path) -> None:
+    case = _finished(
+        tmp_path,
+        (
+            (
+                "a.txt",
+                "Key AKIAIOSFODNN7EXAMPLE and BEGIN RSA PRIVATE KEY in one record.",
+            ),
+            ("b.txt", "Beta completely different omega text."),
+        ),
+    )
+    report = _report(case)
+    assert _fact(report, "detector-secret-hit-count").integer_value == 1
+    hits = _json(report, "detector-hits")
+    assert {item["pattern-id"] for item in hits} == {
+        "secret-aws-access-key",
+        "secret-pem-private-key",
+    }

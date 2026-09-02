@@ -3,7 +3,7 @@
 How invocation reaches Veriformis through one surface-neutral orchestration
 root, with CLI, MCP, Python, and macOS adapters kept outside stage policy.
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 11 collection plan)
+**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
 
 **Next review:** Any entry-point or architecture change
 
@@ -28,7 +28,7 @@ transition regardless of the adapter that initiated it.
 
 ## CLI command surface
 
-The CLI exposes 38 root names (37 `@app.command` entries plus the `export`
+The CLI exposes 53 root names (52 `@app.command` entries plus the `export`
 Typer group). Ten names are workspace stages: `parse`, `clean`, `chunk`,
 `construct`, `map`, `curate`, `split`, `format`, `validate`, and `seal`.
 Document-source uses nine of them (no `map`). Dataset-row uses `parse`,
@@ -36,7 +36,7 @@ Document-source uses nine of them (no `map`). Dataset-row uses `parse`,
 `upgrade-workspace`, `verify`, `preview`, `package`, `package-verify`,
 `taxonomy`, `goals`, `presets`, `modes`, `mapping-contracts`,
 `mapping-templates`, `mapping-detect`, `mapping-preview`,
-`mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `preflight`, `goal-preview`,
+`mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `ocr-preview`, `preflight`, `goal-preview`, `quality-report`,
 the `export` group with four subcommands, `export-verify`, `run`,
 `list-recipes`, `mcp`, `handoff`, `handoff-verify`, and `version`. Ordering
 is enforced by the workspace dependency table, not by Typer.

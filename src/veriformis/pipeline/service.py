@@ -1388,10 +1388,15 @@ class PipelineService:
 
         root = Path(path)
         if (root / "manifest.json").is_file() and not (root / "workspace.json").is_file():
+            if (root / "attestation.json").is_file():
+                raise QualityReportError(
+                    "quality-report preview requires a compiler workspace at or "
+                    "beyond split; a sealed bundle does not retain recipe, "
+                    "construction, curation, or split state"
+                )
             raise QualityReportError(
-                "quality-report preview requires a compiler workspace at or "
-                "beyond split; a sealed bundle does not retain recipe, "
-                "construction, curation, or split state"
+                "quality-report preview requires a compiler workspace with "
+                "workspace.json"
             )
         store = Workspace.open(root)
         revision = store.head()
@@ -1401,16 +1406,16 @@ class PipelineService:
                 "dataset-row revision 4 is not loaded"
             )
         _require_group3_revision(revision)
-        if revision.stages["split"].status != "complete":
-            raise MissingStageInputError(
-                "quality-report preview requires a completed split stage; run "
-                "`veriformis split WORKSPACE` first"
-            )
-        if revision.stages["curate"].status != "complete":
-            raise MissingStageInputError(
-                "quality-report preview requires a completed curate stage; run "
-                "`veriformis curate WORKSPACE` first"
-            )
+        for stage, command in (
+            ("construct", "`veriformis construct WORKSPACE`"),
+            ("curate", "`veriformis curate WORKSPACE`"),
+            ("split", "`veriformis split WORKSPACE`"),
+        ):
+            if revision.stages[stage].status != "complete":
+                raise MissingStageInputError(
+                    f"quality-report preview requires a completed {stage} stage; "
+                    f"run {command} first"
+                )
         recipe, result, _inputs = _load_constructed_dataset(store, revision)
         curation = _load_curation_result(store, revision)
         split = _load_split_result(store, revision)
@@ -1421,8 +1426,6 @@ class PipelineService:
             split=split,
         )
         require_quality_report_not_enforcing(report)
-        if report.enforcing is not False:
-            raise QualityReportError("quality report cannot enforce heuristics in 13.2")
         return QualityReportOutcome(report=report)
 
     def discover_exports(self) -> ExportDiscoveryOutcome:

@@ -49,7 +49,7 @@ unsupported for default parse. `quality-report` is a preview, not a gate. Mac
 Review wraps existing CLI packets; default `review_policy` stays `none`.
 There is no published corpus tier.
 
-**Last reviewed:** 2026-09-01 (Phase 20.10 closeout)
+**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
 
 **Next review:** Any product-contract change. No modest fig-leaf tier. No public plugin API. Version remains
 `0.1.0` development alpha. The frozen support matrix is

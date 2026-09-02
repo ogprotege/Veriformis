@@ -93,8 +93,10 @@ def test_python_cli_mcp_agree_on_support_matrix() -> None:
         tool.name: tool.fn
         for tool in create_mcp_server(SERVICE)._tool_manager.list_tools()
     }
-    mcp_payload = json.loads(tools["support_matrix"]())
+    mcp_text = tools["support_matrix"]()
+    mcp_payload = json.loads(mcp_text)
     assert python_payload == cli_payload == mcp_payload
+    assert mcp_text == cli.output
     assert python_payload["product_version"] == "0.1.0"
     assert python_payload["platforms"]["public_signed_mac"] is False
     assert python_payload["hub_execute"] is False

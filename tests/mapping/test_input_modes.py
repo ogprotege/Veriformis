@@ -67,8 +67,8 @@ def test_discover_modes_is_byte_identical_across_python_cli_and_mcp() -> None:
     }
     mcp = tools["modes"]()
     assert python == expected
-    assert cli.output.strip() == expected
-    assert mcp.strip() == expected
+    assert cli.output == expected + "\n"
+    assert mcp == expected + "\n"
 
 
 @pytest.mark.parametrize("mode", [None, "", DOCUMENT_SOURCE_MODE])
