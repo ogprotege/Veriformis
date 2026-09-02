@@ -16,8 +16,10 @@ Hosted training and required trainer extras are out of product. Hub
 execute, generator, and plugin loader stay behind ADR Decision B
 (ADR-0020, ADR-0018, ADR-0017). This packet does not supersede those
 ADRs. It does not train, add extras, bump the version, start Hub,
-generator, plugins, default-parse `ocr-image`, GitHub `xcodebuild`, or a
-quality-report command.
+generator, plugins, default-parse `ocr-image`, or GitHub `xcodebuild`.
 
-This PR authorizes docs honesty only: live copy must not treat Phase 20
+Authorized remainder item: a thin `veriformis quality-report` CLI over
+the existing Python preview. That command is preview, not a gate.
+
+This packet also holds docs honesty: live copy must not treat Phase 20
 as the current critical path.

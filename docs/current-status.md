@@ -61,7 +61,7 @@ image-only PDF. `ocr-image` remains explicitly unsupported.
 Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, and labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
-There is no quality-report command.
+`veriformis quality-report` emits that preview; it is not a gate.
 Phase 14 review workflows are complete: core queues, corrections as new
 identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
@@ -452,6 +452,7 @@ The installed console entry point is `veriformis`.
 | `mapping-rejections PATH --plan PLAN.json --output DIR` | Writes a content-addressed mapping rejection report beside a directory; `map` also writes one beside the workspace | `veriformis.mapping-rejection-report/v1` JSON; not a verified export |
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
+| `quality-report WORKSPACE_OR_BUNDLE` | Emits the existing `veriformis.quality-report/v1` preview for a workspace at or beyond split; refuses a sealed bundle | Preview, not a gate; `enforcing` stays false; no MCP wrap; no heuristic blocks seal |
 | `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `arrow`, `constrained-csv`, `hugging-face-dataset`, `json`, `parquet`, `split-jsonl-directory` v1, and TRL / MLX-LM adapters |
 | `export dry-run --request-json JSON` | Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
@@ -871,7 +872,7 @@ Independent-product Phases 0–20 are complete on `7a776ca`. Current
 authority is the
 [post-20 claim-honesty remainder](../dev/active/independent-product/post-20-claim-honesty/README.md).
 Version remains `0.1.0` development alpha. Do not invent a Phase 21.
-There is no Hub execute or quality-report command. There is no
+There is no Hub execute. `quality-report` is a preview, not a gate. There is no
 `GeneratorPass`. Public signed/notarized Mac is not in the frozen
 CLI-first matrix.
 

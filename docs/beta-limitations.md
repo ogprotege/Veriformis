@@ -46,6 +46,8 @@ These are permanent or deferred product boundaries. Beta does not soft-pedal the
    consumer profile must not invent membership or replace Veriformis policy.
 6. **No public-ready or production claim** without the full public checklist
    (especially signed/notarized Mac install evidence when claiming a Mac app).
+7. **Quality-report is preview, not a gate.** `veriformis quality-report`
+   emits `veriformis.quality-report/v1`. It does not block seal.
 
 ## Operator limitations (beta-critical)
 

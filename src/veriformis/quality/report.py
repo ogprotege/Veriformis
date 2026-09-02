@@ -7,6 +7,7 @@ enforce heuristics, does not delete rows, and does not block seal.
 
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Literal
 
@@ -162,6 +163,15 @@ class QualityReport(_StrictModel):
         if self.report_id != expected:
             raise QualityReportError("quality report identity mismatch")
         return self
+
+    def transport_text(self) -> str:
+        """ASCII-safe JSON every CLI surface emits for this preview."""
+        return json.dumps(
+            self.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
 
 
 def assemble_quality_report(

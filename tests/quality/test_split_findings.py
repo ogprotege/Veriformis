@@ -222,10 +222,10 @@ def test_three_source_split_records_integer_imbalance_ppm(tmp_path: Path) -> Non
     assert _fact(report, "split-malformed-role-count").integer_value == 0
 
 
-def test_cli_and_service_still_have_no_quality_report_command() -> None:
+def test_cli_and_service_have_preview_quality_report_without_mcp() -> None:
     names = {command.name for command in app.registered_commands}
-    assert "quality-report" not in names
-    assert not hasattr(PipelineService(), "quality_report")
+    assert "quality-report" in names
+    assert hasattr(PipelineService(), "quality_report")
     tools = {tool.name for tool in create_mcp_server()._tool_manager.list_tools()}
     assert "quality_report" not in tools
     assert "quality-report" not in tools

@@ -65,7 +65,7 @@ image-only PDF. `ocr-image` remains explicitly unsupported.
 Phase 13 quality intelligence is complete: versioned quality report,
 previewable gates, labeled fixtures. Closeout merged as PR #122 at
 `ef31559c9184b553209a3c45eca5d943fbb9a680`. No heuristic blocks seal.
-There is no quality-report command.
+`veriformis quality-report` emits that preview; it is not a gate.
 Phase 14 review workflows are complete: queues, corrections as new
 identities, named-seed sampling, CLI/MCP/Python packet exchange,
 required-review seal blocking, and auditable supersession. Default
@@ -270,7 +270,7 @@ Key modules under `src/veriformis/` are:
   goals and presets to existing objectives, row schemas, and executable recipe
   settings, and probe raw sources without workspace mutation;
 - `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
-- `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing);
+- `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing; CLI preview is not a gate);
 - `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
 - `extensions/` for the internal extension protocol, built-in-only registry, and read-only capability declarations (no loader);
 - `families/` for advanced-family admission pins, leakage grouping, and admitted classification execute;

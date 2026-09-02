@@ -56,7 +56,7 @@ def test_support_matrix_is_canonical_and_still_alpha() -> None:
     assert matrix.generator is False
     assert matrix.plugin_loader is False
     assert matrix.hosted_training is False
-    assert matrix.quality_report_command is False
+    assert matrix.quality_report_command is True
     assert matrix.aptus_required is False
     assert matrix.published_corpus_tiers == ()
     assert tuple(item.exclusion_id for item in matrix.exclusions) == REQUIRED_EXCLUSIONS

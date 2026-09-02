@@ -25,8 +25,6 @@ _FORBIDDEN = frozenset(
         "hub-upload",
         "hub_upload",
         "install-extension",
-        "quality-report",
-        "quality_report",
     }
 )
 
@@ -57,6 +55,8 @@ def test_hub_quality_report_and_package_mcp_stay_absent() -> None:
     mcp_names = _mcp_names()
     assert cli_names.isdisjoint(_FORBIDDEN)
     assert mcp_names.isdisjoint(_FORBIDDEN)
+    assert "quality-report" in cli_names
+    assert "quality_report" not in mcp_names
     assert "package" not in mcp_names
     assert "package_verify" not in mcp_names
     assert "spec_run" in mcp_names

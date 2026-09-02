@@ -90,6 +90,7 @@ from veriformis.errors import (
     MissingStageInputError,
     ConstructionError,
     ParseError,
+    QualityReportError,
     TaxonomyError,
     UnsupportedWorkspaceVersionError,
 )
@@ -351,6 +352,11 @@ class VersionOutcome(StageOutcome):
 @dataclass(frozen=True)
 class GoalPreviewOutcome(StageOutcome):
     preview: GoalPreview | None = None
+
+
+@dataclass(frozen=True)
+class QualityReportOutcome(StageOutcome):
+    report: Any = None
 
 
 @dataclass(frozen=True)
@@ -1366,6 +1372,52 @@ class PipelineService:
             record_ids=tuple(record_ids),
         )
         return GoalPreviewOutcome(preview=preview)
+
+    def quality_report(self, path: Path) -> QualityReportOutcome:
+        """Emit the existing preview-only quality report. This is not a gate.
+
+        Requires a compiler workspace whose ``split`` stage is complete.
+        A sealed bundle is refused: it does not retain recipe, construction,
+        curation, or split state. Never opens a transaction or touches seal.
+        """
+        from veriformis.quality import (
+            preview_quality_gates,
+            require_quality_report_not_enforcing,
+        )
+
+        root = Path(path)
+        if (root / "manifest.json").is_file() and not (root / "workspace.json").is_file():
+            raise QualityReportError(
+                "quality-report preview requires a compiler workspace at or "
+                "beyond split; a sealed bundle does not retain recipe, "
+                "construction, curation, or split state"
+            )
+        store = Workspace.open(root)
+        revision = store.head()
+        _require_group3_revision(revision)
+        if revision.stages["split"].status != "complete":
+            raise MissingStageInputError(
+                "quality-report preview requires a completed split stage; run "
+                "`veriformis split WORKSPACE` first"
+            )
+        if revision.stages["curate"].status != "complete":
+            raise MissingStageInputError(
+                "quality-report preview requires a completed curate stage; run "
+                "`veriformis curate WORKSPACE` first"
+            )
+        recipe, result, _inputs = _load_constructed_dataset(store, revision)
+        curation = _load_curation_result(store, revision)
+        split = _load_split_result(store, revision)
+        report = preview_quality_gates(
+            recipe=recipe,
+            construction=result,
+            curation=curation,
+            split=split,
+        )
+        require_quality_report_not_enforcing(report)
+        if report.enforcing is not False:
+            raise QualityReportError("quality report cannot enforce heuristics in 13.2")
+        return QualityReportOutcome(report=report)
 
     def discover_exports(self) -> ExportDiscoveryOutcome:
         """Discover only executable export implementations in the service."""

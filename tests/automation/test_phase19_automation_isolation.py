@@ -37,8 +37,6 @@ _FORBIDDEN_OPERATIONS = frozenset(
         "install_extension",
         "install-plugin",
         "install_plugin",
-        "quality-report",
-        "quality_report",
     }
 )
 _PROJECT_SPEC_OPERATIONS = frozenset(
@@ -162,7 +160,7 @@ def test_public_surfaces_have_no_hub_generator_or_quality_report() -> None:
     for name in _FORBIDDEN_OPERATIONS:
         assert not hasattr(service, name.replace("-", "_"))
     assert "run_pipeline" in mcp_names
-    assert "quality-report" not in cli_names
+    assert "quality-report" in cli_names
     assert "quality_report" not in mcp_names
 
 
