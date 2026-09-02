@@ -158,7 +158,9 @@ local, offline, and free of LLM generation.
       [packet](dev/active/independent-product/phase-20-stable-1.0/README.md).
       Frozen CLI-first matrix. Version remains `0.1.0` development alpha.
       Public signed Mac, Hub execute, generator, and plugin loader stay
-      excluded. Do not invent a Phase 21 from that packet.
+      excluded. Unsigned Debug GitHub `xcodebuild` is optional
+      `continue-on-error` CI. It is not a public Mac claim. Do not invent
+      a Phase 21 from that packet.
 - [ ] Deliberate beta **label** cut (still alpha until then).
 - [ ] Group 9 owner remainder: signed/notarized Mac (blocks **public** Mac app claim).
 - [ ] Group 8 optional (owner-gated).

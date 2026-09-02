@@ -46,7 +46,8 @@ Optional adapters `trl`, `mlx-lm`, `axolotl`, `llama-factory`, and
 cadence: when a profile pin is admitted, record the official-schema
 review date on that pin. A later upstream change does not silently
 expand the frozen matrix. Isolated CI jobs use `continue-on-error` and
-cannot block the independent core. Unsloth is not executable.
+cannot block the independent core. Unsigned Debug `xcodebuild` is one of
+those jobs. It is not a public Mac claim. Unsloth is not executable.
 The exporter does not train.
 
 ## Deprecation notice

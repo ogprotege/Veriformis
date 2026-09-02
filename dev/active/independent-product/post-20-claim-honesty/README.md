@@ -16,10 +16,17 @@ Hosted training and required trainer extras are out of product. Hub
 execute, generator, and plugin loader stay behind ADR Decision B
 (ADR-0020, ADR-0018, ADR-0017). This packet does not supersede those
 ADRs. It does not train, add extras, bump the version, start Hub,
-generator, plugins, default-parse `ocr-image`, or GitHub `xcodebuild`.
+generator, plugins, or default-parse `ocr-image`.
 
-Authorized remainder item: a thin `veriformis quality-report` CLI over
-the existing Python preview. That command is preview, not a gate.
+Authorized remainder items:
+
+- A thin `veriformis quality-report` CLI over the existing Python
+  preview. That command is preview, not a gate.
+- Unsigned Debug `xcodebuild` on GitHub only. The job builds and tests
+  the same Debug scheme `./script/build_and_run.sh` uses, with
+  `continue-on-error` so it cannot fail the independent compiler. This
+  is not a public Mac claim. `public_signed_mac` stays false. No signing
+  secrets, notarize, or staple.
 
 This packet also holds docs honesty: live copy must not treat Phase 20
 as the current critical path.

@@ -31,6 +31,10 @@ The optional `aptus-integration` job runs marked tests and
 the checked-in adapter is self-consistent under its declared policy. It is not
 a core gate and does not prove a live external Aptus release.
 
+The optional `xcodebuild-debug` job builds and tests the same Debug scheme
+`./script/build_and_run.sh` uses, with `CODE_SIGNING_ALLOWED=NO` and
+`continue-on-error: true`. It is not a public Mac claim.
+
 ## What automated gates do **not** prove
 
 - Developer ID signing of the macOS workbench

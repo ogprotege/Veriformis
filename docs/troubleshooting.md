@@ -16,6 +16,7 @@ This page is not a version bump.
 | Trainer extra missing | Optional extras stay empty. | The exporter does not train. Install a trainer yourself if you want one. |
 | Hub upload | Hub execute is excluded. | There is no Hub execute. |
 | Signed Mac app | Public signed Mac is not in the matrix. | Use the CLI. The workbench is a local-dev thin adapter. |
+| GitHub xcodebuild | Unsigned Debug scheme only; `continue-on-error`. | This is not a public Mac claim. `public_signed_mac` stays false. |
 | `quality-report` command | Quality stays preview-only. | The quality-report command is preview, not a gate. |
 
 See also [install.md](install.md) Troubleshooting,

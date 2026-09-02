@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from veriformis.release import support_matrix
+
 
 ROOT = Path(__file__).resolve().parents[2]
 MACOS = ROOT / "macos/Sources"
@@ -47,12 +49,17 @@ def test_cli_equivalents_cover_map_compile_export_review() -> None:
     assert '"mapping-preview"' in model
 
 
-def test_english_v1_locale_and_no_github_xcodebuild() -> None:
+def test_english_v1_locale() -> None:
     pbx = _read("macos/Veriformis.xcodeproj/project.pbxproj")
     assert "developmentRegion = en;" in pbx
+
+
+def test_github_xcodebuild_is_not_a_public_mac_claim() -> None:
     workflows = ROOT / ".github/workflows"
     texts = "\n".join(path.read_text(encoding="utf-8") for path in workflows.glob("*.yml"))
-    assert "xcodebuild" not in texts
+    assert "xcodebuild" in texts
+    assert "xcodebuild-debug (optional)" in texts
+    assert support_matrix().platforms.public_signed_mac is False
 
 
 def test_source_list_is_not_virtualized() -> None:

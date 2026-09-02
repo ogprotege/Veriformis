@@ -89,6 +89,7 @@ Hub execute. Publication retry skipped with a record. Do not start Phase
 20 from that packet. Phase 20 is complete under its own packet.
 Version remains `0.1.0` development alpha. The frozen matrix is
 CLI-first. Public signed Mac and Hub execute stay excluded.
+Unsigned Debug GitHub `xcodebuild` is optional `continue-on-error` CI; it is not a public Mac claim.
 Do not invent a Phase 21 from that packet.
 Phase 4 introduces the
 implemented taxonomy contract/discovery surfaces and the typed internal

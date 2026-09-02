@@ -44,7 +44,7 @@ a schema pin, not a second catalog);
 `veriformis.extension-protocol/v1`
 remains built-in-only with no loader; quality report is preview-only;
 maturity alpha;
-public Mac claim still owner-gated. `ocr-image` remains explicitly
+public Mac claim still owner-gated. Unsigned Debug GitHub `xcodebuild` is not a public Mac claim. `ocr-image` remains explicitly
 unsupported for default parse. `quality-report` is a preview, not a gate. Mac
 Review wraps existing CLI packets; default `review_policy` stays `none`.
 There is no published corpus tier.

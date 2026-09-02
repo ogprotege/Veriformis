@@ -260,7 +260,8 @@ def test_skipped_extras_have_records_and_phase_19_did_not_start_from_this_packet
         assert skipped in closeout
     workflows = ROOT / ".github/workflows"
     texts = "\n".join(path.read_text(encoding="utf-8") for path in workflows.glob("*.yml"))
-    assert "xcodebuild" not in texts
+    assert "xcodebuild" in texts
+    assert "xcodebuild-debug (optional)" in texts
     pbx = _read("macos/Veriformis.xcodeproj/project.pbxproj")
     assert "developmentRegion = en;" in pbx
     sources = _read("macos/Sources/Views/SourceDropView.swift")

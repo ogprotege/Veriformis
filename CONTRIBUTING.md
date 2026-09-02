@@ -63,6 +63,7 @@ optional publication is complete under its own packet. ADR-0020
 Decision A. Hub execute skipped. Do not start Phase 20 from that packet.
 Phase 20 is complete under its own packet. Version remains `0.1.0`
 development alpha. Do not invent a Phase 21.
+Unsigned Debug GitHub `xcodebuild` is optional `continue-on-error` CI; it is not a public Mac claim.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
 Extras stay empty.
