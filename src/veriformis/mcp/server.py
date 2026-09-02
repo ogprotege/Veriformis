@@ -235,11 +235,14 @@ def create_mcp_server(
     @server.tool()
     def support_matrix() -> str:
         """Return the frozen CLI-first 1.0 support matrix. Not a version bump."""
-        return json.dumps(
-            pipeline.discover_support_matrix(),
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
+        return (
+            json.dumps(
+                pipeline.discover_support_matrix(),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
         )
 
     @server.tool()
@@ -281,11 +284,14 @@ def create_mcp_server(
     @server.tool()
     def modes() -> str:
         """Return compiler-path input modes from PipelineService."""
-        return json.dumps(
-            pipeline.discover_modes(),
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
+        return (
+            json.dumps(
+                pipeline.discover_modes(),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
         )
 
     @server.tool()
@@ -362,11 +368,14 @@ def create_mcp_server(
     @server.tool()
     def mapping_contracts() -> str:
         """Return row-mapping contract discovery from PipelineService."""
-        return json.dumps(
-            pipeline.discover_mapping_contracts(),
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
+        return (
+            json.dumps(
+                pipeline.discover_mapping_contracts(),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
         )
 
     @server.tool()

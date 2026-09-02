@@ -51,7 +51,7 @@ def test_pipeline_v1_and_goldens_hold() -> None:
     assert fingerprint["manifest_sha256"]
 
 
-def test_hub_quality_report_and_package_mcp_stay_absent() -> None:
+def test_hub_and_package_mcp_stay_absent() -> None:
     cli_names = _cli_names()
     mcp_names = _mcp_names()
     assert cli_names.isdisjoint(_FORBIDDEN)

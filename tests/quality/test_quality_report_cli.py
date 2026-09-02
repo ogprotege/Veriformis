@@ -10,6 +10,7 @@ from typer.testing import CliRunner
 import pytest
 
 from veriformis.cli import app
+from veriformis.errors import MissingStageInputError, QualityReportError
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
 from veriformis.quality import V1_QUALITY_GATES, require_quality_report_not_enforcing
@@ -128,3 +129,26 @@ def test_quality_report_dataset_row_does_not_ask_for_schema_3(tmp_path: Path) ->
     message = str(exc.value)
     assert "schema 3" not in message
     assert "upgrade-workspace" not in message
+
+
+def test_quality_report_parse_only_does_not_tell_operator_to_split_first(
+    tmp_path: Path,
+) -> None:
+    sources = _write_sources(tmp_path)
+    workspace = tmp_path / "workspace"
+    service = PipelineService()
+    service.parse([sources], workspace, source_root=tmp_path)
+    with pytest.raises(MissingStageInputError) as exc:
+        service.quality_report(workspace)
+    message = str(exc.value)
+    assert "`veriformis split" not in message
+    assert "construct" in message
+
+
+def test_stray_manifest_is_not_called_a_sealed_bundle(tmp_path: Path) -> None:
+    stray = tmp_path / "stray"
+    stray.mkdir()
+    (stray / "manifest.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(QualityReportError) as exc:
+        PipelineService().quality_report(stray)
+    assert "sealed bundle" not in str(exc.value)

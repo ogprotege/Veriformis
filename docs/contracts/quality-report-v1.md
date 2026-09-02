@@ -149,6 +149,25 @@ license status.
 
 Policy records `detector-findings-not-certification` as `record-only`.
 
+## Family-hook facts
+
+`family_hook_facts` counts explicit advanced-family fields on included
+records. Absent fields stay zero on ordinary SFT rows. These facts feed
+preview-only gates. They do not block seal.
+
+| Fact | Value |
+| --- | --- |
+| `family-missing-label-count` | Included records with an empty `label` field |
+| `family-ranking-tie-count` | Extra copies of the same ranked entity/prompt |
+| `family-singleton-label-set-count` | `1` when included records share exactly one nonempty label |
+| `family-tool-role-gap-count` | Tool fields without a role |
+| `family-unpaired-without-policy-count` | `feedback` without `chosen`/`rejected` |
+
+Preview gates `preview-family-missing-label`, `preview-family-ranking-tie`,
+`preview-family-singleton-label-set`, `preview-family-tool-role-gap`, and
+`preview-family-unpaired-without-policy` bind those facts. `admitted-to-block`
+stays false.
+
 ## Split findings (item 13.8)
 
 `report_split_findings` records comparability of train versus evaluation
@@ -189,7 +208,7 @@ sets `admitted_to_block=True` fails closed.
 
 Policy records `quality-gates-preview-only` and
 `quality-no-heuristic-admitted-to-block`. Labeled fixtures calibrate
-detector, near-duplicate, leakage, and split-empty/role heuristics.
+detector, near-duplicate, leakage, family-hook, and split-empty/role heuristics.
 None of those heuristics is admitted to fail seal.
 
 ## Enforcement

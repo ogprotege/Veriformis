@@ -94,25 +94,17 @@ def report_policy_detectors(
         split=split,
     )
     hits = _scan(included)
+
+    def _records(family: str) -> int:
+        return len({item["record-id"] for item in hits if item["family"] == family})
+
     extra = (
         _text_fact("detector-hits", hits),
-        _count_fact(
-            "detector-license-hit-count",
-            sum(item["family"] == "license" for item in hits),
-        ),
-        _count_fact(
-            "detector-pii-hit-count",
-            sum(item["family"] == "pii" for item in hits),
-        ),
-        _count_fact(
-            "detector-secret-hit-count",
-            sum(item["family"] == "secret" for item in hits),
-        ),
+        _count_fact("detector-license-hit-count", _records("license")),
+        _count_fact("detector-pii-hit-count", _records("pii")),
+        _count_fact("detector-secret-hit-count", _records("secret")),
         _text_fact("detector-set-id", DETECTOR_SET_ID),
-        _count_fact(
-            "detector-unsafe-hit-count",
-            sum(item["family"] == "unsafe" for item in hits),
-        ),
+        _count_fact("detector-unsafe-hit-count", _records("unsafe")),
     )
     if tuple(item.name for item in extra) != DETECTOR_FACT_NAMES:
         raise QualityReportError("detector facts must match the v1 name set")

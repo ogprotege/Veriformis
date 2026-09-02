@@ -73,8 +73,8 @@ def test_contract_discovery_is_canonical_and_shared() -> None:
     }
     mcp = tools["mapping_contracts"]()
     assert python == expected
-    assert cli.output.strip() == expected
-    assert mcp.strip() == expected
+    assert cli.output == expected + "\n"
+    assert mcp == expected + "\n"
     assert SERVICE.discover_mapping_contracts() == json.loads(expected)
 
 

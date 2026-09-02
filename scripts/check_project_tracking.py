@@ -665,8 +665,15 @@ def _check_support_matrix(support: dict[str, Any], errors: list[str]) -> None:
         and matrix.generator is False
         and matrix.plugin_loader is False
         and matrix.platforms.public_signed_mac is False
-        and matrix.published_corpus_tiers == (),
+        and matrix.published_corpus_tiers == ()
+        and matrix.quality_report_command is True,
         "support-matrix exclusions drifted from the frozen 1.0 non-claims",
+        errors,
+    )
+    _require(
+        "xcodebuild-debug (optional)"
+        in (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
+        "unsigned Debug xcodebuild job missing from CI",
         errors,
     )
 

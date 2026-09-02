@@ -8,7 +8,7 @@ Phases 0–2; independent-product Phases 0–20 complete)
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-09-01 (Phase 20.10 closeout retained 0.1.0)
+**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
 
 **Next review:** Any capability claim change. Version remains `0.1.0`.
 Do not invent a Phase 21.
