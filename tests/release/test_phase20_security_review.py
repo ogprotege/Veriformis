@@ -67,8 +67,12 @@ def test_first_party_license_is_mit() -> None:
     dependencies = project["project"]["dependencies"]
     assert dependencies
     extras = project["project"]["optional-dependencies"]
-    for name in ("trl", "mlx-lm", "columnar", "axolotl", "llama-factory", "unsloth", "ocr"):
+    for name in ("trl", "mlx-lm", "axolotl", "llama-factory", "unsloth", "ocr"):
         assert extras[name] == []
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
     assert lock
     assert "huggingface_hub" not in " ".join(dependencies)

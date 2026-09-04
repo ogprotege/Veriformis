@@ -138,14 +138,15 @@
     ],
     "extras_empty": [
       "axolotl",
-      "columnar",
       "llama-factory",
       "mlx-lm",
       "ocr",
       "trl",
       "unsloth"
     ],
-    "extras_required": [],
+    "extras_required": [
+      "columnar"
+    ],
     "implemented": [
       "veriformis-canonical-v1",
       "aptus-handoff-v1",

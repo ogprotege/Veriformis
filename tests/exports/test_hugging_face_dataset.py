@@ -6,6 +6,7 @@ import base64
 import importlib.util
 import json
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -179,8 +180,10 @@ def test_importing_hf_dataset_module_does_not_import_columnar_libraries() -> Non
     assert hf_module.HF_DATASET_CONTAINER_ID == "hugging-face-dataset"
     assert not _hugging_face_datasets_loaded()
     assert "pyarrow" not in sys.modules
-    toml = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "columnar = []" in toml
-    lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
-    assert 'name = "datasets"\n' not in lock
-    assert 'name = "pyarrow"\n' not in lock
+    extras = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["optional-dependencies"]
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]

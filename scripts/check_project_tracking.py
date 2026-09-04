@@ -655,7 +655,7 @@ def _check_support_matrix(support: dict[str, Any], errors: list[str]) -> None:
         and matrix.profiles.optional_export_adapters
         == tuple(IMPLEMENTED_EXPORT_CONSUMER_PROFILES)
         and matrix.profiles.candidate_not_executable == tuple(CANDIDATE_CONSUMER_PROFILES)
-        and matrix.profiles.extras_required == (),
+        and matrix.profiles.extras_required == ("columnar",),
         "support-matrix profiles differ from taxonomy",
         errors,
     )

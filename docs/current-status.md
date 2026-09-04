@@ -42,12 +42,16 @@ Phase 9 columnar containers are complete: Parquet v1, Arrow IPC v1, and
 local Hugging Face DatasetDict v1 are implemented `semantic_content_only`
 generic exports with semantic fingerprints, library-reload harnesses, and
 dataset-row mapping for Parquet and Arrow. Suffix does not switch modes.
-Extra `columnar` stays empty. There is no Hub upload.
+Extra `columnar` lists the pins. Default install and core pytest still
+must not import PyArrow or Datasets. Execute without the extra refuses
+and names extra `columnar`. Execute with the extra writes parquet,
+arrow, and hugging-face-dataset. There is no Hub upload.
 Phase 10 consumer-profile expansion is complete: Axolotl, LLaMA-Factory,
 and Aptus are implemented optional `ExportService` adapters. Unsloth
 remains experimental and is not executable. The sibling Aptus handoff
-CLI remains; default seal still does not write the descriptor. Empty
-extras stay empty. The exporter does not train.
+CLI remains; default seal still does not write the descriptor. Trainer
+extras and extra `ocr` stay empty. Extra `columnar` lists the pins. The
+exporter does not train.
 Phase 11 collection ingest is complete: `veriformis.collection-plan/v1`
 expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
 unsupported, duplicate, and symlink members are counted. Limits fail
@@ -802,8 +806,8 @@ See [docs/release.md](release.md).
 | Completed independent Phase 7 | Existing-dataset import/mapping: modes, contracts, JSONL/JSON/CSV capture, confirmation, provenance, preview, partitions, rejections, templates; closeout PR #80 at `b7bb7f0c2046` after all 14 GitHub checks passed |
 | Completed independent Phase 8 | TRL SFT and MLX-LM LoRA optional adapters, admission pins, official-schema harnesses, dataset-only launch sidecars, discovery truthfulness; items 8.1–8.6 merged as PR #82–#87 |
 | Implemented beta-prep (docs/evidence) | Limitations register, install guide, clean-path pack; still alpha maturity |
-| Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` remains empty |
-| Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; extras stay empty; the exporter does not train |
+| Completed independent Phase 9 | Parquet, Arrow IPC, and local Hugging Face DatasetDict v1 as implemented `semantic_content_only` generics; Arrow schema pins; semantic fingerprints; Phase 7 Parquet/Arrow mapping; optional library-reload CI; extra `columnar` later lists the recorded pins |
+| Completed independent Phase 10 | Axolotl, LLaMA-Factory, and Aptus optional export adapters; Unsloth skipped as experimental; official-schema harnesses; dataset-only sidecars; trainer extras stay empty; the exporter does not train |
 | Completed independent Phase 11 | Shared collection plan v1, deterministic inventory, parser hardening, and parser identity pins; archives, parser subprocesses, and new input families skipped |
 | Completed independent Phase 12 | Optional local Tesseract 5 OCR with classified recovery, thresholds, and preview; empty `ocr` extra; default parse still refuses image-only PDF |
 | Completed independent Phase 13 | Versioned quality report, preview-only gates, and labeled fixtures; no heuristic blocks seal |

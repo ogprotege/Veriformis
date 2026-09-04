@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -285,5 +286,10 @@ def test_importing_fingerprint_does_not_import_columnar_libraries() -> None:
     assert "pyarrow" not in sys.modules
     assert "datasets" not in sys.modules
     assert "pandas" not in sys.modules
-    toml = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "columnar = []" in toml
+    extras = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["optional-dependencies"]
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]

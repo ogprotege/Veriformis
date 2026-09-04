@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -68,8 +69,13 @@ def test_columnar_capture_fails_closed_without_pyarrow(tmp_path: Path) -> None:
     with pytest.raises(RowSourceError, match="require PyArrow.*columnar"):
         capture_row_source(arrow, logical_path="rows.arrow")
     assert "pyarrow" not in sys.modules
-    toml = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "columnar = []" in toml
+    extras = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["optional-dependencies"]
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]
 
 
 def test_suffix_does_not_switch_document_source_to_dataset_row(
@@ -114,6 +120,7 @@ def test_mixed_parse_refuses_fused_document_and_columnar(
     doc.write_text("A document paragraph.\n", encoding="utf-8")
     rows = tmp_path / f"rows{suffix}"
     rows.write_bytes(b"PAR1")
+    already_loaded = "pyarrow" in sys.modules
     with pytest.raises(ParseError, match="distinct"):
         SERVICE.parse(
             [doc, rows],
@@ -122,4 +129,5 @@ def test_mixed_parse_refuses_fused_document_and_columnar(
             mode="mixed",
         )
     assert not (tmp_path / "ws").exists()
-    assert "pyarrow" not in sys.modules
+    if not already_loaded:
+        assert "pyarrow" not in sys.modules

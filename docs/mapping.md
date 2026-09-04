@@ -17,7 +17,7 @@ Suffix `.jsonl`, `.json`, `.csv`, `.parquet`, or `.arrow` does not switch
 paths. The same JSON array compiled as document-source becomes IR
 paragraphs; compiled as dataset-row it becomes captured objects. Parquet
 and Arrow stay unsupported in document-source parse. Extra `columnar`
-stays empty; those captures import PyArrow only when the file is read.
+lists the pins; those captures import PyArrow only when the file is read.
 
 ## Confirmation
 

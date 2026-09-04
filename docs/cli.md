@@ -605,7 +605,9 @@ advertise three `portable_exact_bytes` generic selectors:
 `split-jsonl-directory`, canonical `json`, and `constrained-csv`, all version 1
 with no consumer profile. Phase 9.4–9.6 add `parquet`, `arrow`, and
 `hugging-face-dataset` v1 as `semantic_content_only` generics; extra
-`columnar` stays empty. Taxonomy lists them as implemented. Optional TRL
+`columnar` lists the pins. Default install does not import those wheels.
+Execute without the extra refuses and names extra `columnar`. Taxonomy
+lists them as implemented. Optional TRL
 and MLX-LM adapters sit on `split-jsonl-directory` v1. Split JSONL, canonical
 JSON, Parquet, Arrow, Hugging Face DatasetDict, and the TRL, MLX-LM,
 Axolotl, LLaMA-Factory, and Aptus

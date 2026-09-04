@@ -50,7 +50,7 @@ packet. Items 9.1–9.8 merge sequentially. Item 9.8 loads the three
 containers through PyArrow and Hugging Face Datasets in optional CI,
 measures JSONL versus columnar tree sizes, promotes `parquet`, `arrow`,
 and `hugging-face-dataset` to implemented, and closes the phase. Extra
-`columnar` stays empty. Phase 10 (expand consumer profiles under
+`columnar` later lists the recorded pins. Phase 10 (expand consumer profiles under
 evidence gates) is complete under its standard packet. Items 10.1–10.2
 opened the packet and pinned admissions as PR #97 and PR #98. Items
 10.3–10.8 emit Axolotl and LLaMA-Factory, skip Unsloth, move Aptus onto

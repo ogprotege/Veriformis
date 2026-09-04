@@ -72,4 +72,4 @@ Changing JSONL/JSON/CSV determinism.
 ## Isolation
 
 Core pytest and this pin must not import PyArrow, Hugging Face Datasets,
-or pandas. Extra `columnar` stays empty.
+or pandas. Extra `columnar` lists the pins.

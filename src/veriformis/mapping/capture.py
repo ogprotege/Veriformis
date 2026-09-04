@@ -273,8 +273,8 @@ def _require_pyarrow() -> tuple[Any, Any, Any]:
         import pyarrow.parquet as pq
     except ImportError as exc:
         raise RowSourceError(
-            "Parquet and Arrow capture require PyArrow; the optional extra "
-            "'columnar' is empty in this install"
+            "Parquet and Arrow capture require PyArrow; install optional extra "
+            "'columnar'"
         ) from exc
     return pa, pq, ipc
 

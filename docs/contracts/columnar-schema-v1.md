@@ -7,7 +7,7 @@
 **Discovery schema:** `veriformis.columnar-schema-discovery/v1`
 
 **Status:** Implemented Arrow and Hugging Face feature pins for the three
-columnar generic containers. Extra `columnar` remains empty.
+columnar generic containers. Extra `columnar` lists the pins.
 
 **Last reviewed:** 2026-08-24
 
@@ -53,9 +53,10 @@ still bind the exact emitted bytes of a pinned extra.
 
 ## Isolation
 
-Optional extra `columnar` remains an empty list. Core install, compile,
+Optional extra `columnar` lists the recorded pins. Core install, compile,
 seal, generic JSONL/JSON/CSV export, TRL/MLX-LM adapters, and core pytest
-must not import PyArrow, Hugging Face Datasets, or pandas.
+must not import PyArrow, Hugging Face Datasets, or pandas. Execute without
+the extra refuses and names extra `columnar`.
 
 ## Non-goals
 

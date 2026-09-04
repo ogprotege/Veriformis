@@ -77,7 +77,10 @@ def test_packaging_has_no_plugin_entry_points_and_empty_extras() -> None:
         "test": ["pytest>=8.0", "ruff==0.16.0"],
         "trl": [],
         "mlx-lm": [],
-        "columnar": [],
+        "columnar": [
+            "pyarrow>=19.0.0,<26.0.0",
+            "datasets>=3.0.0,<6.0.0",
+        ],
         "axolotl": [],
         "llama-factory": [],
         "unsloth": [],

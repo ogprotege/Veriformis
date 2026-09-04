@@ -31,12 +31,15 @@ _FORBIDDEN = frozenset(
 _EMPTY_EXTRAS = (
     "trl",
     "mlx-lm",
-    "columnar",
     "axolotl",
     "llama-factory",
     "unsloth",
     "ocr",
 )
+_COLUMNAR_EXTRA_PINS = [
+    "pyarrow>=19.0.0,<26.0.0",
+    "datasets>=3.0.0,<6.0.0",
+]
 
 
 def _cli_names() -> set[str]:
@@ -103,6 +106,7 @@ def test_pipeline_hub_quality_and_extras_hold() -> None:
     extras = project["project"]["optional-dependencies"]
     for name in _EMPTY_EXTRAS:
         assert extras[name] == []
+    assert extras["columnar"] == _COLUMNAR_EXTRA_PINS
     workflows = "\n".join(
         path.read_text(encoding="utf-8") for path in (ROOT / ".github/workflows").glob("*.yml")
     )

@@ -34,11 +34,14 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=8.0", "ruff==0.16.0"]
 # Isolation extras declared in Phase 8.2, Phase 9.1, and Phase 10.1.
-# Version ranges live in admission or schema pins. Packages are installed
-# by later harnesses, not core.
+# Extra columnar lists the Phase 9 pins. Trainer extras and extra ocr stay empty.
+# Default install and core pytest must not import those wheels.
 trl = []
 mlx-lm = []
-columnar = []
+columnar = [
+  "pyarrow>=19.0.0,<26.0.0",
+  "datasets>=3.0.0,<6.0.0",
+]
 axolotl = []
 llama-factory = []
 unsloth = []

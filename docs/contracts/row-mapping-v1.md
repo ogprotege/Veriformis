@@ -23,7 +23,7 @@ does not switch compiler mode: `.parquet` and `.arrow` remain unsupported
 in document-source parse. Dataset-row workspaces use revision schema 4 with
 stages `parse → map → curate → split → format → validate → seal`. Format
 emits ordinary `ProductRow` v1. Provenance lists mapping-rule ids instead of
-construction chunk ids. Extra `columnar` stays empty; Parquet and Arrow
+construction chunk ids. Extra `columnar` lists the pins; Parquet and Arrow
 capture import PyArrow only when those files are read.
 
 ## Closed vocabularies
