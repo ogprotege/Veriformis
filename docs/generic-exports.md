@@ -98,20 +98,23 @@ derivative for ordinary-file use, not a replacement source of authority.
 
 ## Safe operator sequence
 
+`--request-json` takes the canonical request JSON text. It does not read a
+filesystem path. To use a file, pass `--request-json "$(cat FILE)"`.
+
 1. Retain the canonical bundle's `manifest.json` SHA-256 outside the bundle.
 2. Run `veriformis export discover` and confirm the selector supports the
    bundle's row schema.
-3. Run `veriformis export dry-run --request-json REQUEST` with
+3. Run `veriformis export dry-run --request-json "$(cat FILE)"` with
    `source_trust_policy` set to `require_external_digest` and the retained
    manifest digest. Review the exact plan ID, sample rows, omission labels, and
    relative destination tree.
 4. Copy the dry-run result's `export_plan_id` into the execute request's
    `expected_export_plan_id`. Run
-   `veriformis export execute --request-json REQUEST` with the same selector,
-   options, trust evidence, and a new destination root. Publication is
-   no-replace: the only overwrite policy is `refuse`.
-5. Run `veriformis export-verify --request-json REQUEST` with those same plan
-   bindings and the published destination.
+   `veriformis export execute --request-json "$(cat FILE)"` with the same
+   selector, options, trust evidence, and a new destination root. Publication
+   is no-replace: the only overwrite policy is `refuse`.
+5. Run `veriformis export-verify --request-json "$(cat FILE)"` with those same
+   plan bindings and the published destination.
 
 The request JSON is a strict canonical protocol object, not a loose CLI
 configuration document. The one-line templates below enumerate the exact

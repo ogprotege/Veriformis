@@ -170,8 +170,11 @@ surface, not an `export` subcommand, MCP tool, or Mac UI action.
 
 `veriformis export discover`, `export dry-run`, `export inspect`,
 `export execute`, and top-level `export-verify` are thin adapters. The latter
-four take one strict canonical request through `--request-json`. Historical
-request v1 remains unchanged and selects the split-JSONL defaults, canonical
+four take one strict canonical request through `--request-json`.
+`--request-json` takes the canonical request JSON text. It does not read a
+filesystem path. To use a file, pass `--request-json "$(cat FILE)"`. The Mac
+bridge already passes that JSON text, not a path. Historical request v1
+remains unchanged and selects the split-JSONL defaults, canonical
 JSON's fixed tree, or constrained CSV's fixed tree. Dry run, execute, and
 source-bound verify also accept request v2 for split JSONL only, whose complete
 canonical
