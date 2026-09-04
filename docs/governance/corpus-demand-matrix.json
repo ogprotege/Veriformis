@@ -25,14 +25,28 @@
       "aggregate": {
         "bundle_context_file_count": 0,
         "bundle_directory_count": 0,
-        "directory_count": 16,
+        "directory_count": 21,
         "extensions": [
+          {
+            "declared_v1_input_suffix": true,
+            "extension": ".csv",
+            "family": "tabular",
+            "file_count": 2,
+            "total_bytes": 47
+          },
           {
             "declared_v1_input_suffix": true,
             "extension": ".json",
             "family": "structured-data",
+            "file_count": 6,
+            "total_bytes": 15308
+          },
+          {
+            "declared_v1_input_suffix": true,
+            "extension": ".jsonl",
+            "family": "structured-data",
             "file_count": 5,
-            "total_bytes": 15212
+            "total_bytes": 434
           },
           {
             "declared_v1_input_suffix": true,
@@ -52,8 +66,8 @@
             "declared_v1_input_suffix": true,
             "extension": ".py",
             "family": "source-code",
-            "file_count": 3,
-            "total_bytes": 377
+            "file_count": 4,
+            "total_bytes": 421
           },
           {
             "declared_v1_input_suffix": true,
@@ -88,13 +102,18 @@
           },
           {
             "family": "source-code",
-            "file_count": 3,
-            "total_bytes": 377
+            "file_count": 4,
+            "total_bytes": 421
           },
           {
             "family": "structured-data",
-            "file_count": 5,
-            "total_bytes": 15212
+            "file_count": 11,
+            "total_bytes": 15742
+          },
+          {
+            "family": "tabular",
+            "file_count": 2,
+            "total_bytes": 47
           },
           {
             "family": "undeclared-other",
@@ -102,7 +121,7 @@
             "total_bytes": 217201
           }
         ],
-        "file_count": 37,
+        "file_count": 46,
         "hidden_entry_count": 0,
         "inaccessible_entry_count": 0,
         "other_entry_count": 0,
@@ -114,8 +133,8 @@
           },
           {
             "bucket": "1b_to_1kib",
-            "file_count": 20,
-            "total_bytes": 7578
+            "file_count": 29,
+            "total_bytes": 8199
           },
           {
             "bucket": "over_1kib_to_1mib",
@@ -134,7 +153,7 @@
           }
         ],
         "symlink_count": 0,
-        "total_bytes": 449691
+        "total_bytes": 450312
       },
       "evidence_grade": "test-verified",
       "limitations": [
