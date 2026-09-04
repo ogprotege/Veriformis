@@ -940,6 +940,43 @@ def test_v2_is_ascii_safe_and_cli_mcp_preserve_exact_unicode(
     assert mcp_result == encoded
 
 
+def test_cli_request_json_path_is_not_read_as_a_request_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = _materialize_bundle(tmp_path)
+    request_json = _dry_request(
+        bundle,
+        container_id=SPLIT_JSONL_CONTAINER_ID,
+        container_version=SPLIT_JSONL_CONTAINER_VERSION,
+    ).canonical_bytes().decode("utf-8")
+    path = tmp_path / "dry-run.request.json"
+    path.write_text(request_json, encoding="utf-8")
+    assert json.loads(path.read_text(encoding="utf-8"))["operation"] == "dry_run"
+
+    calls: list[object] = []
+
+    class RecordingPipeline:
+        def dry_run_export(self, request: object) -> None:
+            calls.append(request)
+            raise AssertionError("path must not be loaded as a request")
+
+    monkeypatch.setattr(cli_module, "_SERVICE", RecordingPipeline())
+    result = CliRunner().invoke(
+        app,
+        ["export", "dry-run", "--request-json", str(path)],
+    )
+
+    assert result.exit_code == 2
+    assert calls == []
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "error"
+    assert payload["error"]["code"] == "export-contract-invalid"
+    message = str(payload["error"]["message"]).lower()
+    assert "invalid export surface request json" in message
+    assert "expecting value" in message
+
+
 def test_legacy_v1_bytes_remain_exact_and_dry_run_errors_are_v2(
     tmp_path: Path,
 ) -> None:

@@ -149,10 +149,10 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis package EXPORT -o EXPORT.vfexport.zip --export-receipt-sha256 HEX` | Deterministic receipt-anchored transport of an unchanged generic export directory |
 | `veriformis package-verify ARCHIVE --export-receipt-sha256 HEX` | Verify receipt-bound export members and canonical transport bytes |
 | `veriformis export discover` | List executable verified-export implementations; includes `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
-| `veriformis export dry-run --request-json JSON` | Derive a source-anchored plan plus exact first-row/non-empty-partition samples and normalized plan-derived tree, without renderer or destination access; whole payloads over 65,536 bytes or excluded by the response budget are omitted with an exact reason |
-| `veriformis export inspect --request-json JSON` | Inspect a self-described export's closed physical tree |
-| `veriformis export execute --request-json JSON` | Publish one operator-confirmed plan with no-replace `refuse` |
-| `veriformis export-verify --request-json JSON` | Re-derive source authority and independently verify an export |
+| `veriformis export dry-run --request-json JSON_TEXT` | Derive a source-anchored plan plus exact first-row/non-empty-partition samples and normalized plan-derived tree, without renderer or destination access; whole payloads over 65,536 bytes or excluded by the response budget are omitted with an exact reason |
+| `veriformis export inspect --request-json JSON_TEXT` | Inspect a self-described export's closed physical tree |
+| `veriformis export execute --request-json JSON_TEXT` | Publish one operator-confirmed plan with no-replace `refuse` |
+| `veriformis export-verify --request-json JSON_TEXT` | Re-derive source authority and independently verify an export |
 | `veriformis handoff BUNDLE --manifest-sha256 HEX` | Build/write Aptus handoff |
 | `veriformis handoff-verify HANDOFF --bundle BUNDLE` | Consumer check |
 | `veriformis list-recipes` | Named recipes |
@@ -162,6 +162,9 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions; see [migration.md](migration.md) |
 
 ### Choose a generic export container
+
+`--request-json` takes the canonical request JSON text. It does not read a
+filesystem path. To use a file, pass `--request-json "$(cat FILE)"`.
 
 Use the [Generic Export Operator Guide](generic-exports.md) to choose among
 split JSONL, canonical JSON, and constrained CSV. The container encodes rows
@@ -297,9 +300,11 @@ veriformis verify /tmp/out.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
 
 Omitted `--instruction` on instruction-and-output uses the catalog template
 after the truthfulness check. To inspect a generic export without writing a
-destination, use `veriformis export dry-run --request-json` as described in
-the [CLI reference](cli.md) and the
-[Generic Export Operator Guide](generic-exports.md).
+destination, use `veriformis export dry-run --request-json "$(cat FILE)"` as
+described in the [CLI reference](cli.md) and the
+[Generic Export Operator Guide](generic-exports.md). `--request-json` takes
+the canonical request JSON text. It does not read a filesystem path. To use a
+file, pass `--request-json "$(cat FILE)"`.
 
 Optional Aptus adapter use is explicit: pass `--aptus-handoff` to `seal`, or
 run `handoff` after retaining the manifest digest. The adapter's current policy

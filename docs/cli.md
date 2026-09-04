@@ -590,11 +590,14 @@ guide and Phase 5 closeout merged as PR #59 at
 
 ```text
 veriformis export discover
-veriformis export dry-run --request-json JSON
-veriformis export inspect --request-json JSON
-veriformis export execute --request-json JSON
-veriformis export-verify --request-json JSON
+veriformis export dry-run --request-json JSON_TEXT
+veriformis export inspect --request-json JSON_TEXT
+veriformis export execute --request-json JSON_TEXT
+veriformis export-verify --request-json JSON_TEXT
 ```
+
+`--request-json` takes the canonical request JSON text. It does not read a
+filesystem path. To use a file, pass `--request-json "$(cat FILE)"`.
 
 `discover` accepts no request and lists only executable implementations from the
 private service catalog. Phase 4 closed with that catalog empty. Phase 5.1–5.3

@@ -64,6 +64,10 @@ export_app = typer.Typer(
 )
 app.add_typer(export_app, name="export")
 _SERVICE: PipelineService = DEFAULT_PIPELINE_SERVICE
+_REQUEST_JSON_HELP = (
+    "Canonical request JSON text. Does not read a filesystem path. "
+    'To use a file, pass --request-json "$(cat FILE)".'
+)
 
 
 def _echo_error(exc: Exception, *, status: int = 2) -> None:
@@ -628,7 +632,11 @@ def export_discover() -> None:
 
 @export_app.command(name="dry-run")
 def export_dry_run(
-    request_json: str = typer.Option(..., "--request-json"),
+    request_json: str = typer.Option(
+        ...,
+        "--request-json",
+        help=_REQUEST_JSON_HELP,
+    ),
 ) -> None:
     """Derive and summarize an export plan without destination access."""
 
@@ -651,7 +659,11 @@ def export_dry_run(
 
 @export_app.command(name="inspect")
 def export_inspect(
-    request_json: str = typer.Option(..., "--request-json"),
+    request_json: str = typer.Option(
+        ...,
+        "--request-json",
+        help=_REQUEST_JSON_HELP,
+    ),
 ) -> None:
     """Inspect one self-described export tree without asserting source trust."""
 
@@ -674,7 +686,11 @@ def export_inspect(
 
 @export_app.command(name="execute")
 def export_execute(
-    request_json: str = typer.Option(..., "--request-json"),
+    request_json: str = typer.Option(
+        ...,
+        "--request-json",
+        help=_REQUEST_JSON_HELP,
+    ),
 ) -> None:
     """Atomically publish one operator-confirmed export plan."""
 
@@ -697,7 +713,11 @@ def export_execute(
 
 @app.command(name="export-verify")
 def export_verify(
-    request_json: str = typer.Option(..., "--request-json"),
+    request_json: str = typer.Option(
+        ...,
+        "--request-json",
+        help=_REQUEST_JSON_HELP,
+    ),
 ) -> None:
     """Source-bind and independently verify one visible export tree."""
 
