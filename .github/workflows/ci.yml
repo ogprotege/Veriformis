@@ -151,7 +151,8 @@ jobs:
         run: uv run --python 3.12 pytest -q -m "profile_integration"
 
   # Isolated columnar library-reload evidence. Visible but cannot block standalone release.
-  # Extra columnar stays empty in the lock; this job installs pin-range wheels only here.
+  # Extra columnar lists the pins; this job installs that extra. Default extra-less
+  # install still must not import those wheels.
   columnar-integration:
     name: columnar-integration (optional)
     runs-on: ubuntu-latest
@@ -163,10 +164,10 @@ jobs:
           enable-cache: true
       - name: Install Python 3.12
         run: uv python install 3.12
-      - name: Sync test extras
-        run: uv sync --python 3.12 --extra test
+      - name: Sync test and columnar extras
+        run: uv sync --python 3.12 --extra test --extra columnar
       - name: Optional PyArrow/Datasets pytest selection
-        run: uv run --python 3.12 --with 'pyarrow>=19.0.0,<26.0.0' --with 'datasets>=3.0.0,<6.0.0' pytest -q -m "columnar_integration"
+        run: uv run --python 3.12 pytest -q -m "columnar_integration"
         env:
           HF_DATASETS_DISABLE_PROGRESS_BARS: "1"
           HF_HUB_OFFLINE: "1"

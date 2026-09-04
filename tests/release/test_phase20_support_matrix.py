@@ -73,7 +73,7 @@ def test_support_matrix_matches_implemented_registries() -> None:
         IMPLEMENTED_EXPORT_CONSUMER_PROFILES
     )
     assert matrix.profiles.candidate_not_executable == tuple(CANDIDATE_CONSUMER_PROFILES)
-    assert matrix.profiles.extras_required == ()
+    assert matrix.profiles.extras_required == ("columnar",)
     assert "unsloth" in matrix.profiles.candidate_not_executable
     assert matrix.training.goals == tuple(support["training"]["implemented_goals"])
     assert matrix.inputs.modes == tuple(support["inputs"]["implemented_modes"])
@@ -81,6 +81,10 @@ def test_support_matrix_matches_implemented_registries() -> None:
     optional = project["project"]["optional-dependencies"]
     for name in matrix.profiles.extras_empty:
         assert optional[name] == []
+    assert optional["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]
 
 
 def test_python_cli_mcp_agree_on_support_matrix() -> None:

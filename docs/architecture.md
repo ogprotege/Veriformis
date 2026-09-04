@@ -122,9 +122,10 @@ Phase 9.2 packages Arrow and Hugging Face feature pins in
 `exports/columnar_schemas-v1.json`. Phase 9.3 packages semantic
 fingerprints in `exports/columnar_fingerprint-v1.json` as
 `semantic_content_only` over ordered product payloads. Extra `columnar`
-stays empty. Parquet, Arrow IPC, and local Hugging Face DatasetDict v1
-are implemented generic containers. Extra `columnar` stays empty. There
-is no Hub upload.
+lists the pins. Default install and core pytest still must not import
+PyArrow or Datasets. Parquet, Arrow IPC, and local Hugging Face
+DatasetDict v1 are implemented generic containers. Execute without the
+extra refuses and names extra `columnar`. There is no Hub upload.
 The macOS workbench lives
 outside the Python package under `macos/` as a process adapter (ADR-0019).
 `workbench/` holds wrap pins only; loading a pin is not a screen. Retained

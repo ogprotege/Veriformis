@@ -177,8 +177,8 @@ def _require_pyarrow() -> tuple[Any, Any]:
         import pyarrow.ipc as ipc
     except ImportError as exc:
         raise ExportContractError(
-            "physical container 'arrow' requires PyArrow; the optional extra "
-            "'columnar' is empty in this install"
+            "physical container 'arrow' requires PyArrow; install optional extra "
+            "'columnar'"
         ) from exc
     return pa, ipc
 

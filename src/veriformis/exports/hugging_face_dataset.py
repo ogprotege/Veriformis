@@ -224,12 +224,12 @@ def _require_datasets() -> Any:
     except ImportError as exc:
         raise ExportContractError(
             "physical container 'hugging-face-dataset' requires Hugging Face "
-            "Datasets; the optional extra 'columnar' is empty in this install"
+            "Datasets; install optional extra 'columnar'"
         ) from exc
     if not _is_hugging_face_datasets(datasets):
         raise ExportContractError(
             "physical container 'hugging-face-dataset' requires Hugging Face "
-            "Datasets; the optional extra 'columnar' is empty in this install"
+            "Datasets; install optional extra 'columnar'"
         )
     return datasets
 

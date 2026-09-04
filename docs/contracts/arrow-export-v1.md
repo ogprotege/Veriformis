@@ -6,7 +6,7 @@
 
 **Determinism claim:** `semantic_content_only`
 
-**Status:** Implemented generic export. Extra `columnar` remains empty.
+**Status:** Implemented generic export. Extra `columnar` lists the pins.
 
 **Last reviewed:** 2026-08-24
 

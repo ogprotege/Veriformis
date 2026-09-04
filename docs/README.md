@@ -88,11 +88,11 @@ development alpha.
 | [Support lifecycle](support-lifecycle.md) | Semver, compatibility, deprecation, vulnerability, rollback | Not a version bump; frozen matrix stays CLI-first |
 | [Troubleshooting](troubleshooting.md) | Fail-closed operator notes | Unknown suffix, ocr-image, empty extras, no Hub, no signed Mac |
 | [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
-| [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` remains empty |
+| [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` lists the pins |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
-| [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints | Implemented; extra `columnar` remains empty |
-| [Arrow Export v1](contracts/arrow-export-v1.md) | Generic Arrow IPC container with semantic fingerprints | Implemented; extra `columnar` remains empty |
-| [Hugging Face Dataset Export v1](contracts/hugging-face-dataset-export-v1.md) | Local Hugging Face DatasetDict container with semantic fingerprints | Implemented; extra `columnar` remains empty; no Hub upload |
+| [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints | Implemented; extra `columnar` lists the pins |
+| [Arrow Export v1](contracts/arrow-export-v1.md) | Generic Arrow IPC container with semantic fingerprints | Implemented; extra `columnar` lists the pins |
+| [Hugging Face Dataset Export v1](contracts/hugging-face-dataset-export-v1.md) | Local Hugging Face DatasetDict container with semantic fingerprints | Implemented; extra `columnar` lists the pins; no Hub upload |
 | [TRL SFT Export v1](contracts/trl-export-v1.md) | Optional TRL SFT adapter over split JSONL | Implemented optional adapter |
 | [MLX-LM LoRA Export v1](contracts/mlx-lm-export-v1.md) | Optional mlx-lm LoRA adapter with train.jsonl and optional valid.jsonl | Implemented optional adapter |
 | [Axolotl SFT Export v1](contracts/axolotl-export-v1.md) | Optional Axolotl JSONL plus dataset-only YAML sidecar | Implemented optional adapter; extra stays empty |

@@ -1,4 +1,4 @@
-"""Phase 9 isolation: extras stay empty after taxonomy promotion."""
+"""Phase 9 isolation: extra columnar lists pins; default install stays extra-less."""
 
 from __future__ import annotations
 
@@ -74,17 +74,18 @@ def test_no_unexecutable_physical_container_remains_on_the_cli() -> None:
     assert UNEXECUTABLE_PHYSICAL_CONTAINER_ITEMS == {}
 
 
-def test_columnar_extra_is_declared_empty() -> None:
-    text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "columnar = []" in text
-    assert "trl = []" in text
-    assert "mlx-lm = []" in text
+def test_columnar_extra_lists_pins_and_default_install_stays_extra_less() -> None:
+    import importlib.util
+
+    path = Path(__file__).resolve().parent / "columnar_extra.py"
+    spec = importlib.util.spec_from_file_location("_vf_columnar_extra", path)
+    assert spec is not None and spec.loader is not None
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    helper.assert_columnar_extra_lists_pins()
+    helper.assert_columnar_wheels_are_extra_only()
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
-    assert 'name = "pyarrow"\n' not in lock
-    assert 'name = "datasets"\n' not in lock
-    assert 'name = "pandas"\n' not in lock
     assert (
         'provides-extras = ["test", "trl", "mlx-lm", "columnar", "axolotl", '
         '"llama-factory", "unsloth", "ocr"]' in lock
     )
-    assert "axolotl = []" in text

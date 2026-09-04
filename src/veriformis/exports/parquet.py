@@ -177,8 +177,8 @@ def _require_pyarrow() -> tuple[Any, Any]:
         import pyarrow.parquet as pq
     except ImportError as exc:
         raise ExportContractError(
-            "physical container 'parquet' requires PyArrow; the optional extra "
-            "'columnar' is empty in this install"
+            "physical container 'parquet' requires PyArrow; install optional extra "
+            "'columnar'"
         ) from exc
     return pa, pq
 

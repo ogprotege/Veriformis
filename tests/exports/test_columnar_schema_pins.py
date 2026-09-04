@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -103,7 +104,7 @@ def test_catalog_closes_over_every_row_schema_and_planned_container() -> None:
             assert field.nullable is False
 
 
-def test_package_pins_match_reviewed_docs_and_stay_out_of_the_lock() -> None:
+def test_package_pins_match_reviewed_docs_and_live_only_on_extra_columnar() -> None:
     by_package = {item.package: item for item in columnar_schema_catalog().packages}
     datasets = by_package["datasets"]
     assert datasets.version_range == ">=3.0.0,<6.0.0"
@@ -121,11 +122,13 @@ def test_package_pins_match_reviewed_docs_and_stay_out_of_the_lock() -> None:
     )
     assert pyarrow.docs_reviewed_on == "2026-08-23"
     assert pyarrow.role == "parquet-and-arrow-ipc"
-    lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
-    assert 'name = "pyarrow"\n' not in lock
-    assert 'name = "datasets"\n' not in lock
-    toml = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "columnar = []" in toml
+    extras = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["optional-dependencies"]
+    assert extras["columnar"] == [
+        f"pyarrow{pyarrow.version_range}",
+        f"datasets{datasets.version_range}",
+    ]
 
 
 def test_messages_pin_is_nested_role_then_content() -> None:

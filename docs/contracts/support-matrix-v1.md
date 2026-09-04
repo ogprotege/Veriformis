@@ -10,7 +10,7 @@
 Loading the pin is not a version bump. Product version remains `0.1.0`
 development alpha. Item 20.10 retained that version.
 
-**Last reviewed:** 2026-09-02
+**Last reviewed:** 2026-09-04
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 20.
 
@@ -40,8 +40,9 @@ CLI `support-matrix`, and MCP `support_matrix` emit the same object.
 | Quality-report command | preview CLI; not a gate |
 
 Inputs, goals, rows, containers, and optional profiles copy the live support
-registry and taxonomy. Optional extras stay empty. A profile failure does not
-block the independent core.
+registry and taxonomy. Extra `columnar` lists the recorded pins. Trainer extras
+and extra `ocr` stay empty. A profile failure does not block the independent
+core.
 
 ## Exclusions
 
@@ -53,7 +54,8 @@ block the independent core.
 - `default-parse-ocr-image` — default parse still refuses image-only PDF
 - `published-corpus-tiers` — scale-support tiers stay empty
 - `hosted-training` — the exporter does not train
-- `required-trainer-extras` — extras stay empty
+- `required-trainer-extras` — trainer extras stay empty; extra `columnar` is the
+  optional execute extra for parquet, arrow, and hugging-face-dataset
 
 Unknown fields fail closed.
 

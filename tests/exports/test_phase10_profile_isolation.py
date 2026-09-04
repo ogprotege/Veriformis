@@ -1,7 +1,8 @@
-"""Phase 10.1: candidate profiles refuse; extras stay empty; implemented selectors stay."""
+"""Phase 10.1: candidate profiles refuse; trainer extras stay empty."""
 
 from __future__ import annotations
 
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -140,7 +141,11 @@ def test_phase_10_extras_are_declared_empty() -> None:
     assert "unsloth = []" in text
     assert "trl = []" in text
     assert "mlx-lm = []" in text
-    assert "columnar = []" in text
+    extras = tomllib.loads(text)["project"]["optional-dependencies"]
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]
     assert "ocr = []" in text
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
     assert 'name = "axolotl"\n' not in lock

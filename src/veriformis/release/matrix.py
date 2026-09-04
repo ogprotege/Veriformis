@@ -138,13 +138,14 @@ class SupportMatrixTraining(_StrictModel):
 class SupportMatrixProfiles(_StrictModel):
     candidate_not_executable: tuple[str, ...]
     extras_empty: tuple[str, ...]
-    extras_required: tuple[()]
+    extras_required: tuple[str, ...]
     implemented: tuple[str, ...]
     optional_export_adapters: tuple[str, ...]
 
     @field_validator(
         "candidate_not_executable",
         "extras_empty",
+        "extras_required",
         "implemented",
         "optional_export_adapters",
         mode="before",
@@ -153,19 +154,20 @@ class SupportMatrixProfiles(_StrictModel):
     def _tuple_fields(cls, value: Any) -> Any:
         return tuple(value) if isinstance(value, list) else value
 
-    @field_validator("extras_required", mode="before")
-    @classmethod
-    def _empty_required(cls, value: Any) -> Any:
-        if value not in ((), []):
-            raise SupportMatrixError("support-matrix extras_required must stay empty")
-        return ()
-
     @model_validator(mode="after")
     def _closed(self) -> SupportMatrixProfiles:
         if "unsloth" not in self.candidate_not_executable:
             raise SupportMatrixError("support-matrix must keep unsloth non-executable")
         if tuple(sorted(self.extras_empty)) != self.extras_empty:
             raise SupportMatrixError("support-matrix extras_empty must be sorted")
+        if self.extras_required != ("columnar",):
+            raise SupportMatrixError(
+                "support-matrix extras_required must be exactly columnar"
+            )
+        if "columnar" in self.extras_empty:
+            raise SupportMatrixError(
+                "support-matrix extras_empty must not list extra columnar"
+            )
         return self
 
 

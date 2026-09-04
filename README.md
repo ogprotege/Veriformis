@@ -140,7 +140,7 @@ do not recurate or resplit.
 | `split-jsonl-directory` | Canonical train / evaluation JSONL |
 | `json` | Canonical JSON tree |
 | `constrained-csv` | Flat quoted CSV (`messages` refused) |
-| `parquet`, `arrow`, `hugging-face-dataset` | Columnar / DatasetDict; extra `columnar` stays empty |
+| `parquet`, `arrow`, `hugging-face-dataset` | Columnar / DatasetDict; extra `columnar` lists the pins |
 | `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus` | Optional adapters over a verified bundle |
 
 Trainer extras stay empty. The exporter does not train. `unsloth` is

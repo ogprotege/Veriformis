@@ -27,12 +27,16 @@ def test_optional_profiles_are_frozen_and_isolated() -> None:
         IMPLEMENTED_EXPORT_CONSUMER_PROFILES
     )
     assert matrix.profiles.candidate_not_executable == tuple(CANDIDATE_CONSUMER_PROFILES)
-    assert matrix.profiles.extras_required == ()
+    assert matrix.profiles.extras_required == ("columnar",)
     assert "unsloth" in matrix.profiles.candidate_not_executable
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     extras = project["project"]["optional-dependencies"]
     for name in matrix.profiles.extras_empty:
         assert extras[name] == []
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]
     ci = CI.read_text(encoding="utf-8")
     assert "name: profile-integration (optional)" in ci
     assert "name: aptus-integration (optional)" in ci
