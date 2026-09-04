@@ -1,0 +1,1 @@
+{"conversation_id": "tool-call-a", "turns": [{"role": "user", "content": "What color is a ripe lemon?"}, {"role": "assistant", "content": "checking", "tool_calls": [{"id": "call-a1", "name": "lookup", "arguments": "{\"q\":\"ripe lemon color\"}"}]}, {"role": "tool", "content": "yellow", "tool_call_id": "call-a1"}, {"role": "assistant", "content": "A ripe lemon is yellow."}]}
