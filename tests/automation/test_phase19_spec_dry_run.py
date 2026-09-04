@@ -142,7 +142,7 @@ def test_environment_inspect_omits_secrets(monkeypatch: object) -> None:
     assert "aws_secret" not in dumped
     assert "HF_TOKEN" not in dumped
     assert packet.taxonomy_implemented_counts["training_family"] > 0
-    assert packet.extras["columnar"] == "empty"
+    assert packet.extras["columnar"] == "present"
 
 
 def test_cli_schema_dry_run_lock_and_env(tmp_path: Path) -> None:

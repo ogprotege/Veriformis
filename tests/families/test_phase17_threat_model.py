@@ -83,8 +83,12 @@ def test_no_generator_module_or_hosted_model_extra() -> None:
         "unsloth",
     }
     assert set(extras).isdisjoint(_HOSTED_EXTRA_NAMES)
+    assert extras["columnar"] == [
+        "pyarrow>=19.0.0,<26.0.0",
+        "datasets>=3.0.0,<6.0.0",
+    ]
     for name, packages in extras.items():
-        if name == "test":
+        if name in {"test", "columnar"}:
             continue
         assert packages == []
 

@@ -25,12 +25,15 @@ RUNNER = CliRunner()
 _EMPTY_EXTRAS = (
     "trl",
     "mlx-lm",
-    "columnar",
     "axolotl",
     "llama-factory",
     "unsloth",
     "ocr",
 )
+_COLUMNAR_EXTRA_PINS = [
+    "pyarrow>=19.0.0,<26.0.0",
+    "datasets>=3.0.0,<6.0.0",
+]
 _OPTIONAL_IMPORT_ROOTS = (
     "trl",
     "mlx",
@@ -56,6 +59,7 @@ def test_optional_extras_remain_empty() -> None:
     ]["optional-dependencies"]
     for name in _EMPTY_EXTRAS:
         assert extras[name] == []
+    assert extras["columnar"] == _COLUMNAR_EXTRA_PINS
 
 
 def test_core_surfaces_start_with_missing_optional_extras() -> None:
