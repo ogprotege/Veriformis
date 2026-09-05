@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-09-05 (recorded-change one-component v1 limit)
+**Last reviewed:** 2026-09-05 (mapping-detect list-valued turns and steps)
 
 **Next review:** Any CLI surface or release-gate documentation change.
 
