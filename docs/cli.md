@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-09-05 (mapping-detect list-valued turns and steps)
+**Last reviewed:** 2026-09-05 (structured-field markdown one-leaf covering chunk)
 
 **Next review:** Any CLI surface or release-gate documentation change.
 
@@ -277,6 +277,17 @@ sources such as `tests/fixtures/matrix/before-after/` construct under
 `--preset reproduce-a-recorded-change.safe` after `--rules lowercase`. Isolating
 one block per chunk with a small `--size` also works with `--goal`; `--preset`
 still requires the preset segmentation.
+
+`structured_field` (`--goal extract-a-structured-value`) copies one recovered
+IR scalar. Curation quarantines `conflicting-target` when one covering chunk
+is the same input for distinct scalars, and coverage then names
+`no-included-contribution`. Typical multi-block markdown under the safe
+paragraph grouping (size 1000) hits that named refuse. The quarantine is not
+turned off. Markdown whose recovered structure is one untitled link (one
+`href`, no title) is one field per covering chunk; packaged fixtures under
+`tests/fixtures/matrix/structured-field/` seal under
+`--preset extract-a-structured-value.safe`. Do not invent field values from
+prose.
 
 `full_text` requires the `text` row schema; every other objective requires a
 supervised row schema. Unknown or duplicate `--source` selections fail closed.

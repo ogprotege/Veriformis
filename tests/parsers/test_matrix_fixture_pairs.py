@@ -33,6 +33,11 @@ PAIRS = (
         ROOT / "tests/fixtures/matrix/before-after/beta.txt",
         id="recorded-change-plain-text",
     ),
+    pytest.param(
+        ROOT / "tests/fixtures/matrix/structured-field/alpha.md",
+        ROOT / "tests/fixtures/matrix/structured-field/beta.md",
+        id="structured-field-markdown",
+    ),
 )
 
 

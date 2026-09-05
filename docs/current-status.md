@@ -607,6 +607,15 @@ plain-text fixtures under `tests/fixtures/matrix/before-after/` do construct
 under the safe preset. Construct may exit 0 with zero accepted records; that
 is not a silent skip.
 
+`structured_field` (`extract-a-structured-value`) copies one recovered IR
+scalar. Curation quarantines `conflicting-target` when one covering chunk is
+the same input for distinct scalars. Typical multi-block markdown under the
+safe paragraph grouping hits that refuse and coverage names
+`no-included-contribution`. The quarantine is not turned off. Packaged
+markdown whose recovered structure is one untitled link (one `href`, no
+title) under `tests/fixtures/matrix/structured-field/` constructs one field
+per covering chunk and can seal. Do not invent field values from prose.
+
 A `DatasetRecipe` binds one objective, an exact source set, cleaning and
 segmentation identities, ordered constructor passes, review policy, required
 construction gates, and one target row schema. Each candidate retains exact

@@ -25,7 +25,7 @@
       "aggregate": {
         "bundle_context_file_count": 0,
         "bundle_directory_count": 0,
-        "directory_count": 22,
+        "directory_count": 23,
         "extensions": [
           {
             "declared_v1_input_suffix": true,
@@ -52,8 +52,8 @@
             "declared_v1_input_suffix": true,
             "extension": ".md",
             "family": "markup",
-            "file_count": 5,
-            "total_bytes": 1184
+            "file_count": 7,
+            "total_bytes": 1268
           },
           {
             "declared_v1_input_suffix": true,
@@ -87,8 +87,8 @@
         "families": [
           {
             "family": "markup",
-            "file_count": 5,
-            "total_bytes": 1184
+            "file_count": 7,
+            "total_bytes": 1268
           },
           {
             "family": "plain-text",
@@ -121,7 +121,7 @@
             "total_bytes": 217201
           }
         ],
-        "file_count": 52,
+        "file_count": 54,
         "hidden_entry_count": 0,
         "inaccessible_entry_count": 0,
         "other_entry_count": 0,
@@ -133,8 +133,8 @@
           },
           {
             "bucket": "1b_to_1kib",
-            "file_count": 35,
-            "total_bytes": 9318
+            "file_count": 37,
+            "total_bytes": 9402
           },
           {
             "bucket": "over_1kib_to_1mib",
@@ -153,7 +153,7 @@
           }
         ],
         "symlink_count": 0,
-        "total_bytes": 451431
+        "total_bytes": 451515
       },
       "evidence_grade": "test-verified",
       "limitations": [

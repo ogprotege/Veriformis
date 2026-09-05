@@ -17,7 +17,7 @@ Phase 6.5 (the runtime-only compile preflight), Phase 6.6 (the
 discovery-closed acceptance matrix), and Phase 6.7 (per-goal instruction
 templates and deterministic instruction truthfulness).
 
-**Last reviewed:** 2026-09-05 (recorded-change one-block evidence)
+**Last reviewed:** 2026-09-05 (structured-field markdown one-leaf covering chunk)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -168,7 +168,7 @@ Top-level object:
 | `continue-a-passage` | `continuation` | all eight | `source-chunks-unavailable`, `continuation-boundary-unavailable` |
 | `recover-a-section-from-its-heading` | `section_reconstruction` | `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `section-structure-unavailable` |
 | `reproduce-a-recorded-change` | `before_after_transformation` | all except `source-code` | `source-chunks-unavailable`, `transformation-pair-unavailable`, `transformation-pair-empty-or-unchanged`. v1 also names `transformation-pair-unavailable` when a recorded change exists but the chunk is not one block with one replayable edits component (joined paragraph groups). |
-| `extract-a-structured-value` | `structured_field` | `source-code`, `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `structured-ir-artifact-unavailable`, `structured-field-unavailable`, `structured-field-chunk-unavailable`, `structured-field-empty-value` |
+| `extract-a-structured-value` | `structured_field` | `source-code`, `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `structured-ir-artifact-unavailable`, `structured-field-unavailable`, `structured-field-chunk-unavailable`, `structured-field-empty-value`. v1 curation later quarantines `conflicting-target` when one covering chunk is the same input for distinct IR scalars (typical multi-block markdown under default paragraph grouping). |
 
 Every goal states `curation_defaults` of `minimum_target_characters` 1,
 `balance_mode` `none`, no per-source cap, `evaluation_ratio_ppm` 500000,

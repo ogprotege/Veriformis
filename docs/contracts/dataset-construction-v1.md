@@ -15,7 +15,7 @@
 **Implementation status:** Normative Group 2 contract. Current capability claims
 require the Group 2 exit gate in this document to pass.
 
-**Last reviewed:** 2026-09-05 (before/after one-component v1 limit)
+**Last reviewed:** 2026-09-05 (structured-field markdown one-leaf covering chunk)
 
 **Next review:** Any construction-schema change or taxonomy compatibility change
 
@@ -172,7 +172,7 @@ schemas.
 | `continuation` | `prompt` as context text; `completion` as target text | Prompt and completion are ordered, non-overlapping segments from one declared source unit. Completion follows the prompt under the recipe's boundary rule. |
 | `section_reconstruction` | `heading` as context text; `section` as target text | The heading identifies the exact source section whose body is the target. The constructor does not invent missing prose. |
 | `before_after_transformation` | `before` as context text; `after` as target text | `after` is produced by replaying the named deterministic transform over `before`. The transform and all edits are bound into field evidence. v1 requires the input chunk to carry exactly one evidence component whose sole derivation is a replayable `edits` step, with no join or slice. Cleaning transform records are not enough: a paragraph chunk that joins several blocks, or a window that slices a stream, is `transformation-pair-unavailable`. |
-| `structured_field` | `input` as context text; `fields` as target encoded scalar text | The target is copied from one explicit strict-IR scalar and encoded under the evidence contract. No value is inferred from an absent field. |
+| `structured_field` | `input` as context text; `fields` as target encoded scalar text | The target is copied from one explicit strict-IR scalar and encoded under the evidence contract. No value is inferred from an absent field. When one covering chunk is the same input for distinct scalars, later curation quarantines `conflicting-target`; that named refuse is the v1 limit for typical multi-block markdown under default paragraph grouping. |
 
 Additional payload fields are forbidden unless a new objective schema version
 declares them. A constructor MUST reject empty required targets, overlapping or
