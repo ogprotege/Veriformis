@@ -13,8 +13,13 @@ from pydantic import field_validator, model_validator
 from veriformis.errors import MappingError
 from veriformis.identity import lossless_json_bytes, sha256_digest
 from veriformis.mapping.capture import CapturedRow, JsonlCapture, capture_row_source
-from veriformis.mapping.execute import _require_two_turn_messages, resolve_json_pointer
-from veriformis.mapping.models import FieldMapping, MappingPlan, _StrictModel
+from veriformis.mapping.execute import _normalized_field_value, resolve_json_pointer
+from veriformis.mapping.models import (
+    ROW_SCHEMA_PAYLOAD_KEYS,
+    FieldMapping,
+    MappingPlan,
+    _StrictModel,
+)
 
 DETECTOR_DATA_NAME = "detectors-v1.json"
 DETECT_SCHEMA = "veriformis.mapping-detect/v1"
@@ -200,19 +205,22 @@ def _detector_matches(
     detector: MappingDetector,
     records: tuple[CapturedRow, ...],
 ) -> bool:
+    targets = ROW_SCHEMA_PAYLOAD_KEYS[detector.row_schema]
+    if tuple(detector.required_paths) != targets:
+        raise MappingError(
+            f"detector {detector.detector_id!r} required_paths drifted from payload keys"
+        )
     for record in records:
-        for pointer in detector.required_paths:
+        for pointer, target_key in zip(detector.required_paths, targets, strict=True):
             try:
                 value = resolve_json_pointer(record.payload, pointer)
-            except MappingError:
-                return False
-            if detector.row_schema == "messages" and pointer in {"messages", "/messages"}:
-                try:
-                    _require_two_turn_messages(value, row_index=record.row_index)
-                except MappingError:
-                    return False
-                continue
-            if not isinstance(value, str) or value == "":
+                _normalized_field_value(
+                    detector.row_schema,
+                    target_key,
+                    value,
+                    row_index=record.row_index,
+                )
+            except (MappingError, TypeError, ValueError):
                 return False
     return True
 
@@ -223,8 +231,6 @@ def _plan_from_detector(
     source_digests: tuple[tuple[str, str], ...],
     container_kind: str,
 ) -> MappingPlan:
-    from veriformis.mapping.models import ROW_SCHEMA_PAYLOAD_KEYS
-
     expected = ROW_SCHEMA_PAYLOAD_KEYS[detector.row_schema]
     if tuple(detector.required_paths) != expected:
         raise MappingError(

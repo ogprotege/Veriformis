@@ -3,7 +3,7 @@
 This page is the operator guide for dataset-row mapping. It is not a trainer
 manual and it does not change `ProductRow` v1.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 9.7 columnar import)
+**Last reviewed:** 2026-09-05 (mapping-detect list-valued turns and steps)
 
 ## When to use which compiler path
 
@@ -24,7 +24,11 @@ lists the pins; those captures import PyArrow only when the file is read.
 `veriformis mapping-detect FILE` proposes one or more `mapping-plan/v1`
 objects. Even a unique proposal requires its confirmation digest before `map`
 mutates a workspace. Ambiguous files (for example a row that could be `text`
-or `prompt_completion`) do not auto-publish.
+or `prompt_completion`) do not auto-publish. Detect uses the same field
+normalizers as `map`: two-turn `messages`, list-valued `turns` with a tool
+trace, and list-valued `steps` of at least two nonempty strings. A string in
+`turns` or `steps` is a named miss (`no mapping detector matched this file`),
+not a coerced list.
 
 Packaged templates from `veriformis mapping-templates` cover the unique
 detector shapes (`text`, `prompt_completion`, `instruction_output`,
@@ -43,10 +47,14 @@ There is no silent default that honors a `split` column.
 
 ## JSONL, JSON, CSV, Parquet, and Arrow
 
-- JSONL: one object per nonempty line. Nested `messages` two-turn objects are admitted.
+- JSONL: one object per nonempty line. Nested two-turn `messages`, list-valued
+  `turns` for tool-call traces, and list-valued `steps` are admitted when they
+  match the same shapes `map` binds.
 - JSON: a top-level array of objects, or one object with a `records` or `rows` array. Nested paths use JSON pointer.
-- CSV: header required, comma, UTF-8, no trim or pad. Jagged or nested cells fail closed. CSV cannot represent `messages`; use `split-jsonl-directory` or `json`.
-- Parquet and Arrow IPC: one table of objects. Nested `messages` is admitted. Null product fields fail closed. Capture requires extra `columnar`.
+- CSV: header required, comma, UTF-8, no trim or pad. Jagged or nested cells fail closed. CSV cannot represent nested `messages`, `turns`, or `steps`; use `split-jsonl-directory` or `json`.
+- Parquet and Arrow IPC: one table of objects. Nested `messages`, list-valued
+  `turns`, and list-valued `steps` are admitted when they match `map`. Null
+  product fields fail closed. Capture requires extra `columnar`.
 
 Rejected rows are written to a content-addressed
 `veriformis.mapping-rejection-report/v1` beside the workspace. That report is
@@ -56,9 +64,11 @@ not a verified export. Accepted rows may still seal.
 
 - No trainer, spreadsheet, or Hub compatibility.
 - No portable exact bytes for Parquet or Arrow across library versions.
-- Preference, tool-call, multimodal, and arbitrary multi-turn chat remain
-  refused. Explicit-label classification is admitted only as mapped
-  `context` / `label` / `annotator` fields with `mapped_value` evidence.
+- Document-source construction still refuses to invent preference pairs,
+  labels, tool traces, or steps. Dataset-row mapping admits operator-supplied
+  `preference-pair`, `label-classification`, `tool-call-conversation`, and
+  `stepwise-trace` rows. Detect matches those shapes, including list-valued
+  `turns` and `steps`. Multimodal rows remain refused.
 - No executable mapping functions and no LLM.
 - No construction chunks on imported fields. Provenance is `mapped_value`.
 - No full Mac mapping spreadsheet. Compile wraps mapping-detect, operator

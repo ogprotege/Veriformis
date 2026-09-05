@@ -16,7 +16,9 @@ from veriformis.pipeline import PipelineService
 
 RUNNER = CliRunner()
 SERVICE = PipelineService()
-DATA = Path(__file__).parents[2] / "src" / "veriformis" / "mapping" / "detectors-v1.json"
+ROOT = Path(__file__).resolve().parents[2]
+DATA = ROOT / "src" / "veriformis" / "mapping" / "detectors-v1.json"
+DATASET_ROW = ROOT / "tests/fixtures/matrix/dataset-row"
 
 
 def test_detector_catalog_is_canonical() -> None:
@@ -98,6 +100,99 @@ def test_detect_refuses_to_invent_a_summary(tmp_path: Path) -> None:
     assert "summary" in detected["refusal"] or "will not invent" in detected["refusal"]
     cli = RUNNER.invoke(app, ["mapping-detect", str(source), "--source-root", str(tmp_path)])
     assert cli.exit_code == 2
+    tools = {
+        tool.name: tool.fn
+        for tool in create_mcp_server(SERVICE)._tool_manager.list_tools()
+    }
+    mcp = json.loads(tools["mapping_detect"](str(source), str(tmp_path)))
+    assert mcp["proposals"] == []
+
+
+@pytest.mark.parametrize(
+    ("filename", "row_schema", "goal_id", "representation"),
+    [
+        (
+            "tool-call-a.jsonl",
+            "tool-call-conversation",
+            "use-provided-tool-traces",
+            "conversation-and-tool-trace",
+        ),
+        (
+            "stepwise-a.jsonl",
+            "stepwise-trace",
+            "use-provided-steps",
+            "prompt-and-steps",
+        ),
+    ],
+)
+def test_detect_matches_list_valued_turns_and_steps_that_map_binds(
+    tmp_path: Path,
+    filename: str,
+    row_schema: str,
+    goal_id: str,
+    representation: str,
+) -> None:
+    source = DATASET_ROW / filename
+    detected = SERVICE.detect_mapping(source, source_root=ROOT)
+    assert detected["refusal"] is None
+    schemas = {item["row_schema"] for item in detected["proposals"]}
+    assert schemas == {row_schema}
+    proposal = detected["proposals"][0]
+    assert proposal["goal_id"] == goal_id
+    assert proposal["representation_id"] == representation
+    workspace = tmp_path / "workspace"
+    SERVICE.parse([source], workspace, source_root=ROOT, mode="dataset-row")
+    mapped = SERVICE.map_rows(
+        workspace,
+        goal=proposal["goal_id"],
+        representation=proposal["representation_id"],
+        mapping_plan=proposal,
+    )
+    assert mapped.record_count == 1
+    cli = RUNNER.invoke(
+        app, ["mapping-detect", str(source), "--source-root", str(ROOT)]
+    )
+    assert cli.exit_code == 0, cli.output
+    payload = json.loads(cli.stdout)
+    assert payload["refusal"] is None
+    assert {item["row_schema"] for item in payload["proposals"]} == {row_schema}
+    tools = {
+        tool.name: tool.fn
+        for tool in create_mcp_server(SERVICE)._tool_manager.list_tools()
+    }
+    mcp = json.loads(tools["mapping_detect"](str(source), str(ROOT)))
+    assert mcp["refusal"] is None
+    assert {item["row_schema"] for item in mcp["proposals"]} == {row_schema}
+
+
+@pytest.mark.parametrize(
+    ("name", "line"),
+    [
+        (
+            "string-turns.jsonl",
+            '{"conversation_id":"tool-call-string","turns":"user then tool then assistant"}\n',
+        ),
+        (
+            "string-steps.jsonl",
+            '{"prompt":"What color is a ripe lemon?","steps":"name the color then yellow"}\n',
+        ),
+    ],
+)
+def test_detect_refuses_string_valued_turns_or_steps(
+    tmp_path: Path,
+    name: str,
+    line: str,
+) -> None:
+    source = tmp_path / name
+    source.write_text(line, encoding="utf-8")
+    detected = SERVICE.detect_mapping(source, source_root=tmp_path)
+    assert detected["proposals"] == []
+    assert detected["refusal"]
+    assert "will not invent" in detected["refusal"]
+    cli = RUNNER.invoke(
+        app, ["mapping-detect", str(source), "--source-root", str(tmp_path)]
+    )
+    assert cli.exit_code == 2, cli.output
     tools = {
         tool.name: tool.fn
         for tool in create_mcp_server(SERVICE)._tool_manager.list_tools()
