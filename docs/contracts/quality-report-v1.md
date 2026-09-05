@@ -12,7 +12,7 @@ heuristic is admitted to block seal. Seal still uses the seventeen
 finished-dataset gates. `veriformis quality-report` emits this preview;
 it is not a gate. There is no MCP wrap.
 
-**Last reviewed:** 2026-09-02
+**Last reviewed:** 2026-09-05 (dataset-row plan_id fip)
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 13.
 
@@ -27,7 +27,7 @@ downstream model quality.
 
 | Layer | Meaning in v1 |
 | --- | --- |
-| `facts` | Observed counts or text bound to the finished-dataset plan |
+| `facts` | Observed counts or text bound to the workspace plan (`fdp` or `fip`) |
 | `policy_decisions` | Named actions. v1 admits only `record-only` |
 | `recommendations` | Advisory messages that may name facts. They are not facts |
 
@@ -37,7 +37,10 @@ may only name facts that are present in the same report.
 ## Distribution facts (item 13.3)
 
 `report_dataset_distributions` fills one closed, sorted fact set from a
-bound recipe, construction result, curation result, and split result.
+bound preview view. Document-source binds recipe, construction result,
+curation result, and split result. Dataset-row binds mapping recipe,
+mapping result, imported curation, and imported split. The report does not
+construct a `DatasetRecord` from an `ImportedRecord`.
 Integer facts are counts. Text facts are lossless canonical JSON.
 
 | Fact | Value |
@@ -191,7 +194,7 @@ Policy records `split-findings-record-only`.
 
 `preview_quality_gates` compares integer facts to a versioned policy
 `veriformis.quality-gate-policy/v1`. Gates are configurable and
-previewable. They bind to the finished-dataset `plan_id`. They do not
+previewable. They bind to the previewed plan identity (`fdp` or `fip`). They do not
 add fields to `FinishedDatasetPlan` or the seventeen-gate validation
 snapshot. `admitted-to-block` is false for every v1 gate. A caller that
 sets `admitted_to_block=True` fails closed.
@@ -199,7 +202,7 @@ sets `admitted_to_block=True` fails closed.
 | Fact | Value |
 | --- | --- |
 | `quality-gate-policy-id` | `veriformis.quality-gate-policy/v1` |
-| `quality-gate-plan-id` | Finished-dataset plan identity |
+| `quality-gate-plan-id` | Previewed plan identity (`fdp` or `fip`) |
 | `quality-gate-preview` | Sorted `{gate-id, fact, threshold, observed, would-block, admitted-to-block}` rows |
 | `quality-gate-would-block-count` | Gates whose observed integer meets the threshold |
 | `quality-admitted-blocking-count` | Always `0` in v1 |
@@ -220,10 +223,12 @@ seal path.
 
 ## Binding
 
-Every report names a finished-dataset `plan_id`. Identity is
-`derive_id("qrp", …)` over the payload excluding `report_id`. Distribution
-inputs must share that plan, recipe, construction result, and curation
-result. Split input identities must equal the included records.
+Every report names the workspace plan identity it previewed: document-source
+`fdp` or dataset-row `fip`. Identity is `derive_id("qrp", …)` over the payload
+excluding `report_id`. Binding fail-closes: recipe, mapping-or-construction
+result, curation result, and split result must share that plan. Split input
+identities must equal the included records. `quality-gate-plan-id` is that
+same identity. A sealed bundle is not a quality-report operand.
 
 ## Limitations
 

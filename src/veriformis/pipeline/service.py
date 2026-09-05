@@ -1376,12 +1376,18 @@ class PipelineService:
     def quality_report(self, path: Path) -> QualityReportOutcome:
         """Emit the existing preview-only quality report. This is not a gate.
 
-        Requires a document-source compiler workspace whose ``split`` stage
-        is complete. A sealed bundle is refused: it does not retain recipe,
-        construction, curation, or split state. Dataset-row revision 4 is
-        not loaded. Never opens a transaction or touches seal.
+        Requires a compiler workspace whose ``split`` stage is complete.
+        Document-source and dataset-row workspaces are admitted. A sealed
+        bundle is refused: it does not retain recipe, construction or mapping,
+        curation, or split state. Never opens a transaction or touches seal.
         """
+        from veriformis.mapping.finish import (
+            finished_import_plan_from_json_bytes,
+            imported_curation_from_json_bytes,
+            imported_split_from_json_bytes,
+        )
         from veriformis.quality import (
+            preview_import_quality_gates,
             preview_quality_gates,
             require_quality_report_not_enforcing,
         )
@@ -1392,7 +1398,7 @@ class PipelineService:
                 raise QualityReportError(
                     "quality-report preview requires a compiler workspace at or "
                     "beyond split; a sealed bundle does not retain recipe, "
-                    "construction, curation, or split state"
+                    "construction or mapping, curation, or split state"
                 )
             raise QualityReportError(
                 "quality-report preview requires a compiler workspace with "
@@ -1401,10 +1407,36 @@ class PipelineService:
         store = Workspace.open(root)
         revision = store.head()
         if is_import_revision(revision.schema_version):
-            raise QualityReportError(
-                "quality-report preview requires a document-source workspace; "
-                "dataset-row revision 4 is not loaded"
+            for stage, command in (
+                ("map", "`veriformis map WORKSPACE`"),
+                ("curate", "`veriformis curate WORKSPACE`"),
+                ("split", "`veriformis split WORKSPACE`"),
+            ):
+                if revision.stages[stage].status != "complete":
+                    raise MissingStageInputError(
+                        f"quality-report preview requires a completed {stage} stage; "
+                        f"run {command} first"
+                    )
+            _plan, recipe, mapping_result = self._load_import_context(store, revision)
+            del _plan
+            plan = finished_import_plan_from_json_bytes(
+                _output_bytes(store, revision, "curate", "plan")
             )
+            curation = imported_curation_from_json_bytes(
+                _output_bytes(store, revision, "curate", "result")
+            )
+            split = imported_split_from_json_bytes(
+                _output_bytes(store, revision, "split", "result")
+            )
+            report = preview_import_quality_gates(
+                plan=plan,
+                recipe=recipe,
+                mapping_result=mapping_result,
+                curation=curation,
+                split=split,
+            )
+            require_quality_report_not_enforcing(report)
+            return QualityReportOutcome(report=report)
         _require_group3_revision(revision)
         for stage, command in (
             ("construct", "`veriformis construct WORKSPACE`"),

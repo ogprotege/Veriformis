@@ -135,7 +135,13 @@ class QualityReport(_StrictModel):
             raise QualityReportError("quality report cannot enforce heuristics in 13.2")
         if self.limitations != REPORT_LIMITATIONS:
             raise QualityReportError("quality report limitations must match the v1 set")
-        validate_id(self.plan_id, kind="fdp")
+        plan_kind = "fip" if self.plan_id.startswith("fip-") else "fdp"
+        try:
+            validate_id(self.plan_id, kind=plan_kind)
+        except ValueError as exc:
+            raise QualityReportError(
+                "quality report plan_id must be a finished-dataset or finished-import plan"
+            ) from exc
         validate_id(self.report_id, kind="qrp")
         fact_names = tuple(item.name for item in self.facts)
         if fact_names != tuple(sorted(set(fact_names))):

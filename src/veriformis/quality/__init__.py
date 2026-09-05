@@ -23,6 +23,7 @@ from veriformis.quality.gates import (
     V1_QUALITY_GATES,
     LabeledFixture,
     QualityGateSpec,
+    preview_import_quality_gates,
     preview_quality_gates,
 )
 from veriformis.quality.leakage import (
@@ -96,6 +97,7 @@ __all__ = [
     "report_dataset_distributions",
     "report_family_hooks",
     "report_leakage_checks",
+    "preview_import_quality_gates",
     "preview_quality_gates",
     "report_near_duplicates",
     "report_policy_detectors",

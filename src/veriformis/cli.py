@@ -1255,8 +1255,9 @@ def quality_report(
         ...,
         metavar="WORKSPACE",
         help=(
-            "Document-source compiler workspace at or beyond split. A sealed "
-            "bundle is refused because it does not retain construction state."
+            "Compiler workspace at or beyond split, document-source or "
+            "dataset-row. A sealed bundle is refused because it does not "
+            "retain construction or mapping state."
         ),
     ),
 ) -> None:

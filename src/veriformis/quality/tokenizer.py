@@ -10,14 +10,17 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
-from veriformis.construction import ConstructionResult, DatasetRecipe, DatasetRecord
-from veriformis.datasets.curation import OBJECTIVE_FIELD_ROLES
+from veriformis.construction import ConstructionResult, DatasetRecipe
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
 from veriformis.identity import canonical_digest, lossless_json_bytes
-from veriformis.quality.distributions import included_dataset_records
-from veriformis.quality.leakage import report_leakage_checks
+from veriformis.quality.leakage import report_leakage_checks_from_binding
+from veriformis.quality.preview import (
+    QualityPreviewBinding,
+    bind_document_quality_preview,
+    context_and_target_names,
+)
 from veriformis.quality.report import (
     QualityFact,
     QualityPolicyDecision,
@@ -89,16 +92,6 @@ def _text_fact(name: str, value: object) -> QualityFact:
     )
 
 
-def _target_text(record: DatasetRecord, target_names: tuple[str, ...]) -> str:
-    by_name = {field.name: field.value for field in record.fields}
-    missing = [name for name in target_names if name not in by_name]
-    if missing:
-        raise QualityReportError(
-            f"included record {record.record_id} is missing objective field {missing[0]!r}"
-        )
-    return "".join(by_name[name] for name in target_names)
-
-
 def _length_histogram(lengths: Sequence[int]) -> list[list[int]]:
     counts: dict[int, int] = {}
     for length in lengths:
@@ -106,12 +99,9 @@ def _length_histogram(lengths: Sequence[int]) -> list[list[int]]:
     return [[length, counts[length]] for length in sorted(counts)]
 
 
-def report_tokenizer_simulations(
+def report_tokenizer_simulations_from_binding(
+    binding: QualityPreviewBinding,
     *,
-    recipe: DatasetRecipe,
-    construction: ConstructionResult,
-    curation: CurationResult,
-    split: SplitResult,
     tokenizer: BoundTokenizerPin | None = None,
     encode: Callable[[str], int] | None = None,
 ) -> QualityReport:
@@ -130,17 +120,12 @@ def report_tokenizer_simulations(
     else:
         if encode is None:
             raise QualityReportError("bound tokenizer pin requires an encode function")
-        included = included_dataset_records(
-            recipe=recipe,
-            construction=construction,
-            curation=curation,
-            split=split,
-        )
-        _context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
+        included = binding.included
+        _context_names, target_names = context_and_target_names(binding)
         lengths: list[int] = []
         truncated = 0
         for record in included:
-            count = encode(_target_text(record, target_names))
+            count = encode(record.joined_values(target_names))
             if type(count) is not int or count < 0:
                 raise QualityReportError("tokenizer encode must return a non-negative int")
             lengths.append(count)
@@ -159,12 +144,7 @@ def report_tokenizer_simulations(
         )
     if tuple(item.name for item in extra) != TOKENIZER_FACT_NAMES:
         raise QualityReportError("tokenizer facts must match the v1 name set")
-    base = report_leakage_checks(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
+    base = report_leakage_checks_from_binding(binding)
     facts = tuple(sorted((*base.facts, *extra), key=lambda item: item.name))
     policy = tuple(
         sorted(
@@ -184,4 +164,26 @@ def report_tokenizer_simulations(
         facts=facts,
         policy_decisions=policy,
         recommendations=base.recommendations,
+    )
+
+
+def report_tokenizer_simulations(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+    tokenizer: BoundTokenizerPin | None = None,
+    encode: Callable[[str], int] | None = None,
+) -> QualityReport:
+    """Add tokenizer length facts. Refuse simulation without a bound pin."""
+    return report_tokenizer_simulations_from_binding(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        ),
+        tokenizer=tokenizer,
+        encode=encode,
     )

@@ -12,15 +12,16 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping, Sequence
 
-from veriformis.construction import ConstructionResult, DatasetRecipe, DatasetRecord
-from veriformis.datasets.curation import OBJECTIVE_FIELD_ROLES
+from veriformis.construction import ConstructionResult, DatasetRecipe
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
 from veriformis.identity import canonical_digest, lossless_json_bytes
-from veriformis.quality.distributions import (
-    included_dataset_records,
-    report_dataset_distributions,
+from veriformis.quality.distributions import report_distributions_from_binding
+from veriformis.quality.preview import (
+    QualityPreviewBinding,
+    bind_document_quality_preview,
+    context_and_target_names,
 )
 from veriformis.quality.report import (
     QualityFact,
@@ -90,16 +91,6 @@ def _jaccard_ppm(left: frozenset[str], right: frozenset[str]) -> int:
     return (len(left & right) * 1_000_000) // len(union)
 
 
-def _target_text(record: DatasetRecord, target_names: tuple[str, ...]) -> str:
-    by_name = {field.name: field.value for field in record.fields}
-    missing = [name for name in target_names if name not in by_name]
-    if missing:
-        raise QualityReportError(
-            f"included record {record.record_id} is missing objective field {missing[0]!r}"
-        )
-    return "".join(by_name[name] for name in target_names)
-
-
 def _union_find(record_ids: Sequence[str]):
     parent = {record_id: record_id for record_id in record_ids}
 
@@ -152,30 +143,14 @@ def _pair_key(left: str, right: str) -> tuple[str, str]:
     return (left, right) if left < right else (right, left)
 
 
-def report_near_duplicates(
-    *,
-    recipe: DatasetRecipe,
-    construction: ConstructionResult,
-    curation: CurationResult,
-    split: SplitResult,
-) -> QualityReport:
+def report_near_duplicates_from_binding(binding: QualityPreviewBinding) -> QualityReport:
     """Add inspectable near-duplicate clusters to the distribution report."""
-    base = report_dataset_distributions(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    included = included_dataset_records(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    _context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
+    base = report_distributions_from_binding(binding)
+    included = binding.included
+    _context_names, target_names = context_and_target_names(binding)
     record_ids = tuple(record.record_id for record in included)
     shingles = {
-        record.record_id: _shingles(_normalize(_target_text(record, target_names)))
+        record.record_id: _shingles(_normalize(record.joined_values(target_names)))
         for record in included
     }
     similarities: dict[tuple[str, str], int] = {}
@@ -250,4 +225,22 @@ def report_near_duplicates(
         plan_id=base.plan_id,
         facts=facts,
         policy_decisions=policy,
+    )
+
+
+def report_near_duplicates(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+) -> QualityReport:
+    """Add inspectable near-duplicate clusters to the distribution report."""
+    return report_near_duplicates_from_binding(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        )
     )
