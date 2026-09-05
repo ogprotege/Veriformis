@@ -216,7 +216,7 @@
         "transformation-pair-unavailable",
         "transformation-pair-empty-or-unchanged"
       ],
-      "required_source_evidence": "At least one cleaning rule that recorded a before-and-after change in which the text actually changed and neither side is empty.",
+      "required_source_evidence": "At least one cleaning rule that recorded a before-and-after change in which the text actually changed, neither side is empty, and the cleaned passage remains one block with that one change.",
       "review_policy_default": "none",
       "review_policy_options": [
         "none",
@@ -228,7 +228,7 @@
       "title": "Reproduce a recorded change",
       "training_family": "source-grounded-supervised-fine-tuning",
       "what_the_model_learns": "Given the text exactly as it was before one recorded cleaning change, produce the text exactly as it was after that change.",
-      "what_you_provide": "Documents cleaned with rules that recorded at least one before-and-after change. Source-code files are never edited by cleaning, so they cannot supply one."
+      "what_you_provide": "Documents cleaned with rules that recorded at least one before-and-after change, each still one block after grouping. Joined passages cannot supply a pair. Source-code files are never edited by cleaning, so they cannot supply one."
     },
     {
       "compatible_representations": [

@@ -19,7 +19,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-09-02 (post-20 quality-report CLI)
+**Last reviewed:** 2026-09-05 (recorded-change one-component v1 limit)
 
 **Next review:** Any CLI surface or release-gate documentation change.
 
@@ -263,6 +263,20 @@ same `recipe_id` from every path and every surface.
 | `section_reconstruction` | `heading`, `section` |
 | `before_after_transformation` | `before`, `after` |
 | `structured_field` | `input`, `fields` |
+
+`before_after_transformation` (`--goal reproduce-a-recorded-change`)
+constructs only when a chunk has exactly one evidence component whose sole
+derivation is a replayable `edits` step, with no join or slice. `clean
+--rules lowercase` can write transform records and construct can still print
+`0 accepted record(s)` and a non-zero diagnostic count when the safe preset's
+paragraph grouping (size 1000) joins several blocks. The named code
+`transformation-pair-unavailable` is on the construction result artifact, not
+on stdout. That is the v1 limit, not a silent skip. Construct still exits 0;
+later `split` / `validate` fail closed if no records remain. Single-block
+sources such as `tests/fixtures/matrix/before-after/` construct under
+`--preset reproduce-a-recorded-change.safe` after `--rules lowercase`. Isolating
+one block per chunk with a small `--size` also works with `--goal`; `--preset`
+still requires the preset segmentation.
 
 `full_text` requires the `text` row schema; every other objective requires a
 supervised row schema. Unknown or duplicate `--source` selections fail closed.

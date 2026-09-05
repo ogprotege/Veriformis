@@ -598,6 +598,15 @@ There is no deterministic summary objective and construction makes no LLM
 call. Ineligible source units produce typed diagnostics instead of invented
 content.
 
+`before_after_transformation` (`reproduce-a-recorded-change`) is the named
+refuse `transformation-pair-unavailable` unless the chunk is already one
+block with one replayable `edits` component and no join or slice. Default
+paragraph grouping of typical multi-block sources does not construct even
+when `clean --rules lowercase` wrote transform records. Packaged single-block
+plain-text fixtures under `tests/fixtures/matrix/before-after/` do construct
+under the safe preset. Construct may exit 0 with zero accepted records; that
+is not a silent skip.
+
 A `DatasetRecipe` binds one objective, an exact source set, cleaning and
 segmentation identities, ordered constructor passes, review policy, required
 construction gates, and one target row schema. Each candidate retains exact

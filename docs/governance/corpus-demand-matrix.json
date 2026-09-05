@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.corpus-demand-matrix/v1",
-  "last_reviewed": "2026-08-25",
+  "last_reviewed": "2026-09-05",
   "collection_policy": {
     "scanner": "scripts/scan_corpus_metadata.py",
     "allowed_metadata": [
@@ -25,7 +25,7 @@
       "aggregate": {
         "bundle_context_file_count": 0,
         "bundle_directory_count": 0,
-        "directory_count": 21,
+        "directory_count": 22,
         "extensions": [
           {
             "declared_v1_input_suffix": true,
@@ -73,8 +73,8 @@
             "declared_v1_input_suffix": true,
             "extension": ".txt",
             "family": "plain-text",
-            "file_count": 3,
-            "total_bytes": 136
+            "file_count": 5,
+            "total_bytes": 277
           },
           {
             "declared_v1_input_suffix": false,
@@ -92,8 +92,8 @@
           },
           {
             "family": "plain-text",
-            "file_count": 3,
-            "total_bytes": 136
+            "file_count": 5,
+            "total_bytes": 277
           },
           {
             "family": "portable-document",
@@ -121,7 +121,7 @@
             "total_bytes": 217201
           }
         ],
-        "file_count": 50,
+        "file_count": 52,
         "hidden_entry_count": 0,
         "inaccessible_entry_count": 0,
         "other_entry_count": 0,
@@ -133,8 +133,8 @@
           },
           {
             "bucket": "1b_to_1kib",
-            "file_count": 33,
-            "total_bytes": 9177
+            "file_count": 35,
+            "total_bytes": 9318
           },
           {
             "bucket": "over_1kib_to_1mib",
@@ -153,7 +153,7 @@
           }
         ],
         "symlink_count": 0,
-        "total_bytes": 451290
+        "total_bytes": 451431
       },
       "evidence_grade": "test-verified",
       "limitations": [
