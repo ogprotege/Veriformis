@@ -129,6 +129,7 @@ def test_quality_report_dataset_row_does_not_ask_for_schema_3(tmp_path: Path) ->
     message = str(exc.value)
     assert "schema 3" not in message
     assert "upgrade-workspace" not in message
+    assert "dataset-row revision 4 is not loaded" not in message
 
 
 def test_quality_report_parse_only_does_not_tell_operator_to_split_first(

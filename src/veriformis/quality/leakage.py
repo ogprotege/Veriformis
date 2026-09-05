@@ -11,8 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from veriformis.construction import ConstructionResult, DatasetRecipe, DatasetRecord
-from veriformis.datasets.curation import OBJECTIVE_FIELD_ROLES
+from veriformis.construction import ConstructionResult, DatasetRecipe
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import Partition, SplitResult
 from veriformis.errors import QualityReportError
@@ -22,8 +21,13 @@ from veriformis.identity import (
     sha256_digest,
     validate_sha256,
 )
-from veriformis.quality.distributions import included_dataset_records
-from veriformis.quality.near_duplicates import report_near_duplicates
+from veriformis.quality.near_duplicates import report_near_duplicates_from_binding
+from veriformis.quality.preview import (
+    QualityPreviewBinding,
+    bind_document_quality_preview,
+    context_and_target_names,
+    with_imported_partition_hints,
+)
 from veriformis.quality.report import (
     QualityFact,
     QualityPolicyDecision,
@@ -87,48 +91,24 @@ def _text_fact(name: str, value: object) -> QualityFact:
     )
 
 
-def _target_text(record: DatasetRecord, target_names: tuple[str, ...]) -> str:
-    by_name = {field.name: field.value for field in record.fields}
-    missing = [name for name in target_names if name not in by_name]
-    if missing:
-        raise QualityReportError(
-            f"included record {record.record_id} is missing objective field {missing[0]!r}"
-        )
-    return "".join(by_name[name] for name in target_names)
-
-
-def report_leakage_checks(
+def report_leakage_checks_from_binding(
+    binding: QualityPreviewBinding,
     *,
-    recipe: DatasetRecipe,
-    construction: ConstructionResult,
-    curation: CurationResult,
-    split: SplitResult,
-    imported_partition_hints: Mapping[str, Partition] | None = None,
     reference_corpus: BoundReferenceCorpus | None = None,
 ) -> QualityReport:
     """Add leakage facts to the near-duplicate quality report."""
-    base = report_near_duplicates(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    included = included_dataset_records(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    _context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
-    assignment = {item.record_id: item.partition for item in split.assignments}
+    base = report_near_duplicates_from_binding(binding)
+    included = binding.included
+    _context_names, target_names = context_and_target_names(binding)
+    assignment = {item.record_id: item.partition for item in binding.assignments}
     partitions_by_digest: dict[str, set[str]] = {}
     digest_by_record: dict[str, str] = {}
     for record in included:
-        digest = sha256_digest(_target_text(record, target_names))
+        digest = sha256_digest(record.joined_values(target_names))
         digest_by_record[record.record_id] = digest
         partitions_by_digest.setdefault(digest, set()).add(assignment[record.record_id])
     cross = sum(len(parts) > 1 for parts in partitions_by_digest.values())
-    hints = imported_partition_hints or {}
+    hints = binding.imported_partition_hints
     mismatches: list[dict[str, str]] = []
     for record_id, hinted in sorted(hints.items()):
         if record_id not in assignment:
@@ -186,4 +166,28 @@ def report_leakage_checks(
         facts=facts,
         policy_decisions=policy,
         recommendations=base.recommendations,
+    )
+
+
+def report_leakage_checks(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+    imported_partition_hints: Mapping[str, Partition] | None = None,
+    reference_corpus: BoundReferenceCorpus | None = None,
+) -> QualityReport:
+    """Add leakage facts to the near-duplicate quality report."""
+    binding = with_imported_partition_hints(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        ),
+        imported_partition_hints,
+    )
+    return report_leakage_checks_from_binding(
+        binding, reference_corpus=reference_corpus
     )

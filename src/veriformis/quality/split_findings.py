@@ -10,15 +10,18 @@ from __future__ import annotations
 
 from collections import Counter
 
-from veriformis.construction import ConstructionResult, DatasetRecipe, DatasetRecord
-from veriformis.datasets.curation import OBJECTIVE_FIELD_ROLES
+from veriformis.construction import ConstructionResult, DatasetRecipe
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
 from veriformis.identity import lossless_json_bytes
-from veriformis.quality.detectors import report_policy_detectors
-from veriformis.quality.distributions import included_dataset_records
-from veriformis.quality.family_hooks import report_family_hooks
+from veriformis.quality.detectors import report_policy_detectors_from_binding
+from veriformis.quality.family_hooks import report_family_hooks_from_binding
+from veriformis.quality.preview import (
+    QualityPreviewBinding,
+    bind_document_quality_preview,
+    context_and_target_names,
+)
 from veriformis.quality.report import (
     QualityFact,
     QualityPolicyDecision,
@@ -56,35 +59,19 @@ def _text_fact(name: str, value: object) -> QualityFact:
     )
 
 
-def _field_map(record: DatasetRecord) -> dict[str, str]:
-    return {field.name: field.value for field in record.fields}
-
-
-def report_split_findings(
-    *,
-    recipe: DatasetRecipe,
-    construction: ConstructionResult,
-    curation: CurationResult,
-    split: SplitResult,
-) -> QualityReport:
+def report_split_findings_from_binding(binding: QualityPreviewBinding) -> QualityReport:
     """Add split-comparability findings to the detector quality report."""
-    included = included_dataset_records(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    records = {record.record_id: record for record in included}
-    context_names, target_names = OBJECTIVE_FIELD_ROLES[recipe.objective.kind]
+    records = {record.record_id: record for record in binding.included}
+    context_names, target_names = context_and_target_names(binding)
     empty_target = 0
     empty_context = 0
     malformed_role = 0
     shapes: list[str] = []
     train_sources: Counter[str] = Counter()
     eval_sources: Counter[str] = Counter()
-    for assignment in split.assignments:
+    for assignment in binding.assignments:
         record = records[assignment.record_id]
-        fields = _field_map(record)
+        fields = record.field_map()
         if any(not fields.get(name) for name in target_names):
             empty_target += 1
         if any(not fields.get(name) for name in context_names):
@@ -101,12 +88,15 @@ def report_split_findings(
             bucket[source_id] += 1
     shape_counts = Counter(shapes)
     rare = sorted(shape for shape, count in shape_counts.items() if count == 1)
-    total = split.realized_train_record_count + split.realized_evaluation_record_count
+    total = (
+        binding.realized_train_record_count + binding.realized_evaluation_record_count
+    )
     if total == 0:
         imbalance = 0
     else:
         delta = abs(
-            split.realized_train_record_count - split.realized_evaluation_record_count
+            binding.realized_train_record_count
+            - binding.realized_evaluation_record_count
         )
         imbalance = (delta * 1_000_000) // total
     comparability = {
@@ -127,18 +117,8 @@ def report_split_findings(
     )
     if tuple(item.name for item in extra) != SPLIT_FINDING_FACT_NAMES:
         raise QualityReportError("split-finding facts must match the v1 name set")
-    base = report_policy_detectors(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    family = report_family_hooks(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
+    base = report_policy_detectors_from_binding(binding)
+    family = report_family_hooks_from_binding(binding)
     facts = tuple(sorted((*base.facts, *extra, *family), key=lambda item: item.name))
     policy = tuple(
         sorted(
@@ -158,4 +138,22 @@ def report_split_findings(
         facts=facts,
         policy_decisions=policy,
         recommendations=base.recommendations,
+    )
+
+
+def report_split_findings(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+) -> QualityReport:
+    """Add split-comparability findings to the detector quality report."""
+    return report_split_findings_from_binding(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        )
     )
