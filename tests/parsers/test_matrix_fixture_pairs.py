@@ -28,6 +28,11 @@ PAIRS = (
         ROOT / "tests/fixtures/matrix/json/beta.jsonl",
         id="document-json-records",
     ),
+    pytest.param(
+        ROOT / "tests/fixtures/matrix/before-after/alpha.txt",
+        ROOT / "tests/fixtures/matrix/before-after/beta.txt",
+        id="recorded-change-plain-text",
+    ),
 )
 
 

@@ -15,7 +15,7 @@
 **Implementation status:** Normative Group 2 contract. Current capability claims
 require the Group 2 exit gate in this document to pass.
 
-**Last reviewed:** 2026-08-11 (historical deferrals reconciled)
+**Last reviewed:** 2026-09-05 (before/after one-component v1 limit)
 
 **Next review:** Any construction-schema change or taxonomy compatibility change
 
@@ -171,13 +171,16 @@ schemas.
 | `full_text` | `text` as target text | The retained sequence is the target. Its complete value resolves through source evidence and declared cleaning derivations. |
 | `continuation` | `prompt` as context text; `completion` as target text | Prompt and completion are ordered, non-overlapping segments from one declared source unit. Completion follows the prompt under the recipe's boundary rule. |
 | `section_reconstruction` | `heading` as context text; `section` as target text | The heading identifies the exact source section whose body is the target. The constructor does not invent missing prose. |
-| `before_after_transformation` | `before` as context text; `after` as target text | `after` is produced by replaying the named deterministic transform over `before`. The transform and all edits are bound into field evidence. |
+| `before_after_transformation` | `before` as context text; `after` as target text | `after` is produced by replaying the named deterministic transform over `before`. The transform and all edits are bound into field evidence. v1 requires the input chunk to carry exactly one evidence component whose sole derivation is a replayable `edits` step, with no join or slice. Cleaning transform records are not enough: a paragraph chunk that joins several blocks, or a window that slices a stream, is `transformation-pair-unavailable`. |
 | `structured_field` | `input` as context text; `fields` as target encoded scalar text | The target is copied from one explicit strict-IR scalar and encoded under the evidence contract. No value is inferred from an absent field. |
 
 Additional payload fields are forbidden unless a new objective schema version
 declares them. A constructor MUST reject empty required targets, overlapping or
 reversed continuation boundaries, missing section structure, unreplayable
-transformations, and unbound structured-field leaves.
+transformations, and unbound structured-field leaves. For
+`before_after_transformation`, unreplayable includes a chunk whose evidence
+is not exactly one component with one `edits` derivation. That named refuse
+is the v1 limit. It is not a silent skip and it does not invent a pair.
 
 `summary` is not an alias for any objective. A later model-assisted generator
 cannot be introduced through this contract.
