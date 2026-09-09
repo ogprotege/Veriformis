@@ -45,7 +45,7 @@
     "bytes_sha256": "63bc07a07275f7ba14a5c62a5ba8110db4d62aa3530634015edc2449bd41ba67",
     "fixture_id": "phase16-text",
     "logical_path": "note.txt",
-    "report_digest": "d52a26ef514d28c9dbfea4d86ce4accc651f03a6e9a85dd63bc373e5b36e0d1d",
+    "report_digest": "0579e2c55ebedc2a986292863998571bab0706bf4458a0ac5ffc35643f46874d",
     "source_id": "src-v1-4b8b97c40658a5c971728569f3168c9d3ca10a5b060c91378b8b0af375562263",
     "utf8": "Hello.\n\nWorld.\n"
   }
