@@ -105,7 +105,7 @@ manifests bind `veriformis_version` and existing goldens stay
 byte-identical. There is no `1.0.0` tag or public signed-Mac claim.
 Hub execute stays excluded. Do not invent a Phase 21.
 
-Post-20 defect closure keeps version `0.1.0` and the existing independent-core
+[Post-20 defect closure](../dev/active/independent-product/post-20-defect-closure/closeout.md) keeps version `0.1.0` and the existing independent-core
 claim. Exact exporters decode emitted payload bytes before comparing source
 membership. Canonical ZIP64 writer metadata verifies. Required construction
 review can finish through Python, CLI, and MCP using a bound packet and the
@@ -125,12 +125,18 @@ reuses one verified source capture and spools renderer trees for comparison.
 Near-duplicate reports use an exact prefix index without changing report bytes.
 These changes add no measured scale support tier.
 
-**Review date:** 2026-09-09 (post-20 defect closure in progress)
+**Review date:** 2026-09-09 (post-20 defect closure complete)
 
 **Next review:** Any capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
+
+The post-20 Mac hardening binds compile results to typed CLI receipts, drains
+all owned operations on quit, preserves versioned local history, and accepts
+new discovery identifiers without extending its semantic row verifier. The
+unsigned Debug workbench remains a development adapter with no public Mac
+release claim.
 
 ## Executive status
 

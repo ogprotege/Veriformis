@@ -10,11 +10,12 @@ final class ApplicationTerminationCoordinator {
         cancel: (@escaping () -> Void) -> Void,
         reply: @escaping () -> Void
     ) -> NSApplication.TerminateReply {
-        guard isRunActive else { return .terminateNow }
         guard !awaitingCancellation else { return .terminateLater }
+        guard isRunActive else { return .terminateNow }
         awaitingCancellation = true
         cancel { [weak self] in
-            self?.awaitingCancellation = false
+            guard let self, self.awaitingCancellation else { return }
+            self.awaitingCancellation = false
             reply()
         }
         return .terminateLater
@@ -28,9 +29,10 @@ final class VeriformisAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         terminationCoordinator.prepareForTermination(
-            isRunActive: workbench?.isRunning == true,
+            isRunActive: workbench?.hasActiveOperations == true,
             cancel: { [weak workbench] completion in
-                workbench?.cancelCompile(onFinished: completion)
+                if let workbench { workbench.cancelAllOperations(onFinished: completion) }
+                else { completion() }
             },
             reply: { [weak sender] in
                 sender?.reply(toApplicationShouldTerminate: true)
@@ -39,7 +41,7 @@ final class VeriformisAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        workbench?.cancelCompile()
+        workbench?.cancelAllOperations(onFinished: {})
     }
 }
 

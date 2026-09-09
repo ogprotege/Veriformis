@@ -40,6 +40,7 @@ with roadmap headings.
 Remainder (not a roadmap phase, not Phase 21):
 
 - [Post-20 claim honesty](post-20-claim-honesty/README.md) — docs honesty only; version remains `0.1.0`
+- [Post-20 defect closure](post-20-defect-closure/README.md): eight stages complete; version remains `0.1.0`
 
 Future phase packets are created only when a phase changes from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active

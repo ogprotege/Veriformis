@@ -94,10 +94,10 @@ def test_unconfirmed_mapping_cannot_compile() -> None:
 
 def test_family_goals_wait_for_confirmed_dataset_row_mapping() -> None:
     model = _read("macos/Sources/ViewModels/WorkbenchViewModel.swift")
-    assert "requiresMappedValueEvidence" in model
+    assert "isKnownMappedObjective" in model
     assert "confirmedMappingPlan?.goalID == goal.goalID" in model
     models = _read("macos/Sources/Models/WorkbenchModels.swift")
-    assert "var requiresMappedValueEvidence: Bool" in models
+    assert "var isKnownMappedObjective: Bool" in models
     assert ".explicitLabel, .preferencePair, .toolCall, .stepwise" in models
     compile_view = _read("macos/Sources/Views/CompileView.swift")
     assert "workbench.selectableGoals" in compile_view

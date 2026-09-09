@@ -1,6 +1,6 @@
 # Post-20 Defect Closure
 
-**Status:** In progress
+**Status:** Complete. All eight local exit gates passed; PR #204 records the final CI and merge evidence.
 
 **Started:** 2026-09-09
 

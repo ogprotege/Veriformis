@@ -59,6 +59,28 @@ examples below use the installed name.
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
 
+## Machine receipts for workbench commands
+
+`split --json`, `seal --json`, and `package --json` print one JSON object on
+stdout after success. Human messages and durability warnings move to stderr.
+Without `--json`, existing human output and exit codes remain unchanged.
+Failures do not emit a success receipt. A visible partial seal retains its
+existing stderr recovery diagnostic and nonzero exit.
+
+The envelope contains exactly `schema_id` (`veriformis.command-result/v1`),
+`command`, and `result`. Result fields are:
+
+| Command | Result fields |
+| --- | --- |
+| `split` | `assignment_digest` |
+| `seal` | `bundle_path`, `manifest_sha256`, `revision_id`, `handoff_path` (null unless requested) |
+| `package` | `archive_path`, `archive_sha256`, `manifest_sha256`, `export_receipt_sha256` (the unused anchor is null) |
+
+These are runtime command receipts, not new persisted stage schemas. The Mac
+adapter takes the seal manifest anchor from this response, passes it to
+`package`, and requires the archive response to bind that same anchor and
+requested destination. It never obtains these digests from diagnostic text.
+
 ## Supported inputs
 
 `parse` (and raw-file `preview`) accepts files or directories. Directories

@@ -78,19 +78,19 @@ def _echo_error(exc: Exception, *, status: int = 2) -> None:
     raise typer.Exit(code=status) from exc
 
 
-def _emit_outcome(outcome: StageOutcome) -> None:
+def _emit_outcome(outcome: StageOutcome, *, machine: bool = False) -> None:
     if outcome.durability_warning is not None:
         typer.echo(
             f"warning[commit-durability]: {outcome.durability_warning}",
             err=True,
         )
     for message in outcome.messages:
-        typer.echo(message.text, err=message.stream == "stderr")
+        typer.echo(message.text, err=machine or message.stream == "stderr")
     if outcome.exit_status != 0:
         raise typer.Exit(code=outcome.exit_status)
 
 
-def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], ...] = ()):
+def _run(call, *, status: int = 2, machine: bool = False, extra_exceptions: tuple[type[BaseException], ...] = ()):
     """Run one service call and turn every handled failure into error[code].
 
     Everything that reads operator input on the command's behalf (plan files,
@@ -120,7 +120,7 @@ def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], 
         *extra_exceptions,
     ) as exc:
         _echo_error(exc, status=status)
-    _emit_outcome(outcome)
+    _emit_outcome(outcome, machine=machine)
     return outcome
 
 
@@ -469,10 +469,24 @@ def curate(
     )
 
 
+def _command_result(command: str, result: dict[str, object]) -> None:
+    """Small versioned stdout receipt; diagnostics remain on stderr."""
+    typer.echo(json.dumps({
+        "schema_id": "veriformis.command-result/v1",
+        "command": command,
+        "result": result,
+    }, sort_keys=True, separators=(",", ":"), allow_nan=False))
+
+
 @app.command()
-def split(workspace: Path) -> None:
+def split(
+    workspace: Path,
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
     """Assign complete transitive leakage groups to fixed partitions."""
-    _run(lambda: _SERVICE.split(workspace))
+    outcome = _run(lambda: _SERVICE.split(workspace), machine=json_output)
+    if json_output:
+        _command_result("split", {"assignment_digest": outcome.assignment_digest})
 
 
 @app.command(name="format")
@@ -491,6 +505,7 @@ def validate(workspace: Path) -> None:
 def seal(
     workspace: Path,
     out: Path = typer.Option(..., "-o"),
+    json_output: bool = typer.Option(False, "--json"),
     aptus_handoff: bool = typer.Option(
         False,
         "--aptus-handoff/--no-aptus-handoff",
@@ -501,7 +516,8 @@ def seal(
     ),
 ) -> None:
     """Revalidate, atomically publish, and receipt one finished dataset."""
-    outcome: SealOutcome = _run(lambda: _SERVICE.seal(workspace, out), status=1)
+    outcome: SealOutcome = _run(lambda: _SERVICE.seal(workspace, out), status=1, machine=json_output)
+    handoff_path: str | None = None
     if aptus_handoff and outcome.publication is not None:
         from veriformis.handoff import (
             build_aptus_handoff,
@@ -527,8 +543,20 @@ def seal(
             TypeError,
         ) as exc:
             _echo_error(exc, status=1)
-        typer.echo(f"aptus handoff: {path}")
-        typer.echo(f"assignment digest: {handoff.assignment_digest}")
+        handoff_path = str(path)
+        typer.echo(f"aptus handoff: {path}", err=json_output)
+        typer.echo(f"assignment digest: {handoff.assignment_digest}", err=json_output)
+
+    if json_output:
+        publication = outcome.publication
+        if publication is None:
+            _echo_error(ValueError("seal returned no publication receipt"), status=1)
+        _command_result("seal", {
+            "bundle_path": str(publication.bundle_path),
+            "manifest_sha256": publication.manifest_sha256,
+            "revision_id": outcome.revision_id,
+            "handoff_path": handoff_path,
+        })
 
 
 @app.command(name="verify")
@@ -546,6 +574,7 @@ def verify_cmd(
 @app.command(name="package")
 def package_cmd(
     bundle: Path,
+    json_output: bool = typer.Option(False, "--json"),
     out: Path = typer.Option(..., "-o"),
     manifest_sha256: str | None = typer.Option(None, "--manifest-sha256"),
     export_receipt_sha256: str | None = typer.Option(
@@ -554,7 +583,7 @@ def package_cmd(
     ),
 ) -> None:
     """Archive a bundle or export pack under one explicit external anchor."""
-    _run(
+    outcome = _run(
         lambda: _SERVICE.package(
             bundle,
             out,
@@ -562,7 +591,19 @@ def package_cmd(
             export_receipt_sha256=export_receipt_sha256,
         ),
         status=1,
+        machine=json_output,
     )
+
+    if json_output:
+        receipt = outcome.receipt
+        if receipt is None:
+            _echo_error(ValueError("package returned no archive receipt"), status=1)
+        _command_result("package", {
+            "archive_path": str(receipt.archive_path),
+            "archive_sha256": receipt.archive_sha256,
+            "manifest_sha256": getattr(receipt, "manifest_sha256", None),
+            "export_receipt_sha256": getattr(receipt, "export_receipt_sha256", None),
+        })
 
 
 @app.command(name="package-verify")

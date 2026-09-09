@@ -65,16 +65,40 @@ enum CompilerInputMode: String, CaseIterable, Identifiable, Codable, Sendable {
     }
 }
 
-enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
-    case fullText = "full_text"
-    case continuation = "continuation"
-    case sectionReconstruction = "section_reconstruction"
-    case beforeAfterTransformation = "before_after_transformation"
-    case structuredField = "structured_field"
-    case explicitLabel = "explicit_label"
-    case preferencePair = "preference_pair"
-    case toolCall = "tool_call"
-    case stepwise = "stepwise"
+/// Known presentation labels are conveniences, not the CLI catalog's admission list.
+struct TrainingObjective: RawRepresentable, CaseIterable, Identifiable, Codable, Hashable, Sendable {
+    let rawValue: String
+
+    init?(rawValue: String) {
+        guard rawValue.range(of: "^[a-z0-9]+([_-][a-z0-9]+)*$", options: .regularExpression) == rawValue.startIndex..<rawValue.endIndex else { return nil }
+        self.rawValue = rawValue
+    }
+
+    init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer().decode(String.self)
+        guard let parsed = Self(rawValue: value) else {
+            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Invalid objective identifier"))
+        }
+        self = parsed
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+
+    static let fullText = TrainingObjective(rawValue: "full_text")!
+    static let continuation = TrainingObjective(rawValue: "continuation")!
+    static let sectionReconstruction = TrainingObjective(rawValue: "section_reconstruction")!
+    static let beforeAfterTransformation = TrainingObjective(rawValue: "before_after_transformation")!
+    static let structuredField = TrainingObjective(rawValue: "structured_field")!
+    static let explicitLabel = TrainingObjective(rawValue: "explicit_label")!
+    static let preferencePair = TrainingObjective(rawValue: "preference_pair")!
+    static let toolCall = TrainingObjective(rawValue: "tool_call")!
+    static let stepwise = TrainingObjective(rawValue: "stepwise")!
+
+    static let allCases: [Self] = [.fullText, .continuation, .sectionReconstruction,
+        .beforeAfterTransformation, .structuredField, .explicitLabel, .preferencePair, .toolCall, .stepwise]
 
     var id: String { rawValue }
 
@@ -89,6 +113,7 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
         case .preferencePair: return "Preference pair"
         case .toolCall: return "Tool call"
         case .stepwise: return "Stepwise"
+        default: return rawValue
         }
     }
 
@@ -112,15 +137,20 @@ enum TrainingObjective: String, CaseIterable, Identifiable, Codable {
             return "User-provided tool traces on the dataset-row path"
         case .stepwise:
             return "User-provided ordered steps on the dataset-row path"
+        default:
+            return "Read the CLI catalog description for this objective."
         }
     }
 
-    /// Phase 17 family objectives compile only from dataset-row mapped_value evidence.
-    var requiresMappedValueEvidence: Bool {
+    /// Existing mapped families wait for confirmation. Unknown identities go
+    /// through CLI preflight; this presentation hint does not grant admission.
+    var isKnownMappedObjective: Bool {
         switch self {
         case .explicitLabel, .preferencePair, .toolCall, .stepwise:
             return true
         case .fullText, .continuation, .sectionReconstruction, .beforeAfterTransformation, .structuredField:
+            return false
+        default:
             return false
         }
     }
@@ -220,10 +250,9 @@ struct TaxonomyDiscovery: Decodable, Equatable, Sendable {
         let lossPolicies = try Self.requireAxis("loss_policy", in: payload)
         let inputFamilies = try Self.requireAxis("input_family", in: payload)
 
-        let expectedObjectives = Set(TrainingObjective.allCases.map(\.rawValue))
         guard !objectives.isEmpty,
               Set(objectives).count == objectives.count,
-              Set(objectives).isSubset(of: expectedObjectives)
+              objectives.allSatisfy({ TrainingObjective(rawValue: $0) != nil })
         else {
             throw TaxonomyDiscoveryError.invalidObjectives(objectives)
         }
@@ -3023,7 +3052,7 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
     static let expectedKeys: Set<String> = [
         "schema_id", "contract_id", "contract_version", "goals", "representations",
     ]
-    /// Taxonomy v1 row schemas in taxonomy order; Python discovery is authoritative.
+    /// Row schemas whose payload semantics this app can independently verify.
     static let rowSchemaOrder = [
         "text",
         "prompt_completion",
@@ -3097,14 +3126,16 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
         for identifier in representationIDs where !Self.isIdentifier(identifier) {
             throw GoalCatalogError.invalidRepresentations("invalid representation_id \(identifier)")
         }
-        guard representations.map(\.rowSchema) == Self.rowSchemaOrder else {
+        let rowSchemas = representations.map(\.rowSchema)
+        guard !rowSchemas.isEmpty, Set(rowSchemas).count == rowSchemas.count,
+              rowSchemas.allSatisfy({ TrainingObjective(rawValue: $0) != nil }) else {
             throw GoalCatalogError.invalidRepresentations(
-                "row schemas must be exactly \(Self.rowSchemaOrder) in order"
+                "row schemas must be unique, non-empty identifiers"
             )
         }
         for representation in representations
-        where representation.requiresOperatorInstruction
-            != (representation.rowSchema == "instruction_output")
+        where Self.rowSchemaOrder.contains(representation.rowSchema)
+            && representation.requiresOperatorInstruction != (representation.rowSchema == "instruction_output")
         {
             throw GoalCatalogError.invalidRepresentations(
                 "requires_operator_instruction drift for \(representation.representationID)"
@@ -3218,9 +3249,9 @@ struct GoalCatalog: Decodable, Equatable, Sendable {
         for identifier in goalIDs where !Self.isIdentifier(identifier) {
             throw GoalCatalogError.invalidGoals("invalid goal_id \(identifier)")
         }
-        guard goals.map(\.objective) == TrainingObjective.allCases else {
+        guard !goals.isEmpty, Set(goals.map(\.objective)).count == goals.count else {
             throw GoalCatalogError.invalidGoals(
-                "goals must cover every objective exactly once in taxonomy order"
+                "goals must bind unique objectives"
             )
         }
 
@@ -4065,7 +4096,7 @@ struct CompilePreflightResolvedSelection: Decodable, Equatable, Sendable {
         representationID = try CompilePreflightDecoding.text(container, "representation_id")
         objective = try container.decode(TrainingObjective.self, forKey: GoalCatalogKey("objective"))
         rowSchema = try CompilePreflightDecoding.text(container, "row_schema")
-        guard GoalCatalog.rowSchemaOrder.contains(rowSchema) else {
+        guard TrainingObjective(rawValue: rowSchema) != nil else {
             throw CompilePreflightError.invalidMetadata("row_schema")
         }
         recipeLibraryID = try CompilePreflightDecoding.text(container, "recipe_library_id")

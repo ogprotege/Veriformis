@@ -243,8 +243,16 @@ final class CLIBridgeTests: XCTestCase {
               \(try compilePreflightHeredoc())
               exit 0
             fi
+            if [ "$stage" = "split" ]; then
+              printf '%s\\n' '{"schema_id":"veriformis.command-result/v1","command":"split","result":{"assignment_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}'
+            fi
             if [ "$stage" = "seal" ]; then
-              printf 'manifest SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\n'
+              previous=""
+              for argument in "$@"; do
+                if [ "$previous" = "-o" ]; then bundle="$argument"; break; fi
+                previous="$argument"
+              done
+              printf '{"schema_id":"veriformis.command-result/v1","command":"seal","result":{"manifest_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bundle_path":"%s","revision_id":"revision","handoff_path":null}}\\n' "$bundle"
             fi
             if [ "$stage" = "\(stage.rawValue)" ]; then
               trap 'exit 0' TERM INT
@@ -921,6 +929,8 @@ final class CLIBridgeTests: XCTestCase {
             if cell.chunkSize == nil, cell.chunkOverlap == nil {
                 construct += ["--preset", cell.presetID]
             }
+            if let size = cell.chunkSize { construct += ["--size", String(size)] }
+            if let overlap = cell.chunkOverlap { construct += ["--overlap", String(overlap)] }
             construct += ["--representation", cell.representationID]
             var curate = ["curate", workspace.path, "--preset", cell.presetID]
             if let instruction = cell.instruction {
@@ -939,12 +949,12 @@ final class CLIBridgeTests: XCTestCase {
                     StageCommand(stage: .chunk, arguments: chunk),
                     StageCommand(stage: .construct, arguments: construct),
                     StageCommand(stage: .curate, arguments: curate),
-                    StageCommand(stage: .split, arguments: ["split", workspace.path]),
+                    StageCommand(stage: .split, arguments: ["split", workspace.path, "--json"]),
                     StageCommand(stage: .format, arguments: ["format", workspace.path]),
                     StageCommand(stage: .validate, arguments: ["validate", workspace.path]),
                     StageCommand(
                         stage: .seal,
-                        arguments: ["seal", workspace.path, "-o", bundle.path]
+                        arguments: ["seal", workspace.path, "-o", bundle.path, "--json"]
                     ),
                 ],
                 cell.cellID
@@ -1591,6 +1601,30 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
+    func testCatalogDiscoveryAcceptsNewIdentifiersAndOrderWithoutInventingPayloadSupport() throws {
+        let catalog = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData { payload in
+            var goals = payload["goals"] as! [[String: Any]]
+            var added = goals[0]
+            added["goal_id"] = "future-goal"
+            added["objective"] = "future_objective"
+            goals.append(added)
+            payload["goals"] = Array(goals.reversed())
+            var representations = payload["representations"] as! [[String: Any]]
+            var representation = representations[0]
+            representation["representation_id"] = "future-representation"
+            representation["row_schema"] = "future_row"
+            representations.append(representation)
+            payload["representations"] = Array(representations.reversed())
+        })
+        XCTAssertEqual(catalog.goals.first?.objective.rawValue, "future_objective")
+        XCTAssertEqual(catalog.representations.first?.rowSchema, "future_row")
+        XCTAssertFalse(GoalCatalog.rowSchemaOrder.contains("future_row"))
+        let taxonomy = try JSONDecoder().decode(TaxonomyDiscovery.self, from: taxonomyData {
+            $0["objective", default: []].append("future_objective")
+        })
+        XCTAssertTrue(taxonomy.objectives.contains("future_objective"))
+    }
+
     func testGoalCatalogRejectsEvaluationRatioEndpoints() throws {
         for endpoint in [0, 1_000_000] {
             XCTAssertThrowsError(
@@ -1614,7 +1648,7 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
-    func testGoalCatalogRejectsDuplicateGoalUnknownObjectiveAndOpenClosure() throws {
+    func testGoalCatalogRejectsDuplicateGoalInvalidObjectiveAndOpenClosure() throws {
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 GoalCatalog.self,
@@ -1632,26 +1666,26 @@ final class CLIBridgeTests: XCTestCase {
                 GoalCatalog.self,
                 from: goalCatalogData { payload in
                     var goals = payload["goals"] as! [[String: Any]]
-                    goals[0]["objective"] = "summary"
+                    goals[0]["objective"] = "bad objective"
                     payload["goals"] = goals
                 }
             )
         ) { error in
-            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("unknown objective summary"))
+            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("unknown objective bad objective"))
         }
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 GoalCatalog.self,
                 from: goalCatalogData { payload in
                     var goals = payload["goals"] as! [[String: Any]]
-                    goals.removeLast()
+                    goals[1]["objective"] = goals[0]["objective"]
                     payload["goals"] = goals
                 }
             )
         ) { error in
             XCTAssertEqual(
                 error as? GoalCatalogError,
-                .invalidGoals("goals must cover every objective exactly once in taxonomy order")
+                .invalidGoals("goals must bind unique objectives")
             )
         }
         XCTAssertThrowsError(
@@ -1674,7 +1708,7 @@ final class CLIBridgeTests: XCTestCase {
                 GoalCatalog.self,
                 from: goalCatalogData { payload in
                     var representations = payload["representations"] as! [[String: Any]]
-                    representations[3]["row_schema"] = "chat"
+                    representations[3]["row_schema"] = "bad row"
                     payload["representations"] = representations
                 }
             )
@@ -1682,7 +1716,7 @@ final class CLIBridgeTests: XCTestCase {
             XCTAssertEqual(
                 error as? GoalCatalogError,
                 .invalidRepresentations(
-                    "row schemas must be exactly \(GoalCatalog.rowSchemaOrder) in order"
+                    "row schemas must be unique, non-empty identifiers"
                 )
             )
         }
@@ -1884,12 +1918,12 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 TaxonomyDiscovery.self,
-                from: taxonomyData { $0["objective"] = ["full_text", "summary"] }
+                from: taxonomyData { $0["objective"] = ["full_text", "bad objective"] }
             )
         ) { error in
             XCTAssertEqual(
                 error as? TaxonomyDiscoveryError,
-                .invalidObjectives(["full_text", "summary"])
+                .invalidObjectives(["full_text", "bad objective"])
             )
         }
     }
@@ -3135,7 +3169,7 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(plan[6].arguments, ["format", workspace.path])
         XCTAssertEqual(
             plan[8].arguments,
-            ["seal", workspace.path, "-o", bundle.path, "--aptus-handoff"]
+            ["seal", workspace.path, "-o", bundle.path, "--json", "--aptus-handoff"]
         )
     }
 
@@ -3209,6 +3243,7 @@ final class CLIBridgeTests: XCTestCase {
             [
                 "construct", workspace.path,
                 "--goal", "reproduce-a-recorded-change",
+                "--size", "24", "--overlap", "0",
                 "--representation", "prompt-and-completion",
             ]
         )
@@ -3313,7 +3348,7 @@ final class CLIBridgeTests: XCTestCase {
             allowEmptyEvaluation: false,
             splitRatioPPM: nil
         )
-        XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path])
+        XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path, "--json"])
         XCTAssertFalse(
             plan.flatMap(\.arguments).contains { $0.lowercased().contains("aptus") }
         )
@@ -3381,38 +3416,6 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(json["writeAptusHandoff"] as? Bool, true)
         let decoded = try JSONDecoder().decode(RunHistoryEntry.self, from: data)
         XCTAssertTrue(decoded.requestsAptusHandoff)
-    }
-
-    func testManifestSHAExtraction() {
-        let log = """
-        sealed bundle: /tmp/out.vfbundle
-        manifest SHA-256: abcdef0123456789
-        verification grade: external_digest
-        """
-        XCTAssertEqual(
-            WorkbenchViewModel.extractManifestSHA256(from: log),
-            "abcdef0123456789"
-        )
-    }
-
-    func testAssignmentDigestExtraction() {
-        let log = """
-        aptus handoff: /tmp/out.vfbundle.aptus-handoff.json
-        assignment digest: deadbeefcafebabe
-        """
-        XCTAssertEqual(
-            WorkbenchViewModel.extractAssignmentDigest(from: log),
-            "deadbeefcafebabe"
-        )
-    }
-
-    func testArchiveDigestExtraction() {
-        XCTAssertEqual(
-            WorkbenchViewModel.extractArchiveSHA256(
-                from: "archive SHA-256: 1234abcdef\nverification grade: external_digest"
-            ),
-            "1234abcdef"
-        )
     }
 
     func testMakeFailureCapturesExitCodeAndStage() {
@@ -3516,11 +3519,11 @@ final class CLIBridgeTests: XCTestCase {
             ["document-source", "dataset-row", "mixed"]
         )
         XCTAssertEqual(CompilerInputMode.documentSource.rawValue, "document-source")
-        XCTAssertTrue(TrainingObjective.explicitLabel.requiresMappedValueEvidence)
-        XCTAssertTrue(TrainingObjective.preferencePair.requiresMappedValueEvidence)
-        XCTAssertTrue(TrainingObjective.toolCall.requiresMappedValueEvidence)
-        XCTAssertTrue(TrainingObjective.stepwise.requiresMappedValueEvidence)
-        XCTAssertFalse(TrainingObjective.fullText.requiresMappedValueEvidence)
+        XCTAssertTrue(TrainingObjective.explicitLabel.isKnownMappedObjective)
+        XCTAssertTrue(TrainingObjective.preferencePair.isKnownMappedObjective)
+        XCTAssertTrue(TrainingObjective.toolCall.isKnownMappedObjective)
+        XCTAssertTrue(TrainingObjective.stepwise.isKnownMappedObjective)
+        XCTAssertFalse(TrainingObjective.fullText.isKnownMappedObjective)
     }
 
     func testDatasetRowCompilePlanParsesThenMapsWithoutCleanChunkConstruct() {

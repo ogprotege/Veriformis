@@ -84,9 +84,9 @@ struct SourceDropView: View {
     }
 
     private func handleDrop(_ providers: [NSItemProvider]) -> Bool {
-        var urls: [URL] = []
+        let urls = DroppedSourceURLs()
         let group = DispatchGroup()
-        for provider in providers {
+        for (index, provider) in providers.enumerated() {
             group.enter()
             provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
                 defer { group.leave() }
@@ -94,14 +94,14 @@ struct SourceDropView: View {
                    let path = String(data: data, encoding: .utf8),
                    let url = URL(string: path)
                 {
-                    urls.append(url)
+                    urls.record(url, at: index)
                 } else if let url = item as? URL {
-                    urls.append(url)
+                    urls.record(url, at: index)
                 }
             }
         }
         group.notify(queue: .main) {
-            workbench.addSources(expand(urls))
+            workbench.addSources(expand(urls.ordered))
         }
         return true
     }
@@ -133,4 +133,24 @@ struct SourceDropView: View {
         .plainText, .utf8PlainText, .sourceCode, .pythonScript, .javaScript,
         .html, .pdf, .commaSeparatedText, .json, .data, .item, .folder,
     ]
+}
+
+/// Providers may complete concurrently or out of order. Only file URLs enter
+/// the source selection; collection and parser admission remain in the CLI.
+final class DroppedSourceURLs: @unchecked Sendable {
+    private let lock = NSLock()
+    private var values: [Int: URL] = [:]
+
+    func record(_ url: URL, at index: Int) {
+        guard url.isFileURL else { return }
+        lock.lock()
+        defer { lock.unlock() }
+        values[index] = url
+    }
+
+    var ordered: [URL] {
+        lock.lock()
+        defer { lock.unlock() }
+        return values.keys.sorted().compactMap { values[$0] }
+    }
 }

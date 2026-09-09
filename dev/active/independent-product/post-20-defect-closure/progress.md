@@ -302,3 +302,59 @@ Append-only dated execution log.
   expected transport warning, in 335.32s.
 - `uv lock --check`, Ruff, project tracking, and `git diff --check` passed.
   D-32 through D-35 are closed. Stage 8 remains the Mac hardening increment.
+
+## 2026-09-09 — Stage 8 implementation
+
+- D-23: drop callbacks use ordered locked storage and refuse non-file URLs.
+  A per-workbench registry closes admission and drains all operations on quit,
+  including superseded requests. Atomic process-group launch and unreaped-leader
+  ownership replace PID-only termination. Output drains before completion.
+- Split, seal, and package expose opt-in runtime JSON receipts. The workbench
+  validates command, digest, destination, and retained manifest anchor rather
+  than searching log lines. Ordinary CLI output and persisted stage schemas
+  remain unchanged. Custom segmentation flags reach construct as well as chunk.
+- Catalogs retain new valid identifiers and ordering. Unknown semantic payloads
+  still refuse independent verification. Versioned history preserves exact
+  legacy bytes and refuses unknown or unreadable versions without overwriting.
+- Initial focused Mac gate: seven tests passed after a pipe-read test exposed
+  buffered short progress lines. Raw descriptor reads corrected that defect.
+  Typed CLI receipts and error-funnel checkpoint: 11 tests passed in 1.26s.
+  Full stage 8 and final release checks remain pending.
+
+- The first complete Mac run passed 119 tests in 293.175s, including all 74
+  real CLI acceptance cells. The first Python exit run found one stale Swift
+  property-name assertion (`2892 passed, 1 failed`). Its mapping-confirmation
+  assertions remain intact under the new presentation-hint name. The release
+  script was interrupted before reaching that stale test and restarted after
+  correction; neither incomplete run counts as a pass.
+
+- Final unsigned Debug Mac gate: `121 tests, 0 failures` in 293.850s,
+  including 74 real CLI cells. The nine new hardening tests include actual
+  running export/review cancellation, process-group descendants holding pipes,
+  repeated quit replies, and unknown history fields.
+- Clean-wheel install, both committed golden objectives and their transports,
+  standalone workbench sequence parity, and the retained project-spec example
+  passed. The required `check_local.sh` is running in an isolated test venv so
+  it does not replace the active checkout interpreter.
+
+## 2026-09-09 — Stage 8 and local release exit gates
+
+- A final identifier regression rejects trailing newlines and control characters
+  while retaining valid unknown identifiers. The complete unsigned Debug gate
+  after that correction passed `122 tests, 0 failures` in 282.862s, including
+  every real CLI acceptance cell and all ten Mac hardening regressions.
+- The required `scripts/release/check_local.sh` passed. Its isolated test-only
+  environment ran `2897 passed, 32 deselected`, no skips, and the expected
+  transport warning in 323.44s. The four missing-columnar-extra refusal tests
+  ran here; they were skipped in the existing environment with those extras.
+  Lock, Ruff, clean-wheel provenance, installed discovery, both committed
+  golden manifests, and their externally anchored transports passed.
+- `macos/scripts/parity_check.sh` and
+  `scripts/release/project_spec_example.sh` passed. The retained example
+  manifest remains `e1146ecae6f714fd5a189d313211bfb37f98907047e6930554b2bb4936e1db3b`.
+- D-23 is closed. All eight local stages are complete. GitHub checks and review
+  state for the final pushed HEAD still govern merge authorization.
+- PR #203 remains separate at `ae5e13cb0f064a811f10320826f049b9ee5d9c3e`.
+  Both its local and remote refs are unchanged. The six pre-existing local
+  files and their saved copies match the original SHA-256 receipts. No file
+  from that preservation set is included in this increment.
