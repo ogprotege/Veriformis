@@ -2299,7 +2299,7 @@ test = [
 requires-dist = [
     { name = "datasets", marker = "extra == 'columnar'", specifier = ">=3.0.0,<6.0.0" },
     { name = "jinja2", specifier = ">=3.1" },
-    { name = "lxml", specifier = ">=4.9" },
+    { name = "lxml", specifier = ">=5.0" },
     { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "mcp", specifier = ">=1.0" },
     { name = "mdit-py-plugins", specifier = ">=0.4" },
