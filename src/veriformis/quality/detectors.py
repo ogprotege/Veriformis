@@ -9,19 +9,19 @@ from __future__ import annotations
 
 import re
 
-from veriformis.construction import ConstructionResult, DatasetRecipe, DatasetRecord
+from veriformis.construction import ConstructionResult, DatasetRecipe
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
 from veriformis.identity import lossless_json_bytes
-from veriformis.quality.distributions import included_dataset_records
+from veriformis.quality.preview import QualityPreviewBinding, QualityPreviewRecord, bind_document_quality_preview
 from veriformis.quality.report import (
     QualityFact,
     QualityPolicyDecision,
     QualityReport,
     assemble_quality_report,
 )
-from veriformis.quality.tokenizer import report_tokenizer_simulations
+from veriformis.quality.tokenizer import report_tokenizer_simulations_from_binding
 
 
 DETECTOR_SET_ID = "veriformis.policy-detectors/v1"
@@ -61,7 +61,7 @@ def _text_fact(name: str, value: object) -> QualityFact:
     )
 
 
-def _scan(records: tuple[DatasetRecord, ...]) -> list[dict[str, str]]:
+def _scan(records: tuple[QualityPreviewRecord, ...]) -> list[dict[str, str]]:
     hits: list[dict[str, str]] = []
     for record in records:
         blob = "\n".join(field.value for field in record.fields)
@@ -79,21 +79,9 @@ def _scan(records: tuple[DatasetRecord, ...]) -> list[dict[str, str]]:
     return hits
 
 
-def report_policy_detectors(
-    *,
-    recipe: DatasetRecipe,
-    construction: ConstructionResult,
-    curation: CurationResult,
-    split: SplitResult,
-) -> QualityReport:
+def report_policy_detectors_from_binding(binding: QualityPreviewBinding) -> QualityReport:
     """Add optional detector findings to the tokenizer quality report."""
-    included = included_dataset_records(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
-    hits = _scan(included)
+    hits = _scan(binding.included)
 
     def _records(family: str) -> int:
         return len({item["record-id"] for item in hits if item["family"] == family})
@@ -108,12 +96,7 @@ def report_policy_detectors(
     )
     if tuple(item.name for item in extra) != DETECTOR_FACT_NAMES:
         raise QualityReportError("detector facts must match the v1 name set")
-    base = report_tokenizer_simulations(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
+    base = report_tokenizer_simulations_from_binding(binding)
     facts = tuple(sorted((*base.facts, *extra), key=lambda item: item.name))
     policy = tuple(
         sorted(
@@ -133,4 +116,22 @@ def report_policy_detectors(
         facts=facts,
         policy_decisions=policy,
         recommendations=base.recommendations,
+    )
+
+
+def report_policy_detectors(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+) -> QualityReport:
+    """Add optional detector findings to the tokenizer quality report."""
+    return report_policy_detectors_from_binding(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        )
     )

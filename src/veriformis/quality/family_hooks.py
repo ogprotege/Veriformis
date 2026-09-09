@@ -4,11 +4,14 @@ from __future__ import annotations
 
 from collections import Counter
 
-from veriformis.construction import ConstructionResult, DatasetRecipe, DatasetRecord
+from veriformis.construction import ConstructionResult, DatasetRecipe
 from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
-from veriformis.quality.distributions import included_dataset_records
+from veriformis.quality.preview import (
+    QualityPreviewBinding,
+    bind_document_quality_preview,
+)
 from veriformis.quality.report import QualityFact
 
 
@@ -30,11 +33,11 @@ def _count_fact(name: str, value: int) -> QualityFact:
     )
 
 
-def _fields(record: DatasetRecord) -> dict[str, str]:
-    return {field.name: field.value for field in record.fields}
+def _fields(record: object) -> dict[str, str]:
+    return {field.name: field.value for field in getattr(record, "fields")}
 
 
-def family_hook_facts(records: tuple[DatasetRecord, ...]) -> tuple[QualityFact, ...]:
+def family_hook_facts(records: tuple[object, ...]) -> tuple[QualityFact, ...]:
     """Count explicit advanced-family fields. Absent fields stay zero on SFT."""
     missing_label = 0
     unpaired = 0
@@ -73,6 +76,12 @@ def family_hook_facts(records: tuple[DatasetRecord, ...]) -> tuple[QualityFact, 
     return facts
 
 
+def report_family_hooks_from_binding(
+    binding: QualityPreviewBinding,
+) -> tuple[QualityFact, ...]:
+    return family_hook_facts(binding.included)
+
+
 def report_family_hooks(
     *,
     recipe: DatasetRecipe,
@@ -80,10 +89,11 @@ def report_family_hooks(
     curation: CurationResult,
     split: SplitResult,
 ) -> tuple[QualityFact, ...]:
-    included = included_dataset_records(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
+    return report_family_hooks_from_binding(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        )
     )
-    return family_hook_facts(included)

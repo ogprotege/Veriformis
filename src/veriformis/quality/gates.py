@@ -1,9 +1,10 @@
 """Previewable quality gates. Item 13.9 records thresholds and fixtures.
 
 Gates are configurable, versioned, and previewable. They bind to the
-finished-dataset plan identity. They do not change FinishedDatasetPlan or
-the seventeen-gate validation snapshot. No heuristic is admitted to block
-seal: labeled fixtures exist, and v1 still records findings only.
+previewed plan identity (`fdp` or `fip`). They do not change
+FinishedDatasetPlan or the seventeen-gate validation snapshot. No heuristic
+is admitted to block seal: labeled fixtures exist, and v1 still records
+findings only.
 """
 
 from __future__ import annotations
@@ -16,13 +17,24 @@ from veriformis.datasets.models import CurationResult
 from veriformis.datasets.splitting import SplitResult
 from veriformis.errors import QualityReportError
 from veriformis.identity import lossless_json_bytes
+from veriformis.mapping.finish import (
+    FinishedImportPlan,
+    ImportedCurationResult,
+    ImportedSplitResult,
+)
+from veriformis.mapping.result import MappingRecipe, MappingResult
+from veriformis.quality.preview import (
+    QualityPreviewBinding,
+    bind_document_quality_preview,
+    bind_import_quality_preview,
+)
 from veriformis.quality.report import (
     QualityFact,
     QualityPolicyDecision,
     QualityReport,
     assemble_quality_report,
 )
-from veriformis.quality.split_findings import report_split_findings
+from veriformis.quality.split_findings import report_split_findings_from_binding
 
 
 QUALITY_GATE_POLICY_ID = "veriformis.quality-gate-policy/v1"
@@ -225,22 +237,14 @@ def _require_gate_specs(gates: Sequence[QualityGateSpec]) -> tuple[QualityGateSp
     return tuple(sorted(specs, key=lambda item: item.gate_id))
 
 
-def preview_quality_gates(
+def preview_quality_gates_from_binding(
+    binding: QualityPreviewBinding,
     *,
-    recipe: DatasetRecipe,
-    construction: ConstructionResult,
-    curation: CurationResult,
-    split: SplitResult,
     gates: Sequence[QualityGateSpec] | None = None,
 ) -> QualityReport:
     """Preview named thresholds against the composed quality report."""
     specs = _require_gate_specs(V1_QUALITY_GATES if gates is None else gates)
-    base = report_split_findings(
-        recipe=recipe,
-        construction=construction,
-        curation=curation,
-        split=split,
-    )
+    base = report_split_findings_from_binding(binding)
     facts_by_name = {item.name: item for item in base.facts}
     rows: list[dict[str, object]] = []
     would_block = 0
@@ -298,4 +302,46 @@ def preview_quality_gates(
         facts=facts,
         policy_decisions=policy,
         recommendations=base.recommendations,
+    )
+
+
+def preview_quality_gates(
+    *,
+    recipe: DatasetRecipe,
+    construction: ConstructionResult,
+    curation: CurationResult,
+    split: SplitResult,
+    gates: Sequence[QualityGateSpec] | None = None,
+) -> QualityReport:
+    """Preview named thresholds against the composed quality report."""
+    return preview_quality_gates_from_binding(
+        bind_document_quality_preview(
+            recipe=recipe,
+            construction=construction,
+            curation=curation,
+            split=split,
+        ),
+        gates=gates,
+    )
+
+
+def preview_import_quality_gates(
+    *,
+    plan: FinishedImportPlan,
+    recipe: MappingRecipe,
+    mapping_result: MappingResult,
+    curation: ImportedCurationResult,
+    split: ImportedSplitResult,
+    gates: Sequence[QualityGateSpec] | None = None,
+) -> QualityReport:
+    """Preview named thresholds for a mapped dataset-row workspace."""
+    return preview_quality_gates_from_binding(
+        bind_import_quality_preview(
+            plan=plan,
+            recipe=recipe,
+            mapping_result=mapping_result,
+            curation=curation,
+            split=split,
+        ),
+        gates=gates,
     )

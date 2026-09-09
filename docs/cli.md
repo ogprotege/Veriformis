@@ -27,7 +27,7 @@ This page is the command reference. For architecture, see
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-09-09 (post-20 defect closure: every root command documented; `--mode`; complete error-code table)
+**Last reviewed:** 2026-09-09 (post-20 defect closure and dataset-row quality-report preview)
 
 **Next review:** Any CLI surface or release-gate documentation change.
 
@@ -1030,13 +1030,15 @@ Print the existing preview-only quality report. This is not a gate.
 veriformis quality-report WORKSPACE
 ```
 
-Reads a document-source compiler workspace whose `split` stage is complete and prints the
+Reads a compiler workspace whose `split` stage is complete and prints the
 same `veriformis.quality-report/v1` object `PipelineService.quality_report`
-and `preview_quality_gates` already produce. `enforcing` stays false. No
-heuristic is admitted to block seal. The seventeen finished-dataset gates
-remain the only seal path. A sealed bundle is refused because it does not
-retain recipe, construction, curation, or split state. There is no MCP wrap.
-See [Quality Report Contract v1](contracts/quality-report-v1.md).
+already produces. Document-source and dataset-row workspaces are admitted.
+`plan_id` is the finished-dataset `fdp` or finished-import `fip`. `enforcing`
+stays false. No heuristic is admitted to block seal. The seventeen
+finished-dataset gates remain the only document-source seal path; dataset-row
+seal still uses `IMPORT_GATES`. A sealed bundle is refused because it does not
+retain recipe, construction or mapping, curation, or split state. There is no
+MCP wrap. See [Quality Report Contract v1](contracts/quality-report-v1.md).
 
 ### `scale-support`
 
