@@ -547,6 +547,17 @@ no other path appears. It MUST run the Phase 4.5 membership operation over the
 returned semantic evidence. Renderer-supplied rows and provenance remain
 separate from the byte tree and do not prove that arbitrary bytes encode them.
 
+Every shipped exact-byte exporter independently decodes its emitted payload
+files and available provenance before returning candidate rows. This includes
+the four implemented consumer adapters. Identity and remap profiles decode
+their named columns. Prompt assembly uses the source instruction length to
+recover the existing field boundary, then compares decoded values through
+row identity and provenance. This check does not claim a standalone trainer
+import or change the profile's `round_trip=false` limit. A configured pack
+without provenance uses the verified source's identity alignment and still
+decodes every emitted payload. A shared planner/renderer defect therefore
+cannot pass membership merely by agreeing on the same incorrect bytes.
+
 The service MUST invoke the renderer twice before destination access. Each
 invocation receives independently strict-reloaded plan and source-row-set
 objects reconstructed from the same canonical bytes. It MUST normalize both

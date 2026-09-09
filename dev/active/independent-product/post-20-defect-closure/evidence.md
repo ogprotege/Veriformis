@@ -25,3 +25,6 @@ fix. Rows are appended as items close; an item without a row is open.
 | D-14 | `tests/ocr/test_tesseract_confidence.py`; `tests/ocr/test_recovery_paths.py::test_provider_without_confidence_requires_review_instead_of_accepting` |
 | D-22 | `tests/collection/test_collection_plan.py` (limits before hashing; argument-order independence) |
 | 3.7 | `tests/chunkers/test_strategies.py::test_sentence_splitter_handles_unicode_terminators_and_quotes` |
+| D-07 | Withdrawn; `tests/datasets/test_models_and_curation.py::test_unicode_is_exact_for_dedup_conflict_and_identity`; imported NFC/NFD case in `tests/mapping/test_mapping_provenance.py` |
+| D-15 | `tests/exports/test_exact_decoding.py` rejects common planner/renderer corruption for all seven exact exporters; complete export/profile and core suites passed |
+| D-16 | `tests/bundle/test_zip64.py` tests writer size/offset extensions and refuses noncanonical extras |

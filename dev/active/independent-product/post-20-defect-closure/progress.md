@@ -173,3 +173,22 @@ Append-only dated execution log.
   the 74-cell matrix, real dataset-row compile, and cancellation receipts.
   The fake waits for its cancellation handler to be installed before the test
   cancels. D-23 remains open for stage 8.
+
+## 2026-09-09 — Stage 4 (exact export payloads and ZIP64)
+
+- D-15: all seven exact exporters decode their emitted payload bytes and
+  provenance into fresh rows before the service compares membership and order.
+  Profile prompt assembly uses the verified source field boundary to reverse
+  the declared mapping. Trainer round-trip claims remain false.
+- A shared planner/renderer corruption reproduced publication of altered data
+  in all seven exporters before the fix. All seven now refuse before publication.
+- D-16: canonical ZIP64 size and offset extensions emitted by the standard
+  library writer are accepted. Extra fields outside that exact encoding refuse.
+  The reduced-limit fixture reproduced the writer/verifier mismatch before repair.
+- D-07 remains withdrawn: document and imported record regressions prove that
+  NFC and NFD text remain distinct. There is no fingerprint version change.
+- Stage 4 tests ran on an isolated copy of the repaired working tree. The
+  integrated source files were byte-compared with that tested copy. Export and
+  profile suite: `593 passed, 3 skipped, 30 deselected` in 30.57s. Core:
+  `2829 passed, 4 skipped, 32 deselected`, one expected transport warning, in
+  429.02s. Lock, Ruff, tracking, and diff checks passed after integration.

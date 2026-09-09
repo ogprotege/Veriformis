@@ -7,8 +7,8 @@ Every code change carries its regression test and its documentation update.
 Canonical-stream-changing parser fixes bump the affected parser identity pin
 and regenerate frozen fixtures through the documented generator; the fixture
 diff is recorded in [progress.md](progress.md). No persisted stage schema
-changes. Where a durable identity derivation changes (D-07) the plan gains a
-versioned selector so pre-change bundles still verify.
+changes. D-07 was withdrawn after direct verification: the existing durable
+fingerprint is lossless. Its algorithm and all persisted plans remain unchanged.
 
 ## Defect register
 
@@ -24,7 +24,7 @@ scalability.
 | D-04 | B | `macos/.../WorkbenchViewModel.swift` | Confirmed mapping plan written inside the CLI workspace before `parse`; dataset-row compile refuses |
 | D-05 | B | `handoff/aptus_v1.py` | `consume` trusts descriptor-declared capabilities; masking and provenance identities unchecked |
 | D-06 | B | `pipeline/service.py` `_seal_imported` | No partial-publication recovery, no `SealPartialPublicationError`, no durability warning |
-| D-07 | B | `datasets/curation.py`, `bundle/verifier.py` | "Exact" fingerprint NFC-normalizes values; inconsistent with the raw conflict key |
+| D-07 | B | `datasets/curation.py`, `bundle/verifier.py` | Withdrawn: exact fingerprint uses lossless JSON; NFC/NFD remain distinct |
 | D-08 | C | `pipeline/service.py` `map_rows` | Rejection report written non-atomically after commit |
 | D-09 | C | `cli.py`, `parsers/pdf.py`, `parsers/structured.py` | Funnel gaps and untyped parser exceptions |
 | D-10 | C | `parsers/docx.py`, `diagnostics.py` | Default lxml parser for notes; no inflate cap; text-box text dropped or mislabeled |

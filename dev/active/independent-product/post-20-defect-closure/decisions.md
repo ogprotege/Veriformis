@@ -6,7 +6,7 @@ Accepted scope and non-scope decisions for the post-20 defect-closure packet.
 | --- | --- | --- |
 | 1 | This is a remainder packet, not Phase 21. | Phase 20 froze the CLI-first 1.0 matrix and version `0.1.0`. Closing defects behind that claim adds no capability and needs no ledger entry. |
 | 2 | Parser fixes that change canonical streams bump the parser identity pin and regenerate frozen fixtures; pre-change workspaces re-parse. | Replay fails closed on identity mismatch by design; a corrected recovery is a new parser version, not a migration. |
-| 3 | The exact-record fingerprint gains a versioned selector on the finished plan rather than a silent algorithm change. | Verifiers recompute the fingerprint for existing sealed bundles; those bundles must keep verifying. |
+| 3 | D-07 is withdrawn. Keep the existing exact fingerprint and all persisted plans unchanged. | Direct inspection and document/import regressions prove NFC and NFD remain distinct. The unused NFC serializer is not the fingerprint serializer. |
 | 4 | Required review becomes resolvable by binding a submitted review bundle into a construct re-commit; the default `review_policy` stays `none`. | The contract already promises Python, CLI, and MCP round trips; resolution was the missing half. |
 | 5 | The ZIP64 boundary is handled by accepting exactly one well-formed ZIP64 extra field whose values match the central-directory record. | The contract promised ZIP64; refusing the archive the codec itself wrote is not fail-closed, it is a defect. |
 | 6 | Pass-through validation gates gain one independent assertion each rather than being removed from the report. | The 17-gate report is a persisted v1 identifier; removing names would need a report migration. |

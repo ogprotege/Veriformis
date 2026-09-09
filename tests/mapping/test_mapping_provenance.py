@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -34,9 +35,10 @@ def test_confirmation_does_not_reuse_against_a_different_file(tmp_path: Path) ->
         )
 
 
-def test_independent_replay_matches_imported_record_ids(tmp_path: Path) -> None:
+@pytest.mark.parametrize("values", [("Alpha café", "Beta café"), ("café", "cafe\u0301")])
+def test_independent_replay_matches_imported_record_ids(tmp_path: Path, values) -> None:
     source = tmp_path / "rows.jsonl"
-    source.write_text('{"text":"Alpha café"}\n{"text":"Beta café"}\n', encoding="utf-8")
+    source.write_text("".join(json.dumps({"text": value}) + "\n" for value in values), encoding="utf-8")
     capture = capture_jsonl(source, logical_path="rows.jsonl")
     mappings = [FieldMapping.create(source_path="text", target_key="text")]
     confirmation = mapping_confirmation_digest(
@@ -63,6 +65,9 @@ def test_independent_replay_matches_imported_record_ids(tmp_path: Path) -> None:
     assert tuple(item.record_id for item in first) == tuple(
         item.record_id for item in replay
     )
+    from veriformis.mapping.finish import exact_imported_fingerprint
+
+    assert len({exact_imported_fingerprint(record) for record in first}) == 2
     assert first[0].fields[0].evidence.kind == "mapped_value"
     assert "chk-" not in first[0].fields[0].evidence.evidence_id
 
