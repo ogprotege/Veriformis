@@ -22,7 +22,6 @@ from veriformis.errors import ParseError
 from veriformis.parsers.dispatch import parse_captured_source
 from veriformis.parsers.docx import (
     DOCX_MAX_INFLATED_BYTES,
-    DOCX_MAX_MEMBERS,
     PARSER_VERSION,
     parse_docx_file,
 )
