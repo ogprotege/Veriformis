@@ -72,7 +72,7 @@ def test_named_profiles_filter_to_admitted_schemas() -> None:
     assert '"split-jsonl-directory"' in models
     assert '"hugging-face-dataset"' in models
     assert "consumer.acceptedRowSchemas.contains(rowSchema)" in models
-    assert "Named profiles wait until a row schema is known" in view
+    assert "Named profiles become available after a generic dry-run verifies the selected bundle schema" in view
     assert "Constrained CSV still refuses nested and family rows" in view
     assert "family-to-trainer" not in view
     assert "huggingface.co" not in view.lower()

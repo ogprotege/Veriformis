@@ -46,7 +46,7 @@ struct ResultView: View {
                 }
             }
 
-            prepublicationSamples
+            compiledPreview
 
             GoalPreviewView(state: workbench.goalPreviewState)
 
@@ -75,8 +75,8 @@ struct ResultView: View {
         .padding(.top, 8)
     }
 
-    private var prepublicationSamples: some View {
-        GroupBox("Pre-publication samples") {
+    private var compiledPreview: some View {
+        GroupBox("Compiled dataset preview") {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Samples are runtime-only. Oversized payloads are omitted whole with an exact reason. Quality findings are preview-only and do not block seal or require review.")
                     .font(.caption)
@@ -205,7 +205,7 @@ struct GoalPreviewView: View {
             }
         }
         if !preview.diagnostics.isEmpty {
-            Text("Quality findings (preview only)")
+            Text("Preview diagnostics")
                 .font(.subheadline.weight(.semibold))
             Text("These facts do not block seal and are not required review.")
                 .font(.caption)
@@ -252,7 +252,7 @@ struct GoalPreviewView: View {
             }
             if let value = record.supervisedValue {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Trained on: \(plainSupervisedLabel(record.supervised.rowKey)) (\(record.supervised.end) code points)")
+                    Text("Supervised target: \(plainSupervisedLabel(record.supervised.rowKey)) (\(record.supervised.end) code points)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(value)

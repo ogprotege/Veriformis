@@ -174,4 +174,53 @@ final class Post20HardeningTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testExportDigestBelongsToTheSelectedBundle() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defaults.set(root.path, forKey: "veriformis.workbench.defaultOutput")
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let vm = WorkbenchViewModel(defaults: defaults, supportDirectory: root)
+        let bundle = root.appendingPathComponent("compiled.vfbundle")
+        let digest = String(repeating: "a", count: 64)
+        vm.lastResult = CompileResult(
+            workspaceURL: root.appendingPathComponent("workspace"), bundleURL: bundle,
+            transportArchiveURL: root.appendingPathComponent("compiled.zip"), handoffURL: nil,
+            manifestSHA256: digest, transportArchiveSHA256: nil, assignmentDigest: nil,
+            log: "", logFileURL: nil
+        )
+        XCTAssertEqual(vm.resolvedExportManifestSHA256, digest)
+        vm.exportBundleURL = root.appendingPathComponent("another.vfbundle")
+        XCTAssertNil(vm.resolvedExportManifestSHA256, "An unrelated bundle cannot inherit compile evidence")
+        vm.exportBundleURL = bundle
+        XCTAssertEqual(vm.resolvedExportManifestSHA256, digest)
+    }
+
+    @MainActor
+    func testExportSchemaDoesNotComeFromTheCompileForm() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defaults.set(root.path, forKey: "veriformis.workbench.defaultOutput")
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let vm = WorkbenchViewModel(defaults: defaults, supportDirectory: root)
+        let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        vm.applyCatalogs(
+            goals: try JSONDecoder().decode(GoalCatalog.self, from: Data(contentsOf:
+                repo.appendingPathComponent("tests/regressions/fixtures/phase6/goal-catalog.json"))),
+            presets: try JSONDecoder().decode(RecipePresetCatalog.self, from: Data(contentsOf:
+                repo.appendingPathComponent("src/veriformis/goals/presets-v1.json")))
+        )
+        vm.selectGoal("learn-the-text")
+        XCTAssertEqual(vm.selectedRepresentation?.rowSchema, "text")
+        vm.exportBundleURL = root.appendingPathComponent("unrelated.vfbundle")
+        XCTAssertNil(vm.knownExportRowSchema, "Only a dry-run may establish the selected bundle schema")
+    }
+
 }
