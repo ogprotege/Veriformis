@@ -195,3 +195,29 @@ def test_regions_are_chunked_separately_and_bound_into_identity():
     assert body.identity_context["region_id"] == "body"
     assert note.identity_context["region_id"] == "footnote:n"
     assert body.heading_path == note.heading_path == []
+
+
+def test_sentence_splitter_handles_unicode_terminators_and_quotes() -> None:
+    """Post-20 defect closure: the splitter is no longer ASCII-only."""
+    from veriformis.chunkers.strategies import CHUNK_STRATEGY_VERSIONS, _sentences
+
+    assert CHUNK_STRATEGY_VERSIONS["sentence"] == "2"
+    assert _sentences('He said "Stop." Then he left. Next one!') == [
+        'He said "Stop."',
+        "Then he left.",
+        "Next one!",
+    ]
+    assert _sentences("Первое предложение. Второе предложение? Третье!") == [
+        "Первое предложение.",
+        "Второе предложение?",
+        "Третье!",
+    ]
+    assert _sentences("第一句。第二句！第三句？最后") == ["第一句。", "第二句！", "第三句？", "最后"]
+    # Abbreviations and lowercase continuations do not split.
+    assert _sentences("Dr. Smith arrived at 5 p.m. He left.") == [
+        "Dr. Smith arrived at 5 p.m. He left."
+    ]
+    assert _sentences("Acme Inc. announced results. Shares rose.") == [
+        "Acme Inc. announced results.",
+        "Shares rose.",
+    ]

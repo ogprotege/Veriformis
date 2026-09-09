@@ -11,9 +11,9 @@ from veriformis.automation.inspect import (
     DATASET_ROW_STAGES,
     ProjectLock,
     create_project_lock,
-    pipeline_for_spec,
+    inspect_environment,
+    resolve_pipeline_and_digest,
     resolve_spec_ref,
-    spec_digest,
 )
 from veriformis.automation.spec import ProjectSpec
 from veriformis.contracts import PROJECT_SPEC_DIAGNOSTIC_SCHEMA_ID
@@ -62,17 +62,39 @@ def load_project_spec_diagnostic(text: str) -> dict[str, Any]:
 
 
 def _apply_spec_pins(spec: ProjectSpec, pipeline: PipelineSpec) -> PipelineSpec:
+    from veriformis.goals.catalog import resolve_goal
+
+    goal_id = spec.goal_id
+    if goal_id is None and spec.preset_id is not None:
+        from veriformis.goals.presets import preset_catalog
+
+        goal_id = preset_catalog().preset(spec.preset_id).goal_id
     stages = {name: dict(config) for name, config in pipeline.stages.items()}
-    if spec.goal_id:
-        for name in ("chunk", "construct", "curate"):
-            if name in stages and not stages[name].get("goal") and not stages[name].get("objective"):
-                stages[name]["goal"] = spec.goal_id
-    if spec.preset_id:
-        for name in ("chunk", "construct", "curate"):
-            if name in stages and not stages[name].get("preset"):
-                stages[name]["preset"] = spec.preset_id
-    if spec.consumer_profile and "construct" in stages:
-        stages["construct"].setdefault("consumer_profile", spec.consumer_profile)
+    for name in ("chunk", "construct", "curate"):
+        if name not in stages:
+            continue
+        config = stages[name]
+        for key, pinned in (("goal", goal_id), ("preset", spec.preset_id)):
+            if pinned is None:
+                continue
+            if config.get(key) is not None and config[key] != pinned:
+                raise ProjectSpecError(f"stage {name} {key} conflicts with project spec pin")
+            config[key] = pinned
+        if goal_id and config.get("objective") is not None:
+            if config["objective"] != resolve_goal(goal_id)[0]:
+                raise ProjectSpecError(f"stage {name} objective conflicts with project spec goal")
+    if goal_id and pipeline.recipe_library_id is not None:
+        if pipeline.recipe_library_id != resolve_goal(goal_id)[2]:
+            raise ProjectSpecError("pipeline recipe_library_id conflicts with project spec goal")
+    if spec.consumer_profile is not None and "construct" in stages:
+        config = stages["construct"]
+        if config.get("consumer_profile") not in (None, spec.consumer_profile):
+            raise ProjectSpecError("construct consumer_profile conflicts with project spec pin")
+        config["consumer_profile"] = spec.consumer_profile
+    if "construct" in stages:
+        for key in ("strategy", "size", "overlap"):
+            if key in stages.get("chunk", {}):
+                stages["construct"].setdefault(key, stages["chunk"][key])
     return replace(pipeline, stages=stages)
 
 
@@ -178,6 +200,13 @@ def _run_dataset_row(
     skip_complete: bool,
     base_dir: Path,
 ) -> PipelineRunResult:
+    plan = _mapping_plan(spec, base_dir=base_dir)
+    if spec.goal_id is None:
+        raise ProjectSpecError("dataset-row execute requires goal_id")
+    if plan.goal_id != spec.goal_id:
+        raise ProjectSpecError(
+            f"mismatched identity goal_id: expected {spec.goal_id} got {plan.goal_id}"
+        )
     outcomes: list[StageOutcome] = []
     if not (skip_complete and _stage_complete(pipeline.workspace, "parse")):
         outcomes.append(
@@ -189,13 +218,6 @@ def _run_dataset_row(
             )
         )
     if not (skip_complete and _stage_complete(pipeline.workspace, "map")):
-        plan = _mapping_plan(spec, base_dir=base_dir)
-        if spec.goal_id is None:
-            raise ProjectSpecError("dataset-row execute requires goal_id")
-        if plan.goal_id != spec.goal_id:
-            raise ProjectSpecError(
-                f"mismatched identity goal_id: expected {spec.goal_id} got {plan.goal_id}"
-            )
         outcomes.append(
             service.map_rows(
                 pipeline.workspace,
@@ -232,8 +254,9 @@ def _run_stages(
     service: PipelineService,
     skip_complete: bool,
     base_dir: Path,
+    pipeline: PipelineSpec,
 ) -> PipelineRunResult:
-    pipeline = pipeline_for_spec(spec, base_dir=base_dir)
+    pipeline = _apply_spec_pins(spec, pipeline)
     if spec.mode == DOCUMENT_SOURCE_MODE:
         return _run_document_source(
             spec,
@@ -260,13 +283,18 @@ def run_project_spec(
     *,
     service: PipelineService,
     base_dir: Path | None = None,
+    expected_lock: ProjectLock | None = None,
 ) -> PipelineRunResult:
     """Execute a confirmed spec. Export is not auto-run."""
+    pipeline, digest = resolve_pipeline_and_digest(spec, base_dir=base_dir or Path.cwd())
+    if expected_lock is not None:
+        _require_lock_context(spec, expected_lock, digest)
     return _run_stages(
         spec,
         service=service,
         skip_complete=False,
         base_dir=base_dir or Path.cwd(),
+        pipeline=pipeline,
     )
 
 
@@ -280,12 +308,9 @@ def resume_project_spec(
     """Resume only when lock, HEAD, and source identities match."""
     from veriformis.workspace import Workspace
 
-    digest = spec_digest(spec)
-    if digest != lock.spec_digest:
-        raise ProjectSpecError(
-            f"mismatched identity spec_digest: expected {lock.spec_digest} got {digest}"
-        )
-    pipeline = pipeline_for_spec(spec, base_dir=base_dir or Path.cwd())
+    lock = ProjectLock.model_validate(lock.model_dump(mode="json"))
+    pipeline, digest = resolve_pipeline_and_digest(spec, base_dir=base_dir or Path.cwd())
+    _require_lock_context(spec, lock, digest)
     store = Workspace.open(pipeline.workspace)
     head = store.head_id
     sources = tuple(sorted(store.head().sources))
@@ -310,15 +335,34 @@ def resume_project_spec(
         service=service,
         skip_complete=True,
         base_dir=base_dir or Path.cwd(),
+        pipeline=pipeline,
     )
 
 
-def lock_after_workspace(spec: ProjectSpec, workspace: Path) -> ProjectLock:
+def _require_lock_context(spec: ProjectSpec, lock: ProjectLock, digest: str) -> None:
+    current = inspect_environment()
+    for field, actual in (
+        ("spec_id", spec.spec_id), ("spec_digest", digest),
+        ("python_version", current.python_version),
+        ("veriformis_version", current.veriformis_version), ("extras", current.extras),
+    ):
+        if getattr(lock, field) != actual:
+            raise ProjectSpecError(f"mismatched identity {field}: project lock differs from current execution")
+
+
+def bind_workspace_lock(lock: ProjectLock, workspace: Path) -> ProjectLock:
+    """Bind completed HEAD while retaining the environment and spec actually run."""
+    from veriformis.identity import derive_id
     from veriformis.workspace import Workspace
 
     store = Workspace.open(workspace)
-    return create_project_lock(
-        spec,
-        workspace_head=store.head_id,
-        source_identities=tuple(sorted(store.head().sources)),
-    )
+    payload = lock.model_dump(mode="json", exclude={"lock_id"}, exclude_none=True)
+    payload.update(workspace_head=store.head_id, source_identities=sorted(store.head().sources))
+    payload["lock_id"] = derive_id("plk", payload)
+    return ProjectLock.model_validate(payload)
+
+
+def lock_after_workspace(
+    spec: ProjectSpec, workspace: Path, *, base_dir: Path | None = None,
+) -> ProjectLock:
+    return bind_workspace_lock(create_project_lock(spec, base_dir=base_dir), workspace)

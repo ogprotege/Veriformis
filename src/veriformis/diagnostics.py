@@ -284,7 +284,14 @@ def _validate_ooxml_diagnostic(
                 raise ParseError("unreadable OOXML part has the wrong refusal reason")
             return
         try:
-            etree.fromstring(data)
+            etree.fromstring(
+                data,
+                parser=etree.XMLParser(
+                    resolve_entities=False,
+                    no_network=True,
+                    recover=False,
+                ),
+            )
         except etree.XMLSyntaxError:
             if reason != "invalid-xml":
                 raise ParseError("invalid OOXML XML has the wrong refusal reason")

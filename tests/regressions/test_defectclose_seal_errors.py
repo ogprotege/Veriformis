@@ -9,6 +9,8 @@ failure alongside — never instead of — a successful seal outcome.
 
 from __future__ import annotations
 
+from support.mcp import call_registered as _call, tool_map as _tool_map
+
 import json
 from pathlib import Path
 
@@ -22,21 +24,6 @@ from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import PipelineService
 
 runner = CliRunner()
-
-
-def _tool_map(server):
-    manager = server._tool_manager
-    return {tool.name: tool.fn for tool in manager.list_tools()}
-
-
-def _call(fn, *args, **kwargs):
-    """Call one registered MCP tool regardless of sync wrapper choice."""
-    result = fn(*args, **kwargs)
-    if hasattr(result, "__await__"):
-        import asyncio
-
-        result = asyncio.get_event_loop().run_until_complete(result)
-    return result
 
 
 def _validated_workspace(tmp_path: Path, service: PipelineService) -> Path:

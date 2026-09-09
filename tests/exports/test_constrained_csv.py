@@ -2,18 +2,13 @@
 
 from __future__ import annotations
 
-import base64
-import json
 import shutil
 from pathlib import Path
-from typing import Any
 
 import pytest
 
 from veriformis.datasets import (
-    ProductRow,
     RowSet,
-    row_provenance_from_json_bytes,
 )
 from veriformis.errors import ExportContractError, ExportVerificationError
 from veriformis.exports import (
@@ -32,7 +27,6 @@ from veriformis.exports import (
 from veriformis.exports import constrained_csv as csv_module
 from veriformis.exports.constrained_csv import (
     CONSTRAINED_CSV_CONTAINER_ID,
-    CONSTRAINED_CSV_CONTAINER_VERSION,
     CONSTRAINED_CSV_DATA_CARD_PATH,
     CONSTRAINED_CSV_DATA_CARD_SCHEMA,
     CONSTRAINED_CSV_DIALECT_SCHEMA,
@@ -47,51 +41,20 @@ from veriformis.exports.models import EXPORT_RECEIPT_PATH
 from veriformis.exports import service as service_module
 from veriformis.identity import derive_id, lossless_json_bytes, sha256_digest
 
+from support.bundles import (
+    EXPECTED_MANIFEST_SHA256,
+    _materialize_bundle,
+    _tree_bytes,
+)
 
-FIXTURE = (
-    Path(__file__).resolve().parents[1]
-    / "regressions"
-    / "fixtures"
-    / "phase3"
-    / "pre-taxonomy-full-text.vfbundle.json"
+from support.export_csv import (
+    _dry,
+    _row_set_for_schema,
+    _selection,
 )
-EXPECTED_MANIFEST_SHA256 = (
-    "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
-)
+
+
 ROW_SCHEMAS = ("instruction_output", "prompt_completion", "text")
-
-
-def _materialize_bundle(root: Path) -> Path:
-    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    bundle = root / "source.vfbundle"
-    for relative_path, encoded in sorted(fixture["files_base64"].items()):
-        data = base64.b64decode(encoded, validate=True)
-        assert sha256_digest(data) == fixture["file_sha256"][relative_path]
-        target = bundle.joinpath(*relative_path.split("/"))
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
-    return bundle
-
-
-def _selection(bundle: Path, *, schema_version: str) -> dict[str, object]:
-    return {
-        "schema_version": schema_version,
-        "bundle": str(bundle),
-        "container_id": CONSTRAINED_CSV_CONTAINER_ID,
-        "container_version": CONSTRAINED_CSV_CONTAINER_VERSION,
-        "consumer_id": None,
-        "consumer_profile_version": None,
-        "source_trust_policy": "require_external_digest",
-        "expected_manifest_sha256": EXPECTED_MANIFEST_SHA256,
-        "overwrite_policy": "refuse",
-    }
-
-
-def _dry(bundle: Path) -> ExportDryRunRequest:
-    return ExportDryRunRequest(
-        operation="dry_run",
-        **_selection(bundle, schema_version=EXPORT_SURFACE_REQUEST_SCHEMA),
-    )
 
 
 def _execute(
@@ -117,75 +80,6 @@ def _verify(
         destination_root=str(destination),
         expected_export_plan_id=plan_id,
         **_selection(bundle, schema_version=EXPORT_SURFACE_REQUEST_SCHEMA),
-    )
-
-
-def _tree_bytes(root: Path) -> dict[str, bytes]:
-    return {
-        path.relative_to(root).as_posix(): path.read_bytes()
-        for path in sorted(root.rglob("*"))
-        if path.is_file()
-    }
-
-
-def _payload(row_schema: str, value: str) -> dict[str, Any]:
-    exact = (
-        f'{value}, "quoted"\t leading and trailing \x00'
-        " CR=\r LF=\n CRLF=\r\n formula==1+1 "
-        "composed=\u00e9 decomposed=e\u0301 nonbmp=\U0001f600"
-    )
-    if row_schema == "text":
-        return {"text": exact}
-    if row_schema == "prompt_completion":
-        return {"prompt": f"context:{exact}", "completion": f"target:{exact}"}
-    if row_schema == "instruction_output":
-        return {
-            "instruction": f"instruction:{exact}",
-            "input": f"context:{exact}",
-            "output": f"target:{exact}",
-        }
-    assert row_schema == "messages"
-    return {
-        "messages": [
-            {"role": "user", "content": f"context:{exact}"},
-            {"role": "assistant", "content": f"target:{exact}"},
-        ]
-    }
-
-
-def _row_set_for_schema(source: RowSet, row_schema: str) -> RowSet:
-    source_rows = (*source.train_rows, *source.evaluation_rows)
-    converted = tuple(
-        ProductRow.create(
-            record_id=row.record_id,
-            row_schema=row_schema,  # type: ignore[arg-type]
-            payload=_payload(row_schema, str(index)),
-        )
-        for index, row in enumerate(source_rows)
-    )
-    converted_by_record = {row.record_id: row for row in converted}
-    provenance = []
-    for item in source.provenance:
-        row = converted_by_record[item.record_id]
-        body = item.model_dump(mode="json", exclude={"provenance_id"})
-        body.update(row_id=row.row_id, payload_sha256=row.payload_sha256)
-        provenance.append(
-            row_provenance_from_json_bytes(
-                lossless_json_bytes({"provenance_id": derive_id("prv", body), **body})
-            )
-        )
-    train_count = source.train_row_count
-    return RowSet.create(
-        plan_id=source.plan_id,
-        serialization_plan_id=source.serialization_plan_id,
-        recipe_id=source.recipe_id,
-        construction_result_id=source.construction_result_id,
-        curation_result_id=source.curation_result_id,
-        split_result_id=source.split_result_id,
-        row_schema=row_schema,  # type: ignore[arg-type]
-        train_rows=converted[:train_count],
-        evaluation_rows=converted[train_count:],
-        provenance=provenance,
     )
 
 

@@ -30,6 +30,31 @@ revision. Reviewer identity is an opaque local unsigned attestation.
 round-trips pending items and completed decisions, waivers, or
 corrections through Python, CLI, and MCP.
 
+## Construction completion
+
+After `construct --require-review` and `curate`, `review-export --workspace`
+exports exactly the current pending candidates bound to the current
+finished-dataset plan. The existing explicit `--plan-id` and `--items` export
+remains available. Workspace export cannot override either field.
+
+A complete packet is submitted with `review-submit`. Pass that packet to
+`construct --review-packet` with the same recipe selection. Python accepts
+`review_packet`; MCP `construct` accepts the packet JSON string. The service
+strictly reloads the packet and submits it through the same review function.
+A stale plan, changed recipe, incomplete or different candidate set, or
+correction refuses before the workspace advances.
+
+Accepted decisions and explicit waivers produce accepted candidates. Rejected
+decisions stay rejected. Each persisted `ReviewEvidence.rationale` contains
+canonical JSON with `review_bundle_id`, `review_packet_id`, and the complete
+unsigned `resolution`, including the exact supplied rationale. Existing
+construction replay verifies these evidence-bearing promotion decisions.
+No persisted schema changes. Recurate and finish after the new construction
+revision. Coverage and other dataset gates remain independent.
+
+Dataset-row mapping v1 has no durable review receipt. A mapping plan may
+represent `required`, but execution refuses that policy. Only `none` executes.
+
 ## Queue kinds
 
 | Kind | Role in v1 |

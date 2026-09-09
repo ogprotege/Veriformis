@@ -5,10 +5,11 @@ from __future__ import annotations
 import csv
 import io
 import json
-import re
+import math
 from pathlib import Path
 from typing import Any
 
+from veriformis._jsonl_frames import frame_jsonl_lines
 from veriformis.diagnostics import (
     DiagnosticLocation,
     make_diagnostic,
@@ -25,10 +26,13 @@ from veriformis.ir import (
 )
 from veriformis.sources import ParseResult, register_source
 
-CSV_PARSER_VERSION = "1.0.0"
-JSON_PARSER_VERSION = "1.0.0"
-JSONL_PARSER_VERSION = "1.0.0"
-_WS = re.compile(r"[ \t]+")
+# 1.1.0 (post-20 defect D-13): the CSV BOM is removed and diagnosed; trimmed
+# cells and omitted blank rows are diagnosed; JSON refuses NaN/Infinity and
+# duplicate keys; floats keep their shortest round-trip form; string values and
+# object key order are preserved exactly; JSONL frames on newline only.
+CSV_PARSER_VERSION = "1.1.0"
+JSON_PARSER_VERSION = "1.1.1"
+JSONL_PARSER_VERSION = "1.1.1"
 
 
 def parse_csv_file(
@@ -52,6 +56,9 @@ def parse_csv_file(
             code="csv.not-utf8",
             message=f"CSV source is not valid UTF-8: {exc}",
         )
+    bom_removed = text.startswith("\ufeff")
+    if bom_removed:
+        text = text[1:]
     if not text.strip():
         return _refuse(
             p,
@@ -64,8 +71,22 @@ def parse_csv_file(
         )
     # Fixed excel dialect keeps recovery deterministic across platforms.
     dialect = csv.excel
-    reader = csv.reader(io.StringIO(text), dialect)
-    sample_rows = list(csv.reader(io.StringIO(text), dialect))
+    try:
+        parsed_rows = list(csv.reader(io.StringIO(text), dialect))
+    except csv.Error as exc:
+        # Oversized fields and malformed quoting raise the module's own error
+        # class, which is not a ValueError; it must become a typed refusal
+        # rather than a traceback (post-20 defect D-09).
+        return _refuse(
+            p,
+            logical_path=logical_path,
+            raw_bytes=captured,
+            parser="csv",
+            parser_version=CSV_PARSER_VERSION,
+            code="csv.invalid",
+            message=f"CSV source could not be parsed with the fixed excel dialect: {exc}",
+        )
+    sample_rows = parsed_rows[:6]
     has_header = False
     if sample_rows:
         first = sample_rows[0]
@@ -74,8 +95,13 @@ def parse_csv_file(
         if rest and all(not _looks_numeric(cell) for cell in first):
             if any(_looks_numeric(cell) for row in rest for cell in row):
                 has_header = True
-    rows = [tuple(cell.replace("\r\n", "\n").replace("\r", "\n") for cell in row) for row in reader]
+    rows = [
+        tuple(cell.replace("\r\n", "\n").replace("\r", "\n") for cell in row)
+        for row in parsed_rows
+    ]
+    blank_rows_omitted = sum(1 for row in rows if not any(cell.strip() for cell in row))
     rows = [row for row in rows if any(cell.strip() for cell in row)]
+    cells_trimmed = sum(1 for row in rows for cell in row if cell != cell.strip())
     if not rows:
         return _refuse(
             p,
@@ -149,6 +175,68 @@ def parse_csv_file(
             },
         )
     ]
+    if bom_removed:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name="csv",
+                parser_version=CSV_PARSER_VERSION,
+                code="csv.bom-removed",
+                severity="info",
+                disposition="normalized",
+                loss_kind="metadata",
+                location=DiagnosticLocation(
+                    kind="text",
+                    line_start=1,
+                    line_end=1,
+                    raw_byte_start=0,
+                    raw_byte_end=3,
+                ),
+                message="A UTF-8 byte-order mark preceded the first header cell and was not carried into it.",
+            )
+        )
+    if cells_trimmed:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name="csv",
+                parser_version=CSV_PARSER_VERSION,
+                code="csv.cells-trimmed",
+                severity="info",
+                disposition="normalized",
+                loss_kind="presentation",
+                location=DiagnosticLocation(
+                    kind="text",
+                    line_start=1,
+                    line_end=max(1, text.count("\n") + 1),
+                    raw_byte_start=0,
+                    raw_byte_end=len(captured),
+                ),
+                message=f"Surrounding whitespace was trimmed from {cells_trimmed} cell(s).",
+                details={"count": cells_trimmed},
+            )
+        )
+    if blank_rows_omitted:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name="csv",
+                parser_version=CSV_PARSER_VERSION,
+                code="csv.blank-rows-omitted",
+                severity="info",
+                disposition="omitted",
+                loss_kind="presentation",
+                location=DiagnosticLocation(
+                    kind="text",
+                    line_start=1,
+                    line_end=max(1, text.count("\n") + 1),
+                    raw_byte_start=0,
+                    raw_byte_end=len(captured),
+                ),
+                message=f"{blank_rows_omitted} row(s) with no cell content were omitted.",
+                details={"count": blank_rows_omitted},
+            )
+        )
     if any(len(row) != width for row in rows):
         diagnostics.append(
             make_diagnostic(
@@ -182,6 +270,49 @@ def parse_csv_file(
     )
 
 
+def _refuse_json_constant(token: str) -> Any:
+    raise ValueError(f"non-finite JSON number {token!r} is not admitted")
+
+
+def _finite_json_float(token: str) -> float:
+    value = float(token)
+    if not math.isfinite(value):
+        _refuse_json_constant(token)
+    return value
+
+
+def _refuse_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON object key {key!r} is not admitted")
+        result[key] = value
+    return result
+
+
+def _load_json_text(text: str) -> Any:
+    """Decode one JSON text strictly; every failure is a typed refusal upstream.
+
+    ``NaN``, ``Infinity``, and duplicate object keys are refused rather than
+    silently admitted or collapsed. ``json.loads`` raises ``RecursionError`` on
+    deep nesting and a plain ``ValueError`` on integers beyond the
+    interpreter's digit limit; callers catch those alongside
+    ``JSONDecodeError`` so no capture yields a traceback.
+    """
+    return json.loads(
+        text,
+        parse_constant=_refuse_json_constant,
+        parse_float=_finite_json_float,
+        object_pairs_hook=_refuse_duplicate_keys,
+    )
+
+
+def _json_failure_text(exc: BaseException) -> str:
+    if isinstance(exc, RecursionError):
+        return "nesting exceeds the recovery depth limit"
+    return str(exc)
+
+
 def parse_json_file(
     path: str | Path,
     *,
@@ -204,8 +335,8 @@ def parse_json_file(
             message=f"JSON source is not valid UTF-8: {exc}",
         )
     try:
-        value = json.loads(text)
-    except json.JSONDecodeError as exc:
+        value = _load_json_text(text)
+    except (json.JSONDecodeError, ValueError, RecursionError) as exc:
         return _refuse(
             p,
             logical_path=logical_path,
@@ -213,7 +344,7 @@ def parse_json_file(
             parser="json",
             parser_version=JSON_PARSER_VERSION,
             code="json.invalid",
-            message=f"JSON source is not valid JSON: {exc}",
+            message=f"JSON source is not valid JSON: {_json_failure_text(exc)}",
         )
     return _structured_value_result(
         p,
@@ -249,12 +380,10 @@ def parse_jsonl_file(
         )
     records: list[Any] = []
     bad_lines: list[int] = []
-    for number, line in enumerate(text.splitlines(), start=1):
-        if not line.strip():
-            continue
+    for number, line in frame_jsonl_lines(text):
         try:
-            records.append(json.loads(line))
-        except json.JSONDecodeError:
+            records.append(_load_json_text(line))
+        except (json.JSONDecodeError, ValueError, RecursionError):
             bad_lines.append(number)
     if bad_lines:
         return _refuse(
@@ -391,15 +520,14 @@ def _flatten_json(value: Any, *, path: str) -> list[str]:
     if isinstance(value, bool):
         return [f"{path}: {'true' if value else 'false'}"]
     if isinstance(value, (int, float)):
-        # Reject non-finite floats implicitly via JSON load; format stably.
-        if isinstance(value, float):
-            text = format(value, ".15g")
-        else:
-            text = str(value)
+        # Non-finite floats are refused at load; repr is the shortest string
+        # that round-trips the exact double, so no precision is invented or lost.
+        text = repr(value) if isinstance(value, float) else str(value)
         return [f"{path}: {text}"]
     if isinstance(value, str):
-        cleaned = _WS.sub(" ", value.replace("\r\n", "\n").replace("\r", "\n")).strip()
-        return [f"{path}: {cleaned}"] if cleaned else [f"{path}:"]
+        # String values are exact: no whitespace collapse, no trimming, no
+        # line-ending rewrite. An empty string projects as the bare label.
+        return [f"{path}: {value}"] if value else [f"{path}:"]
     if isinstance(value, list):
         if not value:
             return [f"{path}: []"]
@@ -411,9 +539,10 @@ def _flatten_json(value: Any, *, path: str) -> list[str]:
         if not value:
             return [f"{path}: {{}}"]
         lines = []
-        for key in sorted(value, key=lambda item: str(item)):
+        # Source key order is preserved; duplicate keys were refused at load.
+        for key, item in value.items():
             child_path = f"{path}.{key}" if path != "$" else str(key)
-            lines.extend(_flatten_json(value[key], path=child_path))
+            lines.extend(_flatten_json(item, path=child_path))
         return lines
     raise ParseError(f"unsupported JSON value type at {path}: {type(value)!r}")
 

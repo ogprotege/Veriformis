@@ -145,7 +145,8 @@ final class WorkbenchViewModel: ObservableObject {
             guard let confirmedMappingPlan else { return nil }
             let workspace = output.appendingPathComponent("workspace", isDirectory: true)
             let bundle = output.appendingPathComponent("dataset.vfbundle")
-            let planURL = workspace.appendingPathComponent("confirmed-mapping-plan.json")
+            let planURL = Self.workbenchSidecarDirectory(for: workspace)
+                .appendingPathComponent("confirmed-mapping-plan.json")
             let plan = VeriformisCLI.compilePlan(
                 sources: sourceURLs,
                 sourceRoot: sourceRoot,
@@ -178,7 +179,8 @@ final class WorkbenchViewModel: ObservableObject {
             instruction: request.instruction,
             cleaningRules: request.rules,
             cleaningCustom: request.custom,
-            chunkSize: request.size,
+            chunkStrategy: request.strategy,
+                chunkSize: request.size,
             chunkOverlap: request.overlap,
             includeHandoff: writeAptusHandoff,
             mode: request.mode
@@ -198,7 +200,10 @@ final class WorkbenchViewModel: ObservableObject {
     }
     private let defaults: UserDefaults
     private let supportDirectoryOverride: URL?
-    private let historyKey = "veriformis.workbench.runHistory.v1"
+    @Published private(set) var historyPersistenceError: String?
+    private let processRegistry = CLIProcessRegistry()
+    private var terminating = false
+    private var historyLoadedBytes: Data?
     private let defaultOutputKey = "veriformis.workbench.defaultOutput"
     private let cliOverrideKey = "veriformis.workbench.cliOverride"
     private let historyLimit = 100
@@ -478,9 +483,9 @@ final class WorkbenchViewModel: ObservableObject {
         }
         var lines = [VeriformisCLI.exportCLIEquivalent(arguments: detect)]
         if confirmedMappingPlan != nil, let output = outputDirectoryURL {
-            let planURL = output
-                .appendingPathComponent("workspace", isDirectory: true)
-                .appendingPathComponent("confirmed-mapping-plan.json")
+            let planURL = Self.workbenchSidecarDirectory(
+                for: output.appendingPathComponent("workspace", isDirectory: true)
+            ).appendingPathComponent("confirmed-mapping-plan.json")
             var preview = ["mapping-preview", path.path, "--plan", planURL.path]
             if let root = resolvedSourceRoot {
                 preview += ["--source-root", root.path]
@@ -587,7 +592,7 @@ final class WorkbenchViewModel: ObservableObject {
     var selectableGoals: [GoalCatalogGoal] {
         guard case .ready(let catalog) = goalCatalogState else { return [] }
         return catalog.goals.filter { goal in
-            if goal.objective.requiresMappedValueEvidence {
+            if goal.objective.isKnownMappedObjective {
                 return currentCompileUsesMapping
                     && confirmedMappingPlan?.goalID == goal.goalID
             }
@@ -643,7 +648,7 @@ final class WorkbenchViewModel: ObservableObject {
             || !allowed.contains(where: { $0.goalID == selectedGoalID })
         {
             selectedGoalID = allowed.first?.goalID ?? goals.goals.first(where: {
-                !$0.objective.requiresMappedValueEvidence
+                !$0.objective.isKnownMappedObjective
             })?.goalID
         }
         if let goalID = selectedGoalID,
@@ -663,7 +668,7 @@ final class WorkbenchViewModel: ObservableObject {
             goalCatalogState = .unavailable("Veriformis CLI is unavailable.")
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         goalCatalogController = controller
         goalCatalogState = .loading
         goalCatalogTask = Task { [weak self] in
@@ -695,7 +700,7 @@ final class WorkbenchViewModel: ObservableObject {
             recipePresetState = .unavailable("Veriformis CLI is unavailable.")
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         recipePresetController = controller
         recipePresetState = .loading
         recipePresetTask = Task { [weak self] in
@@ -806,7 +811,7 @@ final class WorkbenchViewModel: ObservableObject {
             return
         }
 
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         taxonomyHelpController = controller
         taxonomyHelpState = .loading
         taxonomyHelpTask = Task { [weak self] in
@@ -847,7 +852,7 @@ final class WorkbenchViewModel: ObservableObject {
             return
         }
 
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         goalPreviewController = controller
         goalPreviewState = .loading
         goalPreviewTask = Task { [weak self] in
@@ -895,7 +900,7 @@ final class WorkbenchViewModel: ObservableObject {
             return
         }
 
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         compilePreflightController = controller
         compilePreflightState = .loading
         compilePreflightTask = Task { [weak self] in
@@ -991,7 +996,7 @@ final class WorkbenchViewModel: ObservableObject {
             )
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         mappingDetectController = controller
         mappingDetectState = .loading
         let sourceRoot = resolvedSourceRoot?.path
@@ -1055,7 +1060,7 @@ final class WorkbenchViewModel: ObservableObject {
             )
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         mappingPreviewController = controller
         mappingPreviewState = .loading
         let sourceRoot = resolvedSourceRoot?.path
@@ -1157,7 +1162,7 @@ final class WorkbenchViewModel: ObservableObject {
             exportDiscoveryState = .unavailable("Veriformis CLI is unavailable.")
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         exportDiscoveryController = controller
         exportDiscoveryState = .loading
         exportDiscoveryTask = Task { [weak self] in
@@ -1199,7 +1204,7 @@ final class WorkbenchViewModel: ObservableObject {
             )
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         exportDryRunController = controller
         exportDryRunState = .loading
         exportIsRunning = true
@@ -1245,7 +1250,7 @@ final class WorkbenchViewModel: ObservableObject {
             exportExecuteState = .unavailable(error.localizedDescription)
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         exportExecuteController = controller
         exportExecuteState = .loading
         exportIsRunning = true
@@ -1288,7 +1293,7 @@ final class WorkbenchViewModel: ObservableObject {
             exportInspectState = .unavailable(error.localizedDescription)
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         exportInspectController = controller
         exportInspectState = .loading
         exportIsRunning = true
@@ -1333,7 +1338,7 @@ final class WorkbenchViewModel: ObservableObject {
             exportVerifyState = .unavailable(error.localizedDescription)
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         exportVerifyController = controller
         exportVerifyState = .loading
         exportIsRunning = true
@@ -1537,7 +1542,7 @@ final class WorkbenchViewModel: ObservableObject {
             reviewExportState = .unavailable("Choose a finished-dataset plan_id and an items JSON file.")
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         reviewExportController = controller
         reviewExportState = .loading
         reviewIsRunning = true
@@ -1577,7 +1582,7 @@ final class WorkbenchViewModel: ObservableObject {
             reviewImportState = .unavailable("Choose a review packet JSON file.")
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         reviewImportController = controller
         reviewImportState = .loading
         reviewIsRunning = true
@@ -1617,7 +1622,7 @@ final class WorkbenchViewModel: ObservableObject {
             reviewSubmitState = .unavailable("Choose a review packet JSON file.")
             return
         }
-        let controller = CLIProcessController()
+        let controller = CLIProcessController(registry: processRegistry)
         reviewSubmitController = controller
         reviewSubmitState = .loading
         reviewIsRunning = true
@@ -1729,7 +1734,7 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     func compile() {
-        guard !isRunning else { return }
+        guard !isRunning, !terminating else { return }
         applyDefaultOutputIfNeeded()
         lastError = nil
         lastFailure = nil
@@ -1801,7 +1806,7 @@ final class WorkbenchViewModel: ObservableObject {
         let allowEmptySnapshot = allowEmptyEvaluation
         let handoffSnapshot = writeAptusHandoff
         let splitSnapshot = splitRatioPPM
-        let processController = CLIProcessController()
+        let processController = CLIProcessController(registry: processRegistry)
         activeProcessController = processController
 
         compileTask = Task {
@@ -1814,6 +1819,8 @@ final class WorkbenchViewModel: ObservableObject {
                 runFinishedCallbacks.removeAll()
                 callbacks.forEach { $0() }
             }
+            var manifestReceipt: String?
+            var assignmentReceipt: String?
             var combinedLog = ""
             var outputWasTruncated = false
             var workspace = outputDirectory
@@ -1890,12 +1897,18 @@ final class WorkbenchViewModel: ObservableObject {
                 workspace = outputDirectory.appendingPathComponent("workspace-\(stamp)", isDirectory: true)
                 bundle = outputDirectory.appendingPathComponent("dataset-\(stamp).vfbundle", isDirectory: true)
                 transportArchive = URL(fileURLWithPath: bundle.path + ".zip")
-                try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
-                logFileURL = workspace.appendingPathComponent("run.log")
+                // The CLI owns the workspace directory: `parse -o` creates it and
+                // refuses a non-empty destination. Everything the app writes on
+                // its own behalf (run log, confirmed mapping plan) lives in a
+                // sibling `.workbench` directory so the compiler never sees a
+                // foreign file (post-20 defect D-04).
+                let sidecar = Self.workbenchSidecarDirectory(for: workspace)
+                try FileManager.default.createDirectory(at: sidecar, withIntermediateDirectories: true)
+                logFileURL = sidecar.appendingPathComponent("run.log")
 
                 var mappingPlanURL: URL?
                 if usesMappingSnapshot, let confirmed = confirmedPlanSnapshot {
-                    let planURL = workspace.appendingPathComponent("confirmed-mapping-plan.json")
+                    let planURL = sidecar.appendingPathComponent("confirmed-mapping-plan.json")
                     try confirmed.write(to: planURL)
                     mappingPlanURL = planURL
                 }
@@ -1914,6 +1927,7 @@ final class WorkbenchViewModel: ObservableObject {
                     instruction: preflightRequest?.instruction,
                     cleaningRules: preflightRequest?.rules ?? "",
                     cleaningCustom: preflightRequest?.custom ?? "",
+                    chunkStrategy: preflightRequest?.strategy,
                     chunkSize: preflightRequest?.size,
                     chunkOverlap: preflightRequest?.overlap,
                     includeHandoff: handoffSnapshot,
@@ -1962,11 +1976,20 @@ final class WorkbenchViewModel: ObservableObject {
                             message: result.combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
                         )
                     }
+                    if command.stage == .split {
+                        assignmentReceipt = try CommandResult.decode(result, command: "split").digest("assignment_digest")
+                    } else if command.stage == .seal {
+                        let receipt = try CommandResult.decode(result, command: "seal")
+                        guard try receipt.text("bundle_path") == bundle.path else {
+                            throw WorkbenchError.invalidConfiguration("Seal receipt names a different bundle.")
+                        }
+                        manifestReceipt = try receipt.digest("manifest_sha256")
+                    }
                     completedStages.insert(command.stage)
                     progressPercent = min(100, (Double(completedStages.count) / total) * 100)
                 }
 
-                let manifest = Self.extractManifestSHA256(from: combinedLog)
+                let manifest = manifestReceipt
                 guard let manifest else {
                     throw WorkbenchError.processFailed(
                         stage: WorkbenchStage.seal.rawValue,
@@ -1979,6 +2002,7 @@ final class WorkbenchViewModel: ObservableObject {
                 let packageArguments = [
                     "package",
                     bundle.path,
+                    "--json",
                     "-o",
                     transportArchive.path,
                     "--manifest-sha256",
@@ -2014,8 +2038,13 @@ final class WorkbenchViewModel: ObservableObject {
                 completedStages.insert(.package)
                 progressPercent = 100
 
-                let archiveSHA256 = Self.extractArchiveSHA256(from: packageResult.combinedOutput)
-                let assignment = Self.extractAssignmentDigest(from: combinedLog)
+                let packageReceipt = try CommandResult.decode(packageResult, command: "package")
+                guard try packageReceipt.text("archive_path") == transportArchive.path,
+                      try packageReceipt.digest("manifest_sha256") == manifest else {
+                    throw WorkbenchError.invalidConfiguration("Package receipt does not bind the requested bundle and archive.")
+                }
+                let archiveSHA256 = try packageReceipt.digest("archive_sha256")
+                let assignment = assignmentReceipt
                 let handoff = handoffSnapshot
                     ? URL(fileURLWithPath: bundle.path + ".aptus-handoff.json")
                     : nil
@@ -2177,6 +2206,28 @@ final class WorkbenchViewModel: ObservableObject {
         activeProcessController?.cancel()
     }
 
+    var hasActiveOperations: Bool {
+        processRegistry.hasActiveProcesses || operationTasks.contains { $0 != nil }
+    }
+
+    private var operationTasks: [Task<Void, Never>?] {
+        [compileTask, taxonomyHelpTask, goalCatalogTask, recipePresetTask, goalPreviewTask, compilePreflightTask, mappingDetectTask, mappingPreviewTask, exportDiscoveryTask, exportDryRunTask, exportInspectTask, exportExecuteTask, exportVerifyTask, reviewExportTask, reviewImportTask, reviewSubmitTask]
+    }
+
+    /// Drain all owned children and UI completions, including superseded requests.
+    func cancelAllOperations(onFinished: @escaping () -> Void) {
+        terminating = true
+        let tasks = operationTasks.compactMap { $0 }
+        cancelCompile()
+        tasks.forEach { $0.cancel() }
+        processRegistry.closeAndCancel()
+        Task {
+            for task in tasks { await task.value }
+            await processRegistry.drain()
+            onFinished()
+        }
+    }
+
     /// Restore compile form from a history entry and start again.
     func reRun(from entry: RunHistoryEntry) {
         guard !isRunning else { return }
@@ -2258,30 +2309,6 @@ final class WorkbenchViewModel: ObservableObject {
 
     func openLogFile(_ url: URL) {
         NSWorkspace.shared.open(url)
-    }
-
-    nonisolated static func extractManifestSHA256(from log: String) -> String? {
-        extractLabeledDigest(from: log, label: "manifest sha-256")
-    }
-
-    nonisolated static func extractAssignmentDigest(from log: String) -> String? {
-        extractLabeledDigest(from: log, label: "assignment digest")
-    }
-
-    nonisolated static func extractArchiveSHA256(from log: String) -> String? {
-        extractLabeledDigest(from: log, label: "archive sha-256")
-    }
-
-    nonisolated static func extractLabeledDigest(from log: String, label: String) -> String? {
-        let needle = label.lowercased() + ":"
-        for line in log.split(separator: "\n") {
-            let text = String(line)
-            let lower = text.lowercased()
-            guard let range = lower.range(of: needle) else { continue }
-            let value = text[range.upperBound...].trimmingCharacters(in: .whitespaces)
-            if !value.isEmpty { return value }
-        }
-        return nil
     }
 
     nonisolated static func makeFailure(
@@ -2413,22 +2440,57 @@ final class WorkbenchViewModel: ObservableObject {
         supportDirectory().appendingPathComponent("run-history.json")
     }
 
+    /// Directory beside a CLI workspace for files the workbench writes itself.
+    ///
+    /// `veriformis parse -o WORKSPACE` creates the workspace and refuses a
+    /// non-empty destination, so the run log and the confirmed mapping plan
+    /// must never live inside it.
+    nonisolated static func workbenchSidecarDirectory(for workspace: URL) -> URL {
+        let parent = workspace.deletingLastPathComponent()
+        return parent.appendingPathComponent(
+            workspace.lastPathComponent + ".workbench",
+            isDirectory: true
+        )
+    }
+
     private func loadHistory() {
         let url = historyFileURL()
-        guard let data = try? Data(contentsOf: url),
-              let decoded = try? JSONDecoder().decode([RunHistoryEntry].self, from: data)
-        else {
-            runHistory = []
-            return
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        do {
+            let data = try Data(contentsOf: url)
+            historyLoadedBytes = data
+            let decoded = try RunHistoryFile.decode(data)
+            runHistory = decoded.entries
+            selectedHistoryID = runHistory.first?.id
+            if decoded.legacy {
+                let backup = url.deletingLastPathComponent().appendingPathComponent("run-history.legacy-v0.json")
+                if FileManager.default.fileExists(atPath: backup.path) {
+                    guard try Data(contentsOf: backup) == data else {
+                        throw WorkbenchError.invalidConfiguration("Legacy history backup differs; original history was preserved.")
+                    }
+                } else {
+                    try data.write(to: backup, options: .withoutOverwriting)
+                }
+                saveHistory()
+            }
+        } catch {
+            historyPersistenceError = "History could not be loaded or migrated. Original files were preserved: " + error.localizedDescription
         }
-        runHistory = decoded
-        selectedHistoryID = decoded.first?.id
     }
 
     private func saveHistory() {
-        let url = historyFileURL()
-        if let data = try? JSONEncoder().encode(runHistory) {
-            try? data.write(to: url, options: .atomic)
+        guard historyPersistenceError == nil else { return }
+        do {
+            let data = try JSONEncoder().encode(RunHistoryFile(entries: runHistory))
+            let url = historyFileURL()
+            let current = FileManager.default.fileExists(atPath: url.path) ? try Data(contentsOf: url) : nil
+            guard current == historyLoadedBytes else {
+                throw WorkbenchError.invalidConfiguration("History changed after loading; the changed file was preserved.")
+            }
+            try data.write(to: url, options: historyLoadedBytes == nil ? .withoutOverwriting : .atomic)
+            historyLoadedBytes = data
+        } catch {
+            historyPersistenceError = "History could not be saved: " + error.localizedDescription
         }
     }
 

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from veriformis._jsonl_frames import frame_jsonl_lines
 from veriformis.errors import RowSourceError
 from veriformis.identity import lossless_json_bytes, normalize_logical_path, sha256_digest
 from veriformis.mapping.models import RowSource
@@ -203,9 +204,7 @@ def capture_jsonl(
         )
     records: list[CapturedRow] = []
     row_index = 0
-    for line_number, raw_line in enumerate(text.splitlines(), start=1):
-        if not raw_line.strip():
-            continue
+    for line_number, raw_line in frame_jsonl_lines(text):
         row_index += 1
         try:
             parsed = _load_json_object(raw_line, logical_path=logical_path, line=line_number)

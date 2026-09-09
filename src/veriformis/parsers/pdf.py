@@ -17,15 +17,20 @@ from veriformis.diagnostics import (
     make_parse_report,
 )
 from veriformis.identity import sha256_digest
-from veriformis.ir import Document, Heading, Paragraph, Span, Text
+from veriformis.ir import Document, Paragraph, Span, Text
+from veriformis.ocr.raster import render_pdf_page_png
 from veriformis.ocr.recovery import recover_pages
 from veriformis.sources import ParseResult, register_source
 
 if TYPE_CHECKING:
     from veriformis.ocr.recovery import OcrProvider
 
-PARSER_VERSION = "1.0.0"
+# 1.1.0: no synthetic "Page N" headings in the canonical stream; every
+# paragraph span carries its page index; text-layer normalization is
+# diagnosed; per-page pdfium failures refuse (post-20 defects D-09, D-11).
+PARSER_VERSION = "1.1.0"
 _PARSER = "pdf"
+PDF_MAX_PAGES = 10_000
 _OCR_LIMITATION = "ocr-unsupported"
 
 
@@ -42,41 +47,28 @@ def parse_pdf_file(
     try:
         document = pdfium.PdfDocument(captured)
     except Exception as exc:  # pypdfium2 raises PdfiumError subclasses
-        source = register_source(
+        return _refused_pdf(
             p,
-            _PARSER,
-            "",
+            captured=captured,
             logical_path=logical_path,
-            parser_version=PARSER_VERSION,
-            raw_bytes=captured,
-        )
-        report = make_parse_report(
-            source_id=source.id,
-            parser_name=_PARSER,
-            parser_version=PARSER_VERSION,
-            diagnostics=(
-                make_diagnostic(
-                    source_id=source.id,
-                    parser_name=_PARSER,
-                    parser_version=PARSER_VERSION,
-                    code="pdf.unreadable",
-                    severity="error",
-                    disposition="refused",
-                    loss_kind="structure",
-                    location=DiagnosticLocation(kind="source"),
-                    message=f"PDF package could not be opened: {exc}",
-                    details={"reason": "unreadable"},
-                ),
-            ),
-        )
-        return ParseResult(
-            document=Document(children=[], source_id=source.id),
-            source=source,
-            diagnostics=report,
+            code="pdf.unreadable",
+            message=f"PDF package could not be opened: {exc}",
+            details={"reason": "unreadable"},
         )
 
     try:
         page_texts = _pdf_page_texts(document)
+    except _PdfPageUnreadable as exc:
+        # A page that pdfium cannot load or extract is a typed refusal, not a
+        # RuntimeError traceback (post-20 defect D-09).
+        return _refused_pdf(
+            p,
+            captured=captured,
+            logical_path=logical_path,
+            code="pdf.page-unreadable",
+            message=f"PDF page {exc.page_number} could not be read: {exc.cause}",
+            details={"reason": "page-unreadable", "page": exc.page_number},
+        )
     finally:
         document.close()
 
@@ -84,8 +76,6 @@ def parse_pdf_file(
         page_texts = [""]
     rasters: tuple[bytes, ...] | None = None
     if ocr_provider is not None:
-        from veriformis.ocr.raster import render_pdf_page_png
-
         rendered: list[bytes] = []
         for index, text in enumerate(page_texts, start=1):
             if text.strip():
@@ -115,32 +105,26 @@ def parse_pdf_file(
     blocks: list = []
     parts: list[str] = []
     pos = 0
+    normalized_pages: list[int] = []
     for page in recovery.pages:
         if not page.text.strip():
             continue
-        heading = f"Page {page.page_index}"
-        if parts:
-            pos += 2
-        heading_start = pos
-        heading_end = heading_start + len(heading)
-        blocks.append(
-            Heading(
-                level=2,
-                children=[Text(heading)],
-                span=Span(heading_start, heading_end),
-                block_index=len(blocks),
-            )
-        )
-        parts.append(heading)
-        pos = heading_end
-        for paragraph in _split_paragraphs(page.text):
-            pos += 2
+        paragraphs = _split_paragraphs(page.text)
+        # The canonical stream holds only text the source supplies. Page
+        # membership is provenance and rides on every block span; it is not
+        # fabricated into a heading. Whitespace the splitter collapses is
+        # reported below rather than dropped silently.
+        if "\n\n".join(paragraphs) != page.text:
+            normalized_pages.append(page.page_index)
+        for paragraph in paragraphs:
+            if parts:
+                pos += 2
             start = pos
             end = start + len(paragraph)
             blocks.append(
                 Paragraph(
                     children=[Text(paragraph)],
-                    span=Span(start, end),
+                    span=Span(start, end, page=page.page_index),
                     block_index=len(blocks),
                 )
             )
@@ -157,6 +141,25 @@ def parse_pdf_file(
         raw_bytes=captured,
     )
     diagnostics = []
+    if normalized_pages:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code="pdf.text-layer-normalized",
+                severity="info",
+                disposition="normalized",
+                loss_kind="presentation",
+                location=DiagnosticLocation(kind="source"),
+                message=(
+                    "Leading, trailing, or blank-line whitespace in the text layer was "
+                    "normalized while splitting paragraphs on pages: "
+                    + ", ".join(str(item) for item in normalized_pages)
+                ),
+                details={"pages": normalized_pages},
+            )
+        )
     warn_pages = [
         page.page_index
         for page in recovery.pages
@@ -187,7 +190,7 @@ def parse_pdf_file(
                     "OCR confidence is below the warn threshold on pages: "
                     + ", ".join(str(item) for item in warn_pages)
                 ),
-                details={"pages": warn_pages, **recovery_details},
+                details={**recovery_details, "pages": warn_pages},
             )
         )
     if review_pages:
@@ -206,9 +209,9 @@ def parse_pdf_file(
                     + ", ".join(str(item) for item in review_pages)
                 ),
                 details={
+                    **recovery_details,
                     "pages": review_pages,
                     "pending_review": True,
-                    **recovery_details,
                 },
             )
         )
@@ -228,7 +231,7 @@ def parse_pdf_file(
                     "text is retained on held_text and omitted from the stream "
                     "on pages: " + ", ".join(str(item) for item in refused_pages)
                 ),
-                details={"pages": refused_pages, **recovery_details},
+                details={**recovery_details, "pages": refused_pages},
             )
         )
     if empty_pages:
@@ -292,16 +295,80 @@ def parse_pdf_file(
     )
 
 
+class _PdfPageUnreadable(Exception):
+    """One page could not be loaded or its text layer could not be read."""
+
+    def __init__(self, page_number: int, cause: BaseException) -> None:
+        self.page_number = page_number
+        self.cause = cause
+        super().__init__(f"page {page_number}: {cause}")
+
+
+def _refused_pdf(
+    p: Path,
+    *,
+    captured: bytes,
+    logical_path: str,
+    code: str,
+    message: str,
+    details: dict | None,
+) -> ParseResult:
+    source = register_source(
+        p,
+        _PARSER,
+        "",
+        logical_path=logical_path,
+        parser_version=PARSER_VERSION,
+        raw_bytes=captured,
+    )
+    report = make_parse_report(
+        source_id=source.id,
+        parser_name=_PARSER,
+        parser_version=PARSER_VERSION,
+        diagnostics=(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code=code,
+                severity="error",
+                disposition="refused",
+                loss_kind="structure",
+                location=DiagnosticLocation(kind="source"),
+                message=message,
+                details=details,
+            ),
+        ),
+    )
+    return ParseResult(
+        document=Document(children=[], source_id=source.id),
+        source=source,
+        diagnostics=report,
+    )
+
+
 def _pdf_page_texts(document: pdfium.PdfDocument) -> list[str]:
     page_texts: list[str] = []
-    for index in range(len(document)):
-        page = document[index]
-        textpage = page.get_textpage()
+    page_count = len(document)
+    if page_count > PDF_MAX_PAGES:
+        raise _PdfPageUnreadable(
+            page_count,
+            ValueError(f"PDF declares {page_count} pages, above the {PDF_MAX_PAGES} page limit"),
+        )
+    for index in range(page_count):
+        page = None
+        textpage = None
         try:
+            page = document[index]
+            textpage = page.get_textpage()
             text = textpage.get_text_bounded() or ""
+        except Exception as exc:  # pypdfium2 raises RuntimeError subclasses
+            raise _PdfPageUnreadable(index + 1, exc) from exc
         finally:
-            textpage.close()
-            page.close()
+            if textpage is not None:
+                textpage.close()
+            if page is not None:
+                page.close()
         page_texts.append(text.replace("\r\n", "\n").replace("\r", "\n").strip())
     return page_texts
 
@@ -319,6 +386,8 @@ def pdf_page_texts(
         return ()
     try:
         texts = _pdf_page_texts(document)
+    except _PdfPageUnreadable:
+        return ()
     finally:
         document.close()
     return tuple(texts) if texts else ("",)

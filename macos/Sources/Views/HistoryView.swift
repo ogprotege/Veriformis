@@ -22,6 +22,11 @@ struct HistoryView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .safeAreaInset(edge: .top) {
+            if let error = workbench.historyPersistenceError {
+                Text(error).foregroundStyle(.red).padding().textSelection(.enabled)
+            }
+        }
         .padding(8)
     }
 

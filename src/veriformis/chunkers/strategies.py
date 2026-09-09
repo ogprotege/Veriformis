@@ -19,7 +19,36 @@ from veriformis.sources import SourceRef
 
 _ABBREVS = ("mr.", "mrs.", "ms.", "dr.", "prof.", "st.", "vs.", "etc.", "e.g.", "i.e.",
             "p.m.", "a.m.", "u.s.", "u.k.", "no.", "fig.", "approx.", "dept.", "est.")
-_SENT_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'(])")
+# Sentence splitter version 2 (post-20 defect closure): a terminator may be
+# followed by a closing quote or bracket, and the next sentence may open with
+# any letter or digit in any script, not only ASCII capitals. CJK full stops
+# and terminators split with or without following whitespace.
+_SENT_SPLIT = re.compile(
+    r"(?:(?<=[.!?])|(?<=[.!?][\"'\u201d\u2019)\]]))\s+(?=[^\W_]|[\"'\u201c\u2018(\[])"
+    r"|(?<=[\u3002\uff01\uff1f])\s*(?=\S)"
+)
+_SENTENCE_OPENERS = frozenset("\"'\u201c\u2018([")
+
+
+def _opens_sentence(character: str) -> bool:
+    """A sentence starts with a digit, an opening quote or bracket, an
+    uppercase letter, or a letter from a script that has no case (CJK, Arabic,
+    Hebrew, Thai, ...). A lowercase letter continues the current sentence, so
+    an abbreviation missing from the list does not split mid-sentence."""
+    if character.isdigit() or character in _SENTENCE_OPENERS:
+        return True
+    if not character.isalpha():
+        return False
+    return character.isupper() or character.upper() == character.lower()
+# Producer versions travel on the chunk artifact so a splitter or grouping
+# change is a new chunker version rather than a silent replay mismatch.
+CHUNK_STRATEGY_VERSIONS = {
+    "paragraph": "1",
+    "fixed": "1",
+    "sliding": "1",
+    "sentence": "2",
+    "structure": "1",
+}
 
 
 def _norm(transformed: Iterable[int]) -> set[int]:
@@ -236,6 +265,8 @@ def _sentence_spans(text: str) -> list[tuple[int, int]]:
     for match in _SENT_SPLIT.finditer(text):
         candidate = text[start:match.start()]
         if any(candidate.lower().endswith(abbrev) for abbrev in _ABBREVS):
+            continue
+        if match.end() < len(text) and not _opens_sentence(text[match.end()]):
             continue
         spans.append((start, match.start()))
         start = match.end()

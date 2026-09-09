@@ -688,10 +688,18 @@ _RECIPE_LITERAL_FREE_SOURCES = (
     "src/veriformis/pipeline/service.py",
     "src/veriformis/recipes/runner.py",
     "src/veriformis/recipes/library.py",
+    "src/veriformis/automation/spec.py",
+    "src/veriformis/automation/inspect.py",
+    "src/veriformis/automation/execute.py",
+    "src/veriformis/workbench/adapter.py",
+    "src/veriformis/goals/preflight.py",
+    "src/veriformis/goals/preview.py",
     "macos/Sources/ViewModels/WorkbenchViewModel.swift",
     "macos/Sources/Views/CompileView.swift",
     "macos/Sources/Services/VeriformisCLI.swift",
+    "macos/Sources/Models/WorkbenchModels.swift",
 )
+_PACKAGE_DATA_SUFFIXES = (".json", ".jinja", ".yaml", ".yml")
 
 
 def _check_no_recipe_default_literals(errors: list[str]) -> None:
@@ -711,6 +719,120 @@ def _check_no_recipe_default_literals(errors: list[str]) -> None:
                 f"{relative} holds a recipe default literal matching {pattern.pattern}",
                 errors,
             )
+
+
+def _check_package_data_coverage(errors: list[str]) -> None:
+    """Post-20 D-01: every packaged data file must match a package-data glob."""
+    import fnmatch
+
+    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    globs = pyproject["tool"]["setuptools"]["package-data"]["veriformis"]
+    package_root = ROOT / "src" / "veriformis"
+    for path in sorted(package_root.rglob("*")):
+        if not path.is_file() or path.suffix not in _PACKAGE_DATA_SUFFIXES:
+            continue
+        if "__pycache__" in path.parts:
+            continue
+        relative = path.relative_to(package_root).as_posix()
+        _require(
+            any(fnmatch.fnmatch(relative, glob) for glob in globs),
+            f"packaged data file {relative} matches no pyproject package-data glob",
+            errors,
+        )
+
+
+def _contract_descriptor_row_schemas(path: Path) -> list[str] | None:
+    """Return the row schemas frozen in a contract's descriptor block, if any."""
+    text = path.read_text(encoding="utf-8")
+    match = re.search(
+        r"supported_row_schemas:\n((?:  [^\n]+\n)+)overwrite_policies:", text
+    )
+    if match is None:
+        return None
+    joined = " ".join(line.strip() for line in match.group(1).splitlines())
+    return sorted(item.strip() for item in joined.split(",") if item.strip())
+
+
+def _check_contracts_match_discovery(errors: list[str]) -> None:
+    """Post-20 D-24: frozen contract blocks and counts must match live discovery."""
+    from veriformis.exports.api import export_discovery_response
+    from veriformis.pipeline import PipelineService
+
+    discovery = PipelineService().discover_exports().discovery
+    assert discovery is not None
+    by_container: dict[str, list[str]] = {}
+    for profile in export_discovery_response(discovery)["result"]["profiles"]:
+        if profile.get("consumer_profile"):
+            continue
+        container_id = profile["container_profile"]["container_id"]
+        by_container[container_id] = sorted(profile["supported_row_schemas"])
+    for container_id, contract in (
+        ("split-jsonl-directory", "docs/contracts/split-jsonl-export-v1.md"),
+        ("json", "docs/contracts/canonical-json-export-v1.md"),
+        ("constrained-csv", "docs/contracts/constrained-csv-export-v1.md"),
+    ):
+        frozen = _contract_descriptor_row_schemas(ROOT / contract)
+        _require(
+            frozen is not None,
+            f"{contract} has no frozen supported_row_schemas descriptor block",
+            errors,
+        )
+        if frozen is not None:
+            _require(
+                frozen == by_container.get(container_id),
+                f"{contract} freezes supported_row_schemas {frozen} but discovery "
+                f"advertises {by_container.get(container_id)}",
+                errors,
+            )
+    goals = goal_catalog()
+    catalog_contract = (ROOT / "docs/contracts/goal-catalog-v1.md").read_text(encoding="utf-8")
+    for goal in goals.goals:
+        _require(
+            f"| `{goal.goal_id}` |" in catalog_contract,
+            f"goal-catalog-v1.md does not list goal {goal.goal_id}",
+            errors,
+        )
+    for representation in goals.representations:
+        _require(
+            f"| `{representation.representation_id}` |" in catalog_contract,
+            f"goal-catalog-v1.md does not list representation "
+            f"{representation.representation_id}",
+            errors,
+        )
+    preset_contract = (ROOT / "docs/contracts/recipe-preset-v1.md").read_text(encoding="utf-8")
+    for preset in preset_catalog().presets:
+        _require(
+            f"| `{preset.preset_id}` |" in preset_contract,
+            f"recipe-preset-v1.md does not list preset {preset.preset_id}",
+            errors,
+        )
+    status = (ROOT / "docs/current-status.md").read_text(encoding="utf-8")
+    goal_count = len(goals.goals)
+    representation_count = len(goals.representations)
+    _require(
+        f"{_number_word(goal_count)} goals" in status
+        and f"{_number_word(representation_count)} representations" in status,
+        "current-status.md goals row does not state the packaged goal and "
+        "representation counts",
+        errors,
+    )
+
+
+_NUMBER_WORDS = {
+    4: "four",
+    5: "five",
+    6: "six",
+    7: "seven",
+    8: "eight",
+    9: "nine",
+    10: "ten",
+    11: "eleven",
+    12: "twelve",
+}
+
+
+def _number_word(value: int) -> str:
+    return _NUMBER_WORDS.get(value, str(value))
 
 
 def _check_evidence_index(evidence: dict[str, Any], errors: list[str]) -> None:
@@ -783,6 +905,8 @@ def check() -> list[str]:
     evidence = _load_json(EVIDENCE_PATH)
     _check_program(program, errors)
     _check_support(support, errors)
+    _check_package_data_coverage(errors)
+    _check_contracts_match_discovery(errors)
     _check_evidence_index(evidence, errors)
     _check_local_references([program, support, evidence], errors)
     return errors
@@ -806,6 +930,10 @@ def main() -> int:
         "and handoff defaults match code; surfaces hold no recipe default literal"
     )
     print("- governed phase packets and evidence references are structurally complete")
+    print(
+        "- every packaged data file matches a package-data glob; contract descriptor "
+        "blocks and goal, representation, and preset lists match live discovery"
+    )
     return 0
 
 

@@ -26,9 +26,9 @@ jobs:
           - os: macos-latest
             python-version: "3.12"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
 
@@ -45,15 +45,30 @@ jobs:
         run: uv run --python ${{ matrix.python-version }} ruff check src tests
 
       - name: Core pytest (optional integrations excluded)
-        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
+        run: uv run --python ${{ matrix.python-version }} pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark and not matrix"
+
+  acceptance-matrix:
+    name: acceptance-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        with:
+          enable-cache: true
+      - name: Install Python 3.12
+        run: uv python install 3.12
+      - name: Sync test extras
+        run: uv sync --python 3.12 --extra test
+      - name: Required acceptance and round-trip matrices
+        run: uv run --python 3.12 pytest -q --ignore=tests/handoff -m "matrix and not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 
   # Independent of the matrix so packaging signal is not lost when one cell fails.
   install-smoke:
     name: install-smoke
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12
@@ -68,8 +83,8 @@ jobs:
     name: golden-compile
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12
@@ -82,7 +97,7 @@ jobs:
           GOLDEN_EVIDENCE_DIR: ${{ runner.temp }}/golden-evidence
       - name: Upload golden evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: golden-compile-evidence
           path: ${{ runner.temp }}/golden-evidence
@@ -92,8 +107,8 @@ jobs:
     name: project-spec-example
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12
@@ -110,8 +125,8 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12
@@ -126,29 +141,37 @@ jobs:
           APTUS_EVIDENCE_DIR: ${{ runner.temp }}/aptus-evidence
       - name: Upload optional integration evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: aptus-integration-evidence
           path: ${{ runner.temp }}/aptus-evidence
           if-no-files-found: ignore
 
   # Isolated trainer-schema evidence. Visible but cannot block standalone release.
-  # Extras remain empty; the job runs importorskip tests without installing torch/mlx.
+  # Trainer extras remain empty; no trainer is installed. Extra columnar supplies
+  # the official Hugging Face datasets loader that reads the emitted partitions,
+  # and VERIFORMIS_REQUIRE_PROFILE_LIBRARIES turns a missing loader into a
+  # failure instead of a silent skip (post-20 defect D-28).
   profile-integration:
     name: profile-integration (optional)
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12
         run: uv python install 3.12
-      - name: Sync test extras
-        run: uv sync --python 3.12 --extra test
+      - name: Sync test and columnar extras
+        run: uv sync --python 3.12 --extra test --extra columnar
       - name: Optional trainer-schema pytest selection
-        run: uv run --python 3.12 pytest -q -m "profile_integration"
+        run: uv run --python 3.12 pytest -q -m "profile_integration" -rs
+        env:
+          VERIFORMIS_REQUIRE_PROFILE_LIBRARIES: "1"
+          HF_DATASETS_DISABLE_PROGRESS_BARS: "1"
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
 
   # Isolated columnar library-reload evidence. Visible but cannot block standalone release.
   # Extra columnar lists the pins; this job installs that extra. Default extra-less
@@ -158,8 +181,8 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12
@@ -181,8 +204,8 @@ jobs:
     runs-on: macos-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
       - name: Install Python 3.12 CLI for workbench tests

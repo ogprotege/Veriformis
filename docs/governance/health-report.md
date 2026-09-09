@@ -1,13 +1,15 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phases 0–7 complete; Phase 8 in progress
+**Status:** Independent-product Phases 0–20 complete; post-20 defect-closure
+remainder packet in progress
 
-**Review date:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Review date:** 2026-09-09 (post-20 defect closure, Phase 2 claim-honesty
+reconciliation)
 
-**Repository baseline:** Working tree based on PR #82 merge
-`799d56f`
+**Repository baseline:** `main` at `5d617f8` (after PR #202) plus the
+defect-closure branch
 
-**Next review:** Independent-product Phase 8.2 pull-request merge, or the next
+**Next review:** Closeout of the post-20 defect-closure packet, or the next
 active-document behavior change
 
 ## Scope examined
@@ -33,6 +35,14 @@ active-document behavior change
 - Versioned integrity, construction, finished-dataset, verified-export, split-
   JSONL, canonical-JSON, constrained-CSV, and optional Aptus handoff contracts, plus the
   implemented taxonomy contract.
+- The Phase 6–20 contracts: goal catalog, recipe preset, row mapping, profile
+  admission, columnar schema and fingerprint, Parquet, Arrow, Hugging Face
+  Dataset, TRL, MLX-LM, Axolotl, LLaMA-Factory, Aptus export, collection plan,
+  parser identity, OCR recovery identity, quality report, review, scale
+  corpus / baseline / support, extension protocol, advanced-family admission,
+  workbench adapter, project spec / lock / diagnostic, publication adapter,
+  and support matrix.
+- The completed Phase 6–20 packets and the post-20 remainder packets.
 
 These documents govern current behavior, future work, or active execution and
 must be updated when their scope changes.
@@ -92,8 +102,8 @@ deprecated document must link its replacement and removal/review trigger.
 | Area | Assessment | Basis |
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
-| Current capability accuracy | Good within audited active scope; Phases 0–7 are complete, with Phase 7 closeout merged as PR #80 at `b7bb7f0c2046fba87fd7c9da12f7d2ccb5c2c88f` after all 14 GitHub checks passed | Automated code-bound comparisons plus semantic reconciliation of architecture, contracts, status, WIP, mapping evidence, operator guidance, and unchanged production discovery/support |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, and completed Phase 0–7 packets |
+| Current capability accuracy | Corrected 2026-09-09. The 2026-09-09 audit found Phase 17's nine goals, eight representations, nine presets, and eight admitted row schemas absent from their contracts, "no semantic replayer ships" surviving in five active documents after Phase 9 shipped three, "extras stay empty" contradicted by extra `columnar`, `ocr-image` presented as a refusal code, four commands documented nowhere, and stale command counts | Post-20 defect-closure Phase 2 reconciled every quoted statement against `veriformis goals`, `presets`, `export discover`, `cli.py`, `pyproject.toml`, and `ci.yml`; the tracking checker now compares contract row-schema blocks and catalog counts with live discovery |
+| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–20 packets, and two post-20 remainder packets |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
 | External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
@@ -102,13 +112,16 @@ deprecated document must link its replacement and removal/review trigger.
 
 ## Ordered next actions
 
-1. Finish Phase 8.1, then 8.2 admission pins. Do not start Phase 9, 10, or
-   13 from this packet. Do not advertise TRL or MLX-LM as implemented.
-2. Preserve the legacy row-shape ID until a versioned report migration is
+1. Close the post-20 defect-closure packet phase by phase; every phase carries
+   its documentation change in the same commit as its code change.
+2. Keep this report and the debt register current at each packet closeout;
+   a "Next review" trigger that fires without a review is itself drift
+   (DOC-008).
+3. Preserve the legacy row-shape ID until a versioned report migration is
    authorized; do not treat the name as an adapter dependency.
-3. Decide whether completed `dev/active/group-*` packets should move to a
+4. Decide whether completed `dev/active/group-*` packets should move to a
    historical subtree; propose moves before execution.
-4. Add pinned offline Mermaid validation only after dependency review.
+5. Add pinned offline Mermaid validation only after dependency review.
 
 The Phase 4 closeout baseline exposed strict export operations across Python,
 CLI, MCP, and the CLI-backed Mac bridge while production discovery remained

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any, Literal
 
@@ -150,7 +152,23 @@ def write_mapping_rejection_report(
             f"mapping rejection report {path.name} already exists with different bytes"
         )
     if not path.exists():
-        path.write_text(encoded, encoding="utf-8")
+        # Stage beside the destination and rename so a crash never leaves a
+        # truncated report under the content-addressed name.
+        handle, staged = tempfile.mkstemp(
+            prefix=f".{path.name}.", suffix=".tmp", dir=destination
+        )
+        try:
+            with os.fdopen(handle, "w", encoding="utf-8") as stream:
+                stream.write(encoded)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(staged, path)
+        except BaseException:
+            try:
+                os.unlink(staged)
+            except OSError:
+                pass
+            raise
     return path
 
 

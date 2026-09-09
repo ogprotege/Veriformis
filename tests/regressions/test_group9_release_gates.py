@@ -6,6 +6,7 @@ Developer credentials. They do not claim signed/notarized Mac readiness.
 
 from __future__ import annotations
 
+import json
 import stat
 from pathlib import Path
 
@@ -26,7 +27,7 @@ def _golden_sources() -> list[Path]:
 
 def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str]:
     sources = _golden_sources()
-    assert sources
+    assert len(sources) >= 2
     workspace = tmp_path / f"ws-{objective}"
     bundle = tmp_path / f"{objective}.vfbundle"
     service = PipelineService()
@@ -41,15 +42,20 @@ def _seal_objective(tmp_path: Path, objective: str) -> tuple[Path, str]:
         )
     else:
         service.construct(workspace, objective=objective)
-    service.curate(workspace, evaluation_required=False)
+    service.curate(workspace)
     service.split(workspace)
     service.format(workspace)
     assert service.validate(workspace).exit_status == 0
     sealed = service.seal(workspace, bundle)
     assert sealed.publication is not None
+    pin = json.loads((RELEASE_SCRIPTS / "golden-manifests.json").read_text())[objective]
+    assert sealed.publication.manifest_sha256 == pin["manifest_sha256"]
+    for partition in ("train", "evaluation"):
+        rows = (bundle / f"data/{partition}.jsonl").read_bytes().splitlines()
+        assert len(rows) == pin[f"{partition}_rows"] > 0
     verify = service.verify(
         bundle,
-        manifest_sha256=sealed.publication.manifest_sha256,
+        manifest_sha256=pin["manifest_sha256"],
     )
     assert verify.verification is not None
     assert verify.verification.trust_grade == "external_digest"

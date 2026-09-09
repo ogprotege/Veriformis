@@ -37,7 +37,7 @@ class _ConfidenceProvider:
 
 
 def test_decide_confidence_thresholds() -> None:
-    assert decide_confidence(None) == "accept"
+    assert decide_confidence(None) == "review"  # no scored words: nothing to accept on
     assert (
         decide_confidence(OcrConfidence(mean=90.0, minimum=85.0, word_count=3))
         == "accept"

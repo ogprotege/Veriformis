@@ -63,17 +63,70 @@ enum ExportCLIBridgeError: LocalizedError, Equatable, Sendable {
     }
 }
 
+/// Per-workbench ownership includes operations whose UI task was superseded.
+/// Closing admission precedes cancellation, so queued tasks cannot launch on quit.
+final class CLIProcessRegistry: @unchecked Sendable {
+    private let lock = NSLock()
+    private var closing = false
+    private var executions: [UUID: CLIProcessExecution] = [:]
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    var hasActiveProcesses: Bool { lock.withLock { !executions.isEmpty } }
+
+    fileprivate func begin(_ execution: CLIProcessExecution) throws -> UUID {
+        try lock.withLock {
+            guard !closing else { throw CancellationError() }
+            let id = UUID()
+            executions[id] = execution
+            return id
+        }
+    }
+
+    fileprivate func end(_ id: UUID) {
+        let ready = lock.withLock { () -> [CheckedContinuation<Void, Never>] in
+            executions.removeValue(forKey: id)
+            guard executions.isEmpty else { return [] }
+            let ready = waiters
+            waiters.removeAll()
+            return ready
+        }
+        ready.forEach { $0.resume() }
+    }
+
+    func closeAndCancel() {
+        let active = lock.withLock { () -> [CLIProcessExecution] in
+            closing = true
+            return Array(executions.values)
+        }
+        active.forEach { $0.cancel() }
+    }
+
+    func drain() async {
+        await withCheckedContinuation { continuation in
+            let ready = lock.withLock { () -> Bool in
+                guard !executions.isEmpty else { return true }
+                waiters.append(continuation)
+                return false
+            }
+            if ready { continuation.resume() }
+        }
+    }
+}
+
 /// Owns at most one child process and provides cooperative TERM → KILL cancellation.
 final class CLIProcessController: @unchecked Sendable {
     private let lock = NSLock()
     private let terminationGrace: TimeInterval
     fileprivate let maxRetainedOutputBytes: Int
     private var activeExecution: CLIProcessExecution?
+    private let registry: CLIProcessRegistry?
 
     init(
+        registry: CLIProcessRegistry? = nil,
         terminationGrace: TimeInterval = 1.0,
         maxRetainedOutputBytes: Int = 2 * 1024 * 1024
     ) {
+        self.registry = registry
         self.terminationGrace = max(0, terminationGrace)
         self.maxRetainedOutputBytes = max(1_024, maxRetainedOutputBytes)
     }
@@ -112,6 +165,8 @@ final class CLIProcessController: @unchecked Sendable {
                 }
             }
         }
+        let registration = try registry?.begin(execution)
+        defer { if let registration { registry?.end(registration) } }
         return try await withTaskCancellationHandler {
             try await execution.start()
         } onCancel: {
@@ -260,6 +315,7 @@ struct VeriformisCLI: Sendable {
         instruction: String? = nil,
         cleaningRules: String = "",
         cleaningCustom: String = "",
+        chunkStrategy: String? = nil,
         chunkSize: Int? = nil,
         chunkOverlap: Int? = nil,
         includeHandoff: Bool = false,
@@ -281,14 +337,14 @@ struct VeriformisCLI: Sendable {
             curateArgs.append("--allow-empty-evaluation")
         }
 
-        var sealArgs = ["seal", workspace.path, "-o", bundle.path]
+        var sealArgs = ["seal", workspace.path, "-o", bundle.path, "--json"]
         if includeHandoff {
             sealArgs.append("--aptus-handoff")
         }
 
         let finishedTail: [StageCommand] = [
             StageCommand(stage: .curate, arguments: curateArgs),
-            StageCommand(stage: .split, arguments: ["split", workspace.path]),
+            StageCommand(stage: .split, arguments: ["split", workspace.path, "--json"]),
             StageCommand(stage: .format, arguments: ["format", workspace.path]),
             StageCommand(stage: .validate, arguments: ["validate", workspace.path]),
             StageCommand(stage: .seal, arguments: sealArgs),
@@ -315,8 +371,11 @@ struct VeriformisCLI: Sendable {
             cleanArgs.append(contentsOf: ["--custom", cleaningCustom])
         }
 
-        let hasSegmentationOverride = chunkSize != nil || chunkOverlap != nil
+        let hasSegmentationOverride = chunkStrategy != nil || chunkSize != nil || chunkOverlap != nil
         var chunkArgs = ["chunk", workspace.path, "--preset", preset]
+        if let chunkStrategy {
+            chunkArgs.append(contentsOf: ["--strategy", chunkStrategy])
+        }
         if let chunkSize {
             chunkArgs.append(contentsOf: ["--size", String(chunkSize)])
         }
@@ -327,6 +386,15 @@ struct VeriformisCLI: Sendable {
         var constructArgs = ["construct", workspace.path, "--goal", goal]
         if !hasSegmentationOverride {
             constructArgs.append(contentsOf: ["--preset", preset])
+        }
+        if let chunkStrategy {
+            constructArgs.append(contentsOf: ["--strategy", chunkStrategy])
+        }
+        if let chunkSize {
+            constructArgs.append(contentsOf: ["--size", String(chunkSize)])
+        }
+        if let chunkOverlap {
+            constructArgs.append(contentsOf: ["--overlap", String(chunkOverlap)])
         }
         if let representation {
             constructArgs.append(contentsOf: ["--representation", representation])
@@ -1138,9 +1206,13 @@ struct VeriformisCLI: Sendable {
     }
 }
 
-/// One asynchronous process execution. Launch and completion never run on the main actor.
-private final class CLIProcessExecution: @unchecked Sendable {
-    private let process = Process()
+/// Launch in a new process group atomically. waitid(WNOWAIT) retains the
+/// unreaped leader until the final group signal, preventing PID/group reuse.
+/// Every signal and the transition to reaping share one lock.
+fileprivate final class CLIProcessExecution: @unchecked Sendable {
+    private let executableURL: URL
+    private let arguments: [String]
+    private let workingDirectory: URL?
     private let stdout = Pipe()
     private let stderr = Pipe()
     private let standardOutputStream: BoundedLineStream
@@ -1148,12 +1220,11 @@ private final class CLIProcessExecution: @unchecked Sendable {
     private let combinedStream: BoundedLineStream
     private let terminationGrace: TimeInterval
     private let lock = NSLock()
-    private var continuation: CheckedContinuation<CLIProcessResult, Error>?
     private var cancelRequested = false
     private var terminationRequested = false
     private var terminationEscalated = false
     private var launchedPID: Int32?
-    private var finished = false
+    private var signalsClosed = false
 
     init(
         executableURL: URL,
@@ -1163,214 +1234,151 @@ private final class CLIProcessExecution: @unchecked Sendable {
         maxRetainedOutputBytes: Int,
         onOutputLine: (@Sendable (String) -> Void)?
     ) {
+        self.executableURL = executableURL
+        self.arguments = arguments
+        self.workingDirectory = workingDirectory
         self.terminationGrace = terminationGrace
-        standardOutputStream = BoundedLineStream(
-            maxRetainedBytes: maxRetainedOutputBytes,
-            onLine: nil
-        )
-        standardErrorStream = BoundedLineStream(
-            maxRetainedBytes: maxRetainedOutputBytes,
-            onLine: nil
-        )
-        combinedStream = BoundedLineStream(
-            maxRetainedBytes: maxRetainedOutputBytes,
-            onLine: onOutputLine
-        )
-        process.executableURL = executableURL
-        process.arguments = arguments
-        process.currentDirectoryURL = workingDirectory
-        process.standardOutput = stdout
-        process.standardError = stderr
+        standardOutputStream = BoundedLineStream(maxRetainedBytes: maxRetainedOutputBytes, onLine: nil)
+        standardErrorStream = BoundedLineStream(maxRetainedBytes: maxRetainedOutputBytes, onLine: nil)
+        combinedStream = BoundedLineStream(maxRetainedBytes: maxRetainedOutputBytes, onLine: onOutputLine)
     }
 
     func start() async throws -> CLIProcessResult {
         try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global(qos: .userInitiated).async { [self] in
-                launch(continuation)
+                do { continuation.resume(returning: try launchAndWait()) }
+                catch { continuation.resume(throwing: error) }
             }
         }
     }
 
     func cancel() {
-        let shouldTerminate = lock.withLock { () -> Bool in
+        let schedule = lock.withLock { () -> Bool in
             cancelRequested = true
-            return launchedPID != nil && !finished
-        }
-        if shouldTerminate {
-            requestTermination()
-        }
-    }
-
-    private func launch(_ continuation: CheckedContinuation<CLIProcessResult, Error>) {
-        let cancelledBeforeLaunch = lock.withLock { () -> Bool in
-            self.continuation = continuation
-            if cancelRequested {
-                finished = true
-                self.continuation = nil
-                return true
-            }
-            return false
-        }
-        if cancelledBeforeLaunch {
-            continuation.resume(returning: CLIProcessResult(
-                exitCode: -1,
-                standardOutputData: Data(),
-                standardErrorData: Data(),
-                standardOutput: "",
-                standardError: "",
-                standardOutputTruncated: false,
-                standardErrorTruncated: false,
-                combinedOutput: "",
-                outputTruncated: false,
-                cancellation: CLIProcessCancellation(
-                    processIdentifier: nil,
-                    terminationStatus: nil,
-                    terminationEscalated: false
-                )
-            ))
-            return
-        }
-
-        stdout.fileHandleForReading.readabilityHandler = {
-            [standardOutputStream, combinedStream] handle in
-            let data = handle.availableData
-            if !data.isEmpty {
-                standardOutputStream.append(data)
-                combinedStream.append(data)
-            }
-        }
-        stderr.fileHandleForReading.readabilityHandler = {
-            [standardErrorStream, combinedStream] handle in
-            let data = handle.availableData
-            if !data.isEmpty {
-                standardErrorStream.append(data)
-                combinedStream.append(data)
-            }
-        }
-        process.terminationHandler = { [weak self] process in
-            self?.complete(process)
-        }
-
-        do {
-            try process.run()
-            let shouldTerminate = lock.withLock { () -> Bool in
-                launchedPID = process.processIdentifier
-                return cancelRequested
-            }
-            if shouldTerminate {
-                requestTermination()
-            }
-        } catch {
-            finishLaunchFailure(error)
-        }
-    }
-
-    private func requestTermination() {
-        let shouldRequest = lock.withLock { () -> Bool in
-            guard !terminationRequested, !finished else { return false }
+            guard !signalsClosed, !terminationRequested, let pid = launchedPID else { return false }
             terminationRequested = true
+            _ = Darwin.kill(-pid, SIGTERM)
             return true
         }
-        guard shouldRequest else { return }
-        if process.isRunning {
-            process.terminate()
-        }
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(
-            deadline: .now() + terminationGrace
-        ) { [weak self] in
-            self?.forceTerminateIfNeeded()
+        if schedule {
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + terminationGrace) { [weak self] in
+                self?.forceTerminateIfNeeded()
+            }
         }
     }
 
     private func forceTerminateIfNeeded() {
-        let pid = lock.withLock { () -> Int32? in
-            guard cancelRequested, !finished, process.isRunning,
-                  let launchedPID
-            else {
-                return nil
-            }
+        lock.withLock {
+            guard !signalsClosed, cancelRequested, let pid = launchedPID else { return }
             terminationEscalated = true
-            return launchedPID
-        }
-        if let pid {
-            _ = Darwin.kill(pid, SIGKILL)
+            _ = Darwin.kill(-pid, SIGKILL)
         }
     }
 
-    private func complete(_ process: Process) {
-        let completion = lock.withLock { () -> (
-            CheckedContinuation<CLIProcessResult, Error>,
-            Bool,
-            Bool,
-            Int32?
-        )? in
-            guard !finished, let continuation else { return nil }
-            finished = true
-            self.continuation = nil
-            return (
-                continuation,
-                cancelRequested,
-                terminationEscalated,
-                launchedPID
-            )
+    private func launchAndWait() throws -> CLIProcessResult {
+        if lock.withLock({ cancelRequested }) {
+            return result(exitCode: -1, pid: nil, cancelled: true, escalated: false)
         }
-        guard let (continuation, wasCancelled, escalated, pid) = completion else {
-            return
+        var attributes: posix_spawnattr_t?
+        var actions: posix_spawn_file_actions_t?
+        func check(_ code: Int32) throws {
+            if code != 0 { throw NSError(domain: NSPOSIXErrorDomain, code: Int(code)) }
         }
-
-        stopReadingAndDrain()
-        let standardOutputSnapshot = standardOutputStream.snapshot()
-        let standardErrorSnapshot = standardErrorStream.snapshot()
-        let combinedSnapshot = combinedStream.snapshot()
-        continuation.resume(returning: CLIProcessResult(
-            exitCode: process.terminationStatus,
-            standardOutputData: standardOutputSnapshot.data,
-            standardErrorData: standardErrorSnapshot.data,
-            standardOutput: standardOutputSnapshot.output,
-            standardError: standardErrorSnapshot.output,
-            standardOutputTruncated: standardOutputSnapshot.truncated,
-            standardErrorTruncated: standardErrorSnapshot.truncated,
-            combinedOutput: combinedSnapshot.output,
-            outputTruncated: combinedSnapshot.truncated,
-            cancellation: wasCancelled
-                ? CLIProcessCancellation(
-                    processIdentifier: pid,
-                    terminationStatus: process.terminationStatus,
-                    terminationEscalated: escalated
-                )
-                : nil
-        ))
-    }
-
-    private func finishLaunchFailure(_ error: Error) {
-        let continuation = lock.withLock { () -> CheckedContinuation<CLIProcessResult, Error>? in
-            guard !finished else { return nil }
-            finished = true
-            let value = self.continuation
-            self.continuation = nil
-            return value
+        try check(posix_spawnattr_init(&attributes))
+        defer { posix_spawnattr_destroy(&attributes) }
+        try check(posix_spawn_file_actions_init(&actions))
+        defer { posix_spawn_file_actions_destroy(&actions) }
+        try check(posix_spawnattr_setflags(&attributes, Int16(POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_SETSIGMASK | POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_CLOEXEC_DEFAULT)))
+        try check(posix_spawnattr_setpgroup(&attributes, 0))
+        var emptySignals = sigset_t()
+        sigemptyset(&emptySignals)
+        try check(posix_spawnattr_setsigmask(&attributes, &emptySignals))
+        var defaultSignals = sigset_t()
+        sigfillset(&defaultSignals)
+        try check(posix_spawnattr_setsigdefault(&attributes, &defaultSignals))
+        try check(posix_spawn_file_actions_addopen(&actions, STDIN_FILENO, "/dev/null", O_RDONLY, 0))
+        try check(posix_spawn_file_actions_adddup2(&actions, stdout.fileHandleForWriting.fileDescriptor, STDOUT_FILENO))
+        try check(posix_spawn_file_actions_adddup2(&actions, stderr.fileHandleForWriting.fileDescriptor, STDERR_FILENO))
+        if let workingDirectory {
+            try check(posix_spawn_file_actions_addchdir_np(&actions, workingDirectory.path))
         }
-        stdout.fileHandleForReading.readabilityHandler = nil
-        stderr.fileHandleForReading.readabilityHandler = nil
-        continuation?.resume(throwing: error)
-    }
-
-    private func stopReadingAndDrain() {
-        stdout.fileHandleForReading.readabilityHandler = nil
-        stderr.fileHandleForReading.readabilityHandler = nil
-        let stdoutRemainder = stdout.fileHandleForReading.readDataToEndOfFile()
-        let stderrRemainder = stderr.fileHandleForReading.readDataToEndOfFile()
-        if !stdoutRemainder.isEmpty {
-            standardOutputStream.append(stdoutRemainder)
-            combinedStream.append(stdoutRemainder)
+        let argv = ([executableURL.path] + arguments).map { strdup($0) } + [nil]
+        let environment = ProcessInfo.processInfo.environment.sorted { $0.key < $1.key }
+            .map { strdup("\($0.key)=\($0.value)") } + [nil]
+        defer {
+            argv.forEach { free($0) }
+            environment.forEach { free($0) }
         }
-        if !stderrRemainder.isEmpty {
-            standardErrorStream.append(stderrRemainder)
-            combinedStream.append(stderrRemainder)
+        var pid: pid_t = 0
+        try argv.withUnsafeBufferPointer { argvBuffer in
+            try environment.withUnsafeBufferPointer { environmentBuffer in
+                try check(posix_spawn(&pid, executableURL.path, &actions, &attributes,
+                    UnsafeMutablePointer(mutating: argvBuffer.baseAddress!),
+                    UnsafeMutablePointer(mutating: environmentBuffer.baseAddress!)))
+            }
         }
-        standardOutputStream.flushRemainder()
-        standardErrorStream.flushRemainder()
+        let cancelled = lock.withLock { () -> Bool in
+            launchedPID = pid
+            return cancelRequested
+        }
+        // Only the child holds writer descriptors after launch.
+        try? stdout.fileHandleForWriting.close()
+        try? stderr.fileHandleForWriting.close()
+        let readers = DispatchGroup()
+        for (pipe, stream) in [(stdout, standardOutputStream), (stderr, standardErrorStream)] {
+            readers.enter()
+            DispatchQueue.global(qos: .userInitiated).async { [combinedStream] in
+                defer { readers.leave(); try? pipe.fileHandleForReading.close() }
+                var buffer = [UInt8](repeating: 0, count: 16_384)
+                while true {
+                    let count = Darwin.read(pipe.fileHandleForReading.fileDescriptor, &buffer, buffer.count)
+                    if count == -1 && errno == EINTR { continue }
+                    guard count > 0 else { break }
+                    let data = Data(buffer.prefix(count))
+                    stream.append(data)
+                    combinedStream.append(data)
+                }
+                stream.flushRemainder()
+            }
+        }
+        if cancelled { cancel() }
+        var info = siginfo_t()
+        var waited: Int32
+        repeat { waited = waitid(P_PID, id_t(pid), &info, WEXITED | WNOWAIT) }
+        while waited == -1 && errno == EINTR
+        let waitError = waited == -1 ? errno : 0
+        // The leader remains our unreaped child here. No delayed timer may
+        // signal after this locked transition, including after PID reuse.
+        let completion = lock.withLock { () -> (Bool, Bool) in
+            if waitError == 0 { _ = Darwin.kill(-pid, SIGKILL) }
+            signalsClosed = true
+            return (cancelRequested, terminationEscalated)
+        }
+        if waitError != 0 { throw NSError(domain: NSPOSIXErrorDomain, code: Int(waitError)) }
+        var status: Int32 = 0
+        var reaped: pid_t
+        repeat { reaped = waitpid(pid, &status, 0) } while reaped == -1 && errno == EINTR
+        readers.wait()
         combinedStream.flushRemainder()
+        guard reaped == pid else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
+        let signal = status & 0x7f
+        let exitCode = signal == 0 ? (status >> 8) & 0xff : signal
+        return result(exitCode: exitCode, pid: pid, cancelled: completion.0, escalated: completion.1)
+    }
+
+    private func result(exitCode: Int32, pid: Int32?, cancelled: Bool, escalated: Bool) -> CLIProcessResult {
+        let output = standardOutputStream.snapshot()
+        let error = standardErrorStream.snapshot()
+        let combined = combinedStream.snapshot()
+        return CLIProcessResult(
+            exitCode: exitCode,
+            standardOutputData: output.data, standardErrorData: error.data,
+            standardOutput: output.output, standardError: error.output,
+            standardOutputTruncated: output.truncated, standardErrorTruncated: error.truncated,
+            combinedOutput: combined.output, outputTruncated: combined.truncated,
+            cancellation: cancelled ? CLIProcessCancellation(processIdentifier: pid,
+                terminationStatus: pid == nil ? nil : exitCode, terminationEscalated: escalated) : nil
+        )
     }
 }
 

@@ -324,3 +324,100 @@ def test_spec_run_refuses_mapping_plan_identity_drift(tmp_path: Path) -> None:
     result = RUNNER.invoke(app, ["spec-run", str(path)])
     assert result.exit_code == 2
     assert "mismatched identity mapping_plan_id" in result.output
+
+
+@pytest.mark.parametrize("field,value", [
+    ("python_version", "2.7"), ("veriformis_version", "0.0.0"), ("extras", {}),
+])
+def test_resume_refuses_changed_environment_pin(tmp_path: Path, field: str, value) -> None:
+    from veriformis.automation.inspect import ProjectLock
+    from veriformis.identity import derive_id
+
+    spec, _ = _document_spec(tmp_path)
+    ran = SERVICE.run_project_spec(spec)
+    body = dict(ran["lock"])
+    del body["lock_id"]
+    body[field] = value
+    body["lock_id"] = derive_id("plk", body)
+    lock = ProjectLock.model_validate(body)
+    before = Workspace.open(Path(ran["workspace"])).head_id
+    with pytest.raises(ProjectSpecError, match=f"mismatched identity {field}"):
+        resume_project_spec(spec, lock, service=SERVICE)
+    assert Workspace.open(Path(ran["workspace"])).head_id == before
+
+
+def _referenced_spec(tmp_path: Path):
+    embedded, _ = _document_spec(tmp_path)
+    pipeline = tmp_path / "pipeline.yaml"
+    pipeline.write_text(json.dumps(embedded.pipeline), encoding="utf-8")
+    return create_project_spec(
+        mode="document-source", goal_id=embedded.goal_id, pipeline_ref=pipeline.name,
+    ), pipeline
+
+
+def test_resume_pins_exact_external_pipeline_bytes(tmp_path: Path) -> None:
+    spec, pipeline = _referenced_spec(tmp_path)
+    ran = SERVICE.run_project_spec(spec, base_dir=tmp_path)
+    before = Workspace.open(Path(ran["workspace"])).head_id
+    pipeline.write_bytes(pipeline.read_bytes() + b"\n")
+    with pytest.raises(ProjectSpecError, match="mismatched identity spec_digest"):
+        SERVICE.resume_project_spec(spec, ran["lock"], base_dir=tmp_path)
+    assert Workspace.open(Path(ran["workspace"])).head_id == before
+
+
+def test_run_retains_digest_of_external_pipeline_actually_executed(tmp_path: Path, monkeypatch) -> None:
+    from veriformis.automation.inspect import spec_digest
+
+    spec, pipeline = _referenced_spec(tmp_path)
+    initial = spec_digest(spec, base_dir=tmp_path)
+    service = PipelineService()
+    parse = service.parse
+
+    def mutate_after_capture(*args, **kwargs):
+        pipeline.write_text('{"invalid": true}', encoding="utf-8")
+        return parse(*args, **kwargs)
+
+    monkeypatch.setattr(service, "parse", mutate_after_capture)
+    ran = service.run_project_spec(spec, base_dir=tmp_path)
+    assert ran["lock"]["spec_digest"] == initial
+    assert Workspace.open(Path(ran["workspace"])).head().stages["seal"].status == "complete"
+
+
+@pytest.mark.parametrize("key,value", [
+    ("goal", "continue-a-passage"), ("objective", "continuation"),
+])
+def test_stage_cannot_override_project_goal_before_capture(tmp_path: Path, key: str, value: str) -> None:
+    spec, _ = _document_spec(tmp_path)
+    pipeline = dict(spec.pipeline)
+    pipeline["stages"] = {name: dict(config) for name, config in pipeline["stages"].items()}
+    pipeline["stages"]["construct"] = {key: value}
+    drift = create_project_spec(mode=spec.mode, goal_id=spec.goal_id, pipeline=pipeline)
+    with pytest.raises(ProjectSpecError, match="conflicts with project spec"):
+        SERVICE.run_project_spec(drift)
+    assert not Path(pipeline["workspace"]).exists()
+
+
+def test_spec_lock_resolves_external_reference_relative_to_spec(tmp_path: Path) -> None:
+    spec, _ = _referenced_spec(tmp_path)
+    path = tmp_path / "external-spec.json"
+    path.write_text(json.dumps(spec.model_dump(mode="json")), encoding="utf-8")
+    result = RUNNER.invoke(app, ["spec-lock", str(path)])
+    assert result.exit_code == 0, result.output
+    expected = create_project_lock(spec, base_dir=tmp_path)
+    assert json.loads(result.output)["spec_digest"] == expected.spec_digest
+
+
+def test_resume_preserves_explicit_segmentation_after_completed_chunk(tmp_path: Path) -> None:
+    spec, _ = _document_spec(tmp_path)
+    pipeline = dict(spec.pipeline)
+    pipeline["stages"] = dict(pipeline["stages"])
+    pipeline["stages"]["chunk"] = {"size": 24, "overlap": 0}
+    spec = create_project_spec(mode=spec.mode, goal_id=spec.goal_id, pipeline=pipeline)
+    workspace = Path(pipeline["workspace"])
+    SERVICE.parse([Path(p) for p in pipeline["sources"]], workspace, source_root=Path(pipeline["source_root"]))
+    SERVICE.clean(workspace)
+    SERVICE.chunk(workspace, goal=spec.goal_id, size=24, overlap=0)
+    lock = lock_after_workspace(spec, workspace)
+    resumed = resume_project_spec(spec, lock, service=SERVICE)
+    assert resumed.bundle is not None
+    assert Workspace.open(workspace).head().stages["seal"].status == "complete"

@@ -648,6 +648,27 @@ class ImportedRowSet(_StrictModel):
         validate_id(self.split_result_id, kind="spt")
         if not self.train_rows:
             raise MappingError("imported row set requires a non-empty train partition")
+        rows = (*self.train_rows, *self.evaluation_rows)
+        if (self.train_row_count, self.evaluation_row_count, self.total_row_count) != (
+            len(self.train_rows), len(self.evaluation_rows), len(rows),
+        ) or len(self.provenance) != len(rows):
+            raise MappingError("imported row-set counts differ from rows and provenance")
+        for ordinal, (row, provenance) in enumerate(zip(rows, self.provenance, strict=True)):
+            partition = "train" if ordinal < len(self.train_rows) else "evaluation"
+            local = ordinal if partition == "train" else ordinal - len(self.train_rows)
+            if (
+                row.row_schema != self.row_schema or provenance.row_id != row.row_id
+                or provenance.record_id != row.record_id or provenance.payload_sha256 != row.payload_sha256
+                or provenance.partition != partition or provenance.ordinal != local
+            ):
+                raise MappingError("imported row-set provenance is not aligned with its rows")
+        for name, data in (
+            ("train_jsonl", b"".join(lossless_json_bytes(row.payload) + b"\n" for row in self.train_rows)),
+            ("evaluation_jsonl", b"".join(lossless_json_bytes(row.payload) + b"\n" for row in self.evaluation_rows)),
+            ("provenance_jsonl", b"".join(lossless_json_bytes(item.model_dump(mode="json")) + b"\n" for item in self.provenance)),
+        ):
+            if getattr(self, name + "_sha256") != sha256_digest(data) or getattr(self, name + "_byte_size") != len(data):
+                raise MappingError("imported row-set byte bindings differ from canonical rows")
         expected = derive_id("rws", self.model_dump(mode="json", exclude={"row_set_id"}))
         if self.row_set_id != expected:
             raise MappingError("imported row-set identity mismatch")
@@ -723,6 +744,12 @@ class ImportedDatasetSnapshot(_StrictModel):
         _sorted_ids(self.source_ids, kind="src", field="imported snapshot source_ids")
         if self.gate_ids != IMPORT_GATES:
             raise MappingError("imported snapshot gates drifted")
+        if tuple(item.role for item in self.file_bindings) != (
+            "training-partition", "evaluation-partition", "row-provenance",
+        ):
+            raise MappingError("imported snapshot requires every ordered file binding")
+        if self.file_bindings[2].record_count != sum(item.record_count for item in self.file_bindings[:2]):
+            raise MappingError("imported snapshot provenance count differs from partitions")
         expected = derive_id(
             "dss",
             self.model_dump(mode="json", exclude={"snapshot_id"}),
@@ -794,6 +821,10 @@ class ImportedGateResult(_StrictModel):
         validate_id(self.snapshot_id, kind="dss")
         if self.gate_id not in IMPORT_GATES:
             raise MappingError(f"unknown imported validation gate {self.gate_id!r}")
+        if self.finding_codes != tuple(sorted(set(self.finding_codes))):
+            raise MappingError("imported gate findings must be sorted and unique")
+        if (self.status == "passed") != (not self.finding_codes):
+            raise MappingError("imported gate status contradicts its findings")
         expected = derive_id(
             "dgr",
             self.model_dump(mode="json", exclude={"gate_result_id"}),
@@ -839,6 +870,10 @@ class ImportedValidationReport(_StrictModel):
         validate_id(self.snapshot_id, kind="dss")
         if self.snapshot.snapshot_id != self.snapshot_id:
             raise MappingError("imported validation report names another snapshot")
+        if tuple(item.gate_id for item in self.gate_results) != IMPORT_GATES:
+            raise MappingError("imported validation requires every ordered gate")
+        if any(item.snapshot_id != self.snapshot_id for item in self.gate_results):
+            raise MappingError("imported validation gate names another snapshot")
         expected_status: Literal["passed", "failed"] = (
             "passed"
             if all(result.status == "passed" for result in self.gate_results)
@@ -1397,28 +1432,24 @@ def validate_imported_dataset(
     split_result: ImportedSplitResult,
     row_set: ImportedRowSet,
     *,
+    raw_sources: Mapping[str, tuple[str, bytes]],
     train_jsonl: bytes,
     evaluation_jsonl: bytes,
     provenance_jsonl: bytes,
 ) -> ImportedValidationReport:
+    from veriformis.mapping._validation_checks import direct_import_checks, replay_captured_mapping
+
+    plan = FinishedImportPlan.model_validate_json(plan.model_dump_json())
+    recipe = MappingRecipe.model_validate_json(recipe.model_dump_json())
+    mapping_plan = MappingPlan.model_validate_json(mapping_plan.model_dump_json())
+    mapping_result = MappingResult.model_validate_json(mapping_result.model_dump_json())
+    curation = ImportedCurationResult.model_validate_json(curation.model_dump_json())
+    split_result = ImportedSplitResult.model_validate_json(split_result.model_dump_json())
+    row_set = ImportedRowSet.model_validate_json(row_set.model_dump_json())
+    mapping_matches, digest_map = replay_captured_mapping(mapping_plan, recipe, mapping_result, raw_sources)
     replayed_curation = curate_imported_records(plan, recipe, mapping_result)
     if replayed_curation != curation:
         raise DatasetValidationError("imported curation does not match replay")
-    digest_map: dict[str, str] = {}
-    for group in split_result.groups:
-        if len(group.source_ids) != len(group.raw_sha256_values):
-            raise DatasetValidationError(
-                "imported leakage group source digests are misaligned"
-            )
-        for source_id, digest in zip(
-            group.source_ids, group.raw_sha256_values, strict=True
-        ):
-            previous = digest_map.get(source_id)
-            if previous is not None and previous != digest:
-                raise DatasetValidationError(
-                    "imported leakage group source digests conflict"
-                )
-            digest_map[source_id] = digest
     replayed_split = split_imported_records(
         plan,
         mapping_result,
@@ -1452,8 +1483,17 @@ def validate_imported_dataset(
         evaluation_jsonl=evaluation_jsonl,
         provenance_jsonl=provenance_jsonl,
     )
+    checks = direct_import_checks(
+        plan, recipe, mapping_result, curation, split_result, row_set, snapshot,
+        (train_jsonl, evaluation_jsonl, provenance_jsonl),
+    )
+    checks["mapping-replay"] = mapping_matches
     gates = tuple(
-        ImportedGateResult.create(snapshot_id=snapshot.snapshot_id, gate_id=gate_id)
+        ImportedGateResult.create(
+            snapshot_id=snapshot.snapshot_id, gate_id=gate_id,
+            status="passed" if checks[gate_id] else "failed",
+            finding_codes=() if checks[gate_id] else (f"{gate_id}-invariant-failed",),
+        )
         for gate_id in IMPORT_GATES
     )
     return ImportedValidationReport.create(snapshot=snapshot, gate_results=gates)

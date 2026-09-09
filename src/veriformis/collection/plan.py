@@ -140,8 +140,10 @@ def build_collection_plan(
     visited = 0
     accepted_bytes = 0
 
-    for path in paths:
-        absolute = _absolute(path)
+    # Traverse in a canonical order so the first-seen owner of duplicated bytes
+    # (and therefore every `duplicate-bytes:<owner>` reason and the plan id)
+    # does not depend on argument order (post-20 defect D-22).
+    for absolute in sorted({_absolute(path) for path in paths}, key=lambda item: item.as_posix()):
         visited, records, digest_owners, accepted_bytes = _collect_entry(
             absolute,
             root=root,
@@ -394,6 +396,20 @@ def _collect_entry(
         )
         return visited, records, digest_owners, accepted_bytes
 
+    # Enforce the byte and file limits from the directory entry's declared
+    # size before reading a single byte, so an oversized tree is refused
+    # without hashing it first (post-20 defect D-22). The duplicate check
+    # below needs the digest, so the limit uses the pre-dedup upper bound.
+    if accepted_bytes + size > settings.max_bytes:
+        raise CollectionLimitError(
+            f"collection would accept {accepted_bytes + size} bytes at {logical}; "
+            f"max_bytes is {settings.max_bytes}"
+        )
+    if len(digest_owners) + 1 > settings.max_files:
+        raise CollectionLimitError(
+            f"collection would accept {len(digest_owners) + 1} files at {logical}; "
+            f"max_files is {settings.max_files}"
+        )
     digest = _file_digest(absolute)
     owner = digest_owners.get(digest)
     if owner is not None:

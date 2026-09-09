@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 import veriformis
 from pydantic import ValidationError
@@ -32,6 +33,7 @@ from veriformis.bundle.finished import FinishedBundleError
 from veriformis.chunkers.base import Chunk, chunk_from_dict, chunk_to_dict, flatten
 from veriformis.chunkers.pipeline import build_chunks
 from veriformis.chunkers.strategies import (
+    CHUNK_STRATEGY_VERSIONS,
     chunk_fixed,
     chunk_paragraph,
     chunk_sentence,
@@ -171,6 +173,7 @@ from veriformis.taxonomy import (
     implemented_discovery,
     require_identifier,
 )
+from veriformis._operation import workspace_operation, memoized_loader
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
     IMPORT_REVISION_SCHEMA_VERSION,
@@ -420,17 +423,138 @@ def _collection_message(plan: CollectionPlan) -> ServiceMessage:
     )
 
 
+_FINISHED_BUNDLE_ROLES: Final = {
+    "data/train.jsonl": "training-partition",
+    "data/evaluation.jsonl": "evaluation-partition",
+    "metadata/row-provenance.jsonl": "row-provenance",
+    "validation.json": "dataset-validation-report",
+}
+_FINISHED_BUNDLE_MEDIA_TYPES: Final = {
+    "data/train.jsonl": "application/jsonl",
+    "data/evaluation.jsonl": "application/jsonl",
+    "metadata/row-provenance.jsonl": "application/jsonl",
+    "validation.json": "application/json",
+}
+
+
+def _finished_bundle_record_counts(
+    *, train_rows: int, evaluation_rows: int, total_rows: int
+) -> dict[str, int]:
+    return {
+        "data/train.jsonl": train_rows,
+        "data/evaluation.jsonl": evaluation_rows,
+        "metadata/row-provenance.jsonl": total_rows,
+    }
+
+
+def _publish_or_recover_finished_bundle(
+    out: Path,
+    *,
+    files: Mapping[str, bytes],
+    record_counts: Mapping[str, int],
+    manifest: Any,
+    attestation: Any,
+    manifest_bytes: bytes,
+    attestation_bytes: bytes,
+    expected_report: Any,
+    report_loader: Callable[[bytes], Any] = dataset_validation_report_from_json_bytes,
+) -> BundlePublicationReceipt:
+    """Publish one finished bundle or adopt an exact prior publication.
+
+    Shared by the document-source and dataset-row seal paths so both carry the
+    same recovery contract: an existing destination is adopted only when it is
+    byte-identical and re-verifies; a publication that becomes visible during
+    the write is adopted the same way; a visible receipt that differs from the
+    staged workspace receipt fails closed.
+    """
+    target = Path(os.path.abspath(os.fspath(out)))
+    if os.path.lexists(target):
+        return _recover_exact_finished_bundle(
+            target,
+            files=files,
+            manifest=manifest,
+            attestation=attestation,
+            manifest_bytes=manifest_bytes,
+            attestation_bytes=attestation_bytes,
+            expected_report=expected_report,
+            report_loader=report_loader,
+        )
+    try:
+        publication = write_finished_bundle(
+            target,
+            files,
+            roles=_FINISHED_BUNDLE_ROLES,
+            media_types=_FINISHED_BUNDLE_MEDIA_TYPES,
+            record_counts=record_counts,
+            dataset_snapshot_id=expected_report.snapshot_id,
+            validation_report_id=expected_report.report_id,
+        )
+    except FinishedBundleError:
+        if not os.path.lexists(target):
+            raise
+        return _recover_exact_finished_bundle(
+            target,
+            files=files,
+            manifest=manifest,
+            attestation=attestation,
+            manifest_bytes=manifest_bytes,
+            attestation_bytes=attestation_bytes,
+            expected_report=expected_report,
+            report_loader=report_loader,
+        )
+    if (
+        publication.manifest_bytes != manifest_bytes
+        or publication.attestation_bytes != attestation_bytes
+        or publication.manifest != manifest
+        or publication.attestation != attestation
+    ):
+        raise FinishedBundleError(
+            "visible finished bundle receipt differs from the staged "
+            "workspace receipt"
+        )
+    return publication
+
+
+def _seal_messages(
+    publication: BundlePublicationReceipt, revision_id: str
+) -> tuple[ServiceMessage, ...]:
+    messages: list[ServiceMessage] = []
+    if publication.durability_warning is not None:
+        messages.append(
+            ServiceMessage(
+                f"warning[bundle-durability]: {publication.durability_warning}",
+                stream="stderr",
+                kind="warning",
+            )
+        )
+    messages.extend(
+        [
+            ServiceMessage(f"sealed bundle: {publication.bundle_path}"),
+            ServiceMessage(f"manifest SHA-256: {publication.manifest_sha256}"),
+            ServiceMessage(f"verification grade: {publication.trust_grade}"),
+            ServiceMessage(f"seal revision {revision_id}"),
+        ]
+    )
+    return tuple(messages)
+
+
 def _recover_exact_finished_bundle(
     target: Path,
     *,
-    files: dict[str, bytes],
+    files: Mapping[str, bytes],
     manifest: FinishedBundleManifest,
     attestation: BundleAttestation,
     manifest_bytes: bytes,
     attestation_bytes: bytes,
-    expected_report: DatasetValidationReport,
+    expected_report: Any,
+    report_loader: Callable[[bytes], Any] = dataset_validation_report_from_json_bytes,
 ) -> BundlePublicationReceipt:
-    """Adopt only an independently verified, byte-identical prior publication."""
+    """Adopt only an independently verified, byte-identical prior publication.
+
+    ``report_loader`` decodes ``validation.json`` with the validation schema of
+    the sealing path: the document-source report by default, the imported
+    report for dataset-row seals (post-20 defect D-06).
+    """
     expected_manifest_sha256 = sha256_digest(manifest_bytes)
     verification = verify_finished_bundle(
         target,
@@ -471,9 +595,7 @@ def _recover_exact_finished_bundle(
             "existing finished bundle differs from the current exact payload: "
             f"{mismatched}"
         )
-    recovered_report = dataset_validation_report_from_json_bytes(
-        observed_files["validation.json"]
-    )
+    recovered_report = report_loader(observed_files["validation.json"])
     if recovered_report != expected_report:
         raise FinishedBundleError(
             "existing finished bundle report or snapshot differs from the current "
@@ -539,6 +661,7 @@ def _output_bytes(
     return workspace.read_artifact(artifact_id, revision=revision)
 
 
+@memoized_loader
 def _load_sources(
     workspace: Workspace,
     revision: WorkspaceRevision,
@@ -657,6 +780,7 @@ def _cleaning_input_digest(source: SourceRef, document: Any) -> str:
     )
 
 
+@memoized_loader
 def _load_documents(
     workspace: Workspace,
     revision: WorkspaceRevision,
@@ -739,6 +863,7 @@ def _load_documents(
     return documents
 
 
+@memoized_loader
 def _load_transform_records(
     workspace: Workspace,
     revision: WorkspaceRevision,
@@ -774,6 +899,7 @@ def _load_transform_records(
     return records
 
 
+@memoized_loader
 def _load_chunks(workspace: Workspace, revision: WorkspaceRevision) -> list[Chunk]:
     raw = _json_load(_output_bytes(workspace, revision, "chunk", "chunks"))
     if not isinstance(raw, list):
@@ -1105,18 +1231,34 @@ class PipelineService:
 
         return mapping_contract_discovery()
 
+    @workspace_operation
     def export_review_packet(
         self,
-        plan_id: str,
-        items: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+        plan_id: str | None = None,
+        items: list[dict[str, Any]] | tuple[dict[str, Any], ...] | None = None,
+        *,
+        workspace: Path | None = None,
     ) -> dict[str, Any]:
         """Export a pending review packet. Decisions stay vacant."""
         from veriformis.review import ReviewItem, export_review_packet
+        from veriformis.review.construction import pending_construction_items
+        from veriformis.errors import ReviewError
 
-        packet = export_review_packet(
-            plan_id=plan_id,
-            items=tuple(ReviewItem.model_validate(item) for item in items),
-        )
+        if workspace is not None:
+            if plan_id is not None or items is not None:
+                raise ReviewError("workspace review export cannot override plan or items")
+            store = Workspace.open(workspace)
+            current = store.head()
+            _recipe, result, _inputs = _load_constructed_dataset(store, current)
+            plan_id = _load_finished_plan(store, current).plan_id
+            selected = pending_construction_items(result)
+            if not selected:
+                raise ReviewError("workspace has no pending construction candidates")
+        else:
+            if plan_id is None or items is None:
+                raise ReviewError("review export requires workspace or both plan_id and items")
+            selected = tuple(ReviewItem.model_validate(item) for item in items)
+        packet = export_review_packet(plan_id=plan_id, items=selected)
         return packet.model_dump(mode="json")
 
     def import_review_packet(
@@ -1323,6 +1465,7 @@ class PipelineService:
             exit_status=0 if preflight.admitted else 2,
         )
 
+    @workspace_operation
     def preview_goal(
         self,
         workspace: Path,
@@ -1373,6 +1516,7 @@ class PipelineService:
         )
         return GoalPreviewOutcome(preview=preview)
 
+    @workspace_operation
     def quality_report(self, path: Path) -> QualityReportOutcome:
         """Emit the existing preview-only quality report. This is not a gate.
 
@@ -1585,6 +1729,7 @@ class PipelineService:
         root, _identity = _source_root(source_root)
         return plan, accepted_source_paths(plan, source_root=root)
 
+    @workspace_operation
     def parse(
         self,
         paths: list[Path],
@@ -1909,6 +2054,7 @@ class PipelineService:
             messages=tuple(parse_messages),
         )
 
+    @workspace_operation
     def clean(
         self,
         workspace: Path,
@@ -2031,6 +2177,7 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    @workspace_operation
     def chunk(
         self,
         workspace: Path,
@@ -2141,7 +2288,7 @@ class PipelineService:
                 media_type="application/json",
                 source_ids=tuple(sorted(sources)),
                 producer_id=f"veriformis.chunker.{strategy}",
-                producer_version="1",
+                producer_version=CHUNK_STRATEGY_VERSIONS[strategy],
                 config=config,
             )
             revision = transaction.commit(outputs={"chunks": artifact}, config=config)
@@ -2156,6 +2303,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def upgrade_workspace(self, workspace: Path) -> UpgradeOutcome:
         """Advance a verified workspace through every supported revision migration."""
         store = Workspace.open(workspace)
@@ -2178,6 +2326,7 @@ class PipelineService:
             messages=(ServiceMessage(message),),
         )
 
+    @workspace_operation
     def construct(
         self,
         workspace: Path,
@@ -2192,6 +2341,10 @@ class PipelineService:
         require_review: bool | None = None,
         consumer_profile: str | None = None,
         mode: str | None = None,
+        review_packet: object | None = None,
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
     ) -> ConstructOutcome:
         """Construct evidence-bearing candidates and immutable accepted records.
 
@@ -2218,9 +2371,14 @@ class PipelineService:
                 require_identifier("semantic_row", target_row_schema)
         except TaxonomyError as exc:
             raise ConstructionError(exc.message) from exc
+        if review_packet is not None and require_review is None:
+            require_review = True
         try:
             settings = resolve_recipe_settings(
                 goal=goal,
+                strategy=strategy,
+                size=size,
+                overlap=overlap,
                 preset=preset,
                 representation=representation,
                 objective=objective,
@@ -2263,7 +2421,9 @@ class PipelineService:
                 "goal input-family admission failed: " + "; ".join(family_errors)
             )
         chunk_config = current.stages["chunk"].config
-        if preset is not None:
+        if goal is not None or preset is not None or any(
+            value is not None for value in (strategy, size, overlap)
+        ):
             expected = settings.segmentation.model_dump()
             observed = {
                 "strategy": chunk_config["strategy"],
@@ -2272,9 +2432,10 @@ class PipelineService:
             }
             if observed != expected:
                 raise ConstructionError(
-                    f"workspace chunks were produced with {observed!r}, but preset "
-                    f"{preset!r} expects {expected!r}; re-run `veriformis chunk "
-                    f"WORKSPACE --preset {preset}` first"
+                    f"workspace chunks were produced with {observed!r}, but the resolved "
+                    f"goal/preset expects {expected!r}; re-run `veriformis chunk "
+                    "WORKSPACE` with matching settings, or explicitly pass the same "
+                    "--strategy/--size/--overlap overrides to construct"
                 )
         recipe = build_named_recipe(
             settings.recipe_library_id,
@@ -2290,6 +2451,20 @@ class PipelineService:
             target_row_schema=row_schema,
             consumer_profile=settings.construction.consumer_profile,
         )
+        if review_packet is not None:
+            from veriformis.review.construction import construction_review_evidence
+            from veriformis.errors import ReviewError
+
+            prior_recipe, prior_result, _ = _load_constructed_dataset(store, current)
+            if recipe.recipe_id != prior_recipe.recipe_id:
+                raise ReviewError("review construction must retain the current recipe and sources")
+            if construct_dataset(recipe, inputs) != prior_result:
+                raise ReviewError("review construction no longer matches the pending result")
+            reviews = construction_review_evidence(
+                review_packet, plan_id=_load_finished_plan(store, current).plan_id,
+                construction=prior_result,
+            )
+            inputs = ConstructionInputs.model_validate(inputs.model_copy(update={"reviews": reviews}))
         result = construct_dataset(recipe, inputs)
         config = {
             "schema_version": CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
@@ -2343,6 +2518,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def map_rows(
         self,
         workspace: Path,
@@ -2429,6 +2605,20 @@ class PipelineService:
             "mapping_plan_id": plan.mapping_plan_id,
             "selected_source_ids": list(source_ids),
         }
+        # The rejection report depends only on the plan and the mapping result,
+        # so it is written before HEAD advances: a report-write failure fails the
+        # command cleanly instead of after the commit is already durable
+        # (post-20 defect D-08). The write is content-addressed and idempotent.
+        report = MappingRejectionReport.create(
+            mapping_plan_id=plan.mapping_plan_id,
+            accepted_count=len(result.records),
+            rejections=rejections,
+        )
+        report_path = write_mapping_rejection_report(
+            report,
+            workspace.parent,
+            workspace_name=workspace.name,
+        )
         with store.begin(
             "map",
             expected_revision_id=current.revision_id,
@@ -2468,16 +2658,6 @@ class PipelineService:
                 },
                 config=config,
             )
-        report = MappingRejectionReport.create(
-            mapping_plan_id=plan.mapping_plan_id,
-            accepted_count=len(result.records),
-            rejections=rejections,
-        )
-        report_path = write_mapping_rejection_report(
-            report,
-            workspace.parent,
-            workspace_name=workspace.name,
-        )
         record_ids = tuple(record.record_id for record in result.records)
         return MapOutcome(
             record_count=len(result.records),
@@ -2848,6 +3028,11 @@ class PipelineService:
             curated,
             split_result,
             row_set,
+            raw_sources={
+                sid: (current.sources[sid].logical_path, store.read_artifact(
+                    current.sources[sid].raw_artifact_id, revision=current,
+                )) for sid in recipe.source_ids
+            },
             train_jsonl=train_jsonl,
             evaluation_jsonl=evaluation_jsonl,
             provenance_jsonl=provenance_jsonl,
@@ -2913,146 +3098,129 @@ class PipelineService:
 
         publication = None
         expected_revision_id = current.revision_id
-        with store.begin(
-            "seal",
-            expected_revision_id=expected_revision_id,
-        ) as transaction:
-            base = transaction.base
-            mapping_plan, recipe, mapping_result = self._load_import_context(
-                store, base
-            )
-            plan = finished_import_plan_from_json_bytes(
-                _output_bytes(store, base, "curate", "plan")
-            )
-            curated = imported_curation_from_json_bytes(
-                _output_bytes(store, base, "curate", "result")
-            )
-            split_result = imported_split_from_json_bytes(
-                _output_bytes(store, base, "split", "result")
-            )
-            row_set = imported_row_set_from_json_bytes(
-                _output_bytes(store, base, "format", "row-set")
-            )
-            train_jsonl = _output_bytes(store, base, "format", "train")
-            evaluation_jsonl = _output_bytes(store, base, "format", "evaluation")
-            provenance_jsonl = _output_bytes(store, base, "format", "provenance")
-            expected_report = validate_imported_dataset(
-                plan,
-                recipe,
-                mapping_plan,
-                mapping_result,
-                curated,
-                split_result,
-                row_set,
-                train_jsonl=train_jsonl,
-                evaluation_jsonl=evaluation_jsonl,
-                provenance_jsonl=provenance_jsonl,
-            )
-            report_bytes = _output_bytes(store, base, "validate", "report")
-            saved_report = imported_validation_from_json_bytes(report_bytes)
-            if saved_report != expected_report or saved_report.status != "passed":
-                raise ValueError(
-                    "seal requires the exact current passing imported validation report"
+        try:
+            with store.begin(
+                "seal",
+                expected_revision_id=expected_revision_id,
+            ) as transaction:
+                base = transaction.base
+                mapping_plan, recipe, mapping_result = self._load_import_context(
+                    store, base
                 )
-            files = {
-                "data/train.jsonl": train_jsonl,
-                "data/evaluation.jsonl": evaluation_jsonl,
-                "metadata/row-provenance.jsonl": provenance_jsonl,
-                "validation.json": report_bytes,
-            }
-            roles = {
-                "data/train.jsonl": "training-partition",
-                "data/evaluation.jsonl": "evaluation-partition",
-                "metadata/row-provenance.jsonl": "row-provenance",
-                "validation.json": "dataset-validation-report",
-            }
-            media_types = {
-                "data/train.jsonl": "application/jsonl",
-                "data/evaluation.jsonl": "application/jsonl",
-                "metadata/row-provenance.jsonl": "application/jsonl",
-                "validation.json": "application/json",
-            }
-            record_counts = {
-                "data/train.jsonl": row_set.train_row_count,
-                "data/evaluation.jsonl": row_set.evaluation_row_count,
-                "metadata/row-provenance.jsonl": row_set.total_row_count,
-            }
-            manifest, attestation = build_finished_bundle(
-                files,
-                roles=roles,
-                media_types=media_types,
-                record_counts=record_counts,
-                dataset_snapshot_id=saved_report.snapshot_id,
-                validation_report_id=saved_report.report_id,
-            )
-            manifest_bytes = manifest.canonical_bytes()
-            attestation_bytes = attestation.canonical_bytes()
-            config = _finished_stage_config(SEAL_STAGE_SCHEMA_ID, plan.plan_id)
-            manifest_artifact = transaction.put_artifact(
-                manifest_bytes,
-                kind="finished-bundle-manifest",
-                media_type="application/json",
-                source_ids=recipe.source_ids,
-                producer_id="veriformis.bundle.manifest",
-                producer_version="1",
-                config=config,
-            )
-            attestation_artifact = transaction.put_artifact(
-                attestation_bytes,
-                kind="finished-bundle-attestation",
-                media_type="application/json",
-                source_ids=recipe.source_ids,
-                producer_id="veriformis.bundle.attestation",
-                producer_version="1",
-                config=config,
-            )
+                plan = finished_import_plan_from_json_bytes(
+                    _output_bytes(store, base, "curate", "plan")
+                )
+                curated = imported_curation_from_json_bytes(
+                    _output_bytes(store, base, "curate", "result")
+                )
+                split_result = imported_split_from_json_bytes(
+                    _output_bytes(store, base, "split", "result")
+                )
+                row_set = imported_row_set_from_json_bytes(
+                    _output_bytes(store, base, "format", "row-set")
+                )
+                train_jsonl = _output_bytes(store, base, "format", "train")
+                evaluation_jsonl = _output_bytes(store, base, "format", "evaluation")
+                provenance_jsonl = _output_bytes(store, base, "format", "provenance")
+                expected_report = validate_imported_dataset(
+                    plan,
+                    recipe,
+                    mapping_plan,
+                    mapping_result,
+                    curated,
+                    split_result,
+                    row_set,
+                    raw_sources={
+                        sid: (base.sources[sid].logical_path, store.read_artifact(
+                            base.sources[sid].raw_artifact_id, revision=base,
+                        )) for sid in recipe.source_ids
+                    },
+                    train_jsonl=train_jsonl,
+                    evaluation_jsonl=evaluation_jsonl,
+                    provenance_jsonl=provenance_jsonl,
+                )
+                report_bytes = _output_bytes(store, base, "validate", "report")
+                saved_report = imported_validation_from_json_bytes(report_bytes)
+                if saved_report != expected_report or saved_report.status != "passed":
+                    raise ValueError(
+                        "seal requires the exact current passing imported validation report"
+                    )
+                files = {
+                    "data/train.jsonl": train_jsonl,
+                    "data/evaluation.jsonl": evaluation_jsonl,
+                    "metadata/row-provenance.jsonl": provenance_jsonl,
+                    "validation.json": report_bytes,
+                }
+                record_counts = _finished_bundle_record_counts(
+                    train_rows=row_set.train_row_count,
+                    evaluation_rows=row_set.evaluation_row_count,
+                    total_rows=row_set.total_row_count,
+                )
+                manifest, attestation = build_finished_bundle(
+                    files,
+                    roles=_FINISHED_BUNDLE_ROLES,
+                    media_types=_FINISHED_BUNDLE_MEDIA_TYPES,
+                    record_counts=record_counts,
+                    dataset_snapshot_id=saved_report.snapshot_id,
+                    validation_report_id=saved_report.report_id,
+                )
+                manifest_bytes = manifest.canonical_bytes()
+                attestation_bytes = attestation.canonical_bytes()
+                config = _finished_stage_config(SEAL_STAGE_SCHEMA_ID, plan.plan_id)
+                manifest_artifact = transaction.put_artifact(
+                    manifest_bytes,
+                    kind="finished-bundle-manifest",
+                    media_type="application/json",
+                    source_ids=recipe.source_ids,
+                    producer_id="veriformis.bundle.manifest",
+                    producer_version="1",
+                    config=config,
+                )
+                attestation_artifact = transaction.put_artifact(
+                    attestation_bytes,
+                    kind="finished-bundle-attestation",
+                    media_type="application/json",
+                    source_ids=recipe.source_ids,
+                    producer_id="veriformis.bundle.attestation",
+                    producer_version="1",
+                    config=config,
+                )
 
-            def publish_or_recover() -> None:
-                nonlocal publication
-                target = Path(os.path.abspath(os.fspath(out)))
-                if os.path.lexists(target):
-                    publication = _recover_exact_finished_bundle(
-                        target,
+                def publish_or_recover() -> None:
+                    nonlocal publication
+                    publication = _publish_or_recover_finished_bundle(
+                        out,
                         files=files,
+                        record_counts=record_counts,
                         manifest=manifest,
                         attestation=attestation,
                         manifest_bytes=manifest_bytes,
                         attestation_bytes=attestation_bytes,
                         expected_report=saved_report,
+                        report_loader=imported_validation_from_json_bytes,
                     )
-                    return
-                publication = write_finished_bundle(
-                    target,
-                    files,
-                    roles=roles,
-                    media_types=media_types,
-                    record_counts=record_counts,
-                    dataset_snapshot_id=saved_report.snapshot_id,
-                    validation_report_id=saved_report.report_id,
-                )
 
-            transaction._set_seal_publication_action(publish_or_recover)
-            revision = transaction.commit(
-                outputs={
-                    "manifest": manifest_artifact,
-                    "attestation": attestation_artifact,
-                },
-                config=config,
-            )
+                transaction._set_seal_publication_action(publish_or_recover)
+                revision = transaction.commit(
+                    outputs={
+                        "manifest": manifest_artifact,
+                        "attestation": attestation_artifact,
+                    },
+                    config=config,
+                )
+        except Exception as exc:
+            if publication is not None:
+                raise SealPartialPublicationError(publication, exc) from exc
+            raise
         assert publication is not None
-        messages = [
-            ServiceMessage(f"sealed bundle: {publication.bundle_path}"),
-            ServiceMessage(f"manifest SHA-256: {publication.manifest_sha256}"),
-            ServiceMessage(f"verification grade: {publication.trust_grade}"),
-            ServiceMessage(f"seal revision {revision.revision_id}"),
-        ]
         return SealOutcome(
             publication=publication,
             revision_id=revision.revision_id,
             durability_warning=store.last_commit_durability_warning,
-            messages=tuple(messages),
+            messages=_seal_messages(publication, revision.revision_id),
         )
 
+    @workspace_operation
     def curate(
         self,
         workspace: Path,
@@ -3198,6 +3366,7 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    @workspace_operation
     def split(self, workspace: Path) -> SplitOutcome:
         """Assign complete transitive leakage groups to fixed partitions."""
         store = Workspace.open(workspace)
@@ -3248,6 +3417,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def format(self, workspace: Path) -> FormatOutcome:
         """Lower curated records into the row schema fixed by their dataset plan."""
         store = Workspace.open(workspace)
@@ -3330,6 +3500,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def validate(self, workspace: Path) -> ValidateOutcome:
         """Replay and validate one exact finished-dataset byte snapshot."""
         store = Workspace.open(workspace)
@@ -3403,6 +3574,7 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    @workspace_operation
     def seal(self, workspace: Path, out: Path) -> SealOutcome:
         """Revalidate, atomically publish, and receipt one finished dataset."""
         publication = None
@@ -3449,27 +3621,15 @@ class PipelineService:
                     "metadata/row-provenance.jsonl": output.provenance_jsonl,
                     "validation.json": report_bytes,
                 }
-                roles = {
-                    "data/train.jsonl": "training-partition",
-                    "data/evaluation.jsonl": "evaluation-partition",
-                    "metadata/row-provenance.jsonl": "row-provenance",
-                    "validation.json": "dataset-validation-report",
-                }
-                media_types = {
-                    "data/train.jsonl": "application/jsonl",
-                    "data/evaluation.jsonl": "application/jsonl",
-                    "metadata/row-provenance.jsonl": "application/jsonl",
-                    "validation.json": "application/json",
-                }
-                record_counts = {
-                    "data/train.jsonl": output.row_set.train_row_count,
-                    "data/evaluation.jsonl": output.row_set.evaluation_row_count,
-                    "metadata/row-provenance.jsonl": output.row_set.total_row_count,
-                }
+                record_counts = _finished_bundle_record_counts(
+                    train_rows=output.row_set.train_row_count,
+                    evaluation_rows=output.row_set.evaluation_row_count,
+                    total_rows=output.row_set.total_row_count,
+                )
                 manifest, attestation = build_finished_bundle(
                     files,
-                    roles=roles,
-                    media_types=media_types,
+                    roles=_FINISHED_BUNDLE_ROLES,
+                    media_types=_FINISHED_BUNDLE_MEDIA_TYPES,
                     record_counts=record_counts,
                     dataset_snapshot_id=saved_report.snapshot_id,
                     validation_report_id=saved_report.report_id,
@@ -3498,51 +3658,16 @@ class PipelineService:
 
                 def publish_or_recover() -> None:
                     nonlocal publication
-                    target = Path(os.path.abspath(os.fspath(out)))
-                    if os.path.lexists(target):
-                        publication = _recover_exact_finished_bundle(
-                            target,
-                            files=files,
-                            manifest=manifest,
-                            attestation=attestation,
-                            manifest_bytes=manifest_bytes,
-                            attestation_bytes=attestation_bytes,
-                            expected_report=saved_report,
-                        )
-                        return
-                    try:
-                        publication = write_finished_bundle(
-                            target,
-                            files,
-                            roles=roles,
-                            media_types=media_types,
-                            record_counts=record_counts,
-                            dataset_snapshot_id=saved_report.snapshot_id,
-                            validation_report_id=saved_report.report_id,
-                        )
-                    except FinishedBundleError:
-                        if not os.path.lexists(target):
-                            raise
-                        publication = _recover_exact_finished_bundle(
-                            target,
-                            files=files,
-                            manifest=manifest,
-                            attestation=attestation,
-                            manifest_bytes=manifest_bytes,
-                            attestation_bytes=attestation_bytes,
-                            expected_report=saved_report,
-                        )
-                        return
-                    if (
-                        publication.manifest_bytes != manifest_bytes
-                        or publication.attestation_bytes != attestation_bytes
-                        or publication.manifest != manifest
-                        or publication.attestation != attestation
-                    ):
-                        raise FinishedBundleError(
-                            "visible finished bundle receipt differs from the staged "
-                            "workspace receipt"
-                        )
+                    publication = _publish_or_recover_finished_bundle(
+                        out,
+                        files=files,
+                        record_counts=record_counts,
+                        manifest=manifest,
+                        attestation=attestation,
+                        manifest_bytes=manifest_bytes,
+                        attestation_bytes=attestation_bytes,
+                        expected_report=saved_report,
+                    )
 
                 transaction._set_seal_publication_action(publish_or_recover)
                 revision = transaction.commit(
@@ -3557,28 +3682,11 @@ class PipelineService:
                 raise SealPartialPublicationError(publication, exc) from exc
             raise
         assert publication is not None
-        messages: list[ServiceMessage] = []
-        if publication.durability_warning is not None:
-            messages.append(
-                ServiceMessage(
-                    f"warning[bundle-durability]: {publication.durability_warning}",
-                    stream="stderr",
-                    kind="warning",
-                )
-            )
-        messages.extend(
-            [
-                ServiceMessage(f"sealed bundle: {publication.bundle_path}"),
-                ServiceMessage(f"manifest SHA-256: {publication.manifest_sha256}"),
-                ServiceMessage(f"verification grade: {publication.trust_grade}"),
-                ServiceMessage(f"seal revision {revision.revision_id}"),
-            ]
-        )
         return SealOutcome(
             publication=publication,
             revision_id=revision.revision_id,
             durability_warning=store.last_commit_durability_warning,
-            messages=tuple(messages),
+            messages=_seal_messages(publication, revision.revision_id),
         )
 
     def verify(
@@ -3714,6 +3822,7 @@ class PipelineService:
             messages=messages,
         )
 
+    @workspace_operation
     def preview(
         self,
         path: Path,
@@ -3890,7 +3999,7 @@ class PipelineService:
         from veriformis.automation import dry_run_project_spec as run_dry
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
         return run_dry(loaded, base_dir=base_dir).model_dump(mode="json")
 
     def lock_project_spec(
@@ -3898,20 +4007,22 @@ class PipelineService:
         spec: object,
         *,
         workspace: Path | None = None,
+        base_dir: Path | None = None,
     ) -> dict[str, Any]:
         """Pin spec digest, versions, and declared extra presence. Not execute."""
         from veriformis.automation import create_project_lock
         from veriformis.automation.execute import lock_after_workspace
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
         lock = (
-            lock_after_workspace(loaded, workspace)
+            lock_after_workspace(loaded, workspace, base_dir=base_dir)
             if workspace is not None
-            else create_project_lock(loaded)
+            else create_project_lock(loaded, base_dir=base_dir)
         )
         return lock.model_dump(mode="json", exclude_none=True)
 
+    @workspace_operation
     def run_project_spec(
         self,
         spec: object,
@@ -3919,22 +4030,25 @@ class PipelineService:
         base_dir: Path | None = None,
     ) -> dict[str, Any]:
         """Execute a confirmed project spec. Export is not auto-run."""
-        from veriformis.automation.execute import lock_after_workspace, run_project_spec
+        from veriformis.automation.execute import bind_workspace_lock, run_project_spec
+        from veriformis.automation.inspect import create_project_lock
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
-        result = run_project_spec(loaded, service=self, base_dir=base_dir)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
+        locked = create_project_lock(loaded, base_dir=base_dir)
+        result = run_project_spec(loaded, service=self, base_dir=base_dir, expected_lock=locked)
         return {
             "spec_id": loaded.spec_id,
             "workspace": str(result.workspace),
             "bundle": None if result.bundle is None else str(result.bundle),
-            "lock": lock_after_workspace(loaded, result.workspace).model_dump(
+            "lock": bind_workspace_lock(locked, result.workspace).model_dump(
                 mode="json",
                 exclude_none=True,
             ),
             "exit_status": 0,
         }
 
+    @workspace_operation
     def resume_project_spec(
         self,
         spec: object,
@@ -3943,11 +4057,11 @@ class PipelineService:
         base_dir: Path | None = None,
     ) -> dict[str, Any]:
         """Resume only when lock, HEAD, and source identities match."""
-        from veriformis.automation.execute import lock_after_workspace, resume_project_spec
+        from veriformis.automation.execute import bind_workspace_lock, resume_project_spec
         from veriformis.automation.inspect import ProjectLock, load_project_lock
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
         locked = lock if isinstance(lock, ProjectLock) else load_project_lock(lock)
         result = resume_project_spec(
             loaded,
@@ -3959,7 +4073,7 @@ class PipelineService:
             "spec_id": loaded.spec_id,
             "workspace": str(result.workspace),
             "bundle": None if result.bundle is None else str(result.bundle),
-            "lock": lock_after_workspace(loaded, result.workspace).model_dump(
+            "lock": bind_workspace_lock(locked, result.workspace).model_dump(
                 mode="json",
                 exclude_none=True,
             ),

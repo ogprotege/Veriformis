@@ -32,7 +32,7 @@ def export_review_packet(
 def load_review_packet(payload: ReviewPacket | dict[str, Any] | str | bytes) -> ReviewPacket:
     """Reload a packet from JSON text, bytes, or an object dump."""
     if isinstance(payload, ReviewPacket):
-        return payload
+        return ReviewPacket.model_validate(payload.model_dump(mode="json"))
     if isinstance(payload, bytes):
         payload = payload.decode("utf-8")
     if isinstance(payload, str):
@@ -44,6 +44,7 @@ def load_review_packet(payload: ReviewPacket | dict[str, Any] | str | bytes) -> 
 
 def submit_review_packet(packet: ReviewPacket) -> ReviewBundle:
     """Bind completed review evidence. Required items must be resolved."""
+    packet = load_review_packet(packet)
     resolved: dict[str, str] = {}
     for decision in packet.decisions:
         resolved[decision.item_id] = "decision"

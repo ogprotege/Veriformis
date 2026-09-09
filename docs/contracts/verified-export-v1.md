@@ -539,6 +539,12 @@ MUST NOT be used as its own external trust anchor. Supplying external evidence f
 plan. Every reconstructed source, profile, dependency, file-plan, and complete
 membership fact MUST equal the supplied plan exactly.
 
+Within one execute call, planning and publication MAY reuse the same
+descriptor-verified source snapshot. Reuse MUST recheck the closed source
+tree's identity, size, mode, and nanosecond modification/change times. A final
+check after the last cancellation callback MUST precede atomic promotion.
+Changed evidence fails closed. The snapshot MUST NOT survive the outer call.
+
 The internal renderer returns exact `(path, bytes)` pairs plus normalized train
 rows, evaluation rows, and aligned provenance. The service MUST snapshot and
 validate the complete renderer file set before creating staging: paths are
@@ -547,12 +553,29 @@ no other path appears. It MUST run the Phase 4.5 membership operation over the
 returned semantic evidence. Renderer-supplied rows and provenance remain
 separate from the byte tree and do not prove that arbitrary bytes encode them.
 
+Every shipped exact-byte exporter independently decodes its emitted payload
+files and available provenance before returning candidate rows. This includes
+the four implemented consumer adapters. Identity and remap profiles decode
+their named columns. Prompt assembly uses the source instruction length to
+recover the existing field boundary, then compares decoded values through
+row identity and provenance. This check does not claim a standalone trainer
+import or change the profile's `round_trip=false` limit. A configured pack
+without provenance uses the verified source's identity alignment and still
+decodes every emitted payload. A shared planner/renderer defect therefore
+cannot pass membership merely by agreeing on the same incorrect bytes.
+
 The service MUST invoke the renderer twice before destination access. Each
 invocation receives independently strict-reloaded plan and source-row-set
 objects reconstructed from the same canonical bytes. It MUST normalize both
 complete trees into exact plan-path order and validate the returned membership
 from each invocation. Renderer sequence order is not meaningful after path
 normalization; path identity and file contents remain exact.
+
+Private temporary storage holds the first rendering while the second runs.
+Exact comparison reads it in chunks and compares bytes, not only digests.
+Semantic replay loads each physical tree separately after both renders.
+The renderer and replayer interfaces still materialize one complete tree;
+this does not create a streaming or measured scale guarantee.
 
 For `portable_exact_bytes`, every rendered file MUST match its planned SHA-256
 and byte size, and the two normalized `(path, bytes)` trees MUST be identical.

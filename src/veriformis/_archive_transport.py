@@ -12,6 +12,7 @@ import errno
 import hashlib
 import os
 import stat
+import struct
 import tempfile
 import zipfile
 from collections.abc import Callable, Sequence
@@ -87,6 +88,16 @@ def write_deterministic_archive(
                     destination.write(chunk)
 
 
+def _canonical_zip64_extra(info: zipfile.ZipInfo) -> bytes:
+    """Reconstruct the central-directory extension emitted by our ZIP writer."""
+    values = []
+    if info.file_size > zipfile.ZIP64_LIMIT or info.compress_size > zipfile.ZIP64_LIMIT:
+        values.extend((info.file_size, info.compress_size))
+    if info.header_offset > zipfile.ZIP64_LIMIT:
+        values.append(info.header_offset)
+    return struct.pack("<HH" + "Q" * len(values), 1, 8 * len(values), *values) if values else b""
+
+
 def require_canonical_archive_structure(
     archive: zipfile.ZipFile,
     *,
@@ -144,7 +155,7 @@ def require_canonical_archive_structure(
             or info.extract_version != expected_info.extract_version
             or info.external_attr != expected_info.external_attr
             or info.internal_attr != expected_info.internal_attr
-            or info.extra
+            or info.extra != _canonical_zip64_extra(info)
             or info.comment
         ):
             raise CanonicalArchiveError(

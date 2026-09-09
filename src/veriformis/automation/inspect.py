@@ -225,12 +225,17 @@ def project_spec_json_schema() -> dict[str, Any]:
     return json.loads(json.dumps(SpecModel.model_json_schema(), sort_keys=True))
 
 
-def spec_digest(spec: ProjectSpec) -> str:
-    return sha256_digest(
-        lossless_json_bytes(
-            spec.model_dump(mode="json", exclude={"spec_id"}, exclude_none=True)
-        )
-    )
+def _spec_digest(spec: ProjectSpec, reference_bytes: bytes | None = None) -> str:
+    body = spec.model_dump(mode="json", exclude={"spec_id"}, exclude_none=True)
+    if reference_bytes is not None:
+        body = {"spec": body, "pipeline_ref_sha256": sha256_digest(reference_bytes)}
+    return sha256_digest(lossless_json_bytes(body))
+
+
+def spec_digest(spec: ProjectSpec, *, base_dir: Path | None = None) -> str:
+    if spec.pipeline_ref is not None:
+        return resolve_pipeline_and_digest(spec, base_dir=base_dir or Path.cwd())[1]
+    return _spec_digest(spec)
 
 
 def planned_stages(spec: ProjectSpec, *, pipeline_stages: dict[str, Any] | None = None) -> tuple[str, ...]:
@@ -265,20 +270,25 @@ def resolve_spec_ref(value: str, *, base_dir: Path) -> Path:
     return path
 
 
-def pipeline_for_spec(spec: ProjectSpec, *, base_dir: Path):
-    from veriformis.recipes.pipeline_spec import load_pipeline_spec, pipeline_spec_from_dict
+def resolve_pipeline_and_digest(spec: ProjectSpec, *, base_dir: Path):
+    from veriformis.recipes.pipeline_spec import pipeline_spec_from_bytes, pipeline_spec_from_dict
 
     if spec.pipeline is not None:
-        return pipeline_spec_from_dict(spec.pipeline, base_dir=base_dir)
+        return pipeline_spec_from_dict(spec.pipeline, base_dir=base_dir), _spec_digest(spec)
     if spec.pipeline_ref is None:
         raise ProjectSpecError("spec execute requires embedded pipeline or pipeline_ref")
+    path = resolve_spec_ref(spec.pipeline_ref, base_dir=base_dir)
     try:
-        return load_pipeline_spec(resolve_spec_ref(spec.pipeline_ref, base_dir=base_dir))
-    except FileNotFoundError as exc:
+        raw = path.read_bytes()
+    except OSError as exc:
         raise ProjectSpecError(
             "cannot reconstruct stages from unresolved pipeline_ref; embed pipeline sources"
         ) from exc
+    return pipeline_spec_from_bytes(raw, base_dir=path.parent), _spec_digest(spec, raw)
 
+
+def pipeline_for_spec(spec: ProjectSpec, *, base_dir: Path):
+    return resolve_pipeline_and_digest(spec, base_dir=base_dir)[0]
 
 def dry_run_project_spec(spec: ProjectSpec, *, base_dir: Path | None = None) -> ProjectSpecDryRun:
     required = spec.mode in {"dataset-row", "mixed"}
@@ -307,13 +317,14 @@ def create_project_lock(
     *,
     workspace_head: str | None = None,
     source_identities: tuple[str, ...] | None = None,
+    base_dir: Path | None = None,
 ) -> ProjectLock:
     payload = {
         "contract_id": PROJECT_LOCK_CONTRACT_ID,
         "contract_version": PROJECT_LOCK_CONTRACT_VERSION,
         "schema_id": PROJECT_LOCK_SCHEMA_ID,
         "spec_id": spec.spec_id,
-        "spec_digest": spec_digest(spec),
+        "spec_digest": spec_digest(spec, base_dir=base_dir),
         "veriformis_version": veriformis_pkg.__version__,
         "python_version": python_version(),
         "extras": declared_extra_presence(),

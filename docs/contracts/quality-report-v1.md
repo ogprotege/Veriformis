@@ -94,6 +94,12 @@ objective target fields. Similarity is integer Jaccard over overlapping
 `near-duplicate-disabled` as `record-only`. Curation
 `near_duplicate_policy` remains `disabled`.
 
+The implementation uses an exact prefix index and length bounds to avoid
+scoring pairs that cannot reach any reported threshold. Report bytes and
+integer scores remain unchanged. Transitive clusters still report every
+member pair, including pairs below the threshold. Dense clusters can therefore
+require quadratic work and output. This is not a measured scale support claim.
+
 ## Leakage (item 13.5)
 
 `report_leakage_checks` adds facts. It does not certify contamination

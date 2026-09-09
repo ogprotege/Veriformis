@@ -2,7 +2,7 @@
 
 **Status:** Active release-gate documentation for version `0.1.0` development alpha
 
-**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
+**Last reviewed:** 2026-09-09 (post-20 defect closure)
 
 **Next review:** Any public-release claim, packaging change, or CI gate change
 
@@ -21,15 +21,28 @@ Operator non-claims and any future **beta** cut criteria:
 | --- | --- | --- |
 | Lockfile integrity | `uv lock --check` | CI `test` job |
 | Lint | `uv run ruff check src tests` | CI `test` job |
-| Core suite | `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"` | Required CI matrix Python 3.11–3.13 (Ubuntu) + macOS 3.12; adapter-only modules are not collected |
+| Core suite | `uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"` | Required CI Python 3.11–3.13 (Ubuntu) + macOS 3.12 excludes `matrix`; the required `acceptance-matrix` job runs those cells on Python 3.12. The local command runs both selections; adapter-only modules are not collected |
 | Installable package and installed origin | `scripts/release/smoke_install.sh` | CI `install-smoke` job; wheel installed in an isolated environment, no external `aptus` distribution, full golden path through that CLI |
 | Golden standalone product path | `scripts/release/golden_compile.sh` | Required CI `golden-compile` job; both objectives, canonical seal, externally anchored verify, deterministic package + package verification, no handoff |
 | Workspace migration | Ordinary pytest under `tests/regressions/` | Full suite (not a separate silent skip) |
+| Shipped project-spec example | `scripts/release/project_spec_example.sh` | Required CI `project-spec-example` job; the example's fingerprint must match `examples/project-spec/expected-fingerprint.json` |
+
+Nine jobs produce twelve check runs per trigger. Both `push` and
+`pull_request` trigger the workflow. Eight checks are required: the four
+`test` cells, `acceptance-matrix`, `install-smoke`, `golden-compile`, and
+`project-spec-example`. The matrix marker covers the 74-cell cross-surface
+acceptance suite, the goal/input-family matrix, and the generic export
+round-trip suite. All action references are pinned to immutable commits.
 
 The optional `aptus-integration` job runs marked tests and
 `scripts/release/aptus_integration.sh` with `continue-on-error: true`. It proves
 the checked-in adapter is self-consistent under its declared policy. It is not
-a core gate and does not prove a live external Aptus release.
+a core gate and does not prove a live external Aptus release. The optional
+`profile-integration` job installs extra `columnar` so the official Datasets
+loader reads every emitted trainer partition (no trainer is installed; the
+exporter does not train), and the optional `columnar-integration` job reloads
+the Parquet, Arrow, and Hugging Face Dataset containers through PyArrow and
+Datasets.
 
 The optional `xcodebuild-debug` job builds and tests the same Debug scheme
 `./script/build_and_run.sh` uses, with `CODE_SIGNING_ALLOWED=NO` and
@@ -59,7 +72,7 @@ bash scripts/release/check_local.sh
 uv sync --extra test
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 ```
@@ -105,11 +118,16 @@ covered by ordinary suite tests under `tests/regressions/`.
 
 The core script has no Aptus handoff step. It uses default seal behavior,
 asserts that no sibling descriptor appears, checks the closed canonical file
-set, retains the manifest SHA-256 outside the bundle, requires
-`external_digest` verification, then creates and verifies the deterministic
+set, requires nonempty train and evaluation partitions, and verifies against
+the reviewed anchors in `scripts/release/golden-manifests.json`. The expected
+digest is never taken from the current seal output. Both objectives require
+`external_digest` verification, then create and verify the deterministic
 `.vfbundle.zip` transport.
 
 Source set: `tests/fixtures/acceptance/v1/raw/corpus/` (text, markdown, code).
+Each objective currently produces one training row and two evaluation rows.
+An intentional parser or contract change must review the source, row, and
+manifest differences before updating an anchor. The gate never rewrites pins.
 
 Objectives (M1.1 acceptance):
 
@@ -224,7 +242,8 @@ Copy this list into a dated release evidence file when attempting a ship.
 ### Automated (required green)
 
 - [ ] CI matrix green on Python 3.11, 3.12, 3.13 (Ubuntu)
-- [ ] CI macOS Python 3.12 job green (when enabled)
+- [ ] CI macOS Python 3.12 job green
+- [ ] Required `acceptance-matrix` job green
 - [ ] `uv lock --check` green
 - [ ] Ruff and required core pytest green
 - [ ] `scripts/release/smoke_install.sh` green

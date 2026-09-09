@@ -14,10 +14,13 @@
 runtime-only goal preview), Phase 6.4 (goal and preset selection on every
 compile surface under the [Recipe Preset Contract v1](recipe-preset-v1.md)),
 Phase 6.5 (the runtime-only compile preflight), Phase 6.6 (the
-discovery-closed acceptance matrix), and Phase 6.7 (per-goal instruction
-templates and deterministic instruction truthfulness).
+discovery-closed acceptance matrix), Phase 6.7 (per-goal instruction
+templates and deterministic instruction truthfulness), and Phase 17 (four
+admitted-family goals and representations that compile only from
+user-provided evidence through the dataset-row path).
 
-**Last reviewed:** 2026-09-05 (structured-field markdown one-leaf covering chunk)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: Phase 17 goals,
+representations, templates, and export compatibility recorded)
 
 **Next review:** Any goal, representation, objective, row-schema, loss-policy,
 or recipe-library change
@@ -110,17 +113,23 @@ Top-level object:
 
 1. `goals` MUST contain exactly one goal per objective kind, in the taxonomy
    order `full_text`, `continuation`, `section_reconstruction`,
-   `before_after_transformation`, `structured_field`.
+   `before_after_transformation`, `structured_field`, `explicit_label`,
+   `preference_pair`, `tool_call`, `stepwise`.
 2. `representations` MUST contain exactly one representation per row schema,
-   in the order `text`, `prompt_completion`, `instruction_output`, `messages`.
+   in the order `text`, `prompt_completion`, `instruction_output`, `messages`,
+   `label-classification`, `preference-pair`, `tool-call-conversation`,
+   `stepwise-trace`.
 3. A goal's `compatible_representations` MUST resolve to exactly the
    taxonomy compatibility row for its objective, in order; its
    `default_representation` MUST resolve to the taxonomy default row schema.
 4. `training_family`, `loss_policy`, and `recipe_library_id` MUST equal the
    taxonomy and recipe-library bindings for their objective or row schema.
 5. Supervised instruction and conversation representations are admitted only
-   for the four supervised objectives, where the source supplies both the
-   context and the target. `full_text` admits only `whole-text`.
+   for the four document-source supervised objectives, where the source
+   supplies both the context and the target. `full_text` admits only
+   `whole-text`. Each admitted-family objective (`explicit_label`,
+   `preference_pair`, `tool_call`, `stepwise`) admits exactly its own
+   representation; document-source construction refuses those objectives.
 6. Plain-language fields (`title`, `plain_language`,
    `what_the_model_learns`, `what_you_provide`, `not_this`,
    `instruction_template`, `instruction_task`, `supervised_region`) MUST NOT
@@ -147,11 +156,15 @@ Top-level object:
    MUST be absent. Current exclusions: `delimited-table` and `json-records`
    carry no supported scalar; `source-code` is one code block that cleaning
    never edits, so it can supply no before-and-after pair; `pdf-text`
-   recovery supplies paragraphs under synthetic per-page labels, not real
-   headings, so it can supply neither a section nor a recorded attribute.
+   recovery supplies paragraphs whose spans carry a page index and no
+   headings at all (since parser 1.1.0 it fabricates no `Page N` labels), so
+   it can supply neither a section nor a recorded attribute.
    `required_evidence_diagnostics` MUST include `source-chunks-unavailable`
-   for every goal because construction reports it for every objective. Item
-   6.6 proves every named family end to end.
+   for every document-source goal because construction reports it for every
+   document-source objective. Item 6.6 proves every named family end to end.
+   Admitted-family goals name `delimited-table` and `json-records` only,
+   because their evidence is a user-provided mapped value, and their single
+   diagnostic names the missing mapped value.
 9. `curation_defaults` MUST equal the recipe-wide defaults of the Recipe
    Preset Contract v1, which `PipelineService`, the CLI, MCP, the YAML runner,
    the recipe library, and the workbench all resolve through one function; a
@@ -169,14 +182,32 @@ Top-level object:
 | `recover-a-section-from-its-heading` | `section_reconstruction` | `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `section-structure-unavailable` |
 | `reproduce-a-recorded-change` | `before_after_transformation` | all except `source-code` | `source-chunks-unavailable`, `transformation-pair-unavailable`, `transformation-pair-empty-or-unchanged`. v1 also names `transformation-pair-unavailable` when a recorded change exists but the chunk is not one block with one replayable edits component (joined paragraph groups). |
 | `extract-a-structured-value` | `structured_field` | `source-code`, `markdown`, `word-document`, `html` | `source-chunks-unavailable`, `structured-ir-artifact-unavailable`, `structured-field-unavailable`, `structured-field-chunk-unavailable`, `structured-field-empty-value`. v1 curation later quarantines `conflicting-target` when one covering chunk is the same input for distinct IR scalars (typical multi-block markdown under default paragraph grouping). |
+| `classify-with-provided-labels` | `explicit_label` | `delimited-table`, `json-records` (dataset-row path only) | `mapped-label-unavailable` |
+| `prefer-chosen-over-rejected` | `preference_pair` | `delimited-table`, `json-records` (dataset-row path only) | `mapped-preference-unavailable` |
+| `use-provided-tool-traces` | `tool_call` | `delimited-table`, `json-records` (dataset-row path only) | `mapped-tool-trace-unavailable` |
+| `use-provided-steps` | `stepwise` | `delimited-table`, `json-records` (dataset-row path only) | `mapped-stepwise-unavailable` |
 
 Every goal states `curation_defaults` of `minimum_target_characters` 1,
 `balance_mode` `none`, no per-source cap, `evaluation_ratio_ppm` 500000,
 `evaluation_required` true, and `split_seed` `veriformis-v1`;
-`review_policy_default` `none`; and all four non-claim codes. Representations
-admit `split-jsonl-directory`, `json`, `parquet`, `arrow`, and
-`hugging-face-dataset` for every row schema and `constrained-csv` for
-the three flat schemas only.
+`review_policy_default` `none`; and all four non-claim codes.
+
+| Representation | Row schema | Loss policy | Compatible generic exports |
+| --- | --- | --- | --- |
+| `whole-text` | `text` | `full-sequence` | `split-jsonl-directory`, `json`, `constrained-csv`, `parquet`, `arrow`, `hugging-face-dataset` |
+| `prompt-and-completion` | `prompt_completion` | `completion-only` | `split-jsonl-directory`, `json`, `constrained-csv`, `parquet`, `arrow`, `hugging-face-dataset` |
+| `instruction-and-output` | `instruction_output` | `output-only` | `split-jsonl-directory`, `json`, `constrained-csv`, `parquet`, `arrow`, `hugging-face-dataset` |
+| `conversation` | `messages` | `final-assistant-suffix` | `split-jsonl-directory`, `json`, `parquet`, `arrow`, `hugging-face-dataset` |
+| `context-and-label` | `label-classification` | `label-only` | `split-jsonl-directory`, `json` |
+| `prompt-chosen-rejected` | `preference-pair` | `pair-supervision` | `split-jsonl-directory`, `json` |
+| `conversation-and-tool-trace` | `tool-call-conversation` | `tool-trace-suffix` | `split-jsonl-directory`, `json` |
+| `prompt-and-steps` | `stepwise-trace` | `final-step-only` | `split-jsonl-directory`, `json` |
+
+`constrained-csv` admits only the three flat schemas. `parquet`, `arrow`,
+and `hugging-face-dataset` admit the four document-source row schemas. The
+four admitted-family row schemas ride only in `split-jsonl-directory` and
+`json`. The table is derived from `PipelineService.discover_exports()` and
+a test keeps it equal to production discovery.
 
 | Goal | `instruction_task` | `instruction_template` |
 | --- | --- | --- |
@@ -185,10 +216,18 @@ the three flat schemas only.
 | `recover-a-section-from-its-heading` | exact source section body | Produce the exact source section body for this heading. |
 | `reproduce-a-recorded-change` | recorded cleaning change | Apply the recorded cleaning change to this exact source text. |
 | `extract-a-structured-value` | exact structural attribute | Produce the exact structural attribute recorded by this source. |
+| `classify-with-provided-labels` | provided label | Emit the provided label for this context. |
+| `prefer-chosen-over-rejected` | provided chosen completion | Emit the provided chosen completion for this prompt. |
+| `use-provided-tool-traces` | provided tool trace | Emit the provided tool trace for this conversation. |
+| `use-provided-steps` | provided steps | Emit the provided steps for this prompt. |
 
-Those five templates are the only default instruction literals. They are
-byte-identical to the instruction strings pinned by the Phase 6.6
-acceptance matrix for every `instruction_output` cell.
+Those nine templates are the only default instruction literals. The five
+document-source templates are byte-identical to the instruction strings
+pinned by the Phase 6.6 acceptance matrix for every `instruction_output`
+cell; the four admitted-family templates apply only when an
+`instruction-and-output` representation is selected for a mapped goal, which
+the current representations do not offer, so they are catalog data with no
+current render path.
 
 ## Resolution
 
@@ -225,7 +264,7 @@ the exact context field and NEVER receive an instruction prefix.
 | Python | `PipelineService.discover_goals()` | Fresh JSON-ready dict equal to the packaged data |
 | CLI | `veriformis goals` | The exact packaged bytes |
 | MCP | `goals` | The exact packaged text, including the terminal newline |
-| Mac bridge | `VeriformisCLI.discoverGoals` | Strictly decoded `GoalCatalog`; missing or extra keys, empty or control-character text, malformed or duplicate identifiers, an objective outside the five kinds, a row-schema sequence other than taxonomy order, an unclosed default or compatibility set, and `requires_operator_instruction` drift are rejected; per-objective compatibility rows and default row schemas are validated only by Python, which is authoritative |
+| Mac bridge | `VeriformisCLI.discoverGoals` | Strictly decoded `GoalCatalog`; missing or extra keys, empty or control-character text, malformed or duplicate identifiers, an objective outside the nine kinds, a row-schema sequence other than taxonomy order, an unclosed default or compatibility set, and `requires_operator_instruction` drift are rejected; per-objective compatibility rows and default row schemas are validated only by Python, which is authoritative |
 
 The frozen fixture `tests/regressions/fixtures/phase6/goal-catalog.json`
 MUST equal the packaged bytes and is decoded by the Swift tests.

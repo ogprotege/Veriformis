@@ -35,7 +35,7 @@ capture import PyArrow only when those files are read.
 | CSV dialect | header required, comma, UTF-8, no trim, no pad |
 | Membership policy | `authoritative`, `advisory`, `replaced` |
 | Coercion / missing / invalid-row | `refuse` |
-| Review policy | `none`, `required` |
+| Review policy | `none` executes; `required` is representable but refuses execution because v1 has no durable review receipt |
 
 Payload keys are exactly the Finished Dataset v1 keys: `text`; `prompt` and
 `completion`; `instruction`, `input`, and `output`; `messages`.
@@ -59,3 +59,17 @@ nested `messages`. Suffix never selects document-source versus dataset-row.
 Rejected rows are recorded in `veriformis.mapping-rejection-report/v1`. That
 report is a content-addressed project artifact, not a verified export. Accepted
 rows may still seal; rejected rows never appear in the row set.
+
+## Validation evidence
+
+The imported validator receives exact captured raw sources. It recaptures
+rows, verifies mapping confirmation, reconstructs the mapping recipe and
+records, and derives split digests from the raw bytes. Split declarations
+are not their own source evidence. Named gates also check lifecycle,
+curation membership, exact deduplication, target length and source caps,
+coverage, partition assignment, leakage groups, row payloads, schema,
+canonical encoding, required partitions, and snapshot files.
+
+A report must contain every ordered imported gate bound to its snapshot.
+Passing gates carry no findings; failed gates require findings. Snapshot
+files and row counts must agree. These checks do not change the v1 schema.

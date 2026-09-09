@@ -1,7 +1,7 @@
 # Install Veriformis (private beta / local use)
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: complete command map, `--mode`, extra `columnar`)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -133,7 +133,15 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis candidate-profile-admissions` | Print remaining candidate admission pins; none are executable |
 | `veriformis columnar-schemas` | Print packaged Arrow and Hugging Face feature schema pins |
 | `veriformis preflight PATH... --goal ID` | Raw-source compile admission without a workspace |
-| `veriformis parse FILES… -o WORKSPACE [--source-root DIR]` | Capture + parse |
+| `veriformis modes` | Print the compiler paths (`document-source`, `dataset-row`, `mixed`) |
+| `veriformis collect PATHS… [--mode M] [--include G] [--exclude G] [--max-files N] [--max-bytes N] [--hidden] [--unsupported ignore\|refuse]` | Print the deterministic collection plan for files and directories without capturing |
+| `veriformis parse FILES… -o WORKSPACE [--source-root DIR] [--mode M]` | Capture + parse; `--mode dataset-row` captures existing JSONL / JSON / CSV / Parquet / Arrow rows for `map` |
+| `veriformis mapping-detect ROWS` | Propose `mapping-plan/v1` objects with a confirmation digest; writes nothing |
+| `veriformis mapping-preview ROWS --plan PLAN.json` | Walk a confirmed plan over the whole file; writes nothing |
+| `veriformis map WORKSPACE --goal ID --representation ID --plan PLAN.json` | Apply the confirmed plan to a dataset-row workspace (all three options required) |
+| `veriformis mapping-rejections ROWS --plan PLAN.json --output DIR` | Write the content-addressed rejection report; not a verified export |
+| `veriformis mapping-contracts` / `veriformis mapping-templates` | Print mapping contract and template discovery |
+| `veriformis ocr-preview PDF` | Optional local Tesseract page preview; writes nothing |
 | `veriformis clean WORKSPACE` | Cleaning plan + apply |
 | `veriformis chunk WORKSPACE` | Evidence-bearing chunks |
 | `veriformis construct WORKSPACE --goal ID` | Build records from a catalog goal (or `--objective`) |
@@ -142,13 +150,14 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis split WORKSPACE` | Train / evaluation assignment |
 | `veriformis format WORKSPACE` | Lower to product rows |
 | `veriformis validate WORKSPACE` | 17-gate validation |
+| `veriformis quality-report WORKSPACE` | Quality preview at or beyond `split`; never a gate |
 | `veriformis seal WORKSPACE -o BUNDLE.vfbundle` | Atomic canonical six-file bundle; no integration artifact by default |
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
 | `veriformis package BUNDLE -o BUNDLE.vfbundle.zip --manifest-sha256 HEX` | Deterministic Finder-safe transport |
 | `veriformis package-verify ARCHIVE --manifest-sha256 HEX` | Verify transport bytes and reconstructed bundle |
 | `veriformis package EXPORT -o EXPORT.vfexport.zip --export-receipt-sha256 HEX` | Deterministic receipt-anchored transport of an unchanged generic export directory |
 | `veriformis package-verify ARCHIVE --export-receipt-sha256 HEX` | Verify receipt-bound export members and canonical transport bytes |
-| `veriformis export discover` | List executable verified-export implementations; includes `constrained-csv`, `json`, and `split-jsonl-directory` v1 |
+| `veriformis export discover` | List executable verified-export implementations: `split-jsonl-directory`, `json`, `constrained-csv`, `parquet`, `arrow`, `hugging-face-dataset` v1 and the `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus` adapters |
 | `veriformis export dry-run --request-json JSON_TEXT` | Derive a source-anchored plan plus exact first-row/non-empty-partition samples and normalized plan-derived tree, without renderer or destination access; whole payloads over 65,536 bytes or excluded by the response budget are omitted with an exact reason |
 | `veriformis export inspect --request-json JSON_TEXT` | Inspect a self-described export's closed physical tree |
 | `veriformis export execute --request-json JSON_TEXT` | Publish one operator-confirmed plan with no-replace `refuse` |
@@ -157,6 +166,11 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis handoff-verify HANDOFF --bundle BUNDLE` | Consumer check |
 | `veriformis list-recipes` | Named recipes |
 | `veriformis run PIPELINE.yaml` | YAML pipeline |
+| `veriformis spec-schema` / `spec-dry-run SPEC` / `spec-lock SPEC` / `spec-run SPEC` / `spec-resume SPEC --lock LOCK` | Project-spec automation; `spec-lock` pins versions, extras, and (with `--workspace`) HEAD and sources; resume refuses drift |
+| `veriformis env-inspect` | Declared extras, Python version, taxonomy counts; no secrets |
+| `veriformis review-export` / `review-import PACKET` / `review-submit PACKET` | Review packet exchange |
+| `veriformis support-matrix` / `scale-support` / `extension-capabilities` | Frozen 1.0 support matrix; empty scale tiers; built-in extension declarations |
+| `veriformis scale-baseline --corpus-id ID --work-root DIR` | Named-hardware compile baseline; not an SLA |
 | `veriformis mcp` | Local MCP adapter |
 | `veriformis preview PATH` | Cleaning preview without commit |
 | `veriformis upgrade-workspace WORKSPACE` | Migrate older workspace revisions; see [migration.md](migration.md) |
@@ -340,8 +354,9 @@ Debug workbench**.
 | `veriformis: command not found` | Use `uv run veriformis` or put `.venv/bin` on PATH / `uv tool install` |
 | `source root is not a directory` | Pass a directory to `--source-root`, not a file (fixed in recent workbench) |
 | Optional Aptus handoff rejected for `full_text` | Expected under the adapter policy: plain `text` schema; use a supported supervised objective only when that integration is your target |
-| Unknown suffix or image-only PDF | Fail closed. See [troubleshooting.md](troubleshooting.md). `ocr-image` stays unsupported. |
-| Trainer extra or Hub upload | Optional extras stay empty. There is no Hub execute. The exporter does not train. |
+| Unknown suffix or image-only PDF | Fail closed. See [troubleshooting.md](troubleshooting.md). Image-only PDF refuses with `pdf.ocr-required`; the `ocr-image` family stays unsupported. |
+| Trainer extra or Hub upload | Trainer extras stay empty. There is no Hub execute. The exporter does not train. |
+| Parquet / Arrow / Hugging Face export or capture refuses | Install the one non-empty extra: `uv sync --extra columnar`. |
 
 ---
 

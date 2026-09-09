@@ -19,7 +19,7 @@ Capability claims: [docs/current-status.md](docs/current-status.md).
 - Existing JSONL, JSON, CSV, Parquet, or Arrow rows: `parse --mode dataset-row` then `map`, then the same tail
 - Cleaned text is compiler state until a `full_text` recipe selects it
 - Sealed product is a six-file `.vfbundle`; derivatives do not recurate or resplit
-- Optional adapters: `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`. Extras stay empty. The exporter does not train.
+- Optional adapters: `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`. Trainer extras stay empty; only extra `columnar` (PyArrow, Datasets) installs anything. The exporter does not train.
 
 ## Install
 
@@ -81,12 +81,18 @@ Existing JSONL, JSON, compatible CSV, Parquet, or Arrow rows skip
 `clean` / `chunk` / `construct`:
 
 ```bash
+uv run veriformis mapping-detect rows.jsonl > build/detected.json
+# review the proposal, then save the chosen mapping-plan/v1 object as build/plan.json
 uv run veriformis parse --mode dataset-row rows.jsonl -o build/workspace
-uv run veriformis map build/workspace
+uv run veriformis map build/workspace \
+  --goal learn-the-text --representation whole-text --plan build/plan.json
 # then curate → split → format → validate → seal → verify
 ```
 
-Guide: [docs/mapping.md](docs/mapping.md). Suffix never switches the
+`map` takes no defaults: the goal, representation, and a confirmed plan whose
+digest binds the captured file are all required. Parquet and Arrow row
+sources additionally need `uv sync --extra columnar`. Guide:
+[docs/mapping.md](docs/mapping.md). Suffix never switches the
 document-source path.
 
 For a supervised recipe, bind objective and row schema at construct:
@@ -127,8 +133,10 @@ MCP, and required release gates do not need Aptus.
 | Digitally-born PDF | `.pdf` (image-only / OCR fails closed) |
 | Tables and records | `.csv`, `.json`, `.jsonl` |
 | Source | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` |
+| Existing rows (`--mode dataset-row` only) | `.jsonl`, `.json`, compatible `.csv`, `.parquet`, `.arrow` (Parquet and Arrow need extra `columnar`) |
 
-Anything else fails as `unsupported-input`.
+Anything else fails as `unsupported-input`. Image-only PDF refuses with
+`pdf.ocr-required`; the `ocr-image` input family stays unsupported.
 
 ## What it emits
 

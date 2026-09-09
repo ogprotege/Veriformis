@@ -215,7 +215,7 @@ constructs, filters, reorders, curates, resplits, or changes partition
 membership, and none makes a trainer-compatibility claim. The private
 hooks remain trusted implementation code, not an untrusted plugin boundary;
 semantic replay retains complete files in memory and its fixture is statically
-bounded, but no production semantic replayer ships. Phase 4.9 remains the
+bounded. At Phase 4 closeout no production semantic replayer shipped. Since Phase 9, three production `semantic_content_only` replayers ship (`parquet`, `arrow`, `hugging-face-dataset`; each decodes its produced bytes through PyArrow or Datasets before promotion), and since Phases 8 and 10 five optional consumer-profile adapters (`trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`) are discoverable; none trains. Phase 4.9 remains the
 historical consolidated adversarial closeout. Phase 5.4's merged
 receipt-anchored transport leaves those renderer and surface claims unchanged.
 Phase 5.5 likewise adds no entry point: its merged eleven-pair

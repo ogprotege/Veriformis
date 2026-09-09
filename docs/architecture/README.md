@@ -4,7 +4,7 @@ The entry point to the Veriformis architecture documentation: a system
 overview, the top-level module diagram, and an index into the four deep-dive
 references that carry the verified, citation-backed detail.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: counts, stage list, replayer and adapter claims)
 
 **Next review:** Any architecture documentation change
 
@@ -74,8 +74,10 @@ canonical representation, explicit passes, and diagnostics instead of silent
 degradation — transfers directly.
 
 Stage-gated transactional processing supplies the execution discipline. The
-nine stages — parse, clean, chunk, construct, curate, split, format, validate,
-seal — form an explicit dependency graph declared in the workspace kernel (see
+ten stage commands — parse, clean, chunk, construct, curate, split, format,
+validate, seal on the document-source path, with `map` replacing clean,
+chunk, and construct on the dataset-row path — form an explicit dependency
+graph declared in the workspace kernel (see
 `src/veriformis/workspace.py:138`), where each stage reads its predecessors'
 artifacts from an immutable revision and commits its own atomically; rerunning
 a stage invalidates all descendants. The pivotal rule is replay-before-commit:
@@ -102,7 +104,7 @@ locator fields — as a correctness mechanism, not a style preference.
 ```mermaid
 flowchart TB
     subgraph entry["Adapters and Composition"]
-        CLI["cli.py — thin Typer adapter, 26 commands"]
+        CLI["cli.py — thin Typer adapter, 52 commands plus the export group"]
         MCP["mcp/ — local stdio adapter"]
         MAC["macOS workbench — shells the CLI"]
         PIP["pipeline/ — PipelineService composition root"]
@@ -263,9 +265,11 @@ non-empty-partition samples and the sorted relative planned tree plus receipt,
 with ASCII-safe whole-row payload inclusion or exact omission. It never calls a
 renderer or touches a destination and adds no durable model or dependency edge.
 
-The default service still has no semantic replayer. The CLI exposes the nine
-stage commands plus maintenance, inspection, recipe automation, MCP, optional
-Aptus handoff, version, and verified-export surfaces.
+Since Phase 9, three production `semantic_content_only` replayers ship (`parquet`, `arrow`, `hugging-face-dataset`; each decodes its produced bytes through PyArrow or Datasets before promotion), and since Phases 8 and 10 five optional consumer-profile adapters (`trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`) are discoverable; none trains. The CLI exposes the ten
+stage commands plus maintenance, inspection, recipe and project-spec
+automation, review packets, scale and support discovery, MCP, optional Aptus
+handoff, version, and verified-export surfaces (52 root commands plus the
+`export` group; see [entry points](entry-points.md)).
 
 Collaboration between these units is governed by two mechanisms worth naming
 explicitly. The first is the strict acyclic import graph: no lower layer
@@ -292,7 +296,7 @@ code computes.
 | --- | --- |
 | [Layers](layers.md) | The strict acyclic layer stack, responsibility allocation, the lazy-kernel and serde-membrane isolation techniques, and exception flow |
 | [Dependencies](dependencies.md) | The fan-in kernel, external-dependency containment, the pydantic posture, deferred imports, and versioning governance |
-| [Data flow](data-flow.md) | Shape evolution across the nine stages, the provenance backbone, egress separation, persistence, and defense in depth |
+| [Data flow](data-flow.md) | Shape evolution across the ten stage commands, the provenance backbone, egress separation, persistence, and defense in depth |
 | [Entry points](entry-points.md) | The shared service root, CLI/MCP/workbench adapters, stage transactions, seal path, and independent verifier |
 
 ## Related documentation

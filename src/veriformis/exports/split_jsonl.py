@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from veriformis.contracts import PRODUCT_ROW_SCHEMA_KINDS
 from veriformis.datasets import ProductRow, RowProvenance, RowSet
 from veriformis.errors import ExportContractError, ExportVerificationError
+from veriformis.exports._exact_decode import decode_exact_derivative
 from veriformis.exports._implementation import (
     _ExportImplementation,
     _RenderedDerivative,
@@ -472,11 +473,8 @@ def _render(plan: ExportPlan, row_set: RowSet) -> _RenderedDerivative:
     ):
         raise ExportVerificationError("split JSONL renderer received another profile")
     options = _options_from_plan(plan)
-    return _RenderedDerivative(
-        files=_rendered_files(row_set, options),
-        train_rows=row_set.train_rows,
-        evaluation_rows=row_set.evaluation_rows,
-        provenance=row_set.provenance,
+    return decode_exact_derivative(
+        plan, row_set, _rendered_files(row_set, options),
     )
 
 

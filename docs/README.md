@@ -86,8 +86,8 @@ development alpha.
 | [Security review](security.md) | License, parser threat, secrets, reproducibility, provenance | Not a CVE subscription; not a signed-Mac claim |
 | [Consumer profile freeze](consumer-profiles.md) | Optional adapters stay isolated | Extras empty; Unsloth not executable; exporter does not train |
 | [Support lifecycle](support-lifecycle.md) | Semver, compatibility, deprecation, vulnerability, rollback | Not a version bump; frozen matrix stays CLI-first |
-| [Troubleshooting](troubleshooting.md) | Fail-closed operator notes | Unknown suffix, ocr-image, empty extras, no Hub, no signed Mac |
-| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; extras remain empty; Unsloth is not executable |
+| [Troubleshooting](troubleshooting.md) | Fail-closed operator notes | Unknown suffix, `pdf.ocr-required`, HTML charset refusal, empty trainer extras, extra `columnar`, no Hub, no signed Mac |
+| [Consumer Profile Admission v1](contracts/profile-admission-v1.md) | Implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus pins plus the Unsloth candidate pin | Packaged pins; trainer extras remain empty; Unsloth is not executable |
 | [Columnar Schema Pins v1](contracts/columnar-schema-v1.md) | Packaged Arrow and Hugging Face feature pins for Parquet, Arrow, and Hugging Face Dataset containers | Implemented pins; extra `columnar` lists the pins |
 | [Columnar Semantic Fingerprint v1](contracts/columnar-fingerprint-v1.md) | Versioned payload fingerprint independent of library metadata; receipts still bind exact emitted bytes | Implemented algorithm pin |
 | [Parquet Export v1](contracts/parquet-export-v1.md) | Generic Parquet container with semantic fingerprints | Implemented; extra `columnar` lists the pins |

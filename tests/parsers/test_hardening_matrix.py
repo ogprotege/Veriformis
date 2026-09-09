@@ -21,8 +21,9 @@ def test_text_empty_and_non_utf8_fail_closed(tmp_path: Path) -> None:
     empty.write_bytes(b"")
     result = _parse(empty, b"")
     assert result.diagnostics.status in {"complete", "degraded"}
-    with pytest.raises((ParseError, UnicodeDecodeError, UnicodeError)):
-        _parse(tmp_path / "bad.txt", b"\xff\xfe not utf8")
+    refused = _parse(tmp_path / "bad.txt", b"\xff\xfe not utf8")
+    assert refused.diagnostics.status == "refused"
+    assert "text.not-utf8" in {item.code for item in refused.diagnostics.diagnostics}
 
 
 def test_json_truncated_and_jsonl_malformed_fail_closed(tmp_path: Path) -> None:

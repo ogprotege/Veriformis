@@ -10,6 +10,7 @@ from pathlib import Path
 from veriformis.pipeline.service import PipelineService, StageOutcome
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.recipes.pipeline_spec import PipelineSpec, PipelineSpecError
+from veriformis._operation import workspace_operation
 from veriformis.workspace import Workspace
 
 
@@ -32,6 +33,7 @@ def _optional_bool(value: Any) -> bool | None:
     return None if value is None else bool(value)
 
 
+@workspace_operation
 def run_pipeline_spec(
     spec: PipelineSpec,
     *,
@@ -71,6 +73,10 @@ def run_pipeline_spec(
                 )
             )
         elif stage == "construct":
+            # Explicit segmentation on the pipeline chunk stage is also the
+            # operator's construct selection, unless construct names its own.
+            segmentation = dict(spec.stages.get("chunk") or {})
+            segmentation.update(config)
             objective = config.get("objective")
             goal = _optional_str(config.get("goal"))
             preset = _optional_str(config.get("preset"))
@@ -110,6 +116,9 @@ def run_pipeline_spec(
                     split_ratio_ppm=_optional_int(config.get("split_ratio_ppm")),
                     require_review=_optional_bool(config.get("require_review")),
                     consumer_profile=_optional_str(config.get("consumer_profile")),
+                    strategy=_optional_str(segmentation.get("strategy")),
+                    size=_optional_int(segmentation.get("size")),
+                    overlap=_optional_int(segmentation.get("overlap")),
                 )
             )
         elif stage == "curate":

@@ -4,7 +4,7 @@ How the Veriformis source tree is organized: a strict, acyclically ordered
 layer stack, the responsibility of each layer, the isolation techniques that
 keep the stack acyclic, and the exception flow that mirrors it.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: command count and package list)
 
 **Next review:** Any layering or architecture change
 
@@ -30,7 +30,7 @@ the module dependency graph two expressions of the same acyclic order.
 
 ```mermaid
 flowchart TD
-    CLI["cli.py — thin Typer adapter, 23 commands"]
+    CLI["cli.py — thin Typer adapter, 52 commands plus the export group"]
     MCP["mcp/ — thin local stdio adapter"]
     MAC["macOS workbench — CLI shell"]
     PIP["pipeline/ — PipelineService composition root"]

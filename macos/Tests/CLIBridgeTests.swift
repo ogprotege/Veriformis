@@ -230,15 +230,33 @@ final class CLIBridgeTests: XCTestCase {
             let script = """
             #!/bin/sh
             stage="$1"
+            # The real parse command creates its workspace. The app owns only
+            # the sibling sidecar, so the fake must reproduce this CLI effect.
+            if [ "$stage" = "parse" ]; then
+              previous=""
+              for argument in "$@"; do
+                if [ "$previous" = "-o" ]; then mkdir -p "$argument"; break; fi
+                previous="$argument"
+              done
+            fi
             if [ "$stage" = "preflight" ]; then
               \(try compilePreflightHeredoc())
               exit 0
             fi
+            if [ "$stage" = "split" ]; then
+              printf '%s\\n' '{"schema_id":"veriformis.command-result/v1","command":"split","result":{"assignment_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}'
+            fi
             if [ "$stage" = "seal" ]; then
-              printf 'manifest SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\n'
+              previous=""
+              for argument in "$@"; do
+                if [ "$previous" = "-o" ]; then bundle="$argument"; break; fi
+                previous="$argument"
+              done
+              printf '{"schema_id":"veriformis.command-result/v1","command":"seal","result":{"manifest_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bundle_path":"%s","revision_id":"revision","handoff_path":null}}\\n' "$bundle"
             fi
             if [ "$stage" = "\(stage.rawValue)" ]; then
               trap 'exit 0' TERM INT
+              touch "\(root.appendingPathComponent("stage-started").path)"
               while :; do sleep 0.02; done
             fi
             exit 0
@@ -269,7 +287,10 @@ final class CLIBridgeTests: XCTestCase {
 
             var reachedStage = false
             for _ in 0 ..< 300 {
-                if workbench.isRunning, workbench.currentStage == stage {
+                if workbench.isRunning, workbench.currentStage == stage,
+                   FileManager.default.fileExists(
+                       atPath: root.appendingPathComponent("stage-started").path
+                   ) {
                     reachedStage = true
                     break
                 }
@@ -908,6 +929,8 @@ final class CLIBridgeTests: XCTestCase {
             if cell.chunkSize == nil, cell.chunkOverlap == nil {
                 construct += ["--preset", cell.presetID]
             }
+            if let size = cell.chunkSize { construct += ["--size", String(size)] }
+            if let overlap = cell.chunkOverlap { construct += ["--overlap", String(overlap)] }
             construct += ["--representation", cell.representationID]
             var curate = ["curate", workspace.path, "--preset", cell.presetID]
             if let instruction = cell.instruction {
@@ -926,12 +949,12 @@ final class CLIBridgeTests: XCTestCase {
                     StageCommand(stage: .chunk, arguments: chunk),
                     StageCommand(stage: .construct, arguments: construct),
                     StageCommand(stage: .curate, arguments: curate),
-                    StageCommand(stage: .split, arguments: ["split", workspace.path]),
+                    StageCommand(stage: .split, arguments: ["split", workspace.path, "--json"]),
                     StageCommand(stage: .format, arguments: ["format", workspace.path]),
                     StageCommand(stage: .validate, arguments: ["validate", workspace.path]),
                     StageCommand(
                         stage: .seal,
-                        arguments: ["seal", workspace.path, "-o", bundle.path]
+                        arguments: ["seal", workspace.path, "-o", bundle.path, "--json"]
                     ),
                 ],
                 cell.cellID
@@ -1578,6 +1601,30 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
+    func testCatalogDiscoveryAcceptsNewIdentifiersAndOrderWithoutInventingPayloadSupport() throws {
+        let catalog = try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData { payload in
+            var goals = payload["goals"] as! [[String: Any]]
+            var added = goals[0]
+            added["goal_id"] = "future-goal"
+            added["objective"] = "future_objective"
+            goals.append(added)
+            payload["goals"] = Array(goals.reversed())
+            var representations = payload["representations"] as! [[String: Any]]
+            var representation = representations[0]
+            representation["representation_id"] = "future-representation"
+            representation["row_schema"] = "future_row"
+            representations.append(representation)
+            payload["representations"] = Array(representations.reversed())
+        })
+        XCTAssertEqual(catalog.goals.first?.objective.rawValue, "future_objective")
+        XCTAssertEqual(catalog.representations.first?.rowSchema, "future_row")
+        XCTAssertFalse(GoalCatalog.rowSchemaOrder.contains("future_row"))
+        let taxonomy = try JSONDecoder().decode(TaxonomyDiscovery.self, from: taxonomyData {
+            $0["objective", default: []].append("future_objective")
+        })
+        XCTAssertTrue(taxonomy.objectives.contains("future_objective"))
+    }
+
     func testGoalCatalogRejectsEvaluationRatioEndpoints() throws {
         for endpoint in [0, 1_000_000] {
             XCTAssertThrowsError(
@@ -1601,7 +1648,7 @@ final class CLIBridgeTests: XCTestCase {
         }
     }
 
-    func testGoalCatalogRejectsDuplicateGoalUnknownObjectiveAndOpenClosure() throws {
+    func testGoalCatalogRejectsDuplicateGoalInvalidObjectiveAndOpenClosure() throws {
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 GoalCatalog.self,
@@ -1619,26 +1666,26 @@ final class CLIBridgeTests: XCTestCase {
                 GoalCatalog.self,
                 from: goalCatalogData { payload in
                     var goals = payload["goals"] as! [[String: Any]]
-                    goals[0]["objective"] = "summary"
+                    goals[0]["objective"] = "bad objective"
                     payload["goals"] = goals
                 }
             )
         ) { error in
-            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("unknown objective summary"))
+            XCTAssertEqual(error as? GoalCatalogError, .invalidGoals("unknown objective bad objective"))
         }
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 GoalCatalog.self,
                 from: goalCatalogData { payload in
                     var goals = payload["goals"] as! [[String: Any]]
-                    goals.removeLast()
+                    goals[1]["objective"] = goals[0]["objective"]
                     payload["goals"] = goals
                 }
             )
         ) { error in
             XCTAssertEqual(
                 error as? GoalCatalogError,
-                .invalidGoals("goals must cover every objective exactly once in taxonomy order")
+                .invalidGoals("goals must bind unique objectives")
             )
         }
         XCTAssertThrowsError(
@@ -1661,7 +1708,7 @@ final class CLIBridgeTests: XCTestCase {
                 GoalCatalog.self,
                 from: goalCatalogData { payload in
                     var representations = payload["representations"] as! [[String: Any]]
-                    representations[3]["row_schema"] = "chat"
+                    representations[3]["row_schema"] = "bad row"
                     payload["representations"] = representations
                 }
             )
@@ -1669,7 +1716,7 @@ final class CLIBridgeTests: XCTestCase {
             XCTAssertEqual(
                 error as? GoalCatalogError,
                 .invalidRepresentations(
-                    "row schemas must be exactly \(GoalCatalog.rowSchemaOrder) in order"
+                    "row schemas must be unique, non-empty identifiers"
                 )
             )
         }
@@ -1871,12 +1918,12 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 TaxonomyDiscovery.self,
-                from: taxonomyData { $0["objective"] = ["full_text", "summary"] }
+                from: taxonomyData { $0["objective"] = ["full_text", "bad objective"] }
             )
         ) { error in
             XCTAssertEqual(
                 error as? TaxonomyDiscoveryError,
-                .invalidObjectives(["full_text", "summary"])
+                .invalidObjectives(["full_text", "bad objective"])
             )
         }
     }
@@ -3122,7 +3169,7 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(plan[6].arguments, ["format", workspace.path])
         XCTAssertEqual(
             plan[8].arguments,
-            ["seal", workspace.path, "-o", bundle.path, "--aptus-handoff"]
+            ["seal", workspace.path, "-o", bundle.path, "--json", "--aptus-handoff"]
         )
     }
 
@@ -3196,6 +3243,7 @@ final class CLIBridgeTests: XCTestCase {
             [
                 "construct", workspace.path,
                 "--goal", "reproduce-a-recorded-change",
+                "--size", "24", "--overlap", "0",
                 "--representation", "prompt-and-completion",
             ]
         )
@@ -3300,7 +3348,7 @@ final class CLIBridgeTests: XCTestCase {
             allowEmptyEvaluation: false,
             splitRatioPPM: nil
         )
-        XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path])
+        XCTAssertEqual(plan.last!.arguments, ["seal", workspace.path, "-o", bundle.path, "--json"])
         XCTAssertFalse(
             plan.flatMap(\.arguments).contains { $0.lowercased().contains("aptus") }
         )
@@ -3368,38 +3416,6 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertEqual(json["writeAptusHandoff"] as? Bool, true)
         let decoded = try JSONDecoder().decode(RunHistoryEntry.self, from: data)
         XCTAssertTrue(decoded.requestsAptusHandoff)
-    }
-
-    func testManifestSHAExtraction() {
-        let log = """
-        sealed bundle: /tmp/out.vfbundle
-        manifest SHA-256: abcdef0123456789
-        verification grade: external_digest
-        """
-        XCTAssertEqual(
-            WorkbenchViewModel.extractManifestSHA256(from: log),
-            "abcdef0123456789"
-        )
-    }
-
-    func testAssignmentDigestExtraction() {
-        let log = """
-        aptus handoff: /tmp/out.vfbundle.aptus-handoff.json
-        assignment digest: deadbeefcafebabe
-        """
-        XCTAssertEqual(
-            WorkbenchViewModel.extractAssignmentDigest(from: log),
-            "deadbeefcafebabe"
-        )
-    }
-
-    func testArchiveDigestExtraction() {
-        XCTAssertEqual(
-            WorkbenchViewModel.extractArchiveSHA256(
-                from: "archive SHA-256: 1234abcdef\nverification grade: external_digest"
-            ),
-            "1234abcdef"
-        )
     }
 
     func testMakeFailureCapturesExitCodeAndStage() {
@@ -3503,11 +3519,11 @@ final class CLIBridgeTests: XCTestCase {
             ["document-source", "dataset-row", "mixed"]
         )
         XCTAssertEqual(CompilerInputMode.documentSource.rawValue, "document-source")
-        XCTAssertTrue(TrainingObjective.explicitLabel.requiresMappedValueEvidence)
-        XCTAssertTrue(TrainingObjective.preferencePair.requiresMappedValueEvidence)
-        XCTAssertTrue(TrainingObjective.toolCall.requiresMappedValueEvidence)
-        XCTAssertTrue(TrainingObjective.stepwise.requiresMappedValueEvidence)
-        XCTAssertFalse(TrainingObjective.fullText.requiresMappedValueEvidence)
+        XCTAssertTrue(TrainingObjective.explicitLabel.isKnownMappedObjective)
+        XCTAssertTrue(TrainingObjective.preferencePair.isKnownMappedObjective)
+        XCTAssertTrue(TrainingObjective.toolCall.isKnownMappedObjective)
+        XCTAssertTrue(TrainingObjective.stepwise.isKnownMappedObjective)
+        XCTAssertFalse(TrainingObjective.fullText.isKnownMappedObjective)
     }
 
     func testDatasetRowCompilePlanParsesThenMapsWithoutCleanChunkConstruct() {
@@ -3515,7 +3531,7 @@ final class CLIBridgeTests: XCTestCase {
         let root = URL(fileURLWithPath: "/data")
         let workspace = URL(fileURLWithPath: "/tmp/ws")
         let bundle = URL(fileURLWithPath: "/tmp/out.vfbundle")
-        let planURL = URL(fileURLWithPath: "/tmp/ws/confirmed-mapping-plan.json")
+        let planURL = URL(fileURLWithPath: "/tmp/ws.workbench/confirmed-mapping-plan.json")
         let plan = VeriformisCLI.compilePlan(
             sources: sources,
             sourceRoot: root,
@@ -3572,6 +3588,101 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertFalse(plan[0].arguments.contains("--mode"))
         XCTAssertFalse(plan.flatMap(\.arguments).contains("dataset-row"))
         XCTAssertFalse(plan.flatMap(\.arguments).contains("map"))
+    }
+
+    // MARK: - Post-20 defect D-04: the app never writes inside the CLI workspace
+
+    func testWorkbenchSidecarDirectoryIsASiblingOfTheCLIWorkspace() {
+        let workspace = URL(fileURLWithPath: "/tmp/output/workspace-2026", isDirectory: true)
+        let sidecar = WorkbenchViewModel.workbenchSidecarDirectory(for: workspace)
+        XCTAssertEqual(sidecar.path, "/tmp/output/workspace-2026.workbench")
+        XCTAssertEqual(
+            sidecar.deletingLastPathComponent().path,
+            workspace.deletingLastPathComponent().path
+        )
+        XCTAssertFalse(sidecar.path.hasPrefix(workspace.path + "/"))
+    }
+
+    @MainActor
+    func testDatasetRowCompileThroughTheWorkbenchSealsWithRealRepoCLI() async throws {
+        // `parse --mode dataset-row -o WORKSPACE` refuses a non-empty destination.
+        // Before this fix the app wrote confirmed-mapping-plan.json into the
+        // workspace first, so every confirm-then-map compile failed at parse.
+        let repositoryRoot = testRepositoryRoot()
+        let repoCLI = repositoryRoot.appendingPathComponent(".venv/bin/veriformis")
+        XCTAssertTrue(FileManager.default.isExecutableFile(atPath: repoCLI.path))
+        let cli = try VeriformisCLI.resolve(
+            repositoryRoot: repositoryRoot,
+            environment: ["VERIFORMIS_CLI": repoCLI.path]
+        )
+
+        let root = temporaryTestDirectory("post20-dataset-row-compile")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let sourceRoot = root.appendingPathComponent("sources", isDirectory: true)
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        for directory in [sourceRoot, output, support] {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        let fixture = repositoryRoot
+            .appendingPathComponent("tests/regressions/fixtures/phase7/text.jsonl")
+        let source = sourceRoot.appendingPathComponent("text.jsonl")
+        try FileManager.default.copyItem(at: fixture, to: source)
+
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defaults.set(output.path, forKey: "veriformis.workbench.defaultOutput")
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(cli: cli, defaults: defaults, supportDirectory: support)
+        workbench.inputMode = .datasetRow
+        workbench.sourceURLs = [source]
+        workbench.sourceRootURL = sourceRoot
+        workbench.outputDirectoryURL = output
+        workbench.applyCatalogs(
+            goals: try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData()),
+            presets: try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+        )
+
+        workbench.detectMapping()
+        var detected = false
+        for _ in 0 ..< 600 {
+            if case .ready = workbench.mappingDetectState {
+                detected = true
+                break
+            }
+            if case .unavailable(let reason) = workbench.mappingDetectState {
+                XCTFail("mapping-detect unavailable: \(reason)")
+                return
+            }
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertTrue(detected, "mapping-detect did not finish")
+        workbench.confirmSelectedMappingPlan()
+        XCTAssertNotNil(workbench.confirmedMappingPlan)
+
+        workbench.compile()
+        for _ in 0 ..< 6_000 where workbench.isRunning {
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+        XCTAssertFalse(workbench.isRunning, "dataset-row compile did not finish")
+        XCTAssertNil(workbench.lastFailure, "\(String(describing: workbench.lastFailure))")
+        XCTAssertNil(workbench.lastError)
+        let result = try XCTUnwrap(workbench.lastResult)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.bundleURL.path))
+
+        // The CLI workspace holds only what the compiler wrote.
+        let workspaceEntries = try FileManager.default.contentsOfDirectory(atPath: result.workspaceURL.path)
+        XCTAssertFalse(workspaceEntries.contains("run.log"))
+        XCTAssertFalse(workspaceEntries.contains("confirmed-mapping-plan.json"))
+        XCTAssertTrue(workspaceEntries.contains("HEAD"))
+        // The app's own files live beside it.
+        let sidecar = WorkbenchViewModel.workbenchSidecarDirectory(for: result.workspaceURL)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sidecar.appendingPathComponent("run.log").path))
+        XCTAssertTrue(
+            FileManager.default.fileExists(
+                atPath: sidecar.appendingPathComponent("confirmed-mapping-plan.json").path
+            )
+        )
     }
 
     func testMixedDocumentCompilePlanPassesModeAndKeepsDocumentTail() {

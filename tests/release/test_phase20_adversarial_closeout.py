@@ -20,7 +20,7 @@ from veriformis.release import support_matrix
 ROOT = Path(__file__).resolve().parents[2]
 PACKET = ROOT / "dev/active/independent-product/phase-20-stable-1.0"
 KIT = ROOT / "tests/regressions/fixtures/phase16/compatibility-kit.json"
-KIT_SHA256 = "746f258df2ae41445df6d2a108e7169279304aa4db156f6407ebf437e132b8f7"
+KIT_SHA256 = "4fbb60b7b85e65d6cc3f9a03ecf985731bc79c5376e9e6b2a44a6f9d5bbbaabb"
 _FORBIDDEN = frozenset(
     {
         "generator",
@@ -66,7 +66,7 @@ def test_goldens_and_forbidden_surfaces_hold() -> None:
     )
     assert (
         fingerprint["manifest_sha256"]
-        == "d3f76eb9993476def1bb373ed80eccc9ac7a1bc529c96c04e6667eaa02e88ac8"
+        == "e1146ecae6f714fd5a189d313211bfb37f98907047e6930554b2bb4936e1db3b"
     )
     cli_names = _cli_names()
     mcp_names = _mcp_names()
