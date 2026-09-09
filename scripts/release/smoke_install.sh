@@ -61,6 +61,19 @@ veriformis list-recipes > "$TMP/list-recipes.txt"
 test -s "$TMP/list-recipes.txt"
 head -n 5 "$TMP/list-recipes.txt"
 
+echo "==> smoke_install: packaged discovery data reachable from the installed wheel"
+# Every read-only discovery command loads packaged JSON through
+# importlib.resources. Running each one from the clean venv proves the wheel
+# carries the data (post-20 defect D-01: scale/support-v1.json was missing).
+for discovery in taxonomy goals presets modes scale-support support-matrix \
+  mapping-contracts mapping-templates profile-admissions \
+  candidate-profile-admissions columnar-schemas extension-capabilities; do
+  veriformis "$discovery" > "$TMP/discovery-$discovery.json"
+  test -s "$TMP/discovery-$discovery.json"
+done
+veriformis export discover > "$TMP/discovery-export.json"
+test -s "$TMP/discovery-export.json"
+
 echo "==> smoke_install: standalone golden compile via installed CLI"
 VERIFORMIS_USE_PATH=1 bash "$ROOT/scripts/release/golden_compile.sh"
 

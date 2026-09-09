@@ -3,12 +3,9 @@
 from __future__ import annotations
 
 import json
-import sys
-from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from veriformis.errors import ExportContractError
 import veriformis.exports.service as _export_service  # noqa: F401 — break profile/export cycle
@@ -40,10 +37,13 @@ from veriformis.profiles.mlx_lm import (
 )
 from veriformis.profiles.trl import TRL_EVALUATION_PATH, TRL_TRAIN_PATH, map_trl_payload
 
-from test_trl import (  # type: ignore[import-not-found]
-    _materialize_bundle,
+from support.profile_rows import (
     _row_set_for_schema,
     _source_row_set,
+)
+
+from support.bundles import (
+    _materialize_bundle,
 )
 
 REFUSED_KEYS = {

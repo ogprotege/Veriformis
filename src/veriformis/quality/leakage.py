@@ -25,7 +25,6 @@ from veriformis.quality.near_duplicates import report_near_duplicates_from_bindi
 from veriformis.quality.preview import (
     QualityPreviewBinding,
     bind_document_quality_preview,
-    context_and_target_names,
     with_imported_partition_hints,
 )
 from veriformis.quality.report import (
@@ -99,12 +98,11 @@ def report_leakage_checks_from_binding(
     """Add leakage facts to the near-duplicate quality report."""
     base = report_near_duplicates_from_binding(binding)
     included = binding.included
-    _context_names, target_names = context_and_target_names(binding)
     assignment = {item.record_id: item.partition for item in binding.assignments}
     partitions_by_digest: dict[str, set[str]] = {}
     digest_by_record: dict[str, str] = {}
     for record in included:
-        digest = sha256_digest(record.joined_values(target_names))
+        digest = sha256_digest("".join(record.target_values))
         digest_by_record[record.record_id] = digest
         partitions_by_digest.setdefault(digest, set()).add(assignment[record.record_id])
     cross = sum(len(parts) > 1 for parts in partitions_by_digest.values())

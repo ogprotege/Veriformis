@@ -20,7 +20,6 @@ from veriformis.quality.family_hooks import report_family_hooks_from_binding
 from veriformis.quality.preview import (
     QualityPreviewBinding,
     bind_document_quality_preview,
-    context_and_target_names,
 )
 from veriformis.quality.report import (
     QualityFact,
@@ -62,7 +61,6 @@ def _text_fact(name: str, value: object) -> QualityFact:
 def report_split_findings_from_binding(binding: QualityPreviewBinding) -> QualityReport:
     """Add split-comparability findings to the detector quality report."""
     records = {record.record_id: record for record in binding.included}
-    context_names, target_names = context_and_target_names(binding)
     empty_target = 0
     empty_context = 0
     malformed_role = 0
@@ -71,10 +69,9 @@ def report_split_findings_from_binding(binding: QualityPreviewBinding) -> Qualit
     eval_sources: Counter[str] = Counter()
     for assignment in binding.assignments:
         record = records[assignment.record_id]
-        fields = record.field_map()
-        if any(not fields.get(name) for name in target_names):
+        if any(not value for value in record.target_values):
             empty_target += 1
-        if any(not fields.get(name) for name in context_names):
+        if any(not value for value in record.context_values):
             empty_context += 1
         shape = ",".join(field.name for field in record.fields)
         shapes.append(shape)

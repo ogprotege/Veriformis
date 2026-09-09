@@ -5,7 +5,7 @@ bottom of the graph, the containment of third-party libraries at the edges,
 the deferred-import idiom that keeps infrastructure acyclic, and the
 versioning governance that pins it all down.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: command count and package list)
 
 **Next review:** Any architecture or dependency change
 
@@ -43,7 +43,7 @@ abstraction layer.
 
 ```mermaid
 flowchart TD
-    CLI["cli.py — thin Typer adapter, 23 commands"]
+    CLI["cli.py — thin Typer adapter, 52 commands plus the export group"]
     MCP["mcp/ — thin local stdio adapter"]
     PIP["pipeline/service.py — composition root"]
     EXP["exports/ — verified derivative-source service"]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -22,8 +23,10 @@ from veriformis.workspace import IMPORT_REVISION_SCHEMA_VERSION, Workspace
 ROOT = Path(__file__).resolve().parents[2]
 RUNNER = CliRunner()
 SERVICE = PipelineService()
+# Independently reproduced from main 23bdc20 before integrating PR #203.
+# The original PR's 5d617f8 baseline remains in its commit and retained evidence.
 DOCUMENT_SOURCE_GOLDEN_SHA256 = (
-    "54e4616afe9bd8151aef9336831b1d094fbcfbba2fd96dca3c6216665cc15c53"
+    "0bcf32cb96010a1d93d0e41c92cbcb9630d16718ef84a749e5a327fa77d0462d"
 )
 PREFERENCE_GOAL = "prefer-chosen-over-rejected"
 PREFERENCE_REPRESENTATION = "prompt-chosen-rejected"
@@ -266,3 +269,122 @@ def test_empty_import_workspace_does_not_ask_for_schema_3(tmp_path: Path) -> Non
     assert "schema 3" not in message
     assert "upgrade-workspace" not in message
     assert "dataset-row revision 4 is not loaded" not in message
+
+
+@pytest.mark.parametrize(
+    "row_schema",
+    (
+        "text",
+        "prompt_completion",
+        "instruction_output",
+        "messages",
+        "label-classification",
+        "preference-pair",
+        "tool-call-conversation",
+        "stepwise-trace",
+    ),
+)
+def test_all_imported_schemas_report_exact_values_without_writes(
+    tmp_path: Path,
+    row_schema: str,
+) -> None:
+    templates = json.loads(
+        (ROOT / "src/veriformis/mapping/templates-v1.json").read_text()
+    )["templates"]
+    template = next(item for item in templates if item["row_schema"] == row_schema)
+    payloads = []
+    contexts = []
+    targets = []
+    for name in ("alpha", "beta"):
+        context = f"{name} context Café"
+        target = f"{name} exact answer"
+        if row_schema == "text":
+            payload = {"text": target}
+            expected_context = target
+        elif row_schema == "prompt_completion":
+            payload = {"prompt": context, "completion": target}
+            expected_context = context
+        elif row_schema == "instruction_output":
+            payload = {
+                "instruction": "Use the supplied text.",
+                "input": context,
+                "output": target,
+            }
+            expected_context = payload["instruction"] + context
+        elif row_schema == "messages":
+            payload = {
+                "messages": [
+                    {"role": "user", "content": context},
+                    {"role": "assistant", "content": target},
+                ]
+            }
+            expected_context = context
+        elif row_schema == "label-classification":
+            payload = {"context": context, "label": target, "annotator": name}
+            expected_context = context
+        elif row_schema == "preference-pair":
+            payload = {"prompt": context, "chosen": target, "rejected": "other answer"}
+            expected_context = context
+        elif row_schema == "tool-call-conversation":
+            payload = json.loads(
+                (
+                    ROOT / "tests/fixtures/matrix/dataset-row/tool-call-a.jsonl"
+                ).read_text()
+            )
+            payload["conversation_id"] = context
+            payload["turns"][-1]["content"] = target
+            expected_context = context
+        else:
+            payload = {"prompt": context, "steps": ["Supplied first step.", target]}
+            expected_context = context
+        path = tmp_path / f"{name}.jsonl"
+        path.write_text(json.dumps(payload, ensure_ascii=False) + "\n")
+        payloads.append(path)
+        contexts.append(len(expected_context))
+        targets.append(len(target))
+    workspace = tmp_path / "workspace"
+    SERVICE.parse(payloads, workspace, source_root=tmp_path, mode="dataset-row")
+    plan = _mapping_plan(
+        workspace,
+        goal=template["goal_id"],
+        representation=template["representation_id"],
+        row_schema=row_schema,
+        pairs=tuple(
+            (item["source_path"], item["target_key"])
+            for item in template["field_mappings"]
+        ),
+    )
+    SERVICE.map_rows(
+        workspace,
+        goal=template["goal_id"],
+        representation=template["representation_id"],
+        mapping_plan=plan,
+    )
+    SERVICE.curate(workspace, goal=template["goal_id"])
+    SERVICE.split(workspace)
+
+    def snapshot():
+        return {
+            str(path.relative_to(workspace)): hashlib.sha256(
+                path.read_bytes()
+            ).hexdigest()
+            for path in workspace.rglob("*")
+            if path.is_file()
+        }
+
+    before = snapshot()
+    result = RUNNER.invoke(app, ["quality-report", str(workspace)])
+    assert result.exit_code == 0, result.output
+    report = QualityReport.model_validate_json(result.stdout)
+    assert snapshot() == before
+    assert report.enforcing is False
+    assert _fact_int(report, "quality-admitted-blocking-count") == 0
+    assert _fact_int(report, "included-record-count") == 2
+    assert _fact_text(report, "context-length-distribution") == [
+        [n, contexts.count(n)] for n in sorted(set(contexts))
+    ]
+    assert _fact_text(report, "target-length-distribution") == [
+        [n, targets.count(n)] for n in sorted(set(targets))
+    ]
+    assert _fact_text(report, "label-distribution") == {key: 2 for key in payload}
+    assert SERVICE.quality_report(workspace).report == report

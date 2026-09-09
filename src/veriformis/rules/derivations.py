@@ -75,7 +75,13 @@ def block_derivations_from_dict(
         raise EvidenceError("block derivations must be a JSON object")
     result: dict[int, tuple[DerivationStep, ...]] = {}
     for raw_index, steps in value.items():
-        if not isinstance(raw_index, str) or not raw_index.isdigit():
+        if (
+            not isinstance(raw_index, str)
+            or not raw_index.isascii()
+            or not raw_index.isdigit()
+        ):
+            # str.isdigit() accepts superscripts and non-ASCII digits that
+            # int() rejects or silently converts; persisted keys are ASCII.
             raise EvidenceError(
                 "block derivation keys must be non-negative integer strings"
             )

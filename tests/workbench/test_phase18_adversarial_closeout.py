@@ -39,7 +39,7 @@ ADR17 = ROOT / "docs/adr/0017-no-untrusted-extension-loader.md"
 ADR18 = ROOT / "docs/adr/0018-no-compile-path-generator.md"
 ADR19 = ROOT / "docs/adr/0019-thin-workbench-adapter.md"
 KIT = ROOT / "tests/regressions/fixtures/phase16/compatibility-kit.json"
-KIT_SHA256 = "746f258df2ae41445df6d2a108e7169279304aa4db156f6407ebf437e132b8f7"
+KIT_SHA256 = "4fbb60b7b85e65d6cc3f9a03ecf985731bc79c5376e9e6b2a44a6f9d5bbbaabb"
 EXPECTED_MANIFEST_SHA256 = (
     "2394aea09bf8140c7f0626688f85fe2f387cd519c736b15ffc9382b9d3006733"
 )

@@ -9,7 +9,7 @@ train/evaluation split.
 
 **Status:** Implemented in development alpha `0.1.0`
 
-**Last reviewed:** 2026-08-24 (independent-product Phase 10.1 packet; candidates remain non-executable)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: Phase 17 admitted-family row schemas in the container matrix)
 
 Imported dataset-row bundles use the same generic containers. Mapping
 does not add a trainer profile. Named TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters are
@@ -41,12 +41,19 @@ invents instructions, changes loss policy, or resplits records.
 
 | Choose | Use it when | Row schemas | Important boundary |
 | --- | --- | --- | --- |
-| `split-jsonl-directory` v1 | The downstream reader works one JSON object per line, benefits from separate train/evaluation files, or needs nested `messages` rows | `text`, `prompt_completion`, `instruction_output`, `messages` | Payload files contain only row-schema keys. Provenance is a separate aligned sidecar, enabled by default. The only v1 options are `train_partition_name`, `evaluation_partition_name`, and `include_provenance`, supplied together only through surface request v2. |
-| `json` v1 | The downstream reader wants one self-describing dataset object with explicit schema, objective, loss, counts, and train/evaluation arrays | `text`, `prompt_completion`, `instruction_output`, `messages` | The fixed `dataset.json` document is the sole membership-bearing file. It is one complete JSON document; v1 makes no scale, streaming, or memory claim. It has no options. |
+| `split-jsonl-directory` v1 | The downstream reader works one JSON object per line, benefits from separate train/evaluation files, or needs nested `messages` rows | All eight: `text`, `prompt_completion`, `instruction_output`, `messages`, and the dataset-row-only `label-classification`, `preference-pair`, `tool-call-conversation`, `stepwise-trace` | Payload files contain only row-schema keys. Provenance is a separate aligned sidecar, enabled by default. The only v1 options are `train_partition_name`, `evaluation_partition_name`, and `include_provenance`, supplied together only through surface request v2. |
+| `json` v1 | The downstream reader wants one self-describing dataset object with explicit schema, objective, loss, counts, and train/evaluation arrays | All eight: `text`, `prompt_completion`, `instruction_output`, `messages`, and the dataset-row-only `label-classification`, `preference-pair`, `tool-call-conversation`, `stepwise-trace` | The fixed `dataset.json` document is the sole membership-bearing file. It is one complete JSON document; v1 makes no scale, streaming, or memory claim. It has no options. |
 | `constrained-csv` v1 | A strictly checked tabular reader requires flat named columns and can preserve the frozen CSV dialect exactly | `text`, `prompt_completion`, `instruction_output` | Nested `messages` is refused. CSV is fully quoted UTF-8/LF with mandatory provenance. Formula-looking strings are preserved, not sanitized; spreadsheet display or safety is not claimed. It has no options. |
 | `parquet` v1 | A Parquet reader needs columnar train/evaluation files and can tolerate `semantic_content_only` identity | `text`, `prompt_completion`, `instruction_output`, `messages` | Nested `messages` is a list of role/content structs. Null is unrepresentable. Execute requires optional extra `columnar`. Receipt bytes are this-run, not portable across PyArrow versions. |
 | `arrow` v1 | An Arrow IPC reader needs uncompressed train/evaluation files under the same identity as Parquet | `text`, `prompt_completion`, `instruction_output`, `messages` | Same semantic fingerprint as Parquet for the same rows. Execute requires optional extra `columnar`. |
 | `hugging-face-dataset` v1 | A local Hugging Face `DatasetDict` directory is the needed layout | `text`, `prompt_completion`, `instruction_output`, `messages` | Splits are `train` and `evaluation`. There is no Hub upload. Execute requires optional extra `columnar`. |
+
+The four admitted-family row schemas (`label-classification`, `preference-pair`,
+`tool-call-conversation`, `stepwise-trace`) come only from `parse --mode
+dataset-row` and `map`. They ride in `split-jsonl-directory` and `json` only;
+`constrained-csv`, `parquet`, `arrow`, and `hugging-face-dataset` refuse them
+before any destination access. `veriformis export discover` is the authority
+for this matrix and a test keeps this table equal to it.
 
 If the row schema is `messages`, use split JSONL, canonical JSON, Parquet,
 Arrow, or a local Hugging Face DatasetDict. Do not flatten, stringify, or

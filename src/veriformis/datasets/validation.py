@@ -899,6 +899,15 @@ def validate_dataset_snapshot(
     lets validation preserve a failed report when a persisted critical input is
     unreadable. Gates that depend on that input are explicitly blocked.
     """
+    from veriformis.datasets._independent_checks import (
+        curation_checks, leakage_check, record_lifecycle, row_checks,
+    )
+
+    def checked_gate(gate_id: str, passed: bool) -> DatasetGateResult:
+        return _gate(snapshot_id, gate_id, "passed") if passed else _gate(
+            snapshot_id, gate_id, "failed", f"{gate_id}-invariant-failed",
+        )
+
     checked_snapshot = dataset_snapshot_from_json_bytes(
         dataset_snapshot_json_bytes(snapshot)
     )
@@ -998,10 +1007,8 @@ def validate_dataset_snapshot(
                 "construction-replay",
                 "passed",
             )
-            results["record-lifecycle"] = _gate(
-                snapshot_id,
-                "record-lifecycle",
-                "passed",
+            results["record-lifecycle"] = checked_gate(
+                "record-lifecycle", record_lifecycle(checked_construction),
             )
 
     if results["construction-replay"].status == "passed":
@@ -1069,8 +1076,10 @@ def validate_dataset_snapshot(
             )
         else:
             assert checked_curation is not None
-            for gate_id in ("curation", "deduplication", "quality", "balance"):
-                results[gate_id] = _gate(snapshot_id, gate_id, "passed")
+            for gate_id, passed in curation_checks(
+                checked_plan, checked_recipe, checked_construction, checked_curation,
+            ).items():
+                results[gate_id] = checked_gate(gate_id, passed)
             blockers = tuple(
                 blocker
                 for entry in checked_curation.coverage_ledger.entries
@@ -1152,7 +1161,7 @@ def validate_dataset_snapshot(
         else:
             assert checked_split is not None
             results["split"] = _gate(snapshot_id, "split", "passed")
-            results["leakage"] = _gate(snapshot_id, "leakage", "passed")
+            results["leakage"] = checked_gate("leakage", leakage_check(checked_split))
 
     if results.get("split", None) is not None and results["split"].status == "passed":
         assert checked_plan is not None
@@ -1221,8 +1230,11 @@ def validate_dataset_snapshot(
         else:
             assert checked_row_set is not None
             assert replay_output is not None
-            for gate_id in ("row-binding", "objective", "schema", "masking"):
-                results[gate_id] = _gate(snapshot_id, gate_id, "passed")
+            for gate_id, passed in row_checks(
+                checked_plan, checked_recipe, checked_construction, checked_curation,
+                checked_split, checked_row_set,
+            ).items():
+                results[gate_id] = checked_gate(gate_id, passed)
             exact_bytes = (
                 replay_output.train_jsonl == train_jsonl
                 and replay_output.evaluation_jsonl == evaluation_jsonl
@@ -1252,11 +1264,7 @@ def validate_dataset_snapshot(
                     "required-partition-empty",
                 )
             )
-            results["aptus-row-shape"] = _gate(
-                snapshot_id,
-                "aptus-row-shape",
-                "passed",
-            )
+
 
     snapshot_findings = _snapshot_findings(
         checked_snapshot,

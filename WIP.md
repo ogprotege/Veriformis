@@ -28,6 +28,13 @@ group. No trainer or columnar export in that run.
 > within its scope. If this file conflicts with those sources, the canonical
 > source controls. Test totals and verification results are dated snapshots.
 
+## Post-20 dataset-row quality preview
+
+PR #203 adds a read-only, non-enforcing quality preview after imported-row
+map, curate, and split. Its integration with PR #204 and the observed local
+gates are recorded in [the dated evidence](docs/evidence/2026-09-09-quality-report-dataset-row.md).
+The completed post-20 plan is not reopened.
+
 ## Product target
 
 Veriformis owns the difficult path from heterogeneous raw source material to a

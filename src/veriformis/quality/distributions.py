@@ -17,7 +17,6 @@ from veriformis.identity import lossless_json_bytes
 from veriformis.quality.preview import (
     QualityPreviewBinding,
     bind_document_quality_preview,
-    context_and_target_names,
 )
 from veriformis.quality.report import QualityFact, QualityReport, assemble_quality_report
 
@@ -84,7 +83,6 @@ def _length_histogram(lengths: Sequence[int]) -> list[list[int]]:
 def report_distributions_from_binding(binding: QualityPreviewBinding) -> QualityReport:
     """Build distribution facts from a private preview binding."""
     included = binding.included
-    context_names, target_names = context_and_target_names(binding)
     included_count = len(included)
     excluded_count = sum(decision.status == "excluded" for decision in binding.decisions)
     quarantined_count = sum(
@@ -96,11 +94,11 @@ def report_distributions_from_binding(binding: QualityPreviewBinding) -> Quality
     objective_ids = tuple(record.objective_id for record in included)
     field_names = tuple(field.name for record in included for field in record.fields)
     target_lengths = tuple(
-        sum(len(value) for value in record.require_values(target_names))
+        sum(len(value) for value in record.target_values)
         for record in included
     )
     context_lengths = tuple(
-        sum(len(value) for value in record.require_values(context_names))
+        sum(len(value) for value in record.context_values)
         for record in included
     )
     language_values: list[str] = []

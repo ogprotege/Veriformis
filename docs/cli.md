@@ -8,18 +8,26 @@ Veriformis ships one console entry point, `veriformis`
 the dataset pipeline. Additional commands cover maintenance
 (`upgrade-workspace`), immutable transport (`package`, `package-verify`),
 read-only inspection (`verify`, `preview`), recipes
-and YAML automation (`run`, `list-recipes`), Aptus handoff (`handoff`,
-`handoff-verify`), taxonomy discovery (`taxonomy`), goal and preset discovery
-and inspection (`goals`, `presets`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `mapping-rejections`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `collect`, `ocr-preview`, `preflight`, `goal-preview`, `quality-report`), local MCP (`mcp`), verified
-exports (`export`, `export-verify`), and `version`. The complete root surface is
-52 commands; `export` contains four subcommands.
+and YAML automation (`run`, `list-recipes`), project-spec automation
+(`spec-schema`, `spec-dry-run`, `spec-lock`, `spec-run`, `spec-resume`,
+`env-inspect`), review packets (`review-export`, `review-import`,
+`review-submit`), Aptus handoff (`handoff`, `handoff-verify`), taxonomy and
+support discovery (`taxonomy`, `support-matrix`, `scale-support`,
+`extension-capabilities`), goal and preset discovery and inspection (`goals`,
+`presets`, `modes`, `mapping-contracts`, `mapping-templates`,
+`mapping-detect`, `mapping-preview`, `mapping-rejections`,
+`profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`,
+`collect`, `ocr-preview`, `preflight`, `goal-preview`, `quality-report`),
+scale evidence (`scale-baseline`), local MCP (`mcp`), verified exports
+(`export`, `export-verify`), and `version`. The complete root surface is
+52 commands plus the `export` group; `export` contains four subcommands.
 
 This page is the command reference. For architecture, see
 [Architecture: entry points](architecture/entry-points.md). For a guided first
 run, see the [quickstart](../README.md). Everything below describes the
 implemented `0.1.0` behavior unless marked planned.
 
-**Last reviewed:** 2026-09-05 (quality-report dataset-row workspace)
+**Last reviewed:** 2026-09-09 (post-20 defect closure and dataset-row quality-report preview)
 
 **Next review:** Any CLI surface or release-gate documentation change.
 
@@ -41,13 +49,37 @@ examples below use the installed name.
 | --- | --- | --- |
 | Stage | `parse`, `clean`, `chunk`, `construct`, `map`, `curate`, `split`, `format`, `validate`, `seal` | Commits one atomic workspace revision per changing run; `seal` publishes a canonical six-file bundle and currently offers a separately controllable Aptus sibling descriptor |
 | Maintenance | `upgrade-workspace` | Appends migration revisions when the workspace is behind |
-| Automation | `run`, `list-recipes`, `mcp` | `run` may commit stages and seal; `mcp` is long-lived stdio |
+| Automation | `run`, `list-recipes`, `mcp`, `spec-schema`, `spec-dry-run`, `spec-lock`, `spec-run`, `spec-resume`, `env-inspect` | `run` and `spec-run` / `spec-resume` may commit stages and seal; `spec-lock --out` writes one lock file; `mcp` is long-lived stdio; the rest write nothing |
+| Review | `review-export`, `review-import`, `review-submit` | Read packets and print deterministic JSON; nothing is persisted to a workspace (see [Review Contract v1](contracts/review-v1.md)) |
+| Scale evidence | `scale-baseline` | Compiles a named scale corpus under `--work-root` and prints a report that is not an SLA |
 | Handoff | `handoff`, `handoff-verify` | `handoff` writes a sibling descriptor; `handoff-verify` is read-only |
 | Transport | `package`, `package-verify` | `package` writes a verified deterministic archive; `package-verify` is read-only |
 | Verified export | `export discover`, `export dry-run`, `export inspect`, `export execute`, `export-verify` | Only `export execute` may publish, always with no-replace `refuse`; discovery includes split JSONL, canonical JSON, constrained CSV, Parquet, Arrow IPC, Hugging Face DatasetDict v1, and the TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus adapters |
-| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `preflight`, `goal-preview`, `quality-report`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `support-matrix` | Nothing |
+| Read-only | `verify`, `preview`, `taxonomy`, `goals`, `presets`, `collect`, `ocr-preview`, `preflight`, `goal-preview`, `quality-report`, `modes`, `mapping-contracts`, `mapping-templates`, `mapping-detect`, `mapping-preview`, `profile-admissions`, `candidate-profile-admissions`, `columnar-schemas`, `support-matrix`, `scale-support`, `extension-capabilities` | Nothing |
 | Mapping artifact | `mapping-rejections` | Writes a content-addressed report beside `--output`; it is not a verified export |
 | Meta | `version` | Nothing |
+
+## Machine receipts for workbench commands
+
+`split --json`, `seal --json`, and `package --json` print one JSON object on
+stdout after success. Human messages and durability warnings move to stderr.
+Without `--json`, existing human output and exit codes remain unchanged.
+Failures do not emit a success receipt. A visible partial seal retains its
+existing stderr recovery diagnostic and nonzero exit.
+
+The envelope contains exactly `schema_id` (`veriformis.command-result/v1`),
+`command`, and `result`. Result fields are:
+
+| Command | Result fields |
+| --- | --- |
+| `split` | `assignment_digest` |
+| `seal` | `bundle_path`, `manifest_sha256`, `revision_id`, `handoff_path` (null unless requested) |
+| `package` | `archive_path`, `archive_sha256`, `manifest_sha256`, `export_receipt_sha256` (the unused anchor is null) |
+
+These are runtime command receipts, not new persisted stage schemas. The Mac
+adapter takes the seal manifest anchor from this response, passes it to
+`package`, and requires the archive response to bind that same anchor and
+requested destination. It never obtains these digests from diagnostic text.
 
 ## Supported inputs
 
@@ -123,13 +155,14 @@ the workspace and verify it once storage is stable.
 Capture raw files and commit one canonical parse revision.
 
 ```text
-veriformis parse PATHS... -o WORKSPACE [--source-root ROOT]
+veriformis parse PATHS... -o WORKSPACE [--source-root ROOT] [--mode MODE]
 ```
 
 | Option | Default | Effect |
 | --- | --- | --- |
 | `-o PATH` | (required) | Workspace directory; created when new |
 | `--source-root ROOT` | current directory | Stable root for logical paths; every input must resolve beneath it |
+| `--mode MODE` | `document-source` | Compiler path: `document-source` recovers documents into IR for `clean` / `chunk` / `construct`; `dataset-row` captures existing JSONL, JSON, compatible CSV, Parquet, or Arrow IPC rows into workspace revision v4 for `map`; `mixed` is discoverable but a parse that fuses documents and row files refuses so construction and imported-row provenance stay distinct. The file suffix never switches the path (`veriformis modes` lists them) |
 
 The command captures raw bytes before parsing and commits all paths together.
 Each source ID binds its logical path and raw SHA-256, so same-basename inputs
@@ -178,9 +211,12 @@ character and byte counts, warnings, and a portable parse-input digest.
 - **Writes:** per-source cleaned IR, the exact cleaning plan, block
   derivations, and the combined transform log.
 
-A rule that would remove more than 30 percent of its target is skipped and
-reported as `warning[<source-id>]: rule '<name>' skipped: ...`
-(`src/veriformis/rules/cleaning.py:776`). Prose rules never edit inline code,
+A rule whose proposed edits would remove more than 30 percent of the
+document's cleanable text (measured in code points against the whole document
+as it stands after the rules that ran before it, not against only the text the
+rule matched) is skipped and reported as
+`warning[<source-id>]: rule '<name>' skipped: ...` (`rules/cleaning.py`,
+the safety check inside `plan_cleaning`). Prose rules never edit inline code,
 code blocks, math, or other literal payloads. Re-running clean with an
 unchanged configuration is a no-op and prints
 `clean unchanged at revision <id>`.
@@ -235,7 +271,8 @@ LLM call; there is no `summary` objective.
 veriformis construct WORKSPACE (--goal GOAL | --preset PRESET | --objective OBJECTIVE) \
   [--representation ID] [--source SELECTOR]... [--target-row-schema SCHEMA] \
   [--consumer-profile PROFILE] [--split-ratio-ppm PPM] \
-  [--require-review | --no-require-review]
+  [--require-review | --no-require-review] [--review-packet PACKET.json] \
+  [--strategy STRATEGY] [--size N] [--overlap N]
 ```
 
 | Option | When omitted | Effect |
@@ -245,14 +282,19 @@ veriformis construct WORKSPACE (--goal GOAL | --preset PRESET | --objective OBJE
 | `--objective` | — | Persisted objective kind (legacy selection); resolves through its goal's safe preset |
 | `--representation` | preset value | Catalog representation id; must be compatible with the goal |
 | `--source` | all current sources | Repeatable; selects an exact subset by source ID or logical path |
-| `--target-row-schema` | preset value | Legacy row-schema selection: `text`, `prompt_completion`, `instruction_output`, or `messages` |
+| `--target-row-schema` | preset value | Legacy row-schema selection among the four document-source schemas `text`, `prompt_completion`, `instruction_output`, `messages`; the four admitted-family schemas exist only on the dataset-row path and are refused here |
 | `--consumer-profile` | preset value | Compile-time compatibility constraint; implemented profiles are canonical v1 and `aptus-handoff-v1` |
 | `--split-ratio-ppm` | preset value | Opening share for `continuation` only; 1–999999 |
 | `--require-review` / `--no-require-review` | preset value | Leaves construction-integrity decisions pending instead of accepting valid candidates |
+| `--review-packet` | none | Resolve exactly the current pending candidates using the same recipe and plan; implies required review unless explicitly overridden |
+| `--strategy` / `--size` / `--overlap` | resolved goal/preset values | Explicit segmentation overrides; the workspace chunks must match all resolved values |
 
-Exactly one selection path is required. `--goal` and `--objective` adopt the
-workspace's existing chunk configuration; `--preset` requires it to equal the
-preset's segmentation (re-run `chunk --preset` otherwise). The recipe is built
+Exactly one selection path is required. `--goal` and `--preset` require the
+workspace chunks to match their resolved segmentation, including explicit
+`--strategy`, `--size`, and `--overlap` overrides. Repeat custom chunk settings
+on construct. Legacy `--objective` without segmentation overrides adopts the
+existing chunks. A pipeline document carries its explicit chunk overrides
+into construct unless construct declares its own. The recipe is built
 through the named recipe library, so the same effective settings yield the
 same `recipe_id` from every path and every surface.
 
@@ -275,8 +317,8 @@ on stdout. That is the v1 limit, not a silent skip. Construct still exits 0;
 later `split` / `validate` fail closed if no records remain. Single-block
 sources such as `tests/fixtures/matrix/before-after/` construct under
 `--preset reproduce-a-recorded-change.safe` after `--rules lowercase`. Isolating
-one block per chunk with a small `--size` also works with `--goal`; `--preset`
-still requires the preset segmentation.
+one block per chunk with a small `--size` also works when the same size and
+overlap overrides are passed to both `chunk` and `construct`.
 
 `structured_field` (`--goal extract-a-structured-value`) copies one recovered
 IR scalar. Curation quarantines `conflicting-target` when one covering chunk
@@ -292,9 +334,15 @@ prose.
 `full_text` requires the `text` row schema; every other objective requires a
 supervised row schema. Unknown or duplicate `--source` selections fail closed.
 The Aptus profile rejects `text` before the workspace is opened or changed.
-`--require-review` leaves decisions pending because the current CLI does not
-ingest completed review evidence (the Python construction API supports
-separate review values).
+`--require-review` leaves decisions pending. Run `curate`, then
+`review-export --workspace WORKSPACE` to export the exact pending items bound
+to that finished-dataset plan. Complete decisions or explicit waivers in the
+packet through the review models, submit it with `review-submit`, and run
+`construct` with the same selection and `--review-packet PACKET.json`.
+Then rerun `curate` through `seal`. Rejected candidates remain rejected.
+Review does not waive coverage or any other validation gate. Corrections
+require new source or mapping identities and cannot approve old bytes.
+The [review contract](contracts/review-v1.md) describes the durable receipt.
 
 Requires `parse`, `clean`, and `chunk` complete, on revision schema 2 or
 later. Before commit, the workspace reconstructs all selected upstream inputs
@@ -309,6 +357,39 @@ row-schema/profile combination, an out-of-range ratio, a preset/chunk
 mismatch, or a replay mismatch; `source-evidence-invalid` for unknown or
 duplicate source selection; `unsupported-workspace-version` when the
 workspace predates schema 2 (run `upgrade-workspace` first).
+
+### `map`
+
+Apply one operator-confirmed mapping plan to the row sources captured by
+`parse --mode dataset-row`, and commit imported records whose every field is
+bound to `mapped_value` evidence.
+
+```text
+veriformis map WORKSPACE --goal GOAL --representation ID --plan PLAN.json
+```
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `--goal` | (required) | Plain-language goal id from `veriformis goals` |
+| `--representation` | (required) | Catalog representation id compatible with the goal |
+| `--plan PATH` | (required) | A `veriformis.mapping-plan/v1` JSON file whose `confirmation_digest` binds the goal, representation, row schema, field mappings, and the SHA-256 of every captured source; `veriformis mapping-detect` proposes one, `mapping-preview` walks it without writing |
+
+- **Reads:** the captured row sources of the current `parse` revision.
+- **Writes:** a `map` revision with the plan, a mapping recipe, and the
+  mapping result, after re-executing the mapping from the captured bytes and
+  requiring equality before `HEAD` advances. A content-addressed rejection
+  report is written beside the workspace **before** the commit
+  (`<workspace>.mapping-rejection-<id>.json`); the same report is printed by
+  `mapping-rejections`.
+- **Then:** `curate` → `split` → `format` → `validate` → `seal` → `verify`,
+  exactly as for document sources. `clean`, `chunk`, and `construct` do not
+  apply to a dataset-row workspace.
+
+Failure modes (exit 2): `mapping-invalid` for a plan whose confirmation digest
+does not match the captured sources or whose row schema is incompatible with
+the goal; `row-source-invalid` for a malformed capture; `error[invalid-data]`
+for a missing or malformed plan file. See [mapping.md](mapping.md) and the
+[Row Mapping Contract v1](contracts/row-mapping-v1.md).
 
 ### `curate`
 
@@ -959,6 +1040,44 @@ seal still uses `IMPORT_GATES`. A sealed bundle is refused because it does not
 retain recipe, construction or mapping, curation, or split state. There is no
 MCP wrap. See [Quality Report Contract v1](contracts/quality-report-v1.md).
 
+### `scale-support`
+
+Print operator-reviewed scale support discovery
+(`veriformis.scale-support-discovery/v1`): the named-hardware observations
+recorded under `dev/active/independent-product/phase-15-scale/baselines/`
+and an intentionally empty `published_tiers` list. Observations are not an
+SLA; no tier is published until a measured baseline licenses one. The output
+is byte-identical to MCP `scale_support` and to the packaged
+`veriformis/scale/support-v1.json`.
+
+```text
+veriformis scale-support
+```
+
+### `extension-capabilities`
+
+Print the read-only built-in extension declarations
+(`veriformis.extension-protocol/v1`): every parser, cleaning rule, chunker,
+constructor, and export implementation the binary ships, each with its
+`origin: builtin`, lifecycle, offline requirements, and identifiers. There
+is no plugin loader, entry-point scan, or path import (ADR-0017 Decision A);
+the command names what is compiled in and nothing else.
+
+```text
+veriformis extension-capabilities
+```
+
+### `ocr-preview`
+
+Print per-page OCR previews and review hooks for one PDF without writing a
+workspace. Optional Tesseract 5 recovery runs only when the binary and
+trained data are present; default `parse` still refuses an image-only PDF
+with `pdf.ocr-required` (limitation `ocr-unsupported`). See ADR-0016.
+
+```text
+veriformis ocr-preview PATH
+```
+
 ### `verify`
 
 Independently verify one closed finished-dataset bundle.
@@ -1156,6 +1275,30 @@ Codes are defined in `src/veriformis/errors.py`. The CLI can surface:
 | `stale-stage` | A required upstream stage was invalidated by a rerun |
 | `artifact-digest-mismatch` | Stored bytes do not match their content address |
 | `duplicate-identity` | Two identities collide where uniqueness is required |
+| `taxonomy-invalid` | A taxonomy identifier or axis combination is unknown or incompatible |
+| `input-mode-unavailable` | `--mode` names an unknown or non-executable compiler path |
+| `mapping-invalid` | A mapping plan, imported record, or mapping contract is invalid |
+| `row-source-invalid` | A captured existing-dataset file is malformed or unsupported |
+| `goal-catalog-invalid` | The packaged goal catalog or a goal/representation selection is unknown, tampered, or not closed over the taxonomy |
+| `instruction-required` | An `instruction-and-output` row was given an empty operator instruction |
+| `instruction-not-applicable` | An instruction was supplied for a representation that does not use one |
+| `instruction-untruthful` | An operator instruction fails the deterministic truthfulness check |
+| `compile-preflight-invalid` | `preflight` cannot produce one complete truthful response |
+| `collection-invalid` | A collection plan cannot be built or is unsafe to execute |
+| `collection-limit` | A collection exceeded a declared file, byte, or walk limit |
+| `ocr-identity-invalid` | An OCR recovery identity is invalid or not yet executable |
+| `quality-report-invalid` | A quality report mixes layers or claims enforcement it does not have |
+| `review-invalid` | A review packet, bundle, waiver, or correction violates its v1 contract |
+| `scale-invalid` | A scale corpus spec or materialization violates its v1 contract |
+| `scale-cancelled` | A scale baseline stopped at a cooperative between-stage checkpoint |
+| `extension-protocol-invalid` | An extension declaration is malformed, unknown, or not yet executable |
+| `family-admission-invalid` | An advanced-family admission pin is malformed, unknown, or not executable |
+| `workbench-adapter-invalid` | A workbench-adapter pin is malformed, unknown, or not a screen execute |
+| `project-spec-invalid` | A project spec or lock is malformed, unknown, or not an execute |
+| `publication-adapter-invalid` | A publication-adapter pin is malformed, unknown, or not an upload |
+| `support-matrix-invalid` | The frozen 1.0 support-matrix pin is malformed, unknown, or over-claims |
+| `export-contract-invalid` | A versioned export plan, profile, binding, request, or receipt is invalid |
+| `export-verification-invalid` | A derived export is malformed, altered, incomplete, or untrusted |
 
 Three codes are defined but not raised on current CLI paths:
 `gate-failure` (raised only by the legacy `write_bundle`, which the CLI does
@@ -1170,9 +1313,25 @@ raised directly.
 | `run PIPELINE.yaml` | Execute a `veriformis.pipeline/v1` YAML document through `PipelineService` |
 | `list-recipes` | Print named recipe library identifiers |
 | `mcp` | Run the constrained local MCP server on stdio |
+| `spec-schema` | Print the JSON Schema generated from `veriformis.project-spec/v1` |
+| `spec-dry-run SPEC` | Reconstruct the planned stages, input mode, mapping, and environment for one spec; writes nothing |
+| `spec-lock SPEC [--out LOCK] [--workspace WS]` | Write `veriformis.project-lock/v1` pinning the spec digest, Veriformis version, Python version, declared extras, and (with `--workspace`) the workspace `HEAD` and source identities; `--out` refuses an existing file; the lock is not execute |
+| `env-inspect` | Print `veriformis.environment-inspect/v1`: Python major.minor, package version, each declared extra as `present` or `empty`, and taxonomy counts; reads no environment variables and prints no secrets |
+| `spec-run SPEC` | Execute a confirmed spec through `PipelineService`; document-source parse omits `--mode`; export is never auto-run |
+| `spec-resume SPEC --lock LOCK` | Continue only when the lock's spec digest, referenced pipeline bytes, recorded environment fields, workspace `HEAD`, and source identities match; drift names the mismatched identity |
+| `scale-baseline --corpus-id ID --work-root DIR` | Compile one named scale corpus and print a `veriformis.scale-baseline-report/v1`; the report is an observation, not an SLA; dataset-row corpora fail closed |
+| `review-export (--workspace WS \| --plan-id ID --items ITEMS.json)` | Print a deterministic `veriformis.review-packet/v1` for the pending items of one plan |
+| `review-import PACKET` | Reload and validate a packet without submitting it |
+| `review-submit PACKET` | Validate completed human review evidence from a packet and print the resulting `veriformis.review-bundle/v1`; see the [Review Contract v1](contracts/review-v1.md) for how that bundle is bound into a construct re-commit |
 | `handoff BUNDLE --manifest-sha256 DIGEST` | Write sibling Aptus handoff descriptor |
 | `handoff-verify HANDOFF --bundle BUNDLE` | Fail-closed consumer verification |
 | `seal ... --aptus-handoff` / `--no-aptus-handoff` | Control sibling handoff write (default: off) |
+
+The project-spec commands are documented in the
+[Project Spec Contract v1](contracts/project-spec-v1.md) and
+[Project Lock Contract v1](contracts/project-lock-v1.md). The review commands
+exchange packets; default `review_policy` stays `none`, and `quality-report`
+remains a preview.
 
 The handoff commands are optional Aptus integration surfaces. Default `seal`
 does not import the adapter or write its sibling. These commands do not change

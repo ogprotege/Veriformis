@@ -19,7 +19,6 @@ from veriformis.quality.leakage import report_leakage_checks_from_binding
 from veriformis.quality.preview import (
     QualityPreviewBinding,
     bind_document_quality_preview,
-    context_and_target_names,
 )
 from veriformis.quality.report import (
     QualityFact,
@@ -121,11 +120,10 @@ def report_tokenizer_simulations_from_binding(
         if encode is None:
             raise QualityReportError("bound tokenizer pin requires an encode function")
         included = binding.included
-        _context_names, target_names = context_and_target_names(binding)
         lengths: list[int] = []
         truncated = 0
         for record in included:
-            count = encode(record.joined_values(target_names))
+            count = encode("".join(record.target_values))
             if type(count) is not int or count < 0:
                 raise QualityReportError("tokenizer encode must return a non-negative int")
             lengths.append(count)

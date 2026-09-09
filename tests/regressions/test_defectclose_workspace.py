@@ -8,7 +8,7 @@ revision-transition validation that history verification applies.
 
 from unittest.mock import patch
 
-import test_workspace_integrity as twi
+from support import workspace as twi
 
 import veriformis.workspace as workspace_module
 from veriformis.workspace import Workspace

@@ -12,7 +12,7 @@ heuristic is admitted to block seal. Seal still uses the seventeen
 finished-dataset gates. `veriformis quality-report` emits this preview;
 it is not a gate. There is no MCP wrap.
 
-**Last reviewed:** 2026-09-05 (dataset-row plan_id fip)
+**Last reviewed:** 2026-09-09 (dataset-row plan_id fip)
 
 **Authority:** [Independent Product Roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md) Phase 13.
 
@@ -75,6 +75,14 @@ with no such evidence. Lengths are Unicode character counts, not tokens.
 v1 `messages` role counts are schema-implied from the two-turn lowering,
 not a replay of serialized payloads. Distributions do not delete rows.
 
+Imported-row lengths and target comparisons use the same context and target
+projections as imported curation. Instruction/output rows use instruction plus
+input as context and output as target. Two-turn messages use user content and
+assistant content. Tool conversations use the conversation identity and final
+assistant content. Stepwise rows use the prompt and final supplied step.
+Field-name distributions still retain the actual mapped keys. No construction
+record, field evidence, or training result is invented for this preview.
+
 ## Near-duplicates (item 13.4)
 
 `report_near_duplicates` adds facts from algorithm
@@ -96,6 +104,12 @@ objective target fields. Similarity is integer Jaccard over overlapping
 5-grams, stored as parts per million. Policy records
 `near-duplicate-disabled` as `record-only`. Curation
 `near_duplicate_policy` remains `disabled`.
+
+The implementation uses an exact prefix index and length bounds to avoid
+scoring pairs that cannot reach any reported threshold. Report bytes and
+integer scores remain unchanged. Transitive clusters still report every
+member pair, including pairs below the threshold. Dense clusters can therefore
+require quadratic work and output. This is not a measured scale support claim.
 
 ## Leakage (item 13.5)
 

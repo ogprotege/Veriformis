@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from veriformis.errors import OcrIdentityError
-from veriformis.ocr.identity import build_ocr_page_identity
+from veriformis.ocr.identity import OcrConfidence, build_ocr_page_identity
 from veriformis.ocr.recovery import (
     OcrPageRequest,
     OcrPageResult,
@@ -26,9 +26,17 @@ _DIGEST = "a" * 64
 
 
 class _RecordingProvider:
-    def __init__(self, text: str = "OCR recovered line.") -> None:
+    def __init__(
+        self,
+        text: str = "OCR recovered line.",
+        *,
+        confidence: OcrConfidence | None = OcrConfidence(
+            mean=95.0, minimum=90.0, word_count=3
+        ),
+    ) -> None:
         self.called: list[int] = []
         self.text = text
+        self.confidence = confidence
 
     def recover_page(self, request: OcrPageRequest) -> OcrPageResult:
         self.called.append(request.page_index)
@@ -41,6 +49,7 @@ class _RecordingProvider:
             tessdata_language="eng",
             tessdata_sha256="c" * 64,
             engine_version="5.5.3",
+            confidence=self.confidence,
         )
         return OcrPageResult(identity=identity, text=self.text)
 
@@ -152,3 +161,24 @@ def test_digitally_born_pdf_does_not_invoke_provider() -> None:
 
 
 
+
+
+def test_provider_without_confidence_requires_review_instead_of_accepting() -> None:
+    """Post-20 defect D-14: an unscored OCR page is never accepted silently."""
+    path = _G5 / "empty-text.pdf"
+    provider = _RecordingProvider("Unscored sentence.", confidence=None)
+    result = parse_pdf_file(
+        path,
+        logical_path=path.name,
+        raw_bytes=path.read_bytes(),
+        ocr_provider=provider,
+    )
+    assert result.diagnostics.status == "degraded"
+    assert "Unscored sentence." in result.source.extracted_text
+    review = next(
+        item
+        for item in result.diagnostics.diagnostics
+        if item.code == "pdf.ocr-confidence-review"
+    )
+    assert review.details["pending_review"] is True
+    assert review.details["pages"] == [1]

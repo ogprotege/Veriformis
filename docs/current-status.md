@@ -56,7 +56,7 @@ Phase 11 collection ingest is complete: `veriformis.collection-plan/v1`
 expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
 unsupported, duplicate, and symlink members are counted. Limits fail
 closed. Archive ingest, parser subprocesses, and new input families are
-skipped with records. Image-only PDF still refuses as `ocr-image`.
+skipped with records. Image-only PDF still refuses with `pdf.ocr-required` (family `ocr-image` unsupported).
 Phase 12 optional local OCR is complete: Tesseract 5 under ADR-0016;
 digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
@@ -105,12 +105,38 @@ manifests bind `veriformis_version` and existing goldens stay
 byte-identical. There is no `1.0.0` tag or public signed-Mac claim.
 Hub execute stays excluded. Do not invent a Phase 21.
 
-**Review date:** 2026-09-01 (independent-product Phase 20.10 closeout)
+[Post-20 defect closure](../dev/active/independent-product/post-20-defect-closure/closeout.md) keeps version `0.1.0` and the existing independent-core
+claim. Exact exporters decode emitted payload bytes before comparing source
+membership. Canonical ZIP64 writer metadata verifies. Required construction
+review can finish through Python, CLI, and MCP using a bound packet and the
+existing persisted evidence format. Dataset-row required review refuses
+because its v1 format has no durable receipt. Goal and preset construction
+check resolved segmentation. Project resume compares recorded environment
+pins and referenced pipeline contents. Scale cancellation/resume flags now
+require observed cancellation and completion of the retained workspace.
+Document validation adds direct invariants alongside stage replay. Imported
+validation replays captured raw sources and checks every named gate. Report
+loaders require complete gate and file bindings. Persisted schema identifiers
+and valid-output identities remain unchanged.
+
+Workspace operations reuse one verified history and captured artifact reads
+within the outer command, with live HEAD and file-change checks. Export execute
+reuses one verified source capture and spools renderer trees for comparison.
+Near-duplicate reports use an exact prefix index without changing report bytes.
+These changes add no measured scale support tier.
+
+**Review date:** 2026-09-09 (post-20 defect closure complete)
 
 **Next review:** Any capability claim change.
 
 This document is the current source of truth for implemented `0.1.0`
 capability claims.
+
+The post-20 Mac hardening binds compile results to typed CLI receipts, drains
+all owned operations on quit, preserves versioned local history, and accepts
+new discovery identifiers without extending its semantic row verifier. The
+unsigned Debug workbench remains a development adapter with no public Mac
+release claim.
 
 ## Executive status
 
@@ -442,7 +468,7 @@ The installed console entry point is `veriformis`.
 | `package-verify ARCHIVE --export-receipt-sha256 DIGEST` | Reconstructs only receipt-validated export paths, verifies the unchanged inner plan/receipt/file bindings, and proves canonical archive bytes | Receipt-anchored transport result; not source-bound export verification |
 | `package-verify ARCHIVE --manifest-sha256 DIGEST` | Reconstructs and externally verifies the canonical bundle, then proves canonical archive bytes | Terminal verification result |
 | `taxonomy` | Prints the implemented training family, objective, semantic-row, physical-container, consumer-profile, loss-policy, and input-family registry as JSON | Read-only terminal output |
-| `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): five goals bound one-to-one to the existing objectives and named recipes, four representations bound to the existing row schemas and loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
+| `goals` | Prints the packaged plain-language goal catalog (`veriformis.goal-catalog/v1`): nine goals bound one-to-one to the nine objectives (five document-source, four admitted-family under Phase 17) and eight representations bound one-to-one to the eight row schemas and their loss policies | Read-only terminal output, byte-identical to MCP `goals` and the packaged data |
 | `presets` | Prints the packaged recipe presets and recipe-wide defaults (`veriformis.recipe-preset/v1`) that every surface executes | Read-only terminal output, byte-identical to MCP `presets` and the packaged data |
 | `modes` | Prints compiler-path input modes (`veriformis.input-mode-discovery/v1`): `document-source`, `dataset-row`, and `mixed` executable. Mixed parse of documents and JSONL together refuses so construction and imported-row provenance stay distinct. | Read-only terminal output, byte-identical to MCP `modes` and the packaged data |
 | `scale-support` | Prints operator-reviewed scale support discovery (`veriformis.scale-support-discovery/v1`) | Empty `published_tiers`; observations are not an SLA; byte-identical to MCP `scale_support` |
@@ -459,7 +485,7 @@ The installed console entry point is `veriformis`.
 | `preflight PATH...` | Resolves a goal/preset/representation and explicit overrides, captures every regular source once, and predicts parser/family eligibility, construction evidence, curation exclusions and coverage, and required splitting | Bounded runtime-only `veriformis.compile-preflight/v1` JSON; exit `0` when admitted or `2` for a complete negative verdict; no workspace write |
 | `goal-preview WORKSPACE` | Shows, per accepted record, the recovered source evidence, context and target, the row exactly as `format` lowers it, the exact supervised span and loss policy, and curation decisions with reason codes; bounded and ASCII-safe | Runtime-only `veriformis.goal-preview/v1` JSON; no workspace write |
 | `quality-report WORKSPACE` | Emits the existing `veriformis.quality-report/v1` preview for a compiler workspace at or beyond split (document-source `fdp` or dataset-row `fip`); refuses a sealed bundle | Preview, not a gate; `enforcing` stays false; `admitted_to_block` stays false; no MCP wrap; no heuristic blocks seal |
-| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing `arrow`, `constrained-csv`, `hugging-face-dataset`, `json`, `parquet`, `split-jsonl-directory` v1, and TRL / MLX-LM adapters |
+| `export discover` | Lists executable verified-export implementations from the private service catalog | Canonical discovery response containing the six generic containers `arrow`, `constrained-csv`, `hugging-face-dataset`, `json`, `parquet`, `split-jsonl-directory` v1 and the five optional adapters `aptus`, `axolotl`, `llama-factory`, `mlx-lm`, `trl`; `split-jsonl-directory` and `json` admit all eight row schemas, the columnar containers the four document-source schemas, `constrained-csv` the three flat schemas |
 | `export dry-run --request-json JSON_TEXT` | `--request-json` takes the canonical request JSON text. It does not read a filesystem path. To use a file, pass `--request-json "$(cat FILE)"`. Verifies the selected source and derives the exact export plan plus ordinal-zero non-empty-partition samples and normalized plan-derived tree without renderer or destination access; request v1 selects all three containers, while request v2 configures only split JSONL | Canonical response v2 with result exactly `plan` and runtime-only `preview` |
 | `export inspect --request-json JSON_TEXT` | Checks a destination's self-described receipt and closed physical tree without asserting source authority | Canonical `self_described_physical` response |
 | `export execute --request-json JSON_TEXT` | Re-derives and atomically publishes the operator-confirmed no-replace plan | Canonical receipt and verification response, or explicit cancellation/visible-partial status |
@@ -547,7 +573,7 @@ and artifact identities carry semantic reproducibility.
 | `.md`, `.markdown` | Markdown parsing into canonical IR with located diagnostics for HTML, Pandoc metadata, and unsupported tokens |
 | `.docx` | Body and note parsing with OOXML-located diagnostics for unsupported constructs, normalization, unresolved notes, and unavailable page provenance |
 | `.html`, `.htm` | Deterministic `lxml` body extraction; scripts/styles omitted with diagnostics |
-| `.pdf` | Digitally-born PDF text-layer extraction via `pypdfium2`; page headings; empty text layer refuses with named OCR limitation |
+| `.pdf` | Digitally-born PDF text-layer extraction via `pypdfium2`; paragraph spans carry their page index and no heading is fabricated; text-layer whitespace normalization is diagnosed; unreadable pages refuse; empty text layer refuses with named OCR limitation |
 | `.csv` | UTF-8 rectangular table recovery with fixed excel dialect and explicit padding diagnostics |
 | `.json`, `.jsonl` | UTF-8 structured path projection into evidence-bearing paragraphs |
 | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` | UTF-8 text captured as one language-tagged code block |
@@ -568,8 +594,10 @@ that exists only in IR can use strict `IRFieldEvidence`.
 Current cleaning rules are `page-numbers`, `headers-footers`, `whitespace`,
 `urls`, `emails`, `special-chars`, `lowercase`, and one custom removal regular
 expression. With no explicit selection, the CLI applies `page-numbers` and
-`whitespace`. A rule that would remove more than 30 percent of its target is
-skipped and reported.
+`whitespace`. A rule whose edits would remove more than 30 percent of the
+document's cleanable text (code points, measured against the whole document
+after earlier rules) is skipped and reported; a rule that deletes every one
+of its matches still runs when those matches are under that share.
 
 Each clean run creates a source-scoped `CleaningPlan` with exact configuration,
 operations, allowed paths, source locations, before and after digests,

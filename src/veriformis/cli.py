@@ -6,6 +6,7 @@ and workspace orchestration live in ``veriformis.pipeline``.
 
 from __future__ import annotations
 
+import csv
 import signal
 import threading
 from collections.abc import Callable, Iterator
@@ -77,19 +78,26 @@ def _echo_error(exc: Exception, *, status: int = 2) -> None:
     raise typer.Exit(code=status) from exc
 
 
-def _emit_outcome(outcome: StageOutcome) -> None:
+def _emit_outcome(outcome: StageOutcome, *, machine: bool = False) -> None:
     if outcome.durability_warning is not None:
         typer.echo(
             f"warning[commit-durability]: {outcome.durability_warning}",
             err=True,
         )
     for message in outcome.messages:
-        typer.echo(message.text, err=message.stream == "stderr")
+        typer.echo(message.text, err=machine or message.stream == "stderr")
     if outcome.exit_status != 0:
         raise typer.Exit(code=outcome.exit_status)
 
 
-def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], ...] = ()):
+def _run(call, *, status: int = 2, machine: bool = False, extra_exceptions: tuple[type[BaseException], ...] = ()):
+    """Run one service call and turn every handled failure into error[code].
+
+    Everything that reads operator input on the command's behalf (plan files,
+    request JSON) must happen inside ``call`` so a missing or malformed file is
+    reported as ``error[...]`` with the command's exit status rather than as a
+    traceback (post-20 defect D-09).
+    """
     try:
         outcome = call()
     except SealPartialPublicationError as exc:
@@ -108,10 +116,12 @@ def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], 
         UnicodeError,
         ValueError,
         TypeError,
+        csv.Error,
         *extra_exceptions,
     ) as exc:
         _echo_error(exc, status=status)
-    _emit_outcome(outcome)
+    _emit_outcome(outcome, machine=machine)
+    return outcome
 
 
 class _ExportCancellationToken:
@@ -357,6 +367,12 @@ def construct(
         "--mode",
         help="Compiler path: document-source (default), dataset-row, or mixed.",
     ),
+    strategy: str | None = typer.Option(None, "--strategy", help="Explicit chunk strategy to match."),
+    size: int | None = typer.Option(None, "--size", help="Explicit chunk size to match."),
+    overlap: int | None = typer.Option(None, "--overlap", help="Explicit chunk overlap to match."),
+    review_packet: Path | None = typer.Option(
+        None, "--review-packet", help="Apply a complete packet to the current pending construction.",
+    ),
 ) -> None:
     """Construct evidence-bearing candidates and immutable accepted records."""
     _run(
@@ -372,6 +388,10 @@ def construct(
             require_review=require_review,
             consumer_profile=consumer_profile,
             mode=mode,
+            strategy=strategy,
+            size=size,
+            overlap=overlap,
+            review_packet=None if review_packet is None else review_packet.read_bytes(),
         )
     )
 
@@ -390,13 +410,12 @@ def map_cmd(
     ),
 ) -> None:
     """Map captured JSONL row sources into imported semantic records."""
-    payload = json.loads(plan.read_text(encoding="utf-8"))
     _run(
         lambda: _SERVICE.map_rows(
             workspace,
             goal=goal,
             representation=representation,
-            mapping_plan=payload,
+            mapping_plan=json.loads(plan.read_text(encoding="utf-8")),
         )
     )
 
@@ -450,10 +469,24 @@ def curate(
     )
 
 
+def _command_result(command: str, result: dict[str, object]) -> None:
+    """Small versioned stdout receipt; diagnostics remain on stderr."""
+    typer.echo(json.dumps({
+        "schema_id": "veriformis.command-result/v1",
+        "command": command,
+        "result": result,
+    }, sort_keys=True, separators=(",", ":"), allow_nan=False))
+
+
 @app.command()
-def split(workspace: Path) -> None:
+def split(
+    workspace: Path,
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
     """Assign complete transitive leakage groups to fixed partitions."""
-    _run(lambda: _SERVICE.split(workspace))
+    outcome = _run(lambda: _SERVICE.split(workspace), machine=json_output)
+    if json_output:
+        _command_result("split", {"assignment_digest": outcome.assignment_digest})
 
 
 @app.command(name="format")
@@ -472,6 +505,7 @@ def validate(workspace: Path) -> None:
 def seal(
     workspace: Path,
     out: Path = typer.Option(..., "-o"),
+    json_output: bool = typer.Option(False, "--json"),
     aptus_handoff: bool = typer.Option(
         False,
         "--aptus-handoff/--no-aptus-handoff",
@@ -482,29 +516,8 @@ def seal(
     ),
 ) -> None:
     """Revalidate, atomically publish, and receipt one finished dataset."""
-    outcome: SealOutcome | None = None
-    try:
-        outcome = _SERVICE.seal(workspace, out)
-    except SealPartialPublicationError as exc:
-        publication = exc.publication
-        typer.echo(
-            f"published bundle remains visible at {publication.bundle_path}; "
-            f"manifest SHA-256 {publication.manifest_sha256}; workspace receipt "
-            "did not commit",
-            err=True,
-        )
-        _echo_error(exc.cause if isinstance(exc.cause, Exception) else exc, status=1)
-    except (
-        VeriformisError,
-        EvidenceError,
-        OSError,
-        UnicodeError,
-        ValueError,
-        TypeError,
-    ) as exc:
-        _echo_error(exc, status=1)
-    assert outcome is not None
-    _emit_outcome(outcome)
+    outcome: SealOutcome = _run(lambda: _SERVICE.seal(workspace, out), status=1, machine=json_output)
+    handoff_path: str | None = None
     if aptus_handoff and outcome.publication is not None:
         from veriformis.handoff import (
             build_aptus_handoff,
@@ -530,8 +543,20 @@ def seal(
             TypeError,
         ) as exc:
             _echo_error(exc, status=1)
-        typer.echo(f"aptus handoff: {path}")
-        typer.echo(f"assignment digest: {handoff.assignment_digest}")
+        handoff_path = str(path)
+        typer.echo(f"aptus handoff: {path}", err=json_output)
+        typer.echo(f"assignment digest: {handoff.assignment_digest}", err=json_output)
+
+    if json_output:
+        publication = outcome.publication
+        if publication is None:
+            _echo_error(ValueError("seal returned no publication receipt"), status=1)
+        _command_result("seal", {
+            "bundle_path": str(publication.bundle_path),
+            "manifest_sha256": publication.manifest_sha256,
+            "revision_id": outcome.revision_id,
+            "handoff_path": handoff_path,
+        })
 
 
 @app.command(name="verify")
@@ -549,6 +574,7 @@ def verify_cmd(
 @app.command(name="package")
 def package_cmd(
     bundle: Path,
+    json_output: bool = typer.Option(False, "--json"),
     out: Path = typer.Option(..., "-o"),
     manifest_sha256: str | None = typer.Option(None, "--manifest-sha256"),
     export_receipt_sha256: str | None = typer.Option(
@@ -557,7 +583,7 @@ def package_cmd(
     ),
 ) -> None:
     """Archive a bundle or export pack under one explicit external anchor."""
-    _run(
+    outcome = _run(
         lambda: _SERVICE.package(
             bundle,
             out,
@@ -565,7 +591,19 @@ def package_cmd(
             export_receipt_sha256=export_receipt_sha256,
         ),
         status=1,
+        machine=json_output,
     )
+
+    if json_output:
+        receipt = outcome.receipt
+        if receipt is None:
+            _echo_error(ValueError("package returned no archive receipt"), status=1)
+        _command_result("package", {
+            "archive_path": str(receipt.archive_path),
+            "archive_sha256": receipt.archive_sha256,
+            "manifest_sha256": getattr(receipt, "manifest_sha256", None),
+            "export_receipt_sha256": getattr(receipt, "export_receipt_sha256", None),
+        })
 
 
 @app.command(name="package-verify")
@@ -786,6 +824,7 @@ def spec_lock(
         payload = _SERVICE.lock_project_spec(
             load_project_spec_document(spec),
             workspace=workspace,
+            base_dir=spec.parent,
         )
         text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
         if out is not None:
@@ -958,7 +997,14 @@ def mapping_rejections(
             output,
             source_root=source_root,
         )
-    except VeriformisError as exc:
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
         _echo_error(exc)
         return
     typer.echo(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
@@ -966,13 +1012,14 @@ def mapping_rejections(
 
 @app.command(name="review-export")
 def review_export(
-    plan_id: str = typer.Option(..., "--plan-id"),
-    items: Path = typer.Option(..., "--items"),
+    plan_id: str | None = typer.Option(None, "--plan-id"),
+    items: Path | None = typer.Option(None, "--items"),
+    workspace: Path | None = typer.Option(None, "--workspace"),
 ) -> None:
     """Export a pending review packet as deterministic JSON."""
     try:
-        payload = json.loads(items.read_text(encoding="utf-8"))
-        packet = _SERVICE.export_review_packet(plan_id, payload)
+        payload = None if items is None else json.loads(items.read_text(encoding="utf-8"))
+        packet = _SERVICE.export_review_packet(plan_id, payload, workspace=workspace)
     except (OSError, UnicodeError, json.JSONDecodeError, VeriformisError) as exc:
         _echo_error(
             exc if isinstance(exc, VeriformisError) else VeriformisError(str(exc))

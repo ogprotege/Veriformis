@@ -25,7 +25,7 @@ presence so a later clean host can compare the same semantic identity.
 | `contract_version` | `1` |
 | `schema_id` | `veriformis.project-lock/v1` |
 | `spec_id` | Spec identity from the pin |
-| `spec_digest` | SHA-256 of the spec payload excluding `spec_id` and null optional fields |
+| `spec_digest` | Embedded pipeline: SHA-256 of the spec payload excluding `spec_id` and null optional fields. External reference: SHA-256 of canonical `{spec: payload, pipeline_ref_sha256: SHA256(raw reference bytes)}` |
 | `veriformis_version` | Installed package version |
 | `python_version` | `major.minor` |
 | `extras` | Sorted map of declared extra name to `empty` or `present` |
@@ -37,6 +37,15 @@ Unknown fields fail closed. Credentials cannot appear. The lock is not
 `uv.lock` and does not upload. Locks without resume pins still load.
 `spec-run` and `spec-resume` emit a lock with HEAD and source identities.
 `spec-lock --workspace` pins those fields from an existing workspace.
+
+Resume compares every recorded environment field: Veriformis version,
+Python major.minor, and declared extra presence. The extra map describes
+package declarations, not installed dependency versions; `uv.lock` remains
+the dependency pin. External references resolve relative to the spec file.
+Execution decodes the same captured reference bytes that it hashes. The
+returned lock retains that digest even if the reference changes during the
+run. Old reference locks without this content binding refuse resume.
+Embedded-pipeline digests remain unchanged.
 
 ## Exit codes
 

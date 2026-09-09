@@ -9,10 +9,12 @@
 **Execution profile:** `offline-deterministic-v1`
 
 **Implementation status:** Implemented in independent-product Phase 6.4,
-reused without duplicated defaults by Phase 6.5 compile preflight, and
-acceptance-matrix bound by Phase 6.6.
+reused without duplicated defaults by Phase 6.5 compile preflight,
+acceptance-matrix bound by Phase 6.6, and extended additively by Phase 17
+with one `safe` preset for each of the four admitted-family goals.
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 6.7)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: the nine packaged
+presets recorded)
 
 **Next review:** Any default, preset, goal, representation, chunk-strategy,
 curation-policy, or consumer-profile change
@@ -68,6 +70,34 @@ executable `SegmentationPolicy`), `construction` (`split_ratio_ppm` in
 `preset_id` (exactly `<goal_id>.<name>`), `goal_id`, a `representation_id`
 the goal allows, `title`, and `plain_language`. Every preset MUST be
 compilable under the taxonomy for its objective, row schema, and profile.
+
+### Packaged presets
+
+`presets-v1.json` ships exactly nine `safe` presets, one per catalog goal in
+catalog order. Every preset carries the recipe-wide `construction`,
+`curation`, and `review_policy` defaults (`split_ratio_ppm` 500000,
+`require_review` false, `consumer_profile` `veriformis-canonical-v1`;
+`minimum_target_characters` 1, `balance_mode` `none`, no per-source cap,
+`evaluation_ratio_ppm` 500000, `evaluation_required` true, `split_seed`
+`veriformis-v1`; `review_policy` `none`). Segmentation is `paragraph` with
+`size` 1000 and `overlap` 100 for every preset except
+`recover-a-section-from-its-heading.safe`, which selects `structure`.
+
+| Preset | Goal | Representation | Compile path |
+| --- | --- | --- | --- |
+| `learn-the-text.safe` | `learn-the-text` | `whole-text` | document-source |
+| `continue-a-passage.safe` | `continue-a-passage` | `prompt-and-completion` | document-source |
+| `recover-a-section-from-its-heading.safe` | `recover-a-section-from-its-heading` | `prompt-and-completion` | document-source |
+| `reproduce-a-recorded-change.safe` | `reproduce-a-recorded-change` | `prompt-and-completion` | document-source |
+| `extract-a-structured-value.safe` | `extract-a-structured-value` | `prompt-and-completion` | document-source |
+| `classify-with-provided-labels.safe` | `classify-with-provided-labels` | `context-and-label` | dataset-row only |
+| `prefer-chosen-over-rejected.safe` | `prefer-chosen-over-rejected` | `prompt-chosen-rejected` | dataset-row only |
+| `use-provided-tool-traces.safe` | `use-provided-tool-traces` | `conversation-and-tool-trace` | dataset-row only |
+| `use-provided-steps.safe` | `use-provided-steps` | `prompt-and-steps` | dataset-row only |
+
+The dataset-row presets carry segmentation for schema uniformity only; the
+`map` path performs no chunking and their segmentation values are never
+executed. The tracking checker binds this list to the packaged data.
 
 ## Resolution
 

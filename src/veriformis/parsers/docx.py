@@ -68,7 +68,24 @@ from veriformis.parsers import docx_styles as style_map
 from veriformis.sources import ParseResult, register_source
 
 _CITATION_RE = re.compile(r"\[@([A-Za-z][\w:.\-]*)(?:,\s*([^\]]+))?\]")
-PARSER_VERSION = "1.2.0"
+# 1.3.0: hardened XML parser for note parts, decompressed-size cap before the
+# package opens, text-bearing drawings diagnosed as text loss, and accepted
+# moved text (w:moveTo) retained like w:ins (post-20 defect D-10).
+PARSER_VERSION = "1.3.0"
+
+# Every OOXML part is parsed with entity resolution and network access off.
+# python-docx pins the same for word/document.xml; note parts used the lxml
+# default before 1.3.0, which resolved local entities on lxml < 5.
+_HARDENED_XML_PARSER = etree.XMLParser(
+    resolve_entities=False,
+    no_network=True,
+    huge_tree=False,
+    recover=False,
+)
+# Summed uncompressed member size a package may declare before it is refused
+# rather than inflated into memory.
+DOCX_MAX_INFLATED_BYTES = 256 * 1024 * 1024
+DOCX_MAX_MEMBERS = 10_000
 
 
 def _split_citations_in_text(value: str) -> list[Inline]:
@@ -167,6 +184,7 @@ def _parse_docx(
     path: Path, *, raw_bytes: bytes | None = None
 ) -> tuple[Document, str, list[dict]]:
     """Parse a .docx into a Document and its extracted-text stream."""
+    _refuse_oversized_package(raw_bytes if raw_bytes is not None else path)
     docx = OpenDocument(BytesIO(raw_bytes) if raw_bytes is not None else path)
     body = docx.element.body
 
@@ -258,7 +276,7 @@ def _load_notes(
         return notes, diagnostics
 
     try:
-        root = etree.fromstring(data)
+        root = etree.fromstring(data, parser=_HARDENED_XML_PARSER)
     except etree.XMLSyntaxError:
         diagnostics.append(
             _invalid_note_part_spec(note_kind, cfg["xml_file"], "invalid-xml")
@@ -592,6 +610,27 @@ def _loss_diagnostic_specs(
                 "metadata",
                 "Accepted tracked-change text was retained without revision markup.",
             )
+        elif element.tag == _q("w:moveFrom"):
+            add(
+                element,
+                "docx.revision-move-source-omitted",
+                "info",
+                "omitted",
+                "metadata",
+                (
+                    "The original location of accepted moved text was omitted; the "
+                    "text is retained at its destination."
+                ),
+            )
+        elif element.tag == _q("w:moveTo"):
+            add(
+                element,
+                "docx.revision-move-normalized",
+                "info",
+                "normalized",
+                "metadata",
+                "Accepted moved text was retained at its destination without revision markup.",
+            )
         elif element.tag == _q("w:lastRenderedPageBreak"):
             add(
                 element,
@@ -785,6 +824,12 @@ def _inventory_body_boundaries(body: etree._Element, add) -> None:
                 _q("w:del"),
                 _q("w:delText"),
                 _q("w:ins"),
+                _q("w:moveFrom"),
+                _q("w:moveTo"),
+                _q("w:moveFromRangeStart"),
+                _q("w:moveFromRangeEnd"),
+                _q("w:moveToRangeStart"),
+                _q("w:moveToRangeEnd"),
             }:
                 continue
             loss_kind = (
@@ -854,6 +899,12 @@ def _inventory_paragraph_boundary(
                 _q("w:del"),
                 _q("w:delText"),
                 _q("w:ins"),
+                _q("w:moveFrom"),
+                _q("w:moveTo"),
+                _q("w:moveFromRangeStart"),
+                _q("w:moveFromRangeEnd"),
+                _q("w:moveToRangeStart"),
+                _q("w:moveToRangeEnd"),
             }:
                 continue
             # TOC field markers and instructions are accounted for by the
@@ -947,13 +998,34 @@ def _inventory_run_boundary(
                         or ""
                     )
                 )
+                carries_text = _element_has_text_payload(child)
+                if carries_text:
+                    # Text boxes, callouts, and captions live inside the drawing.
+                    # The image (if any) is recovered; their text is not, and
+                    # that is text loss, not a structural omission.
+                    add(
+                        child,
+                        "docx.drawing-text-omitted",
+                        "warning",
+                        "omitted",
+                        "text",
+                        (
+                            "A drawing carries text (text box, callout, or caption) "
+                            "that the canonical document does not represent; the text "
+                            "was omitted."
+                        ),
+                        details={
+                            "relationship_id": rel_id,
+                            "image_recovered": bool(blip is not None and rel_id in rels),
+                        },
+                    )
                 if blip is None or not rel_id or rel_id not in rels:
                     add(
                         child,
                         "docx.drawing-omitted",
                         "warning",
                         "omitted",
-                        "structure",
+                        "text" if carries_text else "structure",
                         "A drawing without a resolvable image relationship was omitted.",
                         details={"relationship_id": rel_id},
                     )
@@ -1044,11 +1116,23 @@ def _clean_revisions(root: etree._Element) -> None:
             if parent is not None:
                 parent.remove(el)
 
-    # Drop w:del (rejected deletions -> final text)
-    for el in list(root.iter(_q("w:del"))):
-        parent = el.getparent()
-        if parent is not None:
-            parent.remove(el)
+    # Drop w:del (rejected deletions -> final text) and w:moveFrom (the
+    # source location of accepted moved text, which reappears under w:moveTo).
+    for tag in (_q("w:del"), _q("w:moveFrom")):
+        for el in list(root.iter(tag)):
+            parent = el.getparent()
+            if parent is not None:
+                parent.remove(el)
+    for tag in (
+        _q("w:moveFromRangeStart"),
+        _q("w:moveFromRangeEnd"),
+        _q("w:moveToRangeStart"),
+        _q("w:moveToRangeEnd"),
+    ):
+        for el in list(root.iter(tag)):
+            parent = el.getparent()
+            if parent is not None:
+                parent.remove(el)
 
     # w:delText inside accepted content -> also drop
     for el in list(root.iter(_q("w:delText"))):
@@ -1056,16 +1140,39 @@ def _clean_revisions(root: etree._Element) -> None:
         if parent is not None:
             parent.remove(el)
 
-    # Unwrap w:ins (accepted insertions)
-    for el in list(root.iter(_q("w:ins"))):
-        parent = el.getparent()
-        if parent is None:
-            continue
-        idx = list(parent).index(el)
-        for child in list(el):
-            parent.insert(idx, child)
-            idx += 1
-        parent.remove(el)
+    # Unwrap w:ins (accepted insertions) and w:moveTo (accepted moved text).
+    for tag in (_q("w:ins"), _q("w:moveTo")):
+        for el in list(root.iter(tag)):
+            parent = el.getparent()
+            if parent is None:
+                continue
+            idx = list(parent).index(el)
+            for child in list(el):
+                parent.insert(idx, child)
+                idx += 1
+            parent.remove(el)
+
+
+def _refuse_oversized_package(source: Path | bytes) -> None:
+    """Refuse a package whose declared inflated size or member count is unsafe.
+
+    The check reads only the central directory, so a decompression bomb is
+    refused before any member is inflated into memory.
+    """
+    archive = BytesIO(source) if isinstance(source, bytes) else source
+    with zipfile.ZipFile(archive) as z:
+        infos = z.infolist()
+        if len(infos) > DOCX_MAX_MEMBERS:
+            raise ValueError(
+                f"DOCX package declares {len(infos)} members, above the "
+                f"{DOCX_MAX_MEMBERS} member limit"
+            )
+        declared = sum(max(0, info.file_size) for info in infos)
+        if declared > DOCX_MAX_INFLATED_BYTES:
+            raise ValueError(
+                f"DOCX package declares {declared} inflated bytes, above the "
+                f"{DOCX_MAX_INFLATED_BYTES} byte limit"
+            )
 
 
 # ---------------------------------------------------------------------------

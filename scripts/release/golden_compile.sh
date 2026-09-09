@@ -31,7 +31,7 @@ SOURCES=()
 while IFS= read -r line; do
   SOURCES+=("$line")
 done < <(find "$CORPUS_DIR" -type f | LC_ALL=C sort)
-test "${#SOURCES[@]}" -ge 1
+test "${#SOURCES[@]}" -ge 2
 
 compile_objective() {
   local objective="$1"
@@ -49,24 +49,33 @@ compile_objective() {
   vf clean "$ws"
   vf chunk "$ws"
   vf construct "$ws" --objective "$objective" "${split_extra[@]+"${split_extra[@]}"}"
-  vf curate "$ws" --allow-empty-evaluation
+  vf curate "$ws"
   vf split "$ws"
   vf format "$ws"
   vf validate "$ws"
-  local seal_out
-  seal_out="$(vf seal "$ws" -o "$bundle" 2>&1)"
-  printf '%s\n' "$seal_out"
+  vf seal "$ws" -o "$bundle"
 
+  # The expected digest comes only from the reviewed, committed anchor.
+  # Never derive this value from the bundle or the current seal output.
   local manifest
-  manifest="$(printf '%s\n' "$seal_out" | awk -F': ' 'tolower($0) ~ /manifest sha-256/ {print $2; exit}')"
-  test -n "$manifest"
-  test "${#manifest}" -eq 64
+  manifest="$(python3 - "$ROOT/scripts/release/golden-manifests.json" "$objective" <<'PYCODE'
+import json
+import re
+import sys
+from pathlib import Path
+anchors = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+digest = anchors[sys.argv[2]]["manifest_sha256"]
+if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+    raise SystemExit("invalid committed golden manifest digest")
+print(digest)
+PYCODE
+)"
 
   # Canonical standalone bundle files must all be published.
   test -f "$bundle/manifest.json"
   test -f "$bundle/attestation.json"
-  test -f "$bundle/data/train.jsonl"
-  test -f "$bundle/data/evaluation.jsonl"
+  test -s "$bundle/data/train.jsonl"
+  test -s "$bundle/data/evaluation.jsonl"
   test -f "$bundle/metadata/row-provenance.jsonl"
   test -f "$bundle/validation.json"
 
@@ -76,7 +85,10 @@ compile_objective() {
 
   echo "==> golden_compile: $objective external_digest verify"
   local verify_out
-  verify_out="$(vf verify "$bundle" --manifest-sha256 "$manifest" 2>&1)"
+  if ! verify_out="$(vf verify "$bundle" --manifest-sha256 "$manifest" 2>&1)"; then
+    printf '%s\n' "$verify_out" >&2
+    return 1
+  fi
   printf '%s\n' "$verify_out"
   printf '%s\n' "$verify_out" | grep -q "verification grade: external_digest"
 

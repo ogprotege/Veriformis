@@ -85,6 +85,11 @@ def execute_mapping_rows(
     """
     from veriformis.mapping.reject import rejection_from_error
 
+    if plan.review_policy == "required":
+        raise MappingError(
+            "dataset-row required review is not executable in v1: "
+            "the mapping contract has no durable review receipt"
+        )
     if plan.mapping_plan_id != recipe.mapping_plan_id:
         raise MappingError("mapping recipe names another mapping plan")
     if plan.row_schema != recipe.row_schema:

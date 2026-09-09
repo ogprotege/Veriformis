@@ -208,7 +208,7 @@ sources.
 | `markdown` | implemented | `.markdown`, `.md` | `markdown` | Headings, paragraphs, code blocks, links, images, lists, tables, math, citations |
 | `word-document` | implemented | `.docx` | `docx` | Headings, paragraphs, code blocks, links, images, lists, tables, math, citations |
 | `html` | implemented | `.htm`, `.html` | `html` | Headings and paragraphs |
-| `pdf-text` | implemented | `.pdf` | `pdf` | Paragraphs from the embedded text layer under synthetic per-page labels (`Page N` headings); image-only pages refuse |
+| `pdf-text` | implemented | `.pdf` | `pdf` | Paragraphs from the embedded text layer, each span carrying its page index; no heading is fabricated; image-only pages refuse |
 | `delimited-table` | implemented | `.csv` | `csv` | One table without alignment attributes |
 | `json-records` | implemented | `.json`, `.jsonl` | `json`, `jsonl` | Paragraph text per flattened textual field |
 | `ocr-image` | explicitly_unsupported | — | — | ADR-0016 authorizes optional Tesseract 5; default parse still refuses image-only PDF; family stays explicitly_unsupported |

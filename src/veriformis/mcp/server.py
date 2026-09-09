@@ -183,10 +183,15 @@ def create_mcp_server(
         )
 
     @server.tool()
-    def export_review(plan_id: str, items: str) -> str:
+    def export_review(
+        plan_id: str | None = None, items: str | None = None, workspace: str | None = None,
+    ) -> str:
         """Export a pending review packet from PipelineService."""
         return json.dumps(
-            pipeline.export_review_packet(plan_id, json.loads(items)),
+            pipeline.export_review_packet(
+                plan_id, None if items is None else json.loads(items),
+                workspace=None if workspace is None else Path(workspace),
+            ),
             ensure_ascii=False,
             indent=2,
             sort_keys=True,
@@ -665,6 +670,10 @@ def create_mcp_server(
         preset: str | None = None,
         representation: str | None = None,
         mode: str | None = None,
+        review_packet: str | None = None,
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
     ) -> str:
         """Construct candidates and accepted records for one goal or objective."""
         return _outcome_json(
@@ -680,6 +689,10 @@ def create_mcp_server(
                 require_review=require_review,
                 consumer_profile=consumer_profile,
                 mode=mode,
+                strategy=strategy,
+                size=size,
+                overlap=overlap,
+                review_packet=review_packet,
             )
         )
 
@@ -889,6 +902,7 @@ def create_mcp_server(
             return pipeline.lock_project_spec(
                 loaded,
                 workspace=None if workspace is None else Path(workspace),
+                base_dir=path.parent,
             )
 
         return _spec_payload(run, spec_id_box=loaded_id)

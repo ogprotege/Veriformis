@@ -14,9 +14,12 @@ Veriformis itself is **MIT**. See [LICENSE](../LICENSE) and
 `pyproject.toml` `license = "MIT"`.
 
 Direct runtime dependencies are declared in `pyproject.toml` and pinned by
-`uv.lock`. Optional extras (`trl`, `mlx-lm`, `columnar`, `axolotl`,
+`uv.lock`. The trainer and OCR extras (`trl`, `mlx-lm`, `axolotl`,
 `llama-factory`, `unsloth`, `ocr`) stay empty, so trainer and OCR wheels are
-not part of the core install. Transitive licenses are those of the locked
+not part of any install. One optional extra is non-empty: `columnar` pins
+`pyarrow` and `datasets` for the Parquet, Arrow, and Hugging Face Dataset
+containers and for Parquet / Arrow dataset-row capture; the default install
+and the core test suite never import them. Transitive licenses are those of the locked
 packages; this review does not invent SPDX identifiers for them.
 
 No copyleft obligation is introduced by Veriformis's own license. CI runs
@@ -40,7 +43,7 @@ and no archive ingest.
 | Threat | Control |
 | --- | --- |
 | Unknown suffix | Fail closed (`UnsupportedInputError`) |
-| Image-only PDF | Named `ocr-image` refusal on the default path |
+| Image-only PDF | Default parse refuses with diagnostic `pdf.ocr-required` (limitation `ocr-unsupported`); the `ocr-image` input family stays unsupported |
 | Malformed DOCX ZIP | `ParseError`; OOXML XML uses `resolve_entities=False` and `no_network=True` |
 | HTML chrome / scripts | Stripped with diagnostics; no network |
 | Non-UTF-8 text | Fail closed |

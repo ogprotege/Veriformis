@@ -71,8 +71,11 @@ then `map` then the finished-dataset tail. Mixed still refuses fused
 members. Export is not auto-run.
 
 `spec-resume` continues only when the lock pins the same spec digest,
-workspace HEAD, and source identities. Drift names the mismatched
-identity. Resume is not a second policy engine.
+workspace HEAD, source identities, and all recorded environment fields.
+External pipeline bytes are included in the lock digest. Drift names the
+mismatched identity. Stage goal, objective, preset, recipe library, and
+consumer selections cannot override a conflicting top-level pin. These
+conflicts refuse before source capture. Resume is not a second policy engine.
 
 Failures emit `veriformis.project-spec-diagnostic/v1`. Truncated JSON
 fails closed. Human CLI text stays.

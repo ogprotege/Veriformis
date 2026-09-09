@@ -10,6 +10,7 @@ stays ``disabled``. The report does not delete rows or block seal.
 from __future__ import annotations
 
 import re
+from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 
 from veriformis.construction import ConstructionResult, DatasetRecipe
@@ -21,7 +22,6 @@ from veriformis.quality.distributions import report_distributions_from_binding
 from veriformis.quality.preview import (
     QualityPreviewBinding,
     bind_document_quality_preview,
-    context_and_target_names,
 )
 from veriformis.quality.report import (
     QualityFact,
@@ -143,23 +143,67 @@ def _pair_key(left: str, right: str) -> tuple[str, str]:
     return (left, right) if left < right else (right, left)
 
 
+def _threshold_similarities(
+    shingles: Mapping[str, frozenset[str]], *, threshold_ppm: int
+) -> dict[tuple[str, str], int]:
+    """Exact prefix join; omit only pairs below the lowest reported threshold.
+
+    Sets share one global token order. A qualifying pair must share a token in
+    their prefixes of length n - ceil(threshold * n) + 1. Length filtering and
+    prefix filtering discard impossible pairs before the exact integer score.
+    Empty sets have their original special score. No approximate index is used.
+    """
+    ids = sorted(shingles)
+    if threshold_ppm == 0:
+        return {
+            (left, right): _jaccard_ppm(shingles[left], shingles[right])
+            for index, left in enumerate(ids)
+            for right in ids[index + 1 :]
+        }
+    frequencies = Counter(token for tokens in shingles.values() for token in tokens)
+    postings: dict[str, list[str]] = defaultdict(list)
+    empty: list[str] = []
+    scores: dict[tuple[str, str], int] = {}
+    for right in ids:
+        tokens = shingles[right]
+        if not tokens:
+            for left in empty:
+                scores[(left, right)] = 1_000_000
+            empty.append(right)
+            continue
+        prefix_size = len(tokens) - (threshold_ppm * len(tokens) + 999_999) // 1_000_000 + 1
+        prefix = sorted(tokens, key=lambda token: (frequencies[token], token))[:prefix_size]
+        candidates = {left for token in prefix for left in postings[token]}
+        for left in sorted(candidates):
+            other = shingles[left]
+            if min(len(tokens), len(other)) * 1_000_000 < (
+                threshold_ppm * max(len(tokens), len(other))
+            ):
+                continue
+            score = _jaccard_ppm(other, tokens)
+            if score >= threshold_ppm:
+                scores[(left, right)] = score
+        for token in prefix:
+            postings[token].append(right)
+    return scores
+
+
 def report_near_duplicates_from_binding(binding: QualityPreviewBinding) -> QualityReport:
     """Add inspectable near-duplicate clusters to the distribution report."""
     base = report_distributions_from_binding(binding)
     included = binding.included
-    _context_names, target_names = context_and_target_names(binding)
     record_ids = tuple(record.record_id for record in included)
     shingles = {
-        record.record_id: _shingles(_normalize(record.joined_values(target_names)))
+        record.record_id: _shingles(_normalize("".join(record.target_values)))
         for record in included
     }
-    similarities: dict[tuple[str, str], int] = {}
-    for index, left in enumerate(record_ids):
-        for right in record_ids[index + 1 :]:
-            similarities[_pair_key(left, right)] = _jaccard_ppm(
-                shingles[left],
-                shingles[right],
-            )
+    similarities = _threshold_similarities(
+        shingles,
+        threshold_ppm=min(
+            NEAR_DUPLICATE_CLUSTER_THRESHOLD_PPM,
+            *NEAR_DUPLICATE_PREVIEW_THRESHOLDS_PPM,
+        ),
+    )
     clusters = _clusters_at_threshold(
         record_ids=record_ids,
         similarities=similarities,
@@ -169,11 +213,15 @@ def report_near_duplicates_from_binding(binding: QualityPreviewBinding) -> Quali
     members: list[str] = []
     for cluster in clusters:
         members.extend(cluster)
-        pairs = [
-            [left, right, similarities[_pair_key(left, right)]]
-            for left_index, left in enumerate(cluster)
-            for right in cluster[left_index + 1 :]
-        ]
+        pairs = []
+        for left_index, left in enumerate(cluster):
+            for right in cluster[left_index + 1 :]:
+                score = similarities.get(_pair_key(left, right))
+                # A transitive cluster may include pairs below every threshold.
+                # The v1 report still contains their exact scores.
+                if score is None:
+                    score = _jaccard_ppm(shingles[left], shingles[right])
+                pairs.append([left, right, score])
         cluster_payload.append(
             {
                 "cluster-id": canonical_digest(

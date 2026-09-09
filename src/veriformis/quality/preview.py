@@ -21,6 +21,8 @@ from veriformis.mapping.finish import (
     FinishedImportPlan,
     ImportedCurationResult,
     ImportedSplitResult,
+    _context_key,
+    _target_token,
 )
 from veriformis.mapping.models import ImportedRecord
 from veriformis.mapping.result import MappingRecipe, MappingResult
@@ -39,22 +41,8 @@ class QualityPreviewRecord:
     source_ids: tuple[str, ...]
     objective_id: str
     fields: tuple[QualityPreviewField, ...]
-
-    def field_map(self) -> dict[str, str]:
-        return {field.name: field.value for field in self.fields}
-
-    def require_values(self, names: tuple[str, ...]) -> tuple[str, ...]:
-        by_name = self.field_map()
-        missing = [name for name in names if name not in by_name]
-        if missing:
-            raise QualityReportError(
-                f"included record {self.record_id} is missing objective field "
-                f"{missing[0]!r}"
-            )
-        return tuple(by_name[name] for name in names)
-
-    def joined_values(self, names: tuple[str, ...]) -> str:
-        return "".join(self.require_values(names))
+    context_values: tuple[str, ...]
+    target_values: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -95,11 +83,22 @@ def language_token_for_dataset_field(field: RecordField) -> str | None:
     return None
 
 
-def preview_record_from_dataset(record: DatasetRecord) -> QualityPreviewRecord:
+def preview_record_from_dataset(
+    record: DatasetRecord, objective_kind: str
+) -> QualityPreviewRecord:
+    context_names, target_names = _require_objective_kind(objective_kind)
+    values = {field.name: field.value for field in record.fields}
+    missing = [name for name in (*context_names, *target_names) if name not in values]
+    if missing:
+        raise QualityReportError(
+            f"included record {record.record_id} is missing objective field {missing[0]!r}"
+        )
     return QualityPreviewRecord(
         record_id=record.record_id,
         source_ids=record.source_ids,
         objective_id=record.objective_id,
+        context_values=tuple(values[name] for name in context_names),
+        target_values=tuple(values[name] for name in target_names),
         fields=tuple(
             QualityPreviewField(
                 name=field.name,
@@ -111,11 +110,17 @@ def preview_record_from_dataset(record: DatasetRecord) -> QualityPreviewRecord:
     )
 
 
-def preview_record_from_imported(record: ImportedRecord) -> QualityPreviewRecord:
+def preview_record_from_imported(
+    record: ImportedRecord, row_schema: str
+) -> QualityPreviewRecord:
+    # Use the imported curation projections. Mapping retains payload-schema
+    # fields, which are not necessarily construction-objective field names.
     return QualityPreviewRecord(
         record_id=record.record_id,
         source_ids=(record.source_id,),
         objective_id=record.objective_id,
+        context_values=_context_key(record, row_schema),
+        target_values=(_target_token(record, row_schema),),
         fields=tuple(
             QualityPreviewField(
                 name=field.name,
@@ -170,7 +175,7 @@ def bind_document_quality_preview(
     if missing:
         raise QualityReportError("included record is missing from construction")
     included = tuple(
-        preview_record_from_dataset(records_by_id[record_id])
+        preview_record_from_dataset(records_by_id[record_id], recipe.objective.kind)
         for record_id in curation.included_record_ids
     )
     hints = dict(imported_partition_hints or {})
@@ -238,7 +243,7 @@ def bind_import_quality_preview(
     if missing:
         raise QualityReportError("included record is missing from mapping result")
     included = tuple(
-        preview_record_from_imported(records_by_id[record_id])
+        preview_record_from_imported(records_by_id[record_id], recipe.row_schema)
         for record_id in curation.included_record_ids
     )
     assigned = {item.record_id for item in split.assignments}
@@ -271,12 +276,6 @@ def bind_import_quality_preview(
         realized_evaluation_record_count=split.realized_evaluation_record_count,
         imported_partition_hints=MappingProxyType(hints),
     )
-
-
-def context_and_target_names(
-    binding: QualityPreviewBinding,
-) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    return _require_objective_kind(binding.objective_kind)
 
 
 def with_imported_partition_hints(

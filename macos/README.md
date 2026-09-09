@@ -94,6 +94,44 @@ policies. Loading and unavailable states stay explicit; the app does not fall
 back to a stale Swift taxonomy catalog. Run `veriformis taxonomy` in Terminal
 to inspect the same JSON used by the help surface.
 
+## Post-20 operation integrity
+
+Source-drop callbacks collect file URLs under a lock and preserve provider
+order. HTTP URLs cannot enter the file selection through a drop callback.
+The CLI still owns collection and parser admission.
+
+Every CLI operation belongs to the workbench process registry. Quit closes
+launch admission, cancels compile, discovery, preflight, mapping, export, and
+review tasks, and waits for their children and UI completions. Superseded
+requests remain registered until their processes finish.
+
+The launcher creates a new process group atomically with `posix_spawn`.
+Cancellation sends TERM and then KILL after the grace interval. The leader
+remains an unreaped child until the final group signal. Delayed timers cannot
+signal after reaping. Remaining group members are terminated when the leader
+exits, and both output pipes drain before completion. This covers descendants
+that remain in the owned group; it does not supervise a hostile executable
+that deliberately leaves that group.
+
+Split, seal, and package use the versioned JSON receipts described in
+[the CLI reference](../docs/cli.md#machine-receipts-for-workbench-commands).
+Truncated stdout, an invalid digest, or a mismatched destination refuses a
+successful workbench result. Logs remain diagnostics. Explicit chunk strategy,
+size, and overlap reach both chunk and construct.
+
+Catalog discovery preserves valid new objective and row-schema identifiers
+and the CLI's ordering. Existing mapped-family choices still require mapping
+confirmation. Unknown goals go through CLI preflight. The app's semantic row
+verifier retains an explicit supported set and refuses unknown payload shapes.
+Trust grades, overwrite policy, and admission statuses remain closed.
+
+Local `run-history.json` uses a version-1 envelope. A legacy array is copied
+byte-for-byte to `run-history.legacy-v0.json` before migration. Unknown versions,
+unreadable history, conflicting backups, and files changed after loading are
+preserved. The History view displays the failure and disables further history
+writes for that session. This does not change compiler evidence schemas or
+create a public Mac release claim.
+
 ## Parity check
 
 ```bash

@@ -1,6 +1,6 @@
 {
   "schema_version": "veriformis.evidence-index/v1",
-  "last_updated": "2026-09-01",
+  "last_updated": "2026-09-09",
   "evidence_grades": {
     "source-verified": "Claim is directly checked against repository source or a strict machine registry.",
     "test-verified": "Claim is exercised by an automated passing test.",
@@ -823,6 +823,27 @@
         "uv run python scripts/check_project_tracking.py",
         "uv lock --check",
         "uv run ruff check src tests",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "post-20-dataset-row-quality-preview-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "working-tree-on-ae5e13c-with-main-23bdc20",
+      "scope": "PR #203 dataset-row quality preview and integration with PR #204",
+      "grade": "recorded-local",
+      "summary": "Read-only, non-enforcing previews bind imported rows across eight schemas. Original instruction/output and messages failures corrected; current-main document report bytes and exact near-duplicate behavior preserved. Local core, clean-wheel, integration, tracking, parity, project example, and 122 unsigned Mac tests passed.",
+      "details": "docs/evidence/2026-09-09-quality-report-dataset-row.md",
+      "related": [
+        "docs/contracts/quality-report-v1.md",
+        "tests/quality/test_quality_report_dataset_row.py"
+      ],
+      "rerun": [
+        "uv run pytest -q tests/quality",
+        "bash scripts/release/check_local.sh",
+        "bash macos/scripts/parity_check.sh",
+        "bash scripts/release/xcodebuild_debug.sh",
+        "uv run python scripts/check_project_tracking.py",
         "git diff --check"
       ]
     }

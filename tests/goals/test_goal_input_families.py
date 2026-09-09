@@ -141,16 +141,22 @@ def test_source_code_is_never_edited_by_cleaning() -> None:
     assert "source-code" not in goal_catalog().goal("reproduce-a-recorded-change").eligible_input_families
 
 
-def test_pdf_text_headings_are_synthetic_page_labels() -> None:
-    """Binds the PDF exclusions to the parser's per-page labels, not real headings."""
+def test_pdf_text_supplies_paragraphs_with_page_provenance_and_no_headings() -> None:
+    """Binds the PDF exclusions to the parser: no headings, page provenance on spans.
+
+    Before post-20 defect D-11 the parser fabricated a ``Page N`` heading per
+    page into the canonical stream; that text did not exist in the source.
+    """
     result = parse_captured_source(
         _PDF_SAMPLE, logical_path="minimal-text.pdf", raw_bytes=_PDF_SAMPLE.read_bytes()
     )
     blocks = [block for top in result.document.children for block in _walk(top)]
     headings = [block for block in blocks if isinstance(block, nodes.Heading)]
-    assert headings, "the PDF sample must exercise the heading path"
-    assert all(_is_synthetic_page_label(block) for block in headings)
-    assert any(isinstance(block, nodes.Paragraph) and block.children for block in blocks)
+    assert headings == [], "PDF recovery must not fabricate headings"
+    assert not _SYNTHETIC_PAGE_LABEL.search(result.source.extracted_text)
+    paragraphs = [block for block in blocks if isinstance(block, nodes.Paragraph) and block.children]
+    assert paragraphs
+    assert all(block.span is not None and block.span.page == 1 for block in paragraphs)
     catalog = goal_catalog()
     assert "pdf-text" not in catalog.goal("recover-a-section-from-its-heading").eligible_input_families
     assert "pdf-text" not in catalog.goal("extract-a-structured-value").eligible_input_families

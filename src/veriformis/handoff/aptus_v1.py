@@ -15,6 +15,7 @@ from typing import Any, Literal, Mapping
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from veriformis._jsonl_frames import frame_jsonl_lines
 from veriformis.bundle import verify_finished_bundle
 from veriformis.bundle.finished import (
     EVALUATION_PATH,
@@ -440,6 +441,10 @@ def consume_aptus_handoff(
             except Exception as exc:  # noqa: BLE001
                 findings.append(f"row-schema-invalid:{partition_name}:{index}:{exc}")
 
+    # The descriptor's own capability block is a claim, not evidence. The
+    # taxonomy pin for this consumer profile is authoritative, and the masking
+    # expectation is recomputed from the row schema rather than trusted
+    # (post-20 defect D-05).
     if descriptor.row_schema in descriptor.backend_capabilities.rejects_row_schemas:
         findings.append(
             f"backend-rejects-row-schema:{descriptor.row_schema}"
@@ -447,11 +452,56 @@ def consume_aptus_handoff(
     if descriptor.row_schema not in descriptor.backend_capabilities.accepts_row_schemas:
         if descriptor.row_schema not in descriptor.backend_capabilities.rejects_row_schemas:
             findings.append(f"backend-unknown-row-schema:{descriptor.row_schema}")
+    if descriptor.row_schema in _DEFAULT_REJECTED_SCHEMAS:
+        finding = f"profile-forbids-row-schema:{descriptor.row_schema}"
+        if f"backend-rejects-row-schema:{descriptor.row_schema}" not in findings:
+            findings.append(finding)
+    elif descriptor.row_schema not in _DEFAULT_ACCEPTED_SCHEMAS:
+        findings.append(f"profile-unknown-row-schema:{descriptor.row_schema}")
+    if (
+        tuple(descriptor.backend_capabilities.accepts_row_schemas)
+        != tuple(_DEFAULT_ACCEPTED_SCHEMAS)
+        or tuple(descriptor.backend_capabilities.rejects_row_schemas)
+        != tuple(_DEFAULT_REJECTED_SCHEMAS)
+    ):
+        findings.append("backend-capabilities-differ-from-profile-pin")
+    try:
+        expected_masking = _masking_expectation(descriptor.row_schema)
+    except AptusHandoffError:
+        findings.append(f"masking-undefined-for-row-schema:{descriptor.row_schema}")
+    else:
+        if descriptor.masking != expected_masking:
+            findings.append("masking-expectation-mismatch")
 
     provenance_rows = _load_jsonl_objects(payloads[descriptor.provenance.path])
     recomputed = portable_assignment_digest(provenance_rows)
     if recomputed != descriptor.assignment_digest:
         findings.append("assignment-digest-mismatch")
+    # Every identity the descriptor names must be the one the sealed
+    # provenance carries; build takes them from provenance, consume proves them.
+    for field in (
+        "plan_id",
+        "recipe_id",
+        "construction_result_id",
+        "split_result_id",
+        "objective_id",
+    ):
+        observed = {str(row.get(field)) for row in provenance_rows}
+        if observed != {getattr(descriptor, field)}:
+            findings.append(f"provenance-binding-mismatch:{field}")
+    observed_sources = tuple(
+        sorted(
+            {
+                str(source_id)
+                for row in provenance_rows
+                for source_id in (row.get("source_ids") or ())
+            }
+        )
+    )
+    if observed_sources != tuple(descriptor.source_ids):
+        findings.append("source-ids-mismatch")
+    if len(provenance_rows) != len(train_rows) + len(evaluation_rows):
+        findings.append("provenance-row-count-mismatch")
 
     status: Literal["accepted", "rejected"] = (
         "accepted" if not findings else "rejected"
@@ -515,10 +565,7 @@ def _infer_row_schema(
         return "text"
     if keys == {"prompt", "completion"}:
         return "prompt_completion"
-    if keys == {"instruction", "input", "output"} or keys == {
-        "instruction",
-        "output",
-    }:
+    if keys == {"instruction", "input", "output"}:
         return "instruction_output"
     if keys == {"messages"}:
         return "messages"
@@ -529,12 +576,7 @@ def _load_jsonl_objects(data: bytes) -> list[dict[str, Any]]:
     if not data:
         return []
     rows: list[dict[str, Any]] = []
-    # Sealed JSONL frames records on the single byte b"\n" only. splitlines()
-    # would also break on U+2028/U+2029/U+0085, which row text legitimately
-    # preserves raw (ensure_ascii=False escapes only characters below 0x20).
-    for line_number, line in enumerate(data.decode("utf-8").split("\n"), start=1):
-        if not line.strip():
-            continue
+    for line_number, line in frame_jsonl_lines(data.decode("utf-8")):
         try:
             value = json.loads(line)
         except json.JSONDecodeError as exc:

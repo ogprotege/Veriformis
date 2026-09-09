@@ -15,7 +15,8 @@ profile
 
 **Status:** Implemented in independent-product Phase 5.1
 
-**Last reviewed:** 2026-08-22 (independent-product Phase 5 closeout)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: Phase 17 admitted-family
+row schemas recorded in the frozen descriptor)
 
 ## Purpose and authority
 
@@ -41,7 +42,8 @@ consumer_id: null
 consumer_profile_version: null
 determinism_claim: portable_exact_bytes
 supported_row_schemas:
-  instruction_output, messages, prompt_completion, text
+  instruction_output, label-classification, messages, preference-pair,
+  prompt_completion, stepwise-trace, text, tool-call-conversation
 overwrite_policies: refuse
 ```
 
@@ -195,7 +197,12 @@ or changed options fail closed.
 
 ## Round-trip and admission evidence
 
-Admission requires fixtures for all four current row schemas. Reloading the two
+Admission requires fixtures for all eight current row schemas: the four
+document-source schemas (`text`, `prompt_completion`, `instruction_output`,
+`messages`) and, since Phase 17, the four admitted-family schemas
+(`label-classification`, `preference-pair`, `tool-call-conversation`,
+`stepwise-trace`) that reach this container only through the dataset-row
+path. Reloading the two
 partition files with the strict schema decoder MUST reproduce identical
 ordered semantic payloads and partitions. Included provenance MUST reload to
 the source's identical ordered provenance sequence. Tests cover Unicode,
@@ -204,7 +211,7 @@ wrong-operation requests, strict request subclasses, traversal and alias
 refusal, tamper, missing and unexpected files, and plan-option mismatch.
 
 Phase 5.5 adds a test-only consolidated semantic round-trip fixture matrix. It
-reloads this container's ordinary files for all four current row schemas and
+reloads this container's ordinary files for the four document-source row schemas and
 reconstructs the identical ordered train and evaluation payloads, complete
 provenance, and source `RowSet` identity. The shared matrix also exercises one
 canonical semantic tamper for this container. It does not add a product

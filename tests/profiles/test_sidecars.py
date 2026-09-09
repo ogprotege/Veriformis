@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import ast
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import veriformis.exports.service as _export_service  # noqa: F401 — break profile/export cycle
 from veriformis.datasets import RowSet
@@ -31,10 +29,13 @@ from veriformis.profiles import llama_factory as llama_module
 from veriformis.profiles import mlx_lm as mlx_module
 from veriformis.profiles import trl as trl_module
 
-from test_trl import (  # type: ignore[import-not-found]
-    _materialize_bundle,
+from support.profile_rows import (
     _row_set_for_schema,
     _source_row_set,
+)
+
+from support.bundles import (
+    _materialize_bundle,
 )
 
 _PROFILES_DIR = Path(__file__).resolve().parents[2] / "src" / "veriformis" / "profiles"
