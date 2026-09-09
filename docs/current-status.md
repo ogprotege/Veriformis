@@ -547,7 +547,7 @@ and artifact identities carry semantic reproducibility.
 | `.md`, `.markdown` | Markdown parsing into canonical IR with located diagnostics for HTML, Pandoc metadata, and unsupported tokens |
 | `.docx` | Body and note parsing with OOXML-located diagnostics for unsupported constructs, normalization, unresolved notes, and unavailable page provenance |
 | `.html`, `.htm` | Deterministic `lxml` body extraction; scripts/styles omitted with diagnostics |
-| `.pdf` | Digitally-born PDF text-layer extraction via `pypdfium2`; page headings; empty text layer refuses with named OCR limitation |
+| `.pdf` | Digitally-born PDF text-layer extraction via `pypdfium2`; paragraph spans carry their page index and no heading is fabricated; text-layer whitespace normalization is diagnosed; unreadable pages refuse; empty text layer refuses with named OCR limitation |
 | `.csv` | UTF-8 rectangular table recovery with fixed excel dialect and explicit padding diagnostics |
 | `.json`, `.jsonl` | UTF-8 structured path projection into evidence-bearing paragraphs |
 | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` | UTF-8 text captured as one language-tagged code block |

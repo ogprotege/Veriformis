@@ -17,15 +17,19 @@ from veriformis.diagnostics import (
     make_parse_report,
 )
 from veriformis.identity import sha256_digest
-from veriformis.ir import Document, Heading, Paragraph, Span, Text
+from veriformis.ir import Document, Paragraph, Span, Text
 from veriformis.ocr.recovery import recover_pages
 from veriformis.sources import ParseResult, register_source
 
 if TYPE_CHECKING:
     from veriformis.ocr.recovery import OcrProvider
 
-PARSER_VERSION = "1.0.0"
+# 1.1.0: no synthetic "Page N" headings in the canonical stream; every
+# paragraph span carries its page index; text-layer normalization is
+# diagnosed; per-page pdfium failures refuse (post-20 defects D-09, D-11).
+PARSER_VERSION = "1.1.0"
 _PARSER = "pdf"
+PDF_MAX_PAGES = 10_000
 _OCR_LIMITATION = "ocr-unsupported"
 
 
@@ -102,32 +106,26 @@ def parse_pdf_file(
     blocks: list = []
     parts: list[str] = []
     pos = 0
+    normalized_pages: list[int] = []
     for page in recovery.pages:
         if not page.text.strip():
             continue
-        heading = f"Page {page.page_index}"
-        if parts:
-            pos += 2
-        heading_start = pos
-        heading_end = heading_start + len(heading)
-        blocks.append(
-            Heading(
-                level=2,
-                children=[Text(heading)],
-                span=Span(heading_start, heading_end),
-                block_index=len(blocks),
-            )
-        )
-        parts.append(heading)
-        pos = heading_end
-        for paragraph in _split_paragraphs(page.text):
-            pos += 2
+        paragraphs = _split_paragraphs(page.text)
+        # The canonical stream holds only text the source supplies. Page
+        # membership is provenance and rides on every block span; it is not
+        # fabricated into a heading. Whitespace the splitter collapses is
+        # reported below rather than dropped silently.
+        if "\n\n".join(paragraphs) != page.text:
+            normalized_pages.append(page.page_index)
+        for paragraph in paragraphs:
+            if parts:
+                pos += 2
             start = pos
             end = start + len(paragraph)
             blocks.append(
                 Paragraph(
                     children=[Text(paragraph)],
-                    span=Span(start, end),
+                    span=Span(start, end, page=page.page_index),
                     block_index=len(blocks),
                 )
             )
@@ -144,6 +142,25 @@ def parse_pdf_file(
         raw_bytes=captured,
     )
     diagnostics = []
+    if normalized_pages:
+        diagnostics.append(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code="pdf.text-layer-normalized",
+                severity="info",
+                disposition="normalized",
+                loss_kind="presentation",
+                location=DiagnosticLocation(kind="source"),
+                message=(
+                    "Leading, trailing, or blank-line whitespace in the text layer was "
+                    "normalized while splitting paragraphs on pages: "
+                    + ", ".join(str(item) for item in normalized_pages)
+                ),
+                details={"pages": normalized_pages},
+            )
+        )
     warn_pages = [
         page.page_index
         for page in recovery.pages
@@ -333,7 +350,13 @@ def _refused_pdf(
 
 def _pdf_page_texts(document: pdfium.PdfDocument) -> list[str]:
     page_texts: list[str] = []
-    for index in range(len(document)):
+    page_count = len(document)
+    if page_count > PDF_MAX_PAGES:
+        raise _PdfPageUnreadable(
+            page_count,
+            ValueError(f"PDF declares {page_count} pages, above the {PDF_MAX_PAGES} page limit"),
+        )
+    for index in range(page_count):
         page = None
         textpage = None
         try:

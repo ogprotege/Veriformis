@@ -156,8 +156,9 @@ Top-level object:
    MUST be absent. Current exclusions: `delimited-table` and `json-records`
    carry no supported scalar; `source-code` is one code block that cleaning
    never edits, so it can supply no before-and-after pair; `pdf-text`
-   recovery supplies paragraphs under synthetic per-page labels, not real
-   headings, so it can supply neither a section nor a recorded attribute.
+   recovery supplies paragraphs whose spans carry a page index and no
+   headings at all (since parser 1.1.0 it fabricates no `Page N` labels), so
+   it can supply neither a section nor a recorded attribute.
    `required_evidence_diagnostics` MUST include `source-chunks-unavailable`
    for every document-source goal because construction reports it for every
    document-source objective. Item 6.6 proves every named family end to end.
