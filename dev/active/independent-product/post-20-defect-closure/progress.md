@@ -235,3 +235,38 @@ Append-only dated execution log.
   Python, CLI, MCP, and pipeline-spec matrix after the validation repairs.
 - `uv lock --check`, Ruff, project tracking, and `git diff --check` passed.
   D-17 through D-21 are closed within their documented v1 perimeter.
+
+## 2026-09-09 — Stage 6 implementation
+
+- D-29: committed anchors replace the digest read from the current seal output.
+  Both acceptance objectives require nonempty evaluation. Each measured build
+  produced one train and two evaluation rows. Full text manifest:
+  `7fce43f7e71d5d8896d30eefb9ffaaf9248b0fda191c46e5e1abd6f6b52fac4c`.
+  Continuation manifest:
+  `ae8e08c40f4b772706c867582637fc570f8ee11f36cdceafe9f28a97ca258002`.
+  The standalone shell gate passed both anchors and transport verification.
+- D-30: the negative tests now cover malformed parser content, partial
+  publication, forged handoff capabilities and provenance, common exporter
+  corruption, noncanonical ZIP64 metadata, stale or incomplete reviews,
+  conflicting stage pins, environment drift, raw-capture drift, forged gate
+  sets, source coverage loss, and common serializer/replay corruption.
+  The evidence table names these regressions by defect. The added golden
+  regression supplies a wrong committed anchor and verifies refusal.
+- D-31: shared fixture and MCP helpers move to `tests/support/`, preserving
+  fixture bytes and test assertions. No test imports a collected test module.
+  MCP harnesses own their asyncio loops. CI actions use official immutable
+  commit pins. The required `acceptance-matrix` job runs the marked acceptance,
+  goal/input-family, and export round-trip cells; four Python/OS jobs run the
+  other core tests. Local full gates include both selections.
+- Focused workspace and CI regressions: `105 passed` in 9.50s. The helper
+  extraction initially lost two dataclass decorators; restored before the
+  exit gate. Full stage 6 gates remain pending.
+
+## 2026-09-09 — Stage 6 exit gates
+
+- Full required core gate: `2873 passed, 4 skipped, 32 deselected`, one
+  expected transport warning, in 420.63s. This includes both the marked
+  acceptance matrix and the other core tests after the helper extraction.
+- `uv lock --check`, Ruff, project tracking, and `git diff --check` passed.
+  D-29 through D-31 are closed. The changed GitHub jobs still require a
+  successful run on the pushed final branch.

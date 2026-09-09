@@ -1,0 +1,12 @@
+{
+  "continuation": {
+    "evaluation_rows": 2,
+    "manifest_sha256": "ae8e08c40f4b772706c867582637fc570f8ee11f36cdceafe9f28a97ca258002",
+    "train_rows": 1
+  },
+  "full_text": {
+    "evaluation_rows": 2,
+    "manifest_sha256": "7fce43f7e71d5d8896d30eefb9ffaaf9248b0fda191c46e5e1abd6f6b52fac4c",
+    "train_rows": 1
+  }
+}

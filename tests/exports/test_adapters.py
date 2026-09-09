@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from support.mcp import call_tool as _call_tool, call_tool_async as _call_tool_async
+
 import asyncio
 import json
 import os
 import threading
 
 import pytest
-from mcp.types import CallToolResult, TextContent
 from typer.testing import CliRunner
 
 import veriformis.cli as cli_module
@@ -56,28 +57,14 @@ from veriformis.identity import derive_id, lossless_json_bytes
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import ExportDiscoveryOutcome, PipelineService
 
-from test_api import (
+from support.export_api import (
     _deep_export_tree,
     _dry_run_request,
     _execute_request,
-    _materialize_bundle,
     _service,
     _verify_request,
 )
-
-
-async def _call_tool_async(server, name: str, arguments: dict[str, str]) -> str:
-    result = await server.call_tool(name, arguments)
-    assert isinstance(result, CallToolResult)
-    assert result.is_error is False
-    assert len(result.content) == 1
-    content = result.content[0]
-    assert isinstance(content, TextContent)
-    return content.text
-
-
-def _call_tool(server, name: str, arguments: dict[str, str]) -> str:
-    return asyncio.run(_call_tool_async(server, name, arguments))
+from support.bundles import _materialize_bundle
 
 
 def _tool_names(server) -> set[str]:

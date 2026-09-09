@@ -17,7 +17,7 @@ from veriformis.review import (
     required_reviews_block_seal,
 )
 
-from .test_review_queues import _construct
+from support.review import _construct
 
 
 def test_required_pending_review_blocks_seal(tmp_path: Path) -> None:

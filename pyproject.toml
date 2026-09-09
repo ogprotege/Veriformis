@@ -80,7 +80,9 @@ source = ["veriformis"]
 show_missing = true
 
 [tool.pytest.ini_options]
+pythonpath = ["tests"]
 markers = [
+  "matrix: required cross-surface acceptance and export round-trip matrices",
   "aptus_integration: optional Aptus compatibility checks excluded from core release gates",
   "profile_integration: optional trainer-schema loader checks excluded from core release gates",
   "columnar_integration: optional PyArrow/Datasets loader checks excluded from core release gates",

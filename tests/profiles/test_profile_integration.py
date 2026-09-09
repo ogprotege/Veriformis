@@ -20,7 +20,6 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import veriformis.exports.service as _export_service  # noqa: F401 — break profile/export cycle
 from veriformis.profiles import axolotl as axolotl_module
@@ -36,10 +35,13 @@ from veriformis.profiles.llama_factory import (
 from veriformis.profiles.mlx_lm import MLX_LM_EVALUATION_PATH, MLX_LM_TRAIN_PATH
 from veriformis.profiles.trl import TRL_EVALUATION_PATH, TRL_TRAIN_PATH
 
-from test_trl import (  # type: ignore[import-not-found]
-    _materialize_bundle,
+from support.profile_rows import (
     _row_set_for_schema,
     _source_row_set,
+)
+
+from support.bundles import (
+    _materialize_bundle,
 )
 
 pytestmark = pytest.mark.profile_integration

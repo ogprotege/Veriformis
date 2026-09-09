@@ -149,7 +149,8 @@ GitHub Actions (`.github/workflows/ci.yml`) runs on pushes and pull requests.
 
 | Job | Blocking | What it runs |
 | --- | --- | --- |
-| `test` (four cells) | yes | Matrix: Python 3.11, 3.12, 3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, core pytest excluding the `aptus_integration`, `profile_integration`, `columnar_integration`, and `scale_benchmark` markers and `tests/handoff` |
+| `test` (four cells) | yes | Matrix: Python 3.11, 3.12, 3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, core pytest excluding the `aptus_integration`, `profile_integration`, `columnar_integration`, `scale_benchmark`, and `matrix` markers and `tests/handoff` |
+| `acceptance-matrix` | yes | Required marked 74-cell cross-surface acceptance, goal/input-family, and generic export round-trip matrices on Python 3.12 |
 | `install-smoke` | yes | `scripts/release/smoke_install.sh` (clean wheel origin, every discovery command from the installed wheel, full installed-CLI golden path) |
 | `golden-compile` | yes | `scripts/release/golden_compile.sh` (both objectives → canonical seal → `external_digest`; no handoff) |
 | `project-spec-example` | yes | `scripts/release/project_spec_example.sh` (the shipped `examples/project-spec` fingerprint) |
@@ -158,9 +159,11 @@ GitHub Actions (`.github/workflows/ci.yml`) runs on pushes and pull requests.
 | `columnar-integration (optional)` | no | Marked PyArrow / Datasets reload tests with extra `columnar` installed |
 | `xcodebuild-debug (optional)` | no | Unsigned Debug `xcodebuild` build and Swift tests on macOS; not a public Mac claim |
 
-That is eight jobs and eleven check runs per trigger; because the workflow
-runs on both `push` and `pull_request`, a pull request shows twenty-two
-check runs, of which fourteen (the seven blocking runs, twice) can fail it.
+Nine jobs produce twelve check runs per trigger, with eight blocking runs.
+Both `push` and `pull_request` trigger the workflow. The local daily command
+includes matrix tests; CI separates them into the required acceptance job.
+Shared helpers live under `tests/support/`; tests do not import collected
+test modules. Third-party CI actions are pinned to immutable commits.
 Local-only: `git diff --check`. Not yet hard gates: static type checking,
 coverage thresholds, dependency audit, signed/notarized Mac install.
 

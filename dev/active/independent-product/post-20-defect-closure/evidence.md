@@ -33,3 +33,6 @@ fix. Rows are appended as items close; an item without a row is open.
 | D-19 | `tests/automation/test_phase19_diagnostics_and_resume.py` covers environment pins, exact external bytes, mid-run reference mutation, conflicting stage pins, and custom segmentation resume |
 | D-20 | `tests/mapping/test_validation_evidence.py` rejects rehashed incomplete reports and changed raw captures; `tests/datasets/test_validation.py` rejects common serializer/replay corruption |
 | D-21 | `tests/scale/test_scale_baseline.py` observes cancellation and actual retained-workspace resume; absent cancellation leaves observations false |
+| D-29 | `tests/release/test_defectclose_ci.py::test_golden_compile_refuses_a_wrong_committed_anchor`; `tests/regressions/test_group9_release_gates.py`; actual two-objective shell gate with nonempty evaluation and committed digests |
+| D-30 | Negative regressions named in D-01 through D-28 above and the wrong-anchor regression; full required core gate: 2873 passed, 4 skipped, 32 deselected |
+| D-31 | `tests/release/test_defectclose_ci.py` enforces immutable action pins, required matrix separation, no cross-test-module imports, and repeated sync/async MCP calls; full suite verifies shared helpers |

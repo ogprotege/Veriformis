@@ -43,6 +43,8 @@ from veriformis.recipes import load_pipeline_spec, run_pipeline_spec
 from veriformis.taxonomy import IMPLEMENTED_INPUT_FAMILIES
 from veriformis.workspace import Workspace
 
+pytestmark = pytest.mark.matrix
+
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = (

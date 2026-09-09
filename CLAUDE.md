@@ -313,9 +313,11 @@ git diff --check
 ```
 
 The core suite takes roughly 15 minutes on a two-vCPU VM; the Phase 6 goal
-acceptance matrix dominates. GitHub runs eight jobs producing eleven check
-runs per trigger (twenty-two per pull request because the workflow fires on
-both `push` and `pull_request`); the historical "14 GitHub checks" figures in
+acceptance matrix dominates. GitHub runs nine jobs producing twelve check
+runs per trigger. The required `acceptance-matrix` job runs marked acceptance
+and round-trip cells; the four Python/OS cells run the remaining core suite.
+The local command above includes both selections. Both `push` and
+`pull_request` trigger the workflow; the historical "14 GitHub checks" figures in
 phase records describe the seven-run workflow of that time.
 
 Run focused tests while developing, then run the complete checks before handoff.

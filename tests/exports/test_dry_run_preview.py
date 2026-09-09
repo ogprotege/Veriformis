@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-import asyncio
+from support.mcp import call_tool as _call_tool
+
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -10,7 +11,6 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
-from mcp.types import CallToolResult, TextContent
 from typer.testing import CliRunner
 
 import veriformis.cli as cli_module
@@ -64,19 +64,17 @@ from veriformis.identity import derive_id, lossless_json_bytes, sha256_digest
 from veriformis.mcp.server import create_mcp_server
 from veriformis.pipeline import ExportPlanOutcome
 
-from test_api import (
-    EXPECTED_MANIFEST_SHA256,
+from support.export_api import (
     _dry_run_request,
-    _materialize_bundle,
     _service,
-    _tree_bytes,
 )
-from test_constrained_csv import (
+from support.bundles import EXPECTED_MANIFEST_SHA256, _materialize_bundle, _tree_bytes
+from support.export_csv import (
     _dry as _csv_dry_run_request,
     _payload as _schema_payload,
     _row_set_for_schema,
 )
-from test_semantic_round_trip import (
+from support.export_round_trip import (
     ROUND_TRIP_FIXTURE,
     ROUND_TRIP_FIXTURE_SHA256,
     SUCCESSFUL_PAIRS,
@@ -244,20 +242,6 @@ def semantic_round_trip_fixture() -> dict[str, Any]:
     data = ROUND_TRIP_FIXTURE.read_bytes()
     assert sha256_digest(data) == ROUND_TRIP_FIXTURE_SHA256
     return _strict_fixture_object(data)
-
-
-async def _call_tool_async(server, name: str, arguments: dict[str, str]) -> str:
-    result = await server.call_tool(name, arguments)
-    assert isinstance(result, CallToolResult)
-    assert result.is_error is False
-    assert len(result.content) == 1
-    content = result.content[0]
-    assert isinstance(content, TextContent)
-    return content.text
-
-
-def _call_tool(server, name: str, arguments: dict[str, str]) -> str:
-    return asyncio.run(_call_tool_async(server, name, arguments))
 
 
 def test_service_preview_uses_one_snapshot_and_neither_renders_nor_writes(
