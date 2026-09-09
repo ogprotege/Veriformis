@@ -18,6 +18,7 @@ from veriformis.diagnostics import (
 )
 from veriformis.identity import sha256_digest
 from veriformis.ir import Document, Paragraph, Span, Text
+from veriformis.ocr.raster import render_pdf_page_png
 from veriformis.ocr.recovery import recover_pages
 from veriformis.sources import ParseResult, register_source
 
@@ -75,8 +76,6 @@ def parse_pdf_file(
         page_texts = [""]
     rasters: tuple[bytes, ...] | None = None
     if ocr_provider is not None:
-        from veriformis.ocr.raster import render_pdf_page_png
-
         rendered: list[bytes] = []
         for index, text in enumerate(page_texts, start=1):
             if text.strip():

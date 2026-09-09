@@ -568,8 +568,10 @@ that exists only in IR can use strict `IRFieldEvidence`.
 Current cleaning rules are `page-numbers`, `headers-footers`, `whitespace`,
 `urls`, `emails`, `special-chars`, `lowercase`, and one custom removal regular
 expression. With no explicit selection, the CLI applies `page-numbers` and
-`whitespace`. A rule that would remove more than 30 percent of its target is
-skipped and reported.
+`whitespace`. A rule whose edits would remove more than 30 percent of the
+document's cleanable text (code points, measured against the whole document
+after earlier rules) is skipped and reported; a rule that deletes every one
+of its matches still runs when those matches are under that share.
 
 Each clean run creates a source-scoped `CleaningPlan` with exact configuration,
 operations, allowed paths, source locations, before and after digests,

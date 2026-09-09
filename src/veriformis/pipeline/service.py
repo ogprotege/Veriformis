@@ -33,6 +33,7 @@ from veriformis.bundle.finished import FinishedBundleError
 from veriformis.chunkers.base import Chunk, chunk_from_dict, chunk_to_dict, flatten
 from veriformis.chunkers.pipeline import build_chunks
 from veriformis.chunkers.strategies import (
+    CHUNK_STRATEGY_VERSIONS,
     chunk_fixed,
     chunk_paragraph,
     chunk_sentence,
@@ -2261,7 +2262,7 @@ class PipelineService:
                 media_type="application/json",
                 source_ids=tuple(sorted(sources)),
                 producer_id=f"veriformis.chunker.{strategy}",
-                producer_version="1",
+                producer_version=CHUNK_STRATEGY_VERSIONS[strategy],
                 config=config,
             )
             revision = transaction.commit(outputs={"chunks": artifact}, config=config)

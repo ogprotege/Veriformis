@@ -189,9 +189,12 @@ character and byte counts, warnings, and a portable parse-input digest.
 - **Writes:** per-source cleaned IR, the exact cleaning plan, block
   derivations, and the combined transform log.
 
-A rule that would remove more than 30 percent of its target is skipped and
-reported as `warning[<source-id>]: rule '<name>' skipped: ...`
-(`src/veriformis/rules/cleaning.py:776`). Prose rules never edit inline code,
+A rule whose proposed edits would remove more than 30 percent of the
+document's cleanable text (measured in code points against the whole document
+as it stands after the rules that ran before it, not against only the text the
+rule matched) is skipped and reported as
+`warning[<source-id>]: rule '<name>' skipped: ...` (`rules/cleaning.py`,
+the safety check inside `plan_cleaning`). Prose rules never edit inline code,
 code blocks, math, or other literal payloads. Re-running clean with an
 unchanged configuration is a no-op and prints
 `clean unchanged at revision <id>`.

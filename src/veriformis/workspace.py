@@ -23,6 +23,7 @@ from pydantic import (
     model_validator,
 )
 
+from veriformis.chunkers.strategies import CHUNK_STRATEGY_VERSIONS
 from veriformis.contracts import (
     CANONICAL_STREAM_CONTRACT_VERSION,
     CONSTRUCTION_STAGE_SCHEMA_ID,
@@ -1067,7 +1068,7 @@ def _validate_stage_output_bindings(
                             "chunk stage lacks a valid producer strategy"
                         )
                     producer_id = f"veriformis.chunker.{strategy}"
-                    producer_version = "1"
+                    producer_version = CHUNK_STRATEGY_VERSIONS.get(strategy, "1")
                     expected_config_digest = state.config_digest
                 elif state.stage == "construct":
                     producer_id = f"veriformis.construction.{output_name}"
