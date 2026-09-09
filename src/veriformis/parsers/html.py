@@ -6,6 +6,7 @@ chrome are omitted with explicit diagnostics. No network fetch is performed.
 
 from __future__ import annotations
 
+import codecs
 import re
 from pathlib import Path
 
@@ -19,8 +20,15 @@ from veriformis.diagnostics import (
 from veriformis.ir import Document, Heading, Paragraph, Span, Text
 from veriformis.sources import ParseResult, register_source
 
-PARSER_VERSION = "1.0.0"
+# 1.1.0: the capture is decoded by Veriformis (UTF-8 first, then a declared
+# charset) before lxml sees it. libxml2 no longer guesses Latin-1 for undeclared
+# UTF-8; an undecodable capture refuses instead of producing mojibake.
+PARSER_VERSION = "1.1.0"
 _PARSER = "html"
+_CHARSET_SNIFF_BYTES = 4096
+_META_CHARSET = re.compile(rb"<meta[^>]*?charset\s*=\s*[\"']?\s*([A-Za-z0-9_.:-]+)", re.I)
+_XML_ENCODING = re.compile(rb"<\?xml[^>]*?encoding\s*=\s*[\"']([A-Za-z0-9_.:-]+)[\"']", re.I)
+_UTF8_ALIASES = frozenset({"utf-8", "utf8", "utf_8", "u8", "cp65001"})
 _STRIP_TAGS = frozenset(
     {
         "script",
@@ -71,22 +79,248 @@ _PARAGRAPH_TAGS = frozenset({"p", "li", "blockquote", "pre", "td", "th"})
 _WS = re.compile(r"[ \t\f\v]+")
 
 
+class _HtmlDecoding:
+    """Outcome of decoding one HTML capture before markup recovery."""
+
+    __slots__ = ("text", "charset", "diagnostics", "refusal")
+
+    def __init__(
+        self,
+        *,
+        text: str | None,
+        charset: str | None,
+        diagnostics: list[dict],
+        refusal: dict | None,
+    ) -> None:
+        self.text = text
+        self.charset = charset
+        self.diagnostics = diagnostics
+        self.refusal = refusal
+
+
+def _declared_charset(captured: bytes) -> str | None:
+    head = captured[:_CHARSET_SNIFF_BYTES]
+    for pattern in (_META_CHARSET, _XML_ENCODING):
+        match = pattern.search(head)
+        if match is not None:
+            return match.group(1).decode("ascii", errors="replace").strip().lower()
+    return None
+
+
+def _decode_html(captured: bytes) -> _HtmlDecoding:
+    """Decode the capture: BOM, then strict UTF-8, then a declared charset.
+
+    libxml2 assumes ISO-8859-1 for undeclared bytes, which turns valid UTF-8
+    into mojibake with no trace. Veriformis therefore decodes first and hands
+    lxml an explicit UTF-8 encoding. Anything undecodable refuses.
+    """
+    diagnostics: list[dict] = []
+    if captured.startswith(codecs.BOM_UTF8):
+        body = captured[len(codecs.BOM_UTF8) :]
+        try:
+            text = body.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            return _HtmlDecoding(
+                text=None,
+                charset="utf-8",
+                diagnostics=diagnostics,
+                refusal={
+                    "code": "html.charset-invalid",
+                    "message": f"HTML declared UTF-8 by byte-order mark but is not valid UTF-8: {exc}",
+                    "details": {"charset": "utf-8", "declared_by": "bom"},
+                },
+            )
+        diagnostics.append(
+            {
+                "code": "html.bom-removed",
+                "severity": "info",
+                "disposition": "normalized",
+                "loss_kind": "metadata",
+                "message": "A UTF-8 byte-order mark preceded the markup and was not carried into the canonical stream.",
+                "details": {"charset": "utf-8", "declared_by": "bom"},
+            }
+        )
+        return _HtmlDecoding(text=text, charset="utf-8", diagnostics=diagnostics, refusal=None)
+    for bom, charset in (
+        (codecs.BOM_UTF32_LE, "utf-32-le"),
+        (codecs.BOM_UTF32_BE, "utf-32-be"),
+        (codecs.BOM_UTF16_LE, "utf-16-le"),
+        (codecs.BOM_UTF16_BE, "utf-16-be"),
+    ):
+        if captured.startswith(bom):
+            try:
+                text = captured[len(bom) :].decode(charset)
+            except UnicodeDecodeError as exc:
+                return _HtmlDecoding(
+                    text=None,
+                    charset=charset,
+                    diagnostics=diagnostics,
+                    refusal={
+                        "code": "html.charset-invalid",
+                        "message": f"HTML declared {charset} by byte-order mark but could not be decoded: {exc}",
+                        "details": {"charset": charset, "declared_by": "bom"},
+                    },
+                )
+            diagnostics.append(
+                {
+                    "code": "html.charset-declared",
+                    "severity": "info",
+                    "disposition": "normalized",
+                    "loss_kind": "metadata",
+                    "message": f"HTML was decoded from {charset} declared by its byte-order mark.",
+                    "details": {"charset": charset, "declared_by": "bom"},
+                }
+            )
+            return _HtmlDecoding(text=text, charset=charset, diagnostics=diagnostics, refusal=None)
+    try:
+        return _HtmlDecoding(
+            text=captured.decode("utf-8"),
+            charset="utf-8",
+            diagnostics=diagnostics,
+            refusal=None,
+        )
+    except UnicodeDecodeError as utf8_error:
+        utf8_reason = str(utf8_error)
+    declared = _declared_charset(captured)
+    if declared is None:
+        return _HtmlDecoding(
+            text=None,
+            charset=None,
+            diagnostics=diagnostics,
+            refusal={
+                "code": "html.charset-unknown",
+                "message": (
+                    "HTML is not valid UTF-8 and declares no charset; refusing rather than "
+                    f"guessing an encoding: {utf8_reason}"
+                ),
+                "details": {"utf8_error": utf8_reason},
+            },
+        )
+    if declared in _UTF8_ALIASES:
+        return _HtmlDecoding(
+            text=None,
+            charset="utf-8",
+            diagnostics=diagnostics,
+            refusal={
+                "code": "html.charset-invalid",
+                "message": f"HTML declares UTF-8 but is not valid UTF-8: {utf8_reason}",
+                "details": {"charset": declared, "declared_by": "meta", "utf8_error": utf8_reason},
+            },
+        )
+    try:
+        codec = codecs.lookup(declared)
+    except LookupError:
+        return _HtmlDecoding(
+            text=None,
+            charset=declared,
+            diagnostics=diagnostics,
+            refusal={
+                "code": "html.charset-unknown",
+                "message": f"HTML declares an unknown charset {declared!r}; refusing rather than guessing.",
+                "details": {"charset": declared, "declared_by": "meta"},
+            },
+        )
+    try:
+        text = captured.decode(codec.name)
+    except (UnicodeDecodeError, ValueError) as exc:
+        return _HtmlDecoding(
+            text=None,
+            charset=declared,
+            diagnostics=diagnostics,
+            refusal={
+                "code": "html.charset-invalid",
+                "message": f"HTML declares charset {declared!r} but could not be decoded with it: {exc}",
+                "details": {"charset": declared, "declared_by": "meta"},
+            },
+        )
+    diagnostics.append(
+        {
+            "code": "html.charset-declared",
+            "severity": "info",
+            "disposition": "normalized",
+            "loss_kind": "metadata",
+            "message": f"HTML was decoded from declared charset {declared!r}; the canonical stream is exact Unicode.",
+            "details": {"charset": declared, "declared_by": "meta", "codec": codec.name},
+        }
+    )
+    return _HtmlDecoding(text=text, charset=declared, diagnostics=diagnostics, refusal=None)
+
+
+def _refused_result(
+    p: Path,
+    *,
+    captured: bytes,
+    logical_path: str,
+    code: str,
+    message: str,
+    details: dict | None,
+) -> ParseResult:
+    source = register_source(
+        p,
+        _PARSER,
+        "",
+        logical_path=logical_path,
+        parser_version=PARSER_VERSION,
+        raw_bytes=captured,
+    )
+    report = make_parse_report(
+        source_id=source.id,
+        parser_name=_PARSER,
+        parser_version=PARSER_VERSION,
+        diagnostics=(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code=code,
+                severity="error",
+                disposition="refused",
+                loss_kind="text",
+                location=DiagnosticLocation(kind="source"),
+                message=message,
+                details=details,
+            ),
+        ),
+    )
+    return ParseResult(
+        document=Document(children=[], source_id=source.id),
+        source=source,
+        diagnostics=report,
+    )
+
+
 def parse_html_file(
     path: str | Path,
     *,
     logical_path: str,
     raw_bytes: bytes | None = None,
 ) -> ParseResult:
-    """Parse one UTF-8 or charset-declared HTML capture into IR."""
+    """Parse one HTML capture into IR.
+
+    The capture is decoded as UTF-8, or from a byte-order mark or declared
+    charset when it is not valid UTF-8. A capture that decodes no way refuses
+    with ``html.charset-unknown`` / ``html.charset-invalid``; libxml2 never
+    guesses an encoding for Veriformis.
+    """
     p = Path(path)
     captured = raw_bytes if raw_bytes is not None else p.read_bytes()
-    diagnostics: list = []
-    # provisional source id placeholder after stream is known
+    decoding = _decode_html(captured)
+    if decoding.refusal is not None:
+        return _refused_result(
+            p,
+            captured=captured,
+            logical_path=logical_path,
+            code=decoding.refusal["code"],
+            message=decoding.refusal["message"],
+            details=decoding.refusal.get("details"),
+        )
+    assert decoding.text is not None
+    diagnostics: list = list(decoding.diagnostics)
     try:
         document_tree = lxml_html.document_fromstring(
-            captured,
+            decoding.text.encode("utf-8"),
             parser=lxml_html.HTMLParser(
-                encoding=None,
+                encoding="utf-8",
                 remove_blank_text=False,
                 recover=True,
                 no_network=True,
@@ -94,11 +328,10 @@ def parse_html_file(
         )
     except (etree.ParserError, etree.XMLSyntaxError, ValueError, TypeError) as exc:
         # Fall back to empty body with refusal when markup is unusable.
-        stream = ""
         source = register_source(
             p,
             _PARSER,
-            stream,
+            "",
             logical_path=logical_path,
             parser_version=PARSER_VERSION,
             raw_bytes=captured,

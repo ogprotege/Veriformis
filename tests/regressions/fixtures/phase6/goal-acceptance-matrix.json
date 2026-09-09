@@ -127,17 +127,17 @@
       "instruction": null,
       "loss_boundary": "Entire text sequence is supervised.",
       "loss_policy": "full-sequence",
-      "manifest_sha256": "6954b5e333972eee980f53a6c15d2b5be83f5cf23089c2e63606f6c1d526cbdc",
+      "manifest_sha256": "7f56ed6cdc4a48c04c5ee06563bcc25f17f75bf1cd2bd2917da1ea1c2c5fb4b0",
       "preset_id": "learn-the-text.safe",
       "recipe_id": "rcp-v1-aedbb9a57ef78cab416317b055c9c9ddc75e155b707f5082cc5ee849c9b5b9b0",
       "representation_id": "whole-text",
-      "row_set_sha256": "10d17a1d41c22a26379c1bcc0f884a4ced1d2da7708aa7f5e68afe9cd282436a",
+      "row_set_sha256": "7c4cc5cba8a5378580e13aa1ff086655218c6815038362a11d35b2dbf029ebac",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "text",
-      "supervision_sha256": "f46894a93fce6ad565228dbb760af48f48fb8b741ad9af6fc23696b45653db19"
+      "supervision_sha256": "dd3f8b9e87f822cfe557239ee00909f3dcefba84762cff83225e92208a065024"
     },
     {
       "cell_id": "learn-the-text__pdf-text__whole-text",
@@ -597,17 +597,17 @@
       "instruction": null,
       "loss_boundary": "Prompt is context; completion receives supervision.",
       "loss_policy": "completion-only",
-      "manifest_sha256": "2433c1bbd5f67da26ccd81c70aa89bdfda346b5416eaf4373a1fe629344b1205",
+      "manifest_sha256": "ea1f54d27d9871b891d8d8b01414b040eeb1bd8ff2c10487d953c1a2e3a45142",
       "preset_id": "continue-a-passage.safe",
       "recipe_id": "rcp-v1-21767dc93472840de425963450db750c2c92a63b8c793dfe97ad6531d765aede",
       "representation_id": "prompt-and-completion",
-      "row_set_sha256": "593ff04f8e81719942ee5ca93b3b18ca27460f91fc95cdd52d045c78a109e348",
+      "row_set_sha256": "26feb6cf635e839556f0c911f02919934ebed2350c9ce6c9823d30c4d97bd16c",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "completion",
-      "supervision_sha256": "126c6bf35260800803e57bf4a6d3cba8b5f1c4b0d517dd3bfe65fcf3025f0e3e"
+      "supervision_sha256": "b82157ec3c0e79ae73910df93ec7d5ae20a00559dee1387d952b226b90603304"
     },
     {
       "cell_id": "continue-a-passage__html__instruction-and-output",
@@ -626,17 +626,17 @@
       "instruction": "Continue the passage with its exact source remainder.",
       "loss_boundary": "Instruction and input are context; output receives supervision.",
       "loss_policy": "output-only",
-      "manifest_sha256": "2f9ae4434f6dd515c26948ec56b60a74d0766f31ce2c1be5c02d4de70a71e745",
+      "manifest_sha256": "8f0a5f8b9d748d564331bd6854d316ba373775589a2e80c4a92989c9feb1b00c",
       "preset_id": "continue-a-passage.safe",
       "recipe_id": "rcp-v1-a209554256e615cf80311cab5c8cd461a32fdd9a30614fb20c93a67f52ff4b44",
       "representation_id": "instruction-and-output",
-      "row_set_sha256": "ee383e753ad34ab9f4d80802ef42ab415377d40516242a416dfaef957609e0c6",
+      "row_set_sha256": "fb8f4f22dc6245cf4510985b5916761d6e5dff954359d300222741e8867d7b7a",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "output",
-      "supervision_sha256": "a04e9e1b64e3a78fd846e4c9a12dd87b80388ca476b539274491788b4a0a3a17"
+      "supervision_sha256": "95dc3c0a20e8046bc96fd7ff417c8f4aadad09b2372e6c88ca6e598f3c77a89b"
     },
     {
       "cell_id": "continue-a-passage__html__conversation",
@@ -654,17 +654,17 @@
       "instruction": null,
       "loss_boundary": "Only the final assistant message receives supervision.",
       "loss_policy": "final-assistant-suffix",
-      "manifest_sha256": "c21af5779ddb10279e5fdcea442223449759021c608749beaf2a4b150f8ff464",
+      "manifest_sha256": "977ffaa302647015e0e833b0ecbe6b12fd23cd826ff1a3d256a74247b75cc510",
       "preset_id": "continue-a-passage.safe",
       "recipe_id": "rcp-v1-fc187a90849c8a8ed14119b236af5f4064fa817f35b7435eda44eba755a81adc",
       "representation_id": "conversation",
-      "row_set_sha256": "6f3a2c87201cb0123190197d46b23fe4dabcf97fb9236c6a747f5dbd66cf7eca",
+      "row_set_sha256": "d7a7405cb32ad8151f389e907dc448864df7a9d56126c1769a0c62eeeb5400bb",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "messages[1].content",
-      "supervision_sha256": "d6bad7912bab5e7154084b085a60c8b23bbb938513c90ceff1715849bcdfc22e"
+      "supervision_sha256": "5de40bb010aef31d19863d7e5fb18844dafd328ec3f9ae97b69227bf3cfb7828"
     },
     {
       "cell_id": "continue-a-passage__pdf-text__prompt-and-completion",
@@ -1107,17 +1107,17 @@
       "instruction": null,
       "loss_boundary": "Prompt is context; completion receives supervision.",
       "loss_policy": "completion-only",
-      "manifest_sha256": "671ab58390975014c98632d161dd05137dd854ba15959891ff0c4b17a98f8a87",
+      "manifest_sha256": "f99cb9431db402e839a829f969c902728301ffd2eb3ca95adbb252ead1cae4d1",
       "preset_id": "recover-a-section-from-its-heading.safe",
       "recipe_id": "rcp-v1-d2ffbfdbcd3813547f1fc02834f49de8d9b44da0af8a3674e5d308a88487b645",
       "representation_id": "prompt-and-completion",
-      "row_set_sha256": "8ad586edbc9ed37c2318e55045e9c5a152f88fbdb741012783c8d20bed5e3c2e",
+      "row_set_sha256": "f9b67fdeffc8cac2daf9bf5f9d9b6fb18a092c3129a5d1d7f43320a6c4b272a7",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "completion",
-      "supervision_sha256": "e81a649ac612f989b37d5d16669c39bb7fe3e49f5bbf4d9a6bf7e6767e96c272"
+      "supervision_sha256": "cc419e62e55c09f938b17975dfd0e309c17bde462ddc7a65e40ce0c9de625dee"
     },
     {
       "cell_id": "recover-a-section-from-its-heading__html__instruction-and-output",
@@ -1136,17 +1136,17 @@
       "instruction": "Produce the exact source section body for this heading.",
       "loss_boundary": "Instruction and input are context; output receives supervision.",
       "loss_policy": "output-only",
-      "manifest_sha256": "19959e10f7968f7646d416718253759311d417ca97b59ad2a55c13b47cf8ff44",
+      "manifest_sha256": "46329cd9968a3a35a095d6f5d1bb8da1e8f1101236de775aed5a66b571d24728",
       "preset_id": "recover-a-section-from-its-heading.safe",
       "recipe_id": "rcp-v1-7bc455f6d3e5707f55aa6104a9791a9aac6895c10aedd8e0d352ab24762f980a",
       "representation_id": "instruction-and-output",
-      "row_set_sha256": "86474601b4c085f8ef1b8911c47bc1def46fde818140245b269f34808502a31c",
+      "row_set_sha256": "ba5aff53e6fa002ed49b14fa3c6ed5534663c018e8fb194ba28336971d4736d3",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "output",
-      "supervision_sha256": "43a8adffc6ef1d35a31ec3c7697d9e1d6b34448a0bbef9be7bb71824d307b14c"
+      "supervision_sha256": "765901a415b69195973e5cf3e124f849127b5477c0d324f5dbf248eb933ba9db"
     },
     {
       "cell_id": "recover-a-section-from-its-heading__html__conversation",
@@ -1164,17 +1164,17 @@
       "instruction": null,
       "loss_boundary": "Only the final assistant message receives supervision.",
       "loss_policy": "final-assistant-suffix",
-      "manifest_sha256": "cdb79fdc6f2f0eded03d6b9cd983b7bf7739d92e7511a18a3c885672ed6265f9",
+      "manifest_sha256": "87d9ce03dfba77f3f85b7c917862dbda8ed07c436502998dd8b0747acfdc65b1",
       "preset_id": "recover-a-section-from-its-heading.safe",
       "recipe_id": "rcp-v1-862a4382218e381053398ca9439eae7bbe450500cb13bb0e408c0f4fc0fd0156",
       "representation_id": "conversation",
-      "row_set_sha256": "36da2a1c443e2c8457c9b87b9118665c292d6e008ca447618bb58d809d06d271",
+      "row_set_sha256": "d566157b94a99d6637fadc570bf6359e629468dbc82e01efd27357c44addd62b",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "messages[1].content",
-      "supervision_sha256": "65d69cb4219b793ab85578a29bc9968ac70f0a5606273cb4e3dd54c9da29d599"
+      "supervision_sha256": "6034ede98b356a332151c277172ceb18158b216c268c467cc19c031678488c35"
     },
     {
       "cell_id": "reproduce-a-recorded-change__plain-text__prompt-and-completion",
@@ -1471,17 +1471,17 @@
       "instruction": null,
       "loss_boundary": "Prompt is context; completion receives supervision.",
       "loss_policy": "completion-only",
-      "manifest_sha256": "fcd00f22eff3609924a7111da716fd673a4412e342ade233f21787d7d5fcdd95",
+      "manifest_sha256": "e7828102d97dc5c222a7101860e82f59049d5c2fdb664593fc0e9f42403ab5d0",
       "preset_id": "reproduce-a-recorded-change.safe",
       "recipe_id": "rcp-v1-509d07e51b9c68794f6f20823e0ad0c0d93e3419dfceaa40965e848d059786aa",
       "representation_id": "prompt-and-completion",
-      "row_set_sha256": "b8cd143af1730ada1e329e2585d2cf486e187e1f3c558ec01a37aa6493e6f15a",
+      "row_set_sha256": "6d5a830d80523209eb2d5a6afe875e29aaadf88d724ba884c588fd895b7a6dc9",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "completion",
-      "supervision_sha256": "b3484214415f4f3b6f4f41b7753a00004c407b01537e11661b102223e31d209c"
+      "supervision_sha256": "82deda72e8f56d66a1c05442713ad11b867eb12cdefccaffaffd19f87880c647"
     },
     {
       "cell_id": "reproduce-a-recorded-change__html__instruction-and-output",
@@ -1500,17 +1500,17 @@
       "instruction": "Apply the recorded cleaning change to this exact source text.",
       "loss_boundary": "Instruction and input are context; output receives supervision.",
       "loss_policy": "output-only",
-      "manifest_sha256": "15978cb6fba693d19cec1b5e189fddab3a45c32cda6dd836e58b029ce6d62941",
+      "manifest_sha256": "cddd7aa85883460204abe3f4943959a65d51e036d7c362b54585091645637760",
       "preset_id": "reproduce-a-recorded-change.safe",
       "recipe_id": "rcp-v1-2208ddf18ee7bce0314c447b43847ed84b8f70e4e835b8276fdc22d12bbfbb27",
       "representation_id": "instruction-and-output",
-      "row_set_sha256": "234bc7eaf2598ce93a77cd50bbc67dc52c2162cea89ea2c43066454577df7716",
+      "row_set_sha256": "e06b2f9aeb2221b9dc748a3e2cb121ba746698af8d95db229694ab0afc57d306",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "output",
-      "supervision_sha256": "0d36dfd3560e2335b6655116e92e8db046596cc729e4a9be96f2f07aa2b53227"
+      "supervision_sha256": "0021eaa08e11adab80ec3bfaed5cc0bdd004ab2c8bb1324281b5fd6dd07e0177"
     },
     {
       "cell_id": "reproduce-a-recorded-change__html__conversation",
@@ -1528,17 +1528,17 @@
       "instruction": null,
       "loss_boundary": "Only the final assistant message receives supervision.",
       "loss_policy": "final-assistant-suffix",
-      "manifest_sha256": "204e398026cbeeefb7751484c73a84ae74eca5dace4cc93538b5ce5d2dba3afd",
+      "manifest_sha256": "5562328f8dff4a05303705f38d4c4737cd39b341c507940ae3f0e26dbc43bf9b",
       "preset_id": "reproduce-a-recorded-change.safe",
       "recipe_id": "rcp-v1-7894a57490291b91b61aba9e1e713fa94ceb446076f6fc9147c873e7a30c66da",
       "representation_id": "conversation",
-      "row_set_sha256": "708b0cd2a9a29df7da09b5b37b3517c5b15c489e0c0f8234ba7471226bddf0ec",
+      "row_set_sha256": "0bd1afbb37aad746bed3446e11178fd474441366c0b430ae74bebe465bd9190e",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "messages[1].content",
-      "supervision_sha256": "b4a74eac50fee8e42f5240e82a53ef01411b66ef8c4cc243107a446fcb2104dc"
+      "supervision_sha256": "87f42ce08b72961ccbbcf80377482e617dca76e9bbc271e6e8f0d9670fc629d7"
     },
     {
       "cell_id": "reproduce-a-recorded-change__pdf-text__prompt-and-completion",
@@ -2066,17 +2066,17 @@
       "instruction": null,
       "loss_boundary": "Prompt is context; completion receives supervision.",
       "loss_policy": "completion-only",
-      "manifest_sha256": "b2ba18b2deb54b7ff45f4c39cc91612a4cea9a9b5da597f218414d9aa7e92ef1",
+      "manifest_sha256": "61ab68c3fd6b819ef8fade3df7976074c507eb30e54c4ec263cb32c833fe6909",
       "preset_id": "extract-a-structured-value.safe",
       "recipe_id": "rcp-v1-92cbe4d12547a4b21f60bf188bf8143b4fb14a20995ce1d731d8aa2af8ff7f23",
       "representation_id": "prompt-and-completion",
-      "row_set_sha256": "f41daa6fc97d8b29a5b29558b82c1701844273ee5ae17c5138fe3463dbff7064",
+      "row_set_sha256": "d4777a30495b67488f34b0fbde0546406a84d1c288ec5ac61b2384745adc7c1b",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "completion",
-      "supervision_sha256": "636e1ce825d081d7ef9565ef17f0dc9fcb51ecb09b37ce6c86c62dac8cfa8d3f"
+      "supervision_sha256": "4ce3809fef637ffe6b21cb6cbc967678eb259a265806d2e6ff332ea8037a218d"
     },
     {
       "cell_id": "extract-a-structured-value__html__instruction-and-output",
@@ -2095,17 +2095,17 @@
       "instruction": "Produce the exact structural attribute recorded by this source.",
       "loss_boundary": "Instruction and input are context; output receives supervision.",
       "loss_policy": "output-only",
-      "manifest_sha256": "1b78730d86e7e0ec0d9c3abc5a08c3a0e58ccb2b56edd16845c11ec1bc8ac9ab",
+      "manifest_sha256": "213f8012eade19061dbaeee4acfc27673e2d0d00d3969f2c4bb2237b3056b886",
       "preset_id": "extract-a-structured-value.safe",
       "recipe_id": "rcp-v1-e9db611b25420466e1588bedee1e92d6c8bfb50fea1a95c57d2de5fc247b5edb",
       "representation_id": "instruction-and-output",
-      "row_set_sha256": "35b8f826ebed3b92180fffe03fb434e19915c41fdb6c5a3251d6888a360eaf29",
+      "row_set_sha256": "c4056769612a315f019d9cc2239f928f6ac8a36725373aa79f54462131482216",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "output",
-      "supervision_sha256": "917d0d372a84fe1793123d5744845b8137cb613e699d073aaff1d80447a085e6"
+      "supervision_sha256": "31f9b6378f3476174aeff18675f95b72d1ed1639976fe8720aea6c247705be35"
     },
     {
       "cell_id": "extract-a-structured-value__html__conversation",
@@ -2123,17 +2123,17 @@
       "instruction": null,
       "loss_boundary": "Only the final assistant message receives supervision.",
       "loss_policy": "final-assistant-suffix",
-      "manifest_sha256": "bb1baac1214a1121f39ce1a5b09720ad50f916a77f509d77738bfb6a0d62842c",
+      "manifest_sha256": "f4d9589d54929a2c176779dda32d6fabaf30c12def2ac40b484e093e7bf62ce4",
       "preset_id": "extract-a-structured-value.safe",
       "recipe_id": "rcp-v1-779f92feacef4060da8f903c21a8e9e1564240a608a378c30b5e6d8e5cb9bce3",
       "representation_id": "conversation",
-      "row_set_sha256": "2c4e446305e1e5702f6762cf1e59b72bf03b2947ed1cf10c97274a53c68a4c52",
+      "row_set_sha256": "2cc88158aa543c166bfbe7328a3ab9514da686aa3dba83a6014e6ebec5937fbc",
       "source_fixture_ids": [
         "html-a-v1",
         "html-b-v1"
       ],
       "supervised_row_key": "messages[1].content",
-      "supervision_sha256": "7e38a7294bf2c77886418dcca588b37772a9bdbf46d1af60002a0905c41cce92"
+      "supervision_sha256": "3fa7585a4e8047045fd0e4985318fc82ab5285a36d2cf4f54a728b378c8c2297"
     }
   ],
   "preset_catalog_sha256": "1e10be877401c796ca5f2a927f0289c3c8a2264e664b32e7f8fad18b3107f743",
