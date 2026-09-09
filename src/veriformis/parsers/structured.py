@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -30,8 +31,8 @@ from veriformis.sources import ParseResult, register_source
 # duplicate keys; floats keep their shortest round-trip form; string values and
 # object key order are preserved exactly; JSONL frames on newline only.
 CSV_PARSER_VERSION = "1.1.0"
-JSON_PARSER_VERSION = "1.1.0"
-JSONL_PARSER_VERSION = "1.1.0"
+JSON_PARSER_VERSION = "1.1.1"
+JSONL_PARSER_VERSION = "1.1.1"
 
 
 def parse_csv_file(
@@ -273,6 +274,13 @@ def _refuse_json_constant(token: str) -> Any:
     raise ValueError(f"non-finite JSON number {token!r} is not admitted")
 
 
+def _finite_json_float(token: str) -> float:
+    value = float(token)
+    if not math.isfinite(value):
+        _refuse_json_constant(token)
+    return value
+
+
 def _refuse_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
@@ -294,6 +302,7 @@ def _load_json_text(text: str) -> Any:
     return json.loads(
         text,
         parse_constant=_refuse_json_constant,
+        parse_float=_finite_json_float,
         object_pairs_hook=_refuse_duplicate_keys,
     )
 

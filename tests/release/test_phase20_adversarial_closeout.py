@@ -66,7 +66,7 @@ def test_goldens_and_forbidden_surfaces_hold() -> None:
     )
     assert (
         fingerprint["manifest_sha256"]
-        == "d3f76eb9993476def1bb373ed80eccc9ac7a1bc529c96c04e6667eaa02e88ac8"
+        == "e1146ecae6f714fd5a189d313211bfb37f98907047e6930554b2bb4936e1db3b"
     )
     cli_names = _cli_names()
     mcp_names = _mcp_names()

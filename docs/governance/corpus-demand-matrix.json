@@ -59,8 +59,8 @@
             "declared_v1_input_suffix": true,
             "extension": ".pdf",
             "family": "portable-document",
-            "file_count": 15,
-            "total_bytes": 215581
+            "file_count": 16,
+            "total_bytes": 216493
           },
           {
             "declared_v1_input_suffix": true,
@@ -97,8 +97,8 @@
           },
           {
             "family": "portable-document",
-            "file_count": 15,
-            "total_bytes": 215581
+            "file_count": 16,
+            "total_bytes": 216493
           },
           {
             "family": "source-code",
@@ -121,7 +121,7 @@
             "total_bytes": 217201
           }
         ],
-        "file_count": 54,
+        "file_count": 55,
         "hidden_entry_count": 0,
         "inaccessible_entry_count": 0,
         "other_entry_count": 0,
@@ -133,8 +133,8 @@
           },
           {
             "bucket": "1b_to_1kib",
-            "file_count": 37,
-            "total_bytes": 9402
+            "file_count": 38,
+            "total_bytes": 10314
           },
           {
             "bucket": "over_1kib_to_1mib",
@@ -153,7 +153,7 @@
           }
         ],
         "symlink_count": 0,
-        "total_bytes": 451515
+        "total_bytes": 452427
       },
       "evidence_grade": "test-verified",
       "limitations": [

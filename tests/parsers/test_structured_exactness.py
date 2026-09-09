@@ -12,6 +12,8 @@ from __future__ import annotations
 import codecs
 from pathlib import Path
 
+import pytest
+
 from veriformis.parsers.structured import (
     CSV_PARSER_VERSION,
     JSON_PARSER_VERSION,
@@ -35,7 +37,8 @@ def _codes(result) -> dict[str, object]:
 
 
 def test_parser_pins_advanced() -> None:
-    assert CSV_PARSER_VERSION == JSON_PARSER_VERSION == JSONL_PARSER_VERSION == "1.1.0"
+    assert CSV_PARSER_VERSION == "1.1.0"
+    assert JSON_PARSER_VERSION == JSONL_PARSER_VERSION == "1.1.1"
     assert TEXT_PARSER_VERSION == "1.2.0"
 
 
@@ -44,6 +47,17 @@ def test_json_non_finite_numbers_are_refused(tmp_path: Path) -> None:
     assert result.diagnostics.status == "refused"
     refusal = _codes(result)["json.invalid"]
     assert "NaN" in refusal.message
+
+
+@pytest.mark.parametrize("token", ["1e999", "-1e999", "Infinity", "-Infinity", "NaN"])
+@pytest.mark.parametrize("parser,suffix", [(parse_json_file, "json"), (parse_jsonl_file, "jsonl")])
+def test_all_non_finite_spellings_refuse(tmp_path: Path, token: str, parser, suffix: str) -> None:
+    result = parser(
+        _write(tmp_path, f"overflow.{suffix}", ('{"a":' + token + '}\n').encode()),
+        logical_path=f"overflow.{suffix}",
+    )
+    assert result.diagnostics.status == "refused"
+    assert result.source.extracted_text == ""
 
 
 def test_json_duplicate_keys_are_refused(tmp_path: Path) -> None:

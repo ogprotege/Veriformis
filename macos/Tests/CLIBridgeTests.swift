@@ -230,6 +230,15 @@ final class CLIBridgeTests: XCTestCase {
             let script = """
             #!/bin/sh
             stage="$1"
+            # The real parse command creates its workspace. The app owns only
+            # the sibling sidecar, so the fake must reproduce this CLI effect.
+            if [ "$stage" = "parse" ]; then
+              previous=""
+              for argument in "$@"; do
+                if [ "$previous" = "-o" ]; then mkdir -p "$argument"; break; fi
+                previous="$argument"
+              done
+            fi
             if [ "$stage" = "preflight" ]; then
               \(try compilePreflightHeredoc())
               exit 0
@@ -239,6 +248,7 @@ final class CLIBridgeTests: XCTestCase {
             fi
             if [ "$stage" = "\(stage.rawValue)" ]; then
               trap 'exit 0' TERM INT
+              touch "\(root.appendingPathComponent("stage-started").path)"
               while :; do sleep 0.02; done
             fi
             exit 0
@@ -269,7 +279,10 @@ final class CLIBridgeTests: XCTestCase {
 
             var reachedStage = false
             for _ in 0 ..< 300 {
-                if workbench.isRunning, workbench.currentStage == stage {
+                if workbench.isRunning, workbench.currentStage == stage,
+                   FileManager.default.fileExists(
+                       atPath: root.appendingPathComponent("stage-started").path
+                   ) {
                     reachedStage = true
                     break
                 }

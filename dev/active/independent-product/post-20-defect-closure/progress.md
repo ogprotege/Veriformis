@@ -128,3 +128,48 @@ Append-only dated execution log.
   `canonical_json_bytes` has no production callers. The exact fingerprint was
   already exact and consistent with the conflict key. A regression pinning
   NFC/NFD distinctness is added in Phase 4 instead of a fingerprint v2.
+
+## 2026-09-09 — Local takeover and stages 1–3 verification
+
+- Verified branch `cursor/post-20-defect-closure-e294` and local/remote HEAD
+  `3e529f4498312b64e3092cd977a8238bdc84586b`. The saved branch has 22 commits
+  after `5d617f88c1b22513c5f52ac5682a6a5088570d96`. PR #203 has one separate
+  commit, `ae5e13cb0f064a811f10320826f049b9ee5d9c3e`, on
+  `feat/quality-report-dataset-row`; neither branch contains the other.
+  No integration of #203 was performed. All six local-only files matched
+  their preserved copies and SHA-256 receipts before edits.
+- The unchanged saved HEAD passed lock, Ruff, and tracking checks. The core
+  gate produced `2 failed, 2804 passed, 4 skipped, 32 deselected` in 388.57s.
+  Both failures reproduced GitHub: stale project-spec manifest and fixture
+  inventory missing `group5/two-page-text.pdf` (912 bytes).
+- Recompiled the retained project-spec example from isolated source trees at
+  base and saved HEAD. Base reproduced manifest
+  `d3f76eb9993476def1bb373ed80eccc9ac7a1bc529c96c04e6667eaa02e88ac8`;
+  saved HEAD reproduced
+  `e1146ecae6f714fd5a189d313211bfb37f98907047e6930554b2bb4936e1db3b`.
+  Raw sources and spec were identical. Recovered payloads were identical as
+  a combined set, but parser-derived record identities changed partition
+  assignment: Alpha moved from train to evaluation, Beta from evaluation
+  to train. Both runs retained one row in each partition. Updated only the
+  manifest pin. Regenerated the repository fixture aggregate with
+  `scripts/scan_corpus_metadata.py tests/fixtures --source-id repository-test-fixtures --evidence-grade test-verified --portability repository-tracked`.
+- Review of D-13 reproduced numeric overflow (`1e999` projected as `inf`).
+  JSON and JSONL now refuse overflowing exponents, with producer pins
+  `1.1.1` and ten negative cases. Regenerated the 74-cell fixture through
+  its existing `--generate` command. Only the JSON-record cells changed,
+  and only manifest, row-set, and supervision digests changed.
+- The Mac cancellation fake did not create a workspace after D-04 correctly
+  moved app-owned files to a sibling sidecar. The fake now reproduces the
+  real `parse -o` workspace creation. The receipt continues to report actual
+  filesystem existence. No assertion was weakened.
+- Focused takeover regressions: `29 passed` in 1.43s. Full exit gates remain
+  pending until their results are recorded below.
+
+- Final stages 1–3 exit gates: lock, Ruff, tracking, and diff checks passed.
+  Core: `2816 passed, 4 skipped, 32 deselected`, one expected transport warning,
+  in 421.64s. The preceding repaired run exposed a second stale copy of the
+  project-spec manifest in the Phase 20 adversarial test; both pins now agree.
+- Unsigned Debug Mac runtime: `114 tests, 0 failures` in 353.871s, including
+  the 74-cell matrix, real dataset-row compile, and cancellation receipts.
+  The fake waits for its cancellation handler to be installed before the test
+  cancels. D-23 remains open for stage 8.

@@ -57,6 +57,7 @@ The post-20 defect-closure packet moved these pins on 2026-09-09:
 | `pdf` parser | `1.0.0` | `1.1.0` | No synthetic `Page N` headings; every paragraph span carries its page index; text-layer whitespace normalization diagnosed; unreadable pages and oversized page counts refuse |
 | `docx` parser | `1.2.0` | `1.3.0` | Hardened XML parser for note parts; declared inflated-size and member-count caps; text inside drawings diagnosed as text loss; accepted moved text retained once |
 | `csv`, `json`, `jsonl` parsers | `1.0.0` | `1.1.0` | CSV BOM removed and diagnosed; trimmed cells and omitted blank rows diagnosed; JSON refuses `NaN`/`Infinity` and duplicate keys; floats keep shortest round-trip form; string values and key order exact; JSONL frames on `\n` only |
+| `json`, `jsonl` parsers | `1.1.0` | `1.1.1` | Exponent overflow such as `1e999` also refuses instead of projecting `inf` |
 | `text` parser | `1.1.0` | `1.2.0` | Invalid UTF-8 refuses with `text.not-utf8`; leading BOM removed and diagnosed |
 | `sentence` chunker | `1` | `2` | Unicode-aware sentence boundaries (closing quotes, non-ASCII capitals, caseless scripts, CJK terminators) |
 
