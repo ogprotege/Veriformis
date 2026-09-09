@@ -10,6 +10,7 @@ from pathlib import Path
 from veriformis.pipeline.service import PipelineService, StageOutcome
 from veriformis.recipes.library import RECIPE_LIBRARY_IDS
 from veriformis.recipes.pipeline_spec import PipelineSpec, PipelineSpecError
+from veriformis._operation import workspace_operation
 from veriformis.workspace import Workspace
 
 
@@ -32,6 +33,7 @@ def _optional_bool(value: Any) -> bool | None:
     return None if value is None else bool(value)
 
 
+@workspace_operation
 def run_pipeline_spec(
     spec: PipelineSpec,
     *,

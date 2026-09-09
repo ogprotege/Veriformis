@@ -119,6 +119,12 @@ validation replays captured raw sources and checks every named gate. Report
 loaders require complete gate and file bindings. Persisted schema identifiers
 and valid-output identities remain unchanged.
 
+Workspace operations reuse one verified history and captured artifact reads
+within the outer command, with live HEAD and file-change checks. Export execute
+reuses one verified source capture and spools renderer trees for comparison.
+Near-duplicate reports use an exact prefix index without changing report bytes.
+These changes add no measured scale support tier.
+
 **Review date:** 2026-09-09 (post-20 defect closure in progress)
 
 **Next review:** Any capability claim change.

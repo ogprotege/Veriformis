@@ -13,6 +13,9 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from veriformis._operation import workspace_operation
+from veriformis.exports._spool import SpooledTree
+from veriformis.exports._source_snapshot import capture_source, get_snapshot
 from veriformis.bundle import (
     VALIDATION_PATH,
     FinishedBundleManifest,
@@ -228,6 +231,7 @@ class ExportService:
             receipt=receipt,
         )
 
+    @workspace_operation
     def execute_export(
         self,
         request: ExportExecuteRequest | ExportExecuteRequestV2,
@@ -528,9 +532,11 @@ class ExportService:
                 "expected_manifest_sha256"
             )
 
-        source = inspect_finished_bundle(
-            bundle,
-            expected_manifest_sha256=expected_manifest_sha256,
+        source = capture_source(
+            bundle, source_trust_policy, expected_manifest_sha256,
+            lambda: inspect_finished_bundle(
+                bundle, expected_manifest_sha256=expected_manifest_sha256,
+            ),
         )
         expected_grade: SourceTrustGrade = (
             "external_digest"
@@ -710,6 +716,7 @@ class ExportService:
                 f"invalid candidate derivative membership evidence: {exc}"
             ) from exc
 
+    @workspace_operation
     def publish(
         self,
         plan: ExportPlan,
@@ -788,60 +795,64 @@ class ExportService:
             row_set_bytes,
             cancellation_check=cancellation_check,
         )
-        second_files = self._render_and_validate(
-            plan_bytes,
-            row_set_bytes,
-            cancellation_check=cancellation_check,
+        snapshot = get_snapshot(
+            bundle, checked_plan.source_trust_policy, expected_manifest_sha256,
         )
-
-        if checked_plan.container_profile.determinism_claim == "portable_exact_bytes":
-            if first_files != second_files:
-                raise ExportVerificationError(
-                    "portable exact renderer executions produced different byte trees"
+        source_check = snapshot.check if snapshot is not None else None
+        exact = checked_plan.container_profile.determinism_claim == "portable_exact_bytes"
+        with SpooledTree(first_files) as first_tree:
+            del first_files
+            second_files = self._render_and_validate(
+                plan_bytes, row_set_bytes, cancellation_check=cancellation_check,
+            )
+            if exact:
+                if not first_tree.matches(second_files):
+                    raise ExportVerificationError(
+                        "portable exact renderer executions produced different byte trees"
+                    )
+                del second_files
+                _run_cancellation_check(cancellation_check)
+                return _publish_exact_export(
+                    destination_root,
+                    source_root=source.bundle_path,
+                    plan=checked_plan,
+                    files=first_tree,
+                    cancellation_check=cancellation_check,
+                    source_check=source_check,
                 )
+
+            with SpooledTree(second_files) as second_tree:
+                del second_files
+                first_semantics = self._replay_and_validate(
+                    plan_bytes, tuple(first_tree.items()), cancellation_check=cancellation_check,
+                )
+                second_semantics = self._replay_and_validate(
+                    plan_bytes, tuple(second_tree.items()), cancellation_check=cancellation_check,
+                )
+            if first_semantics != second_semantics:
+                raise ExportVerificationError(
+                    "semantic renderer executions produced different canonical content"
+                )
+            del second_semantics
             _run_cancellation_check(cancellation_check)
-            return _publish_exact_export(
+
+            def replay_staged(
+                replay_files: tuple[tuple[str, bytes], ...],
+            ) -> tuple[tuple[str, bytes], ...]:
+                return self._replay_and_validate(
+                    plan_bytes, replay_files, cancellation_check=cancellation_check,
+                )
+
+            return _publish_semantic_export(
                 destination_root,
                 source_root=source.bundle_path,
                 plan=checked_plan,
-                files=first_files,
+                files=first_tree,
+                expected_semantic_preimages=first_semantics,
+                semantic_replay=replay_staged,
                 cancellation_check=cancellation_check,
+                source_check=source_check,
             )
-
-        first_semantics = self._replay_and_validate(
-            plan_bytes,
-            first_files,
-            cancellation_check=cancellation_check,
-        )
-        second_semantics = self._replay_and_validate(
-            plan_bytes,
-            second_files,
-            cancellation_check=cancellation_check,
-        )
-        if first_semantics != second_semantics:
-            raise ExportVerificationError(
-                "semantic renderer executions produced different canonical content"
-            )
-        _run_cancellation_check(cancellation_check)
-
-        def replay_staged(
-            replay_files: tuple[tuple[str, bytes], ...],
-        ) -> tuple[tuple[str, bytes], ...]:
-            return self._replay_and_validate(
-                plan_bytes,
-                replay_files,
-                cancellation_check=cancellation_check,
-            )
-
-        return _publish_semantic_export(
-            destination_root,
-            source_root=source.bundle_path,
-            plan=checked_plan,
-            files=first_files,
-            expected_semantic_preimages=first_semantics,
-            semantic_replay=replay_staged,
-            cancellation_check=cancellation_check,
-        )
 
     def _render_and_validate(
         self,

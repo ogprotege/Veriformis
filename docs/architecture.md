@@ -1,6 +1,6 @@
 # Architecture
 
-**Last reviewed:** 2026-08-31 (independent-product Phase 19 closeout)
+**Last reviewed:** 2026-09-09 (post-20 defect closure)
 
 **Next review:** Any service-boundary or architecture change
 
@@ -155,13 +155,21 @@ workspace/
 - Active workspaces use revision schema 3. `HEAD` is the only mutable commit
   pointer; commits hold an exclusive `LOCK`, require the expected parent, and
   leave the prior revision current if interrupted pre-commit.
-- Opening a workspace re-verifies every revision in the active parent chain
-  and re-hashes every referenced object; altered bytes fail closed.
+- Each outer workspace operation verifies the active parent chain once and
+  hashes every referenced object. Nested loaders reuse captured bytes and
+  copied replay results within that operation. File identities and timestamps
+  are rechecked on reuse and before publication; HEAD is always read live.
+  Captured bytes spill to private temporary storage after eight MiB. No cache
+  survives the outer call. Direct Workspace use retains fresh verification.
 - If `HEAD` changes but the final directory sync fails, the API returns the
   visible revision with a durability warning rather than reporting rollback.
 - `upgrade-workspace` migrates revision v1 through v2 to v3 stepwise: v2 to
   v3 preserves parse, clean, chunk, and construct facts, adds curate and
   split as absent, and retires legacy format, validate, and seal state.
+
+`_workspace_validation.py` contains the document stage replay validators.
+The transaction still controls byte access, error boundaries, and publication.
+Construction and finished-stage output kinds derive from `contracts.py`.
 
 ## Stage graph
 
@@ -242,6 +250,13 @@ name.vfbundle/
   or versioned canonical semantic preimages, and uses descriptor-anchored
   staging plus one atomic no-replace promotion. Semantic output is replayed from
   staged descriptors before verification.
+- One export execution reuses its single descriptor-verified source snapshot
+  after checking the closed source tree for changes. It checks again at the
+  final promotion checkpoint. The first rendering is held in private temporary
+  storage while the second runs. Exact comparison reads that storage in chunks;
+  semantic replay loads one physical tree at a time. The renderer and semantic
+  replay interfaces still return whole trees, so this is not a streaming or
+  measured scale support claim.
 - Phase 4.8 adds an exports-owned private implementation catalog plus strict
   discovery, dry run, self-described inspect, operator-confirmed execute, and
   source-bound verify operations through `PipelineService`, CLI, MCP, and the

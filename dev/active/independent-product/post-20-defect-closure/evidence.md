@@ -36,3 +36,7 @@ fix. Rows are appended as items close; an item without a row is open.
 | D-29 | `tests/release/test_defectclose_ci.py::test_golden_compile_refuses_a_wrong_committed_anchor`; `tests/regressions/test_group9_release_gates.py`; actual two-objective shell gate with nonempty evaluation and committed digests |
 | D-30 | Negative regressions named in D-01 through D-28 above and the wrong-anchor regression; full required core gate: 2873 passed, 4 skipped, 32 deselected |
 | D-31 | `tests/release/test_defectclose_ci.py` enforces immutable action pins, required matrix separation, no cross-test-module imports, and repeated sync/async MCP calls; full suite verifies shared helpers |
+| D-32 | `tests/regressions/test_operation_evidence.py` counts one history verification and one file read per command, preserves live HEAD conflicts, and refuses artifact or staging mutation |
+| D-33 | `tests/exports/test_operation_storage.py` counts one source inspection, refuses final tree drift, measures bounded comparison allocation, and checks spool cleanup; existing two-render order and publication tests pass |
+| D-34 | `tests/quality/test_near_duplicates.py` compares exhaustive randomized scores and complete report bytes; 200 disjoint sets need zero exact pair scores |
+| D-35 | `tests/test_workspace_integrity.py` and full core gate preserve stage replay and transaction refusals after extraction; output kinds derive from contract registries |

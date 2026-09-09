@@ -36,6 +36,7 @@ from veriformis.exports.paths import (
     portable_export_path_key,
     validate_export_relative_path,
 )
+from veriformis.exports._spool import SpooledTree
 from veriformis.identity import sha256_digest
 
 _CHUNK_SIZE = 1024 * 1024
@@ -1319,11 +1320,14 @@ def _rename_no_replace(
     *,
     expected_tree: tuple[dict[str, _EntryFacts], dict[str, _EntryFacts]],
     cancellation_check: CancellationCheck | None,
+    source_check: Callable[[], None] | None = None,
 ) -> None:
     destination = staging.destination
     # This is the final caller-controlled checkpoint.  Every identity and tree
     # fact is rechecked after it, with no further callback before the syscall.
     _check_cancellation(cancellation_check)
+    if source_check is not None:
+        source_check()
     _require_parent_identity(destination)
     if not _name_matches_descriptor(
         destination.parent_descriptor,
@@ -1437,10 +1441,11 @@ def _publish_verified_export(
     *,
     source_root: Path,
     plan: ExportPlan,
-    files: Sequence[tuple[str, bytes]],
+    files: Sequence[tuple[str, bytes]] | SpooledTree,
     cancellation_check: CancellationCheck | None,
     semantic_replay: _SemanticReplay | None = None,
     expected_semantic_preimages: Sequence[tuple[str, bytes]] | None = None,
+    source_check: Callable[[], None] | None = None,
 ) -> ExportPublicationOutcome:
     """Write, verify, and atomically publish one exact or semantic export."""
     if cancellation_check is not None and not callable(cancellation_check):
@@ -1465,12 +1470,14 @@ def _publish_verified_export(
             "semantic content"
         )
 
-    copied_tree = _normalize_planned_file_tree(
-        checked_plan,
-        files,
-        label="renderer output",
-    )
-    copied = dict(copied_tree)
+    if type(files) is SpooledTree:
+        if tuple(files) != tuple(item.path for item in checked_plan.file_plans):
+            raise ExportVerificationError("spooled renderer output does not match planned paths")
+        copied = files
+    else:
+        copied = dict(_normalize_planned_file_tree(
+            checked_plan, files, label="renderer output",
+        ))
     expected_preimages: _FileTree | None = None
     if expected_semantic_preimages is not None:
         expected_preimages = _normalize_planned_file_tree(
@@ -1518,6 +1525,7 @@ def _publish_verified_export(
                 byte_size=size,
             )
         )
+    del data
     receipt = ExportReceipt.create(export_plan=checked_plan, files=bindings)
     receipt_bytes = receipt.canonical_bytes()
     destination = _prepare_destination(
@@ -1607,6 +1615,7 @@ def _publish_verified_export(
             staging,
             expected_tree=verified_tree,
             cancellation_check=cancellation_check,
+            source_check=source_check,
         )
         if (
             not _name_matches_descriptor(
@@ -1671,8 +1680,9 @@ def _publish_exact_export(
     *,
     source_root: Path,
     plan: ExportPlan,
-    files: Sequence[tuple[str, bytes]],
+    files: Sequence[tuple[str, bytes]] | SpooledTree,
     cancellation_check: CancellationCheck | None,
+    source_check: Callable[[], None] | None = None,
 ) -> ExportPublicationOutcome:
     """Compatibility wrapper for exact-byte publication."""
     checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
@@ -1686,6 +1696,7 @@ def _publish_exact_export(
         plan=checked_plan,
         files=files,
         cancellation_check=cancellation_check,
+        source_check=source_check,
     )
 
 
@@ -1694,10 +1705,11 @@ def _publish_semantic_export(
     *,
     source_root: Path,
     plan: ExportPlan,
-    files: Sequence[tuple[str, bytes]],
+    files: Sequence[tuple[str, bytes]] | SpooledTree,
     semantic_replay: _SemanticReplay,
     expected_semantic_preimages: Sequence[tuple[str, bytes]],
     cancellation_check: CancellationCheck | None,
+    source_check: Callable[[], None] | None = None,
 ) -> ExportPublicationOutcome:
     """Compatibility wrapper for semantic-content-only publication."""
     checked_plan = ExportPlan.from_json_bytes(plan.canonical_bytes())
@@ -1711,6 +1723,7 @@ def _publish_semantic_export(
         plan=checked_plan,
         files=files,
         cancellation_check=cancellation_check,
+        source_check=source_check,
         semantic_replay=semantic_replay,
         expected_semantic_preimages=expected_semantic_preimages,
     )

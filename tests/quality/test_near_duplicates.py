@@ -272,3 +272,68 @@ def test_distinct_targets_do_not_cluster(tmp_path: Path) -> None:
     assert _json(report, "near-duplicate-threshold-preview")["500000"][
         "cluster-count"
     ] == 0
+
+
+def test_prefix_join_matches_exhaustive_integer_scores() -> None:
+    import random
+
+    from veriformis.quality.near_duplicates import _threshold_similarities
+
+    randomizer = random.Random(35260909)
+    vocabulary = [str(index) for index in range(50)] + ["é", "e\u0301", "\u2028", "ß"]
+    values = {
+        f"row-{index:03}": frozenset(randomizer.sample(vocabulary, randomizer.randrange(55)))
+        for index in range(150)
+    }
+    values.update(empty=frozenset(), empty2=frozenset(), short=frozenset({"é"}))
+    ids = sorted(values)
+    for threshold in (0, 1, 333_333, 500_000, 800_000, 900_000, 990_000, 1_000_000):
+        expected = {}
+        for index, left in enumerate(ids):
+            for right in ids[index + 1 :]:
+                union = values[left] | values[right]
+                score = len(values[left] & values[right]) * 1_000_000 // len(union) if union else 1_000_000
+                if score >= threshold:
+                    expected[(left, right)] = score
+        assert _threshold_similarities(values, threshold_ppm=threshold) == expected
+
+
+def test_disjoint_shingles_do_not_require_all_pair_scoring(monkeypatch) -> None:
+    from veriformis.quality import near_duplicates as module
+
+    values = {str(index): frozenset({f"{index}-{part}" for part in range(20)}) for index in range(200)}
+
+    def unexpected_score(*_args):
+        raise AssertionError("disjoint prefixes must not reach exact pair scoring")
+
+    monkeypatch.setattr(module, "_jaccard_ppm", unexpected_score)
+    assert module._threshold_similarities(values, threshold_ppm=500_000) == {}
+
+
+def test_optimized_report_is_byte_identical_to_exhaustive_report(tmp_path, monkeypatch) -> None:
+    from veriformis.quality import near_duplicates as module
+
+    # Adjacent members pass the cluster threshold while distant members do not.
+    case = _finished(tmp_path, tuple((f"{index}.txt", f"Unique record {index}") for index in range(5)))
+
+    def shingle_chain(text):
+        start = int(text.rsplit(" ", 1)[1])
+        return frozenset(str(index) for index in range(start, start + 10))
+
+    monkeypatch.setattr(module, "_shingles", shingle_chain)
+    report = _report(case)
+    clusters = _json(report, "near-duplicate-clusters")
+    assert len(clusters) == 1 and len(clusters[0]["record-ids"]) == 5
+    assert min(pair[2] for pair in clusters[0]["pair-similarities-ppm"]) < 500_000
+    optimized = lossless_json_bytes(report.model_dump(mode="json"))
+
+    def exhaustive(values, *, threshold_ppm):
+        ids = sorted(values)
+        return {
+            (left, right): module._jaccard_ppm(values[left], values[right])
+            for index, left in enumerate(ids)
+            for right in ids[index + 1 :]
+        }
+
+    monkeypatch.setattr(module, "_threshold_similarities", exhaustive)
+    assert lossless_json_bytes(_report(case).model_dump(mode="json")) == optimized

@@ -173,6 +173,7 @@ from veriformis.taxonomy import (
     implemented_discovery,
     require_identifier,
 )
+from veriformis._operation import workspace_operation, memoized_loader
 from veriformis.workspace import (
     CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
     IMPORT_REVISION_SCHEMA_VERSION,
@@ -660,6 +661,7 @@ def _output_bytes(
     return workspace.read_artifact(artifact_id, revision=revision)
 
 
+@memoized_loader
 def _load_sources(
     workspace: Workspace,
     revision: WorkspaceRevision,
@@ -778,6 +780,7 @@ def _cleaning_input_digest(source: SourceRef, document: Any) -> str:
     )
 
 
+@memoized_loader
 def _load_documents(
     workspace: Workspace,
     revision: WorkspaceRevision,
@@ -860,6 +863,7 @@ def _load_documents(
     return documents
 
 
+@memoized_loader
 def _load_transform_records(
     workspace: Workspace,
     revision: WorkspaceRevision,
@@ -895,6 +899,7 @@ def _load_transform_records(
     return records
 
 
+@memoized_loader
 def _load_chunks(workspace: Workspace, revision: WorkspaceRevision) -> list[Chunk]:
     raw = _json_load(_output_bytes(workspace, revision, "chunk", "chunks"))
     if not isinstance(raw, list):
@@ -1226,6 +1231,7 @@ class PipelineService:
 
         return mapping_contract_discovery()
 
+    @workspace_operation
     def export_review_packet(
         self,
         plan_id: str | None = None,
@@ -1459,6 +1465,7 @@ class PipelineService:
             exit_status=0 if preflight.admitted else 2,
         )
 
+    @workspace_operation
     def preview_goal(
         self,
         workspace: Path,
@@ -1509,6 +1516,7 @@ class PipelineService:
         )
         return GoalPreviewOutcome(preview=preview)
 
+    @workspace_operation
     def quality_report(self, path: Path) -> QualityReportOutcome:
         """Emit the existing preview-only quality report. This is not a gate.
 
@@ -1721,6 +1729,7 @@ class PipelineService:
         root, _identity = _source_root(source_root)
         return plan, accepted_source_paths(plan, source_root=root)
 
+    @workspace_operation
     def parse(
         self,
         paths: list[Path],
@@ -2045,6 +2054,7 @@ class PipelineService:
             messages=tuple(parse_messages),
         )
 
+    @workspace_operation
     def clean(
         self,
         workspace: Path,
@@ -2167,6 +2177,7 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    @workspace_operation
     def chunk(
         self,
         workspace: Path,
@@ -2292,6 +2303,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def upgrade_workspace(self, workspace: Path) -> UpgradeOutcome:
         """Advance a verified workspace through every supported revision migration."""
         store = Workspace.open(workspace)
@@ -2314,6 +2326,7 @@ class PipelineService:
             messages=(ServiceMessage(message),),
         )
 
+    @workspace_operation
     def construct(
         self,
         workspace: Path,
@@ -2505,6 +2518,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def map_rows(
         self,
         workspace: Path,
@@ -3206,6 +3220,7 @@ class PipelineService:
             messages=_seal_messages(publication, revision.revision_id),
         )
 
+    @workspace_operation
     def curate(
         self,
         workspace: Path,
@@ -3351,6 +3366,7 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    @workspace_operation
     def split(self, workspace: Path) -> SplitOutcome:
         """Assign complete transitive leakage groups to fixed partitions."""
         store = Workspace.open(workspace)
@@ -3401,6 +3417,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def format(self, workspace: Path) -> FormatOutcome:
         """Lower curated records into the row schema fixed by their dataset plan."""
         store = Workspace.open(workspace)
@@ -3483,6 +3500,7 @@ class PipelineService:
             ),
         )
 
+    @workspace_operation
     def validate(self, workspace: Path) -> ValidateOutcome:
         """Replay and validate one exact finished-dataset byte snapshot."""
         store = Workspace.open(workspace)
@@ -3556,6 +3574,7 @@ class PipelineService:
             messages=tuple(messages),
         )
 
+    @workspace_operation
     def seal(self, workspace: Path, out: Path) -> SealOutcome:
         """Revalidate, atomically publish, and receipt one finished dataset."""
         publication = None
@@ -3803,6 +3822,7 @@ class PipelineService:
             messages=messages,
         )
 
+    @workspace_operation
     def preview(
         self,
         path: Path,
@@ -4002,6 +4022,7 @@ class PipelineService:
         )
         return lock.model_dump(mode="json", exclude_none=True)
 
+    @workspace_operation
     def run_project_spec(
         self,
         spec: object,
@@ -4027,6 +4048,7 @@ class PipelineService:
             "exit_status": 0,
         }
 
+    @workspace_operation
     def resume_project_spec(
         self,
         spec: object,

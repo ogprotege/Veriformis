@@ -539,6 +539,12 @@ MUST NOT be used as its own external trust anchor. Supplying external evidence f
 plan. Every reconstructed source, profile, dependency, file-plan, and complete
 membership fact MUST equal the supplied plan exactly.
 
+Within one execute call, planning and publication MAY reuse the same
+descriptor-verified source snapshot. Reuse MUST recheck the closed source
+tree's identity, size, mode, and nanosecond modification/change times. A final
+check after the last cancellation callback MUST precede atomic promotion.
+Changed evidence fails closed. The snapshot MUST NOT survive the outer call.
+
 The internal renderer returns exact `(path, bytes)` pairs plus normalized train
 rows, evaluation rows, and aligned provenance. The service MUST snapshot and
 validate the complete renderer file set before creating staging: paths are
@@ -564,6 +570,12 @@ objects reconstructed from the same canonical bytes. It MUST normalize both
 complete trees into exact plan-path order and validate the returned membership
 from each invocation. Renderer sequence order is not meaningful after path
 normalization; path identity and file contents remain exact.
+
+Private temporary storage holds the first rendering while the second runs.
+Exact comparison reads it in chunks and compares bytes, not only digests.
+Semantic replay loads each physical tree separately after both renders.
+The renderer and replayer interfaces still materialize one complete tree;
+this does not create a streaming or measured scale guarantee.
 
 For `portable_exact_bytes`, every rendered file MUST match its planned SHA-256
 and byte size, and the two normalized `(path, bytes)` trees MUST be identical.

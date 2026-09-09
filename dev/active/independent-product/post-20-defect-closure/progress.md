@@ -270,3 +270,35 @@ Append-only dated execution log.
 - `uv lock --check`, Ruff, project tracking, and `git diff --check` passed.
   D-29 through D-31 are closed. The changed GitHub jobs still require a
   successful run on the pushed final branch.
+
+## 2026-09-09 — Stage 7 implementation
+
+- D-32: one scoped history verification per outer command. Nested loaders
+  reuse captured artifact bytes and copied source/IR/chunk replay results.
+  HEAD remains a live read under the commit lock. File facts are rechecked
+  on reuse and before promotion; staged cache entries follow only verified
+  object installation. Bytes spill to temporary storage after eight MiB.
+- D-33: execute inspects its source once, binds reuse to unchanged closed-tree
+  file facts, and rechecks after the last cancellation callback. Both renderers
+  still receive fresh strict inputs. The first byte tree is spooled; exact
+  comparison uses chunks and semantic replay loads each tree separately.
+  Two renders still precede any semantic replay. Existing refusal-order tests
+  caught and corrected an initial change to that order.
+- D-34: an exact prefix join replaces unconditional all-pairs scoring.
+  Exhaustive randomized integer-score comparison and full report byte equality
+  pass. Two hundred disjoint shingle sets require zero exact pair scores.
+  Dense clusters still require all reported member pairs; no scale tier changes.
+- D-35: document semantic replay is split into stage functions. The transaction
+  retains the publication and error boundaries. Construction and finished
+  output kinds derive from the contract registries. Five extracted stage
+  branches preserve their statement ASTs; all existing workspace tests remain.
+- Focused operation, export-storage, and near-duplicate checks: `18 passed`
+  in 1.76s. Workspace/workflow regression checkpoint: `138 passed` in 19.30s.
+  Full stage 7 gates remain pending.
+
+## 2026-09-09 — Stage 7 exit gates
+
+- Full required core gate: `2890 passed, 4 skipped, 32 deselected`, one
+  expected transport warning, in 335.32s.
+- `uv lock --check`, Ruff, project tracking, and `git diff --check` passed.
+  D-32 through D-35 are closed. Stage 8 remains the Mac hardening increment.
