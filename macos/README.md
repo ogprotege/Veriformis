@@ -1,8 +1,8 @@
-# Veriformis macOS Workbench (Group 7 + private beta Phases 0–2)
+# Veriformis macOS Workbench
 
-SwiftUI desktop adapter for the Veriformis dataset compiler. On `main` this is
-the **private beta** shell: compile (not convert) framing, KISS navigation, and
-a run sheet with live log.
+SwiftUI desktop adapter for the Veriformis dataset compiler. This is an unsigned development
+app for version `0.1.0` alpha. It provides compile, mapping, review-packet, and
+verified-export flows over the CLI, with a run sheet and live log.
 
 ## Design
 
@@ -23,7 +23,7 @@ a run sheet with live log.
 
 - macOS 14+
 - Xcode 15+ (Xcode 26 tested in development)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) only when regenerating the project or using the packaging script; normal Debug builds use the checked-in project
 - Python **3.11+** and [uv](https://docs.astral.sh/uv/) for the compiler backend
 - A synced checkout (`uv sync` from the repo root at least once) so
   `.venv/bin/veriformis` exists, **or** `veriformis` on your PATH
@@ -33,14 +33,14 @@ a run sheet with live log.
 > location (`~/.local/bin`, Homebrew) or the app finds the repo `.venv` / Debug
 > embedded repo root.
 
-## Build and run (private beta / dogfood)
+## Build and run locally
 
 **Recommended (one command):** builds Debug, kills old instances, opens the
 correct app, and passes CLI paths via `open --env` (plain `export` + `open`
 does **not** inject env into GUI apps on macOS):
 
 ```bash
-# From the repository root — on branch with the workbench fix:
+# From the repository root:
 uv sync
 ./script/build_and_run.sh
 ```
@@ -55,10 +55,10 @@ Manual equivalent:
 ```bash
 uv sync
 xcodebuild -project macos/Veriformis.xcodeproj -scheme Veriformis -configuration Debug \
-  -derivedDataPath /tmp/veriformis-dd build
+  -derivedDataPath /tmp/veriformis-dd CODE_SIGNING_ALLOWED=NO build
 killall Veriformis 2>/dev/null || true
-open --env "VERIFORMIS_CLI=$PWD/../.venv/bin/veriformis" \
-     --env "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT=$(cd .. && pwd)" \
+open -n --env "VERIFORMIS_CLI=$PWD/.venv/bin/veriformis" \
+     --env "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT=$PWD" \
      /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
 ```
 
@@ -80,9 +80,9 @@ Info.plist key (from `project.yml`), walk up from CWD, walk up from the `.app`.
 
 ```bash
 # Optional explicit launch from Terminal (repo root):
-export VERIFORMIS_CLI="$PWD/.venv/bin/veriformis"
-export VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT="$PWD"
-open /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
+open -n --env "VERIFORMIS_CLI=$PWD/.venv/bin/veriformis" \
+  --env "VERIFORMIS_DEVELOPMENT_REPOSITORY_ROOT=$PWD" \
+  /tmp/veriformis-dd/Build/Products/Debug/Veriformis.app
 ```
 
 ### CLI-backed taxonomy help
@@ -152,6 +152,33 @@ VERIFORMIS_CLI="$PWD/.venv/bin/veriformis" \
 ```
 
 This is functional build/launch evidence, not signing or notarization evidence.
+
+## Supported operator flows and limits
+
+Document-source Compile runs preflight and the complete compile, seal,
+external-digest verify, and transport sequence. Use two independent sources
+for a non-empty evaluation partition. For an intentionally single-group
+compile, Recipe settings exposes Allow empty evaluation partition.
+
+Dataset-row Compile detects and confirms a mapping for one selected row-source
+file, previews it, and runs map through seal and verification. Ordinary
+imported SFT rows use record-level leakage groups; advanced families apply
+their own grouping rules. Mixed mode refuses fused document and row inputs.
+Use the CLI for a confirmed plan bound to multiple imported source files.
+
+Exports selects an existing sealed bundle and a new destination path. Even an
+empty existing destination is refused. Dry-run exposes the plan and destination
+tree; confirmation enables execute; Verify export checks against the source.
+The app does not turn a self-consistent bundle into external evidence by
+reading its own manifest. An external digest comes from the matching retained
+compile result or selected history entry; other bundles can use the explicit
+self-consistent policy.
+
+Goal preview appears after document-source compilation. Mapping preview is the
+imported-row preview. `quality-report` is available through CLI and Python for
+both paths; this app has no quality-report dashboard. The Review screen wraps
+packet exchange; completing required construction review still uses the CLI
+`construct --review-packet` flow. Required imported-row review remains refused.
 
 ## Exit gate
 

@@ -1,10 +1,17 @@
 # Veriformis Independent Product Roadmap
 
-**Status:** Authoritative roadmap for new product work
+**Status:** Completed roadmap; retained execution and decision history
+
+**Closeout note (2026-09-09):** Phases 0–20 are complete, including their
+explicit exclusions and skip records. Phase 20 retained `0.1.0` development
+alpha and `cli-first-independent-core`; the milestone names below are the
+original targets, not a beta or 1.0 release declaration. Post-20 defect closure
+is complete. The original immediate-execution packet below is historical.
+No next phase is authorized by this document.
 
 **Per-phase execution state:**
 [`dev/active/independent-product/program.json`](../../dev/active/independent-product/program.json)
-(Phases 0–2 completed 2026-08-11). Per-phase "Current evidence" blocks record
+(Phases 0–20 complete). Per-phase "Current evidence" blocks record
 facts at the implementation baseline below, not live status; the program
 ledger is the execution authority.
 
@@ -1087,7 +1094,7 @@ evidence required above. This protects the core goal: a trustworthy independent
 tool that turns real source material and existing rows into useful, verifiable
 training datasets.
 
-## 12. Immediate execution packet
+## 12. Original immediate execution packet (historical)
 
 Implementation should begin with one bounded packet covering Phases 0–2:
 

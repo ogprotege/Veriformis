@@ -2,24 +2,37 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-09-09 (post-20 defect closure, Phase 2)
+**Last reviewed:** 2026-09-09 (bounded product polish)
 
-**Next review:** Closeout of the post-20 defect-closure packet, or any
-active-document behavior change
+**Next review:** The next owner-authorized change to current behavior or claims
 
 | ID | State | Risk | Debt | Evidence / trigger | Planned resolution |
 | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Closed 2026-08-11 | High | Current release and beta documents made Aptus verification part of the generic golden/release path. | Phase 1 runtime defaults, standalone scripts/CI, `docs/release.md`, `docs/beta-limitations.md` | Required paths now compile, seal, and externally verify without the adapter; optional self-conformance is separately named and non-blocking |
-| DOC-002 | Open | Medium | Historical Group plans remain under `dev/active/`, so location alone does not distinguish completed history from active work. | Existing repository convention | Consider a reviewed archive move after Phase 0; no moves without an explicit plan |
+| DOC-002 | Closed 2026-09-09 | Medium | Historical Group plans remain under `dev/active/`, so location alone does not distinguish completed history from active work. | Existing repository convention | Archived in place; current indexes explicitly classify completed packets as historical and preserve link targets |
 | DOC-003 | Open | Medium | Mermaid diagrams are hand-reviewed and not rendered in CI. | `docs/README.md` debt note | Add a pinned offline renderer only after dependency and CI review |
 | DOC-004 | Closed 2026-08-11 | High | Active architecture deep-dives described the retired CLI-owned orchestration model and contained obsolete citations. | Phase 0 semantic documentation audit against current source | Rewritten around `PipelineService`, current adapters, 18 commands, and 10 runtime dependencies; future docs prefer stable symbols over fragile line citations |
 | DOC-005 | Closed 2026-08-11 | High | No privacy-preserving corpus/workflow matrix constrained future input, output, and consumer priorities. | `docs/governance/corpus-demand-matrix.json`; scanner regression | Matrix and content-blind scanner added; unsupported priorities remain explicitly unranked until representative owner evidence exists |
-| DOC-006 | Open | Medium | Existing status/release documents record the pre-independent program vocabulary and group numbering alongside the new program. | Current historical implementation record | Retain for history; progressively distinguish historical groups from current phases |
+| DOC-006 | Closed 2026-09-09 | Medium | Existing status/release documents record the pre-independent program vocabulary and group numbering alongside the new program. | Current historical implementation record | Current summaries and historical headings now distinguish the completed chronology from current behavior |
 | DOC-007 | Open | Medium | The generic v1 row-shape validator persists under the consumer-specific ID `aptus-row-shape`. | `V1_FINISHED_DATASET_GATES` and persisted plan/report identities | Rename only through a versioned contract and report migration; until then document that the ID imports no adapter and proves no live compatibility |
 | DOC-008 | Open | Medium | Active documents carried "Next review" triggers that fired without a review: the health report and this register stayed at Phase 8 through Phase 20, five documents kept "no semantic replayer ships" after Phase 9, and the goal-catalog contract was re-stamped 2026-09-05 without recording Phase 17. Roughly a third of the `file:line` citations in `docs/architecture*` and `docs/cli.md` no longer land on the named symbol. | 2026-09-09 audit; DOC-004's own remedy ("prefer stable symbols") regressed | The post-20 defect-closure packet re-dated every touched document and corrected the quoted statements; the tracking checker now compares contract row-schema blocks and goal / preset counts with live discovery. Replace remaining line citations with symbol references opportunistically; never add new ones |
-| DOC-009 | Open | Medium | `docs/evidence/index.json` holds per-item records for Phases 0–7, partial records for 8 and 9, none for Phases 10–19, and one closeout record for Phase 20, while governance text presents it as the evidence ledger for every phase. | 2026-09-09 audit of the index | Either add one closeout record per phase packet or state in `project-tracking.md` that the index is complete only for Phases 0–7 and 20 |
-| DOC-010 | Open | High | Required review could not be resolved on the CLI or MCP: `review-submit` persisted nothing and `construct` accepted no review evidence, while the review contract described packets that "round-trip through Python, CLI, and MCP". | `pipeline/service.py`, `review/exchange.py`, `docs/contracts/review-v1.md` | Post-20 defect D-17 (packet Phase 5) binds a submitted review bundle into a construct re-commit on every surface and documents it in the review contract; close when that lands |
-| DOC-011 | Open | Medium | `bundle-transport-v1.md` claimed ZIP64-capable encoding while the canonical verifier rejected the ZIP64 central-directory extra that the stdlib emits past 4 GiB, so the codec refused archives it wrote itself. | `_archive_transport.py` `verify_staged`; 2026-09-09 audit | Post-20 defect D-16 (packet Phase 4) accepts exactly one well-formed ZIP64 extra and records the behavior in the contract; close when that lands |
+| DOC-009 | Closed 2026-09-09 | Medium | `docs/evidence/index.json` holds per-item records for Phases 0–7, partial records for 8 and 9, none for Phases 10–19, and one closeout record for Phase 20, while governance text presents it as the evidence ledger for every phase. | 2026-09-09 audit of the index | Added one historical closeout record for each Phase 8–19 packet; these link the original observations rather than claiming new test runs |
+| DOC-010 | Closed 2026-09-09 | High | Required review could not be resolved on the CLI or MCP: `review-submit` persisted nothing and `construct` accepted no review evidence, while the review contract described packets that "round-trip through Python, CLI, and MCP". | `pipeline/service.py`, `review/exchange.py`, `docs/contracts/review-v1.md` | PR #204 merged D-17: submitted review evidence binds a construct re-commit through Python, CLI, and MCP; the current contract documents the path |
+| DOC-011 | Closed 2026-09-09 | Medium | `bundle-transport-v1.md` claimed ZIP64-capable encoding while the canonical verifier rejected the ZIP64 central-directory extra that the stdlib emits past 4 GiB, so the codec refused archives it wrote itself. | `_archive_transport.py` `verify_staged`; 2026-09-09 audit | PR #204 merged D-16: accepts exactly one well-formed ZIP64 extra; the transport contract and regression evidence record the boundary |
+
+## Current disposition, 2026-09-09
+
+DOC-002, DOC-006, DOC-009, DOC-010, and DOC-011 are closed by the
+[bounded polish record](../evidence/2026-09-09-product-polish.md), current index
+labels, completed evidence ledger, and merged PR #204. DOC-003, DOC-007, and
+DOC-008 remain explicit maintenance limits. CLI line references were replaced
+with stable file/symbol references; remaining architecture coordinates are not
+claimed repaired by this pass.
+
+## Historical review entries
+
+Earlier open-item statements below describe those review dates, not the
+current states in the table above.
 
 The Phase 5.1–5.3 reviews identified no new documentation debt. Their admitted
 split JSONL, canonical JSON, and constrained CSV contracts are reconciled in

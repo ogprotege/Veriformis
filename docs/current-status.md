@@ -4,7 +4,22 @@
 
 **Maturity:** Development alpha
 
-**Implementation state:** Groups 1–7 complete; Group 9 automated release gates
+**Current summary:**
+
+Version `0.1.0` remains development alpha with claim
+`cli-first-independent-core`. Independent-product Phases 0–20 and the
+eight-stage post-20 defect-closure plan are complete. PR #204 closed that
+plan; PR #203 adds read-only, non-enforcing quality previews for imported
+rows. There is no active numbered phase and no Phase 21.
+
+Document-source workspaces use revision schema 3. Imported-row workspaces use
+schema 4 and confirmed mappings. Generic split JSONL and canonical JSON admit
+all eight row schemas; the other containers and optional consumer profiles
+retain their explicit admission limits. Trainer extras stay empty. Extra
+`columnar` installs PyArrow and Datasets. Default parse does not OCR scans.
+Unsigned Mac builds are development evidence, not public distribution.
+
+**Implementation history through Phase 20:** Groups 1–7 complete; Group 9 automated release gates
 and beta-prep on `main`; private beta Mac workbench Phases 0–2 on `main`
 (maturity remains development alpha; public Mac readiness still owner-gated);
 independent-product Phase 3 completed with taxonomy discovery, public
@@ -125,7 +140,7 @@ reuses one verified source capture and spools renderer trees for comparison.
 Near-duplicate reports use an exact prefix index without changing report bytes.
 These changes add no measured scale support tier.
 
-**Review date:** 2026-09-09 (post-20 defect closure complete)
+**Review date:** 2026-09-09 (product polish and closeout)
 
 **Next review:** Any capability claim change.
 
@@ -517,13 +532,18 @@ Surfaces over the same composition root:
 
 ## Workspace and identity status
 
-The physical workspace layout remains schema 1. Active workspaces use revision
-schema 3 and contain `workspace.json`, `HEAD`, `LOCK`, immutable revision
+The physical workspace layout remains schema 1. Active document-source
+workspaces use revision schema 3; dataset-row workspaces use revision schema 4.
+Both contain `workspace.json`, `HEAD`, `LOCK`, immutable revision
 manifests, content-addressed objects, and a transaction directory. `HEAD`
 selects the current revision. A successful stage becomes visible through one
 atomic pointer replacement.
 
-Revision schema 3 uses these stages and direct dependencies:
+Revision schema 4 uses `parse → map → curate → split → format → validate → seal`.
+It does not run clean, chunk, or construct. Current v3 and v4 workspaces are
+separate paths, not migrations into each other.
+
+Document-source revision schema 3 uses these stages and direct dependencies:
 
 | Stage | Direct dependencies |
 | --- | --- |
@@ -694,6 +714,13 @@ plan explicitly allows an empty evaluation partition.
 
 ## Product rows and provenance
 
+The table below describes document-source rows. Dataset-row mapping also
+admits these four schemas plus `label-classification`, `preference-pair`,
+`tool-call-conversation`, and `stepwise-trace`. Imported instructions and fields
+come from supplied rows rather than a construction template. Imported
+provenance records field paths, source-value digests, mapping rules, and
+`mapped_value` evidence; it does not invent chunks or construction passes.
+
 Serialization consumes the exact plan, construction result, curation result,
 and split result. It lowers one included record into one row. It does not read
 chunks as substitute records, reopen curation, resplit, or invent an objective
@@ -724,7 +751,7 @@ Validation binds exact upstream artifact IDs and digests, source scope, plan,
 row set, three emitted JSONL byte streams, canonical bundle paths, and validator
 versions into one immutable `DatasetSnapshot`.
 
-All 17 gates report in this exact order:
+Document-source validation reports these 17 gates in this exact order:
 
 1. `construction-replay`
 2. `record-lifecycle`
@@ -754,6 +781,11 @@ imports no Aptus code. Renaming it requires a versioned migration. Group 6 adds
 an optional sibling descriptor and consumer verification for sealed partitions
 and assignment projection. Repository checks prove adapter self-conformance,
 not live Aptus release compatibility. Training remains outside this repository.
+
+Dataset-row uses the 13 imported gates documented in
+[the CLI guide](cli.md#validate), including mapping replay from captured raw
+bytes. The heuristic `quality-report` is a separate non-enforcing preview on
+both workspace paths.
 
 ## Bundle and verification boundary
 
@@ -814,14 +846,14 @@ primary-source cap. Group 5 adds a named recipe library, deterministic
 statistics, and versioned YAML pipelines executed only through
 `PipelineService`.
 
-### Public release readiness remains incomplete
+### Intentional release and tooling limits
 
 Automated Group 9 gates are present (matrix CI, lock check, clean-wheel
-installed-CLI smoke, standalone golden compile). Still incomplete for a
-public-ready claim: type checking and coverage as hard gates, dependency audit,
-signed/notarized Mac distribution, and clean-Mac installation under owner
-credentials. Aptus evidence is required only for a separately named Aptus
-compatibility claim.
+installed-CLI smoke, standalone golden compile). Public Mac distribution is
+excluded: signing, notarization, and clean-Mac signed installation are not
+claimed. Type checking, coverage thresholds, and dependency CVE checks are
+optional tooling, not required gates. Aptus evidence is required only for a
+separately named live Aptus compatibility claim.
 See [docs/release.md](release.md).
 
 ## Phase boundary
@@ -920,9 +952,11 @@ requires [docs/release.md](release.md) with retained evidence.
 On `main` at this review: Groups 1–7, Group 9 automated gates, beta-prep, and
 private beta workbench Phases 0–2 are landed; maturity is still **alpha**.
 
-Independent-product Phases 0–20 are complete on `7a776ca`. Current
-authority is the
-[post-20 claim-honesty remainder](../dev/active/independent-product/post-20-claim-honesty/README.md).
+Independent-product Phases 0–20 closed at `7a776ca`. The claim-honesty
+remainder and eight-stage defect closure are complete, and PR #203 closes the
+imported quality preview. The [product-polish closeout](evidence/2026-09-09-product-polish.md)
+records the current operator checks and remaining intentional limits.
+No saved plan authorizes a next implementation phase.
 Version remains `0.1.0` development alpha. Do not invent a Phase 21.
 There is no Hub execute. `quality-report` is a preview, not a gate. There is no
 `GeneratorPass`. Public signed/notarized Mac is not in the frozen

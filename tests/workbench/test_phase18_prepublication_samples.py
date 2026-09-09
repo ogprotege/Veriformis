@@ -1,4 +1,4 @@
-"""Phase 18.6: pre-publication samples. No renderer, no destination write."""
+"""Result previews retain evidence without a renderer or destination write."""
 
 from __future__ import annotations
 
@@ -18,16 +18,16 @@ def _read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
-def test_result_view_shows_prepublication_samples() -> None:
+def test_result_view_labels_compiled_previews_and_retains_evidence() -> None:
     result = _read("macos/Sources/Views/ResultView.swift")
-    assert "Pre-publication samples" in result
+    assert "Compiled dataset preview" in result
     assert "Quality findings are preview-only and do not block seal" in result
     assert "Source recovery" in result
     assert "recoveredSource" in result
     assert "Split assignment digest" in result
     assert "Mapping plan" in result
     assert "does not call a renderer or write a destination" in result
-    assert "Quality findings (preview only)" in result
+    assert "Preview diagnostics" in result
     assert "are not required review" in result
 
 

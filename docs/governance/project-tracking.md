@@ -4,10 +4,9 @@
 
 **Policy version:** `veriformis.project-tracking/v1`
 
-**Last reviewed:** 2026-08-25 (independent-product Phase 13.1 quality packet)
+**Last reviewed:** 2026-09-09 (completed program and product polish)
 
-**Next review:** Phase 13.1 pull-request merge, item 13.2 quality report,
-or any program-state, evidence-grade, or completion-rule change
+**Next review:** Any program-state, evidence-grade, or completion-rule change
 
 ## Purpose
 
@@ -25,7 +24,8 @@ When records conflict, use this order:
 3. [Support registry](support-registry.json) for machine-readable capability
    state.
 4. [Independent product roadmap](../plans/2026-08-11-veriformis-independent-product-roadmap.md)
-   for future work, dependencies, and exit gates.
+   for the completed program's dependencies and exit gates. New work requires
+   an owner instruction; the completed roadmap does not create a next phase.
 5. [Program ledger](../../dev/active/independent-product/program.json) for the
    current execution state of each roadmap phase.
 6. Root [WIP](../../WIP.md) as a convenient human-readable mirror.

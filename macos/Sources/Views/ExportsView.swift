@@ -140,7 +140,7 @@ struct ExportsView: View {
                     }
                     .accessibilityLabel("Export container or named profile")
                     if workbench.knownExportRowSchema == nil {
-                        Text("Named profiles wait until a row schema is known from the selected goal or a dry-run.")
+                        Text("Named profiles become available after a generic dry-run verifies the selected bundle schema.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -152,7 +152,7 @@ struct ExportsView: View {
                     }
                 }
 
-                Text(workbench.resolvedExportDestinationURL?.path ?? "Choose an empty destination folder")
+                Text(workbench.resolvedExportDestinationURL?.path ?? "Choose a new destination folder")
                     .font(.system(.body, design: .monospaced))
                     .textSelection(.enabled)
                 Button("Choose destination…") { workbench.chooseExportDestination() }

@@ -846,6 +846,151 @@
         "uv run python scripts/check_project_tracking.py",
         "git diff --check"
       ]
+    },
+    {
+      "id": "independent-product-phase-8-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 8 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 8 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-08-consumer-profiles/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-9-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 9 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 9 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-09-columnar-containers/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-10-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 10 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 10 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-10-profile-expansion/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-11-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 11 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 11 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-11-collection-ingest/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-12-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 12 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 12 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-12-optional-ocr/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-13-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 13 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 13 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-13-quality-intelligence/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-14-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 14 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 14 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-14-review-workflows/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-15-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 15 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 15 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-15-scale/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-16-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 16 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 16 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-16-extension-architecture/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-17-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 17 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 17 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-17-advanced-dataset-families/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-18-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 18 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 18 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-18-goal-first-workbench/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "independent-product-phase-19-historical-closeout-indexed-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "7f3cce6a42d63762c0f4d649cd68cdf334290554",
+      "scope": "Historical Phase 19 closeout indexed during product polish",
+      "grade": "recorded-local",
+      "summary": "Links the original Phase 19 closeout and its dated observations. Backfilled index entry, not a new test run or renewed authorization.",
+      "details": "dev/active/independent-product/phase-19-automation-and-publication/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "post-20-defect-closure-merged-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "23bdc20b4667a1bd8381debd233d4d12a3bdd87a",
+      "scope": "PR #204 eight-stage defect closure",
+      "grade": "recorded-local",
+      "summary": "Merged completion of the eight-stage defect-closure packet. Original gates and retained limitations are recorded in its closeout.",
+      "details": "dev/active/independent-product/post-20-defect-closure/closeout.md",
+      "rerun": []
+    },
+    {
+      "id": "bounded-product-polish-2026-09-09",
+      "date": "2026-09-09",
+      "commit": "working-tree-on-7f3cce6",
+      "scope": "Operator documentation, Mac export evidence and preview corrections, and preservation accounting",
+      "grade": "recorded-local",
+      "summary": "Current instructions and completion states reconciled; reproduced Mac export and imported-preview defects corrected. The closeout records observed checks, artifact disposition, and unchanged alpha boundaries.",
+      "details": "docs/evidence/2026-09-09-product-polish.md",
+      "rerun": [
+        "bash scripts/release/check_local.sh",
+        "bash scripts/release/xcodebuild_debug.sh",
+        "uv run python scripts/check_project_tracking.py",
+        "git diff --check"
+      ]
     }
   ]
 }

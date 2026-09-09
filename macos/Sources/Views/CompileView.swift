@@ -20,7 +20,9 @@ struct CompileView: View {
 
                     SourceDropView()
 
-                    Text("Start with one file if you are learning the flow. Multiple sources are supported.")
+                    Text(workbench.currentCompileUsesMapping
+                        ? "Select one row-source file and confirm its mapping before compiling."
+                        : "Start with two independent source documents for a non-empty evaluation partition.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 

@@ -61,6 +61,13 @@ These are local observations. GitHub checks and merge state are recorded by
 PR #203. No public signed Mac release, trainer execution, owner-scale imported
 corpus measurement, or quality judgment is claimed.
 
+## Publication update, 2026-09-09
+
+PR #203 merged as `7f3cce6a42d63762c0f4d649cd68cdf334290554` after all
+24 GitHub check results succeeded on `d9176bb036535bfade2d90a176f58e1795eb0fd3`.
+There were no review findings or unresolved threads. The local observations
+above remain the original pre-merge record.
+
 ## Retention
 
 Raw logs, the original failure reproduction, and both independent baseline

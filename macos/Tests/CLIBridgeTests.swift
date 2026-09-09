@@ -3669,6 +3669,35 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertNil(workbench.lastError)
         let result = try XCTUnwrap(workbench.lastResult)
         XCTAssertTrue(FileManager.default.fileExists(atPath: result.bundleURL.path))
+        XCTAssertEqual(workbench.goalPreviewState, .unavailable(
+            "Imported rows use Mapping preview. The document-source goal preview does not apply."
+        ))
+
+        // Profile changes keep only display evidence. They require another dry-run.
+        workbench.discoverExports()
+        for _ in 0..<600 {
+            if case .ready = workbench.exportDiscoveryState { break }
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertNotNil(workbench.selectedExportProfile)
+        workbench.dryRunSelectedExport()
+        for _ in 0..<600 where workbench.exportIsRunning {
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        guard case .ready = workbench.exportDryRunState else {
+            XCTFail("Export preview failed: \(workbench.exportDryRunState)")
+            return
+        }
+        XCTAssertEqual(workbench.knownExportRowSchema, "text")
+        let alternate = try XCTUnwrap(workbench.genericExportProfiles.first {
+            $0.selectionKey != workbench.selectedExportProfileKey
+        })
+        workbench.selectedExportProfileKey = alternate.selectionKey
+        XCTAssertEqual(workbench.knownExportRowSchema, "text")
+        XCTAssertFalse(workbench.canExecuteExport)
+        workbench.exportBundleURL = root.appendingPathComponent("unrelated.vfbundle")
+        XCTAssertNil(workbench.knownExportRowSchema)
+        XCTAssertNil(workbench.resolvedExportManifestSHA256)
 
         // The CLI workspace holds only what the compiler wrote.
         let workspaceEntries = try FileManager.default.contentsOfDirectory(atPath: result.workspaceURL.path)

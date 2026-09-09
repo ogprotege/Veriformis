@@ -2,11 +2,11 @@
 
 This documentation describes the development-alpha compiler from raw source
 capture or existing dataset rows through a verified finished-dataset bundle,
-plus local automation and the private beta Mac workbench (Groups 1–7 product
+plus local automation and the unsigned development Mac workbench (Groups 1–7 product
 path, Group 9 automated gates, workbench Phases 0–2, independent-product
 Phases 0–20 complete).
 
-**Last reviewed:** 2026-09-01 (independent-product Phase 20.10 closeout)
+**Last reviewed:** 2026-09-09 (product polish and closeout)
 
 **Next review:** Any contract or capability-claim change.
 Default parse still refuses image-only PDF. Version remains `0.1.0`
@@ -20,7 +20,7 @@ development alpha.
 4. [Product contract](product-contract.md) — ownership and non-claims.
 5. [Beta limitations](beta-limitations.md) — hard non-claims before any beta invite.
 6. [Independent product analysis](analysis/2026-08-11-independent-product-analysis.md) — evidence and architectural correction.
-7. [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md) — authoritative future work and exit gates.
+7. [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md) — completed execution record and exit gates.
 8. [Project tracking and evidence](governance/README.md) — live phase, claim, ADR, evidence, and completion controls.
 9. [Release guide](release.md) — current CI gates and owner Mac packaging checklist.
 
@@ -75,8 +75,8 @@ development alpha.
 | [Scale Baseline v1](contracts/scale-baseline-v1.md) | Named-hardware compile evidence | Reports are not an SLA; no published tier |
 | [Scale Support v1](contracts/scale-support-v1.md) | Operator-reviewed scale support discovery | Empty `published_tiers`; observations are not an SLA |
 | [Extension Protocol v1](contracts/extension-protocol-v1.md) | Internal capability declarations for six kinds | Built-in-only registry and read-only discovery; no loader or public plugin API |
-| [Advanced Family Admission v1](contracts/advanced-family-admission-v1.md) | Closed pins for advanced semantic families | Schema pin only; no execute or taxonomy promotion |
-| [Workbench Adapter v1](contracts/workbench-adapter-v1.md) | Closed pins for CLI packets a Mac screen may wrap | Schema pin only; no screen execute; ADR-0019 |
+| [Advanced Family Admission v1](contracts/advanced-family-admission-v1.md) | Closed pins for advanced semantic families | Implemented classification, preference, tool-call, and stepwise imported families; no generator |
+| [Workbench Adapter v1](contracts/workbench-adapter-v1.md) | Closed pins for CLI packets a Mac screen may wrap | Thin CLI-backed Compile, Review, and Exports screens; ADR-0019 |
 | [Project Spec v1](contracts/project-spec-v1.md) | Additive compile intent over pipeline/v1 | Loading is not execute; spec-run executes; export is not auto-run |
 | [Project Lock v1](contracts/project-lock-v1.md) | Spec digest, versions, declared extra presence, optional HEAD and sources | Lock is not execute and not `uv.lock` |
 | [Project Spec Diagnostic v1](contracts/project-spec-diagnostic-v1.md) | Machine-readable spec execute/resume failure | Truncated JSON fails closed; human CLI text stays |
@@ -103,17 +103,17 @@ development alpha.
 | [Canonical JSON Export v1](contracts/canonical-json-export-v1.md) | One canonical split/schema-bearing dataset object, aligned provenance object, and receipt | Implemented Phase 5.2 generic container |
 | [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md) | Fixed fully quoted flat-schema partition CSV, aligned provenance, dataset card, and receipt | Implemented Phase 5.3 generic container |
 | [Generic export operator guide](generic-exports.md) | When to use split JSONL, canonical JSON, or constrained CSV without conflating container, objective, row schema, or consumer compatibility | Implemented Phase 5.7 operator guidance; merged as PR #59 at `65cbd471e96d83f8dd65e2cda60e90f64a916e2b` |
-| [ADR index](adr/README.md) | Accepted product-boundary, catalog, mapping, profile-adapter, columnar-container, extension, generator, and workbench-adapter decisions (0001–0008, 0010–0019) | Decision records |
+| [ADR index](adr/README.md) | Accepted product-boundary, catalog, mapping, profile-adapter, columnar-container, extension, generator, and workbench-adapter decisions (see the complete index, including instruction truthfulness and publication boundaries) | Decision records |
 | [Architecture hub](architecture.md) | Module, workspace, artifact, and bundle flow | Current architecture |
 | [Architecture tree](architecture/README.md) | Layers, dependencies, data flow, entry points | Architecture detail |
 | [CLI reference](cli.md) | Commands, options, artifacts, failures | Current CLI reference |
 | [Development guide](development.md) | Setup, checks, tests, engineering constraints | Contributor guide |
-| [Install guide](install.md) | Standard local CLI + Debug workbench install | Operator setup (private beta) |
+| [Install guide](install.md) | Standard local CLI + Debug workbench install | Local alpha operator setup |
 | [Release guide](release.md) | CI gates, install smoke, golden path, Mac packaging checklist | Public-release procedure |
 | [Beta limitations](beta-limitations.md) | Hard non-claims and operator limits for any future beta cut | Limitations register (maturity still alpha) |
 | [macOS workbench](../macos/README.md) | SwiftUI workbench build, launch, parity | Workbench operator guide |
 | [Independent product analysis](analysis/2026-08-11-independent-product-analysis.md) | Evidence for the trainer-neutral product direction | Analysis baseline |
-| [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md) | Standalone product phases, dependencies, and exit gates | **Authoritative future work order** |
+| [Independent product roadmap](plans/2026-08-11-veriformis-independent-product-roadmap.md) | Standalone product phases, dependencies, and exit gates | Completed execution and decision history |
 | [Project governance](governance/README.md) | Program ledger, support registry, evidence, ADRs, and completion policy | Active tracking authority |
 | [Program ledger](../dev/active/independent-product/program.json) | Phase 0–20 states, dependencies, and next gates | Machine execution state |
 | [Phase 0 packet](../dev/active/independent-product/phase-00-foundation/README.md) | Foundation plan, progress, decisions, risks, evidence, and closeout | Completed implementation record |
@@ -157,9 +157,14 @@ contract. Pytest checks its independent-program table against the ledger.
 | **Group 8** | Optional model-assisted construction (Step 25; owner-gated) |
 | **Group 9** | Public release gates (Step 26; automated subset landed; owner Mac remainder for public-ready) |
 | **Private beta workbench** | Owner Mac GUI over CLI; Phases 0–2 implemented |
-| **Unsupported** | Not available (for example OCR) |
+| **Unsupported** | Not available (for example default-parse image OCR) |
 
 ## Historical records
+
+Independent-product Phases 0–20 and the post-20 packets are complete and
+archived in place under `dev/active/`. Directory names do not confer active
+status. [Product-polish evidence](evidence/2026-09-09-product-polish.md) records
+current operator checks. Original dated phase boundaries remain unchanged.
 
 Dated design specs and completed plans are historical. Their status sections
 may note later completion; they do not redefine current capability.

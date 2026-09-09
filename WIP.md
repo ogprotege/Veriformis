@@ -1,14 +1,14 @@
 # Veriformis Work in Progress
 
-**Status:** Active, non-authoritative working inventory
+**Status:** Reviewed completion inventory and deferred limits; non-authoritative
 
-**Implementation baseline reviewed:** `7a776ca` on `main` after PR #190
-(Groups 1–7; Group 9 automated gates; beta-prep; private beta workbench
-Phases 0–2; independent-product Phases 0–20 complete)
+**Implementation baseline reviewed:** PR #204 defect closure and PR #203
+imported quality preview, after independent-product Phases 0–20 completed.
+See [product-polish evidence](docs/evidence/2026-09-09-product-polish.md).
 
 **Product version:** `0.1.0` development alpha (not beta-labeled)
 
-**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
+**Last reviewed:** 2026-09-09 (product polish and closeout)
 
 **Next review:** Any capability claim change. Version remains `0.1.0`.
 Do not invent a Phase 21.
@@ -23,8 +23,8 @@ group. No trainer or columnar export in that run.
 > **Authority:** This file is a convenience tracker. It does not define product
 > truth. [Current implementation status](docs/current-status.md) controls
 > present capability claims. The
-> [independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) controls future work
-> order and exit gates. The applicable versioned contract controls guarantees
+> [independent product roadmap](docs/plans/2026-08-11-veriformis-independent-product-roadmap.md) records the completed work
+> order and exit gates. New work requires an owner instruction. The applicable versioned contract controls guarantees
 > within its scope. If this file conflicts with those sources, the canonical
 > source controls. Test totals and verification results are dated snapshots.
 
@@ -54,6 +54,10 @@ validation, sealing, and verification. The deterministic pipeline remains
 local, offline, and free of LLM generation.
 
 ## Current boundary
+
+The phase progression below is retained history. All numbered phases and both
+post-20 packets are complete. No unchecked optional item below is an active
+execution instruction. Current capabilities are in `docs/current-status.md`.
 
 - [x] M1 core is implemented.
 - [x] Groups 1 through 7 are implemented.
@@ -555,7 +559,7 @@ and the [beta readiness audit](dev/active/group-9-public-release/beta-readiness-
 ## Historical execution order and dependencies
 
 These rules governed the completed group-based program. The independent
-product roadmap now controls active sequencing.
+product roadmap also records a completed program; neither opens new work.
 
 - Complete required Groups 1 through 7 in order.
 - Do not start a later required group before the earlier exit gate passes.
@@ -567,10 +571,13 @@ product roadmap now controls active sequencing.
 - Track build, publication, installation, signing, notarization, and downstream
   compatibility as separate release states.
 
-## Nonblocking follow-up debt
+## Deferred maintenance (no active execution queue)
 
-The Group 1 review recorded two Important architecture deferrals. They do not
-reopen the Group 1 gate, but their stated trigger conditions still apply.
+The Group 1 review recorded two architecture deferrals. These are conditional
+maintenance limits, not active closeout work. PR #204 now reuses verified
+operation evidence and spools export comparisons. Larger-corpus claims still
+require measurements. Producer changes are versioned and stale replay refuses;
+a historical-version runtime registry remains deferred.
 
 - [ ] Bound memory use and deduplicate integrity work before advertising
   large-corpus support.
@@ -582,13 +589,14 @@ the Group 3 gate.
 
 - [ ] Deeply freeze or strongly type nested `ProductRow.payload` values.
 - [ ] Consolidate duplicate closed-contract registries where typing permits.
-- [ ] Split `WorkspaceTransaction._validate_stage_semantics` into private
-  per-stage validators.
+- [x] Split `WorkspaceTransaction._validate_stage_semantics` into private
+  per-stage validators. PR #204 moved those validators to `_workspace_validation.py`.
 
-Additional product follow-ups remain unassigned within the numbered roadmap:
+Other optional maintenance remains outside the completed numbered roadmap:
 
-- [ ] Add CLI ingestion for completed `ReviewEvidence`. Today,
-  `--require-review` leaves candidates pending.
+- [x] Add CLI ingestion for completed construction `ReviewEvidence`. PR #204
+  binds `construct --review-packet` after `review-export --workspace` and
+  `review-submit`. Imported required review remains an explicit v1 refusal.
 - [ ] Define a retention profile for portable bundles that embed replay
   material. Closed-bundle verification remains workspace-independent, while
   full source replay remains available through workspace history.
@@ -596,8 +604,9 @@ Additional product follow-ups remain unassigned within the numbered roadmap:
 ## Documentation status
 
 Groups 1–7 documentation, the Group 9 release guide, and beta limitations are
-retained as implementation history. The active architecture deep-dive is being
-reconciled against `PipelineService` and the independent product authority.
+retained as implementation history. The architecture tree was reconciled in
+PR #204 around `PipelineService`, operation evidence, and private publication.
+Routine documentation maintenance does not reopen the completed program.
 
 Remaining documentation debt:
 
@@ -626,15 +635,16 @@ Remaining documentation debt:
 - Default parse refuses image-only PDFs with a named limitation. Optional
   Tesseract 5 recovery is explicit, local, and isolated under the empty `ocr`
   extra; `ocr-image` remains unsupported as a default input family.
-- Declared inputs are text, Markdown, DOCX, HTML, digitally-born PDF, CSV,
-  JSON, JSONL, and listed source-code formats — not arbitrary binary.
+- Default document inputs are text, Markdown, DOCX, HTML, digitally-born PDF,
+  CSV, JSON, JSONL, and listed source-code formats. Dataset-row additionally
+  admits Parquet and Arrow with extra `columnar`.
 - The checked-in optional Aptus adapter policy rejects plain `text` rows; live
   named-version compatibility has not been established in this repository.
 - Mac Review wraps existing CLI packets; default `review_policy` stays `none`.
 - The minimal bundle omits raw sources and complete replay artifacts.
 - External trust requires a manifest digest retained outside the bundle.
 - Model-assisted construction remains optional and unapproved (Group 8).
-- Automated CI/packaging gates land; public readiness still needs owner Mac evidence.
+- Automated CLI release gates are implemented; public Mac distribution remains excluded.
 
 ## Verification snapshot
 

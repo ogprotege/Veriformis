@@ -19,7 +19,7 @@ Capability claims: [docs/current-status.md](docs/current-status.md).
 - Existing JSONL, JSON, CSV, Parquet, or Arrow rows: `parse --mode dataset-row` then `map`, then the same tail
 - Cleaned text is compiler state until a `full_text` recipe selects it
 - Sealed product is a six-file `.vfbundle`; derivatives do not recurate or resplit
-- Optional adapters: `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`. Trainer extras stay empty; only extra `columnar` (PyArrow, Datasets) installs anything. The exporter does not train.
+- Optional adapters: `trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`. Trainer extras stay empty; among runtime extras, `columnar` installs PyArrow and Datasets. The exporter does not train.
 
 ## Install
 
@@ -37,7 +37,7 @@ export PATH="$PWD/.venv/bin:$PATH"
 veriformis --help
 ```
 
-macOS workbench (private beta, same CLI under the hood):
+macOS workbench (unsigned development app, same CLI under the hood):
 
 ```bash
 ./script/build_and_run.sh
@@ -81,12 +81,17 @@ Existing JSONL, JSON, compatible CSV, Parquet, or Arrow rows skip
 `clean` / `chunk` / `construct`:
 
 ```bash
-uv run veriformis mapping-detect rows.jsonl > build/detected.json
-# review the proposal, then save the chosen mapping-plan/v1 object as build/plan.json
-uv run veriformis parse --mode dataset-row rows.jsonl -o build/workspace
-uv run veriformis map build/workspace \
-  --goal learn-the-text --representation whole-text --plan build/plan.json
-# then curate → split → format → validate → seal → verify
+mkdir -p build/import
+uv run veriformis mapping-detect rows.jsonl > build/import/detected.json
+# For text rows, review the proposal and save it as build/import/plan.json.
+# Use the proposal's goal and representation for other schemas.
+uv run veriformis parse --mode dataset-row rows.jsonl -o build/import/workspace
+uv run veriformis map build/import/workspace \
+  --goal learn-the-text --representation whole-text --plan build/import/plan.json
+uv run veriformis curate build/import/workspace
+uv run veriformis split build/import/workspace
+uv run veriformis quality-report build/import/workspace
+# then format → validate → seal to a new bundle path → verify
 ```
 
 `map` takes no defaults: the goal, representation, and a confirmed plan whose
@@ -95,7 +100,8 @@ sources additionally need `uv sync --extra columnar`. Guide:
 [docs/mapping.md](docs/mapping.md). Suffix never switches the
 document-source path.
 
-For a supervised recipe, bind objective and row schema at construct:
+For a supervised document recipe, replace the earlier `construct` command
+with this selection, then run the remaining stages into a new bundle path:
 
 ```bash
 uv run veriformis construct build/workspace \
@@ -103,8 +109,10 @@ uv run veriformis construct build/workspace \
   --target-row-schema messages
 ```
 
-Later stages read the bound recipe. Only `instruction_output` needs
-`curate --instruction TEXT`.
+Later stages read the bound recipe. For document-source `instruction_output`,
+omitting `curate --instruction` uses the goal's truthful catalog template.
+Other document row schemas reject an instruction override. Imported rows
+preserve their supplied instruction and output fields.
 
 Default `seal` writes this tree and nothing else:
 
@@ -130,7 +138,7 @@ MCP, and required release gates do not need Aptus.
 | Markdown | `.md`, `.markdown` |
 | Word | `.docx` |
 | HTML | `.html`, `.htm` |
-| Digitally-born PDF | `.pdf` (image-only / OCR fails closed) |
+| Digitally-born PDF | `.pdf` (default parse refuses image-only pages) |
 | Tables and records | `.csv`, `.json`, `.jsonl` |
 | Source | `.py`, `.js`, `.ts`, `.java`, `.c`, `.cpp`, `.go`, `.rs`, `.rb`, `.sh` |
 | Existing rows (`--mode dataset-row` only) | `.jsonl`, `.json`, compatible `.csv`, `.parquet`, `.arrow` (Parquet and Arrow need extra `columnar`) |
@@ -161,7 +169,7 @@ optional `.vfexport.zip` around one already-published export directory.
 
 - Invent a summary or any other transformation that did not occur
 - Call a network or an LLM
-- OCR a scan
+- OCR a scan during default parse; optional local `ocr-preview` is separate
 - Upload to a Hub
 - Launch training
 - Claim public beta or a signed Mac app

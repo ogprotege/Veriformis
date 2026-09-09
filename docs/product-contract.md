@@ -5,7 +5,22 @@
 **Applies to:** Product scope, implementation plans, user-facing claims, and
 optional consumer integrations
 
-**Current baseline:** M1 core plus Groups 1–7 runtime, Group 9 automated
+**Current baseline (2026-09-09):**
+
+Version `0.1.0` remains development alpha with claim
+`cli-first-independent-core`. Independent-product Phases 0–20 and the
+eight-stage post-20 defect-closure plan are complete. PR #204 closed that
+plan; PR #203 adds read-only, non-enforcing quality previews for imported
+rows. There is no active numbered phase and no Phase 21.
+
+Document-source workspaces use revision schema 3. Imported-row workspaces use
+schema 4 and confirmed mappings. Generic split JSONL and canonical JSON admit
+all eight row schemas; the other containers and optional consumer profiles
+retain their explicit admission limits. Trainer extras stay empty. Extra
+`columnar` installs PyArrow and Datasets. Default parse does not OCR scans.
+Unsigned Mac builds are development evidence, not public distribution.
+
+**Historical implementation progression:** M1 core plus Groups 1–7 runtime, Group 9 automated
 release gates, beta-prep, and private beta Mac workbench Phases 0–2 on `main`,
 plus completed independent-product Phases 0–4 and Phase 5.1–5.3's supported
 generic `split-jsonl-directory`, canonical `json`, and `constrained-csv` v1
@@ -49,13 +64,13 @@ unsupported for default parse. `quality-report` is a preview, not a gate. Mac
 Review wraps existing CLI packets; default `review_policy` stays `none`.
 There is no published corpus tier.
 
-**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
+**Last reviewed:** 2026-09-09 (product polish and closeout)
 
 **Next review:** Any product-contract change. No modest fig-leaf tier. No public plugin API. Version remains
 `0.1.0` development alpha. The frozen support matrix is
 CLI-first; public signed Mac and Hub execute stay excluded.
 
-**Next execution document:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md)
+**Completed execution record:** [Independent Product Roadmap](./plans/2026-08-11-veriformis-independent-product-roadmap.md). New work requires an owner instruction; this roadmap does not open another phase.
 
 ## Product promise
 
@@ -116,7 +131,7 @@ dataset under explicit semantics, but it must not silently replace Veriformis's
 curation, membership, or split policy. Aptus is one optional consumer
 integration and is not required for the Veriformis product.
 
-## Current and planned capability
+## Implementation history and capability boundaries
 
 The implemented M1 core supports a deterministic stage pipeline for Markdown,
 DOCX, plain text, and code. Group 1 adds transactional workspace revisions,
@@ -274,10 +289,11 @@ container, and consumer profile; it records the exact compatibility matrix and
 does not create a trainer, spreadsheet, importer, renderer, or support claim.
 
 The private Phase 4.7 hooks are trusted conformance code rather than an
-untrusted plugin boundary. Semantic replay currently retains each complete
-produced file in memory; its fixture is statically bounded. Before any semantic
-profile is shipped, that profile must define and enforce explicit byte, record,
-nesting, and other applicable resource limits.
+untrusted plugin boundary.
+Shipped columnar profiles replay decoded semantic content under their declared
+limits. Post-20 exact exporters decode emitted bytes and compare complete
+membership; render comparison uses private spooled storage. These measures
+do not establish a published corpus tier or a streaming-compile claim.
 
 ## End-to-end compiler contract
 

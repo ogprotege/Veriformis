@@ -1,6 +1,6 @@
 # Independent Product Program
 
-**Status:** Active program — Phases 0–20 complete
+**Status:** Completed program, archived in place; Phases 0–20 complete
 
 **Roadmap:** [Independent Product Roadmap](../../../docs/plans/2026-08-11-veriformis-independent-product-roadmap.md)
 
@@ -37,12 +37,17 @@ with roadmap headings.
 - [Phase 19 — Complete automation and optional publication boundaries](phase-19-automation-and-publication/README.md) — complete
 - [Phase 20 — Cut the stable independent 1.0 product](phase-20-stable-1.0/README.md) — completed
 
-Remainder (not a roadmap phase, not Phase 21):
+Completed remainder records (not roadmap phases, not Phase 21):
 
-- [Post-20 claim honesty](post-20-claim-honesty/README.md) — docs honesty only; version remains `0.1.0`
+- [Post-20 claim honesty](post-20-claim-honesty/README.md): completed claim corrections, preview CLI, and unsigned CI; version remains `0.1.0`
 - [Post-20 defect closure](post-20-defect-closure/README.md): eight stages complete; version remains `0.1.0`
 
-Future phase packets are created only when a phase changes from `planned` to
+The following chronology preserves each phase's original boundary. Earlier
+"not yet" and "do not start" statements describe that phase, not current work.
+The [product-polish closeout](../../../docs/evidence/2026-09-09-product-polish.md)
+records final operator verification. No numbered phase remains active.
+
+Historically, phase packets were created only when a phase changed from `planned` to
 `in_progress`. This prevents empty directories from being mistaken for active
 implementation. Phase 4 opened on 2026-08-21 from baseline `db9d93ef`; item
 4.1 implemented the typed `ExportService` boundary and descriptor-anchored
@@ -137,7 +142,7 @@ Item 17.1 records the SFT-only baseline. No family execute, admission
 contract, generator, or Mac UI is added yet. Do not start Phase 18 from
 that packet.
 
-## State change procedure
+## State change procedure for separately authorized future work
 
 1. Confirm predecessor gates and roadmap permission.
 2. Create the standard phase packet.

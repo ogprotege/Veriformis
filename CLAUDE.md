@@ -4,6 +4,24 @@ This file gives coding-agent guidance for the current Veriformis repository.
 
 ## Current state
 
+Version `0.1.0` remains development alpha with claim
+`cli-first-independent-core`. Independent-product Phases 0–20 and the
+eight-stage post-20 defect-closure plan are complete. PR #204 closed that
+plan; PR #203 adds read-only, non-enforcing quality previews for imported
+rows. There is no active numbered phase and no Phase 21.
+
+Document-source workspaces use revision schema 3. Imported-row workspaces use
+schema 4 and confirmed mappings. Generic split JSONL and canonical JSON admit
+all eight row schemas; the other containers and optional consumer profiles
+retain their explicit admission limits. Trainer extras stay empty. Extra
+`columnar` installs PyArrow and Datasets. Default parse does not OCR scans.
+Unsigned Mac builds are development evidence, not public distribution.
+
+See `docs/current-status.md` and the dated closeout evidence for current
+behavior. Completed packets retain earlier claims at their recorded baselines.
+
+## Implementation chronology (historical phase boundaries)
+
 Veriformis is a Python development **alpha** with implemented source code and
 tests. Version `0.1.0` on `main` includes: M1 core; Groups 1–7; Group 9
 automated release gates; beta-prep docs; private beta Mac workbench Phases 0–2
@@ -216,7 +234,7 @@ Read these current authorities before changing code:
 Dated specifications and completed plans are historical records. Current status
 and versioned contracts control present capability claims.
 
-Then use `WIP.md` as the reviewed work queue. It never overrides current
+Then use `WIP.md` as the reviewed inventory of completion and deferred limits. It never overrides current
 status, the roadmap, or a versioned contract.
 
 ## Product doctrine
@@ -273,7 +291,7 @@ Key modules under `src/veriformis/` are:
   settings, and probe raw sources without workspace mutation;
 - `profiles/` for implemented TRL, MLX-LM, Axolotl, LLaMA-Factory, and Aptus admission pins and adapters;
 - `quality/` for the versioned quality report (facts, policy, recommendations; previewable gates; not enforcing; CLI preview is not a gate);
-- `review/` for the versioned review bundle (queue kinds, waiver, correction; 14.2 schema pin; does not block seal);
+- `review/` for review queues, exchange, waivers, corrections, and bound construction completion; required unresolved construction review blocks seal; imported required review refuses without a durable receipt;
 - `extensions/` for the internal extension protocol, built-in-only registry, and read-only capability declarations (no loader);
 - `families/` for advanced-family admission pins, leakage grouping, and admitted classification execute;
 - `workbench/` for Mac wrap pins (`veriformis.workbench-adapter/v1`; loading is not a screen);
@@ -292,7 +310,8 @@ Key modules under `src/veriformis/` are:
 - `cli.py` for the Typer adapter; and
 - `macos/` for the SwiftUI workbench (thin CLI adapter; same digests as terminal).
 
-The physical workspace layout schema is 1. Current revision schema is 3.
+The physical workspace layout schema is 1. Document-source revision schema is
+3; dataset-row revision schema is 4.
 `upgrade-workspace` migrates verified revision-v1 workspaces through v2 and
 then v3. Revision v3 adds `curate` and `split` and binds the complete stage
 graph through `seal`. Every stage commit must pass semantic replay before

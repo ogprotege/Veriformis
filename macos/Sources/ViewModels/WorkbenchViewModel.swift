@@ -72,9 +72,15 @@ final class WorkbenchViewModel: ObservableObject {
     @Published private(set) var confirmedMappingPlan: MappingPlan?
     @Published var exportBundleURL: URL? {
         didSet {
-            if oldValue != exportBundleURL { invalidateExportConfirmation() }
+            if oldValue != exportBundleURL {
+                exportSchemaEvidence = nil
+                invalidateExportConfirmation()
+            }
         }
     }
+    // Display-only schema evidence from a verified dry-run of this bundle.
+    // Changing profiles still requires a fresh plan and explicit confirmation.
+    private var exportSchemaEvidence: (bundle: URL, schema: String)?
     @Published var exportDestinationURL: URL? {
         didSet {
             if oldValue != exportDestinationURL { invalidateExportConfirmation() }
@@ -294,7 +300,14 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     var resolvedExportManifestSHA256: String? {
-        lastResult?.manifestSHA256 ?? selectedHistoryEntry?.manifestSHA256
+        guard let bundle = resolvedExportBundleURL?.standardizedFileURL else { return nil }
+        if let result = lastResult, result.bundleURL.standardizedFileURL == bundle,
+           let digest = result.manifestSHA256 { return digest }
+        if let entry = selectedHistoryEntry,
+           URL(fileURLWithPath: entry.bundlePath).standardizedFileURL == bundle {
+            return entry.manifestSHA256
+        }
+        return nil
     }
 
     var resolvedExportDestinationURL: URL? {
@@ -306,11 +319,10 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     var knownExportRowSchema: String? {
-        if case .ready(let result) = exportDryRunState {
-            return result.plan.rowSchema
-        }
-        if let schema = confirmedMappingPlan?.rowSchema { return schema }
-        return selectedRepresentation?.rowSchema
+        guard let evidence = exportSchemaEvidence,
+              evidence.bundle == resolvedExportBundleURL?.standardizedFileURL
+        else { return nil }
+        return evidence.schema
     }
 
     var admittedExportProfiles: [ExportProfileDescriptorSummary] {
@@ -1143,11 +1155,13 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     func chooseExportDestination() {
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
+        let panel = NSSavePanel()
+        panel.title = "New export folder"
+        panel.nameFieldLabel = "Folder name:"
+        panel.nameFieldStringValue = "export"
         panel.canCreateDirectories = true
-        panel.prompt = "Choose Export Folder"
+        panel.prompt = "Choose Destination"
+        panel.message = "Choose a new folder name. Export creates it; existing destinations are refused."
         if panel.runModal() == .OK, let url = panel.url {
             exportDestinationURL = url.standardizedFileURL
         }
@@ -1220,6 +1234,12 @@ final class WorkbenchViewModel: ObservableObject {
                 nextState = .unavailable(error.localizedDescription)
             }
             guard let self, self.exportDryRunController === controller else { return }
+            if case .ready(let result) = nextState {
+                self.exportSchemaEvidence = (
+                    URL(fileURLWithPath: request.bundle).standardizedFileURL,
+                    result.plan.rowSchema
+                )
+            }
             self.exportDryRunState = nextState
             self.exportIsRunning = false
             self.exportDryRunController = nil
@@ -1362,6 +1382,13 @@ final class WorkbenchViewModel: ObservableObject {
     }
 
     private func invalidateExportConfirmation() {
+        if exportDryRunController != nil {
+            exportDryRunTask?.cancel()
+            exportDryRunController?.cancel()
+            exportDryRunTask = nil
+            exportDryRunController = nil
+            exportIsRunning = false
+        }
         exportPlanConfirmed = false
         exportDryRunState = .idle
         exportExecuteState = .idle
@@ -2073,7 +2100,13 @@ final class WorkbenchViewModel: ObservableObject {
                 if let logFileURL {
                     appendToLogFile(logFileURL, text: "Compile complete.\n")
                 }
-                refreshGoalPreview(workspace: workspace)
+                if usesMappingSnapshot {
+                    goalPreviewState = .unavailable(
+                        "Imported rows use Mapping preview. The document-source goal preview does not apply."
+                    )
+                } else {
+                    refreshGoalPreview(workspace: workspace)
+                }
 
                 recordHistory(
                     startedAt: startedAt,
