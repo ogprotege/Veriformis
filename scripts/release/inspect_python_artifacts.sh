@@ -77,6 +77,20 @@ with zipfile.ZipFile(wheel) as zf:
         raise SystemExit("inspect_python_artifacts: console script missing")
     if "veriformis/release/support-matrix-v1.json" not in names:
         raise SystemExit("inspect_python_artifacts: support matrix missing from wheel")
+    # Every packaged data file must ride in the wheel (post-20 defect D-01).
+    src_root = Path("src/veriformis")
+    expected_data = sorted(
+        "veriformis/" + path.relative_to(src_root).as_posix()
+        for path in src_root.rglob("*")
+        if path.is_file()
+        and path.suffix in {".json", ".jinja"}
+        and "__pycache__" not in path.parts
+    )
+    missing_data = [name for name in expected_data if name not in names]
+    if missing_data:
+        raise SystemExit(
+            f"inspect_python_artifacts: packaged data missing from wheel: {missing_data}"
+        )
 
 with tarfile.open(sdist, "r:gz") as tf:
     members = sorted(member.name for member in tf.getmembers() if member.isfile())

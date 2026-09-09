@@ -61,7 +61,10 @@ where = ["src"]
 version = { attr = "veriformis.__version__" }
 
 [tool.setuptools.package-data]
-veriformis = ["serializers/templates/chat/*.jinja", "goals/*.json", "mapping/*.json", "profiles/*.json", "exports/*.json", "release/*.json"]
+# Every packaged data file under src/veriformis must match one glob here.
+# tests/release/test_package_data_coverage.py fails when a new *.json or
+# *.jinja lands outside these globs (post-20 defect D-01).
+veriformis = ["serializers/templates/chat/*.jinja", "goals/*.json", "mapping/*.json", "profiles/*.json", "exports/*.json", "release/*.json", "scale/*.json"]
 
 [tool.ruff]
 required-version = "==0.16.0"
