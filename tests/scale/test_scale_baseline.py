@@ -132,3 +132,33 @@ def test_named_hardware_tiny_baseline_writes_report(tmp_path: Path) -> None:
     loaded = json.loads(path.read_text(encoding="utf-8"))
     assert loaded["sla_claim"] is False
     assert loaded["metrics"]["wall_ns"] >= 1
+
+
+def test_baseline_cannot_claim_cancellation_when_callback_does_not_cancel(tmp_path: Path, monkeypatch) -> None:
+    import veriformis.scale.baseline as baseline
+
+    monkeypatch.setattr(baseline, "request_scale_cancellation", lambda: lambda: None)
+    report = baseline.run_named_tiny_baseline("ci-tiny-markdown", tmp_path / "run")
+    assert report.metrics.cancel_observed is False
+    assert report.metrics.resume_observed is False
+
+
+def test_baseline_observes_cancel_then_sealed_resume_without_reparsing(tmp_path: Path, monkeypatch) -> None:
+    import veriformis.scale.baseline as baseline
+    from veriformis.workspace import Workspace
+
+    service = PipelineService()
+    parse = service.parse
+    paths = []
+
+    def record_parse(sources, workspace, **kwargs):
+        paths.append(workspace)
+        return parse(sources, workspace, **kwargs)
+
+    monkeypatch.setattr(service, "parse", record_parse)
+    report = baseline.run_named_tiny_baseline("ci-tiny-markdown", tmp_path / "run", service=service)
+    assert report.metrics.cancel_observed and report.metrics.resume_observed
+    cancelled = tmp_path / "run" / "cancel-workspace"
+    assert paths.count(cancelled) == 1
+    assert Workspace.open(cancelled).head().stages["seal"].status == "complete"
+    assert (tmp_path / "run" / "cancel-bundle" / "manifest.json").is_file()

@@ -249,7 +249,8 @@ LLM call; there is no `summary` objective.
 veriformis construct WORKSPACE (--goal GOAL | --preset PRESET | --objective OBJECTIVE) \
   [--representation ID] [--source SELECTOR]... [--target-row-schema SCHEMA] \
   [--consumer-profile PROFILE] [--split-ratio-ppm PPM] \
-  [--require-review | --no-require-review]
+  [--require-review | --no-require-review] [--review-packet PACKET.json] \
+  [--strategy STRATEGY] [--size N] [--overlap N]
 ```
 
 | Option | When omitted | Effect |
@@ -263,10 +264,15 @@ veriformis construct WORKSPACE (--goal GOAL | --preset PRESET | --objective OBJE
 | `--consumer-profile` | preset value | Compile-time compatibility constraint; implemented profiles are canonical v1 and `aptus-handoff-v1` |
 | `--split-ratio-ppm` | preset value | Opening share for `continuation` only; 1–999999 |
 | `--require-review` / `--no-require-review` | preset value | Leaves construction-integrity decisions pending instead of accepting valid candidates |
+| `--review-packet` | none | Resolve exactly the current pending candidates using the same recipe and plan; implies required review unless explicitly overridden |
+| `--strategy` / `--size` / `--overlap` | resolved goal/preset values | Explicit segmentation overrides; the workspace chunks must match all resolved values |
 
-Exactly one selection path is required. `--goal` and `--objective` adopt the
-workspace's existing chunk configuration; `--preset` requires it to equal the
-preset's segmentation (re-run `chunk --preset` otherwise). The recipe is built
+Exactly one selection path is required. `--goal` and `--preset` require the
+workspace chunks to match their resolved segmentation, including explicit
+`--strategy`, `--size`, and `--overlap` overrides. Repeat custom chunk settings
+on construct. Legacy `--objective` without segmentation overrides adopts the
+existing chunks. A pipeline document carries its explicit chunk overrides
+into construct unless construct declares its own. The recipe is built
 through the named recipe library, so the same effective settings yield the
 same `recipe_id` from every path and every surface.
 
@@ -289,8 +295,8 @@ on stdout. That is the v1 limit, not a silent skip. Construct still exits 0;
 later `split` / `validate` fail closed if no records remain. Single-block
 sources such as `tests/fixtures/matrix/before-after/` construct under
 `--preset reproduce-a-recorded-change.safe` after `--rules lowercase`. Isolating
-one block per chunk with a small `--size` also works with `--goal`; `--preset`
-still requires the preset segmentation.
+one block per chunk with a small `--size` also works when the same size and
+overlap overrides are passed to both `chunk` and `construct`.
 
 `structured_field` (`--goal extract-a-structured-value`) copies one recovered
 IR scalar. Curation quarantines `conflicting-target` when one covering chunk
@@ -306,9 +312,15 @@ prose.
 `full_text` requires the `text` row schema; every other objective requires a
 supervised row schema. Unknown or duplicate `--source` selections fail closed.
 The Aptus profile rejects `text` before the workspace is opened or changed.
-`--require-review` leaves decisions pending because the current CLI does not
-ingest completed review evidence (the Python construction API supports
-separate review values).
+`--require-review` leaves decisions pending. Run `curate`, then
+`review-export --workspace WORKSPACE` to export the exact pending items bound
+to that finished-dataset plan. Complete decisions or explicit waivers in the
+packet through the review models, submit it with `review-submit`, and run
+`construct` with the same selection and `--review-packet PACKET.json`.
+Then rerun `curate` through `seal`. Rejected candidates remain rejected.
+Review does not waive coverage or any other validation gate. Corrections
+require new source or mapping identities and cannot approve old bytes.
+The [review contract](contracts/review-v1.md) describes the durable receipt.
 
 Requires `parse`, `clean`, and `chunk` complete, on revision schema 2 or
 later. Before commit, the workspace reconstructs all selected upstream inputs
@@ -1282,9 +1294,9 @@ raised directly.
 | `spec-lock SPEC [--out LOCK] [--workspace WS]` | Write `veriformis.project-lock/v1` pinning the spec digest, Veriformis version, Python version, declared extras, and (with `--workspace`) the workspace `HEAD` and source identities; `--out` refuses an existing file; the lock is not execute |
 | `env-inspect` | Print `veriformis.environment-inspect/v1`: Python major.minor, package version, each declared extra as `present` or `empty`, and taxonomy counts; reads no environment variables and prints no secrets |
 | `spec-run SPEC` | Execute a confirmed spec through `PipelineService`; document-source parse omits `--mode`; export is never auto-run |
-| `spec-resume SPEC --lock LOCK` | Continue a spec only when the lock's spec digest, workspace `HEAD`, and source identities match; drift names the mismatched identity |
+| `spec-resume SPEC --lock LOCK` | Continue only when the lock's spec digest, referenced pipeline bytes, recorded environment fields, workspace `HEAD`, and source identities match; drift names the mismatched identity |
 | `scale-baseline --corpus-id ID --work-root DIR` | Compile one named scale corpus and print a `veriformis.scale-baseline-report/v1`; the report is an observation, not an SLA; dataset-row corpora fail closed |
-| `review-export --plan-id ID --items ITEMS.json` | Print a deterministic `veriformis.review-packet/v1` for the pending items of one plan |
+| `review-export (--workspace WS \| --plan-id ID --items ITEMS.json)` | Print a deterministic `veriformis.review-packet/v1` for the pending items of one plan |
 | `review-import PACKET` | Reload and validate a packet without submitting it |
 | `review-submit PACKET` | Validate completed human review evidence from a packet and print the resulting `veriformis.review-bundle/v1`; see the [Review Contract v1](contracts/review-v1.md) for how that bundle is bound into a construct re-commit |
 | `handoff BUNDLE --manifest-sha256 DIGEST` | Write sibling Aptus handoff descriptor |

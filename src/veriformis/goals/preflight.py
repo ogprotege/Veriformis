@@ -726,8 +726,9 @@ def build_compile_preflight(
                     code="review-evidence-unavailable",
                     fields=("require_review", "review_policy"),
                     message=(
-                        "the current compile surfaces supply no review evidence; "
-                        "a review-required recipe cannot produce dataset records"
+                        "one-shot preflight cannot resolve future candidate reviews; "
+                        "use staged construct --require-review, curate, review-export "
+                        "--workspace, and construct --review-packet before finishing"
                     ),
                 )
             )

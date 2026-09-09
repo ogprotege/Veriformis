@@ -517,6 +517,9 @@ def _finish_python(
     }
     if cell["chunk_size"] is None:
         construct_selection["preset"] = str(cell["preset_id"])
+    else:
+        construct_selection["size"] = int(cell["chunk_size"])
+        construct_selection["overlap"] = int(cell["chunk_overlap"])
     constructed = SERVICE.construct(workspace, **construct_selection)
     SERVICE.curate(
         workspace,
@@ -591,6 +594,8 @@ def _finish_cli(
     ]
     if cell["chunk_size"] is None:
         construct.extend(["--preset", str(cell["preset_id"])])
+    else:
+        construct.extend(["--size", str(cell["chunk_size"]), "--overlap", str(cell["chunk_overlap"])])
     _cli_ok(construct)
     curate = [
         "curate",
@@ -665,6 +670,9 @@ def _finish_mcp(
     }
     if cell["chunk_size"] is None:
         construct_selection["preset"] = str(cell["preset_id"])
+    else:
+        construct_selection["size"] = int(cell["chunk_size"])
+        construct_selection["overlap"] = int(cell["chunk_overlap"])
     construct_payload = _mcp_json(
         tools["construct"], str(workspace), **construct_selection
     )

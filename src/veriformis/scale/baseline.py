@@ -78,6 +78,17 @@ def compile_document_corpus(
     service.parse(collected, workspace, source_root=source_root)
     if cancellation_check is not None:
         cancellation_check()
+    _finish_document_corpus(service, workspace, bundle, cancellation_check=cancellation_check)
+
+
+def _finish_document_corpus(
+    service: PipelineService,
+    workspace: Path,
+    bundle: Path,
+    *,
+    cancellation_check: CancellationCheck | None = None,
+) -> None:
+    """Continue the retained parse revision through external-digest verification."""
     service.clean(workspace)
     if cancellation_check is not None:
         cancellation_check()
@@ -106,10 +117,15 @@ def compile_document_corpus(
         raise ScaleError("scale baseline seal produced no publication")
     if cancellation_check is not None:
         cancellation_check()
-    service.verify(
+    verified = service.verify(
         bundle,
         manifest_sha256=sealed.publication.manifest_sha256,
     )
+    if (
+        verified.exit_status != 0 or verified.verification is None
+        or verified.verification.trust_grade != "external_digest"
+    ):
+        raise ScaleError("scale baseline external-digest verification failed")
 
 
 def run_scale_baseline(
@@ -157,10 +173,29 @@ def run_scale_baseline(
     cpu_system_ns = max(0, system_after - system_before)
 
     cancel_workspace = root / "cancel-workspace"
-    pipeline.parse(list(paths), cancel_workspace, source_root=corpus_dir)
-    cancel_observed = True
-    pipeline.clean(cancel_workspace)
-    resume_observed = True
+    cancel_bundle = root / "cancel-bundle"
+    cancel_observed = False
+    resume_observed = False
+    try:
+        compile_document_corpus(
+            pipeline, paths, workspace=cancel_workspace, bundle=cancel_bundle,
+            source_root=corpus_dir, cancellation_check=request_scale_cancellation(),
+        )
+    except ScaleCancelled:
+        from veriformis.workspace import Workspace
+
+        store = Workspace.open(cancel_workspace)
+        retained = store.head()
+        completed = {name for name, state in retained.stages.items() if state.status == "complete"}
+        cancel_observed = completed == {"parse"} and not cancel_bundle.exists()
+        if cancel_observed:
+            _finish_document_corpus(pipeline, cancel_workspace, cancel_bundle)
+            resumed = Workspace.open(cancel_workspace).head()
+            resume_observed = (
+                resumed.revision_id != retained.revision_id
+                and resumed.stages["seal"].status == "complete"
+                and resumed.sources == retained.sources
+            )
 
     source_bytes = corpus.total_bytes
     workspace_bytes = _tree_bytes(workspace)

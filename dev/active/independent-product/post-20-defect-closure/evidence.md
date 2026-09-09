@@ -28,3 +28,8 @@ fix. Rows are appended as items close; an item without a row is open.
 | D-07 | Withdrawn; `tests/datasets/test_models_and_curation.py::test_unicode_is_exact_for_dedup_conflict_and_identity`; imported NFC/NFD case in `tests/mapping/test_mapping_provenance.py` |
 | D-15 | `tests/exports/test_exact_decoding.py` rejects common planner/renderer corruption for all seven exact exporters; complete export/profile and core suites passed |
 | D-16 | `tests/bundle/test_zip64.py` tests writer size/offset extensions and refuses noncanonical extras |
+| D-17 | `tests/review/test_construction_completion.py` completes review on Python, CLI, and MCP; `tests/mapping/test_mapping_provenance.py` refuses imported required review without a durable receipt |
+| D-18 | `tests/goals/test_construct_segmentation.py`; complete `tests/regressions/test_phase6_goal_acceptance_matrix.py` |
+| D-19 | `tests/automation/test_phase19_diagnostics_and_resume.py` covers environment pins, exact external bytes, mid-run reference mutation, conflicting stage pins, and custom segmentation resume |
+| D-20 | `tests/mapping/test_validation_evidence.py` rejects rehashed incomplete reports and changed raw captures; `tests/datasets/test_validation.py` rejects common serializer/replay corruption |
+| D-21 | `tests/scale/test_scale_baseline.py` observes cancellation and actual retained-workspace resume; absent cancellation leaves observations false |

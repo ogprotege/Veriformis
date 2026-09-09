@@ -192,3 +192,46 @@ Append-only dated execution log.
   profile suite: `593 passed, 3 skipped, 30 deselected` in 30.57s. Core:
   `2829 passed, 4 skipped, 32 deselected`, one expected transport warning, in
   429.02s. Lock, Ruff, tracking, and diff checks passed after integration.
+
+## 2026-09-09 — Stage 5 implementation and focused verification
+
+- D-17: `review-export --workspace` derives the exact current pending items.
+  `construct --review-packet` strictly checks the current recipe, result, plan,
+  and complete candidate set, then persists the submitted packet and bundle
+  identities with the exact unsigned resolution in existing review evidence.
+  Python, CLI, and MCP complete accepted decisions and explicit waivers through
+  seal and external-digest verification. Rejections remain rejected and cannot
+  waive coverage. Corrections require new source or mapping revisions.
+  Dataset-row `required` review now refuses execution because its v1 schema
+  has no durable receipt. Default review remains `none`; schemas are unchanged.
+- D-18: goal and preset construct paths compare all resolved segmentation
+  settings. Explicit strategy, size, and overlap overrides are available on
+  Python, CLI, and MCP. Pipeline execution carries explicit chunk overrides
+  into construct, including after resume filters completed stages.
+- D-19: resume checks Python, Veriformis, and declared-extra pins. External
+  pipeline content is captured, hashed, and decoded together. Returned locks
+  retain the bytes executed even if the reference changes during execution.
+  Conflicting stage pins refuse before parse. Embedded spec digests do not change.
+- D-21: the scale harness invokes and catches actual cancellation, checks the
+  retained parse-only revision, and resumes through seal and external-digest
+  verification. A callback that does not cancel leaves both observation flags
+  false. Support tiers remain empty.
+- D-20: document gates independently check lifecycle, curation, deduplication,
+  quality, balance, leakage, binding, objective, schema, and target placement.
+  Imported validation reconstructs mappings from exact raw source bytes and
+  uses those bytes for split digests. Gate, snapshot, and row-set loaders reject
+  incomplete or contradictory rehashed reports. Valid-output schemas stay v1.
+- Workflow checkpoint: `102 passed, 1 deselected` in 30.11s. The 74-cell
+  cross-surface checkpoint before the independent validation changes passed
+  `297 tests` in 278.60s with no golden changes. Validation-focused suite:
+  `85 passed` in 11.06s. The common serializer/replay corruption and forged
+  imported report regressions passed (`15 tests` in 1.15s). Full stage 5 exit
+  gates remain pending; these checkpoints are not stage closeout.
+
+## 2026-09-09 — Stage 5 exit gates
+
+- Full required core gate: `2869 passed, 4 skipped, 32 deselected`, one
+  expected transport warning, in 415.95s. This includes the complete 74-cell
+  Python, CLI, MCP, and pipeline-spec matrix after the validation repairs.
+- `uv lock --check`, Ruff, project tracking, and `git diff --check` passed.
+  D-17 through D-21 are closed within their documented v1 perimeter.

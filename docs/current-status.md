@@ -105,7 +105,21 @@ manifests bind `veriformis_version` and existing goldens stay
 byte-identical. There is no `1.0.0` tag or public signed-Mac claim.
 Hub execute stays excluded. Do not invent a Phase 21.
 
-**Review date:** 2026-09-01 (independent-product Phase 20.10 closeout)
+Post-20 defect closure keeps version `0.1.0` and the existing independent-core
+claim. Exact exporters decode emitted payload bytes before comparing source
+membership. Canonical ZIP64 writer metadata verifies. Required construction
+review can finish through Python, CLI, and MCP using a bound packet and the
+existing persisted evidence format. Dataset-row required review refuses
+because its v1 format has no durable receipt. Goal and preset construction
+check resolved segmentation. Project resume compares recorded environment
+pins and referenced pipeline contents. Scale cancellation/resume flags now
+require observed cancellation and completion of the retained workspace.
+Document validation adds direct invariants alongside stage replay. Imported
+validation replays captured raw sources and checks every named gate. Report
+loaders require complete gate and file bindings. Persisted schema identifiers
+and valid-output identities remain unchanged.
+
+**Review date:** 2026-09-09 (post-20 defect closure in progress)
 
 **Next review:** Any capability claim change.
 

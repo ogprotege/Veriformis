@@ -53,6 +53,9 @@ _STAGE_CONFIG_KEYS: dict[str, frozenset[str]] = {
             "split_ratio_ppm",
             "require_review",
             "consumer_profile",
+            "strategy",
+            "size",
+            "overlap",
         }
     ),
     "curate": frozenset(
@@ -118,7 +121,11 @@ class PipelineSpec:
 
 
 def load_pipeline_spec(path: Path) -> PipelineSpec:
-    raw = path.read_bytes()
+    return pipeline_spec_from_bytes(path.read_bytes(), base_dir=path.parent)
+
+
+def pipeline_spec_from_bytes(raw: bytes, *, base_dir: Path) -> PipelineSpec:
+    """Decode one captured document without reopening its path."""
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
@@ -129,8 +136,7 @@ def load_pipeline_spec(path: Path) -> PipelineSpec:
         raise PipelineSpecError(f"pipeline document is not valid YAML: {exc}") from exc
     if not isinstance(value, dict):
         raise PipelineSpecError("pipeline document root must be a mapping")
-    base = path.parent
-    return pipeline_spec_from_dict(value, base_dir=base)
+    return pipeline_spec_from_dict(value, base_dir=base_dir)
 
 
 def pipeline_spec_from_dict(

@@ -367,6 +367,12 @@ def construct(
         "--mode",
         help="Compiler path: document-source (default), dataset-row, or mixed.",
     ),
+    strategy: str | None = typer.Option(None, "--strategy", help="Explicit chunk strategy to match."),
+    size: int | None = typer.Option(None, "--size", help="Explicit chunk size to match."),
+    overlap: int | None = typer.Option(None, "--overlap", help="Explicit chunk overlap to match."),
+    review_packet: Path | None = typer.Option(
+        None, "--review-packet", help="Apply a complete packet to the current pending construction.",
+    ),
 ) -> None:
     """Construct evidence-bearing candidates and immutable accepted records."""
     _run(
@@ -382,6 +388,10 @@ def construct(
             require_review=require_review,
             consumer_profile=consumer_profile,
             mode=mode,
+            strategy=strategy,
+            size=size,
+            overlap=overlap,
+            review_packet=None if review_packet is None else review_packet.read_bytes(),
         )
     )
 
@@ -773,6 +783,7 @@ def spec_lock(
         payload = _SERVICE.lock_project_spec(
             load_project_spec_document(spec),
             workspace=workspace,
+            base_dir=spec.parent,
         )
         text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
         if out is not None:
@@ -960,13 +971,14 @@ def mapping_rejections(
 
 @app.command(name="review-export")
 def review_export(
-    plan_id: str = typer.Option(..., "--plan-id"),
-    items: Path = typer.Option(..., "--items"),
+    plan_id: str | None = typer.Option(None, "--plan-id"),
+    items: Path | None = typer.Option(None, "--items"),
+    workspace: Path | None = typer.Option(None, "--workspace"),
 ) -> None:
     """Export a pending review packet as deterministic JSON."""
     try:
-        payload = json.loads(items.read_text(encoding="utf-8"))
-        packet = _SERVICE.export_review_packet(plan_id, payload)
+        payload = None if items is None else json.loads(items.read_text(encoding="utf-8"))
+        packet = _SERVICE.export_review_packet(plan_id, payload, workspace=workspace)
     except (OSError, UnicodeError, json.JSONDecodeError, VeriformisError) as exc:
         _echo_error(
             exc if isinstance(exc, VeriformisError) else VeriformisError(str(exc))

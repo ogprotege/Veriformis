@@ -32,6 +32,14 @@ v1 compiles `document-source` corpora only. Dataset-row specs fail
 closed. Cancellation is cooperative between stages, not mid-stage.
 Peak RSS is process-wide `ru_maxrss`, not a delta.
 
+The harness invokes the actual cancellation callback after parse and catches
+`ScaleCancelled`. `cancel_observed` is true only when the retained workspace
+has parse complete, no later stage complete, and no published bundle.
+It resumes that retained revision from clean through externally anchored
+verification. `resume_observed` also requires a new sealed HEAD and identical
+source identities. If cancellation does not occur, both flags remain false.
+The separate cancellation/resume probe is outside the primary compile timing.
+
 Packaged measurement-point specs (`measure-markdown-*`, `measure-pdf-2-8`)
 are a ladder, not a support table. A modest fig-leaf tier from an
 unrepresentative fixture is forbidden.

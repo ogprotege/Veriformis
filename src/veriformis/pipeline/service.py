@@ -1228,16 +1228,31 @@ class PipelineService:
 
     def export_review_packet(
         self,
-        plan_id: str,
-        items: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+        plan_id: str | None = None,
+        items: list[dict[str, Any]] | tuple[dict[str, Any], ...] | None = None,
+        *,
+        workspace: Path | None = None,
     ) -> dict[str, Any]:
         """Export a pending review packet. Decisions stay vacant."""
         from veriformis.review import ReviewItem, export_review_packet
+        from veriformis.review.construction import pending_construction_items
+        from veriformis.errors import ReviewError
 
-        packet = export_review_packet(
-            plan_id=plan_id,
-            items=tuple(ReviewItem.model_validate(item) for item in items),
-        )
+        if workspace is not None:
+            if plan_id is not None or items is not None:
+                raise ReviewError("workspace review export cannot override plan or items")
+            store = Workspace.open(workspace)
+            current = store.head()
+            _recipe, result, _inputs = _load_constructed_dataset(store, current)
+            plan_id = _load_finished_plan(store, current).plan_id
+            selected = pending_construction_items(result)
+            if not selected:
+                raise ReviewError("workspace has no pending construction candidates")
+        else:
+            if plan_id is None or items is None:
+                raise ReviewError("review export requires workspace or both plan_id and items")
+            selected = tuple(ReviewItem.model_validate(item) for item in items)
+        packet = export_review_packet(plan_id=plan_id, items=selected)
         return packet.model_dump(mode="json")
 
     def import_review_packet(
@@ -2313,6 +2328,10 @@ class PipelineService:
         require_review: bool | None = None,
         consumer_profile: str | None = None,
         mode: str | None = None,
+        review_packet: object | None = None,
+        strategy: str | None = None,
+        size: int | None = None,
+        overlap: int | None = None,
     ) -> ConstructOutcome:
         """Construct evidence-bearing candidates and immutable accepted records.
 
@@ -2339,9 +2358,14 @@ class PipelineService:
                 require_identifier("semantic_row", target_row_schema)
         except TaxonomyError as exc:
             raise ConstructionError(exc.message) from exc
+        if review_packet is not None and require_review is None:
+            require_review = True
         try:
             settings = resolve_recipe_settings(
                 goal=goal,
+                strategy=strategy,
+                size=size,
+                overlap=overlap,
                 preset=preset,
                 representation=representation,
                 objective=objective,
@@ -2384,7 +2408,9 @@ class PipelineService:
                 "goal input-family admission failed: " + "; ".join(family_errors)
             )
         chunk_config = current.stages["chunk"].config
-        if preset is not None:
+        if goal is not None or preset is not None or any(
+            value is not None for value in (strategy, size, overlap)
+        ):
             expected = settings.segmentation.model_dump()
             observed = {
                 "strategy": chunk_config["strategy"],
@@ -2393,9 +2419,10 @@ class PipelineService:
             }
             if observed != expected:
                 raise ConstructionError(
-                    f"workspace chunks were produced with {observed!r}, but preset "
-                    f"{preset!r} expects {expected!r}; re-run `veriformis chunk "
-                    f"WORKSPACE --preset {preset}` first"
+                    f"workspace chunks were produced with {observed!r}, but the resolved "
+                    f"goal/preset expects {expected!r}; re-run `veriformis chunk "
+                    "WORKSPACE` with matching settings, or explicitly pass the same "
+                    "--strategy/--size/--overlap overrides to construct"
                 )
         recipe = build_named_recipe(
             settings.recipe_library_id,
@@ -2411,6 +2438,20 @@ class PipelineService:
             target_row_schema=row_schema,
             consumer_profile=settings.construction.consumer_profile,
         )
+        if review_packet is not None:
+            from veriformis.review.construction import construction_review_evidence
+            from veriformis.errors import ReviewError
+
+            prior_recipe, prior_result, _ = _load_constructed_dataset(store, current)
+            if recipe.recipe_id != prior_recipe.recipe_id:
+                raise ReviewError("review construction must retain the current recipe and sources")
+            if construct_dataset(recipe, inputs) != prior_result:
+                raise ReviewError("review construction no longer matches the pending result")
+            reviews = construction_review_evidence(
+                review_packet, plan_id=_load_finished_plan(store, current).plan_id,
+                construction=prior_result,
+            )
+            inputs = ConstructionInputs.model_validate(inputs.model_copy(update={"reviews": reviews}))
         result = construct_dataset(recipe, inputs)
         config = {
             "schema_version": CONSTRUCTION_STAGE_CONFIG_SCHEMA_VERSION,
@@ -2973,6 +3014,11 @@ class PipelineService:
             curated,
             split_result,
             row_set,
+            raw_sources={
+                sid: (current.sources[sid].logical_path, store.read_artifact(
+                    current.sources[sid].raw_artifact_id, revision=current,
+                )) for sid in recipe.source_ids
+            },
             train_jsonl=train_jsonl,
             evaluation_jsonl=evaluation_jsonl,
             provenance_jsonl=provenance_jsonl,
@@ -3070,6 +3116,11 @@ class PipelineService:
                     curated,
                     split_result,
                     row_set,
+                    raw_sources={
+                        sid: (base.sources[sid].logical_path, store.read_artifact(
+                            base.sources[sid].raw_artifact_id, revision=base,
+                        )) for sid in recipe.source_ids
+                    },
                     train_jsonl=train_jsonl,
                     evaluation_jsonl=evaluation_jsonl,
                     provenance_jsonl=provenance_jsonl,
@@ -3928,7 +3979,7 @@ class PipelineService:
         from veriformis.automation import dry_run_project_spec as run_dry
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
         return run_dry(loaded, base_dir=base_dir).model_dump(mode="json")
 
     def lock_project_spec(
@@ -3936,17 +3987,18 @@ class PipelineService:
         spec: object,
         *,
         workspace: Path | None = None,
+        base_dir: Path | None = None,
     ) -> dict[str, Any]:
         """Pin spec digest, versions, and declared extra presence. Not execute."""
         from veriformis.automation import create_project_lock
         from veriformis.automation.execute import lock_after_workspace
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
         lock = (
-            lock_after_workspace(loaded, workspace)
+            lock_after_workspace(loaded, workspace, base_dir=base_dir)
             if workspace is not None
-            else create_project_lock(loaded)
+            else create_project_lock(loaded, base_dir=base_dir)
         )
         return lock.model_dump(mode="json", exclude_none=True)
 
@@ -3957,16 +4009,18 @@ class PipelineService:
         base_dir: Path | None = None,
     ) -> dict[str, Any]:
         """Execute a confirmed project spec. Export is not auto-run."""
-        from veriformis.automation.execute import lock_after_workspace, run_project_spec
+        from veriformis.automation.execute import bind_workspace_lock, run_project_spec
+        from veriformis.automation.inspect import create_project_lock
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
-        result = run_project_spec(loaded, service=self, base_dir=base_dir)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
+        locked = create_project_lock(loaded, base_dir=base_dir)
+        result = run_project_spec(loaded, service=self, base_dir=base_dir, expected_lock=locked)
         return {
             "spec_id": loaded.spec_id,
             "workspace": str(result.workspace),
             "bundle": None if result.bundle is None else str(result.bundle),
-            "lock": lock_after_workspace(loaded, result.workspace).model_dump(
+            "lock": bind_workspace_lock(locked, result.workspace).model_dump(
                 mode="json",
                 exclude_none=True,
             ),
@@ -3981,11 +4035,11 @@ class PipelineService:
         base_dir: Path | None = None,
     ) -> dict[str, Any]:
         """Resume only when lock, HEAD, and source identities match."""
-        from veriformis.automation.execute import lock_after_workspace, resume_project_spec
+        from veriformis.automation.execute import bind_workspace_lock, resume_project_spec
         from veriformis.automation.inspect import ProjectLock, load_project_lock
         from veriformis.automation.spec import ProjectSpec, load_project_spec
 
-        loaded = spec if isinstance(spec, ProjectSpec) else load_project_spec(spec)
+        loaded = load_project_spec(spec.model_dump(mode="json") if isinstance(spec, ProjectSpec) else spec)
         locked = lock if isinstance(lock, ProjectLock) else load_project_lock(lock)
         result = resume_project_spec(
             loaded,
@@ -3997,7 +4051,7 @@ class PipelineService:
             "spec_id": loaded.spec_id,
             "workspace": str(result.workspace),
             "bundle": None if result.bundle is None else str(result.bundle),
-            "lock": lock_after_workspace(loaded, result.workspace).model_dump(
+            "lock": bind_workspace_lock(locked, result.workspace).model_dump(
                 mode="json",
                 exclude_none=True,
             ),

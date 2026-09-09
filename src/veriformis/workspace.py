@@ -2703,6 +2703,11 @@ class WorkspaceTransaction:
                 curation,
                 split_result,
                 row_set,
+                raw_sources={
+                    sid: (revision.sources[sid].logical_path, self._candidate_artifact_bytes(
+                        revision, revision.sources[sid].raw_artifact_id,
+                    )) for sid in recipe.source_ids
+                },
                 train_jsonl=train_jsonl,
                 evaluation_jsonl=evaluation_jsonl,
                 provenance_jsonl=provenance_jsonl,

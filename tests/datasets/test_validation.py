@@ -430,3 +430,41 @@ def test_exact_model_fields_and_failed_report_invariants_are_closed(
     bad["gate_results"][0]["finding_codes"] = ["forced-failure"]
     with pytest.raises(DatasetValidationError):
         dataset_validation_report_from_json_bytes(lossless_json_bytes(bad))
+
+
+def test_masking_checks_source_fields_when_serializer_and_replay_share_a_fault(tmp_path: Path, monkeypatch) -> None:
+    import veriformis.datasets.validation as validation
+    from veriformis.datasets.serialization import ProductRow, RowProvenance, RowSet, SerializationOutput
+    from veriformis.identity import derive_id
+
+    plan, recipe, inputs, construction, curation, split, output = _finished_case(tmp_path)
+    first = output.row_set.train_rows[0]
+    forged = ProductRow.create(record_id=first.record_id, row_schema="text", payload={"text": "Invented by a faulty serializer"})
+    provenance = output.row_set.provenance[0].model_dump(mode="json")
+    provenance.update(row_id=forged.row_id, payload_sha256=forged.payload_sha256)
+    provenance["provenance_id"] = derive_id("prv", {key: value for key, value in provenance.items() if key != "provenance_id"})
+    changed = RowSet.create(
+        plan_id=plan.plan_id, serialization_plan_id=plan.serialization_plan.serialization_plan_id,
+        recipe_id=recipe.recipe_id, construction_result_id=construction.result_id,
+        curation_result_id=curation.result_id, split_result_id=split.result_id,
+        row_schema="text", train_rows=(forged, *output.row_set.train_rows[1:]),
+        evaluation_rows=output.row_set.evaluation_rows,
+        provenance=(RowProvenance.model_validate_json(lossless_json_bytes(provenance)), *output.row_set.provenance[1:]),
+    )
+    corrupt = SerializationOutput(
+        changed,
+        b"".join(lossless_json_bytes(row.payload) + b"\n" for row in changed.train_rows),
+        output.evaluation_jsonl,
+        b"".join(lossless_json_bytes(item.model_dump(mode="json")) + b"\n" for item in changed.provenance),
+    )
+    monkeypatch.setattr(validation, "serialize_dataset", lambda *args: corrupt)
+    report = validate_finished_dataset(
+        plan, recipe, inputs, construction, curation, split, corrupt.row_set,
+        train_jsonl=corrupt.train_jsonl, evaluation_jsonl=corrupt.evaluation_jsonl,
+        provenance_jsonl=corrupt.provenance_jsonl,
+    )
+    gates = {item.gate_id: item.status for item in report.gate_results}
+    assert gates["row-binding"] == "passed"
+    assert gates["encoding"] == "passed"
+    assert gates["masking"] == "failed"
+    assert report.status == "failed"

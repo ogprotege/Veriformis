@@ -303,7 +303,7 @@ def test_preflight_and_real_stages_agree_for_all_40_cells(
         report.coverage_blockers,
         report.sources[0].refusal_reasons,
     )
-    constructed = _SERVICE.construct(workspace, goal=goal_id)
+    constructed = _SERVICE.construct(workspace, goal=goal_id, size=size, overlap=overlap)
     assert constructed.candidate_count == report.counts.candidate_count
     assert constructed.record_count == report.counts.record_count
     assert constructed.diagnostic_count == len(report.missing_evidence)
