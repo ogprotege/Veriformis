@@ -133,7 +133,10 @@ jobs:
           if-no-files-found: ignore
 
   # Isolated trainer-schema evidence. Visible but cannot block standalone release.
-  # Extras remain empty; the job runs importorskip tests without installing torch/mlx.
+  # Trainer extras remain empty; no trainer is installed. Extra columnar supplies
+  # the official Hugging Face datasets loader that reads the emitted partitions,
+  # and VERIFORMIS_REQUIRE_PROFILE_LIBRARIES turns a missing loader into a
+  # failure instead of a silent skip (post-20 defect D-28).
   profile-integration:
     name: profile-integration (optional)
     runs-on: ubuntu-latest
@@ -145,10 +148,15 @@ jobs:
           enable-cache: true
       - name: Install Python 3.12
         run: uv python install 3.12
-      - name: Sync test extras
-        run: uv sync --python 3.12 --extra test
+      - name: Sync test and columnar extras
+        run: uv sync --python 3.12 --extra test --extra columnar
       - name: Optional trainer-schema pytest selection
-        run: uv run --python 3.12 pytest -q -m "profile_integration"
+        run: uv run --python 3.12 pytest -q -m "profile_integration" -rs
+        env:
+          VERIFORMIS_REQUIRE_PROFILE_LIBRARIES: "1"
+          HF_DATASETS_DISABLE_PROGRESS_BARS: "1"
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
 
   # Isolated columnar library-reload evidence. Visible but cannot block standalone release.
   # Extra columnar lists the pins; this job installs that extra. Default extra-less

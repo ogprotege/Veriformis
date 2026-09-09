@@ -24,7 +24,10 @@ built or run here.
   `tests/handoff` suite and the `aptus_integration` marker are optional Aptus
   integration checks that are intentionally excluded from the core gates;
   `scale_benchmark` is optional named-hardware baseline dumps.
-- `uv run pytest` on the full core suite takes ~90s. One test
+- `uv run pytest` on the full core suite takes roughly 15 minutes on a
+  two-vCPU cloud VM (observed 2026-09-09: 2,701 tests in 15m03s); the 74-cell
+  Phase 6 goal acceptance matrix accounts for most of it. Run focused files
+  while developing and the full suite at handoff. One test
   (`tests/bundle/test_defectclose_transport.py`) intentionally emits a
   `RuntimeWarning` about an unremovable staging link; that warning is expected
   and not a failure.
