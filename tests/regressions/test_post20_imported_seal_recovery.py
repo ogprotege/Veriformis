@@ -130,3 +130,49 @@ def test_imported_seal_refuses_a_different_visible_destination(tmp_path):
     # The foreign destination is untouched.
     assert (bundle / "manifest.json").read_bytes() == b"{}"
     assert sorted(item.name for item in bundle.iterdir()) == ["manifest.json"]
+
+
+def test_map_rows_writes_the_rejection_report_before_head_advances(tmp_path, monkeypatch):
+    """Post-20 defect D-08: a report-write failure must not follow a durable commit."""
+    from veriformis.mapping import reject as reject_module
+
+    service = PipelineService()
+    source = tmp_path / "text.jsonl"
+    source.write_bytes((FIXTURES / "text.jsonl").read_bytes())
+    workspace = tmp_path / "ws"
+    service.parse([source], workspace, source_root=tmp_path, mode="dataset-row")
+    head_before = Workspace.open(workspace).head_id
+    head = Workspace.open(workspace).head()
+    mappings = [FieldMapping.create(source_path="text", target_key="text")]
+    plan = MappingPlan.create(
+        goal_id="learn-the-text",
+        representation_id="whole-text",
+        row_schema="text",
+        container_kind="jsonl",
+        confirmation_digest=mapping_confirmation_digest(
+            goal_id="learn-the-text",
+            representation_id="whole-text",
+            row_schema="text",
+            field_mappings=mappings,
+            source_digests=tuple(
+                (item.logical_path, item.sha256) for item in head.sources.values()
+            ),
+        ),
+        field_mappings=mappings,
+    )
+
+    def refuse_write(*args, **kwargs):
+        raise OSError("injected rejection-report write failure")
+
+    monkeypatch.setattr(reject_module, "write_mapping_rejection_report", refuse_write)
+
+    with pytest.raises(OSError, match="injected rejection-report write failure"):
+        service.map_rows(
+            workspace,
+            goal="learn-the-text",
+            representation="whole-text",
+            mapping_plan=plan,
+        )
+
+    assert Workspace.open(workspace).head_id == head_before
+    assert not list(tmp_path.glob("ws.mapping-rejection-*.json"))

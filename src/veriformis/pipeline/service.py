@@ -2549,6 +2549,20 @@ class PipelineService:
             "mapping_plan_id": plan.mapping_plan_id,
             "selected_source_ids": list(source_ids),
         }
+        # The rejection report depends only on the plan and the mapping result,
+        # so it is written before HEAD advances: a report-write failure fails the
+        # command cleanly instead of after the commit is already durable
+        # (post-20 defect D-08). The write is content-addressed and idempotent.
+        report = MappingRejectionReport.create(
+            mapping_plan_id=plan.mapping_plan_id,
+            accepted_count=len(result.records),
+            rejections=rejections,
+        )
+        report_path = write_mapping_rejection_report(
+            report,
+            workspace.parent,
+            workspace_name=workspace.name,
+        )
         with store.begin(
             "map",
             expected_revision_id=current.revision_id,
@@ -2588,16 +2602,6 @@ class PipelineService:
                 },
                 config=config,
             )
-        report = MappingRejectionReport.create(
-            mapping_plan_id=plan.mapping_plan_id,
-            accepted_count=len(result.records),
-            rejections=rejections,
-        )
-        report_path = write_mapping_rejection_report(
-            report,
-            workspace.parent,
-            workspace_name=workspace.name,
-        )
         record_ids = tuple(record.record_id for record in result.records)
         return MapOutcome(
             record_count=len(result.records),
