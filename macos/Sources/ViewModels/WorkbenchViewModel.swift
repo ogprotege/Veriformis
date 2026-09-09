@@ -145,7 +145,8 @@ final class WorkbenchViewModel: ObservableObject {
             guard let confirmedMappingPlan else { return nil }
             let workspace = output.appendingPathComponent("workspace", isDirectory: true)
             let bundle = output.appendingPathComponent("dataset.vfbundle")
-            let planURL = workspace.appendingPathComponent("confirmed-mapping-plan.json")
+            let planURL = Self.workbenchSidecarDirectory(for: workspace)
+                .appendingPathComponent("confirmed-mapping-plan.json")
             let plan = VeriformisCLI.compilePlan(
                 sources: sourceURLs,
                 sourceRoot: sourceRoot,
@@ -478,9 +479,9 @@ final class WorkbenchViewModel: ObservableObject {
         }
         var lines = [VeriformisCLI.exportCLIEquivalent(arguments: detect)]
         if confirmedMappingPlan != nil, let output = outputDirectoryURL {
-            let planURL = output
-                .appendingPathComponent("workspace", isDirectory: true)
-                .appendingPathComponent("confirmed-mapping-plan.json")
+            let planURL = Self.workbenchSidecarDirectory(
+                for: output.appendingPathComponent("workspace", isDirectory: true)
+            ).appendingPathComponent("confirmed-mapping-plan.json")
             var preview = ["mapping-preview", path.path, "--plan", planURL.path]
             if let root = resolvedSourceRoot {
                 preview += ["--source-root", root.path]
@@ -1890,12 +1891,18 @@ final class WorkbenchViewModel: ObservableObject {
                 workspace = outputDirectory.appendingPathComponent("workspace-\(stamp)", isDirectory: true)
                 bundle = outputDirectory.appendingPathComponent("dataset-\(stamp).vfbundle", isDirectory: true)
                 transportArchive = URL(fileURLWithPath: bundle.path + ".zip")
-                try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
-                logFileURL = workspace.appendingPathComponent("run.log")
+                // The CLI owns the workspace directory: `parse -o` creates it and
+                // refuses a non-empty destination. Everything the app writes on
+                // its own behalf (run log, confirmed mapping plan) lives in a
+                // sibling `.workbench` directory so the compiler never sees a
+                // foreign file (post-20 defect D-04).
+                let sidecar = Self.workbenchSidecarDirectory(for: workspace)
+                try FileManager.default.createDirectory(at: sidecar, withIntermediateDirectories: true)
+                logFileURL = sidecar.appendingPathComponent("run.log")
 
                 var mappingPlanURL: URL?
                 if usesMappingSnapshot, let confirmed = confirmedPlanSnapshot {
-                    let planURL = workspace.appendingPathComponent("confirmed-mapping-plan.json")
+                    let planURL = sidecar.appendingPathComponent("confirmed-mapping-plan.json")
                     try confirmed.write(to: planURL)
                     mappingPlanURL = planURL
                 }
@@ -2411,6 +2418,19 @@ final class WorkbenchViewModel: ObservableObject {
 
     private func historyFileURL() -> URL {
         supportDirectory().appendingPathComponent("run-history.json")
+    }
+
+    /// Directory beside a CLI workspace for files the workbench writes itself.
+    ///
+    /// `veriformis parse -o WORKSPACE` creates the workspace and refuses a
+    /// non-empty destination, so the run log and the confirmed mapping plan
+    /// must never live inside it.
+    nonisolated static func workbenchSidecarDirectory(for workspace: URL) -> URL {
+        let parent = workspace.deletingLastPathComponent()
+        return parent.appendingPathComponent(
+            workspace.lastPathComponent + ".workbench",
+            isDirectory: true
+        )
     }
 
     private func loadHistory() {

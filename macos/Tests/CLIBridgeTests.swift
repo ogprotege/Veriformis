@@ -3515,7 +3515,7 @@ final class CLIBridgeTests: XCTestCase {
         let root = URL(fileURLWithPath: "/data")
         let workspace = URL(fileURLWithPath: "/tmp/ws")
         let bundle = URL(fileURLWithPath: "/tmp/out.vfbundle")
-        let planURL = URL(fileURLWithPath: "/tmp/ws/confirmed-mapping-plan.json")
+        let planURL = URL(fileURLWithPath: "/tmp/ws.workbench/confirmed-mapping-plan.json")
         let plan = VeriformisCLI.compilePlan(
             sources: sources,
             sourceRoot: root,
@@ -3572,6 +3572,101 @@ final class CLIBridgeTests: XCTestCase {
         XCTAssertFalse(plan[0].arguments.contains("--mode"))
         XCTAssertFalse(plan.flatMap(\.arguments).contains("dataset-row"))
         XCTAssertFalse(plan.flatMap(\.arguments).contains("map"))
+    }
+
+    // MARK: - Post-20 defect D-04: the app never writes inside the CLI workspace
+
+    func testWorkbenchSidecarDirectoryIsASiblingOfTheCLIWorkspace() {
+        let workspace = URL(fileURLWithPath: "/tmp/output/workspace-2026", isDirectory: true)
+        let sidecar = WorkbenchViewModel.workbenchSidecarDirectory(for: workspace)
+        XCTAssertEqual(sidecar.path, "/tmp/output/workspace-2026.workbench")
+        XCTAssertEqual(
+            sidecar.deletingLastPathComponent().path,
+            workspace.deletingLastPathComponent().path
+        )
+        XCTAssertFalse(sidecar.path.hasPrefix(workspace.path + "/"))
+    }
+
+    @MainActor
+    func testDatasetRowCompileThroughTheWorkbenchSealsWithRealRepoCLI() async throws {
+        // `parse --mode dataset-row -o WORKSPACE` refuses a non-empty destination.
+        // Before this fix the app wrote confirmed-mapping-plan.json into the
+        // workspace first, so every confirm-then-map compile failed at parse.
+        let repositoryRoot = testRepositoryRoot()
+        let repoCLI = repositoryRoot.appendingPathComponent(".venv/bin/veriformis")
+        XCTAssertTrue(FileManager.default.isExecutableFile(atPath: repoCLI.path))
+        let cli = try VeriformisCLI.resolve(
+            repositoryRoot: repositoryRoot,
+            environment: ["VERIFORMIS_CLI": repoCLI.path]
+        )
+
+        let root = temporaryTestDirectory("post20-dataset-row-compile")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let sourceRoot = root.appendingPathComponent("sources", isDirectory: true)
+        let output = root.appendingPathComponent("output", isDirectory: true)
+        let support = root.appendingPathComponent("support", isDirectory: true)
+        for directory in [sourceRoot, output, support] {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        let fixture = repositoryRoot
+            .appendingPathComponent("tests/regressions/fixtures/phase7/text.jsonl")
+        let source = sourceRoot.appendingPathComponent("text.jsonl")
+        try FileManager.default.copyItem(at: fixture, to: source)
+
+        let suiteName = "veriformis-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defaults.set(output.path, forKey: "veriformis.workbench.defaultOutput")
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let workbench = WorkbenchViewModel(cli: cli, defaults: defaults, supportDirectory: support)
+        workbench.inputMode = .datasetRow
+        workbench.sourceURLs = [source]
+        workbench.sourceRootURL = sourceRoot
+        workbench.outputDirectoryURL = output
+        workbench.applyCatalogs(
+            goals: try JSONDecoder().decode(GoalCatalog.self, from: goalCatalogData()),
+            presets: try JSONDecoder().decode(RecipePresetCatalog.self, from: recipePresetsData())
+        )
+
+        workbench.detectMapping()
+        var detected = false
+        for _ in 0 ..< 600 {
+            if case .ready = workbench.mappingDetectState {
+                detected = true
+                break
+            }
+            if case .unavailable(let reason) = workbench.mappingDetectState {
+                XCTFail("mapping-detect unavailable: \(reason)")
+                return
+            }
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertTrue(detected, "mapping-detect did not finish")
+        workbench.confirmSelectedMappingPlan()
+        XCTAssertNotNil(workbench.confirmedMappingPlan)
+
+        workbench.compile()
+        for _ in 0 ..< 6_000 where workbench.isRunning {
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+        XCTAssertFalse(workbench.isRunning, "dataset-row compile did not finish")
+        XCTAssertNil(workbench.lastFailure, "\(String(describing: workbench.lastFailure))")
+        XCTAssertNil(workbench.lastError)
+        let result = try XCTUnwrap(workbench.lastResult)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.bundleURL.path))
+
+        // The CLI workspace holds only what the compiler wrote.
+        let workspaceEntries = try FileManager.default.contentsOfDirectory(atPath: result.workspaceURL.path)
+        XCTAssertFalse(workspaceEntries.contains("run.log"))
+        XCTAssertFalse(workspaceEntries.contains("confirmed-mapping-plan.json"))
+        XCTAssertTrue(workspaceEntries.contains("HEAD"))
+        // The app's own files live beside it.
+        let sidecar = WorkbenchViewModel.workbenchSidecarDirectory(for: result.workspaceURL)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sidecar.appendingPathComponent("run.log").path))
+        XCTAssertTrue(
+            FileManager.default.fileExists(
+                atPath: sidecar.appendingPathComponent("confirmed-mapping-plan.json").path
+            )
+        )
     }
 
     func testMixedDocumentCompilePlanPassesModeAndKeepsDocumentTail() {
