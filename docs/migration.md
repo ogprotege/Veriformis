@@ -9,8 +9,8 @@ This page names every supported workspace, bundle, mapping, recipe, export,
 and profile version and how it loads or upgrades. Unknown versions fail closed.
 Do not hand-edit content-addressed objects or `HEAD`.
 
-Version remains `0.1.0` until Phase 20.10. This guide is not a 1.0 version
-claim.
+Phase 20 is complete and retained version `0.1.0` development alpha.
+This guide does not change that version or the independent-core claim.
 
 ## Workspace
 

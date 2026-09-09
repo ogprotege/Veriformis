@@ -2,7 +2,7 @@
 
 **Status:** Active limitations register for any future **beta** cut of `0.1.0`
 
-**Last reviewed:** 2026-09-02 (post-20 remainder honesty)
+**Last reviewed:** 2026-09-09 (product polish; alpha boundaries retained)
 
 **Maturity today:** Development **alpha** — this document exists so a beta cut
 can be honest. **Do not treat the current tag as beta** until the beta cut
@@ -36,8 +36,9 @@ is completed and the beta announcement says so explicitly.
 These are permanent or deferred product boundaries. Beta does not soft-pedal them.
 
 1. **No default-parse `ocr-image`.** Image-only PDFs still refuse. Optional
-   Tesseract 5 exists under extra `ocr`, which stays empty. `ocr-preview` is
-   not default parse.
+   Tesseract 5 preview requires separately installed local binaries and trained
+   data. Extra `ocr` stays empty and installs neither. `ocr-preview` is not
+   default parse.
 2. **No network model generation.** The dataset pipeline does not call LLMs or
    remote generation services (Group 8 remains optional and owner-gated).
 3. **No multi-user service, accounts, cloud, billing, or telemetry.**
@@ -89,7 +90,7 @@ assume every PDF is recoverable.
 
 ### Workspaces
 
-- Physical layout schema 1; revision schema 3.
+- Physical layout schema 1; revision schema 3 for document-source and 4 for dataset-row.
 - Use `upgrade-workspace` for verified older revision schemas; do not hand-edit
   content-addressed objects or `HEAD`.
 - Interrupting a stage is safe for durability rules already tested; do not
@@ -102,7 +103,7 @@ assume every PDF is recoverable.
 | CLI (`veriformis`) | Primary beta surface |
 | `PipelineService` | Supported for embedders; same stage policy as CLI |
 | MCP (`veriformis mcp`) | Local constrained adapter; not a multi-tenant server |
-| SwiftUI workbench | Optional developer UI; requires Xcode/XcodeGen; unsigned unless owner-signed |
+| SwiftUI workbench | Optional developer UI; requires Xcode; XcodeGen only for regeneration or packaging; unsigned unless owner-signed |
 | Recipes / YAML | Deterministic named recipes and v1 pipeline specs only |
 
 ### Dependencies

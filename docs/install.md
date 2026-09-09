@@ -1,7 +1,7 @@
-# Install Veriformis (private beta / local use)
+# Install Veriformis for local use
 
 **Status:** Operator install guide for development alpha `0.1.0`  
-**Last reviewed:** 2026-09-09 (post-20 defect closure: complete command map, `--mode`, extra `columnar`)
+**Last reviewed:** 2026-09-09 (product polish and executed operator walkthroughs)
 
 This page is the **standard local install** path. It is separate from “I only
 use `uv run` inside a checkout,” though that path remains valid for
@@ -23,8 +23,8 @@ the hood (usually via the repo’s `.venv` or `uv`).
 | **Generic export derivatives** | Verified split JSONL, canonical JSON, or compatible flat CSV; no trainer profile |
 | **Existing-dataset import** | Confirmed mapping of JSONL, JSON, compatible CSV, Parquet, or Arrow rows; [mapping.md](mapping.md) |
 
-There is not yet a notarized App Store–style installer. Private beta means:
-install the CLI on your machine, optionally build/open the Debug app.
+There is no public signed or notarized Mac installer. Install the CLI on your
+machine and optionally build the Debug workbench. Product maturity is alpha.
 
 ---
 
@@ -43,7 +43,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ## Standard CLI install (recommended for operators)
 
-### Option A — Install from a local checkout (private beta)
+### Option A: Install from a local checkout
 
 ```bash
 git clone https://github.com/ogprotege/Veriformis.git
@@ -149,7 +149,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis goal-preview WORKSPACE` | Show rows and the exact supervised span |
 | `veriformis split WORKSPACE` | Train / evaluation assignment |
 | `veriformis format WORKSPACE` | Lower to product rows |
-| `veriformis validate WORKSPACE` | 17-gate validation |
+| `veriformis validate WORKSPACE` | Exact validation: 17 document-source gates or 13 imported-row gates |
 | `veriformis quality-report WORKSPACE` | Quality preview at or beyond `split`; never a gate |
 | `veriformis seal WORKSPACE -o BUNDLE.vfbundle` | Atomic canonical six-file bundle; no integration artifact by default |
 | `veriformis verify BUNDLE [--manifest-sha256 HEX]` | Independent verify |
@@ -169,7 +169,7 @@ All stage policy lives here. Full options: [cli.md](cli.md).
 | `veriformis spec-schema` / `spec-dry-run SPEC` / `spec-lock SPEC` / `spec-run SPEC` / `spec-resume SPEC --lock LOCK` | Project-spec automation; `spec-lock` pins versions, extras, and (with `--workspace`) HEAD and sources; resume refuses drift |
 | `veriformis env-inspect` | Declared extras, Python version, taxonomy counts; no secrets |
 | `veriformis review-export` / `review-import PACKET` / `review-submit PACKET` | Review packet exchange |
-| `veriformis support-matrix` / `scale-support` / `extension-capabilities` | Frozen 1.0 support matrix; empty scale tiers; built-in extension declarations |
+| `veriformis support-matrix` / `scale-support` / `extension-capabilities` | Frozen CLI-first support matrix; empty scale tiers; built-in extension declarations |
 | `veriformis scale-baseline --corpus-id ID --work-root DIR` | Named-hardware compile baseline; not an SLA |
 | `veriformis mcp` | Local MCP adapter |
 | `veriformis preview PATH` | Cleaning preview without commit |
@@ -191,7 +191,7 @@ Product maturity remains development alpha.
 
 ### Verified split JSONL derivative
 
-`split-jsonl-directory` v1 is the first production generic export. A request-v1
+`split-jsonl-directory` v1 is an implemented generic export. A request-v1
 dry run, execute, or source-bound verify uses these fixed defaults:
 
 ```json
@@ -253,24 +253,28 @@ logical partitions and advertises neither trainer nor spreadsheet
 compatibility. See
 [Constrained CSV Export v1](contracts/constrained-csv-export-v1.md).
 
-### Minimal terminal compile (same path as the GUI)
+### Minimal terminal compile (one source, intentionally empty evaluation)
+
+Use fresh workspace and output paths. This example explicitly permits empty
+evaluation because one source forms one leakage group. For a non-empty
+evaluation partition, use the two-source walkthrough below.
 
 ```bash
 # After install / uv sync:
-veriformis parse document.md -o /tmp/ws --source-root /path/to/dir
-veriformis clean /tmp/ws
-veriformis chunk /tmp/ws
-veriformis construct /tmp/ws --objective full_text
-veriformis curate /tmp/ws --allow-empty-evaluation
-veriformis split /tmp/ws
-veriformis format /tmp/ws
-veriformis validate /tmp/ws
-veriformis seal /tmp/ws -o /tmp/out.vfbundle
-MANIFEST_SHA256="$(shasum -a 256 /tmp/out.vfbundle/manifest.json | awk '{print $1}')"
-veriformis verify /tmp/out.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
-veriformis package /tmp/out.vfbundle -o /tmp/out.vfbundle.zip \
+veriformis parse document.md -o /tmp/vf-single-ws --source-root /path/to/dir
+veriformis clean /tmp/vf-single-ws
+veriformis chunk /tmp/vf-single-ws
+veriformis construct /tmp/vf-single-ws --objective full_text
+veriformis curate /tmp/vf-single-ws --allow-empty-evaluation
+veriformis split /tmp/vf-single-ws
+veriformis format /tmp/vf-single-ws
+veriformis validate /tmp/vf-single-ws
+veriformis seal /tmp/vf-single-ws -o /tmp/vf-single.vfbundle
+MANIFEST_SHA256="$(shasum -a 256 /tmp/vf-single.vfbundle/manifest.json | awk '{print $1}')"
+veriformis verify /tmp/vf-single.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
+veriformis package /tmp/vf-single.vfbundle -o /tmp/vf-single.vfbundle.zip \
   --manifest-sha256 "$MANIFEST_SHA256"
-veriformis package-verify /tmp/out.vfbundle.zip \
+veriformis package-verify /tmp/vf-single.vfbundle.zip \
   --manifest-sha256 "$MANIFEST_SHA256"
 ```
 
@@ -280,6 +284,9 @@ This is the documented non-developer walkthrough for usability criterion U6.
 Use two independent sources so the default split keeps a non-empty
 evaluation partition. The Mac workbench follows the same sequence: pick a
 goal, run preflight, compile, inspect the preview, then dry-run an export.
+
+Use fresh `/tmp/vf-demo`, `/tmp/vf-ws`, and `/tmp/vf-demo.vfbundle` paths.
+Existing output bundles are refused.
 
 ```bash
 mkdir -p /tmp/vf-demo
@@ -304,12 +311,13 @@ veriformis chunk /tmp/vf-ws --preset continue-a-passage.safe
 veriformis construct /tmp/vf-ws --goal continue-a-passage --preset continue-a-passage.safe
 veriformis curate /tmp/vf-ws --preset continue-a-passage.safe
 veriformis split /tmp/vf-ws
+veriformis quality-report /tmp/vf-ws
 veriformis format /tmp/vf-ws
 veriformis validate /tmp/vf-ws
-veriformis seal /tmp/vf-ws -o /tmp/out.vfbundle
+veriformis seal /tmp/vf-ws -o /tmp/vf-demo.vfbundle
 veriformis goal-preview /tmp/vf-ws
-MANIFEST_SHA256="$(sha256sum /tmp/out.vfbundle/manifest.json | awk '{print $1}')"
-veriformis verify /tmp/out.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
+MANIFEST_SHA256="$(shasum -a 256 /tmp/vf-demo.vfbundle/manifest.json | awk '{print $1}')"
+veriformis verify /tmp/vf-demo.vfbundle --manifest-sha256 "$MANIFEST_SHA256"
 ```
 
 Omitted `--instruction` on instruction-and-output uses the catalog template
@@ -341,8 +349,7 @@ So you **did** use the CLI bundle — through the workbench — without a global
 `pip install` or a notarized app.
 
 A future **public** Mac installer (signed/notarized) is separate (Group 9 owner
-checklist). Private beta standard install = **CLI on the machine + optional
-Debug workbench**.
+checklist). Local alpha installation uses the **CLI plus an optional Debug workbench**.
 
 ---
 
@@ -356,7 +363,7 @@ Debug workbench**.
 | Optional Aptus handoff rejected for `full_text` | Expected under the adapter policy: plain `text` schema; use a supported supervised objective only when that integration is your target |
 | Unknown suffix or image-only PDF | Fail closed. See [troubleshooting.md](troubleshooting.md). Image-only PDF refuses with `pdf.ocr-required`; the `ocr-image` family stays unsupported. |
 | Trainer extra or Hub upload | Trainer extras stay empty. There is no Hub execute. The exporter does not train. |
-| Parquet / Arrow / Hugging Face export or capture refuses | Install the one non-empty extra: `uv sync --extra columnar`. |
+| Parquet / Arrow / Hugging Face export or capture refuses | Install the optional runtime extra: `uv sync --extra columnar`. |
 
 ---
 

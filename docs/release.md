@@ -104,7 +104,9 @@ Packs land under `dev/active/group-9-public-release/evidence/` by default.
 
 ### Workspace upgrades (beta operators)
 
-Workspaces use physical layout schema 1 and revision schema 3. If you open an
+Workspaces use physical layout schema 1, revision schema 3 for document-source,
+and revision schema 4 for dataset-row. The two current paths do not migrate
+into each other. If you open an
 older verified workspace, run:
 
 ```bash
@@ -269,7 +271,7 @@ Copy this list into a dated release evidence file when attempting a ship.
 
 - [ ] `docs/current-status.md` does not claim public readiness until this checklist is done
 - [ ] Version and changelog (if published) match the shipped artifact digests
-- [ ] Unsupported capabilities (OCR, cloud, LLM generation) remain non-claims
+- [ ] Unsupported capabilities (default-parse OCR, cloud, LLM generation) remain non-claims
 
 ## Version and packaging notes
 

@@ -1,6 +1,11 @@
 # Post-20 Claim Honesty
 
-**Status:** Remainder packet. Not a roadmap phase.
+**Status:** Complete; retained historical remainder packet. Not a roadmap phase.
+
+**Closeout note (2026-09-09):** Claim honesty merged as PR #191, the preview
+CLI as PR #192, and optional unsigned Debug CI as PR #193. Subsequent defects
+closed in PR #204. PR #203 extends the preview to imported rows. The original
+scope below is retained; it is not a new execution instruction.
 
 **Opened from:** Phase 20 closeout at `7a776ca` / PR #190.
 

@@ -26,8 +26,8 @@ Four separate decisions are involved:
 
 | Decision | Question it answers | When it is fixed |
 | --- | --- | --- |
-| Training objective | What source-grounded relationship is the model meant to learn? | `construct --objective` |
-| Row schema | Which semantic fields represent that relationship? | `construct --target-row-schema`, then bound by the recipe and finished-dataset plan |
+| Training objective | What source-grounded relationship is the model meant to learn? | Document `construct --objective` or confirmed imported mapping goal |
+| Row schema | Which semantic fields represent that relationship? | Document construction or imported mapping, then bound by the finished plan |
 | Physical container | How should those already-finished rows and partitions be encoded as ordinary files? | Verified export selection after seal |
 | Consumer profile | Has a named downstream consumer contract accepted this schema and behavior? | Only when an implemented profile explicitly says so |
 

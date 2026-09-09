@@ -2,7 +2,7 @@
 
 **Status:** Active
 
-**Last reviewed:** 2026-09-01 (Phase 20.10 closeout)
+**Last reviewed:** 2026-09-09 (product polish and closeout)
 
 **Next review:** Any governance-schema change. Version remains `0.1.0` development alpha.
 
@@ -36,8 +36,8 @@ claims from drifting away from code and evidence.
 | [Completed Phase 17 packet](../../dev/active/independent-product/phase-17-advanced-dataset-families/README.md) | Governed advanced dataset families |
 | [Completed Phase 18 packet](../../dev/active/independent-product/phase-18-goal-first-workbench/README.md) | Goal-first Mac workbench |
 | [Completed Phase 19 packet](../../dev/active/independent-product/phase-19-automation-and-publication/README.md) | Automation and optional publication |
-| [Completed Phase 20 packet](../../dev/active/independent-product/phase-20-stable-1.0/README.md) | Stable independent 1.0 cut |
-| [Post-20 claim honesty](../../dev/active/independent-product/post-20-claim-honesty/README.md) | Remainder packet; not Phase 21; docs honesty only |
+| [Completed Phase 20 packet](../../dev/active/independent-product/phase-20-stable-1.0/README.md) | Completed CLI-first freeze; version remains 0.1.0 alpha |
+| [Post-20 claim honesty](../../dev/active/independent-product/post-20-claim-honesty/README.md) | Completed remainder; preview CLI and unsigned CI; not Phase 21 |
 
 Run the governance drift check with:
 
@@ -57,9 +57,11 @@ capability claims still require code and test evidence, and
 support registry makes those claims checkable; it does not weaken their burden
 of proof.
 
-At this review, independent-product Phases 0–20 are complete on `main`
-at `7a776ca` (PR #190). Phase 20 closed 2026-09-01. Current remainder
-authority is [post-20-claim-honesty](../../dev/active/independent-product/post-20-claim-honesty/README.md).
+Independent-product Phases 0–20 closed at `7a776ca` (PR #190) on 2026-09-01.
+The claim-honesty remainder, PR #204 defect closure, and PR #203 imported
+quality preview are complete. Completed records stay archived in place.
+The [product-polish closeout](../evidence/2026-09-09-product-polish.md) records
+current operator evidence and deferred limits; no new phase is open.
 Phase 19 closeout merged as PR #180 at
 `084e504a799b6c1c1cc130c8ee819b13de5d6bbe`.
 ADR-0020 Decision A stands. Hub execute is skipped. Dry-run writes

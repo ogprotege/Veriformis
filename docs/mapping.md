@@ -3,13 +3,13 @@
 This page is the operator guide for dataset-row mapping. It is not a trainer
 manual and it does not change `ProductRow` v1.
 
-**Last reviewed:** 2026-09-05 (mapping-detect list-valued turns and steps)
+**Last reviewed:** 2026-09-09 (operator examples and quality preview)
 
 ## When to use which compiler path
 
 | Mode | Use when | Command |
 | --- | --- | --- |
-| `document-source` (default) | The files are prose, code, HTML, PDF text, or other documents. Construction invents rows from recovered spans. | `veriformis parse …` with no `--mode` |
+| `document-source` (default) | The files are prose, code, HTML, PDF text, or other documents. Construction builds evidence-bound rows from recovered spans. | `veriformis parse …` with no `--mode` |
 | `dataset-row` | The files already contain training rows in JSONL, JSON, compatible CSV, Parquet, or Arrow IPC. Mapping fills an existing catalog representation. Constructors do not run. | `veriformis parse … --mode dataset-row` then `veriformis map …` |
 | `mixed` | You need both document-constructed rows and imported rows in one product later. Parse each family separately. Do not fuse a `.txt` file and a `.jsonl` or `.parquet` file in one parse. | `--mode mixed` only when every path is already one family |
 
@@ -34,6 +34,60 @@ Packaged templates from `veriformis mapping-templates` cover the unique
 detector shapes (`text`, `prompt_completion`, `instruction_output`,
 `messages`, `label-classification`, `preference-pair`, `tool-call-conversation`, `stepwise-trace`). Load a template, bind the confirmation digest for the captured
 files, then pass that plan to `map`.
+
+## Small text-row walkthrough
+
+Run from a checkout after `uv sync`. This fixture has two distinct text rows
+in one source file. Ordinary imported SFT rows form record-level leakage
+groups, so this fixture produces non-empty train and evaluation partitions.
+Advanced families apply their own leakage-group rules. If fewer than two
+groups survive, splitting refuses required evaluation; opt into
+`--allow-empty-evaluation` at `curate` only when that is intentional.
+The Mac mapping flow also selects one source file.
+
+Use a new directory for each run:
+
+```bash
+VF_IMPORT_DEMO="$(mktemp -d /tmp/veriformis-import-demo.XXXXXX)"
+export VF_IMPORT_DEMO
+printf '%s\n' '{"text":"Alpha supplied training text."}' '{"text":"Beta supplied training text."}' > "$VF_IMPORT_DEMO/rows.jsonl"
+uv run veriformis mapping-detect "$VF_IMPORT_DEMO/rows.jsonl" --source-root "$VF_IMPORT_DEMO" > "$VF_IMPORT_DEMO/detected.json"
+cat "$VF_IMPORT_DEMO/detected.json"
+```
+
+After reviewing the unique `learn-the-text` / `whole-text` proposal, save that
+exact object and preview it. For another input, select the intended proposal
+and use its goal and representation; do not assume the first match is correct.
+
+```bash
+python3 - <<'PYPLAN'
+import json, os
+from pathlib import Path
+base = Path(os.environ["VF_IMPORT_DEMO"])
+proposals = json.loads((base / "detected.json").read_text())["proposals"]
+assert len(proposals) == 1
+plan = proposals[0]
+assert plan["goal_id"] == "learn-the-text" and plan["representation_id"] == "whole-text"
+(base / "plan.json").write_text(json.dumps(plan))
+PYPLAN
+uv run veriformis mapping-preview "$VF_IMPORT_DEMO/rows.jsonl" --source-root "$VF_IMPORT_DEMO" --plan "$VF_IMPORT_DEMO/plan.json"
+uv run veriformis parse "$VF_IMPORT_DEMO/rows.jsonl" --mode dataset-row -o "$VF_IMPORT_DEMO/workspace" --source-root "$VF_IMPORT_DEMO"
+uv run veriformis map "$VF_IMPORT_DEMO/workspace" --goal learn-the-text --representation whole-text --plan "$VF_IMPORT_DEMO/plan.json"
+uv run veriformis curate "$VF_IMPORT_DEMO/workspace"
+uv run veriformis split "$VF_IMPORT_DEMO/workspace"
+uv run veriformis quality-report "$VF_IMPORT_DEMO/workspace"
+uv run veriformis format "$VF_IMPORT_DEMO/workspace"
+uv run veriformis validate "$VF_IMPORT_DEMO/workspace"
+uv run veriformis seal "$VF_IMPORT_DEMO/workspace" -o "$VF_IMPORT_DEMO/dataset.vfbundle"
+VF_IMPORT_SHA="$(shasum -a 256 "$VF_IMPORT_DEMO/dataset.vfbundle/manifest.json" | awk '{print $1}')"
+printf '%s\n' "$VF_IMPORT_SHA" > "$VF_IMPORT_DEMO/MANIFEST.sha256"
+uv run veriformis verify "$VF_IMPORT_DEMO/dataset.vfbundle" --manifest-sha256 "$VF_IMPORT_SHA"
+```
+
+`quality-report` reads map, curate, and split state for all eight imported
+schemas. It writes nothing and does not block seal. A bundle alone lacks the
+workspace artifacts needed for this preview. See the
+[generic export guide](generic-exports.md) for derivatives of this bundle.
 
 ## Partition policy
 

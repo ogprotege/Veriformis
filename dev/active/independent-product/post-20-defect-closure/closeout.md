@@ -7,6 +7,14 @@ Merge requires passing checks on the final pushed HEAD and resolved review
 findings. GitHub retains the check runs, final review state, and merge record.
 This document does not substitute a local pass for that remote gate.
 
+## Publication update (2026-09-09)
+
+PR #204 merged as `23bdc20b4667a1bd8381debd233d4d12a3bdd87a` after its
+final checks passed. PR #203 was subsequently reviewed and integrated in its
+own PR; its former preserved state below records this packet's exit, not an
+open task. The [product-polish closeout](../../../../docs/evidence/2026-09-09-product-polish.md)
+accounts for durable backup retention and later operator verification.
+
 ## Defect judgment
 
 The [evidence table](evidence.md) covers D-01 through D-35. Thirty-four confirmed

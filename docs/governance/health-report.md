@@ -1,16 +1,15 @@
 # Documentation Health Report
 
-**Status:** Independent-product Phases 0–20 complete; post-20 defect-closure
-remainder packet in progress
+**Status:** Independent-product Phases 0–20 and post-20 defect closure complete.
+PR #203 dataset-row quality preview is merged.
 
-**Review date:** 2026-09-09 (post-20 defect closure, Phase 2 claim-honesty
-reconciliation)
+**Review date:** 2026-09-09 (bounded product polish)
 
-**Repository baseline:** `main` at `5d617f8` (after PR #202) plus the
-defect-closure branch
+**Repository baseline:** `main` at `7f3cce6` (PR #203), after PR #204 at
+`23bdc20`, plus the bounded polish corrections in the
+[closeout record](../evidence/2026-09-09-product-polish.md).
 
-**Next review:** Closeout of the post-20 defect-closure packet, or the next
-active-document behavior change
+**Next review:** The next owner-authorized change to current behavior or claims.
 
 ## Scope examined
 
@@ -29,9 +28,8 @@ active-document behavior change
 
 - Product contract, current status, architecture, CLI, development, install,
   generic-export operator, release, and beta-limitations documents.
-- Independent product analysis and roadmap.
 - Project governance, support registry, evidence index, ADRs, documentation
-  debt, WIP, and the completed Phase 0–5 packets.
+  debt, and WIP.
 - Versioned integrity, construction, finished-dataset, verified-export, split-
   JSONL, canonical-JSON, constrained-CSV, and optional Aptus handoff contracts, plus the
   implemented taxonomy contract.
@@ -42,13 +40,14 @@ active-document behavior change
   corpus / baseline / support, extension protocol, advanced-family admission,
   workbench adapter, project spec / lock / diagnostic, publication adapter,
   and support matrix.
-- The completed Phase 6–20 packets and the post-20 remainder packets.
-
-These documents govern current behavior, future work, or active execution and
-must be updated when their scope changes.
+These documents govern current behavior and retained boundaries. Update them
+when their scope changes. No new phase is authorized by this report.
 
 ### Historical / archived in place
 
+- Independent product analysis and the completed 2026-08-11 roadmap.
+- Completed Phase 0–20 packets and both completed post-20 packets under
+  `dev/active/independent-product/`. Their directory names remain stable for links.
 - `docs/plans/2026-07-29-veriformis-roadmap.md`.
 - `docs/plans/2026-08-06-private-beta-workbench.md`.
 - `docs/superpowers/specs/2026-07-28-veriformis-design.md`.
@@ -65,7 +64,21 @@ No documentation file is currently classified as deprecated. Runtime legacy
 modules may exist, but documentation is either active or historical. A future
 deprecated document must link its replacement and removal/review trigger.
 
-## Drift findings and disposition
+## Bounded polish review, 2026-09-09
+
+Current instructions now distinguish document-source and imported workspace
+schemas, their validation gates and leakage grouping, existing columnar
+capabilities, preview-only quality reports, and the unsigned Mac development
+workbench. Walkthroughs use fresh output paths. Completed packets and roadmaps
+remain historical evidence, not instructions to restart work. The evidence
+index now points to every Phase 8–19 closeout. The
+[closeout record](../evidence/2026-09-09-product-polish.md) records executed
+operator paths and checks. Version and product claim remain unchanged.
+
+## Historical drift findings and disposition
+
+The following table records earlier reviews in their original sequence. Its
+then-current phase states and capability boundaries are historical.
 
 | Finding | Evidence | Disposition |
 | --- | --- | --- |
@@ -103,25 +116,21 @@ deprecated document must link its replacement and removal/review trigger.
 | --- | --- | --- |
 | Authority clarity | Good | Explicit hierarchy and historical labels |
 | Current capability accuracy | Corrected 2026-09-09. The 2026-09-09 audit found Phase 17's nine goals, eight representations, nine presets, and eight admitted row schemas absent from their contracts, "no semantic replayer ships" surviving in five active documents after Phase 9 shipped three, "extras stay empty" contradicted by extra `columnar`, `ocr-image` presented as a refusal code, four commands documented nowhere, and stale command counts | Post-20 defect-closure Phase 2 reconciled every quoted statement against `veriformis goals`, `presets`, `export discover`, `cli.py`, `pyproject.toml`, and `ci.yml`; the tracking checker now compares contract row-schema blocks and catalog counts with live discovery |
-| Phase visibility | Good | 21-phase ledger, WIP mirror, completed Phase 0–20 packets, and two post-20 remainder packets |
+| Phase visibility | Good | Completed Phase 0–20 ledger and packets, WIP inventory, and two completed post-20 packets |
 | Evidence honesty | Good | Evidence grades distinguish observed summaries from retained artifacts |
 | Historical organization | Adequate | Preserved and labeled, but completed work remains in `dev/active/` |
-| External-link freshness | Not yet automated | Primary links were reviewed during analysis; no crawler is a current gate |
+| External-link freshness | Not yet automated | Local documentation targets are checked during polish; external freshness is not an automated gate |
 | Diagram validation | Manual | Mermaid rendering remains documentation debt |
 | Demand/corpus evidence | Bounded and honest | Tracked fixture aggregate is reproducible; local retained-output counts are non-portable; owner-corpus, scale, container, and trainer-frequency evidence remains unavailable and unranked |
 
-## Ordered next actions
+## Retained maintenance limits
 
-1. Close the post-20 defect-closure packet phase by phase; every phase carries
-   its documentation change in the same commit as its code change.
-2. Keep this report and the debt register current at each packet closeout;
-   a "Next review" trigger that fires without a review is itself drift
-   (DOC-008).
-3. Preserve the legacy row-shape ID until a versioned report migration is
-   authorized; do not treat the name as an adapter dependency.
-4. Decide whether completed `dev/active/group-*` packets should move to a
-   historical subtree; propose moves before execution.
-5. Add pinned offline Mermaid validation only after dependency review.
+DOC-003 retains manual Mermaid validation. DOC-007 retains the persisted
+`aptus-row-shape` ID until an authorized versioned migration. DOC-008 tracks
+remaining architecture line references. These are bounded maintenance debt,
+not a new execution plan. Completed packets remain archived in place.
+
+## Historical Phase 4–5 summary
 
 The Phase 4 closeout baseline exposed strict export operations across Python,
 CLI, MCP, and the CLI-backed Mac bridge while production discovery remained

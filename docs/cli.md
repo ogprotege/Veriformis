@@ -115,11 +115,11 @@ WORKSPACE/
 └── .txn/
 ```
 
-The physical layout is schema 1; active revisions use schema 3
-(`src/veriformis/workspace.py:60-63`). `HEAD` names the current immutable
+The physical layout is schema 1. Document-source revisions use schema 3;
+dataset-row revisions use schema 4 (`src/veriformis/workspace.py`). `HEAD` names the current immutable
 revision and its logical output map. Opening a workspace verifies the complete
 parent chain and every referenced object digest before returning
-(`src/veriformis/workspace.py:1652-1655`). Every successful stage commits one
+(`src/veriformis/workspace.py`). Every successful stage commits one
 revision atomically; rerunning an upstream stage marks every descendant stage
 `stale`, while older revisions remain immutable history.
 
@@ -128,9 +128,14 @@ revision atomically; rerunning an upstream stage marks every descendant stage
 A stage command runs only when each stage it depends on is `complete` in the
 current revision. A dependency left `stale` by an upstream rerun fails with
 `error[stale-stage]`; a dependency that is `absent` or `failed` fails with
-`error[missing-stage-input]` (`src/veriformis/workspace.py:1919-1926`). The
-finished-dataset stages additionally require revision schema 3, and
+`error[missing-stage-input]` (`src/veriformis/workspace.py`). The
+document-source finished-dataset stages require revision schema 3. The
+imported tail uses schema 4 and `map` instead of construction. Legacy
 `construct` requires schema 2 or later.
+
+The table describes document-source stages. For dataset-row, the graph is
+`parse → map → curate → split → format → validate → seal`; the mapping
+artifacts replace construction artifacts. See [mapping.md](mapping.md).
 
 | Stage | Requires complete | Logical output keys |
 | --- | --- | --- |
@@ -201,7 +206,7 @@ veriformis clean WORKSPACE [--rules NAME,NAME] [--custom REGEX]
 | `--custom REGEX` | none | Adds one regular-expression removal rule; matches are removed (there is no replacement-text option) |
 
 Built-in rules: `page-numbers`, `headers-footers`, `whitespace`, `urls`,
-`emails`, `special-chars`, `lowercase` (`src/veriformis/rules/library.py:74`).
+`emails`, `special-chars`, `lowercase` (`src/veriformis/rules/library.py`).
 
 Requires `parse` complete. For each source, clean creates and replays a
 source-scoped plan binding configuration, operations, before/after digests,
@@ -416,11 +421,14 @@ veriformis curate WORKSPACE [--goal GOAL | --preset PRESET] \
 
 Curation runs minimum-target filtering, source-scoped conflict quarantine,
 exact deduplication, optional primary-source cap, and coverage closure, in
-that order (`src/veriformis/datasets/curation.py:77-81`).
+that order (`src/veriformis/datasets/curation.py`).
 `--allow-empty-evaluation` does not force evaluation empty when two or more
 leakage groups exist.
 
-Requires `construct` complete on revision schema 3.
+Document-source requires `construct` on revision schema 3. Dataset-row
+requires `map` on revision schema 4 and binds an imported plan and curation
+result. Imported payload fields are preserved; `--instruction` is a
+document-source option.
 
 - **Reads:** construction recipe and result, reconstructed upstream inputs.
 - **Writes:** `plan` (the finished dataset plan) and `result` (curation
@@ -450,14 +458,15 @@ inherited exact-dedup-family relations; complete transitive components become
 indivisible leakage groups. Assignment is deterministic from the bound ratio
 and seed, and no group crosses partitions.
 
-Requires `construct` and `curate` complete.
+Requires `curate` and either document-source `construct` or dataset-row `map`
+complete. Imported plans additionally apply their declared membership policy.
 
 - **Reads:** plan, curation result, construction result, raw-source digests.
 - **Writes:** `result` — groups, assignments, requested and realized counts,
   and an assignment digest.
 
 Failure modes (exit 2): `split-invalid` when evaluation is required but fewer
-than two leakage groups exist (`src/veriformis/datasets/splitting.py:615`),
+than two leakage groups exist (`src/veriformis/datasets/splitting.py`),
 or when curation included no records.
 
 ### `format`
@@ -477,11 +486,13 @@ exactly one payload row and one provenance row.
 Payload rows contain only their schema keys: `text` rows contain only `text`;
 prompt-completion rows only `prompt` and `completion`; instruction rows only
 `instruction`, `input`, and `output`; message rows only the exact two-turn
-(user, assistant) `messages` value (`src/veriformis/datasets/serialization.py:154`).
+(user, assistant) `messages` value (`src/veriformis/datasets/serialization.py`).
 Rows are sorted by record ID within each partition; provenance is train first,
 then evaluation, with zero-based partition ordinals and exact payload digests.
 
-Requires `construct`, `curate`, and `split` complete.
+Requires `curate`, `split`, and either document-source `construct` or
+dataset-row `map` complete. Imported rows retain their mapped schema fields
+and `mapped_value` provenance, including the four admitted-family schemas.
 
 - **Reads:** plan, recipe, construction result, curation result, split result.
 - **Writes:** `row-set` (strict semantic row set), `train` and `evaluation`
@@ -499,8 +510,8 @@ Replay and validate one exact finished-dataset byte snapshot.
 veriformis validate WORKSPACE
 ```
 
-Validate has no options. It builds one exact snapshot and runs all 17
-required gates in this order (`src/veriformis/contracts.py:114`):
+Validate has no policy options. Document-source builds one exact snapshot and
+runs the 17 required gates in `V1_FINISHED_DATASET_GATES` in this order:
 
 1. `construction-replay`
 2. `record-lifecycle`
@@ -520,7 +531,13 @@ required gates in this order (`src/veriformis/contracts.py:114`):
 16. `aptus-row-shape`
 17. `snapshot`
 
-Requires every stage from `parse` through `format` complete.
+Dataset-row runs the 13 gates in `mapping.finish.IMPORT_GATES`:
+`mapping-replay`, `record-lifecycle`, `curation`, `deduplication`, `quality`,
+`coverage`, `split`, `leakage`, `row-binding`, `schema`, `encoding`,
+`partition-nonempty`, and `snapshot`. These replay captured rows and compare
+the exact imported output. Quality-report heuristics remain non-enforcing.
+
+Requires every stage on the selected compiler path through `format` complete.
 
 - **Reads:** all upstream artifacts, reconstructing and replaying each stage.
 - **Writes:** `snapshot` and `report`, committed with stage status `complete`
@@ -593,7 +610,7 @@ Failure modes (exit 1): `missing-stage-input` / `stale-stage` when any
 upstream stage is not complete; `error[invalid-data]` when the saved
 validation report does not exactly match a fresh replay; `seal-invalid` — including every
 `FinishedBundleError`, which subclasses `SealError`
-(`src/veriformis/bundle/finished.py:86`) — for an existing non-matching
+(`src/veriformis/bundle/finished.py`) — for an existing non-matching
 destination or a publication failure.
 
 ## Maintenance commands
@@ -610,7 +627,7 @@ The command verifies the current history, then applies each supported
 migration in order: v1 to v2, then v2 to v3 when both are needed. Each step is
 a complete, recoverable commit, so an interrupted upgrade may leave the
 workspace safely on v2 and a retry resumes from that exact state
-(`src/veriformis/workspace.py:1769-1778`).
+(`src/veriformis/workspace.py`).
 
 - v1 → v2 adds `construct` as absent.
 - v2 → v3 preserves parse, clean, chunk, and construct facts; adds `curate`
@@ -717,15 +734,17 @@ lists them as implemented. Optional TRL
 and MLX-LM adapters sit on `split-jsonl-directory` v1. Split JSONL, canonical
 JSON, Parquet, Arrow, Hugging Face DatasetDict, and the TRL, MLX-LM,
 Axolotl, LLaMA-Factory, and Aptus
-adapters support all four current row schemas; constrained CSV supports the
-three flat schemas only. The adapters emit dataset-only launch sidecars and
+adapters support the four original SFT/text row schemas where their admission
+permits them; Aptus refuses `text`. The four imported advanced-family schemas
+use generic split JSONL or canonical JSON only. Constrained CSV supports
+`text`, `prompt_completion`, and `instruction_output` only. The adapters emit dataset-only launch sidecars and
 do not launch training. Taxonomy lists `trl` and `mlx-lm` as implemented
 optional adapters. There is no Hub upload.
 Tests may also inject the bounded conformance implementation used for the
 historical cross-surface evidence; that remains private test code.
 
 Dry run, execute, and source-bound verify accept the exact historical
-`veriformis.export-surface-request/v1` shape for all three containers. Split JSONL
+`veriformis.export-surface-request/v1` shape for all six generic containers. Split JSONL
 also accepts the configured `veriformis.export-surface-request/v2` shape.
 Request v1 is unchanged and, for split JSONL, selects this complete safe
 default options object:
@@ -742,8 +761,7 @@ options must be repeated unchanged for dry run, execute, and source-bound
 verify because the exact paths and bytes bind the plan ID.
 
 Canonical `json` v1 has no options. Request v1 selects its fixed tree; request
-v2 is refused for that selector even when `container_options` is empty. The
-Named consumer-profile adapters are request v1 only; request v2 is refused.
+v2 is refused for that selector even when `container_options` is empty. Named consumer-profile adapters are request v1 only; request v2 is refused.
 Constrained `constrained-csv` v1 has the same request boundary: request v1
 selects its fixed tree, while request v2 and every options object are refused.
 
@@ -911,7 +929,7 @@ MCP, YAML, Python, and the workbench. See the
 
 ### `support-matrix`
 
-Print the frozen CLI-first 1.0 support matrix as read-only JSON.
+Print the frozen CLI-first support matrix as read-only JSON.
 
 ```text
 veriformis support-matrix
@@ -969,9 +987,10 @@ veriformis columnar-schemas
 
 The output is the exact packaged `veriformis.columnar-schema-discovery/v1`
 data that `PipelineService` and MCP `columnar_schemas` also emit. It pins
-official docs, a review date, license, empty extra name, version ranges,
-and exact Arrow/feature types for every v1 row schema, including nested
-`messages`. The three columnar containers remain `planned`. The command
+official docs, a review date, license, optional extra name, version ranges,
+and exact Arrow/feature types for the four supported text/SFT row schemas,
+including nested `messages`. The three columnar containers are implemented;
+execute requires the libraries installed by extra `columnar`. The command
 does not emit files and does not import PyArrow or Hugging Face Datasets.
 See [Columnar Schema Pins v1](contracts/columnar-schema-v1.md).
 
@@ -1095,9 +1114,9 @@ not read a workspace or trust producer state. It requires the exact file and
 directory set, safe canonical paths, regular files, a valid link policy, exact
 sizes, digests, record counts, row and provenance alignment, a passing bound
 validation report, and correct attestation binding
-(`src/veriformis/bundle/verifier.py:945-955`).
+(`src/veriformis/bundle/verifier.py`).
 
-It reports one of two grades (`src/veriformis/contracts.py:163`):
+It reports one of two grades (`src/veriformis/contracts.py`):
 
 - `self_consistent` — all internal checks agree; or
 - `external_digest` — those checks pass and the supplied expected manifest
