@@ -153,3 +153,65 @@ def test_cli_collect_prints_plan(tmp_path: Path) -> None:
     payload = json.loads(result.stdout)
     assert payload["schema_id"] == "veriformis.collection-plan/v1"
     assert payload["counts"]["accepted"] == 1
+
+
+def test_byte_limit_is_enforced_before_any_file_is_hashed(tmp_path: Path, monkeypatch) -> None:
+    """Post-20 defect D-22: limits are checked from directory sizes, not after hashing."""
+    import veriformis.collection.plan as plan_module
+
+    (tmp_path / "a.txt").write_bytes(b"x" * 1000)
+    (tmp_path / "b.txt").write_bytes(b"y" * 1000)
+    hashed: list[str] = []
+    original = plan_module._file_digest
+
+    def counting_digest(path: Path) -> str:
+        hashed.append(path.name)
+        return original(path)
+
+    monkeypatch.setattr(plan_module, "_file_digest", counting_digest)
+    with pytest.raises(CollectionLimitError, match="max_bytes"):
+        build_collection_plan(
+            [tmp_path],
+            source_root=tmp_path,
+            settings=CollectionSettings(max_bytes=1500),
+        )
+    # The first file may be hashed; the second is refused before its digest.
+    assert hashed == ["a.txt"]
+
+
+def test_file_limit_is_enforced_before_hashing_the_extra_file(tmp_path: Path, monkeypatch) -> None:
+    import veriformis.collection.plan as plan_module
+
+    (tmp_path / "a.txt").write_bytes(b"x")
+    (tmp_path / "b.txt").write_bytes(b"y")
+    hashed: list[str] = []
+    original = plan_module._file_digest
+
+    def counting_digest(path: Path) -> str:
+        hashed.append(path.name)
+        return original(path)
+
+    monkeypatch.setattr(plan_module, "_file_digest", counting_digest)
+    with pytest.raises(CollectionLimitError, match="max_files"):
+        build_collection_plan(
+            [tmp_path],
+            source_root=tmp_path,
+            settings=CollectionSettings(max_files=1),
+        )
+    assert hashed == ["a.txt"]
+
+
+def test_duplicate_owner_and_plan_id_do_not_depend_on_argument_order(tmp_path: Path) -> None:
+    (tmp_path / "one").mkdir()
+    (tmp_path / "two").mkdir()
+    (tmp_path / "one" / "same.txt").write_bytes(b"identical bytes")
+    (tmp_path / "two" / "same.txt").write_bytes(b"identical bytes")
+    forward = build_collection_plan(
+        [tmp_path / "one", tmp_path / "two"], source_root=tmp_path
+    )
+    reverse = build_collection_plan(
+        [tmp_path / "two", tmp_path / "one"], source_root=tmp_path
+    )
+    assert forward.plan_id == reverse.plan_id
+    duplicates = [member for member in forward.members if member.status == "duplicate"]
+    assert [member.reason for member in duplicates] == ["duplicate-bytes:one/same.txt"]
