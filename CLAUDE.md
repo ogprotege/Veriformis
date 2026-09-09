@@ -277,6 +277,14 @@ Key modules under `src/veriformis/` are:
 - `extensions/` for the internal extension protocol, built-in-only registry, and read-only capability declarations (no loader);
 - `families/` for advanced-family admission pins, leakage grouping, and admitted classification execute;
 - `workbench/` for Mac wrap pins (`veriformis.workbench-adapter/v1`; loading is not a screen);
+- `mapping/` for dataset-row capture, mapping plans, confirmation digests,
+  mapped-value evidence, rejection reports, and imported finish paths;
+- `collection/` for the shared collection plan v1 (files, directories, limits);
+- `ocr/` for optional local Tesseract 5 recovery, thresholds, and preview;
+- `automation/` for project-spec v1, lock v1, dry run, run, and resume;
+- `publication/` for the publication-adapter pins (no Hub execute);
+- `scale/` for scale corpora, named-hardware baselines, and empty support tiers;
+- `release/` for the frozen `veriformis.support-matrix/v1` data;
 - `mcp/` for the constrained local MCP adapter;
 - `handoff/` for the versioned Aptus handoff descriptor and consumer check;
 - `serializers/` and `validate/` for retained M1 compatibility utilities;
@@ -300,9 +308,15 @@ uv sync --extra test
 uv lock --check
 uv run ruff check src tests
 uv run python scripts/check_project_tracking.py
-uv run pytest -q
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 git diff --check
 ```
+
+The core suite takes roughly 15 minutes on a two-vCPU VM; the Phase 6 goal
+acceptance matrix dominates. GitHub runs eight jobs producing eleven check
+runs per trigger (twenty-two per pull request because the workflow fires on
+both `push` and `pull_request`); the historical "14 GitHub checks" figures in
+phase records describe the seven-run workflow of that time.
 
 Run focused tests while developing, then run the complete checks before handoff.
 Construction tests live under `tests/construction/`. Finished-dataset and

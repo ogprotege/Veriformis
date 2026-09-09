@@ -25,11 +25,22 @@ Operator non-claims and any future **beta** cut criteria:
 | Installable package and installed origin | `scripts/release/smoke_install.sh` | CI `install-smoke` job; wheel installed in an isolated environment, no external `aptus` distribution, full golden path through that CLI |
 | Golden standalone product path | `scripts/release/golden_compile.sh` | Required CI `golden-compile` job; both objectives, canonical seal, externally anchored verify, deterministic package + package verification, no handoff |
 | Workspace migration | Ordinary pytest under `tests/regressions/` | Full suite (not a separate silent skip) |
+| Shipped project-spec example | `scripts/release/project_spec_example.sh` | Required CI `project-spec-example` job; the example's fingerprint must match `examples/project-spec/expected-fingerprint.json` |
+
+Eight jobs produce eleven check runs per trigger; a pull request shows
+twenty-two because the workflow runs on `push` and `pull_request`. Seven of
+the eleven can fail it: the four `test` cells, `install-smoke`,
+`golden-compile`, and `project-spec-example`.
 
 The optional `aptus-integration` job runs marked tests and
 `scripts/release/aptus_integration.sh` with `continue-on-error: true`. It proves
 the checked-in adapter is self-consistent under its declared policy. It is not
-a core gate and does not prove a live external Aptus release.
+a core gate and does not prove a live external Aptus release. The optional
+`profile-integration` job installs extra `columnar` so the official Datasets
+loader reads every emitted trainer partition (no trainer is installed; the
+exporter does not train), and the optional `columnar-integration` job reloads
+the Parquet, Arrow, and Hugging Face Dataset containers through PyArrow and
+Datasets.
 
 The optional `xcodebuild-debug` job builds and tests the same Debug scheme
 `./script/build_and_run.sh` uses, with `CODE_SIGNING_ALLOWED=NO` and
@@ -59,7 +70,7 @@ bash scripts/release/check_local.sh
 uv sync --extra test
 uv lock --check
 uv run ruff check src tests
-uv run pytest -q --ignore=tests/handoff -m "not aptus_integration"
+uv run pytest -q --ignore=tests/handoff -m "not aptus_integration and not profile_integration and not columnar_integration and not scale_benchmark"
 bash scripts/release/smoke_install.sh
 bash scripts/release/golden_compile.sh
 ```

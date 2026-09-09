@@ -5,7 +5,7 @@ shapes whose identities are recomputed at every boundary, the provenance
 backbone that makes post-parse text replayable, the payload/provenance
 separation at egress, and the workspace persistence machinery underneath.
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 7 complete)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: replayer and adapter claims)
 
 **Next review:** Any architecture or data-flow change
 
@@ -235,8 +235,7 @@ envelopes over those `PipelineService` operations.
 The private render/replay hooks remain trusted implementation code, and
 semantic replay currently retains each complete file in memory. Phase 4 closed
 with no production entry; Phase 5.1–5.3 now install exact-byte renderers for
-`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1, while no
-production semantic replayer or trainer profile exists. Split JSONL preserves payload-only
+`split-jsonl-directory`, canonical `json`, and `constrained-csv` v1. Since Phase 9, three production `semantic_content_only` replayers ship (`parquet`, `arrow`, `hugging-face-dataset`; each decodes its produced bytes through PyArrow or Datasets before promotion), and since Phases 8 and 10 five optional consumer-profile adapters (`trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`) are discoverable; none trains. Split JSONL preserves payload-only
 partition files; canonical JSON preserves the same logical partitions as
 explicit arrays and keeps complete aligned provenance in a separate object.
 Constrained CSV preserves the three flat row schemas as fully quoted partition

@@ -261,9 +261,9 @@ name.vfbundle/
   fully quoted train/evaluation CSV files, a dataset card, mandatory aligned
   provenance, README, and receipt. Its exact ordered headers support `text`,
   `prompt_completion`, and `instruction_output`; nested `messages` and request
-  v2 fail before publication with an actionable JSON alternative. The
-  default service still has no semantic replayer and discovery advertises no
-  consumer or trainer profile.
+  v2 fail before publication with an actionable JSON alternative. At that
+  point the default service had no semantic replayer and discovery advertised
+  no consumer or trainer profile. Since Phase 9, three production `semantic_content_only` replayers ship (`parquet`, `arrow`, `hugging-face-dataset`; each decodes its produced bytes through PyArrow or Datasets before promotion), and since Phases 8 and 10 five optional consumer-profile adapters (`trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`) are discoverable; none trains.
 - Phase 5.4, merged as PR #56 at
   `499d61fa2e7dd12edb5808c6bd9d0e0ab6b738c8`, leaves that export catalog
   unchanged. The existing

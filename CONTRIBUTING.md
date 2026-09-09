@@ -67,7 +67,8 @@ development alpha. Do not invent a Phase 21.
 Unsigned Debug GitHub `xcodebuild` is optional `continue-on-error` CI; it is not a public Mac claim.
 Phase 10 implements Axolotl, LLaMA-Factory, and Aptus as optional
 adapters under ADR-0014; `unsloth` remains a non-executable candidate.
-Extras stay empty.
+Trainer extras stay empty; only extra `columnar` (PyArrow, Datasets) is
+non-empty, and the default install and core pytest must not import it.
 Consult the
 [completed Phase 4 packet](dev/active/independent-product/phase-04-verified-export-foundation/README.md)
 and the machine ledger before changing the verified-export boundary. The typed

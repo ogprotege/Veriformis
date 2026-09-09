@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last reviewed:** 2026-08-23 (independent-product Phase 8.2 admission pins)
+**Last reviewed:** 2026-09-09 (post-20 defect closure: CI job table, test map, replayer claim)
 
 **Next review:** Any CI gate, packaging, or contributor-tooling change
 
@@ -114,11 +114,24 @@ workbench is `macos/`. `serializers/` and `validate/` are legacy M1 only.
 | Chunkers | `tests/chunkers/` |
 | Recipes / YAML | `tests/recipes/` |
 | MCP parity | `tests/mcp/` |
-| Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker) |
+| Optional Aptus adapter | `tests/handoff/` (`aptus_integration` marker); the Veriformis-side handoff regressions live in `tests/regressions/` and run in the core suite |
 | Consumer-profile adapters, harnesses, and sidecars | `tests/profiles/` |
-| Optional TRL/MLX-LM loader checks | `profile_integration` marker; optional CI job |
+| Optional trainer-schema loader checks | `tests/profiles/test_profile_integration.py` (`profile_integration` marker; optional CI job with extra `columnar`) |
 | Optional PyArrow/Datasets loader checks | `columnar_integration` marker; optional CI job |
 | Finished seal / verifier | `tests/bundle/` |
+| Goal catalog, presets, preview, preflight | `tests/goals/` |
+| Existing-dataset import and mapping | `tests/mapping/` |
+| Collection plans | `tests/collection/` |
+| Optional OCR | `tests/ocr/` |
+| Quality report | `tests/quality/` |
+| Review workflows | `tests/review/` |
+| Scale corpora and baselines | `tests/scale/` (`scale_benchmark` marker for named-hardware dumps) |
+| Extension protocol | `tests/extensions/` |
+| Advanced dataset families | `tests/families/` |
+| Workbench adapter pins | `tests/workbench/` |
+| Project-spec automation | `tests/automation/` |
+| Release isolation and artifacts | `tests/release/` |
+| Legacy serializers and validate gates | `tests/serializers/`, `tests/validate/` |
 | Verified export models, membership, publication, API, and adapter parity | `tests/exports/`, `tests/contracts/test_verified_export_contract.py`, `tests/regressions/fixtures/phase4/export-surfaces.json` |
 | macOS workbench | `macos/Tests/`, `macos/scripts/parity_check.sh` |
 | Group 9 release gates | `tests/regressions/test_group9_release_gates.py`, `scripts/release/` |
@@ -134,13 +147,20 @@ tests, not expected failures.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on pushes and pull requests.
 
-| Job | What it runs |
-| --- | --- |
-| `test` | Matrix: Python 3.11–3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, core pytest excluding `aptus_integration` |
-| `install-smoke` | `scripts/release/smoke_install.sh` (clean wheel origin + full installed-CLI golden path) |
-| `golden-compile` | `scripts/release/golden_compile.sh` (both objectives → canonical seal → `external_digest`; no handoff) |
-| `aptus-integration` | Non-blocking optional adapter self-conformance: marked tests + explicit handoff script |
+| Job | Blocking | What it runs |
+| --- | --- | --- |
+| `test` (four cells) | yes | Matrix: Python 3.11, 3.12, 3.13 on Ubuntu, plus Python 3.12 on macOS; `uv lock --check`, Ruff, core pytest excluding the `aptus_integration`, `profile_integration`, `columnar_integration`, and `scale_benchmark` markers and `tests/handoff` |
+| `install-smoke` | yes | `scripts/release/smoke_install.sh` (clean wheel origin, every discovery command from the installed wheel, full installed-CLI golden path) |
+| `golden-compile` | yes | `scripts/release/golden_compile.sh` (both objectives → canonical seal → `external_digest`; no handoff) |
+| `project-spec-example` | yes | `scripts/release/project_spec_example.sh` (the shipped `examples/project-spec` fingerprint) |
+| `aptus-integration (optional)` | no (`continue-on-error`) | Marked adapter self-conformance tests plus `scripts/release/aptus_integration.sh` |
+| `profile-integration (optional)` | no | Marked trainer-schema tests with extra `columnar` installed for the official Datasets loader; `VERIFORMIS_REQUIRE_PROFILE_LIBRARIES=1` turns a missing loader into a failure |
+| `columnar-integration (optional)` | no | Marked PyArrow / Datasets reload tests with extra `columnar` installed |
+| `xcodebuild-debug (optional)` | no | Unsigned Debug `xcodebuild` build and Swift tests on macOS; not a public Mac claim |
 
+That is eight jobs and eleven check runs per trigger; because the workflow
+runs on both `push` and `pull_request`, a pull request shows twenty-two
+check runs, of which fourteen (the seven blocking runs, twice) can fail it.
 Local-only: `git diff --check`. Not yet hard gates: static type checking,
 coverage thresholds, dependency audit, signed/notarized Mac install.
 
@@ -251,10 +271,9 @@ Phase 5.1–5.3 add reviewed production exact-byte renderers for
 not make the private implementation hook an
 untrusted plugin boundary. Tests may still inject the bounded trusted
 conformance implementation. Semantic replay currently retains each complete
-produced file in memory; the Phase 4.7 fixture is statically bounded, and no
-production semantic replayer ships. Any future shipped semantic profile must
-define and enforce explicit byte, record, nesting, and other applicable
-resource limits.
+produced file in memory and the Phase 4.7 fixture is statically bounded.
+Since Phase 9, three production `semantic_content_only` replayers ship (`parquet`, `arrow`, `hugging-face-dataset`; each decodes its produced bytes through PyArrow or Datasets before promotion), and since Phases 8 and 10 five optional consumer-profile adapters (`trl`, `mlx-lm`, `axolotl`, `llama-factory`, `aptus`) are discoverable; none trains. Every shipped semantic profile
+enforces the explicit byte, record, and nesting limits its contract names.
 
 Merged Phase 5.4 work is transport after publication, not another renderer.
 `exports/archive.py` must validate the separately retained canonical receipt

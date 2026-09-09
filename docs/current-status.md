@@ -56,7 +56,7 @@ Phase 11 collection ingest is complete: `veriformis.collection-plan/v1`
 expands files and directories on CLI, MCP, and the Mac bridge. Hidden,
 unsupported, duplicate, and symlink members are counted. Limits fail
 closed. Archive ingest, parser subprocesses, and new input families are
-skipped with records. Image-only PDF still refuses as `ocr-image`.
+skipped with records. Image-only PDF still refuses with `pdf.ocr-required` (family `ocr-image` unsupported).
 Phase 12 optional local OCR is complete: Tesseract 5 under ADR-0016;
 digital / OCR / merged recovery; confidence thresholds; `ocr-preview`;
 empty extra `ocr`. Closeout merged as PR #112 at
