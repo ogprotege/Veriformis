@@ -18,3 +18,10 @@ fix. Rows are appended as items close; an item without a row is open.
 | D-24 | `scripts/check_project_tracking.py::_check_contracts_match_discovery` (fails on the pre-fix contracts) |
 | D-25 | `tests/release/test_xcodebuild_debug_ci.py::test_cli_reference_command_count_matches_typer`; manual `veriformis map` example run |
 | D-26 | `scripts/check_project_tracking.py::_check_package_data_coverage`; reviewed statements listed in `progress.md` |
+| D-10 | `tests/parsers/test_docx_hardening.py` |
+| D-11 | `tests/parsers/test_pdf_page_provenance.py`; `tests/goals/test_goal_input_families.py::test_pdf_text_supplies_paragraphs_with_page_provenance_and_no_headings` |
+| D-12 | `tests/parsers/test_html_structure.py` |
+| D-13 | `tests/parsers/test_structured_exactness.py`; `tests/parsers/test_hardening_matrix.py::test_text_empty_and_non_utf8_fail_closed` |
+| D-14 | `tests/ocr/test_tesseract_confidence.py`; `tests/ocr/test_recovery_paths.py::test_provider_without_confidence_requires_review_instead_of_accepting` |
+| D-22 | `tests/collection/test_collection_plan.py` (limits before hashing; argument-order independence) |
+| 3.7 | `tests/chunkers/test_strategies.py::test_sentence_splitter_handles_unicode_terminators_and_quotes` |

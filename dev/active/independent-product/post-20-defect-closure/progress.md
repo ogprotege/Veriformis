@@ -86,3 +86,45 @@ Append-only dated execution log.
 - Audited-accurate documents (program.json, packet READMEs, migration,
   support-lifecycle, support-matrix, taxonomy, profile-admission, container
   trees) were not touched.
+
+## 2026-09-09 — Phase 3 (recovery-layer truthfulness)
+
+- D-10 (docx 1.2.0 -> 1.3.0): hardened note-part parser and diagnostics XML probe;
+  `lxml>=5.0` floor; declared-inflation and member-count caps before the
+  package opens; `docx.drawing-text-omitted` (text loss) for text boxes;
+  `w:moveTo` retained once with `docx.revision-move-normalized`,
+  `w:moveFrom` dropped with `docx.revision-move-source-omitted`.
+- D-11 (pdf 1.0.0 -> 1.1.0): no fabricated `Page N` headings; `Span.page` on
+  every paragraph; `pdf.text-layer-normalized`; page-count bound;
+  `pdf.page-unreadable`. New fixture `tests/fixtures/group5/two-page-text.pdf`.
+- D-12 (html 1.1.0 -> 1.2.0): `<br>` and nested blocks become line breaks with
+  `html.line-break-normalized`; `<pre>` whitespace kept; `html.table-flattened`,
+  `html.list-flattened`; omitted subtrees with visible text and content outside a
+  selected `<main>` labelled text loss.
+- D-13 (csv/json/jsonl 1.0.0 -> 1.1.0, text 1.1.0 -> 1.2.0): strict JSON loader
+  (no NaN/Infinity, no duplicate keys); shortest-round-trip floats; exact string
+  values and source key order; `csv.bom-removed`, `csv.cells-trimmed`,
+  `csv.blank-rows-omitted`; `text.not-utf8` typed refusal; `text.bom-removed`.
+- D-14: Tesseract runs one pass writing txt and tsv; word-level confidence
+  populated; `decide_confidence(None)` is `review`; per-action page lists no
+  longer overwritten by the document recovery list.
+- D-22: byte and file limits enforced from directory sizes before hashing;
+  canonical traversal order makes `duplicate-bytes:<owner>` and `plan_id`
+  independent of argument order.
+- 3.7: per-strategy chunk producer versions (`sentence` -> 2) validated by the
+  workspace; Unicode-aware sentence splitter; ASCII-only derivation keys; PDF
+  raster import hoisted; 30 percent safety-rule denominator documented.
+- Fixture regeneration: `phase6/goal-acceptance-matrix.json` regenerated through
+  `--generate`. Diff: 61 of 74 cells changed only in `manifest_sha256`,
+  `row_set_sha256`, `supervision_sha256` (and, for the 7 plain-text cells, the
+  `record_id` of the same `exact-duplicate` exclusion); the 13 markdown cells are
+  byte-identical because the markdown parser did not change; no cell changed its
+  exclusion reasons, supervised keys, loss policy, or instruction. The Phase 16
+  compatibility kit's text-parser `report_digest` and the kit SHA pinned by five
+  closeout tests were regenerated (source id unchanged). `docs/migration.md`
+  records every producer version move.
+- D-07 investigated and withdrawn: `canonical_digest` serializes through
+  `lossless_json_bytes` and does not NFC-normalize; the NFC helper
+  `canonical_json_bytes` has no production callers. The exact fingerprint was
+  already exact and consistent with the conflict key. A regression pinning
+  NFC/NFD distinctness is added in Phase 4 instead of a fingerprint v2.
