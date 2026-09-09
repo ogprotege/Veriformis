@@ -10,8 +10,54 @@ from pathlib import Path
 
 from veriformis.errors import OcrIdentityError
 from veriformis.identity import sha256_digest
-from veriformis.ocr.identity import ADMITTED_LANGUAGES, build_ocr_page_identity
+from veriformis.ocr.identity import (
+    ADMITTED_LANGUAGES,
+    OcrConfidence,
+    build_ocr_page_identity,
+)
 from veriformis.ocr.recovery import OcrPageRequest, OcrPageResult
+
+
+def parse_tsv_confidence(tsv_text: str) -> OcrConfidence | None:
+    """Return word-level confidence from Tesseract TSV output, or None.
+
+    Tesseract's TSV has a header row and one row per element; ``level`` 5 is
+    a word and ``conf`` is its 0-100 confidence (``-1`` for non-word rows).
+    Without at least one scored word there is no confidence to report, and
+    the policy then requires review rather than accepting blindly
+    (post-20 defect D-14).
+    """
+    lines = tsv_text.splitlines()
+    if not lines:
+        return None
+    header = lines[0].split("\t")
+    try:
+        level_index = header.index("level")
+        conf_index = header.index("conf")
+        text_index = header.index("text")
+    except ValueError:
+        return None
+    scores: list[float] = []
+    for line in lines[1:]:
+        cells = line.split("\t")
+        if len(cells) <= max(level_index, conf_index, text_index):
+            continue
+        if cells[level_index] != "5":
+            continue
+        try:
+            score = float(cells[conf_index])
+        except ValueError:
+            continue
+        if score < 0.0 or not cells[text_index].strip():
+            continue
+        scores.append(min(100.0, score))
+    if not scores:
+        return None
+    return OcrConfidence(
+        mean=sum(scores) / len(scores),
+        minimum=min(scores),
+        word_count=len(scores),
+    )
 
 
 def tesseract_binary() -> str | None:
@@ -67,14 +113,36 @@ class TesseractProvider:
         with tempfile.TemporaryDirectory(prefix="veriformis-ocr-") as tmp:
             image = Path(tmp) / "page.png"
             image.write_bytes(request.raster_png)
+            outbase = Path(tmp) / "page"
+            # One recognition pass writes both the text and the word-level TSV
+            # so the confidence describes exactly the emitted text.
             recognized = subprocess.run(
-                [binary, str(image), "stdout", "-l", self.language, "--psm", "6"],
+                [
+                    binary,
+                    str(image),
+                    str(outbase),
+                    "-l",
+                    self.language,
+                    "--psm",
+                    "6",
+                    "txt",
+                    "tsv",
+                ],
                 capture_output=True,
                 check=False,
             )
-            if recognized.returncode != 0:
+            text_path = outbase.with_suffix(".txt")
+            tsv_path = outbase.with_suffix(".tsv")
+            if recognized.returncode != 0 or not text_path.is_file():
                 raise OcrIdentityError("tesseract recovery failed")
-            text = recognized.stdout.decode("utf-8", errors="replace").strip()
+            text = text_path.read_bytes().decode("utf-8", errors="replace").strip()
+            confidence = (
+                parse_tsv_confidence(
+                    tsv_path.read_bytes().decode("utf-8", errors="replace")
+                )
+                if tsv_path.is_file()
+                else None
+            )
         identity = build_ocr_page_identity(
             source_sha256=request.source_sha256,
             page_index=request.page_index,
@@ -82,5 +150,6 @@ class TesseractProvider:
             tessdata_language=self.language,
             tessdata_sha256=sha256_digest(trained.read_bytes()),
             engine_version=engine_version,
+            confidence=confidence,
         )
         return OcrPageResult(identity=identity, text=text)

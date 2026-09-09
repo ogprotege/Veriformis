@@ -191,7 +191,7 @@ def parse_pdf_file(
                     "OCR confidence is below the warn threshold on pages: "
                     + ", ".join(str(item) for item in warn_pages)
                 ),
-                details={"pages": warn_pages, **recovery_details},
+                details={**recovery_details, "pages": warn_pages},
             )
         )
     if review_pages:
@@ -210,9 +210,9 @@ def parse_pdf_file(
                     + ", ".join(str(item) for item in review_pages)
                 ),
                 details={
+                    **recovery_details,
                     "pages": review_pages,
                     "pending_review": True,
-                    **recovery_details,
                 },
             )
         )
@@ -232,7 +232,7 @@ def parse_pdf_file(
                     "text is retained on held_text and omitted from the stream "
                     "on pages: " + ", ".join(str(item) for item in refused_pages)
                 ),
-                details={"pages": refused_pages, **recovery_details},
+                details={**recovery_details, "pages": refused_pages},
             )
         )
     if empty_pages:

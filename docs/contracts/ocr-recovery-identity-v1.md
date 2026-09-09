@@ -98,13 +98,17 @@ of digital text.
 
 ## Confidence policy (item 12.5)
 
-Schema `veriformis.ocr-confidence-policy/v1`. Missing confidence accepts.
+Schema `veriformis.ocr-confidence-policy/v1`. The Tesseract provider runs one
+recognition pass that writes both the text and the word-level TSV, and
+derives `mean`, `minimum`, and `word_count` from the TSV `conf` column of
+level-5 (word) rows. A page with no scored words carries no confidence and
+requires review; missing confidence never accepts.
 
 | Action | When | Stream |
 | --- | --- | --- |
 | `accept` | mean ≥ 80 and minimum ≥ 30 | OCR text emitted |
 | `warn` | 60 ≤ mean < 80 and minimum ≥ 30 | OCR text emitted |
-| `review` | 30 ≤ mean < 60 and minimum ≥ 30 | OCR text emitted, pending review |
+| `review` | 30 ≤ mean < 60 and minimum ≥ 30, or no scored words | OCR text emitted, pending review |
 | `refuse` | minimum < 30 | OCR text omitted from the stream and retained on `held_text` |
 
 Low-confidence OCR is not deleted. Digital pages are not scored.

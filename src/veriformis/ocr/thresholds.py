@@ -15,9 +15,13 @@ ConfidenceAction = Literal["accept", "warn", "review", "refuse"]
 
 
 def decide_confidence(confidence: OcrConfidence | None) -> ConfidenceAction:
-    """Return the v1 action for one OCR page. Missing confidence accepts."""
+    """Return the v1 action for one OCR page.
+
+    A page with no scored words has nothing to accept on; it requires review
+    rather than passing silently (post-20 defect D-14).
+    """
     if confidence is None:
-        return "accept"
+        return "review"
     if confidence.minimum < REFUSE_BELOW_MINIMUM:
         return "refuse"
     if confidence.mean < REVIEW_BELOW_MEAN:
