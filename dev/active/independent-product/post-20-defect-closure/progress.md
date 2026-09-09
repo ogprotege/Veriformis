@@ -57,3 +57,32 @@ Append-only dated execution log.
   Axolotl / LLaMA-Factory partitions through the official `datasets` loader and
   prove no trainer library is imported.
 - `AGENTS.md` suite timing corrected from ~90s to the observed ~15 minutes.
+
+## 2026-09-09 — Phase 2 (claim honesty)
+
+- D-24: goal-catalog-v1 (nine goals, eight representations, nine templates,
+  per-representation export table), recipe-preset-v1 (nine presets),
+  split-jsonl-export-v1 and canonical-json-export-v1 (eight frozen row schemas),
+  generic-exports.md matrix, and current-status.md rows now match `veriformis
+  goals`, `presets`, and `export discover`.
+- D-25: cli.md documents `map`, `--mode`, `spec-*`, `env-inspect`, `review-*`,
+  `scale-support`, `scale-baseline`, `support-matrix`, `extension-capabilities`,
+  `ocr-preview`, and all 51 error codes; install.md's command map is complete;
+  README's `map` example runs.
+- D-26: "no semantic replayer ships" removed from five active documents;
+  "extras stay empty" excepts `columnar` everywhere; `ocr-image` vs
+  `pdf.ocr-required` corrected; architecture counts (52 commands, ten stage
+  commands), package lists, CI job table, and check-run counts corrected;
+  health report and debt register advanced from Phase 8 to Phase 20 with
+  DOC-008 through DOC-011.
+- 2.4: `scripts/check_project_tracking.py` now fails when a packaged data file
+  matches no package-data glob, when a contract's frozen
+  `supported_row_schemas` block differs from live discovery, when a goal,
+  representation, or preset is absent from its contract, or when
+  current-status.md misstates the catalog counts; the recipe-literal scan covers
+  `automation/`, `workbench/`, `goals/preflight.py`, `goals/preview.py`, and
+  `WorkbenchModels.swift`. Each new assertion was shown to fail on the
+  pre-fix tree.
+- Audited-accurate documents (program.json, packet READMEs, migration,
+  support-lifecycle, support-matrix, taxonomy, profile-admission, container
+  trees) were not touched.

@@ -15,3 +15,6 @@ fix. Rows are appended as items close; an item without a row is open.
 | D-09 | `tests/test_cli_error_funnel.py` |
 | D-27 | `tests/regressions/test_defectclose_handoff.py` (moved; collected by the core gate) |
 | D-28 | `tests/profiles/test_profile_integration.py` under `VERIFORMIS_REQUIRE_PROFILE_LIBRARIES=1` with extra `columnar` |
+| D-24 | `scripts/check_project_tracking.py::_check_contracts_match_discovery` (fails on the pre-fix contracts) |
+| D-25 | `tests/release/test_xcodebuild_debug_ci.py::test_cli_reference_command_count_matches_typer`; manual `veriformis map` example run |
+| D-26 | `scripts/check_project_tracking.py::_check_package_data_coverage`; reviewed statements listed in `progress.md` |
