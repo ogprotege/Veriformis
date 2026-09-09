@@ -65,8 +65,22 @@ def parse_csv_file(
         )
     # Fixed excel dialect keeps recovery deterministic across platforms.
     dialect = csv.excel
-    reader = csv.reader(io.StringIO(text), dialect)
-    sample_rows = list(csv.reader(io.StringIO(text), dialect))
+    try:
+        parsed_rows = list(csv.reader(io.StringIO(text), dialect))
+    except csv.Error as exc:
+        # Oversized fields and malformed quoting raise the module's own error
+        # class, which is not a ValueError; it must become a typed refusal
+        # rather than a traceback (post-20 defect D-09).
+        return _refuse(
+            p,
+            logical_path=logical_path,
+            raw_bytes=captured,
+            parser="csv",
+            parser_version=CSV_PARSER_VERSION,
+            code="csv.invalid",
+            message=f"CSV source could not be parsed with the fixed excel dialect: {exc}",
+        )
+    sample_rows = parsed_rows[:6]
     has_header = False
     if sample_rows:
         first = sample_rows[0]
@@ -75,7 +89,10 @@ def parse_csv_file(
         if rest and all(not _looks_numeric(cell) for cell in first):
             if any(_looks_numeric(cell) for row in rest for cell in row):
                 has_header = True
-    rows = [tuple(cell.replace("\r\n", "\n").replace("\r", "\n") for cell in row) for row in reader]
+    rows = [
+        tuple(cell.replace("\r\n", "\n").replace("\r", "\n") for cell in row)
+        for row in parsed_rows
+    ]
     rows = [row for row in rows if any(cell.strip() for cell in row)]
     if not rows:
         return _refuse(
@@ -183,6 +200,22 @@ def parse_csv_file(
     )
 
 
+def _load_json_text(text: str) -> Any:
+    """Decode one JSON text; every decoder failure is a typed refusal upstream.
+
+    ``json.loads`` raises ``RecursionError`` on deep nesting and a plain
+    ``ValueError`` on integers beyond the interpreter's digit limit; callers
+    catch those alongside ``JSONDecodeError`` so no capture yields a traceback.
+    """
+    return json.loads(text)
+
+
+def _json_failure_text(exc: BaseException) -> str:
+    if isinstance(exc, RecursionError):
+        return "nesting exceeds the recovery depth limit"
+    return str(exc)
+
+
 def parse_json_file(
     path: str | Path,
     *,
@@ -205,8 +238,8 @@ def parse_json_file(
             message=f"JSON source is not valid UTF-8: {exc}",
         )
     try:
-        value = json.loads(text)
-    except json.JSONDecodeError as exc:
+        value = _load_json_text(text)
+    except (json.JSONDecodeError, ValueError, RecursionError) as exc:
         return _refuse(
             p,
             logical_path=logical_path,
@@ -214,7 +247,7 @@ def parse_json_file(
             parser="json",
             parser_version=JSON_PARSER_VERSION,
             code="json.invalid",
-            message=f"JSON source is not valid JSON: {exc}",
+            message=f"JSON source is not valid JSON: {_json_failure_text(exc)}",
         )
     return _structured_value_result(
         p,
@@ -252,8 +285,8 @@ def parse_jsonl_file(
     bad_lines: list[int] = []
     for number, line in frame_jsonl_lines(text):
         try:
-            records.append(json.loads(line))
-        except json.JSONDecodeError:
+            records.append(_load_json_text(line))
+        except (json.JSONDecodeError, ValueError, RecursionError):
             bad_lines.append(number)
     if bad_lines:
         return _refuse(

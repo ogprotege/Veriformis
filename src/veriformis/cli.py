@@ -6,6 +6,7 @@ and workspace orchestration live in ``veriformis.pipeline``.
 
 from __future__ import annotations
 
+import csv
 import signal
 import threading
 from collections.abc import Callable, Iterator
@@ -90,6 +91,13 @@ def _emit_outcome(outcome: StageOutcome) -> None:
 
 
 def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], ...] = ()):
+    """Run one service call and turn every handled failure into error[code].
+
+    Everything that reads operator input on the command's behalf (plan files,
+    request JSON) must happen inside ``call`` so a missing or malformed file is
+    reported as ``error[...]`` with the command's exit status rather than as a
+    traceback (post-20 defect D-09).
+    """
     try:
         outcome = call()
     except SealPartialPublicationError as exc:
@@ -108,10 +116,12 @@ def _run(call, *, status: int = 2, extra_exceptions: tuple[type[BaseException], 
         UnicodeError,
         ValueError,
         TypeError,
+        csv.Error,
         *extra_exceptions,
     ) as exc:
         _echo_error(exc, status=status)
     _emit_outcome(outcome)
+    return outcome
 
 
 class _ExportCancellationToken:
@@ -390,13 +400,12 @@ def map_cmd(
     ),
 ) -> None:
     """Map captured JSONL row sources into imported semantic records."""
-    payload = json.loads(plan.read_text(encoding="utf-8"))
     _run(
         lambda: _SERVICE.map_rows(
             workspace,
             goal=goal,
             representation=representation,
-            mapping_plan=payload,
+            mapping_plan=json.loads(plan.read_text(encoding="utf-8")),
         )
     )
 
@@ -482,29 +491,7 @@ def seal(
     ),
 ) -> None:
     """Revalidate, atomically publish, and receipt one finished dataset."""
-    outcome: SealOutcome | None = None
-    try:
-        outcome = _SERVICE.seal(workspace, out)
-    except SealPartialPublicationError as exc:
-        publication = exc.publication
-        typer.echo(
-            f"published bundle remains visible at {publication.bundle_path}; "
-            f"manifest SHA-256 {publication.manifest_sha256}; workspace receipt "
-            "did not commit",
-            err=True,
-        )
-        _echo_error(exc.cause if isinstance(exc.cause, Exception) else exc, status=1)
-    except (
-        VeriformisError,
-        EvidenceError,
-        OSError,
-        UnicodeError,
-        ValueError,
-        TypeError,
-    ) as exc:
-        _echo_error(exc, status=1)
-    assert outcome is not None
-    _emit_outcome(outcome)
+    outcome: SealOutcome = _run(lambda: _SERVICE.seal(workspace, out), status=1)
     if aptus_handoff and outcome.publication is not None:
         from veriformis.handoff import (
             build_aptus_handoff,
@@ -958,7 +945,14 @@ def mapping_rejections(
             output,
             source_root=source_root,
         )
-    except VeriformisError as exc:
+    except (
+        VeriformisError,
+        EvidenceError,
+        OSError,
+        UnicodeError,
+        ValueError,
+        TypeError,
+    ) as exc:
         _echo_error(exc)
         return
     typer.echo(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))

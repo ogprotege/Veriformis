@@ -42,41 +42,28 @@ def parse_pdf_file(
     try:
         document = pdfium.PdfDocument(captured)
     except Exception as exc:  # pypdfium2 raises PdfiumError subclasses
-        source = register_source(
+        return _refused_pdf(
             p,
-            _PARSER,
-            "",
+            captured=captured,
             logical_path=logical_path,
-            parser_version=PARSER_VERSION,
-            raw_bytes=captured,
-        )
-        report = make_parse_report(
-            source_id=source.id,
-            parser_name=_PARSER,
-            parser_version=PARSER_VERSION,
-            diagnostics=(
-                make_diagnostic(
-                    source_id=source.id,
-                    parser_name=_PARSER,
-                    parser_version=PARSER_VERSION,
-                    code="pdf.unreadable",
-                    severity="error",
-                    disposition="refused",
-                    loss_kind="structure",
-                    location=DiagnosticLocation(kind="source"),
-                    message=f"PDF package could not be opened: {exc}",
-                    details={"reason": "unreadable"},
-                ),
-            ),
-        )
-        return ParseResult(
-            document=Document(children=[], source_id=source.id),
-            source=source,
-            diagnostics=report,
+            code="pdf.unreadable",
+            message=f"PDF package could not be opened: {exc}",
+            details={"reason": "unreadable"},
         )
 
     try:
         page_texts = _pdf_page_texts(document)
+    except _PdfPageUnreadable as exc:
+        # A page that pdfium cannot load or extract is a typed refusal, not a
+        # RuntimeError traceback (post-20 defect D-09).
+        return _refused_pdf(
+            p,
+            captured=captured,
+            logical_path=logical_path,
+            code="pdf.page-unreadable",
+            message=f"PDF page {exc.page_number} could not be read: {exc.cause}",
+            details={"reason": "page-unreadable", "page": exc.page_number},
+        )
     finally:
         document.close()
 
@@ -292,16 +279,74 @@ def parse_pdf_file(
     )
 
 
+class _PdfPageUnreadable(Exception):
+    """One page could not be loaded or its text layer could not be read."""
+
+    def __init__(self, page_number: int, cause: BaseException) -> None:
+        self.page_number = page_number
+        self.cause = cause
+        super().__init__(f"page {page_number}: {cause}")
+
+
+def _refused_pdf(
+    p: Path,
+    *,
+    captured: bytes,
+    logical_path: str,
+    code: str,
+    message: str,
+    details: dict | None,
+) -> ParseResult:
+    source = register_source(
+        p,
+        _PARSER,
+        "",
+        logical_path=logical_path,
+        parser_version=PARSER_VERSION,
+        raw_bytes=captured,
+    )
+    report = make_parse_report(
+        source_id=source.id,
+        parser_name=_PARSER,
+        parser_version=PARSER_VERSION,
+        diagnostics=(
+            make_diagnostic(
+                source_id=source.id,
+                parser_name=_PARSER,
+                parser_version=PARSER_VERSION,
+                code=code,
+                severity="error",
+                disposition="refused",
+                loss_kind="structure",
+                location=DiagnosticLocation(kind="source"),
+                message=message,
+                details=details,
+            ),
+        ),
+    )
+    return ParseResult(
+        document=Document(children=[], source_id=source.id),
+        source=source,
+        diagnostics=report,
+    )
+
+
 def _pdf_page_texts(document: pdfium.PdfDocument) -> list[str]:
     page_texts: list[str] = []
     for index in range(len(document)):
-        page = document[index]
-        textpage = page.get_textpage()
+        page = None
+        textpage = None
         try:
+            page = document[index]
+            textpage = page.get_textpage()
             text = textpage.get_text_bounded() or ""
+        except Exception as exc:  # pypdfium2 raises RuntimeError subclasses
+            raise _PdfPageUnreadable(index + 1, exc) from exc
         finally:
-            textpage.close()
-            page.close()
+            if textpage is not None:
+                textpage.close()
+            if page is not None:
+                page.close()
         page_texts.append(text.replace("\r\n", "\n").replace("\r", "\n").strip())
     return page_texts
 
@@ -319,6 +364,8 @@ def pdf_page_texts(
         return ()
     try:
         texts = _pdf_page_texts(document)
+    except _PdfPageUnreadable:
+        return ()
     finally:
         document.close()
     return tuple(texts) if texts else ("",)
