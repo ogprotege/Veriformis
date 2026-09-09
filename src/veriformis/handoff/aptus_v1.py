@@ -15,6 +15,7 @@ from typing import Any, Literal, Mapping
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from veriformis._jsonl_frames import frame_jsonl_lines
 from veriformis.bundle import verify_finished_bundle
 from veriformis.bundle.finished import (
     EVALUATION_PATH,
@@ -529,12 +530,7 @@ def _load_jsonl_objects(data: bytes) -> list[dict[str, Any]]:
     if not data:
         return []
     rows: list[dict[str, Any]] = []
-    # Sealed JSONL frames records on the single byte b"\n" only. splitlines()
-    # would also break on U+2028/U+2029/U+0085, which row text legitimately
-    # preserves raw (ensure_ascii=False escapes only characters below 0x20).
-    for line_number, line in enumerate(data.decode("utf-8").split("\n"), start=1):
-        if not line.strip():
-            continue
+    for line_number, line in frame_jsonl_lines(data.decode("utf-8")):
         try:
             value = json.loads(line)
         except json.JSONDecodeError as exc:

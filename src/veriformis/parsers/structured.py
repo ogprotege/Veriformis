@@ -9,6 +9,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from veriformis._jsonl_frames import frame_jsonl_lines
 from veriformis.diagnostics import (
     DiagnosticLocation,
     make_diagnostic,
@@ -249,9 +250,7 @@ def parse_jsonl_file(
         )
     records: list[Any] = []
     bad_lines: list[int] = []
-    for number, line in enumerate(text.splitlines(), start=1):
-        if not line.strip():
-            continue
+    for number, line in frame_jsonl_lines(text):
         try:
             records.append(json.loads(line))
         except json.JSONDecodeError:
