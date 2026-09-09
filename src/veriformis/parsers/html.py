@@ -23,7 +23,11 @@ from veriformis.sources import ParseResult, register_source
 # 1.1.0: the capture is decoded by Veriformis (UTF-8 first, then a declared
 # charset) before lxml sees it. libxml2 no longer guesses Latin-1 for undeclared
 # UTF-8; an undecodable capture refuses instead of producing mojibake.
-PARSER_VERSION = "1.1.0"
+# 1.2.0: <br> and nested blocks inside a captured paragraph become line breaks
+# instead of gluing words; <pre> keeps its whitespace; table and list
+# flattening, omitted subtrees with visible text, and content dropped outside
+# the selected <main>/<article> are diagnosed (post-20 defect D-12).
+PARSER_VERSION = "1.2.0"
 _PARSER = "html"
 _CHARSET_SNIFF_BYTES = 4096
 _META_CHARSET = re.compile(rb"<meta[^>]*?charset\s*=\s*[\"']?\s*([A-Za-z0-9_.:-]+)", re.I)
@@ -77,6 +81,56 @@ _HEADING_LEVEL = {
 }
 _PARAGRAPH_TAGS = frozenset({"p", "li", "blockquote", "pre", "td", "th"})
 _WS = re.compile(r"[ \t\f\v]+")
+_LINE_BREAK_TAGS = frozenset({"br"})
+_TABLE_TAGS = frozenset({"table"})
+_LIST_TAGS = frozenset({"ul", "ol", "dl"})
+
+
+def _captured_text(element, *, breaks: list[int]) -> str:
+    """Return the visible text of one captured block.
+
+    ``itertext()`` concatenates fragments with no separator, so ``a<br>b`` and
+    ``<li><p>x</p><p>y</p></li>`` became ``ab`` and ``xy``. Every ``<br>`` and
+    every nested block boundary now contributes one line break; ``breaks``
+    counts them so the fold can be diagnosed.
+    """
+    pieces: list[str] = []
+
+    def newline() -> None:
+        if pieces and not pieces[-1].endswith("\n"):
+            pieces.append("\n")
+            breaks[0] += 1
+
+    def walk(node) -> None:
+        for child in node:
+            if not isinstance(child.tag, str):
+                if child.tail:
+                    pieces.append(child.tail)
+                continue
+            name = child.tag.lower()
+            if name in _LINE_BREAK_TAGS:
+                newline()
+            elif name in _BLOCK_TAGS:
+                newline()
+                if child.text:
+                    pieces.append(child.text)
+                walk(child)
+                newline()
+            else:
+                if child.text:
+                    pieces.append(child.text)
+                walk(child)
+            if child.tail:
+                pieces.append(child.tail)
+
+    if element.text:
+        pieces.append(element.text)
+    walk(element)
+    return "".join(pieces)
+
+
+def _subtree_has_visible_text(element) -> bool:
+    return any(part.strip() for part in element.itertext())
 
 
 class _HtmlDecoding:
@@ -364,12 +418,17 @@ def parse_html_file(
         )
 
     omitted_tags: set[str] = set()
+    omitted_text_tags: set[str] = set()
     for tag in list(document_tree.iter()):
         if not isinstance(tag.tag, str):
             continue
         name = tag.tag.lower()
         if name in _STRIP_TAGS:
             omitted_tags.add(name)
+            if name not in {"script", "style", "template", "link", "meta"} and (
+                _subtree_has_visible_text(tag)
+            ):
+                omitted_text_tags.add(name)
             parent = tag.getparent()
             if parent is not None:
                 parent.remove(tag)
@@ -391,10 +450,19 @@ def parse_html_file(
     parts: list[str] = []
     pos = 0
 
-    def append_paragraph(text: str, *, level: int | None = None) -> None:
+    def append_paragraph(
+        text: str, *, level: int | None = None, preformatted: bool = False
+    ) -> None:
         nonlocal pos
-        cleaned = _WS.sub(" ", text).strip()
-        if not cleaned:
+        if preformatted:
+            # <pre> whitespace is content; only the HTML-insignificant leading
+            # newline and trailing newlines are removed.
+            cleaned = text.lstrip("\n").rstrip("\n")
+        else:
+            cleaned = "\n".join(
+                _WS.sub(" ", line).strip() for line in text.split("\n")
+            ).strip("\n")
+        if not cleaned.strip():
             return
         if parts:
             pos += 2
@@ -426,17 +494,29 @@ def parse_html_file(
         found = root.find(f".//{candidate}")
         if found is not None:
             scope = found
+            outside_text = "".join(root.itertext()).strip() != "".join(found.itertext()).strip()
             diagnostics.append(
                 {
                     "code": "html.main-content-selected",
-                    "severity": "info",
-                    "disposition": "normalized",
-                    "loss_kind": "presentation",
-                    "message": f"Main content was taken from the first <{candidate}> element.",
-                    "details": {"container": candidate},
+                    "severity": "warning" if outside_text else "info",
+                    "disposition": "omitted" if outside_text else "normalized",
+                    "loss_kind": "text" if outside_text else "presentation",
+                    "message": (
+                        f"Main content was taken from the first <{candidate}> element"
+                        + (
+                            "; visible text outside it was omitted."
+                            if outside_text
+                            else "."
+                        )
+                    ),
+                    "details": {"container": candidate, "omitted_text": outside_text},
                 }
             )
             break
+
+    flattened_tables = sum(1 for _ in scope.iter(*_TABLE_TAGS))
+    flattened_lists = sum(1 for _ in scope.iter(*_LIST_TAGS))
+    folded_breaks = [0]
 
     # Walk the scope in document order. Heading and paragraph tags are
     # captured whole via itertext without descending; every other text node
@@ -473,7 +553,10 @@ def parse_html_file(
             return False
         if name in _PARAGRAPH_TAGS:
             flush_loose()
-            append_paragraph("".join(element.itertext()))
+            append_paragraph(
+                _captured_text(element, breaks=folded_breaks),
+                preformatted=name == "pre",
+            )
             captured_structured = True
             return False
         if name in _BLOCK_TAGS:
@@ -506,6 +589,48 @@ def parse_html_file(
             loose_parts.append(child.tail)
     flush_loose()
 
+    if folded_breaks[0]:
+        diagnostics.append(
+            {
+                "code": "html.line-break-normalized",
+                "severity": "info",
+                "disposition": "normalized",
+                "loss_kind": "presentation",
+                "message": (
+                    f"{folded_breaks[0]} <br> or nested block boundary(ies) inside captured "
+                    "blocks became line breaks in the canonical stream."
+                ),
+                "details": {"count": folded_breaks[0]},
+            }
+        )
+    if flattened_tables:
+        diagnostics.append(
+            {
+                "code": "html.table-flattened",
+                "severity": "warning",
+                "disposition": "normalized",
+                "loss_kind": "structure",
+                "message": (
+                    f"{flattened_tables} table(s) were flattened to one paragraph per cell; "
+                    "row and column structure is not represented."
+                ),
+                "details": {"count": flattened_tables},
+            }
+        )
+    if flattened_lists:
+        diagnostics.append(
+            {
+                "code": "html.list-flattened",
+                "severity": "info",
+                "disposition": "normalized",
+                "loss_kind": "structure",
+                "message": (
+                    f"{flattened_lists} list(s) were flattened to one paragraph per item; "
+                    "nesting and ordering markers are not represented."
+                ),
+                "details": {"count": flattened_lists},
+            }
+        )
     if recovered_loose and not captured_structured:
         diagnostics.append(
             {
@@ -548,9 +673,9 @@ def parse_html_file(
                 parser_name=_PARSER,
                 parser_version=PARSER_VERSION,
                 code="html.non-content-tags-omitted",
-                severity="info",
+                severity="warning" if omitted_text_tags else "info",
                 disposition="omitted",
-                loss_kind="presentation",
+                loss_kind="text" if omitted_text_tags else "presentation",
                 location=DiagnosticLocation(
                     kind="text",
                     line_start=1,
@@ -562,7 +687,10 @@ def parse_html_file(
                     "Non-content HTML tags were omitted from the canonical stream: "
                     + ", ".join(sorted(omitted_tags))
                 ),
-                details={"tags": sorted(omitted_tags)},
+                details={
+                    "tags": sorted(omitted_tags),
+                    "tags_with_visible_text": sorted(omitted_text_tags),
+                },
             )
         )
     for item in diagnostics:

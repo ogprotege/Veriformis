@@ -31,7 +31,7 @@ def test_undeclared_utf8_is_decoded_exactly(tmp_path: Path) -> None:
     assert result.source.extracted_text == UNICODE_TEXT
     assert result.diagnostics.status == "complete"
     assert "html.charset-declared" not in _codes(result)
-    assert result.source.parser_version == PARSER_VERSION == "1.1.0"
+    assert result.source.parser_version == PARSER_VERSION == "1.2.0"
 
 
 def test_declared_latin1_is_decoded_with_a_diagnostic(tmp_path: Path) -> None:
